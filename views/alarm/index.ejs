@@ -1,0 +1,148 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        <%= __('Alarms') %>
+                        <small><%= __('Control Panel') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li class="active"><%= __('Alarms') %></li>
+                    </ol>
+                </section>
+
+                <!-- Main content -->
+                <section class="content">
+                         <div class="box-body table-responsive" data-ng-controller="AlarmCtrl as vm">
+
+                                    
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Name') %></th>
+                                                <th><%= __('Moment') %></th>
+                                                <th><%= __('Action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="alarm in vm.alarms" class="ng-cloak">
+                                                <td>{{alarm.name}}</td>
+                                                <td ng-show="alarm.recurring == -1" >{{alarm.moment}}</td>
+                                                <td ng-show="alarm.recurring != -1">{{alarm.moment}}, {{alarm.time}}</td>
+                                                <td><button ng-click="vm.destroyAlarm($index, alarm.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+
+                                                
+                                                <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>   
+
+
+                                        <!-- MODAL -->
+                                     <!-- Large modal -->
+                                    <div id="modalNewAlarm" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                           <div class="modal-header">
+                                                  <button type="button" class="close" data-dismiss="modal" aria-label="<%= __('Close') %>"><span aria-hidden="true">×</span></button>
+                                                  <h4 class="modal-title" id="myLargeModalLabel"><%= __('Set an alarm') %></h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                  
+                                                            <!-- DateTime Boostrap Picker -->
+
+                                                             <!-- NEW BOX -->
+                                                          <div class="box box-default">
+                                                          <div class="box-header with-border">
+                                                            <h3 class="box-title"><%= __('Pick a date') %></h3>
+                                                          </div>  
+                               
+                                                            <div class="box-body">
+                                                               <div class="row">
+                                                                    <div class='col-md-2'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newAlarm.name" placeholder="<%= __('Name') %>" />
+                                                                    </div>
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                            <div class='input-group date' id='datetimepicker2'>
+                                                                                <input type='text' class="form-control" id="NewAlarmDatetime" placeholder="<%= __('Date') %>" />
+                                                                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class='col-md-4'>
+                                                                        <button class="btn btn-success" ng-click="vm.createAlarm()"><%= __('New') %></button>
+                                                                      </div>
+                                                                </div>
+                                                            </div>
+                                                          </div>
+                                                            <!-- END OF BOX -->
+                                                         
+                                                           <!-- NEW BOX -->
+                                                          <div class="box box-default">
+                                                          <div class="box-header with-border">
+                                                            <h3 class="box-title"><%= __('Set a recurring alarm') %></h3>
+                                                          </div>  
+                               
+                                                            <div class="box-body">
+                                                               <div class="row">
+                                                                    <div class='col-md-2'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newAlarmReccuring.name" placeholder="<%= __('Name') %>" />
+                                                                    </div>
+                                                                    
+                                                                    <div class='col-md-2'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.recurring">
+                                                                                <option  selected value="1" ><%= __('Monday') %></option>
+                                                                                <option value="2"><%= __('Tuesday') %></option>
+                                                                                <option value="3"><%= __('Wednesday') %></option>
+                                                                                <option value="4"><%= __('Thursday') %></option>
+                                                                                <option value="5"><%= __('Friday') %></option>
+                                                                                <option value="6"><%= __('Saturday') %></option>
+                                                                                <option value="0"><%= __('Sunday') %></option>
+                                                                                
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="col-md-2">
+                                                                        <div class="form-group">
+                                                                            <div class='input-group date' id='datetimepicker3'>
+                                                                                <input type='text' class="form-control" id="NewAlarmTime" placeholder="<%= __('Time') %>" />
+                                                                                <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                     <div class='col-md-4'>
+                                                                         <button class="btn btn-success" ng-click="vm.createAlarmRecurring()"><%= __('New') %></button>
+                                                                      </div>
+                                                                   
+                                                                </div>
+                                                            <!-- End of DateTime Boostrap Picker -->
+                                                            
+                                                            </div>
+                                                          </div>
+                                                          <!-- END OF BOX -->
+                                                     
+                                             </div>
+                                      </div>
+                                    </div>
+                                    </div>
+                                    <!-- END OF MODAL -->
+                             
+
+                        </div>
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+
+    	    <script>
+                document.getElementById("alarmLi").className = "active";
+            </script>
+                
+            

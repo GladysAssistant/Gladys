@@ -1,0 +1,347 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        <%= __('Manage your scenarios') %>
+                        <small><%= __('Control Panel') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li class="active"><%= __('Scenario') %></li>
+                    </ol>
+                </section>
+
+                <!-- Main content -->
+                <section class="content" data-ng-controller="scenarioCtrl as vm" >
+                         <div class="box-body table-responsive" >
+
+                                    <h3><%= __('Scenarios') %></h3>
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Triggers') %></th>
+                                                <th><%= __('States') %></th>
+                                                <th><%= __('Actions') %></th>
+                                                <th><%= __('Action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+
+                                            <tr ng-repeat="scenario in vm.scenarios" class="ng-cloak" >
+                                                <td>
+                                                    <div ng-show="scenario.launcher.option">
+                                                       {{scenario.launcher.name}} "{{scenario.launcher.option.name}}"
+                                                    </div>
+                                                    <div ng-show="!scenario.launcher.option && scenario.parametre.length > 0">
+                                                        {{scenario.launcher.name}} {{scenario.operator}} {{scenario.parametre}}
+                                                    </div>
+                                                    
+                                                    <div ng-show="!scenario.launcher.option && scenario.parametre.length == 0">
+                                                        {{scenario.launcher.name}} "<%= __('All') %>"
+                                                    </div>
+                                                    
+                                                    
+                                                </td>
+                                                <td>
+                                                    <div ng-show="scenario.states.length == 0">
+                                                                <%= __('No states') %>
+                                                    </div>
+                                                            
+                                                    <table ng-show="scenario.states.length > 0" id="example2" class="table table-bordered table-hover">
+                                                        <thead>
+                                                            
+                                                        </thead>
+                                                        <tbody>
+                                                            
+                                                            <tr ng-repeat="state in scenario.states">
+                                                                <td>{{state.name}} {{state.operator}} {{state.parametre}}</td>
+                                                                <td><button ng-click="vm.destroyState($index, scenario.states, state.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                            </tr>
+                                                            <!--<tr>
+                                                                <td><button class="btn btn-success btn-sm" ng-click="createHouse()"><%= __('New') %></button></td>
+                                                            </tr>-->
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                                <td>
+                                                    <div ng-show="scenario.actions.length == 0">
+                                                        <%= __('No actions') %>
+                                                    </div>
+                                                    <table ng-show="scenario.actions.length > 0" id="example2" class="table table-bordered table-hover">
+                                                        <thead>
+                                                            
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="action in scenario.actions">
+                                                                <td>{{action.name}} {{action.parametre}}</td>
+                                                                <td><button ng-click="vm.destroyAction($index, scenario.actions, action.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                            </tr>
+                                                            <!--<tr>
+                                                                <td><input type="text" ng-model="newHouse.name" /></td>
+                                                                <td><button class="btn btn-success btn-sm" ng-click="createHouse()"><%= __('New') %></button></td>
+                                                            </tr>-->
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                                <td><button ng-click="vm.destroyLauncher($index, scenario.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                               
+                                                <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+
+
+                                
+
+                        </div>
+
+
+
+
+
+
+
+
+
+                <!-- MODAL -->
+                 <!-- Large modal -->
+                <div id="modalNewScenario" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                       <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                              <h4 class="modal-title" id="myLargeModalLabel"><%= __('Create a new Scenario') %></h4>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="row form-group">
+                                        <div class="col-xs-12">
+                                            <ul class="nav nav-pills nav-justified thumbnail setup-panel">
+                                                <li ng-class="{ 'active': vm.step == 1, 'disabled': vm.step != 1  }"><a href="#step-1" >
+                                                    <h4 class="list-group-item-heading"><%= __('Step') %> 1</h4>
+                                                    <p class="list-group-item-text"><%= __('Choose the trigger') %></p>
+                                                </a></li>
+                                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step == 1  }"><a href="#step-2" >
+                                                    <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
+                                                    <p class="list-group-item-text"><%= __('Add conditions') %></p>
+                                                </a></li>
+                                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step != 3  }"><a href="#step-3">
+                                                    <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
+                                                    <p class="list-group-item-text"><%= __('Choose Actions') %></p>
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+
+                                     <!-- STEP 1 -->
+                                    <div class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-12 well text-center">
+                                                <h1><%= __('Trigger') %></h1>
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <th><%= __('Name') %></th>
+                                                            <th><%= __('Description') %></th>
+                                                            <th><%= __('Select') %></th>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="launchertype in vm.launcherTypes">
+                                                                <td>{{launchertype.name}}</td>
+                                                                <td>{{launchertype.description}}</td>
+                                                                <td><input type="radio" name="optionsRadios" id="optionsRadios1" value="{{launchertype.id}}" ng-click="vm.selectLauncher($index, launchertype.id)"></td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+
+                                                <form class="form-inline">
+                                                  <div ng-show="!vm.selectedLauncher.optionspath" class="form-group">
+                                                    <input type="text" class="form-control"  disabled="disabled" value="{{vm.selectedLauncher.name}}" />
+                                                    <select  class="form-control" id="LauncherOperator" ng-model="vm.newLauncher.operator" >
+                                                        <option value="=="><%= __('equals') %></option>
+                                                        <option value="!=" ><%= __('different') %></option>
+                                                        <option value=">" ><%= __('strictly greater than') %></option>
+                                                        <option value="<" ><%= __('strictly lower than') %></option>
+                                                        <option value=">=" ><%= __('greater than') %></option>
+                                                        <option value="<=" ><%= __('lower than') %></option>
+                                                    </select>
+
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label class="sr-only" for="launcherparametre"><%= __('Parametre') %></label>
+                                                     <input ng-show="!vm.selectedLauncher.optionspath" id="launcherparametre" type="text" ng-model="vm.newLauncher.parametre" class="form-control" placeholder="<%= __('Parametre') %>">
+                                                    <select ng-show="vm.selectedLauncher.optionspath" ng-model="vm.newLauncher.parametre" class="form-control" >
+                                                        <option value="" selected="selected"><%= __('Always') %></option>
+                                                        <option ng-repeat="launcheroption in vm.launcherOptions" value="{{launcheroption.id}}">{{launcheroption.name}}</option>
+                                                </select>
+                                                  </div>
+                                                  
+                                                  <button type="submit" ng-click="vm.createLauncher()" class="btn btn-success"><%= __('Save Launcher') %></button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END OF STEP 1 -->
+
+
+
+                                    <!-- STEP 2 -->
+                                    <div class="row setup-content" id="step-2" ng-show="vm.step == 2">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-12 well text-center">
+                                                <h1 class="text-center"><%= __('Conditions') %></h1>
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <th><%= __('Name') %></th>
+                                                            <th><%= __('Description') %></th>
+                                                            <th><%= __('Select') %></th>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="statetype in vm.stateTypes">
+                                                                <td>{{statetype.name}}</td>
+                                                                <td>{{statetype.description}}</td>
+                                                                <td><input type="radio" name="stateChoice" id="stateChoice" value="{{statetype.id}}" ng-click="vm.selectState($index, statetype.id)"></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                <form class="form-inline">
+                                                  <div ng-show="!vm.selectedState.optionspath" class="form-group">
+                                                    <input type="text" class="form-control"  disabled="disabled" value="{{vm.selectedState.name}}" />
+                                                    <select  class="form-control" id="stateOperator" ng-model="vm.newState.operator" >
+                                                        <option value="=="><%= __('equals') %></option>
+                                                        <option value="!=" ><%= __('different') %></option>
+                                                        <option value=">" ><%= __('strictly greater than') %></option>
+                                                        <option value="<" ><%= __('strictly lower than') %></option>
+                                                        <option value=">=" ><%= __('greater than') %></option>
+                                                        <option value="<=" ><%= __('lower than') %></option>
+                                                    </select>
+
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label class="sr-only" for="launcherparametre"><%= __('Parametre') %></label>
+                                                     <input ng-show="!vm.selectedState.optionspath" id="launcherparametre" type="text" class="form-control" placeholder="<%= __('Parametre') %>" ng-model="vm.newState.parametre" />
+                                                    <!--<select ng-show="selectedlauncher.optionspath" ng-model="newLauncher.parametre" class="form-control" >
+                                                        <option value="" selected="selected"><%= __('Always') %></option>
+                                                        <option ng-repeat="launcheroption in launcheroptions" value="{{launcheroption.id}}">{{launcheroption.name}}</option>
+                                                </select>-->
+                                                  </div>
+                                                  
+                                                  <button type="submit" ng-click="vm.createState()" class="btn btn-success"><%= __('Save condition') %></button>
+
+                                                  <button type="submit" ng-click="vm.skipState()" class="btn btn-default"><%= __('Skip conditions') %></button>
+                                                </form>
+
+                                                <table class="table table-bordered table-hover" style="margin-top : 20px;">
+                                                       <!-- <thead>
+                                                            <th><%= __('Name') %></th>
+                                                            <th><%= __('Action') %></th>
+                                                        </thead>-->
+                                                        <tbody>
+                                                            <tr ng-repeat="savedstate in vm.savedStates">
+                                                                <td>{{savedstate.name}} {{savedstate.operator}} {{savedstate.parametre}} </td>
+                                                                <td><button ng-click="vm.destroyState($index, vm.savedStates, savedstate.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <!-- END OF STEP 2 -->
+
+
+
+
+
+
+
+                                     <!-- STEP 3 -->
+                                    <div class="row setup-content" id="step-3" ng-show="vm.step == 3">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-12 well text-center">
+                                                <h1 class="text-center"><%= __('Actions') %></h1>
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <th><%= __('Name') %></th>
+                                                            <th><%= __('Description') %></th>
+                                                            <th><%= __('Select') %></th>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="actiontype in vm.actionTypes">
+                                                                <td>{{actiontype.name}}</td>
+                                                                <td>{{actiontype.description}}</td>
+                                                                <td><input type="radio" name="actionChoice" id="actionChoice" value="{{actiontype.id}}" ng-click="vm.selectAction($index, actiontype.id)"></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                <form class="form-inline">
+                                                  <div ng-show="!vm.selectedAction.optionspath" class="form-group">
+                                                    <input type="text" class="form-control"  disabled="disabled" value="{{vm.selectedAction.name}}" />
+                                                  </div>
+                                                  <div class="form-group">
+                                                    
+                                                     <input ng-show="!vm.selectedAction.optionspath" id="actionparametre" type="text" class="form-control" ng-model="vm.newAction.parametre"  placeholder="<%= __('Parametre') %>">
+
+                                                    <select ng-show="vm.selectedAction.optionspath" ng-model="vm.newAction.parametre" class="form-control" >
+                                                        <option value="" selected="selected"><%= __('All') %></option>
+                                                        <option ng-repeat="actionoption in vm.actionOptions" value="{{actionoption.id}}">{{actionoption.name}}</option>
+                                                </select>
+                                                  </div>
+                                                  
+                                                  <button type="submit" ng-click="vm.createAction()" class="btn btn-success"><%= __('Save action') %></button>
+
+                                                  <button type="submit" ng-click="vm.finishScenario()" class="btn btn-default"><%= __('Next') %></button>
+                                                </form>
+
+                                                 <table class="table table-bordered table-hover" style="margin-top : 20px;">
+                                                       <!-- <thead>
+                                                            <th><%= __('Name') %></th>
+                                                            <th><%= __('Action') %></th>
+                                                        </thead>-->
+                                                        <tbody>
+                                                            <tr ng-repeat="savedaction in vm.savedActions">
+                                                                <td>{{savedaction.name}} {{savedaction.parametre}} </td>
+                                                                <td><button ng-click="vm.destroyAction($index,vm.savedActions,  savedaction.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END OF STEP 3 -->
+                               
+                         </div>
+                  </div>
+                </div>
+                </div>
+                <!-- END OF MODAL -->
+
+
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+
+
+            <script>
+                document.getElementById("scenarioLi").className = "active";
+            </script>
+
+            

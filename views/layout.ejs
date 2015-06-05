@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= pageName %> | <%= User.assistantName %></title>
+    <!-- Viewport mobile tag for sensible mobile support -->
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        
+    <!-- AUTO INJECTION OF CSS FILES -->
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles/ionicons.min.css">
+    <link rel="stylesheet" href="/styles/morris/morris.css">
+    <link rel="stylesheet" href="/styles/datepicker/datepicker3.css">
+    <link rel="stylesheet" href="/styles/angular-ui-notification/angular-ui-notification.min.css">
+    <link rel="stylesheet" href="/styles/AdminLTE.css">
+    <link rel="stylesheet" href="/styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/styles/scenariostep.css">
+    <link rel="stylesheet" href="/styles/weatherjs.css">
+    <link rel="stylesheet" href="/styles/sleep.css">
+    <!--STYLES END-->
+
+  </head>
+
+  <body class="skin-blue" ng-app="app"> 
+      
+        <header class="header">
+            <a href="#" class="logo">
+                <!-- Add the class icon to your logo image or logo icon to add the margining -->
+                <%= User.assistantName %>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-right">
+                    <ul class="nav navbar-nav">
+
+                       
+                        <!-- Notifications: style can be found in dropdown.less -->
+                        <li class="dropdown notifications-menu" data-ng-controller="NotificationCtrl as vm" >
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-warning"></i> 
+                                <span class="label label-info ng-cloak">{{ vm.notifications.length }}</span>
+                            </a>
+                            <ul class="dropdown-menu ng-cloak" >
+                                <li class="header"><%= __('You have') %> {{ vm.notifications.length }} <%= __('notification') %>{{ vm.notifications.length > 1 && 's' || ''}}</li>
+                                <li>
+                                    <!-- inner menu: contains the actual data -->
+                                    <ul class="menu">
+                                        <li ng-repeat="notification in vm.notifications" >
+                                            <a href="#">
+                                                <i class="{{notification.icon}} {{notification.iconColor}}"></i> {{notification.title}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="footer"><a href="/dashboard/me"><%= __('View all') %></a></li>
+                            </ul>
+                        </li>
+
+                        <!-- User Account: style can be found in dropdown.less -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="glyphicon glyphicon-user"></i>
+                                <span><%= User.firstname + ' ' + User.lastname %> <i class="caret"></i></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                               
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    
+                                    <div class="pull-left">
+                                        <a href="/lock" class="btn btn-default btn-flat"><%= __('Lock') %></a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="/session/destroy" class="btn btn-default btn-flat"><%= __('Sign out') %></a>
+                                    </div>
+                                </li>
+                                
+                            </ul>
+                        </li>
+                       
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="wrapper row-offcanvas row-offcanvas-left">
+            <!-- Left side column. contains the logo and sidebar -->
+            <aside class="left-side sidebar-offcanvas">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- Sidebar user panel -->
+                    <div class="user-panel">
+                        <div class="pull-left image">
+                            <img src="/img/avatar3.png" class="img-circle" alt="User Image" />
+                        </div>
+                        <div class="pull-left info">
+                            <p><%= __('Hello') %> <%= User.firstname %> !</p>
+
+                            <a href="#"><i class="fa fa-circle text-success"></i> <%= __('Online') %></a>
+                        </div>
+                    </div>
+                    <!-- search form -->
+                    <form action="#" method="get" class="sidebar-form">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search..."/>
+                            <span class="input-group-btn">
+                                <button type='submit' name='seach' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>
+                    <!-- /.search form -->
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu">
+                        <li id="homeLi" >
+                            <a href="/dashboard">
+                                <i class="fa fa-dashboard"></i> <span><%= __('Home') %></span>
+                            </a>
+                        </li>
+                        <li id="meLi"  >
+                            <a href="/dashboard/me">
+                                <i class="fa fa-user"></i> <span><%= __('Me') %></span> <!--<small class="badge pull-right bg-green">new</small>-->
+                            </a>
+                        </li>
+                        <li id="houseLi" >
+                            <a href="/dashboard/house">
+                                <i class="fa fa-home"></i>
+                                <span><%= __('My Rooms') %></span>
+                            </a>
+                        </li>
+                        <li id="alarmLi" class="treeview">
+                            <a href="/dashboard/alarm"> 
+                                <i class="fa fa-clock-o"></i>
+                                <span><%= __('Alarms') %></span>
+                            </a>
+                        </li>
+                        <li id="scenarioLi" class="treeview">
+                            <a href="/dashboard/scenario">
+                                <i class="fa fa-edit"></i> <span><%= __('Scenarios') %></span>
+                            </a>
+                        </li>
+                        <li id="sensorLi" class="treeview">
+                            <a href="/dashboard/sensor">
+                                <i class="fa fa-rss"></i> <span><%= __('Sensors') %></span>
+                            </a>
+                        </li>
+                        <li id="scriptLi" >
+                            <a href="/dashboard/script">
+                                <i class="fa fa-file-text-o"></i> <span><%= __('Scripts') %></span>
+                            </a>
+                        </li>
+                        <li id="roomLi" class="treeview">
+                            <a href="/dashboard/room">
+                                <i class="fa fa-bed"></i> <span><%= __('Permissions') %></span>
+                            </a>
+                        </li>
+                        <li id="parametreLi" class="treeview">
+                            <a href="/dashboard/parametres">
+                                <i class="fa fa-gear"></i> <span><%= __('Parametres') %></span>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+
+         <!-- Include the view file for the current controller/route -->
+         <%- body %>
+
+        <!-- Location Controller -->
+            <div data-ng-controller="geoLocationCtrl as vm" ></div>
+        <!-- End of Location Controller -->
+
+
+
+        </div><!-- ./wrapper -->
+
+
+   
+
+
+    <!--
+
+      Client-side Javascript
+      ========================
+
+      You can import any js files in your `assets` directory as you would 
+      normally: using <script></script> tags.
+
+      Here's an example of importing a few dependencies, in order:
+    -->
+    <!-- Bring in the socket.io client -->
+    <!--<script type="text/javascript" src="/js/socket.io.js"></script>-->
+    <!-- then beef it up with some convenience logic for talking to Sails.js -->
+    
+    <!-- listen on socket.io for incoming messages -->
+    <!--<script type="text/javascript" src="/js/app.js"></script>-->
+
+
+
+    <!-- Your scripts here? -->
+    
+    <!--SCRIPTS-->
+    <script src="/js/dependencies/sails.io.js"></script>
+    <script src="/js/dependencies/angular.min.js"></script>
+    <script src="/js/dependencies/angular-route.min.js"></script>
+    <script src="/js/dependencies/jquery.min.js"></script>
+    <script src="/js/dependencies/bootstrap.min.js"></script>
+    <script src="/js/dependencies/raphael-min.js"></script>
+    <script src="/js/dependencies/morris.min.js"></script>
+    <script src="/js/dependencies/moment-with-locales.js"></script>
+    <script src="/js/dependencies/ace/ace.js"></script>
+    <script src="/js/dependencies/jquery.simpleWeather.min.js"></script>
+    <script src="/js/dependencies/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/dependencies/datepicker/bootstrap-datepicker.js"></script>
+    <script src="/js/ng-device-detector/ng-device-detector.min.js"></script>
+    <script src="/js/ng-infinite-scroll/ng-infinite-scroll.js"></script>
+    <script src="/js/angular-moment/angular-moment.min.js"></script>
+    <script src="/js/angular-ui-notification/angular-ui-notification.min.js"></script>
+    <script src="/js/smooth-scroll/angular-smooth-scroll.min.js"></script>
+    <script src="/js/app/app.module.js"></script>
+    <script src="/js/app/app.run.js"></script>
+    <script src="/js/app/alarm/alarm.controller.js"></script>
+    <script src="/js/app/alarm/alarm.service.js"></script>
+    <script src="/js/app/calendar/calendar.controller.js"></script>
+    <script src="/js/app/calendar/calendar.service.js"></script>
+    <script src="/js/app/geolocation/geolocation.controller.js"></script>
+    <script src="/js/app/geolocation/geolocation.service.js"></script>
+    <script src="/js/app/global/language.service.js"></script>
+    <script src="/js/app/googleapi/googleapi.controller.js"></script>
+    <script src="/js/app/googleapi/googleapi.service.js"></script>
+    <script src="/js/app/house/house.controller.js"></script>
+    <script src="/js/app/house/house.service.js"></script>
+    <script src="/js/app/installation/installation.controller.js"></script>
+    <script src="/js/app/installation/installation.service.js"></script>
+    <script src="/js/app/lifeevent/lifeevent.controller.js"></script>
+    <script src="/js/app/lifeevent/lifeevent.service.js"></script>
+    <script src="/js/app/machine/machine.controller.js"></script>
+    <script src="/js/app/machine/machine.service.js"></script>
+    <script src="/js/app/maps/maps.controller.js"></script>
+    <script src="/js/app/maps/maps.service.js"></script>
+    <script src="/js/app/milight/milight.controller.js"></script>
+    <script src="/js/app/milight/milight.service.js"></script>
+    <script src="/js/app/notification/notification.controller.js"></script>
+    <script src="/js/app/notification/notification.service.js"></script>
+    <script src="/js/app/now/now.controller.js"></script>
+    <script src="/js/app/pushbullet/pushbullet.controller.js"></script>
+    <script src="/js/app/pushbullet/pushbullet.service.js"></script>
+    <script src="/js/app/room/room.controller.js"></script>
+    <script src="/js/app/room/room.service.js"></script>
+    <script src="/js/app/scenario/scenario.controller.js"></script>
+    <script src="/js/app/scenario/scenario.service.js"></script>
+    <script src="/js/app/script/script.controller.js"></script>
+    <script src="/js/app/script/script.service.js"></script>
+    <script src="/js/app/sensor/sensor.controller.js"></script>
+    <script src="/js/app/sensor/sensor.service.js"></script>
+    <script src="/js/app/sleep/sleep.controller.js"></script>
+    <script src="/js/app/sleep/sleep.service.js"></script>
+    <script src="/js/app/socket/socket.service.js"></script>
+    <script src="/js/app/sound/sound.service.js"></script>
+    <script src="/js/app/token/token.controller.js"></script>
+    <script src="/js/app/token/token.service.js"></script>
+    <script src="/js/app/user/user.service.js"></script>
+    <script src="/js/app/weather/weather.controller.js"></script>
+    <script src="/js/AdminLTE/app.js"></script>
+    <!--SCRIPTS END-->
+    
+
+    <!--
+
+      Looking for client-side CoffeeScript or TypeScript?
+      ================================================
+
+      CoffeeScript and TypeScript precompilation are not installed by default,
+      but if you'd like to mix those features in, it is straightforward to
+      `npm install` the relevant grunt community modules and modify your Gruntfile
+      to use them.
+
+    -->
+
+
+
+    <!--
+
+      Another way: The Asset Linker
+      ========================
+
+      Sails supports a Grunt-based asset linker, to automatically inject 
+      <link> and <script> tags, as well any client-side templates you're using
+      into your HTML layouts and views, respecting dependencies.
+
+      You created this Sails app with the asset linker disabled.
+      If you change your mind, check out the docs on the subject:
+      http://sailsjs.org/#!documentation/asset-management
+
+    -->
+
+    </body>
+</html>

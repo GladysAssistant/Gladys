@@ -1,0 +1,23 @@
+{
+  "Welcome": "Welcome",
+  "in-case-problem-check-forum": "If you have some troubles, you can check Gladys forum",
+  "welcome-sentence-installation": "Welcome in the installation page of Gladys !",
+  "before-installing-sentence-installation": "Before installating Gladys, be sure that you have followed the configuration step on Gladys project website.",
+  "congrat-gladys-well-installed":"Congratulation ! Gladys is well installed.",
+  "thank-you-for-installing-gladys": "Thank you very much for installing Gladys",
+  "gladys-only-work":"Gladys is free, and only work because people use it. If you want developers to join the project, you can use the Twitter share button to help the project. Thank you :)",
+  "here-you-can-register-machine":"Here you can register the machine who are running Gladys. Useful if you have multiple Gladys instance ( on a server and on a Raspberry for example ).",
+  "the-master-field-machine":"The Master field indicate that the machine is the master of your installation.",
+  "the-me-field-machine":"The \"Me\" field indicate that the machine you are registering is the machine where your are actually connected to ! (on this interface).",
+  "pagename-homepage":"Home",
+  "pagename-parametres":"Parametres",
+  "pagename-scenario":"Scenario",
+  "pagename-house":"House",
+  "pagename-room":"Permissions",
+  "pagename-script":"Scripts",
+  "pagename-installation":"Installation",
+  "pagename-sensor":"Sensors",
+  "pagename-alarm":"Alarm",
+  "pagename-me":"Me",
+  "pagename-music":"Music"
+}

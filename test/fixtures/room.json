@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Salon",
+    "house": "1",
+    "permission" : 1
+  },
+  {
+    "name": "Cuisine",
+    "house": 1,
+    "permission" : 1
+  },
+  {
+    "name": "Chambre parents",
+    "house": 1,
+    "permission" : 1
+  },
+  {
+    "name": "Salon",
+    "house": 2,
+    "permission" : 1
+  },
+  {
+    "name": "Chambre parents",
+    "house": 2,
+    "permission" : 1
+  }
+]

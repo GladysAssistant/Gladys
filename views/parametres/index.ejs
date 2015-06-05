@@ -1,0 +1,225 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        <%= __('Parametres') %>
+                        <small><%= __('Control Panel') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                        <li class="active">Dashboard</li>
+                    </ol>
+                </section>
+
+                <!-- Main content -->
+                <section class="content">
+                    
+                  <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('Gladys API tokens') %></h3>
+                  </div>
+                         <div class="box-body table-responsive" data-ng-controller="tokenCtrl as vm">
+    	                           
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Name') %></th>
+                                                <th><%= __('Token') %></th>
+                                                <th><%= __('Active') %></th>
+                                                <th><%= __('Delete') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="token in vm.tokens" class="ng-cloak">
+                                                <td>{{token.name}}</td>
+                                                <td>{{token.value}}</td>
+                                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn {{ token.status && 'btn-success' || 'btn-danger' }} btn-sm">{{token.status && 'On' || 'Off' }}</button></td>
+                                                <td><button ng-click="vm.destroyToken($index, token.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="text" ng-model="vm.newTokenName" class="form-control" placeholder="<%= __('Name') %>"/></td>
+                                                <td><button class="btn btn-success btn-sm" ng-click="vm.createToken()"><%= __('New') %></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                      </div>
+                      <!-- END OF BOX -->
+                       
+                       
+                   <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('Google accounts') %></h3>
+                  </div>
+                      <div class="box-body table-responsive" data-ng-controller="googleApiCtrl as vm" >
+    	                           
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Email') %></th>
+                                                <th><%= __('Delete') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="googleApi in vm.googleApis" class="ng-cloak">
+                                                <td>{{googleApi.email}}</td>
+                                                <td><button ng-click="vm.destroyGoogleApi($index, googleApi.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                <td><a href="/googleapi/auth"><button class="btn btn-success btn-sm" ><%= __('Connect new account') %></button></a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                     </div>
+                  <!-- END OF BOX Google Accounts -->
+                  
+                  
+                      <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('Synchronized Google calendars') %></h3>
+                  </div>  
+                      <div class="box-body table-responsive" data-ng-controller="googleApiCtrl as vm" >
+    	                           
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Summary') %></th>
+                                                <th><%= __('Description') %></th>
+                                                <th><%= __('Active') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="calendar in vm.calendarList" class="ng-cloak">
+                                                <td>{{calendar.summary}}</td>
+                                                <td>{{calendar.description}}</td>
+                                                <td><button ng-click="vm.switchStatusCalendar($index, calendar.id)"class="btn {{ calendar.active && 'btn-success' || 'btn-danger' }} btn-sm">{{calendar.active && 'On' || 'Off' }}</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="alert alert-danger ng-cloak" ng-show="vm.syncingError" ng-model="vm.syncingError"></div>
+                                                    <button ng-click="vm.syncCalendars()" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>  <span class="ng-cloak" ng-show="vm.syncing"><%= __('Syncing in progress...') %></span> <span ng-show="!vm.syncing"><%= __('Sync all calendars') %></span></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                        
+                        </div>
+                  <!-- END OF BOX Google Calendar -->
+                  
+                   <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('PushBullets tokens') %></h3>
+                  </div>  
+                      <div class="box-body table-responsive" data-ng-controller="pushBulletCtrl as vm" >
+    	                           
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Token') %></th>
+                                                <th><%= __('Delete') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="param in vm.pushBulletParametres" class="ng-cloak">
+                                                <td>{{param.token}}</td>
+                                                <td><button ng-click="vm.destroyParametre($index, param.id)" class="btn btn-danger btn-sm" ><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="text" class="form-control" ng-model="vm.newParametre.token" placeholder="<%= __('Token') %>" />
+                                                </td>
+                                                <td>
+                                                    <button ng-click="vm.createParametre()" class="btn btn-success btn-sm"><%= __('Connect new account') %></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                  </div>
+                  <!-- END OF PUSHBULLET BOX -->
+                  
+                      <!-- MACHINE BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('Gladys Machines') %></h3>
+                  </div>  
+                       
+                      <div class="box-body table-responsive" data-ng-controller="machineCtrl as vm" >
+    	                            <p><%= __('here-you-can-register-machine') %> 
+                                        <%= __('the-master-field-machine') %> 
+                                        <%= __('the-me-field-machine') %></p>
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Name') %></th>
+                                                <th><%= __('House') %></th>
+                                                <th><%= __('IP') %></th>
+                                                <th><%= __('Master') %></th>
+                                                <th><%= __('Me') %></th>
+                                                <th><%= __('Delete') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="machine in vm.machines" class="ng-cloak">
+                                                <td>{{machine.name}}</td>
+                                                <td>{{machine.house}}</td>
+                                                <td>{{machine.ip}}</td>
+                                                <td><div ng-show="machine.master"><%= __('Yes') %></div><div ng-show="!machine.master"><%= __('No') %></div></td>
+                                                <td><div ng-show="machine.me"><%= __('Yes') %></div><div ng-show="!machine.me"><%= __('No') %></div></td>
+                                                <td><button ng-click="vm.destroyMachine($index, machine.id)" class="btn btn-danger btn-sm" ><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" />
+                                                </td>
+                                                 <td><select ng-model="vm.newMachine.house" class="form-control" >
+                                                        <option ng-repeat="relation in vm.relations" value="{{relation.house.id}}">{{relation.house.name}}</option>
+                                                </select>
+                                                </td>
+                                                 <td>
+                                                    <input type="text" class="form-control" ng-model="vm.newMachine.ip" placeholder="<%= __('IP') %>" />
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm" ng-show="vm.newMachine.master" ng-click="vm.newMachine.master = false" ><%= __('Yes') %></button>
+                                                    <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.master" ng-click="vm.newMachine.master = true" ><%= __('No') %></button>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm" ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
+                                                    <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.me" ng-click="vm.newMachine.me = true" ><%= __('No') %></button>
+                                                </td>
+                                                <td>
+                                                    <button ng-click="vm.createMachine()" class="btn btn-success btn-sm"><%= __('Register machine') %></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                  </div>
+                  <!-- END OF MACHINE BOX -->
+                        
+                      
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+            
+            <script>
+                document.getElementById("parametreLi").className = "active";
+            </script>
+
+            

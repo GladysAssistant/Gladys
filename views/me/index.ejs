@@ -1,0 +1,141 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        <%= __('Me') %>
+                        <small><%= __('My timeline') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li class="active"><%= __('Me') %></li>
+                    </ol>
+                </section>
+
+
+                <section class="content" data-ng-controller="LifeEventCtrl as vm">
+
+                    <!-- row -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- The time line -->
+                            <ul class="timeline ng-cloak" > 
+                                 
+                                <!-- timeline time label -->
+                                <li class="time-label" ng-show="vm.nextEvents.length > 0">
+                                    <span class="bg-red">
+                                        {{vm.nextEvents[0].start | amDateFormat:'DD MMM. YYYY'}}
+                                    </span>
+                                </li>
+                                <!-- /.timeline-label -->
+                                <!-- timeline item -->
+                                <li ng-show="vm.nextEvents.length > 0">
+                                    <i class="fa fa-location-arrow bg-blue"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="vm.nextEvents[0].start"></span></span>
+                                        <h3 class="timeline-header"><a href="#">{{vm.nextEvents[0].summary }}</a></h3>
+                                        <div class="timeline-body">
+                                               <p> <%= __('You need to be in') %> 
+                                               {{vm.nextEvents[0].start | amDifference : null : 'minutes' }} <%= __('minutes') %>
+                                                    
+                                                    <%= __('at') %> {{vm.nextEvents[0].location }}.</p>
+                                                    
+                                               <p>{{vm.nextEvents[0].sentence}} ( <%= __('Arrival') %>  <span am-time-ago="vm.nextEvents[0].arrivalTime"></span> )</p> 
+                                        </div>
+                                        <!--
+                                        <div class="timeline-footer">
+                                            <a class="btn btn-primary btn-xs"  data-toggle="modal" data-target="#myModal" >Préviens mes collaborateurs</a>
+                                            <a class="btn btn-danger btn-xs">Annule la réunion</a>
+                                        </div>-->
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                
+                                
+                                <!-- timeline time label -->
+                                <li class="time-label" ng-show="vm.nextEvents.length == 0">
+                                    <span class="bg-red">
+                                       {{vm.now | amDateFormat:'DD MMM. YYYY'}}
+                                    </span>
+                                </li>
+                                <!-- /.timeline-label -->
+                                
+                                <!-- timeline item -->
+                                
+                                <li infinite-scroll="vm.addMoreLifeEvents()" ng-repeat="lifeevent in vm.lifeevents" class="ng-cloak">
+                                    <i class="{{lifeevent.FaIcon}} {{lifeevent.iconColor}}"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="lifeevent.datetime"></span></span>
+                                        <h3 class="timeline-header" ng-class="{ 'no-border': !lifeevent.sentence }"><a href="#">{{lifeevent.BeautifulName }}</a></h3>
+                                        <div class="timeline-body " ng-show="lifeevent.sentence.length > 0" >
+                                                {{ lifeevent.sentence }}
+                                        </div>
+                                        <div class="timeline-footer" ng-show="lifeevent.sentence.length > 0">
+                                            
+                                        </div>
+                                    </div>
+                                </li>
+                                
+                                <!-- END timeline item -->
+                                <!-- timeline item -->
+                                <!--<li>
+                                    <i class="fa fa-user bg-aqua"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> 7:46</span>
+                                        <h3 class="timeline-header no-border"><a href="#">Vous</a> avez quitté la maison.</h3>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                <!-- timeline item -->
+                                <!--<li>
+                                    <i class="fa fa-clock-o bg-yellow"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> 7:00</span>
+                                        <h3 class="timeline-header"><a href="#">Réveil</a></h3>
+                                        <div class="timeline-body">
+                                            Vous avez dormi 6h32 cette nuit, selon les recommandations de sommeil pour votre âge, vous n'avez pas assez dormi ! 
+                                            <br />Je vous conseille de vous coucher à 22h ce soir pour rattraper votre sommeil.
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                <!-- timeline time label -->
+                               <!-- <li class="time-label">
+                                    <span class="bg-green">
+                                        29 Jan. 2015
+                                    </span>
+                                </li>
+                                <!-- /.timeline-label -->
+                                 <!-- timeline item -->
+                               <!-- <li>
+                                    <i class="fa fa-warning bg-red"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> 17:12</span>
+                                        <h3 class="timeline-header no-border">Un mouvement a été détecté dans le salon (Maison principale).</h3>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                 <!-- timeline item -->
+                               <!-- <li>
+                                    <i class="fa fa-music bg-aqua"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> 10:22</span>
+                                        <h3 class="timeline-header no-border"><a href="#">Vous</a> avez lancé votre playlist "Relaxation".</h3>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                <li>
+                                    <i class="fa fa-clock-o"></i>
+                                </li>
+                            </ul>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+
+                </section>
+
+
+            </aside><!-- /.right-side -->
+
+            <script>
+                document.getElementById("meLi").className = "active";
+            </script>

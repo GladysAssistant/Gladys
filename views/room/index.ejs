@@ -1,0 +1,111 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        <%= __('Permissions') %>
+                        <small><%= __('Control Panel') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li class="active"><%= __('Permissions') %></li>
+                    </ol>
+                </section>
+
+                <!-- Main content -->
+                <section class="content" data-ng-controller="roomCtrl as vm">
+                    
+                    
+                      <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('User House Relations') %></h3>
+                  </div>  
+                         <div class="box-body table-responsive" >
+ 
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('House') %></th>
+                                                <th><%= __('User') %></th>
+                                                <th><%= __('Relation') %></th>
+                                                <th><%= __('Action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="userhouserelation in vm.userHouseRelations" class="ng-cloak">
+                                                <td>{{userhouserelation.houseName}}</td>
+                                                <td>{{userhouserelation.userName}}</td>
+                                                <td>{{vm.userHouseRelationTypes[userhouserelation.userhouserelationtype-1].name}}</td>
+                                                <td><button ng-click="vm.destroyRelation($index, userhouserelation.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr class="ng-cloak">
+                                                <td><select ng-model="vm.newRelation.house" class="form-control" >
+                                                        <option ng-repeat="house in vm.houses" value="{{house.house.id}}">{{house.house.name}}</option>
+                                                </select>
+                                                </td>
+                                                <td><select ng-model="vm.newRelation.user" class="form-control" >
+                                                        <option ng-repeat="user in vm.users" value="{{user.id}}">{{user.firstname}} {{user.lastname}}</option>
+                                                </select>
+                                                </td>
+                                                <td><select ng-model="vm.newRelation.relation" class="form-control" >
+                                                        <option ng-repeat="userhouserelationtype in vm.userHouseRelationTypes" value="{{userhouserelationtype.id}}">{{userhouserelationtype.name}}</option>
+                                                </select>
+                                                </td>
+                                                <td><button class="btn btn-success btn-sm" ng-click="vm.addRelation()"><%= __('New') %></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                             </div>
+                  </div>
+                  <!-- END OF BOX -->
+
+
+                        
+                      <!-- NEW BOX -->
+                  <div class="box box-default">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('Define user\'s sleep room') %></h3>
+                  </div>  
+    	                        <div class="box-body table-responsive" >
+                                     <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('Room') %></th>
+                                                <th><%= __('User') %></th>
+                                                <th><%= __('Action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="sleepin in vm.sleepIn" class="ng-cloak">
+                                                <td>{{sleepin.roomName}}</td>
+                                                <td>{{sleepin.userName}}</td>
+                                                <td><button ng-click="vm.destroySleepin($index, sleepin.roomId, sleepin.userId)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr class="ng-cloak">
+                                                <td><select ng-model="vm.newSleepIn.room" class="form-control" >
+                                                        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+                                                </select>
+                                                </td>
+                                                <td><select ng-model="vm.newSleepIn.user" class="form-control" >
+                                                        <option ng-repeat="user in vm.users" value="{{user.id}}">{{user.firstname}} {{user.lastname}}</option>
+                                                </select>
+                                                </td>
+                                                
+                                                <td><button class="btn btn-success btn-sm" ng-click="vm.defineSleepIn()"><%= __('New') %></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>
+                  </div>
+                  <!-- END OF BOX -->
+                  
+                  
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+
+            <script>
+                document.getElementById("roomLi").className = "active";
+            </script>

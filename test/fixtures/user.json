@@ -1,0 +1,22 @@
+[
+  {
+    "firstname": "Tony",
+    "lastname": "Stark",
+    "password" : "test",
+    "confirmation" : "test",
+    "email": "tony.stark@starkindustry.com",
+    "birthdate":"10/10/1960",
+    "gender" : 1,
+    "language":"FR"
+  },
+  {
+    "firstname": "Pepper",
+    "lastname": "Pots",
+    "password" : "test",
+    "confirmation" : "test",
+    "email": "pepper.pots@starkindustry.com",
+    "birthdate":"02/01/1970",
+    "gender" : 0,
+    "language":"FR"
+  }
+]

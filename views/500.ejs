@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+
+
+555555555555555555      000000000          000000000
+5::::::::::::::::5    00:::::::::00      00:::::::::00
+5::::::::::::::::5  00:::::::::::::00  00:::::::::::::00
+5:::::555555555555 0:::::::000:::::::00:::::::000:::::::0
+5:::::5            0::::::0   0::::::00::::::0   0::::::0
+5:::::5            0:::::0     0:::::00:::::0     0:::::0
+5:::::5555555555   0:::::0     0:::::00:::::0     0:::::0
+5:::::::::::::::5  0:::::0 000 0:::::00:::::0 000 0:::::0
+555555555555:::::5 0:::::0 000 0:::::00:::::0 000 0:::::0
+            5:::::50:::::0     0:::::00:::::0     0:::::0
+            5:::::50:::::0     0:::::00:::::0     0:::::0
+5555555     5:::::50::::::0   0::::::00::::::0   0::::::0
+5::::::55555::::::50:::::::000:::::::00:::::::000:::::::0
+ 55:::::::::::::55  00:::::::::::::00  00:::::::::::::00
+   55:::::::::55      00:::::::::00      00:::::::::00
+     555555555          000000000          000000000
+
+
+
+  This is the default "500: Server Error" page.
+  User agents that don't "Accept" HTML will see a JSON version instead.
+  You can customize the control logic for your needs in `config/500.js`
+
+  Sails considers a request in a "500: Server Error" state when
+  your app throws a catchable error (not inside of an asynchronous callback).
+
+  You can also trigger this response from one of your controllers or policies with:
+  `return res.serverError( e );`
+  (where `e` is an optional message, error, or array of errors to include in the response)
+
+-->
+<html>
+  <head>
+    <title><%= __('Server Error') %></title>
+      <!-- Bootstrap Core CSS -->
+    <link href="/styles/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="/styles/AdminLTE.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+    <div class="content-wrapper" style="min-height: 1066px;">
+      
+        <!-- Main content -->
+        <section class="content">
+
+          <div class="error-page">
+            <h2 class="headline text-red">500</h2>
+            <div class="error-content">
+              <h3><i class="fa fa-warning text-red"></i> <%= __('Oops! Something went wrong.') %></h3>
+              <p>
+                <%= __('We will work on fixing that right away.') %>
+               <%= __('Meanwhile, you may') %>  <a href="/dashboard"><%= __('return to dashboard') %></a>.
+              </p>
+            </div>
+          </div><!-- /.error-page -->
+
+        </section><!-- /.content -->
+      </div>
+  </body>
+</html>

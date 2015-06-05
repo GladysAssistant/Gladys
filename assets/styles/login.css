@@ -1,0 +1,14 @@
+html { 
+    margin:0;
+    padding:0;
+    background: url(/img/splitshirelight.jpg) no-repeat center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-color: transparent;
+}
+
+body{
+	background-color: transparent; 
+}
