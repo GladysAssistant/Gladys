@@ -11,7 +11,7 @@ Gladys is an home automation assistant to help you in your everyday life.
 
 Yes, like a kind of JARVIS!
 
-When you see this kind of project, you say "Uhh, I'm sure this don't work, it's based on speech recognition, even Siri isn't capable of being JARVIS". But the goal of Gladys project is **completely different**. We believe that speech recognition is not working fine today, so we've tried a different approach : If instead of having an assistant waiting for your orders, we have an assistant analyzing all your environment ( analyzing your calendar, reading your emails ) and **predicting your needs**. Because in fact, with all the APIs which exists, we can gather all the information we want to optimize our life.
+When you see this kind of project, you say "Uhh, I'm sure this doesn't work, it's based on speech recognition, even Siri isn't capable of being JARVIS". But the goal of Gladys project is **completely different**. We believe that speech recognition is not working fine today, so we've tried a different approach : If instead of having an assistant waiting for your orders, we have an assistant analyzing all your environment ( analyzing your calendar, reading your emails ) and **predicting your needs**. Because in fact, with all the APIs which exists, we can gather all the information we want to optimize our life.
 
 With this system, it's not the user who ask something to his assistant : it's the assistant which tells informations to the user, **at the right moment**.
 
