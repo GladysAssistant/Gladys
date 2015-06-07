@@ -128,7 +128,7 @@ module.exports = {
 	 */
 	scheduleAllAlarms: function(){
 
-		var request = "SELECT * FROM Alarm ";
+		var request = "SELECT * FROM alarm ";
 		request+= " WHERE (status = 1) ";
 		request+= " AND ( (recurring = -1 AND datetime > SYSDATE() ) OR recurring <> -1 ) ";
 		Alarm.query(request, function(err, Alarms ){
