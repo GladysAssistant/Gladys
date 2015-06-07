@@ -45,7 +45,6 @@ sudo npm install -g node-gyp
 sudo npm install -g sails
 sudo npm install -g forever
 
-
 #Cloning Gladys into "gladys" directory
 git clone https://github.com/GladysProject/Gladys.git gladys
 cd gladys
@@ -53,3 +52,11 @@ cd gladys
 # Installing dependencies
 sudo npm install --unsafe-perm
 
+#Create Gladys service that will start when system start
+sudo cp rpi-installation-scripts/gladys /etc/init.d/gladys
+sudo chmod a+x /etc/init.d/gladys
+sudo chmod a+x /home/pi/gladys/rpi-installation-scripts/startup-gladys.sh
+sudo chmod a+x /home/pi/gladys/rpi-installation-scripts/shutdown-gladys.sh
+
+# Gladys must start AFTER MySQL and stop BEFORE MySQL
+sudo update-rc.d gladys start 20 2 . stop 17 6 .

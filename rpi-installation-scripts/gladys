@@ -1,0 +1,50 @@
+#!/bin/sh
+# Service Name
+SERVICE_NAME=Gladys
+# Directory where executable are
+SERVICE_DIRECTORY=/home/pi/gladys/rpi-installation-scripts
+# Name of the startup script
+SERVICE_STARTUP_SCRIPT=startup-gladys.sh
+# le nom du script d'arrêt du service
+SERVICE_SHUTDOWN_SCRIPT=shutdown-gladys.sh
+
+usage()
+{
+        echo "-----------------------"
+        echo "Usage: $0 (stop|start|restart)"
+        echo "-----------------------"
+}
+if [ -z $1 ]; then
+        usage
+fi
+service_start()
+{
+        echo "Starting service '${SERVICE_NAME}'..."
+        OWD=`pwd`
+        cd ${SERVICE_DIRECTORY} && ./${SERVICE_STARTUP_SCRIPT}
+        cd $OWD
+        echo "Service '${SERVICE_NAME}' started successfully"
+}
+service_stop()
+{
+        echo "Stopping service '${SERVICE_NAME}'..."
+        OWD=`pwd`
+        cd ${SERVICE_DIRECTORY} && ./${SERVICE_SHUTDOWN_SCRIPT}
+        cd $OWD
+        echo "Service '${SERVICE_NAME}' stopped"
+}
+case $1 in
+     stop)
+       	service_stop
+     ;;
+     start)
+       	service_start
+     ;;
+     restart)
+        service_stop
+        service_start
+     ;;
+     *)
+     usage
+esac
+exit 0

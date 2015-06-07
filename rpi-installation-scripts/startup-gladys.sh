@@ -1,0 +1,1 @@
+forever start /home/pi/gladys/app.js
