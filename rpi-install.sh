@@ -10,9 +10,8 @@
 
 
 # This install files is for  simplifying the installation of Gladys
-# on a Raspberry Pi or most linux.
-
-# On a Raspberry Pi, make sure your firmware version is up to date,
+# on a Raspberry Pi.
+# Make sure your firmware version is up to date,
 # You can upgrade with the command "sudo rpi-update"
 
 
@@ -29,7 +28,11 @@ sudo apt-get install -y build-essential
 wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb
 sudo dpkg -i node_0.10.36_armhf.deb
 
-# Installing MySQL  
+# Installing MySQL
+# Prevent MySQL for asking a password, set Password to "raspberry"
+echo "mysql-server mysql-server/root_password raspberry" | debconf-set-selections
+echo "mysql-server mysql-server/root_password_again raspberry" | debconf-set-selection
+# Install MySQL
 sudo apt-get install -y mysql-server
 
 # Dependencies
