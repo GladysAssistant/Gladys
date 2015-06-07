@@ -35,7 +35,7 @@
     "ncp": "^2.0.0",
     "node-dir": "~0.1.6",
     "node-schedule": "~0.1.15",
-    "player": "~0.3.0",
+    "player": "^0.5.0",
     "pushbullet": "^1.4.3",
     "rc": "~0.5.0",
     "request": "2.45.0",
@@ -47,7 +47,7 @@
     "sails-mysql": "~0.10.7",
     "sails-util-mvcsloader": "^0.1.7",
     "serialport": "~1.7.1",
-    "speaker": "~0.2.1"
+    "speaker": "^0.2.5"
   },
   "scripts": {
     "start": "node app.js",
