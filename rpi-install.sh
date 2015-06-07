@@ -23,8 +23,11 @@ sudo apt-get update && sudo apt-get -y upgrade
 sudo apt-get install -y build-essential
 
 # Installing Node.js
-sudo curl -sL https://deb.nodesource.com/setup | sudo bash - 
-sudo apt-get install -y nodejs
+#sudo curl -sL https://deb.nodesource.com/setup | sudo bash - 
+#sudo apt-get install -y nodejs
+
+wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb
+sudo dpkg -i node_0.10.36_armhf.deb
 
 # Installing MySQL  
 sudo apt-get install -y mysql-server
