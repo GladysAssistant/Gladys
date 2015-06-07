@@ -34,6 +34,8 @@ echo "mysql-server mysql-server/root_password root" | debconf-set-selections
 echo "mysql-server mysql-server/root_password_again root" | debconf-set-selection
 # Install MySQL
 sudo apt-get install -y mysql-server
+# Creating database gladys
+mysql -u root -proot -e "create database gladys"
 
 # Dependencies
 sudo apt-get install -y libasound2-dev
@@ -49,5 +51,5 @@ git clone https://github.com/GladysProject/Gladys.git gladys
 cd gladys
 
 # Installing dependencies
-sudo npm install
+sudo npm install --unsafe-perm
 
