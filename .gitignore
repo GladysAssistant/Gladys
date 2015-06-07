@@ -67,6 +67,7 @@
 
 node_modules
 bower_components
+.GladysBackUp
 music/*.mp3
 uploads
 voicecache/*.mp3

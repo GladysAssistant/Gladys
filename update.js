@@ -48,7 +48,7 @@ function putfilesBack(){
 }
 
 function syncWithGithub(callback){
-  exec('git pull', function(error, stdout, stderr) {
+  exec('git pull https://github.com/GladysProject/Gladys.git master', function(error, stdout, stderr) {
       console.log('stdout: ' + stdout);
       console.log('stderr: ' + stderr);
       if (error !== null) {
