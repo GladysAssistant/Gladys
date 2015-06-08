@@ -176,52 +176,54 @@ module.exports = {
 				callback(null);
 		}
 
-		// get recursively all the files in the folder
-		dir.files(sails.config.music.folder, function(err, files) {
-			if(err) return sails.log.warn(err);
-
-			if(files){
-
-				size = files.length;
-
-			   	for(var i=0;i<files.length;i++){
-
-			   		(function(file) { 
-			   		// get the extension of the file
-			   		var ext = file.substr(file.lastIndexOf('.') + 1);
-
-			   			// check if the file's extension is valid
-				   		if(ext == sails.config.music.validExtension){
-
-				   			// remove the music folder from the path
-				   			file = file.substring(sails.config.music.folder.length);
-
-				   			// Get the id3Tags
-					   		getId3Tags(sails.config.music.folder + file, function(err, tags){
-					   			if(err) {
-					   				sails.log.warn(err);
-					   				checkIfDone();
-					   			}
-					   			else{
-						   			if(tags.title == null)
-						   				tags.title = file;
-
-						   			// insert the music in the database
-						   			insertMusic(file, tags.title, tags.artist,tags.album, function(err,music){
-						   				if(err) sails.log.warn(err);
-
+		if(sails.config.machine.soundCapable){
+			// get recursively all the files in the folder
+			dir.files(sails.config.music.folder, function(err, files) {
+				if(err) return sails.log.warn(err);
+		
+				if(files){
+		
+					size = files.length;
+		
+				   	for(var i=0;i<files.length;i++){
+		
+				   		(function(file) { 
+				   		// get the extension of the file
+				   		var ext = file.substr(file.lastIndexOf('.') + 1);
+		
+				   			// check if the file's extension is valid
+					   		if(ext == sails.config.music.validExtension){
+		
+					   			// remove the music folder from the path
+					   			file = file.substring(sails.config.music.folder.length);
+		
+					   			// Get the id3Tags
+						   		getId3Tags(sails.config.music.folder + file, function(err, tags){
+						   			if(err) {
+						   				sails.log.warn(err);
 						   				checkIfDone();
-						   			});
-						   		}
-					   		});
-					   	}else
-					   	{
-					   		checkIfDone();
-					   	}
-
-				   	})(files[i]);
-			   	}
-			}
-		});
+						   			}
+						   			else{
+							   			if(tags.title == null)
+							   				tags.title = file;
+		
+							   			// insert the music in the database
+							   			insertMusic(file, tags.title, tags.artist,tags.album, function(err,music){
+							   				if(err) sails.log.warn(err);
+		
+							   				checkIfDone();
+							   			});
+							   		}
+						   		});
+						   	}else
+						   	{
+						   		checkIfDone();
+						   	}
+		
+					   	})(files[i]);
+				   	}
+				}
+			});
+		}
 	},
 };
