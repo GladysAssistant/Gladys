@@ -1,4 +1,15 @@
 #!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          gladys
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     20 2
+# Default-Stop:      17 6
+# Short-Description: Gladys is your home automation assistant !
+# Description:       This service is used to start/stop Gladys dameon
+### END INIT INFO
+#
 # Service Name
 SERVICE_NAME=Gladys
 # Directory where executable are
@@ -10,41 +21,41 @@ SERVICE_SHUTDOWN_SCRIPT=shutdown-gladys.sh
 
 usage()
 {
-        echo "-----------------------"
-        echo "Usage: $0 (stop|start|restart)"
-        echo "-----------------------"
+echo "-----------------------"
+echo "Usage: $0 (stop|start|restart)"
+echo "-----------------------"
 }
 if [ -z $1 ]; then
         usage
 fi
 service_start()
 {
-        echo "Starting service '${SERVICE_NAME}'..."
-        OWD=`pwd`
-        cd ${SERVICE_DIRECTORY} && ./${SERVICE_STARTUP_SCRIPT}
-        cd $OWD
-        echo "Service '${SERVICE_NAME}' started successfully"
+echo "Starting service '${SERVICE_NAME}'..."
+OWD=`pwd`
+cd ${SERVICE_DIRECTORY} && ./${SERVICE_STARTUP_SCRIPT}
+cd $OWD
+echo "Service '${SERVICE_NAME}' started successfully"
 }
 service_stop()
 {
-        echo "Stopping service '${SERVICE_NAME}'..."
-        OWD=`pwd`
-        cd ${SERVICE_DIRECTORY} && ./${SERVICE_SHUTDOWN_SCRIPT}
-        cd $OWD
-        echo "Service '${SERVICE_NAME}' stopped"
+echo "Stopping service '${SERVICE_NAME}'..."
+OWD=`pwd`
+cd ${SERVICE_DIRECTORY} && ./${SERVICE_SHUTDOWN_SCRIPT}
+cd $OWD
+echo "Service '${SERVICE_NAME}' stopped"
 }
 case $1 in
-     stop)
-       	service_stop
-     ;;
-     start)
-       	service_start
-     ;;
-     restart)
-        service_stop
-        service_start
-     ;;
-     *)
-     usage
+stop)
+service_stop
+;;
+start)
+service_start
+;;
+restart)
+service_stop
+service_start
+;;
+*)
+usage
 esac
 exit 0
