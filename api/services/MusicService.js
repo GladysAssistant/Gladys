@@ -10,17 +10,16 @@
   
 // the player instance
 var player;
-var fs;
 
 var playing = false;
 
 if(sails.config.machine.soundCapable){
 	var Player = require('player');
-	fs = require('fs');
-	var id3 = require('id3js');
-	var dir = require('node-dir');
 }
 
+var dir = require('node-dir');
+var fs = require('fs');
+var id3 = require('id3js');
 
 /**
  * Description
