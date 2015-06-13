@@ -114,6 +114,9 @@ If you want Gladys to be connected to your Google account ( to read your calenda
  - **Authorized redirect URI**: http://localhost:1337/googleapi/create
 - Copy and paste *Client ID* and *Client secret* keys into `config/googleapis.js`
 
+You must allows the created project to access to your calendar, and your email. Your developper console must look like that :
+
+![Alt](http://gladysproject.com/assets/images/presentation/api_authorization.png)
 
 FAQ
 -------------
