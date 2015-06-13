@@ -22,7 +22,7 @@ Specifications
 
 Gladys is 100% written in Node.js, with the [sails.js](http://sailsjs.org/) framework on the server-side, and [AngularJS](https://angularjs.org/) client-side.
 
-![Alt](http://gladysproject.com/img/gladysschemalight.jpg)
+![Alt](http://gladysproject.com/assets/images/presentation/gladys_schema.jpg)
 
 
 Prerequisites
