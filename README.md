@@ -110,7 +110,7 @@ If you want Gladys to be connected to your Google account ( to read your calenda
 - Then select *APIs & auth* from the sidebar and click on *Credentials* tab
 - Click **CREATE NEW CLIENT ID** button :
  - **Application Type**: Web Application
- - **Authorized Javascript origins**: http://localhost:1337
+ - **Authorized Javascript origins**: http://localhost
  - **Authorized redirect URI**: http://localhost:1337/googleapi/create
 - Copy and paste *Client ID* and *Client secret* keys into `config/googleapis.js`
 
