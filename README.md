@@ -28,7 +28,7 @@ Gladys is 100% written in Node.js, with the [sails.js](http://sailsjs.org/) fram
 Prerequisites
 -------------
 
-- [Node.js](http://nodejs.org) ( >= v.0.10.xx )
+- [Node.js](http://nodejs.org) ( = v.0.10.xx, some troubles appears with node.js 0.12.x )
 - [MySQL](http://www.mysql.com/)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
