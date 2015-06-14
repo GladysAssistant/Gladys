@@ -35,7 +35,7 @@ echo "mysql-server mysql-server/root_password_again root" | debconf-set-selectio
 # Install MySQL
 sudo apt-get install -y mysql-server
 # Creating database gladys
-mysql -u root -proot -e "create database gladys"
+mysql -u root -p root -e "create database gladys"
 
 # Dependencies
 sudo apt-get install -y libasound2-dev
