@@ -29,6 +29,8 @@ function validFileName (name){
  * @return 
  */
 var loadInSandbox = function(path, callback){
+	callback = callback || function(){};
+	
 	fs.readdir(path, function (err, files) {
 	   if(err) return callback(err);
 
@@ -65,6 +67,7 @@ sails.config.Event.on('sailsReady', function(){
  * @return 
  */
 function readFile(name,callback) {
+	callback = callback || function(){};
 	
 	require('fs').readFile(sails.config.scripts.folder + '/' + name,'utf8', function(err,data){
 			if(err) return callback('ScriptService, readFile(), error : ' + err);
@@ -84,6 +87,7 @@ module.exports = {
 	 * @return 
 	 */
 	exec:function(name, callback){
+		callback = callback || function(){};
 
 		if(!validFileName)
 			return callback('Invalid file name', false);
@@ -107,6 +111,8 @@ module.exports = {
 	 * @return 
 	 */
 	sandbox:function(codeJS, callback){
+		callback = callback || function(){};
+		
 		try{
 			var script = new vm.Script(codeJS, sails.config.scripts.vmOptions);
 			script.runInNewContext(sandbox);
