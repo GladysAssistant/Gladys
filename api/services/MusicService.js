@@ -121,14 +121,22 @@ module.exports = {
 		
 		// play the music file
 		player = new Player(musicPath);
+		sails.log.info('Playing : ' + musicPath);
+		
 		player.on('playing',function(item){
 			//playing!
 		});
-		sails.log.info('Playing : ' + musicPath);
+		
 		player.play(function(err, player){
 		  	// end of music	
 		  	playing = false;
 		});
+		
+		// when error occurs
+		player.on('error', function(err){ 
+		  sails.log.warn(err);
+		});
+
 	},
 
 	/**
