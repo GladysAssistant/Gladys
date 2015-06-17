@@ -12,6 +12,11 @@
  */
 
 module.exports.views = {
+  
+  
+  // Raspberry Pi B/B+ are slower,
+  // longer timeout
+  _hookTimeout: 240000,
 
   /****************************************************************************
   *                                                                           *
