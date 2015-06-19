@@ -36,8 +36,11 @@
       return sleepService.getSleep()
         .then(function(data){
           vm.recommended = data.data.recommended;
+          if(data.data.userSleep.length == 0){
+            return;
+          }
           vm.lastSleep = data.data.userSleep[data.data.userSleep.length-1].duration;
-  	      
+          
           vm.userSleep = data.data.userSleep;
           var line = new Morris.Line({
                 element: 'line-chart',
