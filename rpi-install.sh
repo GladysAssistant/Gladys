@@ -32,6 +32,7 @@ sudo dpkg -i node_0.10.36_armhf.deb
 # Prevent MySQL for asking a password, set Password to "root"
 echo "mysql-server mysql-server/root_password root" | debconf-set-selections
 echo "mysql-server mysql-server/root_password_again root" | debconf-set-selection
+
 # Install MySQL
 sudo apt-get install -y mysql-server
 # Creating database gladys
@@ -43,7 +44,7 @@ sudo apt-get install -y libasound2-dev
 # NPM global modules
 sudo npm install -g node-gyp
 sudo npm install -g sails
-sudo npm install -g forever
+sudo npm install -g pm2
 
 #Cloning Gladys into "gladys" directory
 git clone https://github.com/GladysProject/Gladys.git gladys
@@ -52,11 +53,8 @@ cd gladys
 # Installing dependencies
 sudo npm install --unsafe-perm
 
-#Create Gladys service that will start when system start
-sudo cp rpi-installation-scripts/gladys /etc/init.d/gladys
-sudo chmod a+x /etc/init.d/gladys
-sudo chmod a+x /home/pi/gladys/rpi-installation-scripts/startup-gladys.sh
-sudo chmod a+x /home/pi/gladys/rpi-installation-scripts/shutdown-gladys.sh
-
-# Gladys must start AFTER MySQL and stop BEFORE MySQL
-sudo update-rc.d gladys start 20 2 . stop 17 6 .
+# Starting Gladys at startup
+sudo su
+pm2 startup
+pm2 start app.js
+pm2 save
