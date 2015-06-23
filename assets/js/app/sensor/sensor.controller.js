@@ -19,9 +19,11 @@
     function SensorCtrl($scope, sensorService, houseService) {
         /* jshint validthis: true */
         var vm = this;
-
+        
+        vm.createSensor = createSensor;
         vm.countDown = countDown;
         vm.displayForm = false;
+        vm.deleteSensor = deleteSensor;
         vm.getRooms = getRooms;
         vm.getSensors = getSensors;
         vm.newSensor = { code : '' };
@@ -35,7 +37,9 @@
         activate();
 
         function activate() {
-            return getSensors();
+            getRooms();
+            getSensors();
+            return ;
         }
 
         function countDown() {
