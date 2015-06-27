@@ -13,5 +13,7 @@ module.exports.googlevoice = {
 	  langParametre : 'tl',
 	  defaultsLang : 'fr',
 	  queryParametre: 'q',
-	  cacheDirectory : 'voicecache'
+	  cacheDirectory : 'voicecache',
+	  charsetParametre : 'ie',
+	  charsetValue : 'UTF-8'
 };
