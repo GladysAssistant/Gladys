@@ -18,6 +18,8 @@ module.exports = {
 	 * @return 
 	 */
 	saveEvent: function(eventType,userId, param,callback){
+		callback = callback || function() {};
+		
 		EventType.findOne({name:eventType}).exec(function(err, eventtype) {
 			if(err) return callback(err); 
 
@@ -33,7 +35,7 @@ module.exports = {
 		 	 		callback(null, true);
 		 	 	});
 		 	}else{
-		 		callback('eventType ' + eventtype + ' not found');
+		 		callback('eventType ' + eventType + ' not found');
 		 	}
 		});
 	}
