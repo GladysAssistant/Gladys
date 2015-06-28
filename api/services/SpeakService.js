@@ -1,12 +1,12 @@
-/** 
+/**
   * Gladys Project
   * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
+  * Software under licence Creative Commons 3.0 France
   * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
   * You may not use this software for commercial purposes.
   * @author :: Pierre-Gilles Leymarie
   */
- 
+
 
 if(sails.config.machine.soundCapable){
 	var fs = require('fs');
@@ -16,14 +16,14 @@ if(sails.config.machine.soundCapable){
 	var md5 = require('MD5');
 
 	/**
-	 * Downloading a file of an given 'url', 
-	 * and putting the file in the 'dest' file, 
+	 * Downloading a file of an given 'url',
+	 * and putting the file in the 'dest' file,
 	 * then 'callback'
 	 * @method download
 	 * @param {} url
 	 * @param {} dest
 	 * @param {} callback
-	 * @return 
+	 * @return
 	 */
 	var download = function (url, dest, callback) {
 	  var file = fs.createWriteStream(dest);
@@ -39,9 +39,9 @@ if(sails.config.machine.soundCapable){
 	 * Play a MP3
 	 * @method play
 	 * @param {} mp3
-	 * @return 
+	 * @return
 	 */
-	var play = function (mp3){	
+	var play = function (mp3){
 		fs.createReadStream(mp3)
 		  .pipe(new lame.Decoder())
 		  .on('format', function (format) {
@@ -50,14 +50,14 @@ if(sails.config.machine.soundCapable){
 	};
 
 	/**
-	 * Save in the database a sentence 
+	 * Save in the database a sentence
 	 * we have just been saying
 	 * @method addSpeak
 	 * @param {} text
 	 * @param {} mp3file
 	 * @param {} User
 	 * @param {} callback
-	 * @return 
+	 * @return
 	 */
 	var addSpeak = function(text,mp3file,User,callback){
 		var speakObj = {
@@ -81,7 +81,7 @@ module.exports = {
 	 * @method say
 	 * @param {} text
 	 * @param {} User
-	 * @return 
+	 * @return
 	 */
 	say: function(text,User){
 		if(!sails.config.machine.soundCapable){
@@ -91,7 +91,7 @@ module.exports = {
 
 		/*if(!User || !User.language)
 			return sails.log.warn('No User with language given');*/
-		
+
 		Speak.findOne({ text: text})
 			 .exec(function speakFound(err, Speak){
 			 		if(err) return sails.log.info(err);
@@ -104,6 +104,9 @@ module.exports = {
 			 			var langParam = sails.config.googlevoice.langParametre;
 			 			// getting the user preference of language
 			 			var lang;
+						// getting the google voice charset parametre
+						var charsetParam = sails.config.googlevoice.charsetParametre;
+						var charsetVal = sails.config.googlevoice.charsetValue;
 			 			if(User && User.language){
 			 				lang = User.language;
 			 			}else{
@@ -112,7 +115,7 @@ module.exports = {
 			 			}
 			 			// composing an google URL to retrieve a mp3 file saying the text
 			 			var url = sails.config.googlevoice.url + '?' + sails.config.googlevoice.queryParametre + '='+ text;
-			 			url += '&' + langParam + '=' + lang;
+			 			url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal;
 			 			var mp3file = md5(text) + '.mp3';
 
 			 			var pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
@@ -137,7 +140,7 @@ module.exports = {
 			 				addSpeak(text,Speak.mp3file,User);
 			 			}
 			 		}
-			 });	
+			 });
 
 
 
@@ -145,7 +148,7 @@ module.exports = {
 
 
 
-	
-	
+
+
 
 };
