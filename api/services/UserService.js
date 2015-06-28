@@ -26,8 +26,8 @@ module.exports = {
 		User.update({id:userId}, {isSleeping : true}, function(err, user){
 			if(err) return callback(err);
 
-			// save gointToSleep Event in LifeEvents database 
-			LifeEventService.saveEvent(sails.config.lifeevent.gointToSleep.name,userId, null,function(err){
+			// save goingToSleep Event in LifeEvents database 
+			LifeEventService.saveEvent(sails.config.lifeevent.goingToSleep.name,userId, null,function(err){
 				if(err) return callback(err);
 
 				callback(null);
