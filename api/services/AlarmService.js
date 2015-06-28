@@ -84,6 +84,9 @@ module.exports = {
 	 * @return 
 	 */
 	create: function(name,datetime,time,recurring, user,callback){
+		
+		callback = callback || function() {};
+		
 		var alarmObj = {
 			name:name, 
 			datetime: datetime,
@@ -109,6 +112,9 @@ module.exports = {
 	 * @return 
 	 */
 	destroyAlarm: function(id,callback){
+		
+		callback = callback || function() {};
+		
 		Alarm.destroy({
 			id: id,
 		}, function alarmDestroyed(err, alarm) {
@@ -126,8 +132,10 @@ module.exports = {
 	 * @method scheduleAllAlarms
 	 * @return 
 	 */
-	scheduleAllAlarms: function(){
-
+	scheduleAllAlarms: function(callback){
+		
+		callback = callback || function() {};
+		
 		var request = "SELECT * FROM alarm ";
 		request+= " WHERE (status = 1) ";
 		request+= " AND ( (recurring = -1 AND datetime > SYSDATE() ) OR recurring <> -1 ) ";
@@ -138,6 +146,8 @@ module.exports = {
 			{
 				scheduleNewAlarm(Alarms[i]);
 			}
+			
+			callback();
 		});
 	},
 	
