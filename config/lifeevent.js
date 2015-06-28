@@ -12,7 +12,7 @@ module.exports.lifeevent = {
 	gladysInstallation : { name: 'gladysInstallation', BeautifulName:'Gladys installed', faIcon : 'fa fa-desktop', iconColor: 'bg-black'},
 	gladysUpdate : { name: 'gladysUpdate', BeautifulName:'Gladys updated',  faIcon : 'fa fa-wrench', iconColor: 'bg-black'},
 	wakeUp : { name: 'wakeUp', BeautifulName:'WakeUp',  faIcon : 'fa fa-bed', iconColor: 'bg-yellow'},
-	gointToSleep: { name: 'gointToSleep', BeautifulName:'Going To Sleep',  faIcon : 'fa fa-bed', iconColor: 'bg-blue'} ,
+	goingToSleep: { name: 'goingToSleep', BeautifulName:'Going To Sleep',  faIcon : 'fa fa-bed', iconColor: 'bg-blue'} ,
 	milightOn: { name: 'milightOn', BeautifulName:'Milight Lamp Turned On', faIcon : 'fa fa-power-off', iconColor: 'bg-yellow'},
 	milightOff: { name: 'milightOff', BeautifulName:'Milight Lamp turned Off ',  faIcon : 'fa fa-power-off', iconColor: 'bg-black'},
 	milightBrightnessChange: { name: 'milightBrightnessChange',BeautifulName:'Milight Lamp Brightness changed',  faIcon : 'fa fa-sliders', iconColor: 'bg-light-blue'},
