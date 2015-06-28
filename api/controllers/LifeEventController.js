@@ -166,7 +166,7 @@ module.exports = {
                 findEventType(sails.config.lifeevent.wakeUp.name, callback);
             },
             function(callback){
-                findEventType(sails.config.lifeevent.gointToSleep.name, callback);
+                findEventType(sails.config.lifeevent.goingToSleep.name, callback);
             }
         ],
         function(err, results){
