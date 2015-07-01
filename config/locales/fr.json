@@ -183,5 +183,7 @@
   "pagename-sensor":"Capteurs",
   "pagename-alarm":"Alarmes",
   "pagename-me":"Moi",
-  "pagename-music":"Musique"
+  "pagename-music":"Musique",
+  "GithubLinkTitle":"Voir sur Github",
+  "GladysWebsiteTitle":"Aller sur le site du projet"
 }
