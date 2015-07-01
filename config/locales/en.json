@@ -19,5 +19,7 @@
   "pagename-sensor":"Sensors",
   "pagename-alarm":"Alarm",
   "pagename-me":"Me",
-  "pagename-music":"Music"
+  "pagename-music":"Music",
+  "GithubLinkTitle":"View on Github",
+  "GladysWebsiteTitle":"Go to Gladys website"
 }
