@@ -9,5 +9,6 @@ module.exports = {
      */
     test: function (req, res) {
         console.log("test method on ExampleController");
+        res.json('ok');
     }
 };
