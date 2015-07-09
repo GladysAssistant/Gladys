@@ -20,6 +20,8 @@ module.exports = {
 	 * @return 
 	 */
 	request: function(url,callback){
+		callback = callback || function(){};
+		
 		request(url, function(err, response, body) {
 				if(err) return callback('HTTPService : Fail to load URL : ' + err);
 
