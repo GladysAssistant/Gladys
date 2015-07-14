@@ -88,7 +88,7 @@ module.exports = {
 		request += 'WHERE userhouserelation.house IN ( SELECT house FROM userhouserelation ';
 		request += 'WHERE user = ? ';
 		request += 'AND userhouserelationtype = ? ) ';
-		request += 'AND user.id != ?'
+		request += 'AND user.id != ?';
 
 		User.query(request, [userId, sails.config.userhouserelationtype.Admin, userId], function(err, users){
 			if(err) return callback(err);

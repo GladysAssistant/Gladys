@@ -53,7 +53,7 @@ module.exports = {
 		Motion.query(request,[roomId], function(err, motions){
 			if(err) return callback(err);
 
-			callback(null, motions)
+			callback(null, motions);
 		});
 	},
 
@@ -75,7 +75,7 @@ module.exports = {
 		Motion.query(request,[houseId], function(err, motions){
 			if(err) return callback(err);
 
-			callback(null, motions)
+			callback(null, motions);
 		});
 	},	
 

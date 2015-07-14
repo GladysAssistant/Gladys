@@ -27,7 +27,7 @@ module.exports = {
 		Motion.query(request,[roomId], function(err, motions){
 			if(err) return callback(err);
 
-			callback(null, (motions.length == 0))
+			callback(null, (motions.length === 0));
 		});
 	}
 };

@@ -17,7 +17,7 @@
  * @param {} callback
  * @return 
  */
-var haveRights = function(state, user,callback){
+function haveRights(state, user,callback){
 	State.findOne({id : state, user: user}, function(err, state){
 		if(err) return callback(err);
 

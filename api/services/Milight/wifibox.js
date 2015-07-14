@@ -35,8 +35,8 @@ var dgram = require('dgram');
  */
 var WifiBox = function (ip, port) {
     this.client = dgram.createSocket('udp4');
-    const default_ip = '192.168.1.255';
-    const default_port = 8899;
+    var default_ip = '192.168.1.255';
+    var default_port = 8899;
     this.ip = (ip != undefined && ip.length > 6) ? ip : default_ip;
     this.port = (port != undefined && port > 0) ? port : default_port;
  
@@ -61,11 +61,11 @@ WifiBox.prototype.command = function (threeByteArray) {
                 console.log("udp error:" + err);
                 throw err;
             } else {
-                console.log('bytes send: ' + [threeByteArray[0], threeByteArray[1], threeByteArray[2]])
+                console.log('bytes send: ' + [threeByteArray[0], threeByteArray[1], threeByteArray[2]]);
             }
         }
     );
-}
+};
  
 /**
  * Description

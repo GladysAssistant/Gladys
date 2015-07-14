@@ -28,14 +28,14 @@ function downloadIcal (url,callback){
 
       for (var k in data){
         if (data.hasOwnProperty(k)) {
-          var ev = data[k]
+          var ev = data[k];
           if(callback){
           	callback(ev);
           }
         }
       }
     });
-};
+}
 
 module.exports = {
 

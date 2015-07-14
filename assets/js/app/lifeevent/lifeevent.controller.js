@@ -46,7 +46,7 @@
             vm.remoteIsBusy = true;
             return lifeeventService.getLifeEvents(start, end)
                 .then(function(data){
-                    if(data.data.length == 0){
+                    if(data.data.length === 0){
                         vm.noMoreLifeEvents = true;
                     }
                     vm.lifeevents = vm.lifeevents.concat(data.data);

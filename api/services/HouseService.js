@@ -19,7 +19,7 @@ module.exports = {
 	 */
 	getHouseWhereUserAdmin: function(userId, callback){
 		var request = 'SELECT house FROM userhouserelation ';
-		request += 'WHERE user = ? '
+		request += 'WHERE user = ? ';
 		request += 'AND userhouserelationtype = ?';
 
 		UserHouseRelation.query(request, [userId, sails.config.userhouserelationtype.Admin], function(err, houses){
@@ -47,7 +47,7 @@ module.exports = {
 		Motion.query(request,[houseId], function(err, motions){
 			if(err) return callback(err);
 
-			callback(null, (motions.length == 0))
+			callback(null, (motions.length === 0));
 		});
 	},
 
@@ -203,7 +203,7 @@ module.exports = {
 				if(err) return callback(err);
 
 				// if the user has no houses.. he is not a home because he has no one, so callback false
-				if(userHouseRelations.length == 0) return callback(null, false);
+				if(userHouseRelations.length === 0) return callback(null, false);
 
 				// houseWhereHeIs will store the result
 				var houseWhereHeIs = null;
@@ -212,7 +212,7 @@ module.exports = {
 				async.each(userHouseRelations, function(userHouseRelation, callback){
 						HouseService.habitantsWhoCanBeAtHome(userHouseRelation.house.id, function(err, userPossiblyAtHome){
 							// if no user can possibly be at home, there is nobody there
-							if(userPossiblyAtHome.length == 0)
+							if(userPossiblyAtHome.length === 0)
 								callback();
 							// else if there is only one user at home
 							else if(userPossiblyAtHome.length == 1){

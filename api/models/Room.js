@@ -73,9 +73,9 @@ module.exports = {
 
         if(nbOk == values.length*nbThingsToDestroy)
             next();
-    }
+    };
 
-    if(values.length == 0)
+    if(values.length === 0)
         return next();
 
     for(i = 0; i<values.length;i++){

@@ -50,7 +50,7 @@ function getActualDate (){
 	month = twoDigit(month);
 	day = twoDigit(day);
 	return year + '-' + month + '-' + day;
-};
+}
 
 
 /**

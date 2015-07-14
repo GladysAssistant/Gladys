@@ -9,7 +9,7 @@ var prettify = require('gulp-jsbeautifier');
  * Jshint
  */
 gulp.task('jshint', function() {
-  return gulp.src(['./api/**/*.js', './assets/js/app/**/*.js', './test/**/*.js', '!./api/hooks'])
+  return gulp.src(['./api/**/*.js', './assets/js/app/**/*.js', './test/**/*.js', '!api/hooks/**'])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish));
 });
@@ -19,7 +19,7 @@ gulp.task('jshint', function() {
  * Beautify JS code
  */
 gulp.task('format-js', function() {
-  gulp.src(['./api/**/*.js', '!./api/hooks' ])
+  gulp.src(['./api/**/*.js', '!api/hooks/**' ])
     .pipe(prettify({config: '.jsbeautifyrc', mode: 'VERIFY_AND_WRITE'}))
     .pipe(gulp.dest('./api'));
 });

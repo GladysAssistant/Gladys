@@ -14,7 +14,7 @@
  * @param {} callback
  * @return 
  */
-var motionSensorExist = function(code,callback){
+function motionSensorExist(code,callback){
     MotionSensor.findOne({code : code}, function(err, motionSensor){
           if(err) return sails.log.warn('SerialPortService : motionSensorExist : ' + err);
 
@@ -57,6 +57,7 @@ module.exports = {
 
           // each time a serial port message is received
           sp.on("data", function (data) {
+         
             try
             {
               // trying to parse JSON received

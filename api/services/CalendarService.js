@@ -22,7 +22,7 @@ module.exports = {
 		request += "JOIN calendarlist ON(calendarevent.calendar = calendarlist.id) ";
 		request += "WHERE user = ? ";
 		request += "AND start > SYSDATE() ";
-		request += "AND calendarlist.active = 1 "
+		request += "AND calendarlist.active = 1 ";
 		request += "ORDER BY start ";
 		request += "LIMIT 0,1 ";
 

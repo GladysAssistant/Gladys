@@ -15,7 +15,7 @@
  * @param {} callback
  * @return 
  */
-var getUserSocketsId = function(userId,callback){
+function getUserSocketsId (userId,callback){
 		Socket.find({user : userId}, function(err,sockets){
 			if(err) return callback('SocketService : getUserSocketId : ' + err);
 
@@ -116,7 +116,7 @@ module.exports = {
 	 */
 	joinRoom: function(userId, roomName,callback){
 		getUserSocketsId(userId,function(sockets){
-			if(!sockets || sockets.length == 0) return callback(null, 0);
+			if(!sockets || sockets.length === 0) return callback(null, 0);
 			
 			for(var i = 0;i<sockets.length;i++){
 				//sails.sockets.join(sockets[i].socketId, roomName);
