@@ -27,10 +27,11 @@ module.exports = {
         gm.directions(start, end , 
         function(err, data){
             if(err) return callback(err);
+            
             // calculate the duration in seconds
-            var duration = data['routes'][0]['legs'][0]['duration']['value'];
+            var duration = data.routes[0].legs[0].duration.value;
             callback(null, duration);
         });
         
     }
-}
+};

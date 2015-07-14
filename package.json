@@ -61,5 +61,11 @@
     "url": "git://github.com/root/gladys.git"
   },
   "author": "Pierre-Gilles Leymarie",
-  "license": "Creative Commons 3.0 France"
+  "license": "Creative Commons 3.0 France",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jsbeautifier": "^1.0.1",
+    "gulp-jshint": "^1.11.2",
+    "jshint-stylish": "^2.0.1"
+  }
 }

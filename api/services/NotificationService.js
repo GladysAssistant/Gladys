@@ -41,7 +41,7 @@ module.exports = {
 		 	SocketService.sendDesktopMessageUser(userId, 'newNotification' , notification, function(err, nbOfMsgSent){
 				 if(err) return callback(err);
 				 
-				 if(nbOfMsgSent == 0){
+				 if(nbOfMsgSent === 0){
 					 pushBulletService.sendNotificationUser(notification.user, notification.id, notification.title, notification.content, callback);
 				 }else{
 					 callback(null);

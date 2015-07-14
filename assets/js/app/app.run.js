@@ -19,5 +19,6 @@
   function runBlock(languageService,socketService) {
     languageService.initialize();
     socketService.subscribe();
-  };
+  }
+  
 })();

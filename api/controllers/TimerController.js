@@ -26,7 +26,7 @@ module.exports = {
 	 */
 	create:function(req,res,next){
 		if(!req.param('duration'))
-			return res.json('Missing parametres')
+			return res.json('Missing parametres');
 
 		// defaults name
 		var name = 'Timer';

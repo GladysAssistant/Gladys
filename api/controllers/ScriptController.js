@@ -18,7 +18,7 @@
  */
 function validFileName(name){
 	var reg = /[a-zA-Z0-9]+\.js$/;
-	return reg.test(name)
+	return reg.test(name);
 }
 
 function stringifyError (err, filter, space) {

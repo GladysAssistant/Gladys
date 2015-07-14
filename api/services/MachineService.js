@@ -22,10 +22,10 @@ module.exports = {
 
 			if(machines.length == 1)
 				return callback(null, machines[0].house);
-			else if(machines.length == 0)
+			else if(machines.length === 0)
 				return callback('MachineService : getMyHouse : I don\'t know in which house I live :( ');
 			else
-				return callback('MachineService : getMyHouse : A machine can\'t be at multiple place at once ! :D ')
+				return callback('MachineService : getMyHouse : A machine can\'t be at multiple place at once ! :D ');
 		});
 	}
 
