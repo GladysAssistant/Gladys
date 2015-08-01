@@ -14,7 +14,7 @@
  * @return BinaryExpression
  */
 function deg2rad (deg) {
-		  return deg * (Math.PI/180)
+	return deg * (Math.PI/180);
 }
 
 module.exports = {

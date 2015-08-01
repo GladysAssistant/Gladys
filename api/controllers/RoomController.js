@@ -21,12 +21,12 @@
  * @param {} callback
  * @return 
  */
-var haveRights = function (user,room,callback){
+function haveRights (user,room,callback){
 	Room.findOne({id:room}, function(err, room){
 		if(err) callback(err);
 
 		if(!room){
-			callback(false,false)
+			callback(false,false);
 		}else{
 			UserHouseRelation.findOne({house: room.house, user: user, userhouserelationtype: sails.config.userhouserelationtype.Admin }, function(err, userHouseRelation){
 		          if(err) callback(err);

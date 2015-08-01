@@ -20,7 +20,7 @@ module.exports = {
     // new time type because time does not exist in sails
     time: function(time){
       var re = /^[0-2]\d:[0-5]\d$/  ;
-      return (time != '' && time.match(re));
+      return (time !== '' && time.match(re));
     },
   },
   

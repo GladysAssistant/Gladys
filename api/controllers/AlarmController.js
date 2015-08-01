@@ -94,7 +94,7 @@ module.exports = {
 		AlarmService.destroyAlarm(req.param('id'), function(err,alarm){
 			if(err) return res.json(err);
 			
-			res.json(alarm)
+			res.json(alarm);
 		});
 	}
 };

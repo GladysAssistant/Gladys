@@ -131,7 +131,7 @@ module.exports = {
 	 * @return 
 	 */
 	hue: function(userId,color,callback){
-		if(lastLampId == null) return callback(false);
+		if(lastLampId === null) return callback(false);
 		
 		connectWifiBox(lastLampId, function (success, box, zone){
 			// if we can't find the wifi module associated with the lamp
@@ -153,7 +153,7 @@ module.exports = {
 	 * @return 
 	 */
 	brightness: function (userId,brightness, callback){
-		if(lastLampId == null) return callback(false);
+		if(lastLampId === null) return callback(false);
 		
 		connectWifiBox(lastLampId, function (success, box, zone){
 			// if we can't find the wifi module associated with the lamp
@@ -174,7 +174,7 @@ module.exports = {
 	 * @return 
 	 */
 	effectModeNext: function(userId,callback){
-		if(lastLampId == null) return callback(false);
+		if(lastLampId === null) return callback(false);
 
 		connectWifiBox(lastLampId, function (success, box, zone){
 			// if we can't find the wifi module associated with the lamp
@@ -195,7 +195,7 @@ module.exports = {
 	 * @return 
 	 */
 	whiteMode: function(userId,callback){
-		if(lastLampId == null) return callback(false);
+		if(lastLampId === null) return callback(false);
 
 		connectWifiBox(lastLampId, function (success, box, zone){
 			// if we can't find the wifi module associated with the lamp

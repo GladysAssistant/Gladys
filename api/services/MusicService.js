@@ -177,7 +177,7 @@ module.exports = {
 		 * @method checkIfDone
 		 * @return 
 		 */
-		var checkIfDone = function(){
+		function checkIfDone(){
 			inserted++;
 			if(inserted >= size)
 				callback(null);
@@ -210,7 +210,7 @@ module.exports = {
 					   				checkIfDone();
 					   			}
 					   			else{
-						   			if(tags.title == null)
+						   			if(tags.title === null)
 						   				tags.title = file;
 
 						   			// insert the music in the database

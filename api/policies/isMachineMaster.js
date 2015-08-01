@@ -17,4 +17,4 @@ module.exports = function(req, res, next) {
 		return next();
 	else
 		res.forbidden('This is not a master, just a slave executing orders.');
-}
+};

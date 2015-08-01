@@ -20,11 +20,11 @@
         var service = {
 			addToQueue:addToQueue
         };
-
-        return service;
 		
 		var queue = [];
 		var audio = new Audio();
+
+        return service;
 		
 		function addToQueue(file){
 			queue.push(file);

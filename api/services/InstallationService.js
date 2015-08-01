@@ -83,7 +83,7 @@ module.exports = {
 			.exec(function(err, eventtypes){
 				if(err) return callback(err);
 				
-				if(eventtypes.length == 0){
+				if(eventtypes.length === 0){
 					importAndInjectEventTypes(callback);
 				}else{
 					callback(null);
@@ -102,7 +102,7 @@ module.exports = {
 			.exec(function(err, actiontypes){
 				if(err) return callback(err);
 				
-				if(actiontypes.length == 0){
+				if(actiontypes.length === 0){
 					importAndInjectActionTypes(callback);
 				}else{
 					callback(null);
@@ -121,7 +121,7 @@ module.exports = {
 			.exec(function(err, launchertypes){
 				if(err) return callback(err);
 				
-				if(launchertypes.length == 0){
+				if(launchertypes.length === 0){
 					importAndInjectLauncherTypes(callback);
 				}else{
 					callback(null);

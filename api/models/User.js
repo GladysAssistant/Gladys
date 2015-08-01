@@ -29,7 +29,7 @@ module.exports = {
     },
 
     fullname: function() {
-      return this.firstname + ' ' + this.lastname
+      return this.firstname + ' ' + this.lastname;
     },
 
   	email:{

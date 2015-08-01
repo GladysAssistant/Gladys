@@ -37,7 +37,7 @@ function haveRights(launcher, user,callback){
  * @param {} callback
  * @return 
  */
-var haveRightsAction = function(action, user,callback){
+function haveRightsAction (action, user,callback){
 	Action.findOne({id : action, user: user}, function(err, action){
 		if(err) return callback(err);
 
@@ -53,7 +53,7 @@ var haveRightsAction = function(action, user,callback){
  * @param {} callback
  * @return 
  */
-var haveRightsState = function(state, user,callback){
+function haveRightsState(state, user,callback){
 	State.findOne({id : state, user: user}, function(err, state){
 		if(err) return callback(err);
 
