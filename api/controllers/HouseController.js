@@ -155,17 +155,17 @@ module.exports = {
    * @return 
    */
   getrelationhouse: function(req,res,next){
-                var request = "SELECT userhouserelation.id AS id, user.id AS userId, CONCAT(user.firstname, ' ', user.lastname) as userName, house.id as houseId, house.name as houseName, userhouserelationtype "
+                var request = "SELECT userhouserelation.id AS id, user.id AS userId, CONCAT(user.firstname, ' ', user.lastname) as userName, house.id as houseId, house.name as houseName, userhouserelationtype ";
                 request+= "FROM userhouserelation ";
                 request+= "JOIN user ON (userhouserelation.user = user.id) ";
                 request+= "JOIN house ON (userhouserelation.house = house.id) ";
                 request+= "WHERE house IN ( SELECT house FROM userhouserelation WHERE userhouserelationtype = 1 ";
                 request+= "AND user = ?) ";
                
-                UserHouseRelation.query(request,[req.session.User.id], function UserHouseRelation(err,UserHouseRelation){
+                UserHouseRelation.query(request,[req.session.User.id], function UserHouseRelation(err,userHouseRelation){
                     if(err) res.json(err);
 
-                    res.json(UserHouseRelation);
+                    res.json(userHouseRelation);
                 });
   },
 

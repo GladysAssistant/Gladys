@@ -137,5 +137,16 @@ On Debian/Ubuntu, the ALSA backend is selected by default, so be sure to have th
 For more informations, check [node-speaker repository](https://github.com/TooTallNate/node-speaker).
 
 
+Contributing
+-------------
+
+Pull request are welcome, but code must follow some guidelines.
+
+* For the Node.js part, follow [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide).
+* For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
+* Use [JSHint](https://github.com/jshint/jshint).
+* Try to Unit test your code as much as possible. Gladys is partially unit tested ( yes, that's bad ). The goal is to fully unit-test Gladys !
+
+If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](http://gladysproject.com).
 
 

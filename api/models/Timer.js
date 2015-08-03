@@ -21,7 +21,7 @@ module.exports = {
     time: function(time){
       re = /^[0-2]\d:[0-5]\d$/  ;
 
-      	return (time != '' && time.match(re));
+      	return (time !== '' && time.match(re));
     },
   },
 

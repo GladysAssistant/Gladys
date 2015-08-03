@@ -48,7 +48,7 @@
                   vm.timeLeft--;
                 });
                 setTimeout(countDown, 1000); 
-            }else if(vm.timeLeft == 0){
+            }else if(vm.timeLeft === 0){
                 $scope.$apply(function () {
                   vm.timeLeft = null;
                 });

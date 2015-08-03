@@ -37,7 +37,7 @@ module.exports = function(req, res, next) {
 							callback(err, true);
 						});
 					}else
-						callback(null, false)
+						callback(null, false);
 			    }
 			], function (err, result) {
 				if(err) sails.log.warn('sameNetworkPolicies : ' + err);

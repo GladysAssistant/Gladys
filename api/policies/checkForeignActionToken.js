@@ -18,4 +18,4 @@ module.exports = function(req, res, next) {
 		return next();
 	else
 		res.forbidden('Foreign Action Token is not valid');
-}
+};

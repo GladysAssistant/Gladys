@@ -71,7 +71,7 @@ if(sails.config.machine.soundCapable){
 			if(callback)
 				callback();
 		});
-	}
+	};
 }
 
 module.exports = {
@@ -96,7 +96,8 @@ module.exports = {
 			 .exec(function speakFound(err, Speak){
 			 		if(err) return sails.log.info(err);
 
-
+					var pathToMp3;
+					 
 			 		if(!Speak)
 			 		{ // if it is the first time we are saying this sentence
 
@@ -118,7 +119,7 @@ module.exports = {
 			 			url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal;
 			 			var mp3file = md5(text) + '.mp3';
 
-			 			var pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
+			 			pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
 			 			// downloading mp3 from Google
 			 			download(url,pathToMp3, function(){
 			 				// playing mp3
@@ -130,9 +131,10 @@ module.exports = {
 
 			 		}
 			 		else
-			 		{//if text has already been said before
+			 		{
+						//if text has already been said before
 			 			// get the path to the mp3 of the sentence
-			 			var pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + Speak.mp3file;
+			 			pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + Speak.mp3file;
 			 			// play the mp3 file
 			 			play(pathToMp3);
 			 			if(User){

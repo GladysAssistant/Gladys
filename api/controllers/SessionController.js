@@ -80,7 +80,7 @@ module.exports = {
 			var usernamePasswordRequiredError = [{
 				name: 'usernamePasswordRequired',
 				message: 'You must enter both a username and password.'
-			}]
+			}];
 
 			req.flash('error', usernamePasswordRequiredError);
 			return res.redirect('/login');
@@ -97,7 +97,7 @@ module.exports = {
 				var noAccountError = [{
 					name: 'noAccount',
 					message: 'The email address ' + req.param('email') + ' not found.'
-				}]
+				}];
 
 				req.flash('error', noAccountError);
 
@@ -114,7 +114,7 @@ module.exports = {
 					var usernamePasswordMismatchError = [{
 						name: 'usernamePasswordMismatch',
 						message: 'Invalid username and password combination.'
-					}]
+					}];
 					req.flash('error', usernamePasswordMismatchError);
 					res.redirect('/login');
 					return;

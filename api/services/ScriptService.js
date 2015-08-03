@@ -18,7 +18,7 @@ var fs = require("fs");
  */
 function validFileName (name){
 	var reg = /[a-zA-Z0-9]+\.js$/;
-	return reg.test(name)
+	return reg.test(name);
 }
 
 /**
@@ -28,7 +28,7 @@ function validFileName (name){
  * @param {} callback
  * @return 
  */
-var loadInSandbox = function(path, callback){
+function loadInSandbox (path, callback){
 	callback = callback || function(){};
 	
 	fs.readdir(path, function (err, files) {
