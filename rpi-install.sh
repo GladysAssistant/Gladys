@@ -59,5 +59,5 @@ sudo npm install
 # Starting Gladys at startup
 sudo su
 pm2 startup
-pm2 start app.js --name gladys
+pm2 start app.js --name gladys -- --prod
 pm2 save
