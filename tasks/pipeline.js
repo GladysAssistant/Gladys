@@ -45,6 +45,8 @@ var jsFilesToInject = [
   'js/dependencies/angular.min.js',
   // loading angularJS route
   'js/dependencies/angular-route.min.js',
+  // loading angularJS animate
+  'js/dependencies/angular-animate.min.js',
   // loading JQuery
   'js/dependencies/jquery.min.js',
   // loading Bootstrap
