@@ -6,7 +6,7 @@ var path = require('path');
 var BACKUP_FOLDERNAME = ".GladysBackUp";
 
 var filesToKeep = [
-	'config/connections.js',
+	  'config/connections.js',
     'config/serialport.js',
     'config/machine.js',
     'config/googleapi.js'
@@ -37,6 +37,7 @@ function backUpFiles(){
   for(var i = 0; i< filesToKeep.length;i++){
     var pathDest = path.join(BACKUP_FOLDERNAME,path.basename(filesToKeep[i]));
     fs.createReadStream(filesToKeep[i]).pipe(fs.createWriteStream(pathDest));
+    console.log('Backed Up file : ' + pathDest );
   }  
 }
 
@@ -44,11 +45,12 @@ function putfilesBack(){
     for(var i = 0; i< filesToKeep.length;i++){
     var pathOrigin = path.join(BACKUP_FOLDERNAME,path.basename(filesToKeep[i]));
     fs.createReadStream(pathOrigin).pipe(fs.createWriteStream(filesToKeep[i]));
+    console.log('File put back  : ' + pathOrigin);
   }  
 }
 
 function syncWithGithub(callback){
-  exec('git pull https://github.com/GladysProject/Gladys.git master', function(error, stdout, stderr) {
+  exec('git reset --hard HEAD && git pull origin master', function(error, stdout, stderr) {
       console.log('stdout: ' + stdout);
       console.log('stderr: ' + stderr);
       if (error !== null) {
