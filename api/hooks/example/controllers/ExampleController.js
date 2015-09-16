@@ -9,6 +9,7 @@ module.exports = {
      */
     test: function (req, res) {
         console.log("test method on ExampleController");
-        res.json('ok');
+        //res.json('ok');
+        HookService.resView(req, res, 'example/views/box', 'Page de test');
     }
 };
