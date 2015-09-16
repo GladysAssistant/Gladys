@@ -46,7 +46,7 @@
     "sails-hook-hookloader": "~0.2.0",
     "sails-memory": "~0.10.3",
     "sails-mysql": "~0.10.7",
-    "sails-util-mvcsloader": "^0.2.4",
+    "sails-util-mvcsloader": "^0.3.0",
     "serialport": "~1.7.1",
     "speaker": "^0.2.5"
   },
