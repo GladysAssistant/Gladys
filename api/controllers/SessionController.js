@@ -42,6 +42,7 @@ module.exports = {
 	 * @return
 	 */
 	createUser: function(req, res, next) {
+		
 		var userObj = {
 			firstname: req.param('firstname'),
 			lastname: req.param('lastname'),

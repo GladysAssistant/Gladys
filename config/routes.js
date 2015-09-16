@@ -33,26 +33,11 @@ module.exports.routes = {
   ***************************************************************************/
 
 
-  '/login' :{
-    view: 'welcome/index',
-    locals: {
-      layout: null
-    }
-  },
+  '/login' : 'WelcomeController.login',
 
-  '/register' :{
-    view: 'user/new',
-    locals: {
-      layout: null
-    }
-  },
+  '/register' : 'SessionController.newUser',
   
-  '/': {
-    view: 'welcome/homepage',
-    locals: {
-      layout: null
-    }
-  }
+  '/': 'WelcomeController.index'
 
 
 

@@ -57,7 +57,12 @@ module.exports.policies = {
   Room : ['isMachineMaster','checkToken', 'Human'],
   Scenario : ['isMachineMaster','checkToken', 'Human'],
   Script : ['isMachineMaster','checkToken', 'Human'],
-  Session : true,
+  Session : {
+    newUser: ['signupAllowed'],
+    createUser: ['signupAllowed'],
+    create: true,
+    destroy: ['isMachineMaster','checkToken', 'Human']
+  },
   Socket : ['isMachineMaster','checkToken', 'Human'],
   Speak : ['isMachineMaster','checkToken', 'Human'],
   State : ['isMachineMaster','checkToken', 'Human'],

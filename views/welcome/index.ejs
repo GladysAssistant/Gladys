@@ -39,8 +39,9 @@
                     <button type="submit" class="btn bg-olive btn-block"><%= __('Sign me in') %></button>  
                     
                     <p><a href="#"><%= __('I forgot my password') %></a></p>
-                    
-                    <a href="/register" class="text-center"><%= __('Register a new membership') %></a>
+                    <% if(signupActive) { %>
+                        <a href="/register" class="text-center"><%= __('Register a new membership') %></a>
+                    <% } %>
                 </div>
             </form>
 

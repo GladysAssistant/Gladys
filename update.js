@@ -9,7 +9,8 @@ var filesToKeep = [
 	  'config/connections.js',
     'config/serialport.js',
     'config/machine.js',
-    'config/googleapi.js'
+    'config/googleapi.js',
+    'config/signup.js'
 ];
 
 backUpFiles();

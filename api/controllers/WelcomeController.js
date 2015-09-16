@@ -18,7 +18,7 @@ module.exports = {
 
 
 	/**
-	 * Description
+	 * Welcome page ( / )
 	 * @method index
 	 * @param {} req
 	 * @param {} res
@@ -26,8 +26,24 @@ module.exports = {
 	 * @return
 	 */
 	index: function(req, res, next) {
-		res.view('welcome/index', {
-			layout: null
+		res.view('welcome/homepage', {
+			layout: null,
+			signupActive: sails.config.signup.active
 		});
+	},
+	
+	/**
+	 * Login Page ( /login )
+	 * @method index
+	 * @param {} req
+	 * @param {} res
+	 * @param {} next
+	 * @return
+	 */
+	login: function(req, res, next){
+		res.view('welcome/index', {
+			layout: null,
+			signupActive: sails.config.signup.active
+		});	
 	}
 };
