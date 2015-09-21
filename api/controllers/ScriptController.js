@@ -23,6 +23,9 @@ function validFileName(name){
 
 function stringifyError (err, filter, space) {
   var plainObject = {};
+  if (err instanceof Object == false) {
+  	return JSON.stringify(err);
+  }
   Object.getOwnPropertyNames(err).forEach(function(key) {
     plainObject[key] = err[key];
   });
