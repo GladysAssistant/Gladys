@@ -116,7 +116,7 @@ module.exports = {
 			 			}
 			 			// composing an google URL to retrieve a mp3 file saying the text
 			 			var url = sails.config.googlevoice.url + '?' + sails.config.googlevoice.queryParametre + '='+ text;
-			 			url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal;
+			 			url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal + '&client=tw-ob';
 			 			var mp3file = md5(text) + '.mp3';
 
 			 			pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
