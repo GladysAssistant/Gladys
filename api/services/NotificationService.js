@@ -37,7 +37,8 @@ module.exports = {
 	    Notification.create(NotificationObj,function NotificationCreated(err, notification){
 			if(err) return callback(err);
 			
-			sails.config.Event.emit('newNotification', notification); 		
+			gladys.emit('notification', notification);
+			 		
 		 	SocketService.sendDesktopMessageUser(userId, 'newNotification' , notification, function(err, nbOfMsgSent){
 				 if(err) return callback(err);
 				 

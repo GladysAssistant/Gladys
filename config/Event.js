@@ -9,5 +9,5 @@
   
   
 var events = require('events');
-
+global.gladys = new events.EventEmitter();
 module.exports.Event = new events.EventEmitter();

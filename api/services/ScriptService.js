@@ -48,7 +48,7 @@ function loadInSandbox (path, callback){
 
 var sandbox = sails.config.scripts.defaultSandbox;
 
-sails.config.Event.on('sailsReady', function(){
+gladys.on('sailsReady', function(){
 	// adding sails.log function to sandbox
 	sandbox.sails = {};
 	sandbox.sails.log = sails.log;

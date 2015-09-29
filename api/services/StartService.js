@@ -36,7 +36,11 @@ module.exports = {
 			if(err) return sails.log.warn(err);
 		});
 		SchedulerService.startEvery30MinutesScheduler();
+		
+		// old way
 		sails.config.Event.emit('sailsReady');
+		// new way
+		gladys.emit('sailsReady');
 	}
 
 
