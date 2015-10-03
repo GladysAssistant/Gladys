@@ -19,6 +19,8 @@ module.exports.bootstrap = function(cb) {
 				StartService.onStart();
 			}
 	});
+	
+	LifeEventService.syncEvents();
 	cb();
 	//sails.hooks.orm.reload();
 	//
