@@ -28,7 +28,7 @@ module.exports = {
     },
     
     html:{
-      type:'string',
+      type:'text',
     },
 
     icon:{
