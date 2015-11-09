@@ -15,6 +15,8 @@ module.exports.scripts = {
 	folder:'api/scripts',
 	servicesFolder: './api/services',
 	modelFolder: './api/models',
+	servicesHooksFolder: 'services',
+	hooksFolder: './api/hooks',
 	vmOptions:{ 
 	},
 	defaultSandbox: {
