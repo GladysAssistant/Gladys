@@ -33,12 +33,7 @@ module.exports = {
 
   	album:{
   		type:'string'
-  	},
-
-  	playlist:{
-      collection: 'Playlist',
-      via: 'music'
-    },
+  	}
 
   }
 };

@@ -150,19 +150,6 @@ module.exports = {
 
 	/**
 	 * Description
-	 * @method playlist
-	 * @param {} idPlaylist
-	 * @return 
-	 */
-	playlist : function(idPlaylist){
-		if(!sails.config.machine.soundCapable){
-			sails.log.warn('Machine can\'t play sound');
-			return;
-		}
-	},
-
-	/**
-	 * Description
 	 * @method importFolder
 	 * @param {} callback
 	 * @return 
