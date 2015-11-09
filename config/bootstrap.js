@@ -20,7 +20,13 @@ module.exports.bootstrap = function(cb) {
 			}
 	});
 	
-	LifeEventService.syncEvents();
+	
+	// refresh events only in production mode to avoid flooding
+	// Github when developping
+	if(sails.config.environment == 'production'){
+		LifeEventService.syncEvents();
+	}
+	
 	cb();
 	//sails.hooks.orm.reload();
 	//
