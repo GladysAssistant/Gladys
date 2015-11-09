@@ -53,6 +53,7 @@ function loadInSandbox (path, callback){
 	   		if(validFileName(file)){
 	   			file = file.substring(0,file.length-3);
 	   			sandbox[file] = global[file];
+				sails.log.info('Adding ' + file + ' to sandbox');
 	   			delete sandbox[file]['sails'];
 	   		}
 	   }
@@ -72,20 +73,8 @@ function loadHooksServices (name, cb){
 	sails.log.info('Loading services in module ' + name);
 	sails.log.info('Scanning folder : ' + servicePath);
 	
-	fs.readdir(servicePath, function (err, files) {
-	   if(err) return cb(err);
-
-	   for(var key in files){
-	   		var file = files[key];
-	   		if(validFileName(file)){
-	   			file = file.substring(0,file.length-3);
-	   			sandbox[file] = global[file];
-				sails.log.info('Adding service ' + file + ' to sandbox');
-	   			delete sandbox[file]['sails'];
-	   		}
-	   }
-	   cb(null);
-	});
+	// load in sandbox folder
+	loadInSandbox(servicePath, cb);
 }
 
 
