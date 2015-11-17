@@ -6,7 +6,7 @@ var path = require('path');
 var BACKUP_FOLDERNAME = ".GladysBackUp";
 
 var filesToKeep = [
-	  'config/connections.js',
+    'config/connections.js',
     'config/serialport.js',
     'config/machine.js',
     'config/googleapi.js',

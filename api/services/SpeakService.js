@@ -13,7 +13,7 @@ if(sails.config.machine.soundCapable){
 	var lame = require('lame');
 	var Speaker = require('speaker');
 	var http = require('http');
-	var md5 = require('MD5');
+	var md5 = require('md5');
 
 	/**
 	 * Downloading a file of an given 'url',
