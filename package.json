@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Your personnal assistant, always here.",
   "keywords": [
     "home",
@@ -80,7 +80,7 @@
     "url": "https://github.com/GladysProject/Gladys"
   },
   "bugs": {
-    "url": "https://github.com/GladysProject/Gladys/issues"  
+    "url": "https://github.com/GladysProject/Gladys/issues"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "Creative Commons 3.0 France"
