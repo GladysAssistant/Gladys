@@ -68,10 +68,12 @@
 node_modules
 bower_components
 .GladysBackUp
-music/*.mp3
+music/**/*.mp3
+music/**/*.wav
 uploads
-voicecache/*.mp3
+voicecache/**/*.mp3
 www
+api/hooks
 
 ################################################
 # Sails.js / Waterline / Grunt
