@@ -1,8 +1,19 @@
 {
-  "name": "Gladys",
+  "name": "gladys",
   "version": "2.1.4",
   "description": "Your personnal assistant, always here.",
-  "keywords": [],
+  "keywords": [
+    "home",
+    "assistant",
+    "automation",
+    "jarvis",
+    "artificial",
+    "intelligence",
+    "domotique"
+  ],
+  "bin": {
+    "gladys": "./app.js"
+  },
   "dependencies": {
     "MD5": "~1.2.1",
     "apriori": "~1.0.4",
@@ -49,6 +60,12 @@
     "serialport": "~1.7.1",
     "speaker": "^0.2.5"
   },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jsbeautifier": "^1.0.1",
+    "gulp-jshint": "^1.11.2",
+    "jshint-stylish": "^2.0.1"
+  },
   "scripts": {
     "start": "node app.js",
     "debug": "node debug app.js",
@@ -57,14 +74,11 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/root/gladys.git"
+    "url": "https://github.com/GladysProject/Gladys"
+  },
+  "bugs": {
+    "url": "https://github.com/GladysProject/Gladys/issues"  
   },
   "author": "Pierre-Gilles Leymarie",
-  "license": "Creative Commons 3.0 France",
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "gulp-jsbeautifier": "^1.0.1",
-    "gulp-jshint": "^1.11.2",
-    "jshint-stylish": "^2.0.1"
-  }
+  "license": "Creative Commons 3.0 France"
 }
