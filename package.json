@@ -69,7 +69,10 @@
   "scripts": {
     "start": "node app.js",
     "debug": "node debug app.js",
-    "test": "grunt test"
+    "test": "grunt test",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish"
   },
   "main": "app.js",
   "repository": {
