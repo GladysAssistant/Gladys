@@ -14,6 +14,8 @@
  * @help :: See http://links.sailsjs.org/docs/controllers
  */
 
+fs = require('fs');
+
 module.exports = {
 
 	/**
@@ -41,6 +43,14 @@ module.exports = {
 		sails.config.Event.emit('sailsReady');
 		// new way
 		gladys.emit('sailsReady');
+		// get version of Gladys from package.json
+		try {
+			json = JSON.parse(fs.readFileSync('package.json'));
+		} catch(e) {
+			console.error('Cannot parse package.json');
+		}
+		gladys.version = json.version;
+	}
 	}
 
 
