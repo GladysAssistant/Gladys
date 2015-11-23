@@ -51,7 +51,6 @@ module.exports = {
 		}
 		gladys.version = json.version;
 	}
-	}
 
 
 };
