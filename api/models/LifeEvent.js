@@ -24,8 +24,11 @@ module.exports = {
     },
 
     user:{
-        model:'User',
-        required:true
+      model:'User'
+    },
+    
+    room: {
+      model: 'Room',
     },
 
     eventtype:{
