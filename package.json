@@ -64,7 +64,8 @@
     "gulp": "^3.9.0",
     "gulp-jsbeautifier": "^1.0.1",
     "gulp-jshint": "^1.11.2",
-    "jshint-stylish": "^2.0.1"
+    "jshint-stylish": "^2.0.1",
+    "should": "^7.1.1"
   },
   "scripts": {
     "start": "node app.js",
