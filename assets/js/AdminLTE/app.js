@@ -29,6 +29,7 @@ $(function() {
             $('.left-side').toggleClass("collapse-left");
             $(".right-side").toggleClass("strech");
         }
+        $(".main-footer").toggleClass('full-width');
     });
 
     //Add hover support for touch devices

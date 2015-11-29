@@ -297,7 +297,7 @@ body.fixed .wrapper {
 }
 /* Content */
 .content {
-  padding: 20px 15px;
+  padding: 20px 15px 50px 15px;
   background: #f9f9f9;
   overflow: auto;
 }
@@ -3721,4 +3721,25 @@ fieldset[disabled] .btn-vk.active {
 .btn-vk .badge {
   color: #587ea3;
   background-color: #ffffff;
+}
+
+.main-footer {
+    background: #fff;
+    padding: 15px;
+    color: #555;
+    height: 50px;
+    border-top: 1px solid #eee;
+    margin-left: 220px;
+    margin-top: -50px;
+    &.full-width {
+        margin-left: 0;
+    }
+}
+.main-footer a {
+    color: #555;
+    margin-right:5px;
+}
+.main-footer span {
+    color: #555;
+    margin-right:5px;
 }
