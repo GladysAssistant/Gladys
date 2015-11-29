@@ -33,7 +33,12 @@ module.exports.connections = {
   },
 
   test: {
-    adapter: 'sails-memory'
+    adapter: 'sails-mysql',
+    host: 'localhost',
+    port: 8889,
+    user: 'root',
+    password: 'root',
+    database: 'gladystest'
   },
 
   /***************************************************************************

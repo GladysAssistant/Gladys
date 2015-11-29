@@ -7,7 +7,8 @@
     "email": "tony.stark@starkindustry.com",
     "birthdate":"10/10/1960",
     "gender" : 1,
-    "language":"FR"
+    "language":"FR",
+    "preparationTimeAfterWakeUp": 20
   },
   {
     "firstname": "Pepper",
@@ -17,6 +18,7 @@
     "email": "pepper.pots@starkindustry.com",
     "birthdate":"02/01/1970",
     "gender" : 0,
-    "language":"FR"
+    "language":"FR",
+    "preparationTimeAfterWakeUp": 20
   }
 ]
