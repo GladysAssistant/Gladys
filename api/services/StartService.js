@@ -43,6 +43,7 @@ module.exports = {
 		try {
 			var json = JSON.parse(fs.readFileSync('package.json'));
 			gladys.version = json.version;
+			sails.log.info('Gladys version : ' + gladys.version);
 		} catch(e) {
 			sails.log.warn('Cannot parse package.json');
 		}
