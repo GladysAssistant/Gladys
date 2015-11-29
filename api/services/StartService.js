@@ -14,7 +14,7 @@
  * @help :: See http://links.sailsjs.org/docs/controllers
  */
 
-fs = require('fs');
+var fs = require('fs');
 
 module.exports = {
 
@@ -39,17 +39,18 @@ module.exports = {
 		});
 		SchedulerService.startEvery30MinutesScheduler();
 		
+		// get version of Gladys from package.json
+		try {
+			var json = JSON.parse(fs.readFileSync('package.json'));
+			gladys.version = json.version;
+		} catch(e) {
+			sails.log.warn('Cannot parse package.json');
+		}
+		
 		// old way
 		sails.config.Event.emit('sailsReady');
 		// new way
 		gladys.emit('sailsReady');
-		// get version of Gladys from package.json
-		try {
-			json = JSON.parse(fs.readFileSync('package.json'));
-		} catch(e) {
-			console.error('Cannot parse package.json');
-		}
-		gladys.version = json.version;
 	}
 
 
