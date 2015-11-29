@@ -66,7 +66,7 @@
                                     <i class="{{lifeevent.FaIcon}} {{lifeevent.iconColor}}"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="lifeevent.datetime"></span></span>
-                                        <h3 class="timeline-header" ng-class="{ 'no-border': !lifeevent.sentence }"><a href="#">{{lifeevent.BeautifulName }}</a></h3>
+                                        <h3 class="timeline-header" ng-class="{ 'no-border': !lifeevent.sentence }"><a href="#">{{lifeevent.BeautifulName }} <span ng-show="lifeevent.param">( {{lifeevent.param}} )</span></a></h3>
                                         <div class="timeline-body " ng-show="lifeevent.sentence.length > 0" >
                                                 {{ lifeevent.sentence }}
                                         </div>
