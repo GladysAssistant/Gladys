@@ -90,8 +90,14 @@ module.exports = {
 			lastLampId = lampId;
 			if(callback)
 				callback(false);
+			
+			var event = {
+				user: userId,
+				eventtype: sails.config.lifeevent.milightOn.name,
+				param: lampId
+			};
 
-			LifeEventService.saveEvent(sails.config.lifeevent.milightOn.name, userId, lampId, function(err){
+			LifeEventService.saveEvent(event, function(err){
 				if(err) sails.log.warn(err);
 			});
 		});
@@ -114,8 +120,15 @@ module.exports = {
 			lastLampId = lampId;
 			if(callback)
 				callback(false);
+				
+			var event = {
+				user: userId,
+				eventtype: sails.config.lifeevent.milightOff.name,
+				param: lampId
+			};
+
 			
-			LifeEventService.saveEvent(sails.config.lifeevent.milightOff.name, userId, lampId, function(err){
+			LifeEventService.saveEvent(event, function(err){
 				if(err) sails.log.warn(err);
 			});
 		});

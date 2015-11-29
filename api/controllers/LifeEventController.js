@@ -142,8 +142,22 @@ module.exports = {
 	 * @return 
 	 */
 	create : function (req, res, next){
-  	LifeEventService.saveEvent(req.param('eventtype'),req.session.User.id, req.param('param'), function(err){
-        	if(err) return res.json(err);
+    
+    var event = {
+        user: req.session.User.id,
+        eventtype: req.param('eventtype')
+    };
+    
+    if(req.param('room')){
+      event.room = req.param('room');
+    }
+    
+    if(req.param('param')){
+      event.param = req.param('param');
+    }
+    
+  	LifeEventService.saveEvent(event, function(err){
+        	if(err) return res.status(500).json(err);
           
           return res.json("ok");
     });

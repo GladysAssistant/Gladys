@@ -56,25 +56,22 @@ module.exports = {
 	 * @param {} callback
 	 * @return 
 	 */
-	saveEvent: function(eventType,userId, param,callback){
-		callback = callback || function() {};
+	saveEvent: function(event, cb){
+		cb =  cb || function() {};
 		
-		EventType.findOne({name:eventType}).exec(function(err, eventtype) {
-			if(err) return callback(err); 
+		EventType.findOne({name: event.eventtype}).exec(function(err, eventtype) {
+			if(err) return cb(err); 
 
 			if(eventtype){
-		  		eventtype.lifeevents.add({user:userId, param:param});
-
-		 	 	eventtype.save(function(err) {
-		 	 		if(err) return callback(err);
-					  
-					// fire the event
-					ScenarioService.launcher(eventType, param, function(){});
+				event.eventtype = eventtype.id;
+				LifeEvent.create(event, function(err, lifeevent){
+					if(err) return cb(err);
 					
-		 	 		callback(null, true);
-		 	 	});
+					ScenarioService.launcher(eventtype.name, event.param, function (){});
+					cb(null, lifeevent);
+				});
 		 	}else{
-		 		callback('eventType ' + eventType + ' not found');
+		 		cb('eventType ' + event.eventtype + ' not found');
 		 	}
 		});
 	},

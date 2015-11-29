@@ -25,9 +25,14 @@ module.exports = {
 	goToSleep: function(userId, callback){
 		User.update({id:userId}, {isSleeping : true}, function(err, user){
 			if(err) return callback(err);
+			
+			var event = {
+				user: userId,
+				eventtype: sails.config.lifeevent.goingToSleep.name,
+			};
 
 			// save goingToSleep Event in LifeEvents database 
-			LifeEventService.saveEvent(sails.config.lifeevent.goingToSleep.name,userId, null,function(err){
+			LifeEventService.saveEvent(event ,function(err){
 				if(err) return callback(err);
 
 				callback(null);
@@ -45,9 +50,14 @@ module.exports = {
 	wakeUp: function(userId, callback){
 		User.update({id:userId}, {isSleeping : false}, function(err, user){
 			if(err) return callback(err);
+			
+			var event = {
+				user: userId,
+				eventtype: sails.config.lifeevent.wakeUp.name,
+			};
 
 			// save WakeUp Event in LifeEvents database 
-			LifeEventService.saveEvent(sails.config.lifeevent.wakeUp.name,userId, null,function(err){
+			LifeEventService.saveEvent(event ,function(err){
 				if(err) return callback(err);
 
 				callback(null);
