@@ -14,6 +14,7 @@ if(sails.config.machine.soundCapable){
 	var Speaker = require('speaker');
 	var http = require('http');
 	var md5 = require('md5');
+	var async = require('async');
 
 	/**
 	 * Downloading a file of an given 'url',
@@ -26,12 +27,16 @@ if(sails.config.machine.soundCapable){
 	 * @return
 	 */
 	var download = function (url, dest, callback) {
-	  var file = fs.createWriteStream(dest);
-	  var request = http.get(url, function(response) {
-	    response.pipe(file);
-	    file.on('finish', function() {
-	      file.close(callback);
-	    });
+		var request = http.get(url, function(response) {
+			if(response.statusCode >= 200 && response.statusCode < 300){
+				var file = fs.createWriteStream(dest);
+		    response.pipe(file);
+		    file.on('finish', function() {
+		      file.close(callback);
+		    });
+		  }else{
+				callback('Invalid statusCode : '+ response.statusCode);
+		  }
 	  });
 	};
 
@@ -39,13 +44,16 @@ if(sails.config.machine.soundCapable){
 	 * Play a MP3
 	 * @method play
 	 * @param {} mp3
+	 * @param {} callback
 	 * @return
 	 */
-	var play = function (mp3){
+	var play = function (mp3, callback){
 		fs.createReadStream(mp3)
 		  .pipe(new lame.Decoder())
 		  .on('format', function (format) {
-		    this.pipe(new Speaker(format));
+				var speaker = new Speaker(format);
+				speaker.on('close', callback);
+				this.pipe(speaker);
 		   });
 	};
 
@@ -72,6 +80,79 @@ if(sails.config.machine.soundCapable){
 				callback();
 		});
 	};
+
+	/**
+	 * @method say
+	 * @param {} infoObj
+	 * @param {} callback
+	 */
+	var say = function(infoObj, callback){
+		var User = infoObj.User;
+		var text = infoObj.text;
+
+		/*if(!User || !User.language)
+			return sails.log.warn('No User with language given');*/
+
+		Speak.findOne({ text: text})
+			.exec(function speakFound(err, Speak){
+				if(err){
+					sails.log.info(err);
+					return callback(err);
+				}
+
+				var pathToMp3;
+
+				if(!Speak)
+				{ // if it is the first time we are saying this sentence
+
+					// getting the google Voice lang parametre
+					var langParam = sails.config.googlevoice.langParametre;
+					// getting the user preference of language
+					var lang;
+					// getting the google voice charset parametre
+					var charsetParam = sails.config.googlevoice.charsetParametre;
+					var charsetVal = sails.config.googlevoice.charsetValue;
+					if(User && User.language){
+						lang = User.language;
+					}else{
+						// if User's language is not set
+						lang = sails.config.googlevoice.defaultsLang;
+					}
+					// composing an google URL to retrieve a mp3 file saying the text
+					var url = sails.config.googlevoice.url + '?' + sails.config.googlevoice.queryParametre + '='+ text;
+					url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal + '&client=tw-ob';
+					var mp3file = md5(text) + '.mp3';
+
+					pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
+					// downloading mp3 from Google
+					download(url,pathToMp3, function(err){
+						if(err)return callback(err);
+
+						// playing mp3
+						play(pathToMp3, callback);
+						if(User){
+							addSpeak(text,mp3file,User);
+						}
+					});
+
+				}
+				else
+				{
+				//if text has already been said before
+					// get the path to the mp3 of the sentence
+					pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + Speak.mp3file;
+					// play the mp3 file
+					play(pathToMp3, callback);
+					if(User){
+						// add the sentence to Speak database
+						addSpeak(text,Speak.mp3file,User);
+					}
+				}
+			});
+	};
+
+	// queue object to say sentence per sentence
+	var queue = async.queue(say, 1);
 }
 
 module.exports = {
@@ -81,76 +162,25 @@ module.exports = {
 	 * @method say
 	 * @param {} text
 	 * @param {} User
+	 * @param {} callback
 	 * @return
 	 */
-	say: function(text,User){
+	say: function(text,User,callback){
+		callback = callback || function(){};
+
 		if(!sails.config.machine.soundCapable){
+			callback('Machine can\'t play sound');
 			sails.log.warn('Machine can\'t play sound');
 			return;
 		}
 
-		/*if(!User || !User.language)
-			return sails.log.warn('No User with language given');*/
+		var sentences = text.split('.');
+		async.each(sentences, function(sentence){
+			if(sentence.length > 0)
+				queue.push({User:User, text: sentence});
+		});
 
-		Speak.findOne({ text: text})
-			 .exec(function speakFound(err, Speak){
-			 		if(err) return sails.log.info(err);
-
-					var pathToMp3;
-					 
-			 		if(!Speak)
-			 		{ // if it is the first time we are saying this sentence
-
-			 			// getting the google Voice lang parametre
-			 			var langParam = sails.config.googlevoice.langParametre;
-			 			// getting the user preference of language
-			 			var lang;
-						// getting the google voice charset parametre
-						var charsetParam = sails.config.googlevoice.charsetParametre;
-						var charsetVal = sails.config.googlevoice.charsetValue;
-			 			if(User && User.language){
-			 				lang = User.language;
-			 			}else{
-			 				// if User's language is not set
-			 				lang = sails.config.googlevoice.defaultsLang;
-			 			}
-			 			// composing an google URL to retrieve a mp3 file saying the text
-			 			var url = sails.config.googlevoice.url + '?' + sails.config.googlevoice.queryParametre + '='+ text;
-			 			url += '&' + langParam + '=' + lang + '&' + charsetParam + '=' + charsetVal + '&client=tw-ob';
-			 			var mp3file = md5(text) + '.mp3';
-
-			 			pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + mp3file;
-			 			// downloading mp3 from Google
-			 			download(url,pathToMp3, function(){
-			 				// playing mp3
-			 				play(pathToMp3);
-			 				if(User){
-			 					addSpeak(text,mp3file,User);
-			 				}
-			 			});
-
-			 		}
-			 		else
-			 		{
-						//if text has already been said before
-			 			// get the path to the mp3 of the sentence
-			 			pathToMp3 = sails.config.googlevoice.cacheDirectory + '/' + Speak.mp3file;
-			 			// play the mp3 file
-			 			play(pathToMp3);
-			 			if(User){
-			 				// add the sentence to Speak database
-			 				addSpeak(text,Speak.mp3file,User);
-			 			}
-			 		}
-			 });
-
-
-
+		callback();
 	}
-
-
-
-
-
 
 };
