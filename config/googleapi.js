@@ -10,8 +10,8 @@
 // config/googleapi.js
 module.exports.googleapi = {
 
-	  consumer_key: 'YOUR_CONSUMER_KEY',
-	  consumer_secret: 'YOUR_CONSUMER_SECRET',
+	  consumer_key: process.env.GOOGLE_API_KEY || 'YOUR_CONSUMER_KEY',
+	  consumer_secret: process.env.GOOGLE_API_SECRET || 'YOUR_CONSUMER_SECRET',
 	  scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.modify','https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email']
 
 };
