@@ -30,13 +30,13 @@ if(sails.config.machine.soundCapable){
 		var request = http.get(url, function(response) {
 			if(response.statusCode >= 200 && response.statusCode < 300){
 				var file = fs.createWriteStream(dest);
-		    response.pipe(file);
-		    file.on('finish', function() {
-		      file.close(callback);
-		    });
-		  }else{
+				response.pipe(file);
+				file.on('finish', function() {
+					file.close(callback);
+				});
+			}else{
 				callback('Invalid statusCode : '+ response.statusCode);
-		  }
+			}
 	  });
 	};
 
@@ -54,7 +54,7 @@ if(sails.config.machine.soundCapable){
 				var speaker = new Speaker(format);
 				speaker.on('close', callback);
 				this.pipe(speaker);
-		   });
+			});
 	};
 
 	/**
