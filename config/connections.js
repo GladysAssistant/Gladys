@@ -51,11 +51,11 @@ module.exports.connections = {
   ***************************************************************************/
   sailsmysql: {
     adapter: 'sails-mysql',
-    host: 'localhost',
-    port: 8889,
-    user: 'root',
-    password: 'root',
-    database: 'gladys'
+    host: process.env.MYSQL_HOST || 'localhost',
+    port: process.env.MYSQL_PORT || 3306,
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || 'root',
+    database: process.env.MYSQL_DATABASE || 'gladys'
   }
 
 };
