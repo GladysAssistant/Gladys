@@ -28,10 +28,10 @@ sudo apt-get install -y build-essential
 #wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb
 #sudo dpkg -i node_0.10.36_armhf.deb
 
-wget http://nodejs.org/dist/v0.10.2/node-v0.10.2-linux-arm-pi.tar.gz
-tar -xvf node-v0.10.2-linux-arm-pi.tar.gz
-cd node-v0.10.2-linux-arm-pi
-sudo cp -R ./bin/* /usr/local/bin/ && sudo cp -R ./lib/* /usr/local/lib/
+wget https://nodejs.org/dist/v4.2.2/node-v4.2.2-linux-armv7l.tar.xz
+tar -xvf node-v4.2.2-linux-armv7l.tar.xz
+cd node-v4.2.2-linux-armv7l
+sudo cp -R * /usr/local/
 
 # Install MySQL
 sudo apt-get install -y mysql-server
@@ -42,22 +42,19 @@ mysql -u root -proot -e "create database gladys"
 sudo apt-get install -y libasound2-dev
 
 # NPM global modules
-sudo npm install -g npm
-sudo npm install -g node-gyp
-sudo npm install -g sails
 sudo npm install -g pm2
 
 cd /home/pi
 
+sudo apt-get install -y git
 #Cloning Gladys into "gladys" directory
 git clone https://github.com/GladysProject/Gladys.git gladys
 cd gladys
 
 # Installing dependencies
-sudo npm install
+sudo npm install --unsafe-perm
 
 # Starting Gladys at startup
-sudo su
-pm2 startup
-pm2 start app.js --name gladys
-pm2 save
+sudo pm2 startup
+sudo pm2 start app.js --name gladys
+sudo pm2 save

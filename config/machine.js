@@ -18,6 +18,6 @@ IPStartWith : The beginning of all your IPs on your network (to detect if your a
 module.exports.machine = {
 	master: true,
 	foreignActionToken:'319cb7d86f65a848f0325f0827fa0fc55d6456c0',
-	soundCapable : true,
+	soundCapable : process.env.SOUND_CAPABLE || true,
 	IPStartWith : '192.168'
 };
