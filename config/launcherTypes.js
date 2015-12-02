@@ -9,7 +9,7 @@
   
 
 module.exports.launcherTypes = [
-	{code: 'motion',name:'Motion', description:'Fire when a movement is detected', 'optionspath': '/room/index'},
+	{code: 'motionRoom',name:'Motion in a Room', description:'Fire when a movement is detected', 'optionspath': '/room/index'},
 	{code: 'alarmRing',name:'Alarm Ring', description:'Fire when an alarm ring', 'optionspath': '/alarm/index'},
 	{code: '433ReceivedSerialPort',name:'433 Mhz signal received', description:'Fire when a signal is received on serial port', 'optionspath': ''},
 	{code: 'leftHome',name:'Leaving Home', description:'Fire when someone left the house', 'optionspath': '/user/index'},
