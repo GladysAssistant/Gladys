@@ -33,7 +33,7 @@ module.exports = {
         required:true
     },
 
-    motions:{
+    doors:{
         collection: 'Door',
         via: 'doorsensor'
     }
