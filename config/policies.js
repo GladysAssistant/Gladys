@@ -67,8 +67,6 @@ module.exports.policies = {
   Speak : ['isMachineMaster','checkToken', 'Human'],
   State : ['isMachineMaster','checkToken', 'Human'],
   StateType : ['isMachineMaster','checkToken', 'Human'],
-  Temperature : ['isMachineMaster','checkToken', 'Human'],
-  TemperatureSensor : ['isMachineMaster','checkToken', 'Human'],
   Timer: ['isMachineMaster','checkToken', 'Human'],
   Token : ['isMachineMaster','checkToken', 'Human'],
   User : ['isMachineMaster','checkToken', 'Human'],

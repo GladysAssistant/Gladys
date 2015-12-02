@@ -55,11 +55,6 @@ module.exports = {
     milightlamps:{
         collection: 'MilightLamp',
         via: 'room'
-    },
-
-    temperaturesensor:{
-        collection: 'TemperatureSensor',
-        via: 'room'
     }
 
   },
@@ -87,13 +82,6 @@ module.exports = {
         });
 
         PhenixElectricDevice.destroy({room: values[i].id}, function(err, phenixelectricdevice){
-            if(err) return next(err);
-
-            nbOk++;
-            checkifAllDestroyed();
-        });
-
-        TemperatureSensor.destroy({room : values[i].id}, function(err, temperaturesensor){
             if(err) return next(err);
 
             nbOk++;
