@@ -150,3 +150,16 @@ Pull request are welcome, but code must follow some guidelines.
 If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](http://gladysproject.com).
 
 
+Roadmap
+-------------
+
+All the work is listed on our [Trello](https://trello.com/b/cxtyidIH) !
+
+Links
+-------------
+
+- [Website](http://gladysproject.com)
+- [Developer Website](http://developer.gladysproject.com)
+- [Trello](https://trello.com/b/cxtyidIH)
+- [Twitter](https://twitter.com/gladysproject)
+- [Instagram](https://www.instagram.com/gladysproject/)
