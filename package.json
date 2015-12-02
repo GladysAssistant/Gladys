@@ -52,7 +52,7 @@
     "request": "2.45.0",
     "sails": "^0.11.0",
     "sails-disk": "~0.10.0",
-    "sails-hook-dev": "^0.2.2",
+    "sails-hook-dev": "^1.0.0",
     "sails-hook-hookloader": "~0.2.0",
     "sails-memory": "~0.10.3",
     "sails-mysql": "~0.10.7",
