@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /** 
   * Gladys Project
   * http://gladysproject.com
