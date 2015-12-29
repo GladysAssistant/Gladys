@@ -15,7 +15,7 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
-var bcrypt = require('bcryptjs');
+var bcrypt = require('bcrypt');
 var crypto = require('crypto');
 
 module.exports = {

@@ -14,6 +14,8 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var bcrypt = require('bcrypt');
+
 module.exports = {
 
   attributes: {
@@ -216,7 +218,7 @@ module.exports = {
 
     delete values.confirmation;
 
-      require('bcryptjs').hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
+      bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
         if (err) return next(err);
         values.password = encryptedPassword;
         // values.online= true;
