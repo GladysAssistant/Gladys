@@ -10,7 +10,7 @@
 
 
 # This install files is for  simplifying the installation of Gladys
-# on a Raspberry Pi.
+# on a Raspberry Pi 2.
 # Make sure your firmware version is up to date,
 # You can upgrade with the command "sudo rpi-update"
 
