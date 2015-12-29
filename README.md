@@ -28,7 +28,7 @@ Gladys is 100% written in Node.js, with the [sails.js](http://sailsjs.org/) fram
 Prerequisites
 -------------
 
-- [Node.js](http://nodejs.org) ( = v.0.10.xx, some troubles appears with node.js 0.12.x )
+- [Node.js](http://nodejs.org) ( >= v4.2.2, not compatible with v5 for now )
 - [MySQL](http://www.mysql.com/)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
@@ -41,15 +41,18 @@ Prerequisites
 Getting Started
 ---------------
 
-The easiest way to get started is to clone the Gladys repository:
+The easiest way to get started is to install Gladys with NPM :
 
 ```bash
-# Clone the repository
-$ git clone https://github.com/GladysProject/Gladys.git gladys
-$ cd gladys
+npm install -g gladys --unsafe-perm
+```
 
-# Install NPM dependencies
-$ npm install
+Gladys is now located where you global node_modules are.
+
+For example on Raspbian or on a Mac, it's located in :
+ 
+```
+/usr/local/lib/node_modules/gladys
 ```
 
 #### Connect Gladys to MySQL
