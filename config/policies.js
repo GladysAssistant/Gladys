@@ -44,8 +44,6 @@ module.exports.policies = {
   Lock : ['isMachineMaster','checkToken', 'Human'],
   Machine : ['isMachineMaster','checkToken', 'Human'],
   Message : ['isMachineMaster','checkToken', 'Human'],
-  MilightLamp : ['isMachineMaster','checkToken', 'Human'],
-  MilightWifi : ['isMachineMaster','checkToken', 'Human'],
   Motion : ['isMachineMaster','checkToken', 'Human'],
   MotionSensor : ['isMachineMaster','checkToken', 'Human'],
   Music : ['isMachineMaster','checkToken', 'Human'],

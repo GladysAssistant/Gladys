@@ -125,30 +125,7 @@
 
                             
 
-                            
-
-                            <div class="box" data-ng-controller="milightCtrl as vm" >
-                                <div class="box-header">
-                                    <h3 class="box-title"><%= __('My devices') %></h3>
-                                    <div class="box-tools pull-right">
-                                        <button class="btn btn-default btn-sm" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse"><i class="fa fa-minus"></i></button>
-                                        <button class="btn btn-default btn-sm" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove"><i class="fa fa-times"></i></button>
-                                    </div>
-                                </div>
-                                <div class="box-body">
-                                    <table class="table table-bordered">
-                                        <tbody><tr>
-                                            <!--<th style="width: 10px">#</th>-->
-                                            <th><%= __('Device') %></th>
-                                            <th><%= __('Action') %></th>
-                                        </tr>
-                                        <tr ng-repeat="milightlamp in vm.milightlamps" class="ng-cloak"> 
-                                            <td>{{milightlamp.name}}</td>
-                                            <td><button ng-click="vm.switchStatus($index, milightlamp.id)"class="btn {{ milightlamp.status && 'btn-danger' || 'btn-success' }} btn-sm">{{milightlamp.status && '<%= __('Turn Off') %>' || '<%= __('Turn On') %>' }}</button></td>
-                                        </tr>
-                                    </tbody></table>
-                                </div><!-- /.box-body -->
-                            </div>
+                    
 
                               <!-- Loading half of the boxs -->
                             <%  var i = 0;

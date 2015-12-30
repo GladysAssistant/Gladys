@@ -52,10 +52,6 @@ module.exports = {
         via: 'room'
     },
 
-    milightlamps:{
-        collection: 'MilightLamp',
-        via: 'room'
-    }
 
   },
 
