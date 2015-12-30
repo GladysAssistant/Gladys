@@ -53,7 +53,6 @@ module.exports.policies = {
   Parametre : ['isMachineMaster','checkToken', 'Human'],
   PhenixElectricDevice : ['isMachineMaster','checkToken', 'Human'],
   ProfilePicture : ['isMachineMaster','checkToken', 'Human'],
-  PushBullet : ['isMachineMaster','checkToken', 'Human'],
   Room : ['isMachineMaster','checkToken', 'Human'],
   Scenario : ['isMachineMaster','checkToken', 'Human'],
   Script : ['isMachineMaster','checkToken', 'Human'],

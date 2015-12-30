@@ -47,7 +47,6 @@
     "node-dir": "~0.1.6",
     "node-schedule": "~0.1.15",
     "player": "^0.6.1",
-    "pushbullet": "^1.4.3",
     "rc": "~0.5.0",
     "request": "2.45.0",
     "sails": "^0.11.0",

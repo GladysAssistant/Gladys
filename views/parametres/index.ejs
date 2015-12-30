@@ -118,40 +118,6 @@
                         </div>
                   <!-- END OF BOX Google Calendar -->
                   
-                   <!-- NEW BOX -->
-                  <div class="box box-default">
-                  <div class="box-header with-border">
-                    <h3 class="box-title"><%= __('PushBullets tokens') %></h3>
-                  </div>  
-                      <div class="box-body table-responsive" data-ng-controller="pushBulletCtrl as vm" >
-    	                           
-                                    <table id="example2" class="table table-bordered table-hover">
-                                        
-                                        <thead>
-                                            <tr>
-                                                <th><%= __('Token') %></th>
-                                                <th><%= __('Delete') %></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="param in vm.pushBulletParametres" class="ng-cloak">
-                                                <td>{{param.token}}</td>
-                                                <td><button ng-click="vm.destroyParametre($index, param.id)" class="btn btn-danger btn-sm" ><%= __('Delete') %></button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="text" class="form-control" ng-model="vm.newParametre.token" placeholder="<%= __('Token') %>" />
-                                                </td>
-                                                <td>
-                                                    <button ng-click="vm.createParametre()" class="btn btn-success btn-sm"><%= __('Connect new account') %></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                        </div>
-                  </div>
-                  <!-- END OF PUSHBULLET BOX -->
                   
                       <!-- MACHINE BOX -->
                   <div class="box box-default">

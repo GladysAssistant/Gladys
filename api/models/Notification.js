@@ -55,16 +55,6 @@ module.exports = {
         required:true
     },
 
-    pushovernotification:{
-        collection: 'PushoverNotification',
-        via: 'notification'
-    },
-
-    pushbulletnotification:{
-        collection: 'PushBulletNotification',
-        via: 'notification'
-    },
-
     chromenotification:{
         collection: 'ChromeNotification',
         via: 'notification'

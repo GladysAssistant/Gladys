@@ -107,17 +107,7 @@ module.exports = {
         collection: 'ProfilePicture',
         via: 'user'
     },
-
-    pushoverparametres:{
-        collection: 'PushoverParametres',
-        via: 'user'
-    },
-
-    pushbulletparametres:{
-        collection: 'PushBulletParametre',
-        via: 'user'
-    },
-
+    
     alarms:{
         collection: 'Alarm',
         via: 'user'
@@ -189,11 +179,6 @@ module.exports = {
 
     calendarlist:{
         collection: 'CalendarList',
-        via: 'user'
-    },
-
-    icals:{
-        collection: 'ICal',
         via: 'user'
     },
 

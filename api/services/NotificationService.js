@@ -43,7 +43,7 @@ module.exports = {
 				 if(err) return callback(err);
 				 
 				 if(nbOfMsgSent === 0){
-					 pushBulletService.sendNotificationUser(notification.user, notification.id, notification.title, notification.content, callback);
+					 //pushBulletService.sendNotificationUser(notification.user, notification.id, notification.title, notification.content, callback);
 				 }else{
 					 callback(null);
 				 }
