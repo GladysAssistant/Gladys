@@ -27,8 +27,8 @@ module.exports = {
 		// start listening to serial port (USB port)
 		// to detect message from Arduino
 		// if disabled, it will not start automaticaly
-		SerialPortService.startListening();
-		AlarmService.scheduleAllAlarms();
+		//SerialPortService.startListening();
+		//AlarmService.scheduleAllAlarms();
 		SocketService.destroyAllSavedSockets();
 		// import all music
 		MusicService.importFolder(function(err){
@@ -37,7 +37,7 @@ module.exports = {
 		InstallationService.injectAll(function(err){
 			if(err) return sails.log.warn(err);
 		});
-		SchedulerService.startEvery30MinutesScheduler();
+		//SchedulerService.startEvery30MinutesScheduler();
 		
 		// get version of Gladys from package.json
 		try {
