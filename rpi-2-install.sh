@@ -47,3 +47,4 @@ sudo npm install -g gladys --unsafe-perm
 sudo pm2 startup -u `whoami`
 sudo pm2 start /usr/local/lib/node_modules/gladys/app.js --name gladys
 sudo pm2 save
+sudo chattr +i /home/`whoami`/.pm2/dump.pm2
