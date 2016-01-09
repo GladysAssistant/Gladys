@@ -44,6 +44,6 @@ sudo npm install -g pm2
 sudo npm install -g gladys --unsafe-perm
 
 # Starting Gladys at startup
-sudo pm2 startup
+sudo pm2 startup -u `whoami`
 sudo pm2 start /usr/local/lib/node_modules/gladys/app.js --name gladys
 sudo pm2 save
