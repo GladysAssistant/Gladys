@@ -103,14 +103,14 @@ module.exports = {
   
   index: function(req,res,next){
       if(typeof req.param('start') === 'undefined' || typeof req.param('end') === 'undefined') {
-        return res.json('Wrong parametre');
+        return res.json('Wrong parameter');
       }
       
       var start = parseInt(req.param('start'));
       var end = parseInt(req.param('end'));
       
       if(isNaN(start) || isNaN(end)){
-        return res.json('Must be valid number');
+        return res.json('Must be a valid number');
       }
       
       var sql = "SELECT lifeevent.id, name, BeautifulName, FaIcon,iconColor, sentence, param, datetime ";
