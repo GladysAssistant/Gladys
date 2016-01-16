@@ -82,9 +82,9 @@ function getIntervalBetweenLifeEvents(userId,startEventType, stopEventType, call
   						var duration = (date1.getTime() - date2.getTime())/ (1000*60*60);
               // Round in the format :  8,2 Hours (for example) 
               duration = Math.round(duration*10)/10;
-              var month = date2.getMonth() + 1;
-              var day = date2.getDate();
-              var year = date2.getFullYear();
+              var month = date1.getMonth() + 1;
+              var day = date1.getDate();
+              var year = date1.getFullYear();
   						Interval[cpt] = {start : (year + "-" + month + "-" + day), duration : duration};
   						cpt++;
   					}
