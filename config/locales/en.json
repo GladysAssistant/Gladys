@@ -1,5 +1,6 @@
 {
   "Welcome": "Welcome",
+  "registration-birthdate-placeholder": "yyyy-mm-dd",
   "in-case-problem-check-forum": "If you have some troubles, you can check Gladys forum",
   "welcome-sentence-installation": "Welcome in the installation page of Gladys !",
   "before-installing-sentence-installation": "Before installating Gladys, be sure that you have followed the configuration step on Gladys project website.",
