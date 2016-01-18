@@ -82,8 +82,7 @@ function saveorUpdateEvent(userId, Event,callback) {
         }else if(Event.start.date){
             Event.start = Event.start.date;
         }
-    }
-    if(!Event.start){
+    } else {
         return callback('saveorUpdateEvent : No start date for the event.');
     }
 
@@ -93,8 +92,7 @@ function saveorUpdateEvent(userId, Event,callback) {
         }else if(Event.end.date){
             Event.end = Event.end.date;
         }
-    }
-    if(!Event.end){
+    } else {
         return callback('saveorUpdateEvent : No end date for the event.');
     }
 
