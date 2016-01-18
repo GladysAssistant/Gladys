@@ -76,17 +76,25 @@ function getGoogleCalendar(access_token,refresh_token,userId, callback){
 function saveorUpdateEvent(userId, Event,callback) {
 
 	// transform all
-	if(Event.start.dateTime){
-		Event.start = Event.start.dateTime;
-	}else if(Event.start.date){
-		Event.start = Event.start.date;
-	}
+	if(Event.start){
+        if(Event.start.dateTime){
+            Event.start = Event.start.dateTime;
+        }else if(Event.start.date){
+            Event.start = Event.start.date;
+        }
+    } else {
+        return callback('saveorUpdateEvent : No start date for the event.');
+    }
 
-	if(Event.end.dateTime){
-		Event.end = Event.end.dateTime;
-	}else if(Event.end.date){
-		Event.end = Event.end.date;
-	}
+    if(Event.end){
+        if(Event.end.dateTime){
+            Event.end = Event.end.dateTime;
+        }else if(Event.end.date){
+            Event.end = Event.end.date;
+        }
+    } else {
+        return callback('saveorUpdateEvent : No end date for the event.');
+    }
 
 	Event.externalid = Event.id;
 	delete Event.id;
