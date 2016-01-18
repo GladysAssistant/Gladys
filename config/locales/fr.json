@@ -5,6 +5,7 @@
   "First Name" : "Prénom",
   "Last Name" : "Nom",
   "Birthdate": "Date de naissance",
+  "registration-birthdate-placeholder": "jj/mm/aaaa",
   "Your Email" : "Votre Email",
   "Email" : "Email",
   "Password": "Mot de passe",
