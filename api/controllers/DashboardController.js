@@ -116,9 +116,5 @@ module.exports = {
     res.view('me/index', {User: req.session.User, pageName: req.__('pagename-me')});
   },
 
-  music:function(req,res,next){
-    res.view('music/index', {User: req.session.User, pageName: req.__('pagename-music')});
-  }
-
 };
 
