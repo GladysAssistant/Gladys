@@ -26,10 +26,14 @@ before(function(done) {
     fixtures = barrels.data;
 
     // Populate the DB
-    barrels.populate(['house', 'user'],function(err) {
-        console.log('House : '+ err);
+    barrels.populate(['user', 'house'],function(err) {
+        if(err) return done(err);
+        
+        barrels.populate(['room'],function(err) {
+            if(err) return done(err);
 
-        done(err, sails);
+            done(err, sails);
+        });
     });
 
   });
@@ -37,5 +41,7 @@ before(function(done) {
 
 after(function(done) {
   // here you can clear fixtures, etc.
-  sails.lower(done);
+  sails.lower(function(){
+      done();
+  });
 });

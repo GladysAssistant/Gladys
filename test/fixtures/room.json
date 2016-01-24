@@ -1,7 +1,7 @@
 [
   {
     "name": "Salon",
-    "house": "1",
+    "house": 1,
     "permission" : 1
   },
   {

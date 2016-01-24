@@ -1,5 +1,6 @@
 [
   {
+    "uuid": "2094b316-c295-48d7-bbdd-40360d2543dd",
     "name": "Maison principale",
     "address": "102 avenue des Champs-Elysées",
     "city" : "Paris",
@@ -7,6 +8,7 @@
     "country": "France"
   },
   {
+    "uuid": "2c3935c8-25e4-4956-ab20-e3c3eb798e2d",
     "name": "Maison de vacances",
     "address": "26 Boulevard Eugène Gazagnair",
     "city" : "Cannes",
