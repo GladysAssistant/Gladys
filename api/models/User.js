@@ -29,6 +29,10 @@ module.exports = {
       type:'string',
       required:true
     },
+    
+    fullname: function() {
+      return this.firstname + ' ' + this.lastname;
+    },
 
   	email:{
   		type:'email',
@@ -39,6 +43,12 @@ module.exports = {
     birthdate :{
       type:'date',
       required:true
+    },
+    
+    age: function() {
+        var birth = new Date(this.birthdate);
+        var now = new Date();
+        return (now.getTime() - birth.getTime())/ (1000*60*60*24*365);
     },
     
     gender :{
