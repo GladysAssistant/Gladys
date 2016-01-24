@@ -1,6 +1,6 @@
 var request = require('supertest');
 
-describe('UserController', function() {
+describe.skip('UserController', function() {
 
   describe('#login()', function() {
     it('should redirect to /dashboard', function (done) {

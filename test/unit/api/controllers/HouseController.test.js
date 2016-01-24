@@ -1,7 +1,7 @@
 var request = require('supertest');
 var validateHouse = require('../validator/houseValidator.js');
 
-describe('HouseController', function() {
+describe.skip('HouseController', function() {
 
   describe('index', function() {
     
