@@ -50,9 +50,11 @@
     "sails-util-mvcsloader": "^0.3.0"
   },
   "devDependencies": {
+    "grunt-mocha-istanbul": "^3.0.1",
     "gulp": "^3.9.0",
     "gulp-jsbeautifier": "^1.0.1",
     "gulp-jshint": "^1.11.2",
+    "istanbul": "^0.4.2",
     "jshint-stylish": "^2.0.1",
     "mocha": "^2.3.4",
     "should": "^7.1.1",

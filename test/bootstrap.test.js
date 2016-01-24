@@ -12,7 +12,7 @@ log: {
 before(function(done) {
   Sails.lift({
     models: {
-      connection: 'test',
+      connection: process.env.CONNECTION_NAME || 'test',
       migrate: 'drop'
     }
   }, function(err, server) {

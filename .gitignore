@@ -66,6 +66,7 @@
 ################################################
 
 node_modules
+coverage
 bower_components
 .GladysBackUp
 music/**/*.mp3

@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - '4.2'
+  
+services:
+  - mysql
+  
+before_install:
+  - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
+
+script:
+  - "grunt coverage"
+    
+env:
+  - CONNECTION_NAME=travis

@@ -56,6 +56,15 @@ module.exports.connections = {
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || 'root',
     database: process.env.MYSQL_DATABASE || 'gladys'
-  }
+  },
+  
+  travis: {
+    adapter: 'sails-mysql',
+    host: '127.0.0.1',
+    port: 3306,
+    user: 'travis',
+    password: '',
+    database: 'gladystest'
+  },
 
 };
