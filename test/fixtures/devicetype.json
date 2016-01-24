@@ -1,9 +1,11 @@
 [
   {
+    "id": 1,  
     "type": "binary",
     "device": 1
   },
   {
+    "id": 2,  
     "type":"multilevel",
     "unit": "color",
     "min": 0,
@@ -11,6 +13,7 @@
     "device": 1
   },
   {
+    "id": 3,  
     "type": "binary",
     "device": 2
   }
