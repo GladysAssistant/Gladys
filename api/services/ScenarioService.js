@@ -145,11 +145,6 @@ module.exports = {
 	launcher: function(code, value, callback) {
 
 		// emit an event for modules
-		
-		// deprecated way.. keeped for module 
-		sails.config.Event.emit(code, value);
-		
-		// new way
 		gladys.emit(code, value);
 		
 		sails.log.info('ScenarioService : launcher : ' + code + ' : ' + value);

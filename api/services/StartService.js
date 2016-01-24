@@ -45,9 +45,6 @@ module.exports = {
 			sails.log.warn('Cannot parse package.json');
 		}
 		
-		// old way
-		sails.config.Event.emit('sailsReady');
-		// new way
 		gladys.emit('sailsReady');
 	}
 
