@@ -14,3 +14,4 @@ script:
     
 env:
   - CONNECTION_NAME=travis
+  - CXX=g++-4.8
