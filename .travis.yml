@@ -5,6 +5,11 @@ node_js:
   
 services:
   - mysql
+
+addons:
+  apt:
+    packages:
+    - g++-4.8
   
 before_install:
   - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
