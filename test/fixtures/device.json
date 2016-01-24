@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Light",
+    "protocol": "milight",
+    "room": 1
+  },
+  {
+    "name": "TV",
+    "protocol": "zwave",
+    "room": 1
+  }
+]

@@ -24,6 +24,14 @@ module.exports = {
           required: true
       }
 
+  },
+  
+  beforeValidate: function(values, cb){
+      // If no datetime is set, set to actual time
+        if (!values.datetime) {
+            values.datetime = new Date();
+        }
+        cb();
   }
 };
 

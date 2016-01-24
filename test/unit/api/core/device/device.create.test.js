@@ -1,4 +1,5 @@
 var should = require('should');
+var validateDevice = require('../../validator/deviceValidator.js');
 
 describe('Device', function() {
 
@@ -29,7 +30,7 @@ describe('Device', function() {
         gladys.device.create(obj).then(function(result){
            result.should.have.property('device');
            result.should.have.property('types');
-           result.device.should.have.property('id');
+           validateDevice(result.device);
            result.types.should.be.instanceOf(Array);
            result.types[0].should.have.property('id');
            done();

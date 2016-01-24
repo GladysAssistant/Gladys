@@ -23,6 +23,16 @@ module.exports = {
           required: true
       }
 
+  },
+  
+  beforeDestroy: function (criteria, cb){
+      if(criteria.where && criteria.where.id){
+          
+          // removing all deviceType associated with a specific device
+          DeviceType.destroy({device: criteria.where.id}, cb);
+      } else {
+          cb();   
+      }
   }
 };
 

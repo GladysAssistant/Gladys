@@ -31,8 +31,20 @@ before(function(done) {
         
         barrels.populate(['room'],function(err) {
             if(err) return done(err);
+            
+            barrels.populate(['device'],function(err) {
+                if(err) return done(err);
+                
+                 barrels.populate(['devicetype'],function(err) {
+                        if(err) return done(err);
 
-            done(err, sails);
+                        barrels.populate(['devicestate'],function(err) {
+                            if(err) return done(err);
+
+                            done(err, sails);
+                        });
+                 });
+            });
         });
     });
 

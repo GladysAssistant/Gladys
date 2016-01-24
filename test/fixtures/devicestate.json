@@ -1,0 +1,18 @@
+[
+  {
+    "value": 1,
+    "devicetype": 1
+  },
+  {
+    "value": 0,
+    "devicetype": 1
+  },
+  {
+    "value": 12,
+    "devicetype": 2
+  },
+  {
+    "value": 0,
+    "devicetype": 3
+  }
+]

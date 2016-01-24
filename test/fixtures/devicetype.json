@@ -1,0 +1,17 @@
+[
+  {
+    "type": "binary",
+    "device": 1
+  },
+  {
+    "type":"multilevel",
+    "unit": "color",
+    "min": 0,
+    "max": 100,
+    "device": 1
+  },
+  {
+    "type": "binary",
+    "device": 2
+  }
+]
