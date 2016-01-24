@@ -2,7 +2,9 @@
   {
     "id": 1,  
     "type": "binary",
-    "device": 1
+    "device": 1,
+    "min": 0,
+    "max": 1 
   },
   {
     "id": 2,  
@@ -15,6 +17,8 @@
   {
     "id": 3,  
     "type": "binary",
-    "device": 2
+    "device": 2,
+    "min": 0,
+    "max": 1
   }
 ]

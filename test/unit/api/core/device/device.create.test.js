@@ -16,7 +16,9 @@ describe('Device', function() {
             
             types: [
                 {
-                    type: 'binary'
+                    type: 'binary',
+                    min: 0,
+                    max: 1
                 },
                 {
                     type:'multilevel',
@@ -36,6 +38,66 @@ describe('Device', function() {
            done();
         }).catch(function(err){
             done(err);
+        });
+
+    });
+    
+    it('should return an error, incorrect device', function (done) {
+     	var obj = {
+             
+            device: {
+               name: 'Light in my room',
+               protocol: 'milight',
+            },
+            
+            types: [
+                {
+                    type: 'binary',
+                    min: 0,
+                    max: 1
+                },
+                {
+                    type:'multilevel',
+                    unit: 'color',
+                    min: 0,
+                    max: 100
+                }
+            ]   
+        };
+        
+        gladys.device.create(obj).then(function(result){
+           
+           done('No error detected');
+        }).catch(function(err){
+            done();
+        });
+
+    });
+    
+     it('should return an error, incorrect types', function (done) {
+     	var obj = {
+             
+            device: {
+               name: 'Light in my room',
+               protocol: 'milight',
+               room: 1
+            },
+            
+            types: [
+                {
+                    // no type specified...
+                    unit:'degrees',
+                    min: 0,
+                    max: 100
+                }
+            ]   
+        };
+        
+        gladys.device.create(obj).then(function(result){
+           
+           done('No error detected');
+        }).catch(function(err){
+            done();
         });
 
     });

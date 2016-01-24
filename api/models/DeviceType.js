@@ -19,15 +19,18 @@ module.exports = {
       },
       
       min: {
-          type: 'integer'
+          type: 'integer',
+          required: true
       },
       
       max: {
-          type: 'integer'
+          type: 'integer',
+          required: true
       },
       
       device: {
-          model: 'Device'  
+          model: 'Device',
+          required: true  
       }
 
   },
