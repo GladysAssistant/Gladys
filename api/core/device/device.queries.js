@@ -2,13 +2,13 @@
 
 module.exports = {
   get: `
-    SELECT * FROM Device
-    JOIN DeviceType ON (Device.id = DeviceType.device)
+    SELECT * FROM device
+    JOIN devicetype ON (device.id = devicetype.device)
     LIMIT ?
     OFFSET ?;
   `,
   getDeviceType: `
-    SELECT id, type, unit, min, max, device FROM DeviceType
+    SELECT id, type, unit, min, max, device FROM devicetype
     WHERE id = ?;
   `
     
