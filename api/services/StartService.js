@@ -30,10 +30,7 @@ module.exports = {
 		//SerialPortService.startListening();
 		//AlarmService.scheduleAllAlarms();
 		SocketService.destroyAllSavedSockets();
-		// import all music
-		MusicService.importFolder(function(err){
-			if(err) return sails.log.warn(err);
-		});
+
 		InstallationService.injectAll(function(err){
 			if(err) return sails.log.warn(err);
 		});
