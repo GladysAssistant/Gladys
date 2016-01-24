@@ -22,5 +22,4 @@ script:
   - "grunt coverage"
     
 env:
-  - CONNECTION_NAME=travis
   - CXX=g++-4.8

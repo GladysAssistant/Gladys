@@ -10,9 +10,14 @@ log: {
 
 // Gobal before
 before(function(done) {
+  var connectionName = 'test';
+  if(process.env.TRAVIS) {
+     connectionName = 'travis'; 
+  } 
+   
   Sails.lift({
     models: {
-      connection: process.env.CONNECTION_NAME || 'test',
+      connection: connectionName,
       migrate: 'drop'
     }
   }, function(err, server) {
