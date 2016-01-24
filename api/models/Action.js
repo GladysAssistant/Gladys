@@ -23,10 +23,6 @@ module.exports = {
         required:true
     },
 
-  	parametre:{
-  		type:'string'
-  	},
-
   	launcher: {
         model: 'Launcher'
     },

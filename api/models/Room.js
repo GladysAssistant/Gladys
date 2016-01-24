@@ -23,75 +23,15 @@ module.exports = {
       required:true
     },
 
-    sleepers:{
-        collection:'User',
-        via:'roomwheresleep'
-    },
-
     house:{
-        model:'House',
-        required:true
+      model:'House',
+      required:true
     },
-
-    timeBeforeEmpty:{
-        type:'integer',
-        defaultsTo: sails.config.room.defaultTimeBeforeEmpty
-    },
-
+    
     permission:{
-        type:'integer'
+      type:'integer'
     },
-
-    motionsensors:{
-        collection: 'MotionSensor',
-        via: 'room'
-    },
-
-    phenixelectricdevices:{
-        collection: 'PhenixElectricDevice',
-        via: 'room'
-    },
-
-
-  },
-
-   afterDestroy: function(values, next){
-
-    var nbOk = 0;
-    var i;
-    var nbThingsToDestroy = 4;
-    var checkifAllDestroyed = function(){
-
-        if(nbOk == values.length*nbThingsToDestroy)
-            next();
-    };
-
-    if(values.length === 0)
-        return next();
-
-    for(i = 0; i<values.length;i++){
-        MotionSensor.destroy({room: values[i].id}, function(err, motionsensor){
-            if(err) return next(err);
-
-            nbOk++;
-            checkifAllDestroyed();
-        });
-
-        PhenixElectricDevice.destroy({room: values[i].id}, function(err, phenixelectricdevice){
-            if(err) return next(err);
-
-            nbOk++;
-            checkifAllDestroyed();
-        });
-
-        MilightLamp.destroy({room: values[i].id}, function(err, milightlamp){
-            if(err) return next(err);
-
-            nbOk++;
-            checkifAllDestroyed();
-        });
-    }
-   }
-
+  }
+  
 };
 

@@ -24,8 +24,8 @@ module.exports = {
     },
 
     code:{
-    	type:'integer',
-    	required:true
+      type:'integer',
+      required:true
     },
 
     userhouserelations:{

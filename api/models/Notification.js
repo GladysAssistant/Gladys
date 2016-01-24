@@ -18,46 +18,45 @@ module.exports = {
 
   attributes: {
 
-  	content :{
-      type:'string',
-      required:true
-    },
-
-    title :{
+    title: {
     	type: 'string',
     	required:true
     },
-
-    priority:{
-    	type:'integer',
-    	 min: -2,
-    	 max: 2,
-    	 required:true
-    },
-
-    isRead:{
-        type:'boolean',
-        defaultsTo:false
-    },
     
-    icon:{
-        type:'string',
+    text: {
+        type: 'string',
         required:true
     },
     
-    iconColor:{
-        type:'string',
-        required:true
+    link: {
+        type:'string'
     },
 
-    user:{
-        model:'User',
-        required:true
+    priority: {
+        type: 'integer',
+    	min: -2,
+    	max: 2,
+    	required: true
     },
 
-    chromenotification:{
-        collection: 'ChromeNotification',
-        via: 'notification'
+    isRead: {
+        type: 'boolean',
+        defaultsTo: false
+    },
+    
+    icon: {
+        type: 'string',
+        required: true
+    },
+    
+    iconColor: {
+        type: 'string',
+        required: true
+    },
+
+    user: {
+        model: 'User',
+        required: true
     }
 
   }

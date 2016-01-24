@@ -22,23 +22,24 @@ module.exports = {
     	type: 'datetime',
     	required:true
     },
+    
+    param:{
+        type:'string'
+    },
 
     user:{
-      model:'User'
+        model:'User',
+        required: true
     },
     
     room: {
-      model: 'Room',
+        model: 'Room',
     },
 
     eventtype:{
         model:'EventType',
         required:true
-    },
-
-    param:{
-        type:'string'
-    },
+    }
 
   },
 

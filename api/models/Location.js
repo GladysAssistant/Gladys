@@ -20,25 +20,25 @@ module.exports = {
 
   	datetime:{
   		type:'datetime',
-      required:true
+        required:true
   	},
 
   	latitude:{
   		type:'float',
-      required:true
+        required:true
   	},
 
     longitude :{
-      type:'float',
-      required:true
+        type:'float',
+        required:true
     },
 
     altitude:{
-      type:'float'
+        type:'float'
     },
 
     accuracy:{
-      type:'float'
+        type:'float'
     },
 
     user:{

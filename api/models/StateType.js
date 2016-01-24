@@ -19,17 +19,27 @@ module.exports = {
   attributes: {
 
   	code:{
-  		type:'string',
-  		required:true
+      type:'string',
+  	  required:true
   	},
+      
+    service: {
+      type:'string',
+      required: true
+    },
+    
+    function: {
+      type:'string',
+      required: true  
+    },
 
   	name:{
-  		type:'string',
-  		required:true
+      type:'string',
+  	  required:true
   	},
 
   	description:{
-  		type:'string'
+  	  type:'string'
   	},
 
   	states:{

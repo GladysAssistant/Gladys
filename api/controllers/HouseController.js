@@ -13,7 +13,6 @@
  * @description :: Server-side logic for managing Houses
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
-var crypto = require('crypto');
 
 /**
  * Test if the user is allowed to get/modify the house

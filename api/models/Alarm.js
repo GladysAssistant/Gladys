@@ -50,7 +50,7 @@ module.exports = {
       defaultsTo:-1
     },
 
-    status:{
+    active:{
     	type:'boolean',
     	defaultsTo:true
     },

@@ -20,7 +20,7 @@ module.exports = {
 
   	code:{
   		type:'string',
-      unique:true,
+        unique:true,
   		required:true
   	},
 
@@ -32,9 +32,13 @@ module.exports = {
   	description:{
   		type:'string'
   	},
-
+      
+    service: {
+        type:'string'    
+    },
+    
     optionspath:{
-      type:'string'
+        type:'string'
     },
 
   	launchers:{

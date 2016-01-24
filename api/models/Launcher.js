@@ -33,8 +33,8 @@ module.exports = {
   	},
 
     active:{
-      type:'boolean',
-      defaultsTo: true
+        type:'boolean',
+        defaultsTo: true
     },
 
   	actions: {

@@ -17,6 +17,11 @@
 module.exports = {
 
   attributes: {
+      
+    uuid: {
+      type: 'uuid',
+      required: true
+    },
 
     name:{
       type:'string',
@@ -24,12 +29,12 @@ module.exports = {
     },
 
   	address:{
-  		type:'string',
+  	  type:'string',
       required:true
   	},
 
   	city:{
-  		type:'string',
+  	  type:'string',
       required:true
   	},
 
@@ -52,18 +57,13 @@ module.exports = {
     },
 
     rooms:{
-        collection: 'Room',
-        via: 'house'
+      collection: 'Room',
+      via: 'house'
     },
 
     userrelation:{
       collection: 'UserHouseRelation',
       via: 'house'
-    },
-
-    usersInside :{
-        collection: 'User',
-        via: 'atHome'
     },
 
   },

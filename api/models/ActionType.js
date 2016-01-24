@@ -18,12 +18,12 @@ module.exports = {
 
   attributes: {
 
-  	serviceName:{
+  	service:{
   		type:'string',
   		required:true
   	},
 
-    functionName:{
+    function:{
       type:'string',
       required:true
     },

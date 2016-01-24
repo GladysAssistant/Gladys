@@ -16,7 +16,6 @@
  */
 
 var bcrypt = require('bcrypt');
-var crypto = require('crypto');
 
 module.exports = {
 

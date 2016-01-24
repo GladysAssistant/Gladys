@@ -30,10 +30,6 @@ module.exports = {
       required:true
     },
 
-    fullname: function() {
-      return this.firstname + ' ' + this.lastname;
-    },
-
   	email:{
   		type:'email',
   		required:true,
@@ -44,13 +40,7 @@ module.exports = {
       type:'date',
       required:true
     },
-
-    age: function() {
-        var birth = new Date(this.birthdate);
-        var now = new Date();
-        return (now.getTime() - birth.getTime())/ (1000*60*60*24*365);
-    },
-
+    
     gender :{
       type:'integer',
       required:true
@@ -67,15 +57,6 @@ module.exports = {
   		required:true
   	},
 
-    online :{
-      type:'boolean'
-    },
-
-    isSleeping:{
-      type:'boolean',
-      defaultsTo:false
-    },
-
     assistantName:{
       type:'string',
       defaultsTo:'Gladys'
@@ -85,111 +66,6 @@ module.exports = {
     // to go working for example
     preparationTimeAfterWakeUp:{
       type:'integer'
-    },
-
-    roomwheresleep:{
-      collection: 'Room',
-      via: 'sleepers',
-      dominant:true
-    },
-
-    houserelation:{
-      collection: 'UserHouseRelation',
-      via: 'user'
-    },
-
-    locations:{
-        collection: 'Location',
-        via: 'user'
-    },
-
-    profilepicture:{
-        collection: 'ProfilePicture',
-        via: 'user'
-    },
-    
-    alarms:{
-        collection: 'Alarm',
-        via: 'user'
-    },
-
-    sentMessage:{
-        collection: 'Message',
-        via: 'sender'
-    },
-
-    receivedMessage:{
-        collection: 'Message',
-        via: 'receiver'
-    },
-
-    tokens:{
-        collection: 'Token',
-        via: 'user'
-    },
-
-    actions:{
-        collection: 'Action',
-        via: 'user'
-    },
-
-    states:{
-        collection: 'State',
-        via: 'user'
-    },
-
-    launchers:{
-        collection: 'Launcher',
-        via: 'user'
-    },
-
-    speaks:{
-        collection: 'Speak',
-        via: 'user'
-    },
-
-    sockets:{
-        collection: 'Socket',
-        via: 'user'
-    },
-
-    parametres:{
-        model:'Parametre'
-    },
-
-    // if null, user is outside
-    // if value of a House, user is inside the house
-    atHome: {
-      model:'House'
-    },
-
-    menubaritems:{
-        collection: 'MenuBarItem',
-        via: 'user'
-    },
-
-    timers:{
-        collection: 'Timer',
-        via: 'user'
-    },
-
-    googleapi:{
-        model:'GoogleApi'
-    },
-
-    calendarlist:{
-        collection: 'CalendarList',
-        via: 'user'
-    },
-
-    contacts:{
-        collection: 'Contact',
-        via: 'user'
-    },
-
-    RFDevices:{
-        collection: 'RFDevice',
-        via: 'user'
     },
 
   },

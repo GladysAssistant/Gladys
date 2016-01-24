@@ -28,18 +28,15 @@ module.exports = {
       unique:true
     },
 
-    status :{
-    	type: 'boolean',
-    	defaultsTo: true
+    active :{
+      type: 'boolean',
+      defaultsTo: true
     },
 
     user:{
-        model:'User',
-        required:true,
-        foreignKey: true
+      model:'User',
+      required:true
     }
-
-
 
   }
 };
