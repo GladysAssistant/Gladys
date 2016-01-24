@@ -54,7 +54,9 @@
     "gulp-jsbeautifier": "^1.0.1",
     "gulp-jshint": "^1.11.2",
     "jshint-stylish": "^2.0.1",
-    "should": "^7.1.1"
+    "mocha": "^2.3.4",
+    "should": "^7.1.1",
+    "supertest": "^1.1.0"
   },
   "scripts": {
     "start": "node app.js",
