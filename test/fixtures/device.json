@@ -3,12 +3,14 @@
     "id": 1,
     "name": "Light",
     "protocol": "milight",
+    "service": "MilightService",
     "room": 1
   },
   {
     "id": 2,
     "name": "TV",
     "protocol": "zwave",
+    "service": "ZwaveService",
     "room": 1
   }
 ]

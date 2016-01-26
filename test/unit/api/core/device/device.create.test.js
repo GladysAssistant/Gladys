@@ -11,6 +11,7 @@ describe('Device', function() {
             device: {
                name: 'Light in my room',
                protocol: 'milight',
+               service: 'MilightService',
                room: 1
             },
             
@@ -47,7 +48,7 @@ describe('Device', function() {
              
             device: {
                name: 'Light in my room',
-               protocol: 'milight',
+               protocol: 'milight'
             },
             
             types: [
