@@ -18,6 +18,11 @@ module.exports = {
         required: true
       },
       
+      service: {
+        type:'string',
+        required: true  
+      },
+      
       room: {
           model: 'Room',
           required: true
