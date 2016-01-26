@@ -57,8 +57,13 @@ module.exports = {
     user: {
         model: 'User',
         required: true
+    },
+    
+    type: {
+        model: 'NotificationType',
+        required: true
     }
-
+    
   }
 };
 
