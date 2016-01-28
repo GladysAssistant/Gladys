@@ -148,14 +148,15 @@ gladys.device.update(device)
 
 ```
 
-###Set
+###Exec
 
-`gladys.device.set` set a new value for the devicetype passed in argument. 
-It simply check if the DeviceType exist, and then create a DeviceState in the database.
+`gladys.device.exec` set a new value for the devicetype passed in argument and exec the related service.
+It simply check if the DeviceType exist, then call the service to start an action (turning on the light for example ),
+then create a DeviceState in the database.
 
 **Params**
 
-`gladys.device.set`
+`gladys.device.exec` need an object, see the example.
 
 **Example**
 
@@ -166,7 +167,7 @@ var state = {
     value: 1  
 };
 
-gladys.device.set(state)
+gladys.device.exec(state)
       .then(function(state){
           // new state created
       })
