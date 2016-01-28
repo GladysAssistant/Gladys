@@ -21,7 +21,7 @@ function set (param) {
 
             
             if (typeof global[types[0].service] !== "function"){
-                return reject({code: 500, message: 'Service does not exist'});
+                return reject({code: 500, message: `${types[0].service} is not a valid service`});
             }
             
             // calling service method
