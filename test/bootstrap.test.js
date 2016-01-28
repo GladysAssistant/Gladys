@@ -59,7 +59,7 @@ function fillDatabaseWithFixtures(done){
             barrels.populate(['device'],function(err) {
                 if(err) return done(err);
                 
-                 barrels.populate(['devicetype'],function(err) {
+                 barrels.populate(['devicetype', 'notificationtype'],function(err) {
                         if(err) return done(err);
 
                         barrels.populate(['devicestate'],function(err) {

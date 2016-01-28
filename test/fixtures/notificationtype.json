@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "service": "TestService",
+        "user": 1
+    },
+    {
+        "id": 2,
+        "service": "ThisServiceDoesNotExist",
+        "user": 1
+    }
+]

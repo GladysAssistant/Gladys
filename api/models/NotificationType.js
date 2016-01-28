@@ -25,6 +25,10 @@ module.exports = {
       
       priority: {
           type:'integer'
+      },
+      
+      user: {
+          model: 'User'
       }
   }
 };
