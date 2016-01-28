@@ -1,14 +1,11 @@
 module.exports = install;
 
+var Promise = require('bluebird');
+var createNotificationType = Promise.promisify(NotificationType.create);
+
 /**
  * Install a new Notification Type
  */
 function install (type){
-    return new Promise(function(resolve, reject){
-       NotificationType.create(type, function(err, notificationType) {
-           if(err) return reject(err);
-           
-           resolve(notificationType);
-       }); 
-    });
+    return createNotificationType(type);
 }
