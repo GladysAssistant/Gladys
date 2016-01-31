@@ -21,14 +21,7 @@ module.exports = {
       service: {
           type:'string',
           required: true
-      },
-      
-      priority: {
-          type:'integer'
-      },
-      
-      user: {
-          model: 'User'
       }
+      
   }
 };
