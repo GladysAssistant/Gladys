@@ -5,7 +5,7 @@ describe('Notification', function() {
 
   describe('create', function() {
     
-    it.only('should return notification created', function (done) {
+    it('should return notification created', function (done) {
      	 
           var notification = {
              title: 'Fire !',
