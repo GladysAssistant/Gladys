@@ -12,6 +12,8 @@
 global.gladys = require('../api/core/index.js');
 
 module.exports.bootstrap = function(cb) {
+    
+    gladys.load();
 	
 	// refresh events only in production mode to avoid flooding
 	// Github when developping
