@@ -175,3 +175,36 @@ gladys.device.exec(state)
          // something bad happened ! 
       });
 ```
+
+###addTypes
+
+
+`gladys.device.addTypes` add new DeviceTypes to an existing Device.
+
+**params**
+
+`gladys.device.addTypes` need an array of DeviceTypes.
+
+**Example**
+
+```javascript
+
+var types =  [
+    {
+        device: 1,
+        type: 'binary',
+        min: 0,
+        max: 1
+    }
+];
+
+gladys.device.addTypes(types)
+      .then(function(types){
+          // new types created ! 
+      })
+      .catch(function(err){
+         // something bad happened :/ 
+      });
+
+```
+
