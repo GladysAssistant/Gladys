@@ -35,6 +35,7 @@ module.exports.policies = {
   ChromeNotification : ['isMachineMaster','checkToken', 'Human'],
   Contact : ['isMachineMaster','checkToken', 'Human'],
   Dashboard: ['isMachineMaster', 'authenticated', 'Human', 'sameNetwork'],
+  Device: ['isMachineMaster','checkToken', 'Human'],
   GoogleApi : ['isMachineMaster','checkToken', 'Human'],
   House : ['isMachineMaster','checkToken', 'Human'],
   Launcher :['isMachineMaster','checkToken', 'Human'],
