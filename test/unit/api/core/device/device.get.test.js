@@ -31,21 +31,6 @@ describe('Device', function() {
 
     });
     
-    it('should return an error', function (done) {
-        var options = {
-            take: 'This is nonsense, limit should be integer',
-            skip: 10
-        };
-        
-        gladys.device.get(options).then(function(devices){
-           
-           done('No error detected');
-        }).catch(function(err){
-            done();
-        });
-
-    });
-    
   });
 
 });
