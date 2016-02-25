@@ -1,4 +1,4 @@
-FROM node:4.2.2
+FROM node:argon
 
 # Create src folder
 RUN mkdir /src
