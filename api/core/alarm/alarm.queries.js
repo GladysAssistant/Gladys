@@ -2,7 +2,7 @@
 module.exports = {
     
   getAlarms:  `SELECT * FROM alarm
-                WHERE (status = 1)
-		        AND ( (recurring = -1 AND datetime > SYSDATE()) OR recurring <> -1 )`
+                WHERE active = 1
+		        AND ((dayofweek = -1 AND datetime > SYSDATE()) OR dayofweek <> -1 )`
 
 };

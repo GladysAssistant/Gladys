@@ -53,7 +53,7 @@ function fillDatabaseWithFixtures(done){
     barrels.populate(['user', 'house'],function(err) {
         if(err) return done(err);
         
-        barrels.populate(['room', 'token'],function(err) {
+        barrels.populate(['room', 'token', 'alarm'],function(err) {
             if(err) return done(err);
             
             barrels.populate(['device'],function(err) {
