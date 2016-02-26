@@ -41,13 +41,13 @@ module.exports = {
     	type:'string',
     	time : true,
     },
-    // recurring => If the alarm is each monday for example, going from 0 = Sunday
+    // going from 0 = Sunday
     // to 6 = Saturday
-    recurring:{
-    	type:'integer',
+    dayofweek: {
+      type:'integer',
       min: -1,
       max: 6,
-      defaultsTo:-1
+      defaultsTo: -1
     },
 
     active:{
