@@ -8,7 +8,7 @@ module.exports = function() {
   return getAlarmsPromise(queries.getAlarms, [])
               .then(function(alarms){
                   
-                   // foreach alarm, we program it via gladys.scheduler
+                   // foreach alarm, we program it via gladys.alarm.schedule
                    return Promise.map(alarms, function(alarm){
                        return gladys.alarm.schedule(alarm);
                    });
