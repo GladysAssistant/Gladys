@@ -20,7 +20,7 @@ module.exports.bootstrap = function(cb) {
 	if(sails.config.environment == 'production'){
 		LifeEventService.syncEvents();
 	}
-	StartService.onStart();
+    
 	cb();
 	//sails.hooks.orm.reload();
 	//
