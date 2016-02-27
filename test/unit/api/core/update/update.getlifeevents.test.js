@@ -4,7 +4,7 @@ describe('Update', function() {
 
   describe('getLifeEvents', function() {
     
-    it.only('should sync lifeEvents with GitHub', function (done) {
+    it('should sync lifeEvents with GitHub', function (done) {
      	 
           gladys.update.getLifeEvents()
                 .then(function(){
