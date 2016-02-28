@@ -55,7 +55,10 @@ function fillDatabaseWithFixtures(done){
         .then(function(){
             done();
         })
-        .catch(done);
+        .catch(function(err){
+            sails.log.warn('Error while loading fixtures');
+            done(err);
+        });
 }
 
 function loadFixtures(barrels){
