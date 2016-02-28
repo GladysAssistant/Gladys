@@ -2,7 +2,7 @@ var Promise = require('bluebird');
 
 module.exports = function(params){
     
-    if(!params || !params.actiontype || !params.actionparams || !params.scope){
+    if(!params || !params.actiontype || !params.scope){
         return Promise.reject(new Error('Wrong parameters passed to function'));
     }
     

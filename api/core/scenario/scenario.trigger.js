@@ -6,9 +6,17 @@ module.exports = function(params){
      return gladys.utils.sql(queries.getLaunchersWithCode, [params.eventName])
            .then(function(launchers){
                return Promise.map(launchers, function(launcher){
-                  return verifyCondition 
+                  return verifyCondition(launcher, params.scope); 
                });
-           }); 
+           })
+           .then(function(){
+               
+           })
+           .catch(function(err){
+              if(err.message !== 'condition_not_verified'){
+                  throw err;
+              }
+           });
 };
 
 
@@ -20,18 +28,9 @@ function verifyCondition(launcher, scope){
         if(result == 'true') {
             return Promise.resolve(true);
         } else {
-            return Promise.resolve(false);
+            return Promise.reject(new Error('condition_not_verified'));
         }
     } catch (e){
-        return Promise.reject(e);
+        return Promise.reject(new Error(e));
     }
-}
-
-function executeIfVerified(launcher, scope){
-    return verifyCondition(launcher, scope)
-        .then(function(result){
-           if(result){
-               
-           } 
-        });
 }

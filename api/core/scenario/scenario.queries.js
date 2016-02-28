@@ -9,7 +9,7 @@ module.exports = {
   SELECT actiontype.*, action.id AS actionId 
   FROM action 
   INNER JOIN actiontype ON action.action = actiontype.id
-  WHERE laucher = ?;
+  WHERE launcher = ?;
   `,
   getActionParams: `SELECT * FROM actionparam WHERE action = ?;`  
 };

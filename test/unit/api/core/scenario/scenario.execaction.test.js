@@ -7,13 +7,16 @@ describe('Scenario', function() {
     it('should execute action', function (done) {
      	 
           var action = {
-               
+              service: 'TestService',
+              function: 'exec',
+              id: 1 
           };
           
-          gladys.notification.create(notification)
+          gladys.scenario.execAction({actiontype: action, scope: {}})
                 .then(function(){
                     done();
-                });
+                })
+                .catch(done);
     });
     
   });
