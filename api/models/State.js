@@ -23,12 +23,7 @@ module.exports = {
         required:true
     },
 
-  	operator:{
-  		type:'string',
-  		enum: ['==', '!=', '>', '<', '>=', '<=']
-  	},
-
-  	parametre:{
+  	condition:{
   		type:'string'
   	},
 

@@ -23,14 +23,9 @@ module.exports = {
         required:true
     },
 
-  	operator:{
-  		type:'string',
-  		enum: ['==', '!=', '>', '<', '>=', '<=']
-  	},
-
-  	parametre:{
-  		type:'string'
-  	},
+  	condition: {
+        type:'string'      
+    },
 
     active:{
         type:'boolean',
