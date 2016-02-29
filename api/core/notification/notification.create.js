@@ -15,7 +15,7 @@ function create (notification){
             })
             .catch(function(err){
                  if(err.message !== 'ok'){
-                     throw err;
+                     sails.log.err(err);
                  }
             });
 }
@@ -26,7 +26,7 @@ function create (notification){
 function startService (notification, type){
         
     if(!global[type.service] || typeof global[type.service].exec !== "function"){
-        return Promise.reject({code: 500, message: `${type.service} is not a valid service`});
+        return Promise.reject(new Error(`${type.service} is not a valid service`));
     }
     return global[type.service].exec(notification)
                .then(function(ok){
