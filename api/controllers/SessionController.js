@@ -127,7 +127,7 @@ module.exports = {
 				user.online = true;
 
 				// 
-				sails.log.info("New User connected : " + user.fullname());
+				sails.log.info("New User connected : " + user.firstname);
 				// 
 				user.save(function(err, user) {
 					if (err) return next(err);

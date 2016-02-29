@@ -46,22 +46,7 @@ module.exports = {
         required:true
     }
 
-  },
-
-   beforeValidate: function (values, next) {
-
-    // If no datetime is set, set to actual time
-    if (!values.datetime) {
-        values.datetime = new Date();
-    }
-
-    // if no user is set, set to actual connected user
-    if(!values.user){
-        values.user = req.session.User.id;
-    }
-
-    next();
-   }
+  }
 
 };
 

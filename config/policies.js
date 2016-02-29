@@ -33,7 +33,6 @@ module.exports.policies = {
   CalendarEvent : ['isMachineMaster','checkToken', 'Human'],
   CalendarList : ['isMachineMaster','checkToken', 'Human'],
   ChromeNotification : ['isMachineMaster','checkToken', 'Human'],
-  Contact : ['isMachineMaster','checkToken', 'Human'],
   Dashboard: ['isMachineMaster', 'authenticated', 'Human', 'sameNetwork'],
   Device: ['isMachineMaster','checkToken', 'Human'],
   GoogleApi : ['isMachineMaster','checkToken', 'Human'],
