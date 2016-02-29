@@ -23,7 +23,7 @@ module.exports = {
         required:true
     },
 
-  	condition: {
+  	condition_template: {
         type:'string'      
     },
 

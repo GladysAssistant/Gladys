@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "name": "Test condition service",
+        "service": "TestService",
+        "function": "getValue"
+    },
+    {
+        "id": 2,
+        "name": "Test condition service",
+        "service": "UNKNOWSERVICE",
+        "function": "THISSERVICEDOESNOTEXIST"
+    }
+]

@@ -18,9 +18,13 @@ module.exports = {
 
   attributes: {
 
-  	code:{
+    name:{
       type:'string',
   	  required:true
+  	},
+
+  	description:{
+  	  type:'string'
   	},
       
     service: {
@@ -31,21 +35,7 @@ module.exports = {
     function: {
       type:'string',
       required: true  
-    },
-
-  	name:{
-      type:'string',
-  	  required:true
-  	},
-
-  	description:{
-  	  type:'string'
-  	},
-
-  	states:{
-        collection: 'State',
-        via: 'state'
-    },
+    }
 
   }
 };

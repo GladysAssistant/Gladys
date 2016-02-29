@@ -2,7 +2,21 @@
     {
         "id": 1,
         "launcher": 1,
-        "condition": "true",
+        "condition_template": "true",
+        "active": 1,
+        "user": 1
+    },
+     {
+        "id": 2,
+        "launcher": 1,
+        "condition_template": "true",
+        "active": 1,
+        "user": 1
+    },
+    {
+        "id": 3,
+        "launcher": 1,
+        "condition_template": "true",
         "active": 1,
         "user": 1
     }

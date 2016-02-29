@@ -23,7 +23,7 @@ module.exports = {
         required:true
     },
 
-  	condition:{
+  	condition_template:{
   		type:'string'
   	},
 
@@ -34,12 +34,7 @@ module.exports = {
 
     launcher:{
         model:'Launcher'
-    },
-
-    user:{
-        model:'User',
-        required:true
-    },
+    }
 
   }
 };

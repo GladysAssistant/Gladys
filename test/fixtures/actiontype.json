@@ -5,5 +5,12 @@
        "function": "exec",
        "name": "Just for testing",
        "description": "All code is guilty, until proven innocent."
+    },
+    {
+       "id": 2,
+       "service": "device",
+       "function": "get",
+       "name": "Retrieve all device",
+       "description": "Awesome function get all devices."
     }
 ]

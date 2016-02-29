@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "launcher": 1,
+        "state": 1,
+        "condition_template": "true"
+    },
+    {
+        "id": 2,
+        "launcher": 3,
+        "state": 2,
+        "condition_template": "true"
+    }
+]
