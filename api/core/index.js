@@ -13,6 +13,7 @@ gladys.load = function load () {
     gladys.notification = require('./notification/index.js');
     gladys.scenario = require('./scenario/index.js');
     gladys.scheduler = require('./scheduler/index.js');
+    gladys.script = require('./script/index.js');
     gladys.update = require('./update/index.js');
     gladys.utils = require('./utils/index.js');
     

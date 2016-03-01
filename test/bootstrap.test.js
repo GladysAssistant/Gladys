@@ -80,7 +80,8 @@ function loadFixtures(barrels){
        'actionparam',
        'statetype',
        'state',
-       'eventtype'
+       'eventtype',
+       'script'
     ];
     
     return Promise.mapSeries(order, function(tableName){
