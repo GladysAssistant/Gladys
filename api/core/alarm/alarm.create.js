@@ -8,10 +8,10 @@ module.exports = function create (alarm) {
     // create alarm in db
     return Alarm.create(alarm)
          .then(function(alarm){
-            
-            // if alarm is in the future, we schedule the alarm
-            if(new Date(alarm.datetime) > new Date() || alarm.recurring !== -1){
-				
+
+            // if alarm is in the future and active, we schedule the alarm
+            if(alarm.active && (new Date(alarm.datetime) > new Date() || alarm.dayofweek !== -1)){
+
                 // schedule the alarm with gladys.schedule
                 return gladys.alarm.schedule(alarm); 
 			} else {

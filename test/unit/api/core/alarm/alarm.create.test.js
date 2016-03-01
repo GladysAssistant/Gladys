@@ -38,6 +38,25 @@ describe('Alarm', function() {
                 .catch(done);
     });
     
+    it('should return error, wrong parameters', function (done) {
+     	 
+          var alarm = {
+            dayofweek: 1,
+            user: 1,
+            name: 'test'  
+          };
+          
+          gladys.alarm.create(alarm)
+                .then(function(alarm){
+                    
+                    done('no error detected');
+                })
+                .catch(function(err){
+                    err.message.should.equal('Wrong parameters, missing arguments.');
+                    done();
+                });
+    });
+    
     
   });
 
