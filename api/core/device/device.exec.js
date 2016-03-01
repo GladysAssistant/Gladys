@@ -1,5 +1,6 @@
 module.exports = set;
 
+var Promise = require('bluebird');
 var queries = require('./device.queries.js');
 
 /**
@@ -7,42 +8,28 @@ var queries = require('./device.queries.js');
  * the related service.
  */
 function set (param) {
-    return new Promise(function(resolve, reject){
-       DeviceType.query(queries.getDeviceType, [param.devicetype], function(err, types){
-            if(err) return reject(err);
-            
-            if (types.length === 0) {
-                return reject({code: 404, message: 'DeviceType not found'});
-            }
-            
-            if(param.value < types[0].min || param.value > types[0].max){
-                return reject({code: 422, message: 'Incorrect value.'});
-            }
+    
+    return gladys.utils.sql(queries.getDeviceType, [param.devicetype])
+      .then(function(types){  
+        
+        if (types.length === 0) {
+            return Promise.reject(new Error('DeviceType not found'));
+        }
+        
+        if(param.value < types[0].min || param.value > types[0].max){
+            return Promise.reject(new Error('Incorrect value'));
+        }
 
-            
-            if (typeof global[types[0].service] !== "function"){
-                return reject({code: 500, message: `${types[0].service} is not a valid service`});
-            }
-            
-            // calling service method
-            return global[types[0].service].exec(types[0])
-                .then(function(){
-                    
-                    // creating DeviceState
-                    return createState(param);
-                });     
-       });
-       
-    });
-}
-
-
-function createState (param){
-    return new Promise(function(resolve, reject){
-        DeviceState.create(param, function(err, state){
-                if(err) return reject(err);
+        if (typeof global[types[0].service].exec !== "function"){
+            return Promise.reject(new Error(`${types[0].service} does not exist or does not have an exec function`));
+        }
+        
+        // calling service method
+        return global[types[0].service].exec({type: types[0], state:param})
+            .then(function(){
                 
-                resolve(state); 
-            }); 
+                // creating DeviceState
+                return DeviceState.create(param);
+            });     
     });
 }

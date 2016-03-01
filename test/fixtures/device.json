@@ -3,7 +3,7 @@
     "id": 1,
     "name": "Light",
     "protocol": "milight",
-    "service": "MilightService",
+    "service": "TestService",
     "room": 1
   },
   {

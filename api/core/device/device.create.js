@@ -4,17 +4,6 @@ module.exports = create;
 
 /**
  * Create a Device and its DeviceType.
- * You need to pass an object containing :
- * {
- *      device: {
- *          // device property
- *      },
- *      types: [
- *          {
- *              // type property
- *          }
- *      ]
- * }
  */
 function create (param) {
     return new Promise(function(resolve, reject){

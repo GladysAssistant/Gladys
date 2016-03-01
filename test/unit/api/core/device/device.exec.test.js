@@ -6,7 +6,8 @@ describe('Device', function() {
 
   describe('set', function() {
     
-    it.skip('should create new DeviceState', function (done) {
+    it('should create new DeviceState', function (done) {
+        
         var obj = {
             devicetype: 1,
             value: 1  
