@@ -15,7 +15,7 @@ function create (notification){
             })
             .catch(function(err){
                  if(err.message !== 'ok'){
-                     sails.log.err(err);
+                     sails.log.error(err);
                  }
             });
 }

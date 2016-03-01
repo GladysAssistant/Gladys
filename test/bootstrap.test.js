@@ -79,7 +79,8 @@ function loadFixtures(barrels){
        'action',
        'actionparam',
        'statetype',
-       'state'
+       'state',
+       'eventtype'
     ];
     
     return Promise.mapSeries(order, function(tableName){

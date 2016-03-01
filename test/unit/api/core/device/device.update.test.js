@@ -34,7 +34,6 @@ describe('Device', function() {
            
            done('No error detected');
         }).catch(function(err){
-            validateError(err);
             done();
         });
 

@@ -23,7 +23,6 @@ describe('Device', function() {
            
            done('No error detected');
         }).catch(function(err){
-            validateError(err);
             done();
         });
 
@@ -34,8 +33,7 @@ describe('Device', function() {
         gladys.device.delete({id:'NONSENSE'}).then(function(device){
            
            done('No error detected');
-        }).catch(function(err){
-            
+        }).catch(function(err){        
             done();
         });
 

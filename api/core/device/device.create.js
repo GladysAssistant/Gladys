@@ -1,31 +1,29 @@
 module.exports = create;
 
-
+var Promise = require('bluebird');
 
 /**
  * Create a Device and its DeviceType.
  */
 function create (param) {
-    return new Promise(function(resolve, reject){
-        
-        // insert the device
-        Device.create(param.device, function(err, device){
-           if(err) return reject(err);
-           
-           // foreach type of the device, insert it
-           async.map(param.types, function(type, cb) {
-
-              type.device = device.id;
-              DeviceType.create(type, cb); 
-           }, function(err, types){
-               if(err) return reject(err);
-
+    
+    // first, we create the device
+    return Device.create(param.device)
+        .then(function(device){
+            
+            // we create all the types
+            return Promise.map(param.types, function(type){
+                type.device = device.id;
+                return DeviceType.create(type);
+            })
+            
+            // we return the results
+            .then(function(types){
                var result = {
                    device: device,
                    types: types
                };
-               resolve(result);
-           });
+               return Promise.resolve(result);
+            });
         });
-    });
 }
