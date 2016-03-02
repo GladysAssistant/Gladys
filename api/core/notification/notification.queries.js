@@ -1,5 +1,5 @@
 module.exports = {
-  getNotificationTypes: `
+    getNotificationTypes: `
     SELECT * FROM notificationtype nt
     JOIN notificationuser nu ON (nt.id = nu.notificationtype)
     WHERE nu.user = ?

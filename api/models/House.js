@@ -1,121 +1,123 @@
 /** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-  
+ * Gladys Project
+ * http://gladysproject.com
+ * Software under licence Creative Commons 3.0 France 
+ * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+ * You may not use this software for commercial purposes.
+ * @author :: Pierre-Gilles Leymarie
+ */
+
 /**
-* House.js
-*
-* @description :: TODO: You might write a short summary of how this model works and what it represents here.
-* @docs        :: http://sailsjs.org/#!documentation/models
-*/
+ * House.js
+ *
+ * @description :: TODO: You might write a short summary of how this model works and what it represents here.
+ * @docs        :: http://sailsjs.org/#!documentation/models
+ */
 
 module.exports = {
 
-  attributes: {
-      
-    uuid: {
-      type: 'uuid',
-      required: true
+    attributes: {
+
+        uuid: {
+            type: 'uuid',
+            required: true
+        },
+
+        name: {
+            type: 'string',
+            required: true
+        },
+
+        address: {
+            type: 'string',
+            required: true
+        },
+
+        city: {
+            type: 'string',
+            required: true
+        },
+
+        postcode: {
+            type: 'integer',
+            required: true
+        },
+
+        country: {
+            type: 'string',
+            required: true
+        },
+
+        latitude: {
+            type: 'float'
+        },
+
+        longitude: {
+            type: 'float'
+        },
+
+        rooms: {
+            collection: 'Room',
+            via: 'house'
+        },
+
+        userrelation: {
+            collection: 'UserHouseRelation',
+            via: 'house'
+        },
+
     },
 
-    name:{
-      type:'string',
-      required:true
-    },
+    beforeCreate: function(values, next) {
 
-  	address:{
-  	  type:'string',
-      required:true
-  	},
+        // If no latitude and longitude are set, get them
 
-  	city:{
-  	  type:'string',
-      required:true
-  	},
-
-    postcode :{
-      type:'integer',
-      required:true
-    },
-
-    country:{
-      type:'string',
-      required:true
-    },
-
-    latitude:{
-      type:'float'
-    },
-
-    longitude:{
-      type:'float'
-    },
-
-    rooms:{
-      collection: 'Room',
-      via: 'house'
-    },
-
-    userrelation:{
-      collection: 'UserHouseRelation',
-      via: 'house'
-    },
-
-  },
-
-  beforeCreate: function (values, next) {
-
-    // If no latitude and longitude are set, get them
-
-      if (!values.latitude && !values.longitude && sails.config.environment == 'production') {
-          var address = values.address + ' ' + values.postcode + ' ' + values.city + ' ' + values.country;
-          AddressToCoordinateService.geocode(address, function(err, latitude, longitude){
-              if(!err){
-                values.latitude = latitude;
-                values.longitude = longitude;
-              }
-              next(); 
-          });
-      }else
-      {
-         next();
-      }
-   },
-
-   afterDestroy: function(values, next){
-
-      var nbOk = 0;
-      var i;
-      var nbThingsToDestroy = 2;
-      var checkifAllDestroyed = function(){
-        if(nbOk == values.length*nbThingsToDestroy)
+        if (!values.latitude && !values.longitude && sails.config.environment == 'production') {
+            var address = values.address + ' ' + values.postcode + ' ' + values.city + ' ' + values.country;
+            AddressToCoordinateService.geocode(address, function(err, latitude, longitude) {
+                if (!err) {
+                    values.latitude = latitude;
+                    values.longitude = longitude;
+                }
+                next();
+            });
+        } else {
             next();
-      };
+        }
+    },
 
-      if(values.length === 0)
-          return next();
+    afterDestroy: function(values, next) {
 
-      for(i = 0; i<values.length;i++){
-        UserHouseRelation.destroy({house: values[i].id}, function UserHouseRelationDestroyed(err, userHouseRelation){
-            if(err) return next(err);
+        var nbOk = 0;
+        var i;
+        var nbThingsToDestroy = 2;
+        var checkifAllDestroyed = function() {
+            if (nbOk == values.length * nbThingsToDestroy)
+                next();
+        };
 
-            nbOk++;         
-            checkifAllDestroyed();
-      });
+        if (values.length === 0)
+            return next();
 
-        Room.destroy({house : values[i].id}, function roomDestroyed(err, room){
-            if(err) return next(err);
+        for (i = 0; i < values.length; i++) {
+            UserHouseRelation.destroy({
+                house: values[i].id
+            }, function UserHouseRelationDestroyed(err, userHouseRelation) {
+                if (err) return next(err);
 
-            nbOk++;
-            checkifAllDestroyed();
-        });
-      }
-   }
+                nbOk++;
+                checkifAllDestroyed();
+            });
+
+            Room.destroy({
+                house: values[i].id
+            }, function roomDestroyed(err, room) {
+                if (err) return next(err);
+
+                nbOk++;
+                checkifAllDestroyed();
+            });
+        }
+    }
 
 };
-

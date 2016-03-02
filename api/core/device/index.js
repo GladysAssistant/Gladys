@@ -1,5 +1,3 @@
-
-
 module.exports.create = require('./device.create.js');
 module.exports.delete = require('./device.delete.js');
 module.exports.get = require('./device.get.js');

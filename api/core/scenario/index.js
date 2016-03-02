@@ -1,6 +1,3 @@
-
-
-
 module.exports.create = require('./scenario.create.js');
 module.exports.exec = require('./scenario.exec.js');
 module.exports.trigger = require('./scenario.trigger.js');

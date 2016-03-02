@@ -1,5 +1,3 @@
-
-
 module.exports.cancel = require('./alarm.cancel.js');
 module.exports.create = require('./alarm.create.js');
 module.exports.delete = require('./alarm.delete.js');

@@ -4,8 +4,8 @@ var fs = require('fs');
 var gladys = {};
 gladys = new events.EventEmitter();
 
-gladys.load = function load () {
-    
+gladys.load = function load() {
+
     // require all Gladys dependencies
     gladys.alarm = require('./alarm/index.js');
     gladys.device = require('./device/index.js');
@@ -16,13 +16,13 @@ gladys.load = function load () {
     gladys.script = require('./script/index.js');
     gladys.update = require('./update/index.js');
     gladys.utils = require('./utils/index.js');
-    
+
     // get Gladys version number
     try {
         var json = JSON.parse(fs.readFileSync('package.json'));
         gladys.version = json.version;
         sails.log.info('Gladys version : ' + gladys.version);
-    } catch(e) {
+    } catch (e) {
         sails.log.warn('Cannot parse package.json');
     }
     gladys.emit('ready');
