@@ -43,7 +43,7 @@ module.exports = {
         },
 
         calendar: {
-            model: 'CalendarList',
+            model: 'Calendar',
             required: true
         }
 

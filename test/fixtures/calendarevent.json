@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "externalid": "1cbf9890-4e25-49ef-a728-dcd1973936c4",
+        "name": "Meeting",
+        "location": "San Fransisco",
+        "start":"2015-05-12 18:00:00",
+        "end": "2015-05-12 20:00:00",
+        "calendar": 1
+    }
+]
