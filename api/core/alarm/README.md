@@ -54,3 +54,50 @@ gladys.alarm.create(alarm)
           // something bad happened ! :/
       });
 ```
+
+
+###Delete
+
+**Params**
+
+`gladys.alarm.delete` need an object containing the id of the alarm to delete.
+
+**Example**
+
+```javascript
+var alarm = {
+    id: 1
+};
+
+gladys.alarm.delete(alarm)
+      .then(function(alarm){
+          // alarm deleted ! 
+      })
+      .catch(function(err){
+         // something bad happened ! :/ 
+      });
+```
+
+###Update
+
+**Params**
+
+`gladys.alarm.update` need an object containing : the id of the alarm to update, 
+and the values of the attributes to update.
+
+**Example**
+
+```javascript
+var alarm = {
+    id: 1,
+    name: 'Name updated'
+};
+
+gladys.alarm.update(alarm)
+      .then(function(alarm){
+          // alarm updated ! 
+      })
+      .catch(function(err){
+         // something bad happened ! :/ 
+      });
+```
