@@ -40,7 +40,6 @@ It returns a Promise.
 
 ```javascript
 var alarm = {
-  id: 1,
   name: 'Monday wake up !',
   time: '08:00',
   dayofweek: 1
