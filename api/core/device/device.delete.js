@@ -1,17 +1,12 @@
-module.exports = destroy;
+var queries = require('./device.queries.js');
 
-var Promise = require('bluebird');
-
-function destroy(options)  {
-    return Device.destroy({
-            id: options.id
-        })
-        .then(function(devices) {
-
-            if (devices.length === 0) {
-                return Promise.reject(new Error('Device not found'));
-            }
-
-            return Promise.resolve(devices[0]);
-        });
-}
+module.exports = function (device){
+  
+  // we delete all the devicetypes associated to the device
+  return gladys.utils.sql(queries.deleteDeviceTypes, [device.id])
+    .then(function(){
+        
+        // then we delete the device itself
+        return gladys.utils.sqlUnique(queries.delete, [device.id]);
+    });    
+};

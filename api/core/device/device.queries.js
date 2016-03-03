@@ -10,6 +10,8 @@ module.exports = {
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
     WHERE dt.id = ?;
-  `
+  `,
+  delete: 'DELETE FROM device WHERE id = ?;',
+  deleteDeviceTypes: 'DELETE FROM devicetype WHERE device = ?;'
 
 };
