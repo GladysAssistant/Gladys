@@ -54,17 +54,7 @@ module.exports = {
 
         longitude: {
             type: 'float'
-        },
-
-        rooms: {
-            collection: 'Room',
-            via: 'house'
-        },
-
-        userrelation: {
-            collection: 'UserHouseRelation',
-            via: 'house'
-        },
+        }
 
     },
 
