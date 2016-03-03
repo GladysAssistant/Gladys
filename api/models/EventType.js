@@ -18,13 +18,13 @@ module.exports = {
 
     attributes: {
 
-        name: {
+        code: {
             type: 'string',
             required: true,
             unique: true
         },
 
-        BeautifulName: {
+        name: {
             type: 'string'
         },
 
@@ -38,11 +38,6 @@ module.exports = {
 
         sentence: {
             type: 'string'
-        },
-
-        lifeevents: {
-            collection: 'LifeEvent',
-            via: 'eventtype'
         }
 
     }

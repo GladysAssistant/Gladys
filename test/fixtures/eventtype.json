@@ -1,13 +1,15 @@
 [
 	{ 
-		"name": "gladysInstallation", 
-		"BeautifulName": "Gladys installed", 
+        "id": 1,
+		"code": "gladysInstallation", 
+		"name": "Gladys installed", 
 		"faIcon": "fa fa-desktop", 
 		"iconColor": "bg-black"
 	},
 	{ 
-		"name": "gladysUpdate", 
-		"BeautifulName": "Gladys updated", 
+        "id": 2,
+		"code": "wakeup", 
+		"name": "Gladys updated", 
 		"faIcon": "fa fa-wrench", 
 		"iconColor": "bg-black"
 	}

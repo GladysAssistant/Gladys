@@ -1,4 +1,4 @@
 module.exports = {
-    getByName: `SELECT * FROM eventtype WHERE name = ?;`,
+    getByCode: `SELECT * FROM eventtype WHERE code = ?;`,
     get: `SELECT * FROM eventtype;`
 };
