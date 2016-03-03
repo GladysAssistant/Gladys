@@ -8,6 +8,7 @@ gladys.load = function load() {
 
     // require all Gladys dependencies
     gladys.alarm = require('./alarm/index.js');
+    gladys.area = require('./area/index.js');
     gladys.calendar = require('./calendar/index.js');
     gladys.device = require('./device/index.js');
     gladys.house = require('./house/index.js');
