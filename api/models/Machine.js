@@ -21,6 +21,11 @@ module.exports = {
         name: {
             type: 'string'
         },
+        
+        uuid:{
+            type:'uuid',
+            required: true
+        },
 
         house: {
             model: 'House'
@@ -28,12 +33,6 @@ module.exports = {
 
         ip: {
             type: 'string'
-        },
-
-        // if not master, machine is a slave
-        master: {
-            type: 'boolean',
-            defaultsTo: true
         },
 
         // if the machine which is executing the code IS this machine
