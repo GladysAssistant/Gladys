@@ -37,7 +37,13 @@ module.exports.routes = {
 
   '/register' : 'SessionController.newUser',
   
-  '/': 'WelcomeController.index'
+  '/': 'WelcomeController.index',
+  
+  // Device 
+  
+  'post /device': 'DeviceController.create',
+  'patch /device/:id': 'DeviceController.update',
+  'delete /device/:id': 'DeviceController.delete'
 
 
 

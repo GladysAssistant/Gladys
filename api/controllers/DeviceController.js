@@ -29,7 +29,7 @@ module.exports = {
   create: function(req, res, next) {
       gladys.device.create(req.body)
             .then(function(device){
-                return res.json(device);
+                return res.status(201).json(device);
             })
             .catch(next);
   },
@@ -49,8 +49,8 @@ module.exports = {
   /**
    * Delete a device
    */
-  destroy: function(req, res, next) {
-      gladys.device.delete(req.params.id)
+  delete: function(req, res, next) {
+      gladys.device.delete({id: req.params.id})
             .then(function(device){
                 return res.json(device);
             })

@@ -1,5 +1,5 @@
 var request = require('supertest');
-var validateDevice = require('../validator/deviceValidator.js');
+var validateDevice = require('../../validator/deviceValidator.js');
 
 describe('DeviceController', function() {
 
