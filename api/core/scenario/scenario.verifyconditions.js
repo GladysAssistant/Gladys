@@ -19,6 +19,8 @@ module.exports = function(params)  {
 function verify(statetype, params) {
 
     var verifyFunction;
+    
+    sails.log.info(`Verifying condition "${statetype.name}" with template (${statetype.condition_template})`);
 
     // if it's a gladys core function
     if (gladys[statetype.service] && typeof gladys[statetype.service][statetype.function] == "function") {

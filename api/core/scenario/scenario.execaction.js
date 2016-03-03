@@ -6,6 +6,8 @@ module.exports = function(params) {
     if (!params || !params.actiontype || !params.scope) {
         return Promise.reject(new Error('Wrong parameters passed to function'));
     }
+    
+    sails.log.info(`Executing action "${params.actiontype.name}"`);
 
     // if it's a gladys core function
     if (gladys[params.actiontype.service] && typeof gladys[params.actiontype.service][params.actiontype.function] == "function") {

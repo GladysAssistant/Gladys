@@ -3,6 +3,8 @@ var template = require('es6-template-strings');
 var Promise = require('bluebird');
 
 module.exports = function(params) {
+    
+    sails.log.info(`New event : ${params.eventName}`);
 
     // we get all launchers with this eventName
     return gladys.utils.sql(queries.getLaunchersWithCode, [params.eventName])
