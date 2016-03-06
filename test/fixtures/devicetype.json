@@ -2,6 +2,7 @@
   {
     "id": 1,  
     "type": "binary",
+    "sensor": false,
     "device": 1,
     "min": 0,
     "max": 1 
@@ -9,6 +10,7 @@
   {
     "id": 2,  
     "type":"multilevel",
+    "sensor": false,
     "unit": "color",
     "min": 0,
     "max": 100,
@@ -17,6 +19,7 @@
   {
     "id": 3,  
     "type": "binary",
+    "sensor": false,
     "device": 2,
     "min": 0,
     "max": 1

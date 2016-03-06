@@ -19,6 +19,7 @@ describe('DeviceController', function() {
             types: [
                 {
                     type: 'binary',
+                    sensor: false,
                     min: 0,
                     max: 1
                 }

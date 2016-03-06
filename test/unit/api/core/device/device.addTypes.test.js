@@ -10,6 +10,7 @@ describe('Device', function() {
                 {
                     device: 1,
                     type: 'binary',
+                    sensor: false,
                     min: 0,
                     max: 1
                 }

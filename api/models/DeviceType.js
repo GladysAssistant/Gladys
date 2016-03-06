@@ -13,6 +13,12 @@ module.exports = {
             type: 'string',
             required: true
         },
+        
+        // true if the devicetype is a sensor
+        sensor: {
+            type: 'boolean',
+            required: true
+        },
 
         unit: {
             type: 'string'

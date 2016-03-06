@@ -18,11 +18,13 @@ describe('Device', function() {
             types: [
                 {
                     type: 'binary',
+                    sensor: false,
                     min: 0,
                     max: 1
                 },
                 {
                     type:'multilevel',
+                    sensor: false,
                     unit: 'color',
                     min: 0,
                     max: 100
