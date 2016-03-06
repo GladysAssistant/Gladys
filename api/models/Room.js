@@ -31,6 +31,11 @@ module.exports = {
         permission: {
             type: 'integer'
         },
+        
+        zones: {
+          collection: 'Zone',
+          via: 'rooms'
+        }
     }
 
 };

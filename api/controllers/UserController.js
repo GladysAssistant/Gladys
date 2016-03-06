@@ -15,6 +15,12 @@
  */
 
 module.exports = {
+    
+    
+    
+   create: function(req, res, next){
+       
+   },
 
   /**
    * Get all the users

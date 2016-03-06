@@ -16,8 +16,16 @@
  */
 
 var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
 
 module.exports = {
+    
+    
+    
+    
+    login: function(req, res, next) {
+        
+    },
 
 	/**
 	 * Description

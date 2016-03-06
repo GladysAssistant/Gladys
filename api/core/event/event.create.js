@@ -1,4 +1,4 @@
-var queries = require('./lifeevent.queries.js');
+var queries = require('./event.queries.js');
 
 module.exports = function create(lifeevent){
     

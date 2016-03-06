@@ -11,14 +11,16 @@ gladys.load = function load() {
     gladys.area = require('./area/index.js');
     gladys.calendar = require('./calendar/index.js');
     gladys.device = require('./device/index.js');
+    gladys.event = require('./event/index.js');
     gladys.house = require('./house/index.js');
-    gladys.lifeEvent = require('./lifeevent/index.js');
     gladys.location = require('./location/index.js');
     gladys.notification = require('./notification/index.js');
     gladys.scenario = require('./scenario/index.js');
     gladys.scheduler = require('./scheduler/index.js');
     gladys.script = require('./script/index.js');
+    gladys.token = require('./token/index.js');
     gladys.update = require('./update/index.js');
+    gladys.user = require('./user/index.js');
     gladys.utils = require('./utils/index.js');
 
     // get Gladys version number

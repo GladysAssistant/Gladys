@@ -10,7 +10,8 @@ module.exports = {
     attributes: {
 
         name: {
-            type: 'string'
+            type: 'string',
+            required: true
         },
 
         protocol: {
