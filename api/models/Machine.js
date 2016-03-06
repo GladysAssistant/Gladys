@@ -33,13 +33,7 @@ module.exports = {
 
         ip: {
             type: 'string'
-        },
-
-        // if the machine which is executing the code IS this machine
-        me: {
-            type: 'boolean',
-            defaultsTo: true
-        },
+        }
 
     }
 };
