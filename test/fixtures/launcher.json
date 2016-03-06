@@ -1,22 +1,22 @@
 [
     {
         "id": 1,
-        "launcher": 1,
         "condition_template": "true",
+        "eventtype": 1,
         "active": 1,
         "user": 1
     },
      {
         "id": 2,
-        "launcher": 1,
         "condition_template": "true",
+        "eventtype": 1,
         "active": 1,
         "user": 1
     },
     {
         "id": 3,
-        "launcher": 1,
         "condition_template": "true",
+        "eventtype": 1,
         "active": 1,
         "user": 1
     }

@@ -25,6 +25,15 @@ module.exports = {
         },
 
         name: {
+            type: 'string',
+            required: true
+        },
+
+        description: {
+            type: 'string'
+        },
+
+        service: {
             type: 'string'
         },
 
@@ -33,10 +42,6 @@ module.exports = {
         },
 
         iconColor: {
-            type: 'string'
-        },
-
-        sentence: {
             type: 'string'
         }
 

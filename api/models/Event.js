@@ -23,10 +23,6 @@ module.exports = {
             required: true
         },
 
-        room: {
-            model: 'Room',
-        },
-
         eventtype: {
             model: 'EventType',
             required: true

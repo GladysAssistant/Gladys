@@ -1,8 +1,9 @@
 [
 	{ 
         "id": 1,
-		"code": "gladysInstallation", 
-		"name": "Gladys installed", 
+		"code": "test", 
+		"name": "test", 
+        "service": "TestService",
 		"faIcon": "fa fa-desktop", 
 		"iconColor": "bg-black"
 	},
@@ -10,6 +11,7 @@
         "id": 2,
 		"code": "wakeup", 
 		"name": "Gladys updated", 
+        "service": "TestService",
 		"faIcon": "fa fa-wrench", 
 		"iconColor": "bg-black"
 	}

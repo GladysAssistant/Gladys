@@ -18,11 +18,6 @@ module.exports = {
 
     attributes: {
 
-        launcher: {
-            model: 'LauncherType',
-            required: true
-        },
-
         condition_template: {
             type: 'string'
         },
@@ -31,15 +26,10 @@ module.exports = {
             type: 'boolean',
             defaultsTo: true
         },
-
-        actions: {
-            collection: 'Action',
-            via: 'launcher'
-        },
-
-        states: {
-            collection: 'State',
-            via: 'launcher'
+        
+        eventtype: {
+            model: 'EventType',
+            required: true
         },
 
         user: {

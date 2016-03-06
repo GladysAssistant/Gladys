@@ -1,8 +1,8 @@
 module.exports = {
     getLaunchersWithCode: `
     SELECT launcher.* FROM launcher
-    INNER JOIN launchertype ON launcher.launcher = launchertype.id
-    WHERE launchertype.code = ? AND active = 1;
+    INNER JOIN eventtype ON launcher.eventtype = eventtype.id
+    WHERE eventtype.code = ? AND active = 1;
   `,
     getActionsLauncher: `
   SELECT actiontype.*, action.id AS actionId

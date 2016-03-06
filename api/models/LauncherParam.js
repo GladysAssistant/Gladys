@@ -18,8 +18,8 @@ module.exports = {
             type: 'string'
         },
 
-        launchertype: {
-            model: 'LauncherType',
+        eventtype: {
+            model: 'EventType',
             required: true
         }
 
