@@ -17,6 +17,7 @@ gladys.load = function load() {
     gladys.house = require('./house/index.js');
     gladys.location = require('./location/index.js');
     gladys.machine = require('./machine/index.js');
+    gladys.module = require('./module/index.js');
     gladys.notification = require('./notification/index.js');
     gladys.scenario = require('./scenario/index.js');
     gladys.scheduler = require('./scheduler/index.js');

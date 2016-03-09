@@ -1,9 +1,12 @@
 [
     {
+        "id": 1,
         "title": "My box",
         "x": 1,
         "y": 1,
         "user": 1,
-        "html": "<b>My awesome box</b>"
+        "html": "<b>My awesome box</b>",
+        "icon": "fa fa-bell",
+        "type": "box box-info"
     }
 ]

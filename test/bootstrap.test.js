@@ -86,7 +86,8 @@ function loadFixtures(barrels){
        'calendarevent',
        'area',
        'machine',
-       'box'
+       'box',
+       'module'
     ];
     
     return Promise.mapSeries(order, function(tableName){

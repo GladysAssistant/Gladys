@@ -1,0 +1,8 @@
+[
+    {
+        "id": 1,
+        "name": "Downloader",
+        "url": "https://github.com/GladysProject/gladys-downloader.git",
+        "slug": "downloader"
+    }
+]
