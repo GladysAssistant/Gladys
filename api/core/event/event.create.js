@@ -1,19 +1,29 @@
 var queries = require('./event.queries.js');
 
-module.exports = function create(lifeevent){
+module.exports = function create(event){
     
    // looking if the eventtype exist 
-   return gladys.utils.sql(queries.getByCode, [lifeevent.code])
+   return gladys.utils.sql(queries.getByCode, [event.code])
         .then(function(types) {
             
             if(types.length === 0){
                 return Promise.reject(new Error('EventType not found'));
             }
             
-            lifeevent.eventtype = types[0].id;
-            delete lifeevent.code;
+            var eventToSave = {
+              eventtype: types[0].id,
+              datetime: event.datetime || new Date(),
+            };
+            
+            if(event.user) {
+                eventToSave.user = event.user;
+            }
            
-           // inserting the lifeEvent in the database
-           return LifeEvent.create(lifeevent); 
+           // inserting the Event in the database
+           return Event.create(eventToSave);
+        })
+        .then(function(eventSaved){
+            gladys.scenario.trigger(event);
+            return eventSaved;
         });
 };

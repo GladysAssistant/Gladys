@@ -7,7 +7,7 @@ describe('Scenario', function() {
     it('should trigger scenario', function (done) {
      	 
           
-          gladys.scenario.trigger({eventName:'test', scope: {}})
+          gladys.scenario.trigger({code:'test', scope: {}})
                 .then(function(result){
 
                     done();

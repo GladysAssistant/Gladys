@@ -4,10 +4,10 @@ var Promise = require('bluebird');
 
 module.exports = function(params) {
     
-    sails.log.info(`New event : ${params.eventName}`);
+    sails.log.info(`New event : ${params.code}`);
 
-    // we get all launchers with this eventName
-    return gladys.utils.sql(queries.getLaunchersWithCode, [params.eventName])
+    // we get all launchers with this code
+    return gladys.utils.sql(queries.getLaunchersWithCode, [params.code])
         .then(function(launchers) {
 
             // foreach launcher, we verify if the condition is satisfied
