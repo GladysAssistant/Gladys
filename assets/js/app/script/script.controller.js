@@ -131,11 +131,7 @@
         function refresh(){
             vm.scriptError = false;
             if(vm.currentScript != 'newScript'){
-                return scriptservice.getScript(vm.currentScript)
-                    .then(function(data){
-                        editor.setValue(data.data.content);
-        				vm.script = data.data;
-                    });
+               editor.setValue(vm.currentScript.text);
       		}
       		else{
       			editor.setValue('');

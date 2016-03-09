@@ -21,6 +21,39 @@ module.exports = {
               .catch(next);
 	},
     
+    /**
+     * Create a script
+     */
+    create: function(req, res, next){
+        gladys.script.create(req.body)
+              .then(function(script){
+                 return res.json(script); 
+              })
+              .catch(next);
+    },
+    
+    /**
+     * Update a script
+     */
+    update: function(req, res, next){
+        req.body.id = req.params.id;
+        gladys.script.update(req.body)
+              .then(function(script){
+                  return res.json(script);
+              })
+              .catch(next);
+    },
+    
+    exec: function (req, res, next){
+        gladys.script.exec({id: req.params.id})
+              .then(function(result){
+                  return res.json(result);
+              })
+              .catch(next);
+    }
+    
+    
+    
     
 };
 

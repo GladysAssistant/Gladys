@@ -18,16 +18,15 @@
 
     function scriptservice($http) {
         var service = {
-            getAllScripts: getAllScripts,
-            getScript:getScript,
-            runScript:runScript,
-            saveScript:saveScript,
-            destroyScript: destroyScript
+            get: get,
+            run: run,
+            update: update,
+            destroy: destroy
         };
 
         return service;
 
-        function getAllScripts() {
+        function get() {
             return $http({method: 'GET', url: '/script'}).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
@@ -40,8 +39,8 @@
                 });
         }
         
-         function getScript(name) {
-            return $http({method: 'POST', url: '/script/get', data:{name:name}}).
+        function run(id) {
+            return $http({method: 'POST', url: '/script/run/' + id }).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available
@@ -53,8 +52,8 @@
                 });
         }
         
-        function runScript(name) {
-            return $http({method: 'POST', url: '/script/run', data: {name:name} }).
+        function update(script) {
+            return $http({method: 'PUT', url: '/script', data: script}).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available
@@ -66,21 +65,8 @@
                 });
         }
         
-        function saveScript(script) {
-            return $http({method: 'POST', url: '/script/put', data: script}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function destroyScript(name) {
-            return $http({method: 'POST', url: '/script/destroy', data: {name: name}}).
+        function destroy(id) {
+            return $http({method: 'DELETE', url: '/script/' + id}).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available
