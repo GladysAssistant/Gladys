@@ -1,7 +1,7 @@
 module.exports = set;
 
 var Promise = require('bluebird');
-var queries = require('./device.queries.js');
+var queries = require('./deviceType.queries.js');
 
 /**
  * Set a new state for a device by executing 

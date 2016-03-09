@@ -39,16 +39,5 @@ module.exports = {
             required: true
         }
 
-    },
-
-    afterDestroy: function(deviceTypes, cb) {
-
-        // removing all deviceState associated with a specific deviceType
-        //DeviceState.destroy({devicetype: criteria.id}, cb);
-        async.each(deviceTypes, function(type, cb) {
-            DeviceState.destroy({
-                devicetype: type.id
-            }, cb);
-        }, cb);
     }
 };

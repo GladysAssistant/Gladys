@@ -2,9 +2,9 @@ var should = require('should');
 var validateDeviceState = require('../../validator/deviceStateValidator.js');
 var validateError = require('../../validator/errorValidator.js');
 
-describe('Device', function() {
+describe('DeviceType', function() {
 
-  describe('set', function() {
+  describe('exec', function() {
     
     it('should create new DeviceState', function (done) {
         
@@ -13,7 +13,7 @@ describe('Device', function() {
             value: 1  
         };
         
-        gladys.device.exec(obj).then(function(state){
+        gladys.deviceType.exec(obj).then(function(state){
            validateDeviceState(state);
            done();
         }).catch(function(err){
@@ -28,7 +28,7 @@ describe('Device', function() {
             value: 1  
         };
         
-        gladys.device.exec(obj).then(function(state){
+        gladys.deviceType.exec(obj).then(function(state){
            
            done('No error detected');
         }).catch(function(err){
@@ -44,7 +44,7 @@ describe('Device', function() {
             value: 1  
         };
         
-        gladys.device.exec(obj).then(function(state){
+        gladys.deviceType.exec(obj).then(function(state){
            
            done('No error detected');
         }).catch(function(err){
@@ -61,7 +61,7 @@ describe('Device', function() {
             value: 120  
         };
         
-        gladys.device.exec(obj).then(function(state){
+        gladys.deviceType.exec(obj).then(function(state){
            
            done('No error detected');
         }).catch(function(err){
