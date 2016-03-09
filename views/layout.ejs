@@ -129,36 +129,30 @@
                                 <i class="fa fa-user"></i> <span><%= __('Me') %></span> <!--<small class="badge pull-right bg-green">new</small>-->
                             </a>
                         </li>
-                        <li id="houseLi" >
-                            <a href="/dashboard/house">
-                                <i class="fa fa-home"></i>
-                                <span><%= __('My Rooms') %></span>
-                            </a>
-                        </li>
                         <li id="alarmLi" class="treeview">
                             <a href="/dashboard/alarm"> 
                                 <i class="fa fa-clock-o"></i>
                                 <span><%= __('Alarms') %></span>
                             </a>
                         </li>
-                        <li id="scenarioLi" class="treeview">
-                            <a href="/dashboard/scenario">
-                                <i class="fa fa-edit"></i> <span><%= __('Scenarios') %></span>
+                        <li id="sensorLi" class="treeview">
+                            <a href="/dashboard/device">
+                                <i class="fa fa-rss"></i> <span><%= __('Devices') %></span>
                             </a>
                         </li>
-                        <li id="sensorLi" class="treeview">
-                            <a href="/dashboard/sensor">
-                                <i class="fa fa-rss"></i> <span><%= __('Sensors') %></span>
+                        <li id="scenarioLi" class="treeview">
+                            <a href="/dashboard/scenario">
+                                <i class="fa fa-tasks"></i> <span><%= __('Scenarios') %></span>
+                            </a>
+                        </li>
+                        <li id="moduleLi" class="treeview">
+                            <a href="/dashboard/device">
+                                <i class="fa fa-cloud-download"></i> <span><%= __('Modules') %></span>
                             </a>
                         </li>
                         <li id="scriptLi" >
                             <a href="/dashboard/script">
                                 <i class="fa fa-file-text-o"></i> <span><%= __('Scripts') %></span>
-                            </a>
-                        </li>
-                        <li id="roomLi" class="treeview">
-                            <a href="/dashboard/room">
-                                <i class="fa fa-bed"></i> <span><%= __('Permissions') %></span>
                             </a>
                         </li>
                         <li id="parametreLi" class="treeview">
@@ -238,6 +232,8 @@
     <script src="/js/app/alarm/alarm.service.js"></script>
     <script src="/js/app/calendar/calendar.controller.js"></script>
     <script src="/js/app/calendar/calendar.service.js"></script>
+    <script src="/js/app/device/device.controller.js"></script>
+    <script src="/js/app/device/device.service.js"></script>
     <script src="/js/app/geolocation/geolocation.controller.js"></script>
     <script src="/js/app/geolocation/geolocation.service.js"></script>
     <script src="/js/app/global/language.service.js"></script>
