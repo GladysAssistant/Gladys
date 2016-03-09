@@ -173,7 +173,7 @@ module.exports = {
    */
   getSleep: function (req, res, next){
 
-  	User.findOne({ id: req.session.User.id }, function(err, user) {
+  	/*User.findOne({ id: req.session.User.id }, function(err, user) {
         
         async.parallel([
             function(callback){
@@ -193,7 +193,8 @@ module.exports = {
 
   			
   		});
-  	});
+  	});*/
+      res.json({});
 
   } 
 	
