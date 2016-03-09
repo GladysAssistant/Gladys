@@ -24,12 +24,10 @@ module.exports = {
 	 * @return 
 	 */
 	index : function (req, res, next){
-    DashboardBox.find()
-        .exec(function(err, boxs){
-            if(err) return res.json(err);
-    
-            return res.view('dashboard/index', { User: req.session.User, boxs:boxs, pageName: req.__('pagename-homepage') });  
-        });
+        gladys.box.get({user:req.session.User})
+            .then(function(boxs){
+                return res.view('dashboard/index', { User: req.session.User, boxs: boxs, pageName: req.__('pagename-homepage') }); 
+            }); 
   },
 
   /**

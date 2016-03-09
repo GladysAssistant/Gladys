@@ -33,7 +33,13 @@ module.exports = {
       },
       
       icon: {
-          type: 'string'
+          type: 'string',
+          required: true
+      },
+      
+      type: {
+          type:'string',
+          required: true
       },
       
       user: {

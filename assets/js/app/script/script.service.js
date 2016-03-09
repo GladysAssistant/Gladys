@@ -28,7 +28,7 @@
         return service;
 
         function getAllScripts() {
-            return $http({method: 'POST', url: '/script/index'}).
+            return $http({method: 'GET', url: '/script'}).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available

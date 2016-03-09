@@ -5,12 +5,14 @@ describe('Box', function() {
 
   describe('create', function() {
     
-    it('should return calendar created', function (done) {
+    it('should return box created', function (done) {
      	var box = {
            title: 'My awesome box',
            x: 1,
            y: 2,
-           user: 1
+           user: 1,
+           type: 'danger',
+           icon: ''
         };
         
         gladys.box.create(box).then(function(result){

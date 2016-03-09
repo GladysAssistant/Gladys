@@ -43,7 +43,13 @@ module.exports.routes = {
   
   'post /device': 'DeviceController.create',
   'patch /device/:id': 'DeviceController.update',
-  'delete /device/:id': 'DeviceController.delete'
+  'delete /device/:id': 'DeviceController.delete',
+  
+  
+  
+  // Script
+  
+  'get /script': 'ScriptController.index'
 
 
 
