@@ -34,6 +34,11 @@ module.exports = {
       
       icon: {
           type: 'string'
+      },
+      
+      user: {
+          model: 'User',
+          required: true
       }
 
   }
