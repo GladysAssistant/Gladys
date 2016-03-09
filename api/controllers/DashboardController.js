@@ -92,6 +92,10 @@ module.exports = {
     res.view('script/index',  { User: req.session.User, pageName: req.__('pagename-script') });
   },
   
+  device: function(req,res,next){
+    res.view('device/index',  { User: req.session.User, pageName: req.__('pagename-device') });
+  },
+  
   installation :function(req,res,next){
     res.view('installation/index',  { User: req.session.User, pageName: req.__('pagename-installation'), layout: null });
   },
