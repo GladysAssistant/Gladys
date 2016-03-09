@@ -27,6 +27,7 @@ var cssFilesToInject = [
   'styles/scenariostep.css',
   'styles/weatherjs.css',
   'styles/sleep.css',
+  'styles/search.css',
   // all styles, disabled by default
   //'styles/**/*.css',
   

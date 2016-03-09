@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/styles/scenariostep.css">
     <link rel="stylesheet" href="/styles/weatherjs.css">
     <link rel="stylesheet" href="/styles/sleep.css">
+    <link rel="stylesheet" href="/styles/search.css">
     <!--STYLES END-->
 
   </head>
@@ -168,7 +169,8 @@
 
          <!-- Include the view file for the current controller/route -->
          <%- body %>
-
+         
+         
         <!-- Location Controller -->
             <div data-ng-controller="geoLocationCtrl as vm" ></div>
         <!-- End of Location Controller -->
@@ -185,8 +187,9 @@
           </div>            
         </footer>
    
-
-
+        <!-- search bar -->
+        <%- partial ('./partials/search.ejs') %>
+        <!-- end of search bar -->
     <!--
 
       Client-side Javascript
