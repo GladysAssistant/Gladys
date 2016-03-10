@@ -12,7 +12,7 @@ describe('Box', function() {
            y: 2,
            user: 1,
            type: 'danger',
-           icon: ''
+           icon: 'fa fa-info'
         };
         
         gladys.box.create(box).then(function(result){
