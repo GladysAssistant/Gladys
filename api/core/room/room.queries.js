@@ -10,5 +10,6 @@ module.exports = {
     LIMIT ?
     OFFSET ?;
   
-  `
+  `,
+   getAll: 'SELECT * FROM room;'
 };
