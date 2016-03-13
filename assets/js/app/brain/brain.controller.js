@@ -32,7 +32,10 @@
 
 
     function classify(text){
-       return brainService.classify(text);
+       return brainService.classify(text)
+         .then(function(answer){
+             vm.text = '';
+         });
     }
 
   }
