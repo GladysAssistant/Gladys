@@ -1,7 +1,7 @@
-<div id="search">
+<div id="search" data-ng-controller="BrainCtrl as vm">
    <!-- <button type="button" class="close">×</button> -->
     <form>
-        <input id="searchInput" type="search"  value="" placeholder="Que puis-je faire pour vous ?" autocomplete="off" />
+        <input id="searchInput" type="search" ng-model="vm.text" ng-keypress="$event.keyCode == 13 && vm.classify(vm.text)"  value="" placeholder="Que puis-je faire pour vous ?" autocomplete="off" />
        <!-- <button type="submit" class="btn btn-primary">Search</button>-->
     </form>
     <p id="searchResult">Allumage de la lampe !</p>
