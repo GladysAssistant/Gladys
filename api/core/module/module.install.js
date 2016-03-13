@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 module.exports = function (params){
     var path = './api/hooks/' + params.slug;
     
-    return filePathExists(path)
+    return gladys.utils.pathExist(path)
         .then(function(result){
            if(result){
                sails.log.info(`Gladys module ${params.slug} already cloned, skipping to install.`);
@@ -26,7 +26,7 @@ module.exports = function (params){
  * Clone a repository into a specific folder
  */
 function gitClone(url, path){
-    return exec(`git clone ${url} ${path}`);
+    return exec(`git clone --depth=1 ${url} ${path}`);
 }
 
 /**
@@ -47,22 +47,4 @@ function exec(command){
             return resolve(stdout);
         });
     });
-}
-
-/**
- * Return if folder exist or not
- */
-function filePathExists(filePath) {
-  return new Promise((resolve, reject) => {
-    fs.stat(filePath, (err, stats) => {
-      if (err && err.code === 'ENOENT') {
-        return resolve(false);
-      } else if (err) {
-        return reject(err);
-      }
-      if (stats.isFile() || stats.isDirectory()) {
-        return resolve(true);
-      }
-    });
-  });
 }
