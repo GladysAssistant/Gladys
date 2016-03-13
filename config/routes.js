@@ -46,6 +46,9 @@ module.exports.routes = {
   'delete /device/:id': 'DeviceController.delete',
   
   
+  // Brain
+  'get /brain/classify': 'BrainController.classify',  
+  
   
   // Script
   

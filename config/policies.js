@@ -30,6 +30,7 @@ module.exports.policies = {
   Action : ['checkToken', 'Human'],
   ActionType : ['checkToken', 'Human'],
   Alarm : ['checkToken', 'Human'],
+  Brain: [ 'authenticated', 'Human'],
   CalendarEvent : ['checkToken', 'Human'],
   CalendarList : ['checkToken', 'Human'],
   ChromeNotification : ['checkToken', 'Human'],
