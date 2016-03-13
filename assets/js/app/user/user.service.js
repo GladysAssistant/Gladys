@@ -17,21 +17,27 @@
     userService.$inject = ['$http'];
 
     function userService($http) {
+        
         var service = {
             getUsers: getUsers,
             setPreparationTime: setPreparationTime,
             setAssistantName:setAssistantName,
             whoAmI: whoAmI
         };
+        
+        var user = null;
 
         return service;
 
         function whoAmI(){
+            if(user) return Promise.resolve(user);
+            
             return $http({method: 'POST', url: '/user/whoami' }).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available
-                    return data;
+                    user = data.data;
+                    return data.data;
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
