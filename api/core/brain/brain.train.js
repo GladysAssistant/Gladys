@@ -8,12 +8,13 @@ module.exports = function train(){
     return gladys.sentence.getAll()
       .then(function(sentences){
          
-         // foreach sentence, we add the document to the model
+         var batch = [];
          sentences.forEach(function(sentence){
-            classifier.addDocument(sentence.text, sentence.service);
-         }); 
+            batch.push({input: sentence.text, output: sentence.service + sails.config.brain.separator + sentence.label }); 
+         });
          
-         classifier.train();
+         classifier.trainBatch(batch);
+         
          sails.log.info(`Brain trained with success ! Added ${sentences.length} sentences.`);
          return Promise.resolve();
       })

@@ -5,24 +5,36 @@ var parser = require('./parser/parser.js');
 module.exports = function classify(text){
     
     if(!text || text.length === 0){
-        return Promise.reject('You must give a text');
+        return Promise.reject(new Error('You must give a text'));
     }
     
     var classifier = shared.getClassifier();
-    var classifications = classifier.getClassifications(text);
-    if(classifications.length === 0) {
-        return Promise.reject('No command detected');
-    }
-    var service = classifications[0].label;
-    sails.log.info(`Brain : Classified ${classifications[0].label} with value ${classifications[0].value}`);
+    var classifications = classifier.classify(text);
     
-    return parser.parse(text)
+    if(classifications.length === 0) {
+        return Promise.reject(new Error('No command detected'));
+    }
+    
+    
+    return Promise.map(classifications, function(classification){
+        var result = classification.split(sails.config.brain.separator);
+        sails.log.info(`Brain : Classified ${classification} `);
+        return callAction(text, result[0], result[1]);
+    });
+    
+};
+
+
+function callAction(text, service, label){
+   return parser.parse(text)
       .then(function(scope){
+          
+            scope.label = label;
             
             // if it's a gladys core function
             if (gladys[service] && typeof gladys[service].command == "function") {
                 gladys[params.actiontype.service].command(scope);
-                return Promise.resolve(classifications[0]);
+                return Promise.resolve();
             }
 
             // testing if it's a Service
@@ -34,6 +46,6 @@ module.exports = function classify(text){
 
             // executing action
             global[service].command(scope);
-            return Promise.resolve(classifications[0]);
-      });
-};
+            return Promise.resolve();
+      }); 
+}

@@ -1,11 +1,14 @@
-var natural = require('natural');
-var classifier = new natural.BayesClassifier();
+var createClassifier = require('./brain.create.js');
+
+var intentClassifier = createClassifier();
 
 module.exports = {
-	getClassifier: function() { 
-        return classifier; 
+    
+    getClassifier: function(){
+        return intentClassifier;
     },
-    setClassifier: function(newClassifier) { 
-        classifier = newClassifier; 
+    
+    setClassifier: function(classifier){
+        intentClassifier = classifier;
     }
 };

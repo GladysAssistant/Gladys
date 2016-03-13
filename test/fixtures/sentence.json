@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "uuid": "162096a4-6c1a-402d-99ec-2a9b9f4575e2",
+        "text": "Turn on the light in the living room",
+        "label": "set-device-on",
+        "service": "TestService",
+        "language": "en-US"
+    },
+    {
+        "id": 2,
+        "uuid": "fcb9fff3-06db-4b90-8fc4-cd19583d64f6",
+        "text": "I'm coming back home",
+        "label": "back-at-home",
+        "service": "TestService",
+        "language": "en-US"
+    }  
+]

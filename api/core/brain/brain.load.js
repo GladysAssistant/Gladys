@@ -1,17 +1,33 @@
-var natural = require('natural');
+var serialize = require('serialization');
+var fs = require('fs');
 var shared = require('./brain.shared.js');
 
 /**
  * Load the classifier from json
  */
-module.exports = function load(){
+module.exports = function (){
+     return gladys.utils.pathExist(sails.config.brain.savePath)
+       .then(function(){
+           return load(sails.config.brain.savePath);
+       })
+       .catch(function(err){
+          sails.log.error('No brain file detected' + err); 
+       });
+};
+
+
+function load(path){
     return new Promise(function(resolve, reject){
-        natural.BayesClassifier.load(sails.config.brain.savePath, null, function(err, classifier) {
-            if(err) return reject(err);
-            
-            shared.setClassifier(classifier);
-            
-            return resolve();
+        fs.readFile(path, 'utf8', function(err, data){
+           if(err) return reject(err);
+           
+           // transform serialized string to classifier
+           var intentClassifierCopy = serialize.fromString(data, __dirname);
+           
+           // set shared classifier
+           shared.setClassifier(intentClassifierCopy); 
+           
+           return resolve();
         });
     });
-};
+}

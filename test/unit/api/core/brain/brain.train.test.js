@@ -4,7 +4,7 @@ describe('Brain', function() {
 
   describe('train', function() {
     
-    it('should train the brain with sentences', function (done) {
+    it.only('should train the brain with sentences', function (done) {
      	
         gladys.brain.train().then(function(result){
            
