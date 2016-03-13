@@ -2,6 +2,7 @@
   {
     "id": 1,  
     "type": "binary",
+    "tag": "light",
     "sensor": false,
     "device": 1,
     "min": 0,
@@ -11,6 +12,7 @@
     "id": 2,  
     "type":"multilevel",
     "sensor": false,
+    "tag": "light",
     "unit": "color",
     "min": 0,
     "max": 100,

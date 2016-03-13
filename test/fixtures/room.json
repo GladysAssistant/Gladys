@@ -1,19 +1,19 @@
 [
   {
     "id": 1, 
-    "name": "Salon",
+    "name": "room",
     "house": 1,
     "permission" : 1
   },
   {
     "id": 2,   
-    "name": "Cuisine",
+    "name": "living-room",
     "house": 1,
     "permission" : 1
   },
   {
     "id": 3,   
-    "name": "Chambre parents",
+    "name": "salon",
     "house": 1,
     "permission" : 1
   },
