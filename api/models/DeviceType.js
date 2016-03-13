@@ -14,6 +14,12 @@ module.exports = {
             required: true
         },
         
+        // the name of the deviceType for 
+        // text recognition
+        tag: {
+          type: 'string'
+        },
+        
         // true if the devicetype is a sensor
         sensor: {
             type: 'boolean',
