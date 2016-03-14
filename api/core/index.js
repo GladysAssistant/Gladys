@@ -29,6 +29,7 @@ gladys.load = function load() {
     gladys.update = require('./update/index.js');
     gladys.user = require('./user/index.js');
     gladys.utils = require('./utils/index.js');
+    gladys.weather = require('./weather/index.js');
 
     // get Gladys version number
     try {
