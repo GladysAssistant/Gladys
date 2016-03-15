@@ -12,6 +12,10 @@ var forecast = new Forecast({
 
 module.exports = function get(params){
     return new Promise(function(resolve, reject){
+       if(!params || !params.latitude || !params.longitude) {
+           return reject('Missing parameters, need latitude and longitude');
+       } 
+        
        forecast.get([params.latitude, params.longitude], function(err, weather){
           if(err) return reject(err);
           
