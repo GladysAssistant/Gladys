@@ -39,20 +39,28 @@ module.exports.routes = {
   
   '/': 'WelcomeController.index',
   
+  // Brain
+  'get /brain/classify': 'BrainController.classify', 
+  
   // Device 
   
   'post /device': 'DeviceController.create',
   'patch /device/:id': 'DeviceController.update',
   'delete /device/:id': 'DeviceController.delete',
   
+  // Module
   
-  // Brain
-  'get /brain/classify': 'BrainController.classify',  
-  
+  'get /module': 'ModuleController.index',
   
   // Script
+  'get /script': 'ScriptController.index',
+  'post /script': 'ScriptController.create',
+  'patch /script/:id': 'ScriptController.update',
+  'post /script/:id/exec': 'ScriptController.exec',
+  'delete /script/:id': 'ScriptController.delete',
   
-  'get /script': 'ScriptController.index'
+  // Weather
+  'get /weather': 'WeatherController.index'
 
 
 

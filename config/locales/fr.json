@@ -182,5 +182,15 @@
   "pagename-sensor":"Capteurs",
   "pagename-alarm":"Alarmes",
   "pagename-me":"Moi",
-  "pagename-music":"Musique"
+  "pagename-music":"Musique",
+  "script-new": "Nouveau script",
+  "script-name": "Script",
+  "script-run-script": "Executer le script",
+  "script-save": "Enregistrer",
+  "script-saved": "Script enregistré",
+  "script-saving": "Enregistrement",
+  "script-delete": "Supprimer",
+  "script-modal-title": "Nouveau script",
+  "script-modal-name": "Nom du script",
+  "script-modal-create": "Créer"
 }

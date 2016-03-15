@@ -45,6 +45,7 @@ module.exports.policies = {
   Lock : ['checkToken', 'Human'],
   Machine : ['checkToken', 'Human'],
   Message : ['checkToken', 'Human'],
+  Module : ['checkToken', 'Human'],
   Motion : ['checkToken', 'Human'],
   MotionSensor : ['checkToken', 'Human'],
   Music : ['checkToken', 'Human'],
@@ -70,6 +71,7 @@ module.exports.policies = {
   User : ['checkToken', 'Human'],
   UserHouseRelationType : ['checkToken', 'Human'],
   Welcome : [],
+  Weather : ['checkToken', 'Human'],
 
 
   /***************************************************************************

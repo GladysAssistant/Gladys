@@ -19,5 +19,15 @@
   "pagename-sensor":"Sensors",
   "pagename-alarm":"Alarm",
   "pagename-me":"Me",
-  "pagename-music":"Music"
+  "pagename-music":"Music",
+  "script-new": "New script",
+  "script-name": "Script",
+  "script-run-script": "Start script",
+  "script-save": "Save",
+  "script-saved": "Saved",
+  "script-saving": "Saving",
+  "script-delete": "Delete",
+  "script-modal-title": "New script",
+  "script-modal-name": "Name",
+  "script-modal-create": "Create"
 }

@@ -25,6 +25,7 @@ module.exports = {
      * Create a script
      */
     create: function(req, res, next){
+        req.body.user = req.session.User.id;
         gladys.script.create(req.body)
               .then(function(script){
                  return res.json(script); 
@@ -44,12 +45,28 @@ module.exports = {
               .catch(next);
     },
     
+    /**
+     * Delete a script
+     */
+    delete: function(req, res, next){
+        gladys.script.delete({id:req.params.id})
+              .then(function(script){
+                  return res.json(script);
+              })
+              .catch(next);
+    },
+    
+    
     exec: function (req, res, next){
-        gladys.script.exec({id: req.params.id})
+        var script = {id: req.params.id};
+        var user = req.session.User;
+        gladys.script.exec({script, user})
               .then(function(result){
                   return res.json(result);
               })
-              .catch(next);
+              .catch(function(err){
+                  return res.status(500).json(err);
+              });
     }
     
     
