@@ -58,8 +58,7 @@ var jsFilesToInject = [
   'js/dependencies/moment-with-locales.js',
   // loading ace
   'js/dependencies/ace/ace.js',
-  //loading simpleWeather
-  'js/dependencies/jquery.simpleWeather.min.js',
+
   // loading bootstrap datetimepicker
   'js/dependencies/bootstrap-datetimepicker.min.js',
   
