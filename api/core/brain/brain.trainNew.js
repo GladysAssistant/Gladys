@@ -1,8 +1,9 @@
 var Promise = require('bluebird');
 var shared = require('./brain.shared.js');
+var createClassifier = require('./brain.create.js');
 
 module.exports = function train(){
-    var classifier = shared.getClassifier();
+    var classifier = createClassifier();
     
     // we get all sentences, rooms, and deviceTypes
     return gladys.sentence.getAll()
