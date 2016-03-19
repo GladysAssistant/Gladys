@@ -23,7 +23,7 @@ module.exports.bootstrap = function(cb) {
     
     
     // loading brain (for text recognition)
-   /* gladys.brain.load()
+    gladys.brain.load()
       .then(function(){
          sails.log.info('Gladys brain loaded with success !');
          cb(); 
@@ -31,12 +31,13 @@ module.exports.bootstrap = function(cb) {
       .catch(function(){
          sails.log.err('Cannot load gladys.brain.');
          cb(); 
-      });*/
+      });
       
-      gladys.brain.train()
+      /*gladys.brain.train()
         .then(function(){
             cb();
-        });
+        });*/
+       
       
       
 	//sails.hooks.orm.reload();
