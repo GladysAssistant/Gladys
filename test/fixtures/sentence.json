@@ -1,18 +1,1213 @@
 [
     {
-        "id": 1,
-        "uuid": "162096a4-6c1a-402d-99ec-2a9b9f4575e2",
-        "text": "Turn on the light in the living room",
-        "label": "set-device-on",
-        "service": "TestService",
-        "language": "en-US"
-    },
-    {
-        "id": 2,
-        "uuid": "fcb9fff3-06db-4b90-8fc4-cd19583d64f6",
-        "text": "I'm coming back home",
-        "label": "back-at-home",
-        "service": "TestService",
-        "language": "en-US"
-    }  
+    "uuid": "a3cac48a-0bc1-4423-abfb-0eab4d774b1f",
+    "text": "Je dois être a 8 heures demain au college",
+    "label": "create-calendar-event",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "00b71507-0259-46fb-93a8-822bb5aa24d3",
+    "text": "J'ai rendez-vous chez  à",
+    "label": "create-calendar-event",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "2b058dc2-a353-4c84-b314-76b5b6ac8944",
+    "text": "Ajoute à l'agenda ma réunion de mardi prochain à 8h",
+    "label": "create-calendar-event",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "5e727f98-7af8-49c2-a466-209d553ef0b0",
+    "text": "J'ai une reunion jusqu'à 18h",
+    "label": "create-calendar-event",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "483d61aa-38dc-46e7-8f18-f440839a896b",
+    "text": "Quel est mon emploi du temps aujourd'hui?",
+    "label": "get-calendar",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "d2426793-13c4-4597-8a1b-edd17237096c",
+    "text": "Quelle sont mes tâche aujourd'hui ?",
+    "label": "get-calendar",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "84c81a69-8388-4205-b7cc-1fa98a91a318",
+    "text": "Es-ce que j'ai des rendez-vous aujourd'hui ?",
+    "label": "get-calendar",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "5945a843-70f9-4554-a1bb-13636dda56e0",
+    "text": "Es-ce que c'est l'anniversaire de quelqu'un aujourd'hui ?",
+    "label": "get-calendar",
+    "service": "calendar",
+    "language": "fr"
+  },
+  {
+    "uuid": "c96ea78d-a899-49c5-a419-77498b62f3af",
+    "text": "Quelle température fait-il dans la …?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "8270f5ba-0809-4bcb-9ae7-5f0aa64b75fd",
+    "text": "Quelle est la température ?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "6654e8c3-722d-4389-bfa3-d355891db0c1",
+    "text": "Quelle est l'humidité ?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "6df4ae81-e3b3-4b55-9bc2-828aa6837234",
+    "text": "Quelle est la température du bureau ?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "b006fd22-5304-4b8d-a9af-f9587003643f",
+    "text": "Quel température fait-il dans",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "b5267f97-12b6-43cf-b41c-8ac7d88048f3",
+    "text": "Est ce que tu as bien éteint le ?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "d77e5836-a457-451a-89ca-2b19d3225390",
+    "text": "Est-ce que j'ai des emails ?",
+    "label": "get-emails",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "4d3738bd-8188-4217-af35-c9079ecbfda5",
+    "text": "Est-ce que j'ai des mails non lus ?",
+    "label": "get-emails",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "2e7875b1-d787-44d5-bce0-572520a3bf0c",
+    "text": "Quelles-sont mes valeurs boursière aujourd'hui?",
+    "label": "get-stock-exchange",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "da124c50-f17c-437b-b347-148b8b98ca9c",
+    "text": "Quelle est la température extérieure?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "561570a1-f9dc-45a4-af21-162c9872901b",
+    "text": "Quelle est la température de l'appartement?",
+    "label": "get-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "fa8358a7-ee5c-4440-8882-65155e51c3f3",
+    "text": "Quelle heure est-il ?",
+    "label": "get-time",
+    "service": "time",
+    "language": "fr"
+  },
+  {
+    "uuid": "418f91b3-bb8d-4f8e-b767-8cbee564a347",
+    "text": "Peux-tu me donner l'heure ?",
+    "label": "get-time",
+    "service": "time",
+    "language": "fr"
+  },
+  {
+    "uuid": "634d5067-1353-43a6-bd93-0c371ff4d746",
+    "text": "Peux-tu me donner l'heure à Washington ?",
+    "label": "get-time",
+    "service": "time",
+    "language": "fr"
+  },
+  {
+    "uuid": "c81fa70e-944a-4388-a54f-83cb8cf89362",
+    "text": "Donne moi l'heure",
+    "label": "get-time",
+    "service": "time",
+    "language": "fr"
+  },
+  {
+    "uuid": "0b0ca0e2-f8af-44a2-84f1-d1cadf6ecb99",
+    "text": "dis moi quelle heure il est",
+    "label": "get-time",
+    "service": "time",
+    "language": "fr"
+  },
+  {
+    "uuid": "5128525a-6e3e-40b1-8be1-483507b04d3d",
+    "text": "Combien de temps faut-il pour aller au travail?",
+    "label": "get-traffic",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "043033b7-efc8-4f1f-ba27-0d051be8e3ed",
+    "text": "Y-a quoi d’intéressant ce soir a la télé ?",
+    "label": "get-tv-program",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "8efdcf58-e875-4834-b046-9b41189d23e3",
+    "text": "Va-t-il geler demain matin?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "c53846b7-c129-4244-8e73-8ec4e87ae726",
+    "text": "Quel temps pour ce week end?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "c6f589ad-64bf-4c68-a799-4cfddfc838b4",
+    "text": "Quelle temps est prévu pour aujourd'hui ?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "b8334a71-13b6-4cc6-8aa7-db5c8fddd2b8",
+    "text": "Quel temps fera demain",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "59e53712-4f56-48b5-84f6-ba032c2bdaad",
+    "text": "quel temps fera-t-il demain ?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "e039820b-8e95-4e76-8d85-266cfb507437",
+    "text": "Comment je dois prévoir de m'habiller aujourd'hui ?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "76e4057e-1f57-4ee7-b92f-7f819d2f3221",
+    "text": "Je dois m'habiller comment demain ?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "ab2a1379-ab24-4735-b58f-f8da78ca2447",
+    "text": "Il fait quel temps demain ?",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "82b634ef-8bdd-4abb-8478-1a604c3c7e85",
+    "text": "Quel temps fait il",
+    "label": "get-weather",
+    "service": "weather",
+    "language": "fr"
+  },
+  {
+    "uuid": "7c985493-8ff9-4229-9b10-06ac838ae394",
+    "text": "Baisse le son",
+    "label": "music-volume-down",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "c299ea06-02ed-4685-821f-527df2a28b41",
+    "text": "Monte le son",
+    "label": "music-volume-up",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "3d2cb055-297c-4e1a-aef1-25f1d3c7d442",
+    "text": "Joue de la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "87df1b98-e209-4443-9c3f-3bc8f90aac35",
+    "text": "J'ai envie de musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "9e9919d8-1bbc-4f2e-93dc-3bf53a811c32",
+    "text": "Lecture de la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "381695c1-4354-48d6-908c-65868fb5946e",
+    "text": "Mets de la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "e5134676-7321-4f39-b965-ff149f7a3234",
+    "text": "Arrête la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "22214e7d-bfa0-4f78-88f0-65099aa88469",
+    "text": "Lance la playlist",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "f47c503e-3d1c-406f-84c5-a03d9fa25967",
+    "text": "Je veux écouter de la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "6bf317fe-c894-4a5e-88d8-eaf2f787ff75",
+    "text": "Je souhaite écouter de la musique",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "8c7222d4-5c91-4e35-8680-d0a19e95b21e",
+    "text": "Quelle est le prix en moyenne d'un ?",
+    "label": "question",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "1b73b74e-2aa3-4093-9114-9ea9c4f8b159",
+    "text": "Ou puis-je trouver un ?",
+    "label": "question",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "0115a0aa-bfb5-40a5-aba2-74bd06b2bd77",
+    "text": "Envoi un message à , dit que",
+    "label": "send-message",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "38c6b2c0-a95b-4e7e-b063-51c9b1bba144",
+    "text": "Réveille-moi dans 30min",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "68d48578-b291-440b-9c09-ff580203f94e",
+    "text": "Réveille-moi demain à 8h",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "4c34c37e-6566-420a-8a75-7acdd518a9f4",
+    "text": "Réveille-moi à 6h30",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "7ba6595e-6b64-4f36-b799-f062a8abeb88",
+    "text": "Rappelle moi que j'ai mardi prochain à 7h du matin",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "f4ad3ac6-e403-4082-89ee-4ac0e4381e7d",
+    "text": "Mode réveil demain à 6h30",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "abb26680-df25-4909-a099-c3be935fc407",
+    "text": "Reveille moi demain 11h",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "face029c-f4a5-43b6-8197-4ac550ffd322",
+    "text": "réveille-moi à",
+    "label": "set-alarm",
+    "service": "alarm",
+    "language": "fr"
+  },
+  {
+    "uuid": "1fbf2878-6b7b-4a04-80c3-38fd3e5c0483",
+    "text": "Ferme les volets du bas",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "0649f8cb-718f-43df-9afb-3859661753f0",
+    "text": "Ferme tous les volets",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "dd9bebfa-bb88-4ed9-bea3-c7eb48edeb40",
+    "text": "Éteins les lumières du bas",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "ed333f87-955d-4c7c-a72b-9c0c05edc0d8",
+    "text": "Éteins toutes les lumières",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f4dd1b1e-b9e5-4019-aff3-3c780b6dea8c",
+    "text": "Ferme les volets du bas",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "c2a66916-ae3e-4ea8-a7cf-afb5e0c025a9",
+    "text": "Éteins la radio",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "e1616645-1cdd-4eb5-8426-9188f51c5845",
+    "text": "Ferme les volets",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "c4546087-e608-4521-9ee3-4c90d794a918",
+    "text": "Ferme les volets (du salon)",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "e8253f63-e344-4c2e-8889-d13a562eb25e",
+    "text": "Éteins toutes les lumières",
+    "label": "set-device-off",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "2eb0e5ed-7555-42ae-90da-2cc7de708a7e",
+    "text": "Allume la lumière",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "39cba7dc-3949-4d0a-b466-d47566e3584b",
+    "text": "Fais moi couler un café",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "45e13a94-5eb0-402c-99b5-90e346b63353",
+    "text": "J'aimerais regarder Netflix",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f683326c-67cd-4939-8a96-75875a473e5e",
+    "text": "Allume la télévision",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "87d5f9cb-dc2e-487a-98bd-c0e1f61bf63c",
+    "text": "Allume la radio",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "bbd5aded-5843-4547-9a09-17f3e44e09db",
+    "text": "Allume la lumière du salon",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "54aa7a45-48ca-4ff6-96a9-693cd695d3d2",
+    "text": "Ouvre demain les volets à 8h00",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "cda4c978-9466-4108-a9d2-55ad862c03ad",
+    "text": "Ferme les volets à 22h00",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "86636880-c2d7-4254-952d-92a754d3e21d",
+    "text": "Allume le chauffage de la salle de bain",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "e385f878-2247-4639-a36b-c2413a6be7e5",
+    "text": "Allume la télé",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "0db08b46-5bf8-4c7f-ac73-739555383a00",
+    "text": "Met en route la machine à café",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "a00ec0e3-0d73-49ea-811f-154b1ee42403",
+    "text": "Fais préchauffer le four",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "d9b78489-c2b7-41c7-94c8-f13e6c5a4448",
+    "text": "Met une lumière blanche",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "7d38a004-2b21-4f63-b18c-7c3999ae8521",
+    "text": "Met une lumière plus douce",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "233c8e11-7462-49d9-9796-b92cddf448b8",
+    "text": "Allume l'ordinateur",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "2c9eeef1-12e0-4287-b0c2-e6fb11d13ada",
+    "text": "Allume le vidéo projecteur",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f4355c57-cc53-41cc-bb9c-baf20a1c0506",
+    "text": "Allumer la lumière de *piece*",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "6200a348-f07a-4826-a7cc-98ce1058af00",
+    "text": "Fais moi un café",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f6421cff-80ac-4c9e-a42b-558891605064",
+    "text": "Allume la cafetière",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "df122093-213b-4525-a7c7-9b8737fb9538",
+    "text": "Prépare moi un café",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "263a45af-af04-4323-b8dc-2c1980bab823",
+    "text": "Allume la lumière de l'entrée",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "b9efa45b-35e5-43f0-92d2-24839d7c771b",
+    "text": "Allume toutes la maison",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "3d307e90-c784-47a6-8d5a-b63e48137d69",
+    "text": "Ouvre le garage int/ext",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "69ee4dab-f4b6-4f0e-8380-08fcbf8f0f7b",
+    "text": "Allume le XXX dès mon réveil",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "3bd4ed3a-9f27-4f06-8c54-ab02baf222a2",
+    "text": "Allume le salon",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "a22ca782-5184-403d-a3c7-faec309fff3c",
+    "text": "regarder la tv",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "6531e011-e121-45f1-993c-2fc10af8b7b5",
+    "text": "Allume la TV",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "607d1ddd-7c83-4d2a-a2f3-20451d38f9ce",
+    "text": "Allume la lumière dans",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f93eb55d-c650-4995-a19a-dcdd81d9ad9a",
+    "text": "Ouvre la porte du",
+    "label": "set-device-on",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "49c33c9a-276a-46a6-984b-f32f379c5234",
+    "text": "il fait froid, augmente la température de 3 degrés",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "5faf94dc-1d11-4821-a03b-bb9954b78427",
+    "text": "J'ai chaud",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "2f4e8f34-1118-4e9c-b130-bd1eb33935ed",
+    "text": "J'ai froid",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "addcac09-259b-4287-b62a-af50a890ef06",
+    "text": "Augmente la température du salon",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "0f5704e7-7077-4796-b017-599c639e52be",
+    "text": "Baisse la température du salon",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f92ea7f6-9e5f-4516-b8a1-4ba5ef683750",
+    "text": "Augmente le volume de la télévision",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "99221739-9422-4de8-87b4-330563e8dd13",
+    "text": "Baisse le volume de la télévision",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "be27cb10-4e3a-4d2b-b61e-8cae5c12dfb0",
+    "text": "Monte le chauffage",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "1afa5c0d-cbea-4ea9-bada-9c66669178dc",
+    "text": "Baisse un peu la lumière",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "505b1586-1e45-493c-9f2d-16c91d7781db",
+    "text": "Tamise la lumière à xx %",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "a3d4e524-9c33-43eb-8c04-0b088f20a367",
+    "text": "Met en route le film \"xxxx",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "720094e7-bc74-459b-a036-0f846dce967f",
+    "text": "Règle la température sur x degrés dans x pièce",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "2a69748e-a255-42c2-9891-472c00787202",
+    "text": "Préchauffe le four à X degrés",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "e7dac123-f429-411a-97cf-16dacb681ba1",
+    "text": "Met la 24",
+    "label": "set-device-value",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "f3535462-e5f6-4b3c-a809-43a5dc05b736",
+    "text": "Baisse la température",
+    "label": "set-device-value-down",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "96c6725d-d22b-4d9a-9728-99cd83abfb0b",
+    "text": "Augmente la température",
+    "label": "set-device-value-up",
+    "service": "device",
+    "language": "fr"
+  },
+  {
+    "uuid": "af89d15c-2530-470c-9153-802ecb647920",
+    "text": "Coucou, je suis rentré",
+    "label": "set-mode=athome",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "746a9272-8218-4f8e-900b-0d1a6684f4cc",
+    "text": "Active l'ambiance souper",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "483ff166-26fb-42f8-89a9-5e4ce4bec20c",
+    "text": "Active l'ambiance party",
+    "label": "set-mode=party",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "d6afb0f7-154f-4259-b8bd-12006d50b8c2",
+    "text": "Je suis rentrée",
+    "label": "set-mode=athome",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "953aa411-25df-4220-8257-ded5333de4fb",
+    "text": "Je rentre dans x minutes",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "c906c75b-a7a9-4649-a1fa-ed6588e8e8bf",
+    "text": "Je m'en vais, éteins tout",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "bc447c43-8f33-4c33-9f2d-7dd776d955ca",
+    "text": "Je pars en vacances, coupe tout",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "7d1e3c40-bcef-4b1a-8952-85d78329f742",
+    "text": "Je ne dors pas à la maison ce soir",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "c5a33bd4-3d40-46eb-a3c6-631fa9392e46",
+    "text": "Je rentre tard ce soir",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "9fddc72b-87d1-4fa7-bdb0-743be167d286",
+    "text": "J'arrive",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "87c57bcd-42f6-4876-ae4b-30b081fb27d1",
+    "text": "Je rentre à h",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "3b6e1ee3-4737-46b2-9762-c0f21ac51dd4",
+    "text": "Je pars à",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "56f2504e-21fb-4ee4-9bfc-73232f9ee20a",
+    "text": "Je rentre de vacances",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "8111555b-3a31-4d36-af81-4f84132e9b86",
+    "text": "Sécurise la maison",
+    "label": "set-mode",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "e1610c58-ef4e-46ce-8939-cfc5ef955656",
+    "text": "Déverrouille la maison",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "98ca592b-1e70-4d80-b009-ca1dbb3d379a",
+    "text": "Je rentre du travail",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "b3c00bfc-18cc-4150-9062-db96ca76760d",
+    "text": "Je rentre de soirée",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "4fdc212c-085c-44f3-9cb5-cf3b3450184d",
+    "text": "Les enfants rentre de l'école dans 10 minutes",
+    "label": "set-mode=coming-back-home",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "a2d59502-1698-490c-9966-3ecac5255b1b",
+    "text": "Je vais dormir",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "10c2f4aa-d621-4572-8793-27dd188e9ff1",
+    "text": "je suis rentré",
+    "label": "set-mode=athome",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "315163e2-9da3-4805-bb91-82085bcccc82",
+    "text": "J'ai du mal à me concentrer",
+    "label": "set-mode=calm",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "124d0ca1-eb61-4e84-a85a-bc6c068093e3",
+    "text": "Passe en mode séance ciné",
+    "label": "set-mode=cinema",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "443957a9-f4bc-4924-b124-3cccb98ab2b7",
+    "text": "au secours",
+    "label": "set-mode=emergency",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "6c161ee0-c347-4ec5-a984-4962801db5bd",
+    "text": "Je pars en vacances",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "0dab7740-f4f4-40f8-a1e7-5e4dc827ca32",
+    "text": "je pars pour 2 semaines",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "e35182e7-aa74-4b16-a26e-da2b0acb9f20",
+    "text": "Je part en weekend",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "afce12e8-aa32-4107-885b-88189e8c10d3",
+    "text": "Je part en vacance",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "d4d8ebf5-5e37-418a-92b1-a1e07a938177",
+    "text": "Je serais absent tout le week-end",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "223234c2-a737-410c-b78a-f7ebc13a7283",
+    "text": "Je pars en vacances",
+    "label": "set-mode=holidays",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "3c9d07f3-ec43-459a-a3b8-b1f63d5e2db2",
+    "text": "Je veux faire une sieste de 40 minutes",
+    "label": "set-mode=nap",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "c9f0c49d-4247-43b6-bd48-5b2db3233a7e",
+    "text": "je sors, éteint la lumière !",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "f81d1879-884b-4d2d-bbe1-9a97385502a6",
+    "text": "Mets l'alarme",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "0c04aeb9-54b1-4087-8429-67ddc207afd4",
+    "text": "Mets l'alarme partielle",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "9f8c9dc4-f381-4af8-95d6-a3d074ce508d",
+    "text": "Je pars au travail",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "3dff9e1b-c7c5-4a60-a5ab-5aa2c6fc021b",
+    "text": "Je quitte l'appartement",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "14aff1bf-67e0-4fff-bf29-7aa1ed051472",
+    "text": "Je part travailler",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "4fb75e1d-8c76-4a37-b45c-02b73d707270",
+    "text": "Je part la journée",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "889804f5-f280-4b7d-9576-3fea3cd90c69",
+    "text": "Je part pour la soirée",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "7004fbc7-15a5-4216-9f51-1b36c26249c3",
+    "text": "Je sors dans 5 minutes",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "ff1186f9-61b9-4153-ab94-f36ad8df7b23",
+    "text": "Je rentre dans 15 minutes",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "a1b18e2d-84c4-4691-a2f5-df0a74e81719",
+    "text": "On sort tous",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "972891cc-5090-43ed-b29e-a6461542430a",
+    "text": "Je sors",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "bff21f91-c766-404f-a31b-5672158621b0",
+    "text": "Je pars chercher mon enfant à l'école",
+    "label": "set-mode=out",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "d70c4a5a-ac3d-462c-89b1-4cbae65b1010",
+    "text": "Ambiance-moi",
+    "label": "set-mode=party",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "60526c63-6345-4774-b73a-4daf175e68cb",
+    "text": "Fait péter l'ambiance !",
+    "label": "set-mode=party",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "ad8db5af-9456-4b6b-95ff-199f234be100",
+    "text": "Mode Romantique",
+    "label": "set-mode=romantic",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "8078903e-e01f-4917-b3c5-7a7e42c80872",
+    "text": "Ma copine vient ce soir",
+    "label": "set-mode=romantic",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "a2e28063-898a-463d-8a67-fd874b031cdc",
+    "text": "Je vais me coucher",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "eb5df2c8-48c3-49e7-891e-74c6f52c65d1",
+    "text": "Je vais me coucher",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "0e72c426-c979-41cb-b1dc-7255f3fd0023",
+    "text": "Je vais me coucher",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "01a6cb9f-c438-402b-9d0a-690606a34bb6",
+    "text": "Bonne nuit Gladys",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "9e568b1c-0fef-4d6f-a18f-0be109a7ab63",
+    "text": "Active le mode nuit",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "b632a84a-2bf7-42b9-bb6a-b680c49922f3",
+    "text": "Il est tard, A demain",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "217012aa-11be-4825-b1e9-9e8c223aa844",
+    "text": "Bonne nuit",
+    "label": "set-mode=sleep",
+    "service": "mode",
+    "language": "fr"
+  },
+  {
+    "uuid": "9c2a4700-785f-4d2f-816c-f6a7e328e898",
+    "text": "Active l'ambiance cinéma",
+    "label": "set-mode=tv",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "9b53dc1d-fb51-404e-a031-3ac8304a9ff6",
+    "text": "Soirée télé ce soir",
+    "label": "set-mode=tv",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "6af57c50-cd05-4adc-a031-f42ae9dcc363",
+    "text": "Rappelle moi d'aller prier toutes les heures",
+    "label": "set-reminder",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "5099197b-d661-423b-a622-c1178609104a",
+    "text": "Programme un minuteur de XX heures/minutes",
+    "label": "set-reminder",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "c7ded779-296c-4cca-853a-8b39ebb4e3fd",
+    "text": "Fait moi penser à",
+    "label": "set-reminder",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "4f498dcd-6da1-4ada-9aaa-7e726cea5500",
+    "text": "Active le scénario",
+    "label": "start-scenario",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "682aded5-ff11-49dc-9967-f503e75579c3",
+    "text": "Je vais prendre une douche",
+    "label": "start-scenario=shower",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "aaa0ae4c-bc63-4594-a0cf-7b0e24e9d020",
+    "text": "Je vais prendre ma douche dans 10 minutes",
+    "label": "start-scenario=shower",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "7785e44a-ddff-4750-b385-a8d55fb5b3f3",
+    "text": "Traduis moi en anglais",
+    "label": "traduction",
+    "service": 0,
+    "language": "fr"
+  },
+  {
+    "uuid": "ae356a38-e6de-4d83-a3f2-1c2d660ccbbe",
+    "text": "Un peu de musique :)",
+    "label": "play-music",
+    "service": 0,
+    "language": "fr"
+  }  
 ]
