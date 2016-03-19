@@ -4,11 +4,11 @@ describe('Brain', function() {
 
   describe('classify', function() {
     
-    it.only('should classify a sentence and call a service', function (done) {
+    it('should classify a sentence and call a service', function (done) {
      	
-        gladys.brain.load()
+        gladys.brain.train()
             .then(function(){
-              return gladys.brain.classify('turn on the light in ');   
+              return gladys.brain.classify('THIS IS A TEST, ARE YOU GETTING ME ???');   
             })
            .then(function(result){ 
                 done();

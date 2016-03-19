@@ -14,5 +14,5 @@ function validateModule(module) {
 	module.should.be.instanceOf(Object);
 	module.should.have.property('slug');
 	module.should.have.property('url');
-    module.should.have.property('installed');
+    module.should.have.property('status');
 }

@@ -4,7 +4,7 @@ describe('Brain', function() {
 
   describe('load', function() {
     
-    it('should load the brain ', function (done) {
+    it.skip('should load the brain ', function (done) {
      	
         gladys.brain.load().then(function(result){
            
