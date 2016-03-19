@@ -1,5 +1,5 @@
 /**
-* Box.js
+* BoxType.js
 *
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
@@ -9,29 +9,27 @@ module.exports = {
 
   attributes: {
       
-      boxtype: {
-          model:'BoxType',
+      title: {
+          type: 'string',
           required: true
       },
       
-      x: {
-          type: 'integer',
+      ngcontroller: {
+          type: 'string'
+      },
+      
+      html: {
+          type: 'text'
+      },
+      
+      icon: {
+          type: 'string',
           required: true
       },
       
-      y: {
-          type: 'integer',
+      type: {
+          type:'string',
           required: true
-      },
-      
-      user: {
-          model: 'User',
-          required: true
-      },
-      
-      active: {
-           type: 'boolean',
-           defaultsTo: true
       },
 
   }

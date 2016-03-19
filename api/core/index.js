@@ -10,6 +10,7 @@ gladys.load = function load() {
     gladys.alarm = require('./alarm/index.js');
     gladys.area = require('./area/index.js');
     gladys.box = require('./box/index.js');
+    gladys.boxType = require('./boxtype/index.js');
     gladys.brain = require('./brain/index.js');
     gladys.calendar = require('./calendar/index.js');
     gladys.device = require('./device/index.js');
