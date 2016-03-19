@@ -3,15 +3,11 @@ var validateBox = require('../../validator/boxValidator.js');
 
 describe('Box', function() {
 
-  describe('get', function() {
+  describe('update', function() {
     
-    it('should return list of boxs', function (done) {
-     	var user = {
-             id: 1,
-             view: 'dashboard'
-         };
-        
-        gladys.box.get({user}).then(function(result){
+    it('should update a box', function (done) {
+     	
+        gladys.box.update({id:1, active: 0}).then(function(result){
            validateBox(result);
            done();
         }).catch(function(err){

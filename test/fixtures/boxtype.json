@@ -4,6 +4,7 @@
         "title": "My box",
         "html": "<b>My awesome box</b>",
         "icon": "fa fa-bell",
-        "type": "box box-info"
+        "type": "box box-info",
+        "view": "dashboard"
     }
 ]

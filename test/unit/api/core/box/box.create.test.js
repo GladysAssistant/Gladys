@@ -7,12 +7,10 @@ describe('Box', function() {
     
     it('should return box created', function (done) {
      	var box = {
-           title: 'My awesome box',
            x: 1,
            y: 2,
            user: 1,
-           type: 'danger',
-           icon: 'fa fa-info'
+           boxtype: 1
         };
         
         gladys.box.create(box).then(function(result){

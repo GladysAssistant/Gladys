@@ -24,7 +24,7 @@ module.exports = {
 	 * @return 
 	 */
 	index : function (req, res, next){
-        gladys.box.get({user:req.session.User})
+        gladys.box.get({user:req.session.User, view: 'dashboard'})
             .then(function(boxs){
                 return res.view('dashboard/index', { User: req.session.User, boxs: boxs, pageName: req.__('pagename-homepage') }); 
             }); 

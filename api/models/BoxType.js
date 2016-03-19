@@ -31,6 +31,13 @@ module.exports = {
           type:'string',
           required: true
       },
+      
+      // the view where the module should be displayed
+      view: {
+          type:'string',
+          enum: ['dashboard', 'module-param'],
+          required: true
+      }
 
   }
 };

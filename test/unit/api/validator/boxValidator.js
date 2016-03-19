@@ -12,7 +12,6 @@ function validate(box) {
 
 function validateBox(box) {
 	box.should.be.instanceOf(Object);
-    box.should.have.property('title');
     box.should.have.property('x');
     box.should.have.property('y');
     box.should.have.property('user');
