@@ -14,6 +14,11 @@ module.exports = {
           required: true
       },
       
+      version: {
+          type:'string',
+          required: true
+      },
+      
       slug: {
           type: 'string',
           required: true
@@ -29,7 +34,7 @@ module.exports = {
       // 1 = installed with success, but waiting for restart
       // 2 = installation failed, will retry later
       // 3 = definitely failed, module is buggy
-      installed: {
+      status: {
           type: 'integer',
           enum: [0, 1, 2, 3]
       }

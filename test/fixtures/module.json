@@ -3,6 +3,7 @@
         "id": 1,
         "name": "Downloader",
         "url": "https://github.com/GladysProject/gladys-downloader.git",
+        "version": "2.1",
         "slug": "downloader"
     }
 ]
