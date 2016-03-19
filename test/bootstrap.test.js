@@ -86,6 +86,7 @@ function loadFixtures(barrels){
        'calendarevent',
        'area',
        'machine',
+       'boxtype',
        'box',
        'module',
        'sentence'
