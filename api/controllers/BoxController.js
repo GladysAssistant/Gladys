@@ -6,6 +6,16 @@
  */
 
 module.exports = {
+    
+    
+    update: function(req, res, next){
+        req.body.id = req.params.id;
+        gladys.box.update(req.body)
+          .then(function(box){
+              return res.json(box);
+          })
+          .catch(next);
+    }
 	
 };
 

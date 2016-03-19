@@ -39,6 +39,9 @@ module.exports.routes = {
   
   '/': 'WelcomeController.index',
   
+  // Box
+  'patch /box/:id': 'BoxController.update',
+  
   // Brain
   'get /brain/classify': 'BrainController.classify', 
   
