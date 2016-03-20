@@ -64,6 +64,10 @@ module.exports.routes = {
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
   
+  // Event
+  
+  'get /event': 'EventController.index',
+  
   // Location
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',

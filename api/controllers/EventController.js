@@ -7,8 +7,16 @@
 
 module.exports = {
     
-    get: function(req, res, next){
-        
+    /** 
+     * Return all events from a specific user
+     */
+    index: function(req, res, next){
+        req.query.user = req.session.User;
+        gladys.event.get(req.query)
+          .then(function(events){
+              return res.json(events);
+          })
+          .catch(next);
     },
     
     create: function(req, res, next){

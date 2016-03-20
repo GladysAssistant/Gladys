@@ -1,4 +1,7 @@
 module.exports = {
     getByCode: `SELECT * FROM eventtype WHERE code = ?;`,
-    get: `SELECT * FROM eventtype;`
+    getByUser: `
+        SELECT * FROM event
+        JOIN eventtype ON (event.eventtype = eventtype.id)
+        WHERE user = ? LIMIT ? OFFSET ?;`
 };

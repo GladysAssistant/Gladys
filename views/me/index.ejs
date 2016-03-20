@@ -13,7 +13,7 @@
                 </section>
 
 
-                <section class="content" data-ng-controller="LifeEventCtrl as vm">
+                <section class="content" data-ng-controller="EventCtrl as vm">
 
                     <!-- row -->
                     <div class="row">
@@ -62,15 +62,12 @@
                                 
                                 <!-- timeline item -->
                                 
-                                <li infinite-scroll="vm.addMoreLifeEvents()" ng-repeat="lifeevent in vm.lifeevents" class="ng-cloak">
-                                    <i class="{{lifeevent.FaIcon}} {{lifeevent.iconColor}}"></i>
+                                <li infinite-scroll="vm.loadMore()" ng-repeat="event in vm.events" class="ng-cloak">
+                                    <i class="{{event.faIcon}} {{event.iconColor}}"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="lifeevent.datetime"></span></span>
-                                        <h3 class="timeline-header" ng-class="{ 'no-border': !lifeevent.sentence }"><a href="#">{{lifeevent.BeautifulName }} <span ng-show="lifeevent.param">( {{lifeevent.param}} )</span></a></h3>
-                                        <div class="timeline-body " ng-show="lifeevent.sentence.length > 0" >
-                                                {{ lifeevent.sentence }}
-                                        </div>
-                                        <div class="timeline-footer" ng-show="lifeevent.sentence.length > 0">
+                                        <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="event.datetime"></span></span>
+                                        <h3 class="timeline-header" ng-class="{ 'no-border': !event.sentence }"><a href="#">{{event.name }} <span ng-show="event.param">( {{event.param}} )</span></a></h3>
+                                        <div class="timeline-footer" ng-show="event.sentence.length > 0">
                                             
                                         </div>
                                     </div>

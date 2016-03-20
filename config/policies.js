@@ -36,6 +36,7 @@ module.exports.policies = {
   CalendarList : ['checkToken', 'Human'],
   ChromeNotification : ['checkToken', 'Human'],
   Dashboard: [ 'authenticated', 'Human'],
+  Event: ['checkToken', 'Human'], 
   Device: ['checkToken', 'Human'],
   DeviceState: ['checkToken', 'Human'],
   DeviceType: ['checkToken', 'Human'],
