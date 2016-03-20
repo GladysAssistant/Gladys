@@ -74,40 +74,6 @@ module.exports = {
         } else {
             next();
         }
-    },
-
-    afterDestroy: function(values, next) {
-
-        var nbOk = 0;
-        var i;
-        var nbThingsToDestroy = 2;
-        var checkifAllDestroyed = function() {
-            if (nbOk == values.length * nbThingsToDestroy)
-                next();
-        };
-
-        if (values.length === 0)
-            return next();
-
-        for (i = 0; i < values.length; i++) {
-            UserHouseRelation.destroy({
-                house: values[i].id
-            }, function UserHouseRelationDestroyed(err, userHouseRelation) {
-                if (err) return next(err);
-
-                nbOk++;
-                checkifAllDestroyed();
-            });
-
-            Room.destroy({
-                house: values[i].id
-            }, function roomDestroyed(err, room) {
-                if (err) return next(err);
-
-                nbOk++;
-                checkifAllDestroyed();
-            });
-        }
     }
 
 };
