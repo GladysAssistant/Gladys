@@ -27,6 +27,7 @@ gladys.load = function load() {
     gladys.scenario = require('./scenario/index.js');
     gladys.scheduler = require('./scheduler/index.js');
     gladys.script = require('./script/index.js');
+    gladys.socket = require('./socket/index.js');
     gladys.token = require('./token/index.js');
     gladys.update = require('./update/index.js');
     gladys.user = require('./user/index.js');

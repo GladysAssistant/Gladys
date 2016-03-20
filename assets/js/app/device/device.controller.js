@@ -38,6 +38,7 @@
     function activate() {
       getDevices();
       getRooms();
+      waitForNewValue();
       return ;
     }
     
@@ -93,6 +94,33 @@
             .then(function(){
                 
             });
+    }
+    
+     // waiting for websocket message
+    function waitForNewValue(){
+        
+        io.socket.on('newDeviceState', function (deviceState) {
+            console.log(deviceState);
+            updateValueType(deviceState);
+        });
+    }
+    
+    // loop foreach device and upadte the value when the type is found
+    function updateValueType(deviceState){
+        var found = false;
+        var i = 0;
+        if(vm.selectedDevice.types){
+            while(!found && i < vm.selectedDevice.types.length){
+
+                if(vm.selectedDevice.types[i].id == deviceState.devicetype){
+                    found = true;
+                    vm.selectedDevice.types[i].lastValue = deviceState.value;
+                    vm.selectedDevice.types[i].lastChanged = deviceState.datetime;
+                    $scope.$apply();
+                }
+                i++;
+            }
+        }
     }
     
   }

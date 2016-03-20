@@ -79,6 +79,10 @@ module.exports.routes = {
   'post /script/:id/exec': 'ScriptController.exec',
   'delete /script/:id': 'ScriptController.delete',
   
+  //Socket
+  
+  'post /socket/subscribe': 'SocketController.subscribe',
+  
   // Weather
   'get /weather': 'WeatherController.index'
 

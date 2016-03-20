@@ -25,7 +25,7 @@
 
         function subscribe() {
             return new Promise(function(resolve, reject){
-				io.socket.get('/socket/subscribeToMyRooms', {}, function (data, jwres){
+				io.socket.post('/socket/subscribe', {}, function (data, jwres){
 				    resolve();
 				});
 			});

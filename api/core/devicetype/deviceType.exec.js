@@ -47,5 +47,12 @@ function set(param) {
                     // creating DeviceState
                     return DeviceState.create(param);
                 });
+        })
+        .then(function(deviceState){
+           
+           // broadcast news to everyone
+           gladys.socket.emit('newDeviceState', deviceState); 
+           
+           return deviceState; 
         });
 }

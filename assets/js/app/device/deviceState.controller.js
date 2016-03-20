@@ -28,6 +28,7 @@
 
     function activate() {
       getDeviceTypes();
+      waitForNewValue();
       return ;
     }
     
@@ -72,6 +73,21 @@
               chartData.data = [chartData.data];
               vm.chart = chartData;
           });
+    }
+    
+    // waiting for websocket message
+    function waitForNewValue(){
+        
+        io.socket.on('newDeviceState', function (deviceState) {
+            
+            // if the device is the current device, push the value in the graph
+            if(vm.currentDeviceType && deviceState.devicetype == vm.currentDeviceType.id){
+                $scope.$apply(function(){
+                    vm.chart.labels.push(deviceState.datetime);
+                    vm.chart.data[0].push(deviceState.value);  
+                });
+            }
+        });
     }
     
     function formatDataChartjs(rows){

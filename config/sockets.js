@@ -21,10 +21,6 @@ module.exports.sockets = {
   ***************************************************************************/
 
   afterDisconnect: function (session, socket, cb) {
-     var socketId = sails.sockets.id(socket);
-    
-
-    // destroy socket
 
     // Be sure to call the callback
     return cb();
