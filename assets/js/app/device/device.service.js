@@ -22,9 +22,11 @@
             get: get,
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
+            getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
             updateDeviceType: updateDeviceType,
             deleteDeviceType: deleteDeviceType,
+            exec: exec,
             getStates: getStates
         };
 
@@ -44,6 +46,10 @@
             return $http({method: 'DELETE', url: '/device/' + device.id, data: device});
         }
         
+        function getDeviceTypesDevice(id){
+            return $http({method: 'GET', url: '/device/' + id + '/devicetype'});
+        }
+        
         
         // all about deviceTypes
         function getTypes(){
@@ -58,10 +64,9 @@
             return $http({method: 'DELETE', url: '/devicetype/' + deviceType.id, data: deviceType});
         }
         
-        function getTypesDevice(id){
-            
+        function exec(deviceType, value){
+            return $http({method: 'POST', url: '/devicetype/' + deviceType.id + '/exec', data: {value: value}});
         }
-        
         
         // all about deviceStates
         function getStates(deviceType, skip){

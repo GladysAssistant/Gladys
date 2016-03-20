@@ -197,5 +197,18 @@
   "devices-data": "Courbes",
   "devices-select-device-type": "Sélectionnez un device",
   "devices-skip-previous": "Précédents",
-  "devices-skip-next": "Suivant"
+  "devices-skip-next": "Suivant",
+  "devices-types-ID": "ID",
+  "devices-types-type": "type",
+  "devices-types-tag": "tag",
+  "devices-types-unit": "Unité",
+  "devices-types-min": "min",
+  "devices-types-max": "max",
+  "devices-types-isensor": "Capteur",
+  "devices-types-lastvalue": "Dernière valeur",
+  "devices-sensor-true": "Oui",
+  "devices-sensor-false": "Non",
+  "devices-types-on": "On",
+  "devices-types-off": "Off",
+  "devices-types-changevalue": "Modifier"
 }

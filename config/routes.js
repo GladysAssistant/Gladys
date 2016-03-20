@@ -47,9 +47,11 @@ module.exports.routes = {
   
   // Device 
   
+  'get /device': 'DeviceController.index',
   'post /device': 'DeviceController.create',
   'patch /device/:id': 'DeviceController.update',
   'delete /device/:id': 'DeviceController.delete',
+  'get /device/:id/devicetype': 'DeviceController.getDeviceTypes',
   
   
   // DeviceState
@@ -59,6 +61,8 @@ module.exports.routes = {
   // DeviceType
   
   'get /devicetype': 'DeviceTypeController.index',
+  'patch /devicetype/:id': 'DeviceTypeController.update',
+  'post /devicetype/:id/exec': 'DeviceTypeController.exec',
   
   // Module
   

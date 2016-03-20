@@ -34,5 +34,18 @@
   "devices-data": "Charts",
   "devices-select-device-type": "Select a device",
   "devices-skip-previous": "Previous",
-  "devices-skip-next": "Next"
+  "devices-skip-next": "Next",
+  "devices-types-ID": "ID",
+  "devices-types-type": "type",
+  "devices-types-tag": "tag",
+  "devices-types-unit": "Unit",
+  "devices-types-min": "min",
+  "devices-types-max": "max",
+  "devices-types-isensor": "Sensor",
+  "devices-types-lastvalue": "Last value",
+  "devices-sensor-true": "Yes",
+  "devices-sensor-false": "No",
+  "devices-types-on": "On",
+  "devices-types-off": "Off",
+  "devices-types-changevalue": "Modify"
 }

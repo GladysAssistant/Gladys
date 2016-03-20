@@ -22,6 +22,8 @@
     var vm = this;
     
     vm.selectDevice = selectDevice;
+    vm.changeValue = changeValue;
+    vm.updateDeviceType = updateDeviceType;
     vm.saving = false;
     vm.devices = [];
     vm.rooms = [];
@@ -73,6 +75,24 @@
     
     function selectDevice(device){
         vm.selectedDevice = device;
+        return deviceService.getDeviceTypesDevice(device.id)
+          .then(function(data){
+              vm.selectedDevice.types = data.data;
+          });
+    }
+    
+    function changeValue(deviceType, value){
+        return deviceService.exec(deviceType, value)
+          .then(function(data){
+             deviceType.lastValue = data.data.value; 
+          });
+    }
+    
+    function updateDeviceType(deviceType){
+        return deviceService.updateDeviceType(deviceType)
+            .then(function(){
+                
+            });
     }
     
   }

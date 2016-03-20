@@ -24,6 +24,17 @@ module.exports = {
   },
   
   /**
+   * Return all deviceTypes for a specific device
+   */
+  getDeviceTypes: function(req, res, next){
+    gladys.deviceType.getByDevice({id: req.params.id})
+      .then(function(deviceTypes){
+          return res.json(deviceTypes);
+      }) 
+      .catch(next);
+  },
+  
+  /**
    * Create a new device
    */
   create: function(req, res, next) {

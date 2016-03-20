@@ -53,7 +53,7 @@
                                                             ng-model="device.room" ng-change="vm.updateDevice(device);">
                                                    </select>
                                                 </td>
-                                                <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('Edit') %></button></td>
+                                                <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ng-click="vm.selectDevice(device);" ><%= __('Edit') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -124,44 +124,68 @@
                               <h4 class="modal-title" id="myLargeModalLabel"><%= __('Device') %></h4>
                             </div>
                             <div class="modal-body">
-                                <!-- START OF MODAL BODY -->
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h3 class="panel-title">Device Types</h3>
-                                        </div>
-                                        <div class="panel-body">
+                                 <div class="box-body table-responsive">
                                             <table id="example2" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th><%= __('ID') %></th>
-                                                <th><%= __('type') %></th>
-                                                <th><%= __('unite') %></th>
-                                                <th><%= __('min') %></th>
-                                                <th><%= __('max') %></th>
-                                                <th><%= __('sensor') %></th>
+                                                <th><%= __('devices-types-ID') %></th>
+                                                <th><%= __('devices-types-type') %></th>
+                                                <th><%= __('devices-types-tag') %></th>
+                                                <th><%= __('devices-types-unit') %></th>
+                                                <th><%= __('devices-types-min') %></th>
+                                                <th><%= __('devices-types-max') %></th>
+                                                <th><%= __('devices-types-isensor') %></th>
+                                                <th><%= __('devices-types-lastvalue') %></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="type in vm.selectedDevice.types" class="ng-cloak">
                                                 <td>{{type.id}}</td>
                                                 <td>{{type.type}}</td>
+                                                <td><input type="text" class="form-control" ng-model="type.tag"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
+                                                <td>{{type.unit}}</td>
                                                 <td>{{type.min}}</td>
                                                 <td>{{type.max}}</td>
-                                                <td>{{type.sensor}}</td>
-                                                <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('Edit') %></button></td>
+                                                <td><div ng-show="type.sensor == 1"><%= __('devices-sensor-true') %></div><div ng-show="type.sensor == 0"><%= __('devices-sensor-false') %></div></td>
+                                                <td>
+                                                    <!-- If the deviceType is a sensor, display last data -->
+                                                    <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
+                                                    
+                                                    <!-- If the deviceType is not a sensor and is not a binary, display input field -->
+                                                     <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                            <input 
+                                                                type="number" class="form-control input-sm" 
+                                                                ng-model="type.lastValue" 
+                                                            />
+                                                            <span class="input-group-btn">
+                                                            <button class="btn btn-success btn-sm" ng-click="vm.changeValue(type, type.lastValue);" ><%= __('devices-types-changevalue') %></button> 
+                                                            </span>
+                                                            </div>
+                                                        </div>
+                                                     </form>    
+                                                    <!-- If the deviceType is not a sensor and is  a binary, display on/off button -->
+                                                    <button ng-show="!type.sensor && type.type == 'binary'" ng-click="vm.changeValue(type, !type.lastValue);" 
+                                                            class="btn {{ type.lastValue && 'btn-danger' || 'btn-success' }} btn-sm">
+                                                            {{type.lastValue && '<%= __('devices-types-off') %>' || '<%= __('devices-types-on') %>' }}
+                                                    </button>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                        </div>
-                                    </div>
-                                
+                                  
+                                  
+                                  </div>
+  
                                 <!-- END OF BODY -->
-                            
                             </div>
                   </div>
                 </div>
                 </div>
-
+                <!-- end of modal -->
+                
+                
                 </section><!-- /.content -->
             </aside><!-- /.right-side -->
             

@@ -8,7 +8,7 @@ var queries = require('./deviceType.queries.js');
  * the related service.
  */
 function set(param) {
-
+    
     return gladys.utils.sql(queries.getDeviceType, [param.devicetype])
         .then(function(types) {
 
@@ -23,6 +23,19 @@ function set(param) {
             if (typeof global[types[0].service].exec !== "function") {
                 return Promise.reject(new Error(`${types[0].service} does not exist or does not have an exec function`));
             }
+            
+            
+            // if we send true or false, it's valid
+            // but it won't insert in db because validator
+            // need an integer
+            if(param.value === true){
+                param.value = 1;
+            } else if(param.value === false){
+                param.value = 0;
+            }
+            
+            // parseInt value
+            param.value = parseInt(param.value);
 
             // calling service method
             return global[types[0].service].exec({
