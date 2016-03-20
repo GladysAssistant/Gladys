@@ -8,7 +8,8 @@
     "birthdate":"10/10/1960",
     "gender" : 1,
     "language":"FR",
-    "preparationTimeAfterWakeUp": 20
+    "preparationTimeAfterWakeUp": 20,
+    "role": "admin"
   },
   {
     "id": 2,   
@@ -19,6 +20,7 @@
     "birthdate":"02/01/1970",
     "gender" : 0,
     "language":"FR",
-    "preparationTimeAfterWakeUp": 20
+    "preparationTimeAfterWakeUp": 20,
+    "role": "habitant"
   }
 ]

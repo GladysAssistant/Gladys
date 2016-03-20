@@ -14,7 +14,8 @@ describe('User', function() {
              birthdate: '1971-06-28',
              language: 'en-US',
              password: 'tesla123',
-             gender: 1
+             gender: 1,
+             role: 'admin'
          };
         
         gladys.user.create(user)
