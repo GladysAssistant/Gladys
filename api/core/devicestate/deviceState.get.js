@@ -1,4 +1,4 @@
-var queries = require('./devicestate.queries.js');
+var queries = require('./deviceState.queries.js');
 
 module.exports = function get(options){
     options.take = parseInt(options.take) || 25;
