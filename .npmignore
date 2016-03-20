@@ -1,9 +1,8 @@
 node_modules
 coverage
 bower_components
-music/**/*.mp3
-music/**/*.wav
-voicecache/**/*.mp3
+cache/*.json
+api/hooks
 
 ################################################
 # Sails.js / Waterline / Grunt

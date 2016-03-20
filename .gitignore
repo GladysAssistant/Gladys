@@ -67,12 +67,7 @@
 
 node_modules
 coverage
-bower_components
-.GladysBackUp
-music/**/*.mp3
-music/**/*.wav
-uploads
-voicecache/**/*.mp3
+cache/*.json
 www
 api/hooks
 
