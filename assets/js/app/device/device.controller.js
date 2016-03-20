@@ -15,32 +15,60 @@
     .module('app')
     .controller('DeviceCtrl', DeviceCtrl);
 
-  DeviceCtrl.$inject = ['deviceService'];
+  DeviceCtrl.$inject = ['deviceService','roomService', '$scope'];
 
-  function DeviceCtrl(deviceService) {
+  function DeviceCtrl(deviceService, roomService, $scope) {
     /* jshint validthis: true */
     var vm = this;
     
     vm.selectDevice = selectDevice;
-    
+    vm.saving = false;
     vm.devices = [];
+    vm.rooms = [];
     vm.selectedDevice = {
         types: []
     };
     
+    vm.updateDevice = updateDevice;
 
     activate();
 
     function activate() {
       getDevices();
+      getRooms();
       return ;
     }
+    
     
     function getDevices() {
       return deviceService.get()
         .then(function(data){
           vm.devices = data.data;
         });
+    }
+    
+    function getRooms(){
+        return roomService.get()
+          .then(function(data){
+              vm.rooms = data.data;
+          });
+    }
+    
+    function updateDevice(device){
+        console.log('Updating device ' + device.name);
+        vm.saving = true;
+        var newDevice = {
+            id: device.id,
+            room: device.room.id,
+            name: device.name
+        };
+        return deviceService.updateDevice(newDevice)
+             .then(function(device){
+                 vm.saving = false;
+             })
+             .catch(function(err){
+                vm.saving = false;
+             });
     }
     
     function selectDevice(device){

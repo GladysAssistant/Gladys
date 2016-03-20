@@ -192,5 +192,10 @@
   "script-delete": "Supprimer",
   "script-modal-title": "Nouveau script",
   "script-modal-name": "Nom du script",
-  "script-modal-create": "Créer"
+  "script-modal-create": "Créer",
+  "devices-list": "Mes devices",
+  "devices-data": "Courbes",
+  "devices-select-device-type": "Sélectionnez un device",
+  "devices-skip-previous": "Précédents",
+  "devices-skip-next": "Suivant"
 }

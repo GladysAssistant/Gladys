@@ -11,6 +11,17 @@
 module.exports = {
     
    /**
+    * Return all deviceTypes
+    */
+   index: function(req, res, next){
+       gladys.deviceType.getAll()
+         .then(function(deviceTypes){
+             return res.json(deviceTypes);
+         })
+         .catch(next);
+   },
+    
+   /**
     *  Create a deviceType
     */ 
    create: function(req, res, next){

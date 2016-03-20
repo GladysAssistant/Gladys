@@ -37,6 +37,8 @@ module.exports.policies = {
   ChromeNotification : ['checkToken', 'Human'],
   Dashboard: [ 'authenticated', 'Human'],
   Device: ['checkToken', 'Human'],
+  DeviceState: ['checkToken', 'Human'],
+  DeviceType: ['checkToken', 'Human'],
   GoogleApi : ['checkToken', 'Human'],
   House : ['checkToken', 'Human'],
   Launcher :['checkToken', 'Human'],

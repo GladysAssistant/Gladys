@@ -51,6 +51,15 @@ module.exports.routes = {
   'patch /device/:id': 'DeviceController.update',
   'delete /device/:id': 'DeviceController.delete',
   
+  
+  // DeviceState
+  
+  'get /devicestate': 'DeviceStateController.index',
+  
+  // DeviceType
+  
+  'get /devicetype': 'DeviceTypeController.index',
+  
   // Module
   
   'get /module': 'ModuleController.index',

@@ -14,7 +14,18 @@
 
                 <!-- Main content -->
                 <section class="content"  data-ng-controller="DeviceCtrl as vm">
-                         <div class="box-body table-responsive">
+                    
+                     <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('devices-list') %></a></li>
+              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('devices-data') %></a></li>
+
+              <li class="pull-right"><a href="#" class="ng-cloak" ng-show="vm.saving"><%= __('devices-saving') %>...</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                    <!-- BEGINNING OF TAB 1 -->
+                        <div class="box-body table-responsive">
 
                                     <table id="example2" class="table table-bordered table-hover">
                                         <thead>
@@ -30,17 +41,80 @@
                                         <tbody>
                                             <tr ng-repeat="device in vm.devices" class="ng-cloak">
                                                 <td>{{device.id}}</td>
-                                                <td>{{device.name}}</td>
+                                                <td><input type="text" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td>{{device.protocol}}</td>
                                                 <td>{{device.service}}</td>
-                                                <td>{{device.roomName}}</td>
+                                                <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
+                                                    <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+                                                    </select>-->
+                                                    
+                                                    <select name="selectRoom" id="selectRoom" class="form-control"
+                                                            ng-options="room.name for room in vm.rooms track by room.id"
+                                                            ng-model="device.room" ng-change="vm.updateDevice(device);">
+                                                   </select>
+                                                </td>
                                                 <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('Edit') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
 
+                        </div>          
+                    
+                    <!-- END OF TAB 1 -->
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_2" data-ng-controller="DeviceStateCtrl as vm">
+                  
+                  <!-- BEGINNING OF TAB 2 -->
+                    <div class="row">
+                        <div class="col-md-8 pull-right">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label for="selectDeviceType"><%= __('devices-select-device-type') %> : </label>
+                                    <select name="selectDeviceType" id="selectDeviceType" class="form-control"
+                                                            ng-options="deviceType.name for deviceType in vm.deviceTypes track by deviceType.id"
+                                                            ng-model="vm.currentDeviceType">
+                                                            </select>
+                                </div>
+                                <div class="form-group">
+                                     <button class="btn btn-sm btn-info" ng-click="vm.previousStates();" ><%= __('devices-skip-previous') %></button>
+                                     <button class="btn btn-sm btn-info" ng-click="vm.nextStates();" ><%= __('devices-skip-next') %></button>
+                                </div>
+                                </form>
+                            
+                           
+                            
                         </div>
-                
+                        <!-- col-md-4 -->
+                        
+                       
+                        <!-- col-md-6 -->
+                    </div>
+                     <!-- /.row --> 
+                     
+                      
+                            
+                     <div>
+                      <canvas id="line" class="chart chart-line" chart-data="vm.chart.data"
+                                chart-labels='vm.chart.labels' chart-legend="true" chart-series="vm.chart.series"
+                                chart-click="onClick" >
+                                </canvas> 
+                      </div>
+                     
+                  <!-- END OF TAB 2 -->
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_3">
+
+              </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+
+                    
+                    
+  
                 <!-- Large modal -->
                 <div id="modalNewSensor" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-lg">

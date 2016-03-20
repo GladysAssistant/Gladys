@@ -3,6 +3,7 @@ module.exports = {
     SELECT device.*, room.name AS roomName 
     FROM device
     JOIN room ON device.room = room.id
+    ORDER BY device.id
     LIMIT ?
     OFFSET ?;
   `,

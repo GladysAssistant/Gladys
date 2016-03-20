@@ -28,6 +28,7 @@ var cssFilesToInject = [
   'styles/weatherjs.css',
   'styles/sleep.css',
   'styles/search.css',
+  'styles/angular-chart/angular-chart.min.css',
   // all styles, disabled by default
   //'styles/**/*.css',
   
@@ -52,10 +53,16 @@ var jsFilesToInject = [
   'js/dependencies/bootstrap.min.js',
    // loading Raphael
   'js/dependencies/raphael-min.js',
+  
   // loading Morris JS
   'js/dependencies/morris.min.js',
-  // loading Morris JS
+  
+  // loading Moment with locales
   'js/dependencies/moment-with-locales.js',
+  
+  // loading Chart JS
+  'js/dependencies/chart.min.js',
+  
   // loading ace
   'js/dependencies/ace/ace.js',
 
@@ -75,6 +82,7 @@ var jsFilesToInject = [
     'js/angular-moment/angular-moment.min.js',
     'js/angular-ui-notification/angular-ui-notification.min.js',
     'js/smooth-scroll/angular-smooth-scroll.min.js',
+    'js/angular-chart/angular-chart.min.js',
     
     // loading first AngularModule definition
    'js/app/app.module.js',

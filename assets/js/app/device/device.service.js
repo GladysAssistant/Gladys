@@ -19,26 +19,53 @@
     function deviceService($http) {
         
         var service = {
-            get: get
+            get: get,
+            updateDevice: updateDevice,
+            deleteDevice: deleteDevice,
+            getTypes: getTypes,
+            updateDeviceType: updateDeviceType,
+            deleteDeviceType: deleteDeviceType,
+            getStates: getStates
         };
 
         return service;
-
+        
+        // all about devices 
+        
         function get() {
-            return $http({method: 'GET', url: '/device'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+            return $http({method: 'GET', url: '/device'});
         }
         
-        function getTypes(id){
+        function updateDevice(device){
+            return $http({method: 'PATCH', url: '/device/' + device.id, data: device});
+        }
+        
+        function deleteDevice(device){
+            return $http({method: 'DELETE', url: '/device/' + device.id, data: device});
+        }
+        
+        
+        // all about deviceTypes
+        function getTypes(){
+            return $http({method: 'GET', url: '/devicetype'});
+        }
+        
+        function updateDeviceType(deviceType){
+            return $http({method: 'PATCH', url: '/devicetype/' + deviceType.id, data: deviceType});
+        }
+        
+        function deleteDeviceType(deviceType){
+            return $http({method: 'DELETE', url: '/devicetype/' + deviceType.id, data: deviceType});
+        }
+        
+        function getTypesDevice(id){
             
+        }
+        
+        
+        // all about deviceStates
+        function getStates(deviceType, skip){
+            return $http({method: 'GET', url: '/devicestate', params: {devicetype: deviceType, skip:skip}});
         }
     }
 })();

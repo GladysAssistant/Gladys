@@ -29,5 +29,10 @@
   "script-delete": "Delete",
   "script-modal-title": "New script",
   "script-modal-name": "Name",
-  "script-modal-create": "Create"
+  "script-modal-create": "Create",
+  "devices-list": "My devices",
+  "devices-data": "Charts",
+  "devices-select-device-type": "Select a device",
+  "devices-skip-previous": "Previous",
+  "devices-skip-next": "Next"
 }
