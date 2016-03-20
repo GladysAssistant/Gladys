@@ -24,10 +24,7 @@ module.exports.sockets = {
      var socketId = sails.sockets.id(socket);
     
 
-    // destroy the socket from the database
-    Socket.destroy({socketId: socketId}, function socketDestroyed(err, Socket){
-        if(err) sails.log.warn(err);
-    });
+    // destroy socket
 
     // Be sure to call the callback
     return cb();

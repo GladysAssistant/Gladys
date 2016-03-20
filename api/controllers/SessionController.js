@@ -136,16 +136,12 @@ module.exports = {
 
 				// 
 				sails.log.info("New User connected : " + user.firstname);
-				// 
-				user.save(function(err, user) {
-					if (err) return next(err);
-					
-					if(user.preparationTimeAfterWakeUp){
-						res.redirect('/dashboard');
-					}else{
-						res.redirect('/dashboard/installation');
-					}
-				});
+				
+                if(user.preparationTimeAfterWakeUp){
+                    res.redirect('/dashboard');
+                }else{
+                    res.redirect('/dashboard/installation');
+                }
 			});
 		});
 	},

@@ -67,6 +67,13 @@ module.exports = {
         preparationTimeAfterWakeUp: {
             type: 'integer'
         },
+        
+        // the role of the user
+        role: {
+            type:'string',
+            enum: ['admin', 'habitant', 'guest'],
+            required: true
+        }
 
     },
 
