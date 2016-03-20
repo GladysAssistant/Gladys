@@ -9,7 +9,13 @@ module.exports = {
     * POWER(SIN(RADIANS(? - area.longitude)), 2))) * 1000) AS distance
     FROM area
     WHERE area.user = ?
-    HAVING distance < area.range
+    HAVING distance < area.radius
     ORDER BY distance;
-  `  
+  `,
+  lastLocationUser: `
+    SELECT * FROM location
+    WHERE user = ?
+    ORDER BY datetime DESC
+    LIMIT 1;
+  `
 };

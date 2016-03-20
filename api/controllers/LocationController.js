@@ -26,47 +26,24 @@ module.exports = {
 	 * @return 
 	 */
 	create : function(req,res, next){
-		var locationObj = {
-	      latitude: req.param('latitude'),
-	      longitude: req.param('longitude'),
-	      altitude: req.param('altitude'),
-	      accuracy: req.param('accuracy'),
-	      user: req.session.User.id,
-	      datetime: new Date()
-	    };
+        
+        var location;
+        
+        // request can be a get or post request
+        if(req.query.latitude) {
+            location = req.query;
+        } else {
+            location = req.body;
+        }
+        
+        location.user = req.session.User.id;
 
-	  		Location.create(locationObj, function LocationCreated(err,Location){
-	  			if(err) res.json(err);
-	  			
-	  			res.json(Location);
-	  		});
-
-	},
-
-	getAllLastLocation:function(req,res,next){
-		UserService.getUsersOneCanControl(req.session.User.id, function(err, users){
-          if(err) return res.json(err);
-
-          users.unshift(req.session.User);
-          var locations = [];
-          async.each(users, function(user, callback) {
-          		LocationService.lastPreciseLocation(user.id, sails.config.googlegeocoder.localisationValidityTime, function(err, location){
-          			if(!err){
-          				location.firstname = user.firstname;
-          				location.lastname = user.lastname;
-          				locations.push(location);
-          			}
-          			callback();
-          		});
-			}, function(err){
-			   	if(err){
-			   		return res.json(err);
-			   	}else{
-			   		res.json(locations);
-			   	}
-			});
-      });
-	},
+        gladys.location.create(location)
+          .then(function(location){
+              return res.json(location);
+          })
+          .catch(next);
+	}
 
 };
 

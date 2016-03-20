@@ -18,26 +18,23 @@
 
     function geoLocationService($http) {
         var service = {
-            saveGeoLocation: saveGeoLocation,
-            getGeoLocation: getGeoLocation
+            create: create,
+            getCurrentPosition: getCurrentPosition
         };
 
         return service;
 
-        function saveGeoLocation(geolocationObj) {
-            return $http({method: 'POST', url: '/Location/create', data : geolocationObj }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function create(location) {
+            var locationObj = {
+              latitude: location.latitude,
+              longitude:  location.longitude,
+              accuracy: location.accuracy,
+              altitude: location.altitude
+            };
+            return $http({method: 'POST', url: '/location', data: locationObj });
         }
 
-        function getGeoLocation() {
+        function getCurrentPosition() {
             return new Promise(function(resolve, reject) {
                 if (navigator.geolocation) {
                     var options = {

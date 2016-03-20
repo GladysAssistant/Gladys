@@ -1,25 +1,24 @@
 var Promise = require('bluebird');
 
 module.exports = function create (location){
+    
+   location.datetime = location.datetime || new Date();
   
-  // first, we create the location
-  return Location.create(location)
-    .then(function(location){
+  // we check if the user did not enter a new area
+  return gladys.area.enterArea(location)
+    .then(function(areas){
         
-        // we verify if the user is in a specified Area
-        return [gladys.area.inArea(location), location];
-    })
-    .spread(function(areas, location){
-        
-        if(areas.length > 0){
+       if(areas.length > 0){
             Promise.map(areas, function(area){
-               return gladys.scenario.trigger({
-                   eventName: 'inArea',
+               return gladys.event.create({
+                   code: 'inArea',
+                   user: location.user,
                    scope: area
                });
             });
         }
         
-       return Promise.resolve(location); 
+        // we create the location in database
+        return Location.create(location);
     });
 };

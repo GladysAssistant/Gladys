@@ -36,12 +36,12 @@
     }
 
     function locate() {
-      return geoLocationService.getGeoLocation()
+      return geoLocationService.getCurrentPosition()
         .then(function(data){
             // vm.geolocation now contains coords
             vm.geolocation = data.coords;
             // Saving coords on the server to tell Gladys
-            geoLocationService.saveGeoLocation(vm.geolocation)
+            geoLocationService.create(vm.geolocation)
             .then(function(data){
                 // Geolocation Sucessfully saved
             });

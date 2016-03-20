@@ -24,7 +24,7 @@ module.exports = {
             required: true
         },
 
-        range: {
+        radius: {
             type: 'float',
             required: true
         },
