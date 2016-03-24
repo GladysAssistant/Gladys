@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('NotificationCtrl', NotificationCtrl);
 
     NotificationCtrl.$inject = ['notificationService', 'Notification'];

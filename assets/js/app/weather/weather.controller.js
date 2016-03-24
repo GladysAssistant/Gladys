@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('weatherCtrl', weatherCtrl);
 
     weatherCtrl.$inject = ['geoLocationService', 'weatherService', '$scope'];
@@ -22,7 +22,7 @@
         }
   
         function locateAndCheckWeather() {
-            return geoLocationService.getGeoLocation()
+            return geoLocationService.getCurrentPosition()
                 .then(function(data){
                     var params = {
                         latitude: data.coords.latitude,

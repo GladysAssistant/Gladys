@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('SensorCtrl', SensorCtrl);
 
     SensorCtrl.$inject = ['$scope','sensorService', 'houseService'];

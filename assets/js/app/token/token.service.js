@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('tokenService', tokenService);
 
     tokenService.$inject = ['$http'];

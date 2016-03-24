@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('machineService', machineService);
 
     machineService.$inject = ['$http'];

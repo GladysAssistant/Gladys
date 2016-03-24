@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('eventService', eventService);
 
     eventService.$inject = ['$http'];

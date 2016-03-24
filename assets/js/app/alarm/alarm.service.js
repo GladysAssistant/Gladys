@@ -12,7 +12,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('alarmService', alarmService);
 
     alarmService.$inject = ['$http'];

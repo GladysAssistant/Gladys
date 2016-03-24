@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('ModuleCtrl', ModuleCtrl);
 
     ModuleCtrl.$inject = ['moduleService'];

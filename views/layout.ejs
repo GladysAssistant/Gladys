@@ -20,11 +20,12 @@
     <link rel="stylesheet" href="/styles/weatherjs.css">
     <link rel="stylesheet" href="/styles/sleep.css">
     <link rel="stylesheet" href="/styles/search.css">
+    <link rel="stylesheet" href="/styles/angular-chart/angular-chart.min.css">
     <!--STYLES END-->
 
   </head>
 
-  <body class="skin-blue" ng-app="app"> 
+  <body class="skin-blue" ng-app="gladys"> 
       
         <header class="header">
             <a href="#" class="logo">
@@ -220,8 +221,8 @@
     <script src="/js/dependencies/raphael-min.js"></script>
     <script src="/js/dependencies/morris.min.js"></script>
     <script src="/js/dependencies/moment-with-locales.js"></script>
+    <script src="/js/dependencies/chart.min.js"></script>
     <script src="/js/dependencies/ace/ace.js"></script>
-    <script src="/js/dependencies/jquery.simpleWeather.min.js"></script>
     <script src="/js/dependencies/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/dependencies/datepicker/bootstrap-datepicker.js"></script>
     <script src="/js/ng-device-detector/ng-device-detector.min.js"></script>
@@ -229,14 +230,23 @@
     <script src="/js/angular-moment/angular-moment.min.js"></script>
     <script src="/js/angular-ui-notification/angular-ui-notification.min.js"></script>
     <script src="/js/smooth-scroll/angular-smooth-scroll.min.js"></script>
+    <script src="/js/angular-chart/angular-chart.min.js"></script>
     <script src="/js/app/app.module.js"></script>
     <script src="/js/app/app.run.js"></script>
     <script src="/js/app/alarm/alarm.controller.js"></script>
     <script src="/js/app/alarm/alarm.service.js"></script>
+    <script src="/js/app/box/box.controller.js"></script>
+    <script src="/js/app/box/box.service.js"></script>
+    <script src="/js/app/brain/brain.controller.js"></script>
+    <script src="/js/app/brain/brain.service.js"></script>
+    <script src="/js/app/cache/cacheService.js"></script>
     <script src="/js/app/calendar/calendar.controller.js"></script>
     <script src="/js/app/calendar/calendar.service.js"></script>
     <script src="/js/app/device/device.controller.js"></script>
     <script src="/js/app/device/device.service.js"></script>
+    <script src="/js/app/device/deviceState.controller.js"></script>
+    <script src="/js/app/event/event.controller.js"></script>
+    <script src="/js/app/event/event.service.js"></script>
     <script src="/js/app/geolocation/geolocation.controller.js"></script>
     <script src="/js/app/geolocation/geolocation.service.js"></script>
     <script src="/js/app/global/language.service.js"></script>
@@ -246,12 +256,12 @@
     <script src="/js/app/house/house.service.js"></script>
     <script src="/js/app/installation/installation.controller.js"></script>
     <script src="/js/app/installation/installation.service.js"></script>
-    <script src="/js/app/lifeevent/lifeevent.controller.js"></script>
-    <script src="/js/app/lifeevent/lifeevent.service.js"></script>
     <script src="/js/app/machine/machine.controller.js"></script>
     <script src="/js/app/machine/machine.service.js"></script>
     <script src="/js/app/maps/maps.controller.js"></script>
     <script src="/js/app/maps/maps.service.js"></script>
+    <script src="/js/app/module/module.controller.js"></script>
+    <script src="/js/app/module/module.service.js"></script>
     <script src="/js/app/notification/notification.controller.js"></script>
     <script src="/js/app/notification/notification.service.js"></script>
     <script src="/js/app/now/now.controller.js"></script>
@@ -272,7 +282,9 @@
     <script src="/js/app/token/token.controller.js"></script>
     <script src="/js/app/token/token.service.js"></script>
     <script src="/js/app/user/user.service.js"></script>
+    <script src="/js/app/voice/voice.service.js"></script>
     <script src="/js/app/weather/weather.controller.js"></script>
+    <script src="/js/app/weather/weather.service.js"></script>
     <script src="/js/AdminLTE/app.js"></script>
     <!--SCRIPTS END-->
     

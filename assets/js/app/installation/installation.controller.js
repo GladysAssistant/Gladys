@@ -11,12 +11,12 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('installationCtrl', installationCtrl);
 
-  installationCtrl.$inject = ['installationService', 'userService','lifeeventService'];
+  installationCtrl.$inject = ['installationService', 'userService','eventService'];
 
-  function installationCtrl(installationService, userService,lifeeventService) {
+  function installationCtrl(installationService, userService, eventService) {
     /* jshint validthis: true */
     var vm = this;
     vm.step = 1;
@@ -30,10 +30,7 @@
     }
     
     function installationFinished(){
-      return lifeeventService.saveLifeEvent('gladysInstallation', '')
-        .then(function(data){
-            	
-        });
+        
     }
     
     function changeStep(step){

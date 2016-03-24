@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('ScriptCtrl', ScriptCtrl);
 
     ScriptCtrl.$inject = ['$scope','scriptService'];

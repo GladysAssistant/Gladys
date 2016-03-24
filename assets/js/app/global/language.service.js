@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('languageService', languageService);
 
     languageService.$inject = ['userService','amMoment'];

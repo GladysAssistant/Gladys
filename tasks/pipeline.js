@@ -83,6 +83,7 @@ var jsFilesToInject = [
     'js/angular-ui-notification/angular-ui-notification.min.js',
     'js/smooth-scroll/angular-smooth-scroll.min.js',
     'js/angular-chart/angular-chart.min.js',
+    'js/angular-translate/angular-translate.min.js',
     
     // loading first AngularModule definition
    'js/app/app.module.js',

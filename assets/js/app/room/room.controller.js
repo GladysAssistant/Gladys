@@ -11,7 +11,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('roomCtrl', roomCtrl);
 
   roomCtrl.$inject = ['roomService', 'houseService', 'userService'];

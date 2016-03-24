@@ -12,7 +12,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('DeviceCtrl', DeviceCtrl);
 
   DeviceCtrl.$inject = ['deviceService','roomService', '$scope'];

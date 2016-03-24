@@ -1,0 +1,63 @@
+<div class="box-body table-responsive" data-ng-controller="HouseCtrl as vm">
+
+    <h3><%= __('Houses') %></h3>
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><%= __('Name') %></th>
+                <th><%= __('Address') %></th>
+                <th><%= __('City') %></th>
+                <th><%= __('PostCode') %></th>
+                <th><%= __('Country') %></th>
+                <th><%= __('Action') %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="relation in vm.relations" class="ng-cloak">
+                <td>{{relation.house.name}}</td>
+                <td>{{relation.house.address}}</td>
+                <td>{{relation.house.city}}</td>
+                <td>{{relation.house.postcode}}</td>
+                <td>{{relation.house.country}}</td>
+                <td><button ng-click="vm.deleteHouse($index, relation.house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.name" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.address" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.city" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.postcode" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.country" /></td>
+                <td><button class="btn btn-success btn-sm" ng-click="vm.createHouse()"><%= __('New') %></button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3><%= __('Rooms') %></h3>
+
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><%= __('Name') %></th>
+                <th><%= __('House') %></th>
+                <th><%= __('Action') %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="room in vm.rooms" class="ng-cloak">
+                <td>{{room.name}}</td>
+                <td>{{room.house}}</td>
+                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+            </tr>
+            <tr class="ng-cloak"> 
+                <td><input type="text" class="form-control" ng-model="vm.newRoom.name" /></td>
+                <td><select ng-model="vm.newRoom.house" class="form-control" >
+                        <option ng-repeat="relation in vm.relations" value="{{relation.house.id}}">{{relation.house.name}}</option>
+                </select>
+
+                </td>
+                <td><button class="btn btn-success btn-sm" ng-click="vm.createRoom()"><%= __('New') %></button></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

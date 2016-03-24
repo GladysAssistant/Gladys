@@ -43,6 +43,10 @@
                         
                         <div class="box-body"><%- boxs[i].html %></div>
                         <!-- /.box-body -->
+                        
+                        <% if(boxs[i].footer) { %>
+                             <div class="box-footer text-black"><%- boxs[i].footer %></div>
+                         <% } %>
                     </div><!-- /.box -->
                     
                <%
@@ -78,6 +82,10 @@
                         
                         <div class="box-body"><%- boxs[i].html %></div>
                         <!-- /.box-body -->
+                        
+                         <% if(boxs[i].footer) { %>
+                             <div class="box-footer text-black"><%- boxs[i].footer %></div>
+                         <% } %>
                     </div><!-- /.box -->
                     
                <%

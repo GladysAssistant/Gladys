@@ -12,7 +12,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('AlarmCtrl', AlarmCtrl);
 
   AlarmCtrl.$inject = ['alarmService', 'userService'];

@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('EventCtrl', EventCtrl);
 
     EventCtrl.$inject = ['eventService'];

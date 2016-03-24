@@ -12,7 +12,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('brainService', brainService);
 
     brainService.$inject = ['$http'];
