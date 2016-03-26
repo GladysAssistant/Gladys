@@ -52,10 +52,10 @@ var jsFilesToInject = [
   // loading Bootstrap
   'js/dependencies/bootstrap.min.js',
    // loading Raphael
-  'js/dependencies/raphael-min.js',
+  //'js/dependencies/raphael-min.js',
   
   // loading Morris JS
-  'js/dependencies/morris.min.js',
+  //'js/dependencies/morris.min.js',
   
   // loading Moment with locales
   'js/dependencies/moment-with-locales.js',
