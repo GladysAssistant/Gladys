@@ -11,7 +11,7 @@ module.exports = function create (location){
        if(areas.length > 0){
             Promise.map(areas, function(area){
                return gladys.event.create({
-                   code: 'inArea',
+                   code: 'enterArea',
                    user: location.user,
                    scope: area
                });
