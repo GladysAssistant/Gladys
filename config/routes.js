@@ -72,7 +72,6 @@ module.exports.routes = {
   'get /event': 'EventController.index',
   
   // House
-  
   'get /house': 'HouseController.index',
   'post /house': 'HouseController.create',
   'patch /house/:id': 'HouseController.update',
@@ -83,7 +82,6 @@ module.exports.routes = {
   'get /location/create': 'LocationController.create',
   
   // Module
-  
   'get /module': 'ModuleController.index',
   
   // Script
@@ -92,6 +90,12 @@ module.exports.routes = {
   'patch /script/:id': 'ScriptController.update',
   'post /script/:id/exec': 'ScriptController.exec',
   'delete /script/:id': 'ScriptController.delete',
+  
+  // Room
+  'get /room': 'RoomController.index',
+  'post /room': 'RoomController.create',
+  'patch /room/:id': 'RoomController.update',
+  'delete /room/:id': 'RoomController.delete',
   
   //Socket
   

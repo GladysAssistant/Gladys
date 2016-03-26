@@ -23,6 +23,7 @@ describe('HouseController', function() {
             if(err) return done(err);
             
             validateHouse(res.body);
+            res.body.name.should.equal(house.name);
             done();
         });
 

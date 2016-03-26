@@ -1,5 +1,5 @@
-var queries = require('./house.queries.js');
+var queries = require('./room.queries.js');
 
 module.exports = function(room){
-    return gladys.utils.sqlUnique(queries.deleteRoom, [room.id]);
+    return gladys.utils.sqlUnique(queries.delete, [room.id]);
 };
