@@ -72,8 +72,14 @@ module.exports.policies = {
   StateType : ['checkToken', 'Human'],
   Timer: ['checkToken', 'Human'],
   Token : ['checkToken', 'Human'],
-  User : ['checkToken', 'Human'],
-  UserHouseRelationType : ['checkToken', 'Human'],
+  User : {
+    index: ['checkToken', 'Human'],
+    create: ['canCreateUser'],
+    login: [],
+    delete: ['checkToken', 'Human'],
+    update: ['checkToken', 'Human'],
+    whoami: ['checkToken', 'Human']
+  },
   Welcome : [],
   Weather : ['checkToken', 'Human'],
 

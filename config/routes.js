@@ -101,6 +101,18 @@ module.exports.routes = {
   
   'post /socket/subscribe': 'SocketController.subscribe',
   
+  // Update
+  'get /update/verify': 'UpdateController.verify',
+  
+  //User
+  'get /user': 'UserController.index',
+  'post /user': 'UserController.create',
+  'post /user/login': 'UserController.login',
+  'patch /user/:id': 'UserController.update',
+  'delete /user/:id': 'UserController.delete',
+  'get /user/whoami': 'UserController.whoami',
+  
+  
   // Weather
   'get /weather': 'WeatherController.index'
 
