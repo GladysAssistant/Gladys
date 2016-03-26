@@ -33,11 +33,14 @@ module.exports.routes = {
   ***************************************************************************/
 
 
+  // views
   '/login' : 'WelcomeController.login',
 
   '/register' : 'SessionController.newUser',
   
   '/': 'WelcomeController.index',
+  
+  '/installation': 'WelcomeController.installation',
   
   // Box
   'patch /box/:id': 'BoxController.update',
@@ -67,6 +70,13 @@ module.exports.routes = {
   // Event
   
   'get /event': 'EventController.index',
+  
+  // House
+  
+  'get /house': 'HouseController.index',
+  'post /house': 'HouseController.create',
+  'patch /house/:id': 'HouseController.update',
+  'delete /house/:id': 'HouseController.delete',
   
   // Location
   'post /location': 'LocationController.create',
