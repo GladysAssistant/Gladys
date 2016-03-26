@@ -8,6 +8,7 @@
     <link href="/styles/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Ionicons -->
     <link href="/styles/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css">
      <!-- Theme style -->
      <link href="/styles/AdminLTE.css" rel="stylesheet" type="text/css" />
     <link href="/styles/scenariostep.css" rel="stylesheet" type="text/css" />
@@ -44,19 +45,24 @@
                 <div class="col-xs-12">
                     <div class="col-md-12 well text-center">
                         <h1><%= __('installation-welcome') %></h1>
-                        <p><%= __('installation-welcome-sentence-installation') %> <%= __('before-installing-sentence-installation') %></p>
+                        <p><%= __('installation-welcome-sentence-installation') %> <%= __('installation-welcome-data-information') %></p>
                             
                             <form class="form-horizontal">   
                                <div class="row">
                                    <div class="col-md-3"></div>
                                    <div class="col-md-6">   
-                                       <form class="form-horizontal">
+                                       <form class="form-horizontal ng-cloak" >
+                                           
+                                           <p class="bg-danger" ng-show="vm.createAccountError" style="padding:15px;"></p>
+                                           <p class="bg-danger" ng-show="vm.invalidEmail" style="padding:15px;"><%= __('installation-invalid-email') %></p>
+                                           <p class="bg-danger" ng-show="vm.invalidPassword" style="padding:15px;"><%= __('installation-invalid-password') %></p>
+                                           <p class="bg-danger" ng-show="vm.invalidBirthdate" style="padding:15px;"><%= __('installation-invalid-birthdate') %></p>
                                             
                                             <!-- FirstName -->
                                             <div class="form-group">
                                                 <label for="firstname" class="col-sm-4 control-label"><%= __('installation-firstname') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
+                                                <input type="text" ng-model="vm.newUser.firstname" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
                                                 </div>
                                             </div>
                                             
@@ -64,49 +70,52 @@
                                             <div class="form-group">
                                                 <label for="lastname" class="col-sm-4 control-label"><%= __('installation-lastname') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
+                                                <input type="text" ng-model="vm.newUser.lastname" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
                                                 </div>
                                             </div>
                                             
                                             <!-- Email -->
-                                            <div class="form-group">
-                                                <label for="email" class="col-sm-4 control-label"><%= __('installation-email') %></label>
+                                            <div ng-class="{'form-group': !vm.invalidEmail , 'form-group has-error': vm.invalidEmail }">
+                                                <label for="email" class="col-sm-4 control-label"   ><%= __('installation-email') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
+                                                <input type="email" ng-model="vm.newUser.email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
                                                 </div>
                                             </div>
                                             
                                             <!-- Password -->
-                                            <div class="form-group">
-                                                <label for="password" class="col-sm-4 control-label"><%= __('installation-password') %></label>
+                                            <div ng-class="{'form-group': !vm.invalidPassword , 'form-group has-error': vm.invalidPassword }">
+                                                <label for="password"  class="col-sm-4 control-label" ><%= __('installation-password') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
+                                                <input type="password" ng-model="vm.newUser.password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
                                                 </div>
                                             </div>
                                             
                                              <!-- Birthdate -->
-                                            <div class="form-group">
-                                                <label for="birthdate" class="col-sm-4 control-label"><%= __('installation-birthdate') %></label>
+                                            <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
+                                                <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="birthdate" placeholder="<%= __('installation-birthdate-placeholder') %>">
+                                                <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
                                                 </div>
                                             </div>
                                             
                                             <!-- Country code -->
-                                            <div class="form-group">
-                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-countrycode') %></label>
+                                            <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
+                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
+                                                <select class="form-control" id="countrycode"  ng-model="vm.newUser.language">
+                                                    <option value="en-US">English</option>
+                                                    <option value="fr-FR">Français</option>
+                                                </select>
                                                 </div>
                                             </div>
                                             
                                             <!-- Preparation time -->
-                                            <div class="form-group">
+                                            <!--<div class="form-group">
                                                 <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-preparation-time') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
+                                                <input type="text" ng-model="vm.newUser.preparationTime" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
                                                 </div>
-                                            </div>
+                                            </div>-->
                                             
                                             
                                             <!-- Gender -->
@@ -115,7 +124,7 @@
                                                      <%= __('installation-gender') %>
                                                 </label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="gender">
+                                                    <select ng-model="vm.newUser.gender" class="form-control" id="gender">
                                                         <option value="0"><%= __('installation-male') %></option>
                                                         <option value="1"><%= __('installation-female') %></option>
                                                     </select>
@@ -138,7 +147,17 @@
                     <div class="col-md-12 well text-center">
                         <h2 class="text-center"><%= __('Configuration') %></h2>
                          
-                          <%- partial ('../partials/houses.ejs') %>
+                          <p ng-show="vm.downloadStep > 0"><%= __('installation-downloading-events') %></p>
+                          <p ng-show="vm.downloadStep > 1"><%= __('installation-downloading-modes') %></p>
+                          <p ng-show="vm.downloadStep > 2"><%= __('installation-downloading-boxs') %></p>
+                          <p ng-show="vm.downloadStep > 3"><%= __('installation-downloading-sentences') %></p>
+                          <p ng-show="vm.downloadStep > 4"><%= __('installation-training-brain') %></p>
+                          
+                          <div class="progress progress-sm active">
+                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{vm.downloadProgression}}" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+                                <!--<span class="sr-only">20% Complete</span>->
+                                </div>
+                          </div>
                          
                           <div class="pull-right"><button ng-click="vm.changeStep(3)" class="btn btn-primary"><%= __('Next') %></button></div>
                              
@@ -177,8 +196,6 @@
     <script src="/js/dependencies/angular-route.min.js"></script>
     <script src="/js/dependencies/jquery.min.js"></script>
     <script src="/js/dependencies/bootstrap.min.js"></script>
-    <script src="/js/dependencies/raphael-min.js"></script>
-    <script src="/js/dependencies/morris.min.js"></script>
     <script src="/js/dependencies/moment-with-locales.js"></script>
     <script src="/js/dependencies/chart.min.js"></script>
     <script src="/js/dependencies/ace/ace.js"></script>
@@ -190,6 +207,7 @@
     <script src="/js/angular-ui-notification/angular-ui-notification.min.js"></script>
     <script src="/js/smooth-scroll/angular-smooth-scroll.min.js"></script>
     <script src="/js/angular-chart/angular-chart.min.js"></script>
+    <script src="/js/angular-translate/angular-translate.min.js"></script>
     <script src="/js/app/app.module.js"></script>
     <script src="/js/app/app.run.js"></script>
     <script src="/js/app/alarm/alarm.controller.js"></script>
@@ -209,8 +227,6 @@
     <script src="/js/app/geolocation/geolocation.controller.js"></script>
     <script src="/js/app/geolocation/geolocation.service.js"></script>
     <script src="/js/app/global/language.service.js"></script>
-    <script src="/js/app/googleapi/googleapi.controller.js"></script>
-    <script src="/js/app/googleapi/googleapi.service.js"></script>
     <script src="/js/app/house/house.controller.js"></script>
     <script src="/js/app/house/house.service.js"></script>
     <script src="/js/app/installation/installation.controller.js"></script>
@@ -224,9 +240,6 @@
     <script src="/js/app/notification/notification.controller.js"></script>
     <script src="/js/app/notification/notification.service.js"></script>
     <script src="/js/app/now/now.controller.js"></script>
-    <script src="/js/app/pushbullet/pushbullet.controller.js"></script>
-    <script src="/js/app/pushbullet/pushbullet.service.js"></script>
-    <script src="/js/app/room/room.controller.js"></script>
     <script src="/js/app/room/room.service.js"></script>
     <script src="/js/app/scenario/scenario.controller.js"></script>
     <script src="/js/app/scenario/scenario.service.js"></script>
@@ -240,6 +253,7 @@
     <script src="/js/app/sound/sound.service.js"></script>
     <script src="/js/app/token/token.controller.js"></script>
     <script src="/js/app/token/token.service.js"></script>
+    <script src="/js/app/update/update.service.js"></script>
     <script src="/js/app/user/user.service.js"></script>
     <script src="/js/app/voice/voice.service.js"></script>
     <script src="/js/app/weather/weather.controller.js"></script>
