@@ -6,7 +6,7 @@ describe.skip('UserController', function() {
     it('should redirect to /dashboard', function (done) {
      	request(sails.hooks.http.app)
         .post('/session/create')
-        .send({ email: 'tony.stark@starkindustry.com', password: 'test' })
+        .send({ email: 'tony.stark@starkindustry.com', password: 'test1234' })
         .expect(302)
         .expect('location','/dashboard', done);
 

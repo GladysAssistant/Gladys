@@ -29,6 +29,7 @@ gladys.load = function load() {
     gladys.scheduler = require('./scheduler/index.js');
     gladys.script = require('./script/index.js');
     gladys.socket = require('./socket/index.js');
+    gladys.task = require('./task/index.js');
     gladys.token = require('./token/index.js');
     gladys.update = require('./update/index.js');
     gladys.user = require('./user/index.js');
@@ -43,6 +44,11 @@ gladys.load = function load() {
     } catch (e) {
         sails.log.warn('Cannot parse package.json');
     }
+    
+    // init tasks
+    gladys.task.init();
+    
+    // gladys is ready
     gladys.emit('ready');
 };
 

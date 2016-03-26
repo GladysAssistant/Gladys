@@ -78,6 +78,10 @@ module.exports = {
     },
 
     beforeCreate: function(values, next) {
+        
+        if(values.password.length < 5){
+            return next('Password is too short');
+        }
 
         bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
             if (err) return next(err);

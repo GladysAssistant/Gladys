@@ -9,7 +9,7 @@ describe('User', function() {
      	
          var user = {
              email: 'tony.stark@starkindustry.com',
-             password: 'test'
+             password: 'test1234'
          };
         
         gladys.user.login(user)
