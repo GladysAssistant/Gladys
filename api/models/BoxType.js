@@ -22,6 +22,10 @@ module.exports = {
           type: 'text'
       },
       
+      footer: {
+          type: 'text'
+      },
+      
       icon: {
           type: 'string',
           required: true
