@@ -7,7 +7,7 @@ WORKDIR /src
 ADD . /src
 RUN npm install
 
-RUN npm install -g grunt
+RUN npm install -g grunt-cli
 RUN grunt buildProd
 
 # Export listening port
