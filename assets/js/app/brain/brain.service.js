@@ -19,22 +19,18 @@
 
     function brainService($http) {
         var service = {
-            classify: classify
+            classify: classify,
+            trainNew: trainNew
         };
 
         return service;
 
         function classify(text) {
-            return $http({method: 'GET', url: '/brain/classify', params: {q: text} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+            return $http({method: 'GET', url: '/brain/classify', params: {q: text} });
+        }
+        
+        function trainNew(){
+            return $http({method: 'POST', url: '/brain/trainnew'});
         }
     }
 })();
