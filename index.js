@@ -6,7 +6,7 @@
 
 
 var Sails = require('sails').Sails;
-var sails;
+var app;
 
 /**
  * Start Gladys and return the sails instance
@@ -15,7 +15,8 @@ module.exports.start = function (config, cb){
     Sails().lift(config, function(err, _sails){
         if(err) return cb(err);
         
-        sails = _sails;
+        app = _sails;
+        cb(null, app);
     });
 };
 
@@ -24,6 +25,6 @@ module.exports.start = function (config, cb){
  * Stop Gladys
  */
 module.exports.stop = function (cb){
-    sails.lower(cb);
+    app.lower(cb);
 };
 

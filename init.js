@@ -21,7 +21,10 @@ var config = {
 };
 
 sailsApp.start(config, function(err, app){
-    if(err) return console.log(err);
+    if(err) {
+        console.log(err);
+        process.exit(1);
+    }
     
     console.log('Gladys started with success');
     
