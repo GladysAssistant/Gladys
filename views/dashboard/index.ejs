@@ -20,7 +20,24 @@
 
 
             <!-- Left col -->
-            <section class="col-lg-7 connectedSortable">       
+            <section class="col-lg-7 connectedSortable"> 
+                
+             <!-- If there are no box on dashboard ! -->
+             <% if(boxs.length === 0) { %>
+                    
+                 <div class="box box-info">
+                        
+                        <div class="box-header">
+                            <i class="fa fa-info"></i>
+                            <h3 class="box-title"><%= __('dashboard-default-box-title') %></h3>
+                        </div><!-- /.box-header -->
+                        
+                        <div class="box-body"><%= __('dashboard-default-box-text') %></div>
+                        <!-- /.box-body -->
+                    </div><!-- /.box -->
+                    
+              <% }  %>
+              <!-- end of default box -->      
                 
                 
                 <!-- ALL LEFT BOX COMES HERE --> 
@@ -61,6 +78,7 @@
 
             <!-- right col (We are only adding the ID to make the widgets sortable)-->
             <section class="col-lg-5 connectedSortable"> 
+            
                     
                 <!-- ALL RIGHT BOX COMES HERE --> 
                 
