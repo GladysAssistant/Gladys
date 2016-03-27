@@ -7,7 +7,10 @@ WORKDIR /src
 ADD . /src
 RUN npm install
 
+RUN npm install -g grunt
+RUN grunt buildProd
+
 # Export listening port
-EXPOSE 1337
+EXPOSE 8080
 
 CMD ["node" ,"app.js"]
