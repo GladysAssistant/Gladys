@@ -21,6 +21,14 @@ module.exports = {
         user: {
             model: 'User'
         },
+        
+        house: {
+            model:'House'
+        },
+        
+        room: {
+            model: 'Room'
+        },
 
         eventtype: {
             model: 'EventType',

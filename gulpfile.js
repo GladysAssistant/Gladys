@@ -10,7 +10,20 @@ var prettify = require('gulp-jsbeautifier');
  */
 gulp.task('jshint', function() {
   return gulp.src(['./api/**/*.js', './assets/js/app/**/*.js', './test/**/*.js', '!api/hooks/**'])
-    .pipe(jshint())
+    .pipe(jshint({
+        esversion: 6
+    }))
+    .pipe(jshint.reporter(stylish));
+});
+
+/**
+ * Jshint
+ */
+gulp.task('jshint-core', function() {
+  return gulp.src(['./api/core/**/*.js', './test/**/*.js', '!api/hooks/**'])
+    .pipe(jshint({
+        esversion: 6
+    }))
     .pipe(jshint.reporter(stylish));
 });
 

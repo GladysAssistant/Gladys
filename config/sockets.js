@@ -20,11 +20,11 @@ module.exports.sockets = {
   *                                                                          *
   ***************************************************************************/
 
-  afterDisconnect: function (session, socket, cb) {
+ /* afterDisconnect: function (session, socket, cb) {
 
     // Be sure to call the callback
     return cb();
-  }
+  }*/
   
   
 

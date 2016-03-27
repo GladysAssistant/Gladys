@@ -1,0 +1,44 @@
+<!-- NEW BOX -->
+<div class="box box-default">
+<div class="box-header with-border">
+    <h3 class="box-title"><%= __('parameters-box-title') %></h3>
+</div>
+        <div class="box-body table-responsive" data-ng-controller="boxCtrl as vm">
+                
+                    <table id="example2" class="table table-bordered table-hover">
+                        
+                        <thead>
+                            <tr>
+                                <th><%= __('parameters-box-table-boxtype') %></th>
+                                <th><%= __('parameters-box-table-x') %></th>
+                                <th><%= __('parameters-box-table-y') %></th>
+                                <th><%= __('parameters-box-table-active') %></th>
+                                <th><%= __('parameters-box-table-delete') %></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="box in vm.boxs" class="ng-cloak">
+                                <td>{{box.boxName}}</td>
+                                <td>{{box.x}}</td>
+                                <td>{{box.y}}</td>
+                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn {{ box.active && 'btn-success' || 'btn-danger' }} btn-sm">{{box.active && 'On' || 'Off' }}</button></td>
+                                <td><button ng-click="vm.destroyToken($index, token.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                            </tr>
+                            <tr>
+                                <td><select class="form-control" >
+                                    <option ng-repeat="boxType in vm.boxTypes" ng-model="vm.newBox.boxtype" value="boxType.id">
+                                        {{boxType.name}}
+                                    </option>
+                                </select>
+                                </td>
+                                <td><input type="text" ng-model="vm.newBox.x"class="form-control" placeholder="x"/></td>
+                                <td><input type="text" ng-model="vm.newBox.y"class="form-control" placeholder="y"/></td>
+                                <td><input type="text" ng-model="vm.newBox.active"class="form-control" placeholder="<%= __('parameters-box-table-active') %>"/></td>
+                                <td><button class="btn btn-success btn-sm" ng-click="vm.createToken()"><%= __('New') %></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+        </div>
+    </div>
+    <!-- END OF BOX -->

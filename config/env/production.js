@@ -22,10 +22,10 @@ module.exports = {
   // },
 
   /***************************************************************************
-   * Set the port in the production environment to 1337                      *
+   * Set the port in the production environment to 8080                      *
    ***************************************************************************/
 
-   port: 1337,
+   port: 8080,
 
   /***************************************************************************
    * Set the log level in production environment to "silent"                 *

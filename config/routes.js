@@ -46,6 +46,7 @@ module.exports.routes = {
   
   // Brain
   'get /brain/classify': 'BrainController.classify', 
+  'post /brain/trainnew': 'BrainController.trainNew', 
   
   // Device 
   
@@ -82,6 +83,9 @@ module.exports.routes = {
   
   // Module
   'get /module': 'ModuleController.index',
+  
+  // Notification
+  'get /notification': 'NotificationController.index',
   
   // Script
   'get /script': 'ScriptController.index',
