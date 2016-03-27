@@ -5,7 +5,7 @@ describe('HouseController', function() {
 
   describe('delete', function() {
     
-    it.only('should delete a house', function (done) {
+    it('should delete a house', function (done) {
         
      	request(sails.hooks.http.app)
         .delete('/house/1?token=test')
