@@ -12,15 +12,16 @@ module.exports = {
       code: {
           type:'string',
           required: true,
+          unique: true
       },
       
-      datetime: {
-          type:'datetime',
+      name: {
+          type:'string',
           required: true
       },
       
-      house: {
-          model: 'House',
+      description: {
+          type: 'string',
           required: true
       }
       

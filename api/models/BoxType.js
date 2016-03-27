@@ -9,6 +9,13 @@ module.exports = {
 
   attributes: {
       
+      uuid: {
+        type: 'string',
+        uuid: true,
+        required: true,
+        unique: true  
+      },
+      
       title: {
           type: 'string',
           required: true

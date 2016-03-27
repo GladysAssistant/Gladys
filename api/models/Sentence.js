@@ -12,6 +12,7 @@ module.exports = {
     uuid: {
         type:'string',
         uuid: true,
+        required: true,
         unique: true
     },
 

@@ -35,12 +35,11 @@ module.exports.routes = {
 
   // views
   '/login' : 'WelcomeController.login',
-
-  '/register' : 'SessionController.newUser',
-  
   '/': 'WelcomeController.index',
-  
   '/installation': 'WelcomeController.installation',
+  
+  //dashboard
+  '/dashboard': 'DashboardController.index' ,
   
   // Box
   'patch /box/:id': 'BoxController.update',
@@ -103,6 +102,10 @@ module.exports.routes = {
   
   // Update
   'get /update/verify': 'UpdateController.verify',
+  'get /update/event': 'UpdateController.updateEvents',
+  'get /update/mode': 'UpdateController.updateModes',
+  'get /update/sentence': 'UpdateController.updateSentences',
+  'get /update/box': 'UpdateController.updateBoxTypes',
   
   //User
   'get /user': 'UserController.index',
