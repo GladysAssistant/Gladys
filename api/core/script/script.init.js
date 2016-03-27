@@ -11,9 +11,9 @@ module.exports = function init() {
     shared.sandbox.gladys = gladys;
 
     // adding all the Hooks services to sandbox
-    loadAllHooksServices(function(err) {
+   /* loadAllHooksServices(function(err) {
         if (err) sails.log.warn(err);
-    });
+    });*/
 };
 
 
@@ -26,7 +26,7 @@ function loadHooksServices() {
     return readDir(sails.config.scripts.hooksFolder)
         .then(function(hooks) {
             return Promise.map(hooks, function(hook) {
-                return
+                
             });
         });
 }

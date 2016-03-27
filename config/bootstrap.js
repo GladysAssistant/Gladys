@@ -14,31 +14,7 @@ global.gladys = require('../api/core/index.js');
 module.exports.bootstrap = function(cb) {
 
     gladys.load();
-	
-	// refresh events only in production mode to avoid flooding
-	// Github when developping
-	if(sails.config.environment == 'production'){
-		LifeEventService.syncEvents();
-	}
-    
-    
-    // loading brain (for text recognition)
-    gladys.brain.load()
-      .then(function(){
-         sails.log.info('Gladys brain loaded with success !');
-         cb(); 
-      })
-      .catch(function(){
-         sails.log.err('Cannot load gladys.brain.');
-         cb(); 
-      });
-      
-      /*gladys.brain.train()
-        .then(function(){
-            cb();
-        });*/
-       
-      
+    cb();
       
 	//sails.hooks.orm.reload();
 	//
