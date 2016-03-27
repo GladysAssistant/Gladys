@@ -55,6 +55,7 @@
     "serialization": "^0.2.0"
   },
   "devDependencies": {
+    "grunt-contrib-csslint": "^1.0.0",
     "grunt-mocha-istanbul": "^3.0.1",
     "gulp": "^3.9.0",
     "gulp-jsbeautifier": "^1.0.1",
