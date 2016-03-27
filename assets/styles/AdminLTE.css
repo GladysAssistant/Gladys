@@ -3731,9 +3731,9 @@ fieldset[disabled] .btn-vk.active {
     border-top: 1px solid #eee;
     margin-left: 220px;
     margin-top: -50px;
-    &.full-width {
+    /*&.full-width {
         margin-left: 0;
-    }
+    }*/
 }
 .main-footer a {
     color: #555;
