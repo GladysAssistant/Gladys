@@ -22,6 +22,8 @@
   "pagename-music":"Music",
   "dashboard-default-box-title": "Welcome in Gladys !",
   "dashboard-default-box-text": "You are on the dashboard of Gladys. To add boxs on this dashboard, go to \"Parameters\" then \"Boxs\".",
+  "modules-installed": "Installed Modules",
+  "modules-store": "Module Store",
   "script-new": "New script",
   "script-name": "Script",
   "script-run-script": "Start script",
