@@ -5,6 +5,7 @@ module.exports = {
     WHERE nu.user = ?
     ORDER BY nu.priority; 
   `,
+   get: 'SELECT * FROM notification WHERE user = ? ORDER BY createdat DESC LIMIT ? OFFSET ?;',
    checkIfExist: `
    SELECT * FROM notification 
    WHERE user = ?
