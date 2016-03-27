@@ -77,5 +77,18 @@
   "installation-training-brain": "Training neural network...",
   "installation-checking-for-updates": "Checking for updates...",
   "installation-configuration-success": "I just configured myself successfully ! You can move to next step :)",
-  "search-placeholder": "What can I do for you ?"
+  "search-placeholder": "What can I do for you ?",
+  "parameters-general": "General",
+  "parameters-house": "Houses",
+  "parameters-areas": "Areas",
+  "parameters-account": "My account",
+  "parameters-security": "Security",
+  "parameters-boxs": "Box",
+  "parameters-box-title": "Box",
+  "parameters-box-text": "Box are widgets, on the homescreen for example. X and Y are the position of the box in the grid. (x=1,y=1) is top left. (x can be only 1 or 2)",
+  "parameters-box-table-boxtype": "Type",
+  "parameters-box-table-x": "x",
+  "parameters-box-table-y": "y",
+  "parameters-box-table-active": "active",
+  "parameters-box-table-delete": "Delete"
 }

@@ -240,5 +240,18 @@
   "installation-training-brain": "Entrainement du réseau de neurones...",
   "installation-checking-for-updates": "Vérification des mises à jours...",
   "installation-configuration-success": "Ma configuration s'est terminée avec succès ! Vous pouvez passer à l'étape suivante :)",
-  "search-placeholder": "Que puis-je faire pour vous ?"
+  "search-placeholder": "Que puis-je faire pour vous ?",
+  "parameters-general": "Général",
+  "parameters-house": "Logements",
+  "parameters-areas": "Zones",
+  "parameters-account": "Mon compte",
+  "parameters-security": "Sécurité",
+  "parameters-boxs": "Box",
+  "parameters-box-title": "Box",
+  "parameters-box-text": "Les boxs sont les widgets, sur la page d'accueil par exemple. X et Y correspondent à la position de la box sur la grille, x peut prendre comme valeur 0 ou 1. Par exemple: (x=1,y=1) place la box en haut à gauche.",
+  "parameters-box-table-boxtype": "Type",
+  "parameters-box-table-x": "x",
+  "parameters-box-table-y": "y",
+  "parameters-box-table-active": "Actif",
+  "parameters-box-table-delete": "Supprimer"
 }
