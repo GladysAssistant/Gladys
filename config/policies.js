@@ -81,7 +81,11 @@ module.exports.policies = {
     update: ['checkToken', 'Human'],
     whoami: ['checkToken', 'Human']
   },
-  Welcome : [],
+  Welcome : {
+    index: [],
+    login: [],
+    installation: ['signupAllowed']
+  },
   Weather : ['checkToken', 'Human'],
 
 
