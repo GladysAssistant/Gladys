@@ -50,6 +50,7 @@
          */
         function activateEditor(){
             editor = ace.edit("editor");
+            ace.config.set("basePath", "/js/dependencies/ace");
 			editor.setTheme("ace/theme/xcode");
 			editor.getSession().setMode("ace/mode/javascript");
 			editor.setOptions({

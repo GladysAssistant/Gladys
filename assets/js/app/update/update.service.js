@@ -20,12 +20,32 @@
         
         var service = {
             verify: verify,
+            updateEvents: updateEvents,
+            updateModes: updateModes,
+            updateBoxTypes: updateBoxTypes,
+            updateSentences: updateSentences,
         };
 
         return service;
 
         function verify() {
             return $http({method: 'GET', url: '/update/verify'});
+        }
+        
+        function updateEvents(){
+            return $http({method: 'GET', url: '/update/event'});
+        }
+        
+        function updateModes(){
+            return $http({method: 'GET', url: '/update/mode'});
+        }
+        
+        function updateBoxTypes(){
+            return $http({method: 'GET', url: '/update/box'});
+        }
+        
+        function updateSentences(){
+            return $http({method: 'GET', url: '/update/sentence'});
         }
     }
 })();

@@ -14,20 +14,22 @@
     .module('gladys')
     .controller('installationCtrl', installationCtrl);
 
-  installationCtrl.$inject = ['installationService', 'userService','eventService', 'updateService'];
+  installationCtrl.$inject = ['installationService', 'userService','eventService', 'updateService', 'brainService'];
 
-  function installationCtrl(installationService, userService, eventService, updateService) {
+  function installationCtrl(installationService, userService, eventService, updateService, brainService) {
     /* jshint validthis: true */
     var vm = this;
     vm.step = 2;
     vm.createAccountError = null;
+    vm.downloadError = null;
+    vm.configurationFinished = true;
     
     vm.newUser = {
         role: 'admin',
         language: 'en-US'
     };
     vm.changeStep = changeStep;
-    vm.downloadProgression = 0;
+    vm.downloadProgress = 0;
     vm.downloadStep = 1;
   	
     activate();
@@ -35,6 +37,7 @@
     function activate() {
       activateDateTimePicker();
       resetErrors();
+      updateAll();
     }
     
     function installationFinished(){
@@ -66,6 +69,7 @@
                   })
                   .then(function(){
                       vm.step = step;
+                      updateAll();
                   })
                   .catch(function(err){
                     console.log(err); 
@@ -77,6 +81,58 @@
                 vm.step = step;
             break;
         }
+    }
+    
+    function updateAll(){
+        
+        vm.downloadStep = 1;
+        vm.downloadProgress = 0;
+        var nbSteps = 6;
+        
+        // get all modes
+        updateService.updateModes()
+          .then(function(){
+              
+               vm.downloadStep++;
+               vm.downloadProgress += 100/nbSteps;
+              // get all sentences
+              return updateService.updateSentences();
+          })
+          .then(function(){
+              
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              // get all events
+             return updateService.updateEvents(); 
+          })
+          .then(function(){
+              
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              // get all boxTypes
+              return updateService.updateBoxTypes();
+          })
+          .then(function(){
+              
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              // train brain
+              return brainService.trainNew(); 
+          })
+          .then(function(){
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              return updateService.verify();
+          })
+          .then(function(){
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              vm.configurationFinished = true;
+          })
+          .catch(function(err){
+              vm.downloadError = err.data;
+              vm.configurationFinished = true;
+          });
     }
     
     function createUser(user){
