@@ -42,7 +42,12 @@ module.exports.routes = {
   '/dashboard': 'DashboardController.index' ,
   
   // Box
-  'patch /box/:id': 'BoxController.update',
+  'get /box': 'BoxController.index',
+  'post /box': 'BoxController.create',
+  'delete /box/:id': 'BoxController.delete',
+  
+  //BoxType
+  'get /boxtype' : 'BoxTypeController.index',
   
   // Brain
   'get /brain/classify': 'BrainController.classify', 

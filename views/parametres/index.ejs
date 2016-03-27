@@ -1,121 +1,60 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
-                <!-- Content Header (Page header) -->
-                <section class="content-header">
-                    <h1>
-                        <%= __('Parametres') %>
-                        <small><%= __('Control Panel') %></small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
-                        <li class="active"><%= __('Parametres') %></li>
-                    </ol>
-                </section>
+<aside class="right-side">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= __('Parametres') %>
+            <small><%= __('Control Panel') %></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+            <li class="active"><%= __('Parametres') %></li>
+        </ol>
+    </section>
 
-                <!-- Main content -->
-                <section class="content">
-                    
-                    <div class="nav-tabs-custom">
-                        <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('parameteres-general') %></a></li>
-                         <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('parameteres-account') %></a></li>
-                        <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('parameteres-boxs') %></a></li>
-                        <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><%= __('parameteres-security') %></a></li>
-                        <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
-                        </ul>
-                        <div class="tab-content">
-                        <div class="tab-pane active" id="tab_1">
-                    
-                       
-                      
-                      
-                      
-                       
-                  
-                  
-                     
-                  
-                      <!-- MACHINE BOX -->
-                  <!--<div class="box box-default">
-                  <div class="box-header with-border">
-                    <h3 class="box-title"><%= __('Gladys Machines') %></h3>
-                  </div>  
-                       
-                      <div class="box-body table-responsive" data-ng-controller="machineCtrl as vm" >
-    	                            <p><%= __('here-you-can-register-machine') %> 
-                                        <%= __('the-master-field-machine') %> 
-                                        <%= __('the-me-field-machine') %></p>
-                                    <table id="example2" class="table table-bordered table-hover">
-                                        
-                                        <thead>
-                                            <tr>
-                                                <th><%= __('Name') %></th>
-                                                <th><%= __('House') %></th>
-                                                <th><%= __('IP') %></th>
-                                                <th><%= __('Master') %></th>
-                                                <th><%= __('Me') %></th>
-                                                <th><%= __('Delete') %></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="machine in vm.machines" class="ng-cloak">
-                                                <td>{{machine.name}}</td>
-                                                <td>{{machine.house}}</td>
-                                                <td>{{machine.ip}}</td>
-                                                <td><div ng-show="machine.master"><%= __('Yes') %></div><div ng-show="!machine.master"><%= __('No') %></div></td>
-                                                <td><div ng-show="machine.me"><%= __('Yes') %></div><div ng-show="!machine.me"><%= __('No') %></div></td>
-                                                <td><button ng-click="vm.destroyMachine($index, machine.id)" class="btn btn-danger btn-sm" ><%= __('Delete') %></button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" />
-                                                </td>
-                                                 <td><select ng-model="vm.newMachine.house" class="form-control" >
-                                                        <option ng-repeat="relation in vm.relations" value="{{relation.house.id}}">{{relation.house.name}}</option>
-                                                </select>
-                                                </td>
-                                                 <td>
-                                                    <input type="text" class="form-control" ng-model="vm.newMachine.ip" placeholder="<%= __('IP') %>" />
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-success btn-sm" ng-show="vm.newMachine.master" ng-click="vm.newMachine.master = false" ><%= __('Yes') %></button>
-                                                    <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.master" ng-click="vm.newMachine.master = true" ><%= __('No') %></button>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-success btn-sm" ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
-                                                    <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.me" ng-click="vm.newMachine.me = true" ><%= __('No') %></button>
-                                                </td>
-                                                <td>
-                                                    <button ng-click="vm.createMachine()" class="btn btn-success btn-sm"><%= __('Register machine') %></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                        </div>
-                  </div>-->
-                  <!-- END OF MACHINE BOX -->
-                              <!-- END OF TAB 1 -->
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2">
-                  
-              </div> 
-               <!-- /.tab-pane --> 
-                <div class="tab-pane" id="tab_3">
-                  <%- partial ('../partials/boxconfig.ejs') %>
-              </div> 
-               <!-- /.tab-pane --> 
-                <div class="tab-pane" id="tab_4">
-                   <%- partial ('../partials/token.ejs') %>
-              </div> 
-               <!-- /.tab-pane --> 
-                      
-                </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+    <!-- Main content -->
+    <section class="content">
+        
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('parameters-general') %></a></li>
+            <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('parameters-house') %></a></li>
+            <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('parameters-areas') %></a></li>
+            <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><%= __('parameters-account') %></a></li>
+            <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><%= __('parameters-boxs') %></a></li>
+            <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><%= __('parameters-security') %></a></li>
+            <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
+            </ul>
+            <div class="tab-content">
+            <div class="tab-pane active" id="tab_1">
+                Work in progress...                    
+            </div>
+            <div class="tab-pane" id="tab_3">
+                <%- partial ('../partials/areas.ejs') %>
+            </div> 
+            <!-- END OF TAB -->
+            <div class="tab-pane" id="tab_3">
+                <%- partial ('../partials/houses.ejs') %>
+            </div> 
+            <!-- END OF TAB -->
+            <div class="tab-pane" id="tab_4">
+                Work in progress...
+            </div> 
+            <!-- END OF TAB -->
+            <div class="tab-pane" id="tab_5">
+                <%- partial ('../partials/boxconfig.ejs') %>
+            </div> 
+            <!-- END OF TAB -->
+            <div class="tab-pane" id="tab_6">
+                <%- partial ('../partials/token.ejs') %>
+            </div> 
+            <!-- END OF TAB -->
             
-            <script>
-                document.getElementById("parametreLi").className = "active";
-            </script>
+    </section><!-- /.content -->
+</aside><!-- /.right-side -->
+
+<script>
+    document.getElementById("parametreLi").className = "active";
+</script>
 
             

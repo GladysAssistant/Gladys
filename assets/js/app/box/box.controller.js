@@ -14,26 +14,50 @@
         .module('gladys')
         .controller('BoxCtrl', BoxCtrl);
 
-    BoxCtrl.$inject = ['boxService'];
+    BoxCtrl.$inject = ['boxService', 'boxTypeService'];
 
-    function BoxCtrl(boxService) {
+    function BoxCtrl(boxService, boxTypeService) {
         /* jshint validthis: true */
         var vm = this;
-        vm.remove = remove;
-        vm.update = update;
+        vm.create = create;
+        vm.destroy = destroy;
+        vm.newBox = {};
+        vm.boxs = [];
+        vm.boxTypes = [];
 
         activate();
 
         function activate() {
-            
+            get();
+            getTypes();
         }
         
-        function remove(id){
-            return update(id, {active: 0});
+        function get(){
+            return boxService.get()
+              .then(function(data){
+                 vm.boxs = data.data; 
+              });
         }
         
-        function update(id, box){
-            return boxService.update(id, box);
+        function getTypes(){
+            return boxTypeService.get()
+              .then(function(data){
+                  vm.boxTypes = data.data;
+              });
+        }
+        
+        function create(box){
+            return boxService.create(box)
+              .then(function(){
+                  get();
+              });
+        }
+        
+        function destroy(index, id){
+            return boxService.destroy(id)
+              .then(function(){
+                  vm.boxs.splice(index, 1);
+              });
         }
         
        

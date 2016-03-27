@@ -19,10 +19,25 @@
     function boxService($http) {
         
         var service = {
+            get:get, 
+            create:create,
+            destroy: destroy,
             update: update
         };
 
         return service;
+        
+        function get() {
+            return $http({method: 'GET', url: '/box' });
+        }
+        
+        function create(box) {
+            return $http({method: 'POST', url: '/box', data: box});
+        }
+        
+        function destroy(id){
+            return $http({method: 'DELETE', url: '/box/' + id});
+        }
         
         function update(id, box) {
             return $http({method: 'PATCH', url: '/box/' + id, data: box});

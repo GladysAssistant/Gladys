@@ -32,6 +32,7 @@ module.exports.policies = {
   Alarm : ['checkToken', 'Human'],
   Brain: [ 'authenticated', 'Human'],
   Box: [ 'authenticated', 'Human'],
+  BoxType: [ 'authenticated', 'Human'],
   CalendarEvent : ['checkToken', 'Human'],
   CalendarList : ['checkToken', 'Human'],
   ChromeNotification : ['checkToken', 'Human'],
