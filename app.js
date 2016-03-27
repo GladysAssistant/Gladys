@@ -30,6 +30,13 @@
  * `node app.js --silent --port=80 --prod`
  */
 
+
+// if no env variable is set, we are in production
+if(!process.env.NODE_ENV){
+    process.env.NODE_ENV = 'production';    
+}
+
+
 // Ensure we're in the project directory, so relative paths work as expected
 // no matter where we actually lift from.
 process.chdir(__dirname);
