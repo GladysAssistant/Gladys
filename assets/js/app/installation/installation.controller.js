@@ -19,7 +19,7 @@
   function installationCtrl(installationService, userService, eventService, updateService, brainService) {
     /* jshint validthis: true */
     var vm = this;
-    vm.step = 2;
+    vm.step = 1;
     vm.createAccountError = null;
     vm.downloadError = null;
     vm.configurationFinished = true;
