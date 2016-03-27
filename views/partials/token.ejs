@@ -19,7 +19,7 @@
                             <tr ng-repeat="token in vm.tokens" class="ng-cloak">
                                 <td>{{token.name}}</td>
                                 <td>{{token.value}}</td>
-                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn {{ token.status && 'btn-success' || 'btn-danger' }} btn-sm">{{token.status && 'On' || 'Off' }}</button></td>
+                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn {{ token.active && 'btn-success' || 'btn-danger' }} btn-sm">{{token.active && 'On' || 'Off' }}</button></td>
                                 <td><button ng-click="vm.destroyToken($index, token.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
                             </tr>
                             <tr>

@@ -65,8 +65,8 @@
                 });
         }
         
-        function updateStatus(id, status) {
-            return $http({method: 'POST', url: '/token/updateStatus', data:{id:id, status:status} }).
+        function updateStatus(id, active) {
+            return $http({method: 'POST', url: '/token/updateStatus', data:{id:id, active:active} }).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available

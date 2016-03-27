@@ -54,9 +54,9 @@
     }
     
     function switchStatus(index, id) {
-      return tokenService.updateStatus(id,!vm.tokens[index].status )
+      return tokenService.updateStatus(id,!vm.tokens[index].active )
         .then(function(data){
-          vm.tokens[index].status = !vm.tokens[index].status;
+          vm.tokens[index].active = !vm.tokens[index].active;
         });
     }
     
