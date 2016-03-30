@@ -14,12 +14,16 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService'];
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService'];
 
-    function scenarioCtrl(scenarioService) {
+    function scenarioCtrl(scenarioService, categoryService, eventTypeService) {
         /* jshint validthis: true */
         var vm = this;
-    	
+        
+        
+        vm.selectCategory = selectCategory;
+    	vm.selectEventType = selectEventType;
+        
         vm.createAction = createAction;
         vm.createLauncher = createLauncher;
         vm.createState = createState;
@@ -43,13 +47,8 @@
         activate();
 
         function activate() {
+            getCategory();
             initialiseVar();
-            getActionTypes()
-            .then(function(){
-                getScenarios();
-            });
-            getLauncherTypes();
-            getStateTypes();
             return;
         }
         
@@ -63,6 +62,34 @@
             vm.savedStates = []; 
             vm.savedActions = [];
             vm.step = 1;
+        }
+        
+        
+        function getCategory(){
+            return categoryService.get()
+              .then(function(data){
+                 vm.categories = data.data;
+              });
+        }
+        
+        function selectCategory(id){
+            return categoryService.getEventTypes(id)
+              .then(function(data){
+                 vm.eventTypes = data.data; 
+                 vm.step = 2;
+              });
+        }
+        
+        function selectEventType(index, id, optionsPath){
+            
+            // first we get
+            return eventTypeService.getLauncherParams(id)
+              .then(function(launcherParams){
+                 vm.launcherParams = launcherParams;
+                 console.log(launcherParams);
+                  
+              })
+              .catch(console.log);
         }
         
         function createAction() {

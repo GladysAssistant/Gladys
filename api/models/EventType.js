@@ -32,6 +32,10 @@ module.exports = {
         description: {
             type: 'string'
         },
+        
+        category: {
+            model: 'Category'
+        },
 
         service: {
             type: 'string'
@@ -43,7 +47,7 @@ module.exports = {
 
         iconColor: {
             type: 'string'
-        }
+        },
 
     }
 };

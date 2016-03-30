@@ -53,8 +53,12 @@ module.exports.routes = {
   'get /brain/classify': 'BrainController.classify', 
   'post /brain/trainnew': 'BrainController.trainNew', 
   
-  // Device 
   
+  //Category
+  'get /category': 'CategoryController.index',
+  'get /category/:id/eventtype': 'CategoryController.getEventTypes',
+  
+  // Device 
   'get /device': 'DeviceController.index',
   'post /device': 'DeviceController.create',
   'patch /device/:id': 'DeviceController.update',
@@ -63,7 +67,6 @@ module.exports.routes = {
   
   
   // DeviceState
-  
   'get /devicestate': 'DeviceStateController.index',
   
   // DeviceType
@@ -73,8 +76,10 @@ module.exports.routes = {
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
   
   // Event
-  
   'get /event': 'EventController.index',
+  
+  //EventType
+  'get /eventtype/:id/launcherparam': 'EventTypeController.getLauncherParams',
   
   // House
   'get /house': 'HouseController.index',
@@ -106,8 +111,12 @@ module.exports.routes = {
   'delete /room/:id': 'RoomController.delete',
   
   //Socket
-  
   'post /socket/subscribe': 'SocketController.subscribe',
+  
+  
+  // StateType
+  'get /statetype/:id/stateparam': 'StateTypeController.getStateTypes',
+  
   
   // Update
   'get /update/verify': 'UpdateController.verify',

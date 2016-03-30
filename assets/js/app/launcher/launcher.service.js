@@ -1,0 +1,32 @@
+/** 
+  * Gladys Project
+  * http://gladysproject.com
+  * Software under licence Creative Commons 3.0 France 
+  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+  * You may not use this software for commercial purposes.
+  * @author :: Pierre-Gilles Leymarie
+  */
+  
+(function () {
+    'use strict';
+
+    angular
+        .module('gladys')
+        .factory('launcherService', launcherService);
+
+    launcherService.$inject = ['$http'];
+
+    function launcherService($http) {
+        
+        var service = {
+            create: create
+        };
+
+        return service;
+
+        function create(launcher) {
+            return $http({method: 'POST', url: '/launcher', data: launcher});
+        }
+
+    }
+})();

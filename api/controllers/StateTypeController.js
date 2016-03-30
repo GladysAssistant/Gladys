@@ -15,23 +15,16 @@
  */
 
 module.exports = {
-
-	/**
-	 * Get all the existing state types
-	 * @method index
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	index:function(req,res,next){
-		StateType.find()
-				  .exec(function(err, stateType){
-				  		if(err) return res.json(err);
-
-				  		res.json(stateType);
-				  });
-	}
+    
+    
+    getStateTypes: function(req, res, next){
+        
+        gladys.stateParam.get({statetype: req.params.id})
+          .then(function(stateParams){
+              return res.json(stateParams);
+          })
+          .catch(next);
+    }
 	
 };
 

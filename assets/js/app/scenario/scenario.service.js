@@ -17,177 +17,37 @@
     scenarioService.$inject = ['$http'];
 
     function scenarioService($http) {
-        var service = {
-           createAction: createAction,
-           createLauncher: createLauncher,
-           createState: createState,
-           destroyAction: destroyAction,
-           destroyLauncher: destroyLauncher,
-           destroyState: destroyState,
-           getActionTypes: getActionTypes,
-           getActionOptions: getActionOptions,
-           getLauncherOptions: getLauncherOptions,
-           getLauncherTypes: getLauncherTypes,
-           getScenarios: getScenarios,
-           getStateTypes: getStateTypes
+        
+        var service = {           
+           getOptions: getOptions,
+           generateTemplate: generateTemplate
         };
 
         return service;
         
-        function createAction(action) {
-            return $http({method: 'POST', url: '/action/create', data: action}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function getOptions(path){
+            return $http({method: 'GET', url: path});
         }
         
-        function createLauncher(launcher) {
-            return $http({method: 'POST', url: '/launcher/create', data: launcher}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        // will generate a templateString like
+        // "devicetype == 1 && value > 12"
+        // this template will be injected an ES6 template
+        // evaluator
+        function generateTemplate(params){
+            var template = '';
+            
+            // foreach param
+            params.forEach(function(param){
+                if(template !== ''){
+                    template += ' && ';
+                }
+                
+                // we add the condition
+                template += param.variablename + ' ' + param.operator + ' ' + param.value;
+            });
+            
+            return template;
         }
         
-        function createState(state) {
-            return $http({method: 'POST', url: '/state/create', data: state}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function destroyAction(id) {
-            return $http({method: 'POST', url: '/action/destroy', data: {id:id} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function destroyLauncher(id) {
-            return $http({method: 'POST', url: '/launcher/destroy', data: {id:id} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function destroyState(id) {
-            return $http({method: 'POST', url: '/state/destroy', data: {id:id} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getActionTypes() {
-            return $http({method: 'POST', url: '/actiontype/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getActionOptions(path) {
-            return $http({method: 'POST', url: path}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getLauncherOptions(path) {
-            return $http({method: 'POST', url: path}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getLauncherTypes() {
-            return $http({method: 'POST', url: '/launchertype/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getScenarios() {
-            return $http({method: 'POST', url: '/scenario/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function getStateTypes() {
-            return $http({method: 'POST', url: '/statetype/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
     }
 })();

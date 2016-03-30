@@ -13,6 +13,11 @@ module.exports = {
             type: 'string',
             required: true
         },
+        
+        variablename: {
+            type:'string',
+            required: true  
+        },
 
         path: {
             type: 'string'
