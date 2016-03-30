@@ -41,10 +41,5 @@ module.exports = {
             type: 'string'
         },
 
-        actions: {
-            collection: 'Action',
-            via: 'action'
-        },
-
     }
 };
