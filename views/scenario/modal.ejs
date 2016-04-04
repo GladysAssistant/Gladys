@@ -68,7 +68,7 @@
                                             <tr ng-repeat="eventType in vm.eventTypes">
                                                 <td>{{eventType.name}}</td>
                                                 <td>{{eventType.description}}</td>
-                                                <td><input type="radio" name="eventTypeRadio" id="eventTypeRadio" value="{{eventType.id}}" ng-click="vm.selectEventType($index, eventType.id, eventType.optionspath)"></td>
+                                                <td><input type="radio" name="eventTypeRadio" id="eventTypeRadio" value="{{eventType.id}}" ng-click="vm.selectEventType($index, eventType.id)"></td>
                                             </tr>
 
                                         </tbody>
@@ -78,7 +78,7 @@
                                     <div class="form-group" ng-repeat="launcherParam in vm.launcherParams">
                                         <label for="inputEmail3" class="col-sm-2 control-label">{{launcherParam.name}} :</label>
                                         <div class="col-sm-2" >
-                                            <select ng-show="!launcherParam.options"  class="form-control">
+                                            <select ng-show="!launcherParam.options" ng-model="launcherParam.operator"  class="form-control">
                                                 <option value="==">égal</option>
                                                 <option value="!=">différent de</option>
                                                 <option value=">=">supérieur ou égal</option>
@@ -88,11 +88,67 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-8">
-                                            <select ng-show="launcherParam.options" ng-model="vm.newLauncher.params[$index]" class="form-control" >
+                                            <select ng-show="launcherParam.options" ng-model="launcherParam.value" class="form-control" >
                                                 <option ng-repeat="option in launcherParam.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
                                             
-                                            <input ng-show="!launcherParam.options" id="launcherparametre" type="text" ng-model="vm.newLauncher.params[$index]" class="form-control" placeholder="<%= __('Parametre') %>">
+                                            <input ng-show="!launcherParam.options" id="launcherparametre" type="text" ng-model="launcherParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                       </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="col-md-2 col-md-offset-10">
+                                        <button type="submit" class="btn btn-success" ng-click="vm.createLauncher();">Next</button>
+                                        </div>
+                    
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END OF STEP 2 -->
+                    
+                     <!-- STEP 3 CHOOSE CONDITION  -->
+                    <div class="row setup-content" id="step-2" ng-show="vm.step == 3">
+                        <div class="col-xs-12">
+                            <div class="col-md-12 well text-center">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <th><%= __('Name') %></th>
+                                            <th><%= __('Description') %></th>
+                                            <th><%= __('Select') %></th>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="stateType in vm.stateTypes">
+                                                <td>{{stateType.name}}</td>
+                                                <td>{{stateType.description}}</td>
+                                                <td><input type="radio" name="stateTypeRadio" id="stateTypeRadio" value="{{stateType.id}}" ng-click="vm.selectStateType($index, stateType.id)"></td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                    
+                                    
+                                <form class="form-horizontal">
+                                   
+                                    <div class="form-group" ng-repeat="stateParam in vm.stateParams">
+                                        <label for="inputEmail3" class="col-sm-2 control-label">{{stateParam.name}} :</label>
+                                        <div class="col-sm-2" >
+                                            <select ng-show="!stateParam.options" ng-model="stateParam.operator" class="form-control">
+                                                <option value="==">égal</option>
+                                                <option value="!=">différent de</option>
+                                                <option value=">=">supérieur ou égal</option>
+                                                <option value=">">strictement supérieur</option>
+                                                <option value="<=">inférieur ou égal</option>
+                                                <option value="<">strictement inférieur</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <select ng-show="stateParam.options" ng-model="stateParam.value" class="form-control" >
+                                                <option ng-repeat="option in stateParam.options" value="{{option.id}}">{{option.name}}</option>
+                                            </select>
+                                            
+                                            <input ng-show="!stateParam.options" id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
                                        </div>
                                     </div>
                                     
@@ -106,88 +162,14 @@
                             </div>
                         </div>
                     </div>
-                    <!-- END OF STEP 2 -->
+                    <!-- END OF STEP 3 -->
 
 
 
-                    <!-- STEP 2 -->
-                    <div class="row setup-content" id="step-2" ng-show="vm.step == 2">
-                        <div class="col-xs-12">
-                            <div class="col-md-12 well text-center">
-                                <h1 class="text-center"><%= __('Conditions') %></h1>
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Description') %></th>
-                                            <th><%= __('Select') %></th>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="statetype in vm.stateTypes">
-                                                <td>{{statetype.name}}</td>
-                                                <td>{{statetype.description}}</td>
-                                                <td><input type="radio" name="stateChoice" id="stateChoice" value="{{statetype.id}}" ng-click="vm.selectState($index, statetype.id)"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                   
 
-                                <form class="form-inline">
-                                    <div ng-show="!vm.selectedState.optionspath" class="form-group">
-                                    <input type="text" class="form-control"  disabled="disabled" value="{{vm.selectedState.name}}" />
-                                    <select  class="form-control" id="stateOperator" ng-model="vm.newState.operator" >
-                                        <option value="=="><%= __('equals') %></option>
-                                        <option value="!=" ><%= __('different') %></option>
-                                        <option value=">" ><%= __('strictly greater than') %></option>
-                                        <option value="<" ><%= __('strictly lower than') %></option>
-                                        <option value=">=" ><%= __('greater than') %></option>
-                                        <option value="<=" ><%= __('lower than') %></option>
-                                    </select>
-
-                                    </div>
-                                    <div class="form-group">
-                                    <label class="sr-only" for="launcherparametre"><%= __('Parametre') %></label>
-                                        <input ng-show="!vm.selectedState.optionspath" id="launcherparametre" type="text" class="form-control" placeholder="<%= __('Parametre') %>" ng-model="vm.newState.parametre" />
-                                    <!--<select ng-show="selectedlauncher.optionspath" ng-model="newLauncher.parametre" class="form-control" >
-                                        <option value="" selected="selected"><%= __('Always') %></option>
-                                        <option ng-repeat="launcheroption in launcheroptions" value="{{launcheroption.id}}">{{launcheroption.name}}</option>
-                                </select>-->
-                                    </div>
-                                    
-                                    <button type="submit" ng-click="vm.createState()" class="btn btn-success"><%= __('Save condition') %></button>
-
-                                    <button type="submit" ng-click="vm.skipState()" class="btn btn-default"><%= __('Skip conditions') %></button>
-                                </form>
-
-                                <table class="table table-bordered table-hover" style="margin-top : 20px;">
-                                        <!-- <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Action') %></th>
-                                        </thead>-->
-                                        <tbody>
-                                            <tr ng-repeat="savedstate in vm.savedStates">
-                                                <td>{{savedstate.name}} {{savedstate.operator}} {{savedstate.parametre}} </td>
-                                                <td><button ng-click="vm.destroyState($index, vm.savedStates, savedstate.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-
-
-
-                            </div>
-
-
-                        </div>
-                    </div>
-                    <!-- END OF STEP 2 -->
-
-
-
-
-
-
-
-                        <!-- STEP 3 -->
-                    <div class="row setup-content" id="step-3" ng-show="vm.step == 3">
+                        <!-- STEP 4 CHOOSE ACTIONS -->
+                    <div class="row setup-content" id="step-3" ng-show="vm.step == 4">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
                                 <h1 class="text-center"><%= __('Actions') %></h1>
