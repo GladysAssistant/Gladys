@@ -34,12 +34,20 @@
         // this template will be injected an ES6 template
         // evaluator
         function generateTemplate(params){
+            
+            // we initialize the template
             var template = '';
             
             // foreach param
             params.forEach(function(param){
+                
                 if(template !== ''){
                     template += ' && ';
+                }
+                
+                // if value is not a number, we transform it into a string escaped
+                if(!isNumber(param.value)){
+                    param.value = '"' + escapeDoubleQuotes(param.value) + '"';
                 }
                 
                 // we add the condition
@@ -47,6 +55,14 @@
             });
             
             return template;
+        }
+        
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        
+        function escapeDoubleQuotes(str) {
+            return str.replace(/\\([\s\S])|(")/g,"\\$1$2"); // thanks @slevithan!
         }
         
     }

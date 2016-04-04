@@ -14,40 +14,25 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService'];
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService', 'stateService'];
 
-    function scenarioCtrl(scenarioService, categoryService, eventTypeService) {
+    function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService) {
         /* jshint validthis: true */
         var vm = this;
         
         
         vm.selectCategory = selectCategory;
     	vm.selectEventType = selectEventType;
-        
-        vm.createAction = createAction;
+        vm.selectStateType = selectStateType;
         vm.createLauncher = createLauncher;
-        vm.createState = createState;
-        vm.destroyAction = destroyAction;
-        vm.destroyLauncher = destroyLauncher;
-        vm.destroyState = destroyState;
-        vm.finishScenario = finishScenario;
-        vm.getActionsTypes = getActionTypes;
-        vm.getStateTypes = getStateTypes;
-        vm.getLauncherTypes = getLauncherTypes;
-        vm.getOneOptionName = getOneOptionName;
-        vm.getScenarios = getScenarios;
-        //vm.getActionOptions = getActionOptions;
-        //vm.getLauncherOptions = getLauncherOptions;
-        vm.selectLauncher = selectLauncher;
-        vm.selectState = selectState;
-        vm.selectAction = selectAction;
-        vm.skipState = skipState;
+        
         vm.scenarios = [];
         
         activate();
 
         function activate() {
             getCategory();
+            getStateTypes();
             initialiseVar();
             return;
         }
@@ -80,9 +65,11 @@
               });
         }
         
-        function selectEventType(index, id, optionsPath){
-            
-            // first we get
+        /**
+         * When user select an eventType in scenario panel
+         * The system get all launcherParams
+         */
+        function selectEventType(index, id){
             return eventTypeService.getLauncherParams(id)
               .then(function(launcherParams){
                  vm.launcherParams = launcherParams;
@@ -90,6 +77,34 @@
                   
               })
               .catch(console.log);
+        }
+        
+        function getStateTypes(){
+            return stateTypeService.get()
+              .then(function(data){
+                 vm.stateTypes = data.data; 
+              });
+        }
+        
+        
+        function createLauncher(){
+            var template = scenarioService.generateTemplate(vm.launcherParams);
+            vm.newLauncher.condition_template = template;
+            return launcherService.create(vm.newLauncher);
+        }
+        
+        function createState(){
+            var template = scenarioService.generateTemplate(vm.stateParams);
+            vm.newState.condition_template = template;
+            return stateService.create(vm.newLauncher);
+        }
+        
+        function selectStateType(index, id){
+            return stateTypeService.getParams(id)
+              .then(function(stateParams){
+                  console.log(stateParams);
+                  vm.stateParams = stateParams;
+              });
         }
         
         function createAction() {
@@ -100,25 +115,7 @@
                     vm.savedActions.push(data.data);
                 });
         }
-        
-        function createLauncher() {
-    	   return scenarioService.createLauncher(vm.newLauncher)
-                .then(function(data){
-                    vm.newLauncher.id = data.data.id;
-                    vm.newState.launcher = data.data.id;
-                    vm.newAction.launcher = data.data.id;
-                    vm.step = 2;
-                });
-        } 
-        
-        function createState() {
-            return scenarioService.createState(vm.newState)
-                .then(function(data){
-                    vm.newState.id = data.data.id;
-                    data.data.name = vm.newState.name;
-                    vm.savedStates.push(data.data);
-                });
-        }
+       
         
         function destroyAction(index,array, id) {
             return scenarioService.destroyAction(id)
@@ -156,96 +153,7 @@
                     });
                 });
         }
-        
-        function getStateTypes() {
-             return scenarioService.getStateTypes()
-                .then(function(data){
-                    vm.stateTypes = data.data;
-                });
-        }
-        
-        function getLauncherTypes() {
-             return scenarioService.getLauncherTypes()
-                .then(function(data){
-                    vm.launcherTypes = data.data;
-                });
-        }
-        
-        function getScenarios() {
-            return scenarioService.getScenarios()
-                .then(function(data){
-                    for(var i = 0; i<data.data.length;i++){
-                        if(data.data[i].launcher.optionspath){
-                             getOneOptionName(data.data[i].launcher.optionspath, data.data[i].launcher, data.data[i].parametre);
-                        }
-                    }
-                    vm.scenarios = data.data;
-                });
-        }
-        
-        function getActionOptions(path){
-            return scenarioService.getActionOptions(path)
-                .then(function(data){
-                    console.log(data.data);
-                    vm.actionOptions = data.data;
-                });
-        }
-        
-        function getLauncherOptions(path){
-            return scenarioService.getLauncherOptions(path)
-                .then(function(data){
-                    vm.launcherOptions = data.data;
-                });
-        }
-        /**
-         * Give more information about the launcher (with his id)
-         */
-        function getOneOptionName(path, variable, id ){
-            return scenarioService.getLauncherOptions(path)
-                .then(function(data){
-                    var i = 0;
-                    var found = false;
-                    while(!found && i<data.data.length){
-                        if(data.data[i].id == id){
-                            variable.option = data.data[i];
-                            found = true;
-                        }
-                        i++;
-                    }
-                });
-        }
-        
-        
-        function selectLauncher(index,launcherId) {
-            vm.selectedLauncher = vm.launcherTypes[index];
-            vm.newLauncher.launcher = vm.launcherTypes[index].id;
-            // if an OptionPath is provided, get all the options by making a request to
-            // the specified URL
-            if(vm.selectedLauncher.optionspath){
-
-              vm.newLauncher.operator = '==';
-              // Get the options
-              getLauncherOptions(vm.selectedLauncher.optionspath);
-            }
-        }
-        
-        function selectState(index,stateId) {
-            vm.selectedState = vm.stateTypes[index];
-            vm.newState.state = vm.stateTypes[index].id;
-            vm.newState.name = vm.stateTypes[index].name;
-        }
-        
-        function selectAction(index, actionId) {
-            vm.selectedAction = vm.actionTypes[index];
-            vm.newAction.action = vm.actionTypes[index].id;
-            vm.newAction.name = vm.actionTypes[index].name;
-    	   
-            // if an OptionPath is provided, get all the options by making a request to
-            // the specified URL
-            if(vm.selectedAction.optionspath){
-                getActionOptions(vm.selectedAction.optionspath);
-            }
-        }
+       
         
         function skipState(){
             if(vm.step < 3){
