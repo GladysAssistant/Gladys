@@ -43,6 +43,9 @@
         
         function getOptions(launcherParam){
             
+            // default operator
+            launcherParam.operator = '==';
+            
             if(!launcherParam.path || launcherParam.path.length === 0){
                 return Promise.resolve(launcherParam);
             }
