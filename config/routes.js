@@ -113,9 +113,12 @@ module.exports.routes = {
   //Socket
   'post /socket/subscribe': 'SocketController.subscribe',
   
+  // State
+  'post /state': 'StateController.create',
   
   // StateType
-  'get /statetype/:id/stateparam': 'StateTypeController.getStateTypes',
+  'get /statetype': 'StateTypeController.index',
+  'get /statetype/:id/stateparam': 'StateTypeController.getStateParams',
   
   
   // Update
