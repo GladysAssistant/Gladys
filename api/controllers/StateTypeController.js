@@ -16,10 +16,17 @@
 
 module.exports = {
     
+    index: function(req, res, next){
+        gladys.stateType.get()
+          .then(function(stateTypes){
+              return res.json(stateTypes);
+          })
+          .catch(next);
+    },
     
-    getStateTypes: function(req, res, next){
+    getStateParams: function(req, res, next){
         
-        gladys.stateParam.get({statetype: req.params.id})
+        gladys.stateParam.getByStateType({statetype: req.params.id})
           .then(function(stateParams){
               return res.json(stateParams);
           })
