@@ -40,7 +40,7 @@ module.exports = {
 
         gladys.location.create(location)
           .then(function(location){
-              return res.json(location);
+              return res.status(201).json(location);
           })
           .catch(next);
 	}
