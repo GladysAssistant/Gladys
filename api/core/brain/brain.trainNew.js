@@ -16,7 +16,10 @@ module.exports = function train(){
          
          classifier.trainBatch(batch);
          
-         sails.log.info(`Brain trained with success ! Added ${sentences.length} sentences.`);
+         // we set the actual classifier to the new classifier
+         shared.setClassifier(classifier);
+         
+         sails.log.info(`Brain trained with success ! Added ${sentences.length} sentences.`); 
          return Promise.resolve();
       })
       .then(function(){

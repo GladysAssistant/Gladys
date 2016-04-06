@@ -33,8 +33,7 @@ function callAction(text, service, label){
             
             // if it's a gladys core function
             if (gladys[service] && typeof gladys[service].command == "function") {
-                gladys[params.actiontype.service].command(scope);
-                return Promise.resolve();
+                return gladys[service].command(scope);
             }
 
             // testing if it's a Service
@@ -45,7 +44,6 @@ function callAction(text, service, label){
             }
 
             // executing action
-            global[service].command(scope);
-            return Promise.resolve();
+            return global[service].command(scope);
       }); 
 }

@@ -15,6 +15,7 @@ module.exports = function saveModel(){
        fs.writeFile(sails.config.brain.savePath, intentClassifierString, 'utf8', function(err){
            if(err) return reject(err);
            
+           sails.log.info('Brain file saved with success');
            return resolve('ok');
        });
     });
