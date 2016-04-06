@@ -20,7 +20,8 @@ module.exports = {
 
         uuid: {
             type: 'uuid',
-            required: true
+            required: true,
+            unique: true
         },
 
         name: {
