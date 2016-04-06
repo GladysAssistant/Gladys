@@ -16,9 +16,8 @@ module.exports = {
           unique: true
       },
       
-      sentence: {
+      label: {
          type: 'string',
-         uuid: true,
          required: true  
       },
       
