@@ -1,3 +1,3 @@
 
-module.exports.create = require('./param.create.js');
 module.exports.getValue = require('./param.getValue.js');
+module.exports.setValue = require('./param.setValue.js');

@@ -89,7 +89,8 @@ function loadFixtures(barrels){
        'boxtype',
        'box',
        'module',
-       'sentence'
+       'sentence',
+       'param'
     ];
     
     return Promise.mapSeries(order, function(tableName){
