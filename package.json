@@ -20,7 +20,6 @@
     "bcrypt": "^0.8.5",
     "bluebird": "^3.3.4",
     "crypto": "~0.0.3",
-    "ejs": "^2.4.1",
     "es6-template-strings": "^2.0.0",
     "forecast": "^0.2.1",
     "grunt": "^1.0.1",
@@ -48,8 +47,6 @@
     "rc": "^1.1.6",
     "request": "^2.70.0",
     "sails": "^0.12.3",
-    "sails-disk": "~0.10.0",
-    "sails-memory": "~0.10.3",
     "sails-mysql": "^0.12.1",
     "sails-util-mvcsloader": "^0.3.2",
     "serialization": "^0.2.0"
@@ -57,9 +54,6 @@
   "devDependencies": {
     "grunt-contrib-csslint": "^1.0.0",
     "grunt-mocha-istanbul": "^3.0.1",
-    "gulp": "^3.9.0",
-    "gulp-jsbeautifier": "^1.0.1",
-    "gulp-jshint": "^1.11.2",
     "istanbul": "^0.4.2",
     "jshint-stylish": "^2.0.1",
     "mocha": "^2.3.4",
