@@ -56,6 +56,9 @@ gladys.load = function load() {
     // init tasks
     gladys.task.init();
     
+    // gladys modules contains all public methods of hooks
+    gladys.modules = sails.hooks;
+    
     // gladys is ready
     gladys.emit('ready');
 };
