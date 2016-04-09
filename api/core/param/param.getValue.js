@@ -11,6 +11,6 @@ module.exports = function getValue(name){
              return Promise.reject(new Error('Param not found'));
          } 
          
-         return values[0].value;
+         return Promise.resolve(values[0].value);
       });
 };

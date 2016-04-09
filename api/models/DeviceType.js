@@ -20,6 +20,11 @@ module.exports = {
           type: 'string'
         },
         
+        // can be useful to identify a device (ex: unique ID of a lamp)
+        identifier: {
+          type: 'string'  
+        },
+        
         // true if the devicetype is a sensor
         sensor: {
             type: 'boolean',

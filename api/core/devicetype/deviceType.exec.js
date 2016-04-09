@@ -20,7 +20,7 @@ function set(param) {
                 return Promise.reject(new Error('Incorrect value'));
             }
 
-            if (typeof global[types[0].service].exec !== "function") {
+            if (typeof gladys.modules[types[0].service].exec !== "function") {
                 return Promise.reject(new Error(`${types[0].service} does not exist or does not have an exec function`));
             }
             
@@ -38,15 +38,15 @@ function set(param) {
             param.value = parseInt(param.value);
 
             // calling service method
-            return global[types[0].service].exec({
-                    type: types[0],
+            return gladys.modules[types[0].service].exec({
+                    deviceType: types[0],
                     state: param
-                })
-                .then(function() {
-
-                    // creating DeviceState
-                    return DeviceState.create(param);
                 });
+        })
+        .then(function() {
+
+            // creating DeviceState
+            return DeviceState.create(param);
         })
         .then(function(deviceState){
            
