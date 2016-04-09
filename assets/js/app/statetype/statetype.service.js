@@ -49,7 +49,7 @@
         function getOptions(stateParam){
             
             // default operator
-            launcherParam.operator = '==';
+            stateParam.operator = '==';
             
             if(!stateParam.path || stateParam.path.length === 0){
                 return Promise.resolve(stateParam);
@@ -59,7 +59,7 @@
             return $http({method: 'GET', url: stateParam.path })
               .then(function(data){
 
-                 // and add them to the launcherParam
+                 // and add them to the stateParam
                  stateParam.options = data.data;
                  return Promise.resolve(stateParam); 
               });
