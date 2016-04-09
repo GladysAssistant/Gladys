@@ -24,6 +24,7 @@ var cssFilesToInject = [
   'styles/AdminLTE.css',
   'styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css',
   'styles/search.css',
+  'styles/store.css',
   'styles/angular-chart/angular-chart.min.css',
   // all styles, disabled by default
   //'styles/**/*.css',
