@@ -3,6 +3,7 @@ set -e
 if [ "$#" -ne 1 ]; then
 	echo "###############################################"
     echo "You must provide the URL of the new archive to download."
+    echo "Example : ./rpi-update.sh http://url-of-the-file.tar.gz"
     echo "Exiting. "
     exit 1
 fi
