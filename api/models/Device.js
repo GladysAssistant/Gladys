@@ -24,9 +24,13 @@ module.exports = {
             required: true
         },
 
+        // can be useful to identify a device (ex: unique ID of a lamp)
+        identifier: {
+          type: 'string'  
+        },
+
         room: {
             model: 'Room',
-            required: true
         }
 
     }
