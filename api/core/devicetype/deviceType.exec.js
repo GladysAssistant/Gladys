@@ -1,4 +1,4 @@
-module.exports = set;
+module.exports = exec;
 
 var Promise = require('bluebird');
 var queries = require('./deviceType.queries.js');
@@ -7,7 +7,7 @@ var queries = require('./deviceType.queries.js');
  * Set a new state for a device by executing 
  * the related service.
  */
-function set(param) {
+function exec(param) {
     
     return gladys.utils.sql(queries.getDeviceType, [param.devicetype])
         .then(function(types) {
