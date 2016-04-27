@@ -42,7 +42,7 @@
                   // caching current user
                   user = data.data;
                   
-                  return data;
+                  return user;
               });
         }
 
