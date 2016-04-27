@@ -26,10 +26,10 @@
         function initialize(){
             // get User Language
 			return userService.whoAmI()
-                .then(function(data){
-                    if(data.data.language){
+                .then(function(user){
+                    if(user.language){
                         // set the language of the moment library
-                        amMoment.changeLocale(data.data.language.substring(0,2));
+                        amMoment.changeLocale(user.language.substring(0,2));
                     }
                 });
 		}
