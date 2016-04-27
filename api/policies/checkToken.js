@@ -40,7 +40,7 @@ module.exports = function(req, res, next) {
       // check if get param 'token' is a valid
       gladys.token.verify(req.param('token'))
         .then(function(user){
-           sails.log.info('Access with token : "' + req.param('token') + '" to user ' + user.firstname);
+           sails.log.info('Access with token to user ' + user.firstname);
            req.session.User = user; 
            return next();
         })
