@@ -25,7 +25,10 @@ before(function(done) {
   }, function(err, server) {
     sails = server;
     if (err) return done(err);
-
+    
+    // adding a fake module for tests
+    addTestModuleGladys(gladys);
+    
     done(err, sails);
 
   });
@@ -109,4 +112,13 @@ function load(tableName, barrels){
             resolve();
         }); 
     });
+}
+
+function addTestModuleGladys(gladys){
+    
+    // simulating fake test module
+    gladys.modules.test = {
+        exec: function(){},
+        install: function(){}
+    };
 }
