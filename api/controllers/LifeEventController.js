@@ -50,50 +50,50 @@ function getIntervalBetweenLifeEvents(userId,startEventType, stopEventType, call
   		sort: 'datetime DESC',
   		limit: numberLifeEventToGet }, function(err, LifeEvents) {
 
-  				var Interval = [];
-  				var cpt = 0;
-  				var i = 0;
+            var Interval = [];
+            var cpt = 0;
+            var i = 0;
           
-          if(!LifeEvents){
-            return callback('No lifeEvents');
-          }
+            if(!LifeEvents){
+                return callback('No lifeEvents');
+            }
  
-  				while(i < LifeEvents.length)
-  				{
-            // while the current element is not the stop Event
-  					while(i<LifeEvents.length && LifeEvents[i].eventtype != stopEventType)
-  						i++;
+            while(i < LifeEvents.length)
+            {
+                // while the current element is not the stop Event
+                while(i<LifeEvents.length && LifeEvents[i].eventtype != stopEventType)
+                    i++;
 
-            var date1;
-            // if we have found the stop Event
-  					if(i<LifeEvents.length) date1 = new Date(LifeEvents[i].datetime);
-            i++;
+                var date1;
+                // if we have found the stop Event
+                if(i<LifeEvents.length) date1 = new Date(LifeEvents[i].datetime);
+                    i++;
 
-            // While the current element is not the start element
-  					while(i<LifeEvents.length && LifeEvents[i].eventtype != startEventType)
-  						i++;
+                // While the current element is not the start element
+                while(i<LifeEvents.length && LifeEvents[i].eventtype != startEventType)
+                    i++;
 
-            var date2;
-  					if(i<LifeEvents.length) date2 = new Date(LifeEvents[i].datetime);
-            i++;
-  					if(date1 && date2)
-  					{
-  						// Calculate interval between the two Events two by two
-  						var duration = (date1.getTime() - date2.getTime())/ (1000*60*60);
-              // Round in the format :  8,2 Hours (for example) 
-              duration = Math.round(duration*10)/10;
-              var month = date2.getMonth() + 1;
-              var day = date2.getDate();
-              var year = date2.getFullYear();
-  						Interval[cpt] = {start : (year + "-" + month + "-" + day), duration : duration};
-  						cpt++;
-  					}
-            date1= false;
-            date2= false;
+                var date2;
+                if(i<LifeEvents.length) date2 = new Date(LifeEvents[i].datetime);
+                    i++;
+                if(date1 && date2)
+                {
+                    // Calculate interval between the two Events two by two
+                    var duration = (date1.getTime() - date2.getTime())/ (1000*60*60);
+                    // Round in the format :  8,2 Hours (for example)
+                    duration = Math.round(duration*10)/10;
+                    var month = date1.getMonth() + 1;
+                    var day = date1.getDate();
+                    var year = date1.getFullYear();
+                    Interval[cpt] = {start : (year + "-" + month + "-" + day), duration : duration};
+                    cpt++;
+                }
+                date1= false;
+                date2= false;
   					
-  				}
+            }
 
-  				callback(Interval);
+            callback(Interval);
 	
 		});
 }
@@ -103,14 +103,14 @@ module.exports = {
   
   index: function(req,res,next){
       if(typeof req.param('start') === 'undefined' || typeof req.param('end') === 'undefined') {
-        return res.json('Wrong parametre');
+        return res.json('Wrong parameter');
       }
       
       var start = parseInt(req.param('start'));
       var end = parseInt(req.param('end'));
       
       if(isNaN(start) || isNaN(end)){
-        return res.json('Must be valid number');
+        return res.json('Must be a valid number');
       }
       
       var sql = "SELECT lifeevent.id, name, BeautifulName, FaIcon,iconColor, sentence, param, datetime ";
