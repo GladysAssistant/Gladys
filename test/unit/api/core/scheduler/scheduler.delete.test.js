@@ -7,8 +7,10 @@ describe('Scheduler', function() {
     it('should cancel event', function (done) {
         
         var obj = {
-               eventName: 'test',
-               value: 'test',
+               event: {
+                   code:'test',
+                   value: 'test'
+               },
                rule: {
                    hour: 14, 
                    minute: 30, 

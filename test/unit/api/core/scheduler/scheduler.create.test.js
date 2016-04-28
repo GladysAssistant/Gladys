@@ -7,8 +7,10 @@ describe('Scheduler', function() {
     it('should return index of scheduler created', function (done) {
      	 
           var obj = {
-               eventName: 'test',
-               value: 'test',
+               event: {
+                   code: 'test',
+                   value: 'test',
+               }, 
                rule: {
                    hour: 14, 
                    minute: 30, 
@@ -23,11 +25,14 @@ describe('Scheduler', function() {
                 });
     });
     
-    it('should return error - no eventName specified', function (done) {
+    it('should return error - no event specified', function (done) {
      	 
           var obj = {
-              
-               value: 'test'
+               rule: {
+                   hour: 14, 
+                   minute: 30, 
+                   dayOfWeek: 0
+               }
           };
           
           gladys.scheduler.create(obj)

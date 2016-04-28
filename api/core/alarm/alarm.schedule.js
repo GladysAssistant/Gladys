@@ -16,8 +16,10 @@ module.exports = function schedule(alarm) {
 
     var options = {
         rule: rule,
-        eventName: 'alarmRing',
-        value: alarm.id
+        event: {
+            name: 'alarmRing',
+            value: alarm.id
+        }
     };
 
     return gladys.scheduler.create(options)
