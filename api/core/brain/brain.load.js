@@ -21,13 +21,17 @@ function load(path){
         fs.readFile(path, 'utf8', function(err, data){
            if(err) return reject(err);
            
-           // transform serialized string to classifier
-           var intentClassifierCopy = serialize.fromString(data, __dirname);
-           
-           // set shared classifier
-           shared.setClassifier(intentClassifierCopy); 
-           
-           return resolve();
+           try{
+               // transform serialized string to classifier
+                var intentClassifierCopy = serialize.fromString(data, __dirname);
+                
+                // set shared classifier
+                shared.setClassifier(intentClassifierCopy); 
+                
+                return resolve();
+           } catch(e) {
+                return Promise.reject(new Error(e));   
+           }
         });
     });
 }
