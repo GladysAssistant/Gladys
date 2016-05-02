@@ -41,6 +41,10 @@ module.exports.routes = {
   //dashboard
   '/dashboard': 'DashboardController.index' ,
   
+  //actionType
+  'get /actiontype': 'ActionType.index',
+  'get /actiontype/:id/params': 'ActionType.getParams',
+  
   // Box
   'get /box': 'BoxController.index',
   'post /box': 'BoxController.create',
@@ -70,7 +74,6 @@ module.exports.routes = {
   'get /devicestate': 'DeviceStateController.index',
   
   // DeviceType
-  
   'get /devicetype': 'DeviceTypeController.index',
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
