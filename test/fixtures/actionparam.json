@@ -1,8 +1,8 @@
 [
     {
         "id": 1,
-        "name": "name",
-        "value": "test",
-        "action": 1
+        "value": 1,
+        "action": 1,
+        "actiontypeparam": 1
     }
 ]

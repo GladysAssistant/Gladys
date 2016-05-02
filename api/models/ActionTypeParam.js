@@ -1,5 +1,5 @@
 /**
- * ActionParam.js
+ * ActionTypeParam.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
@@ -8,19 +8,23 @@
 module.exports = {
 
     attributes: {
-        
-        value: {
+
+        name: {
             type: 'string',
             required: true
         },
         
-        action: {
-            model: 'Action',
-            required: true
+        variablename: {
+            type:'string',
+            required: true  
         },
 
-        actiontypeparam: {
-            model: 'ActionTypeParam',
+        path: {
+            type: 'string'
+        },
+
+        actiontype: {
+            model: 'ActionType',
             required: true
         }
 

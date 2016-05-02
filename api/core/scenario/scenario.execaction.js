@@ -14,13 +14,13 @@ module.exports = function(params) {
         return gladys[params.actiontype.service][params.actiontype.function](params);
     }
 
-    // testing if it's a Service
-    if (!global[params.actiontype.service] || typeof global[params.actiontype.service][params.actiontype.function] != "function") {
+    // testing if it's a module
+    if (!gladys.modules[params.actiontype.service] || typeof gladys.modules[params.actiontype.service][params.actiontype.function] != "function") {
 
         // the function does not exist, rejecting
-        return Promise.reject(new Error(`${params.actiontype.service}.${params.actiontype.function} is not a function`));
+        return Promise.reject(new Error(`gladys.modules.${params.actiontype.service}.${params.actiontype.function} is not a function`));
     }
 
     // executing action
-    return global[params.actiontype.service][params.actiontype.function](params);
+    return gladys.modules[params.actiontype.service][params.actiontype.function](params);
 };

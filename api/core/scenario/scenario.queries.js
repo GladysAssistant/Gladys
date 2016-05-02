@@ -10,7 +10,10 @@ module.exports = {
   INNER JOIN actiontype ON action.action = actiontype.id
   WHERE launcher = ?;
   `,
-    getActionParams: `SELECT * FROM actionparam WHERE action = ?;`,
+    getActionParams: `
+      SELECT * FROM actionparam 
+      JOIN actiontypeparam ON (actionparam.actiontypeparam = actiontypeparam.id)
+      WHERE action = ?;`,
     getStatesLauncher: `
     SELECT statetype.*, state.id AS stateId, state.condition_template AS condition_template
     FROM state

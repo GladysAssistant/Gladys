@@ -13,7 +13,7 @@ describe('Scenario', function() {
           gladys.scenario.getActions({launcher:launcher})
                 .then(function(actions){
                     actions.should.be.instanceOf(Array);
-                    actions[0].should.have.property('actionparams');
+                    actions[0].should.have.property('params');
                     done();
                 })
                 .catch(done);

@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "name": "House id",
+        "path": "/house",
+        "variablename": "houseId",
+        "actiontype": 1
+    }
+]

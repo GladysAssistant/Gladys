@@ -79,6 +79,7 @@ function loadFixtures(barrels){
        'eventtype',
        'launcher',
        'actiontype',
+       'actiontypeparam',
        'action',
        'actionparam',
        'statetype',
