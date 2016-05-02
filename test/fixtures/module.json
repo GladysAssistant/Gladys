@@ -1,9 +1,9 @@
 [
     {
         "id": 1,
-        "name": "Downloader",
+        "name": "Test",
         "url": "https://github.com/GladysProject/gladys-downloader.git",
         "version": "2.1",
-        "slug": "downloader"
+        "slug": "test"
     }
 ]
