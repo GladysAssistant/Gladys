@@ -118,7 +118,11 @@ function addTestModuleGladys(gladys){
     
     // simulating fake test module
     gladys.modules.test = {
-        exec: function(){},
-        install: function(){}
+        exec: function(){
+            return Promise.resolve();
+        },
+        install: function(){
+            return Promise.resolve();
+        }
     };
 }
