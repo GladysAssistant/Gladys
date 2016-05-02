@@ -7,7 +7,7 @@ describe('Scenario', function() {
     it('should execute action', function (done) {
      	 
           var action = {
-              service: 'TestService',
+              service: 'test',
               function: 'exec',
               id: 1 
           };
