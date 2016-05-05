@@ -33,7 +33,8 @@ module.exports = {
         },
 
         launcher: {
-            model: 'Launcher'
+            model: 'Launcher',
+            required: true
         }
 
     }

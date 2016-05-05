@@ -90,6 +90,12 @@ module.exports.routes = {
   'patch /house/:id': 'HouseController.update',
   'delete /house/:id': 'HouseController.delete',
   
+  
+  // Launcher
+  'get /launcher': 'LauncherController.index',
+  'get /launcher/:id/action': 'LauncherController.getActions',
+  'get /launcher/:id/state': 'LauncherController.getStates',
+
   // Location
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
