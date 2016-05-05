@@ -14,26 +14,35 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService', 'stateService'];
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService'];
 
-    function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService) {
+    function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService, actionTypeService, actionService) {
         /* jshint validthis: true */
         var vm = this;
         
         
         vm.selectCategory = selectCategory;
     	vm.selectEventType = selectEventType;
-        vm.selectStateType = selectStateType;
+        vm.addState = addState;
+        vm.addAction = addAction;
+        vm.insertAll = insertAll;
+        vm.deleteLauncher = deleteLauncher;
         vm.createLauncher = createLauncher;
+        vm.nextStep = nextStep;
         
-        vm.scenarios = [];
+        vm.actionTypes = [];
+        vm.launchers = [];
+        vm.states = [];
+        vm.actions = [];
         
         activate();
 
         function activate() {
+            getLaunchers();
             getCategory();
             getStateTypes();
             initialiseVar();
+            getActionTypes();
             return;
         }
         
@@ -47,6 +56,15 @@
             vm.savedStates = []; 
             vm.savedActions = [];
             vm.step = 1;
+        }
+        
+        
+        
+        function getLaunchers(){
+           return launcherService.get()
+             .then(function(data){
+                vm.launchers = data.data; 
+             });
         }
         
         
@@ -65,18 +83,27 @@
               });
         }
         
+        function getActionTypes(){
+            return actionTypeService.get()
+              .then(function(data){
+                 vm.actionTypes = data.data; 
+              });
+        }
+        
+        
+        
         /**
          * When user select an eventType in scenario panel
          * The system get all launcherParams
          */
         function selectEventType(index, id){
+            
+            // we set the eventtype selected
+            vm.newLauncher.eventtype = id;
             return eventTypeService.getLauncherParams(id)
               .then(function(launcherParams){
                  vm.launcherParams = launcherParams;
-                 console.log(launcherParams);
-                  
-              })
-              .catch(console.log);
+              });
         }
         
         function getStateTypes(){
@@ -87,78 +114,110 @@
         }
         
         
-        function createLauncher(){
-            var template = scenarioService.generateTemplate(vm.launcherParams);
-            vm.newLauncher.condition_template = template;
-            return launcherService.create(vm.newLauncher);
+        function createLauncher(newLauncher, launcherParams){
+            var template = scenarioService.generateTemplate(launcherParams);
+            newLauncher.condition_template = template;
+            var func;
+            
+            // if we insert or update the launcher
+            if(newLauncher.id){
+                func = launcherService.update(newLauncher.id, newLauncher);
+            } else {
+                func = launcherService.create(newLauncher);
+            }
+            
+            return func
+                .then(function(data){
+                    vm.newLauncher = data.data;
+                    console.log('Created/Updated Launcher : ');
+                    console.log(vm.newLauncher); 
+                });
         }
         
-        function createState(){
-            var template = scenarioService.generateTemplate(vm.stateParams);
-            vm.newState.condition_template = template;
-            return stateService.create(vm.newLauncher);
-        }
-        
-        function selectStateType(index, id){
-            return stateTypeService.getParams(id)
-              .then(function(stateParams){
-                  console.log(stateParams);
-                  vm.stateParams = stateParams;
+        function addState(index, stateTypeId){
+            var newState = {
+                launcher: vm.newLauncher.id,
+                state: stateTypeId
+            };
+            
+            return stateTypeService.getParams(stateTypeId)
+              .then(function(params){
+                  
+                  newState.params = params;
+                  vm.states.push(newState);
               });
         }
         
-        function createAction() {
-            return scenarioService.createAction(vm.newAction)
-                .then(function(data){
-                    vm.newAction.id = data.data.id;
-                    data.data.name = vm.newAction.name;
-                    vm.savedActions.push(data.data);
-                });
+        function addAction(index, actionType){
+            
+            var newAction = {
+                launcher: vm.newLauncher.id,
+                action: actionType.id,
+                name: actionType.name
+            };
+            
+            return actionTypeService.getParams(actionType.id)
+              .then(function(params){
+                  
+                  
+                  // foreach parameter, we transform the argument 
+                  params.forEach(function(param){
+                     param.actiontypeparam = param.id; 
+                     delete param.id;
+                  });
+                  
+                  newAction.params = params;
+                  vm.actions.push(newAction);
+              });
+            
+        }
+        
+        function deleteLauncher(index, id){
+            return launcherService.destroy(id)
+              .then(function(){
+                  vm.launchers.splice(index, 1);
+              });
+        }
+       
+       
+       function insertAll(){
+           return actionService.insertActions(vm.actions)
+             .then(function(result){
+                 return stateService.insertOrUpdateStates(vm.states);
+             })
+             .then(function(){
+                 finishScenario();
+             });
+       }
+       
+        
+        
+        function nextStep(){
+            switch(vm.step){
+                case 2:
+                    createLauncher(vm.newLauncher, vm.launcherParams)
+                      .then(function(){
+                            vm.step++;
+                      });
+                break;
+                    
+                case 3:
+                    vm.step++;
+                break;
+                
+                case 4: 
+                    // save everything
+                break;
+            }
         }
        
         
-        function destroyAction(index,array, id) {
-            return scenarioService.destroyAction(id)
-                .then(function(data){
-                    array.splice(index, 1); 
-                });
-        }
-        
-        function destroyLauncher(index, id) {
-    	   return scenarioService.destroyLauncher(id)
-                .then(function(data){
-                    vm.scenarios.splice(index, 1); 
-                });
-        } 
-        
-        function destroyState(index, array,  id) {
-            return scenarioService.destroyState(id)
-                .then(function(data){
-                    array.splice(index, 1);
-                });
-        }
         	
         function finishScenario() {
           initialiseVar();
-          getScenarios();
+          getLaunchers();
           $('#modalNewScenario').modal('hide');
         }
-        
-        function getActionTypes() {
-            return scenarioService.getActionTypes()
-                .then(function(data){
-                    return new Promise(function(resolve, reject){
-                        vm.actionTypes = data.data;
-                        resolve();
-                    });
-                });
-        }
        
-        
-        function skipState(){
-            if(vm.step < 3){
-               vm.step++; 
-            }
-        }   
     }
 })();

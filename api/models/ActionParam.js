@@ -10,8 +10,7 @@ module.exports = {
     attributes: {
         
         value: {
-            type: 'string',
-            required: true
+            type: 'string'
         },
         
         action: {

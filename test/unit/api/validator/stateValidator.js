@@ -13,6 +13,5 @@ function validate(state) {
 function validateState(state) {
 	state.should.be.instanceOf(Object);
     state.should.have.property('launcher');
-    state.should.have.property('condition_template');
     state.should.have.property('active');
 }

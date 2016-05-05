@@ -14,5 +14,4 @@ function validateAction(action) {
 	action.should.be.instanceOf(Object);
     action.should.have.property('action');
     action.should.have.property('launcher');
-    action.should.have.property('user');
 }

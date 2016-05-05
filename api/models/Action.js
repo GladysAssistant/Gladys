@@ -26,12 +26,7 @@ module.exports = {
         launcher: {
             model: 'Launcher',
             required: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        },
+        }
 
     }
 };

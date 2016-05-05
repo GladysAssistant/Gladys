@@ -12,19 +12,19 @@
                 <div class="row form-group">
                         <div class="col-xs-12">
                             <ul class="nav nav-pills nav-justified thumbnail setup-panel">
-                                <li ng-class="{ 'active': vm.step == 1, 'disabled': vm.step != 1  }"><a href="#step-1" >
+                                <li ng-class="{ 'active': vm.step == 1 }"><a href="#step-1" >
                                     <h4 class="list-group-item-heading"><%= __('Step') %> 1</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-category') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step != 2  }"><a href="#step-1" >
+                                <li ng-class="{ 'active': vm.step == 2 }"><a href="#step-1" >
                                     <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-trigger') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step == 2  }"><a href="#step-2" >
+                                <li ng-class="{ 'active': vm.step == 3 }"><a href="#step-2" >
                                     <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-add-conditions') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 4, 'disabled': vm.step != 4  }"><a href="#step-3">
+                                <li ng-class="{ 'active': vm.step == 4 }"><a href="#step-3">
                                     <h4 class="list-group-item-heading"><%= __('Step') %> 4</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-actions') %></p>
                                 </a></li>
@@ -60,9 +60,9 @@
                             <div class="col-md-12 well text-center">
                                     <table class="table table-bordered table-hover">
                                         <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Description') %></th>
-                                            <th><%= __('Select') %></th>
+                                            <th><%= __('scenario-name') %></th>
+                                            <th><%= __('scenario-description') %></th>
+                                            <th><%= __('scenario-select') %></th>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="eventType in vm.eventTypes">
@@ -79,12 +79,12 @@
                                         <label for="inputEmail3" class="col-sm-2 control-label">{{launcherParam.name}} :</label>
                                         <div class="col-sm-2" >
                                             <select ng-show="!launcherParam.options" ng-model="launcherParam.operator"  class="form-control">
-                                                <option value="==">égal</option>
-                                                <option value="!=">différent de</option>
-                                                <option value=">=">supérieur ou égal</option>
-                                                <option value=">">strictement supérieur</option>
-                                                <option value="<=">inférieur ou égal</option>
-                                                <option value="<">strictement inférieur</option>
+                                                <option value="=="><%= __('scenario-equal') %></option>
+                                                <option value="!="><%= __('scenario-different') %></option>
+                                                <option value=">="><%= __('scenario-greater-or-equal') %></option>
+                                                <option value=">"><%= __('scenario-greater') %></option>
+                                                <option value="<="><%= __('scenario-less-or-equal') %></option>
+                                                <option value="<"><%= __('scenario-less') %></option>
                                             </select>
                                         </div>
                                         <div class="col-sm-8">
@@ -98,7 +98,7 @@
                                     
                                     <div class="form-group">
                                         <div class="col-md-2 col-md-offset-10">
-                                        <button type="submit" class="btn btn-success" ng-click="vm.createLauncher();">Next</button>
+                                        <button type="submit" class="btn btn-success" ng-click="vm.nextStep();"><%= __('scenario-next-step') %></button>
                                         </div>
                     
                                     </div>
@@ -111,36 +111,55 @@
                      <!-- STEP 3 CHOOSE CONDITION  -->
                     <div class="row setup-content" id="step-2" ng-show="vm.step == 3">
                         <div class="col-xs-12">
+                            
                             <div class="col-md-12 well text-center">
                                     <table class="table table-bordered table-hover">
                                         <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Description') %></th>
-                                            <th><%= __('Select') %></th>
+                                             <th><%= __('scenario-name') %></th>
+                                            <th><%= __('scenario-description') %></th>
+                                            <th><%= __('scenario-select') %></th>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="stateType in vm.stateTypes">
                                                 <td>{{stateType.name}}</td>
                                                 <td>{{stateType.description}}</td>
-                                                <td><input type="radio" name="stateTypeRadio" id="stateTypeRadio" value="{{stateType.id}}" ng-click="vm.selectStateType($index, stateType.id)"></td>
+                                                <td><button  class="btn btn-success btn-sm" ng-click="vm.addState($index, stateType.id)" ><%= __('scenario-state-add') %></button></td>
                                             </tr>
 
                                         </tbody>
                                     </table>
                                     
-                                    
-                                <form class="form-horizontal">
+                                
+                            </div>
+                            
+                            <div class="well">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <%= __('scenario-conditions-explained') %>
+                                    </div>
+                                    <div class="col-md-2">
+                                             <div class="form-group">
+                                                <button type="submit" class="btn btn-success" ng-click="vm.nextStep();"><%= __('scenario-next-step') %></button>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- CONDITION ROW -->
+                            <div class="well" ng-repeat="state in vm.states">
+                                
+                                 <form class="form-horizontal">
                                    
-                                    <div class="form-group" ng-repeat="stateParam in vm.stateParams">
+                                    <div class="form-group" ng-repeat="stateParam in state.params">
                                         <label for="inputEmail3" class="col-sm-2 control-label">{{stateParam.name}} :</label>
                                         <div class="col-sm-2" >
                                             <select ng-show="!stateParam.options" ng-model="stateParam.operator" class="form-control">
-                                                <option value="==">égal</option>
-                                                <option value="!=">différent de</option>
-                                                <option value=">=">supérieur ou égal</option>
-                                                <option value=">">strictement supérieur</option>
-                                                <option value="<=">inférieur ou égal</option>
-                                                <option value="<">strictement inférieur</option>
+                                                <option value="=="><%= __('scenario-equal') %></option>
+                                                <option value="!="><%= __('scenario-different') %></option>
+                                                <option value=">="><%= __('scenario-greater-or-equal') %></option>
+                                                <option value=">"><%= __('scenario-greater') %></option>
+                                                <option value="<="><%= __('scenario-less-or-equal') %></option>
+                                                <option value="<"><%= __('scenario-less') %></option>
                                             </select>
                                         </div>
                                         <div class="col-sm-8">
@@ -152,14 +171,13 @@
                                        </div>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <div class="col-md-2 col-md-offset-10">
-                                        <button type="submit" class="btn btn-success">Next</button>
-                                        </div>
-                    
-                                    </div>
+                                   
                                 </form>
+                                
+                                
                             </div>
+                            <!-- END OF CONDITION ROW -->
+                            
                         </div>
                     </div>
                     <!-- END OF STEP 3 -->
@@ -172,58 +190,67 @@
                     <div class="row setup-content" id="step-3" ng-show="vm.step == 4">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
-                                <h1 class="text-center"><%= __('Actions') %></h1>
+                                <h1 class="text-center"><%= __('scenario-actions') %></h1>
                                     <table class="table table-bordered table-hover">
                                         <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Description') %></th>
-                                            <th><%= __('Select') %></th>
+                                            <th><%= __('scenario-name') %></th>
+                                            <th><%= __('scenario-description') %></th>
+                                            <th><%= __('scenario-select') %></th>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="actiontype in vm.actionTypes">
-                                                <td>{{actiontype.name}}</td>
-                                                <td>{{actiontype.description}}</td>
-                                                <td><input type="radio" name="actionChoice" id="actionChoice" value="{{actiontype.id}}" ng-click="vm.selectAction($index, actiontype.id)"></td>
+                                            <tr ng-repeat="actionType in vm.actionTypes">
+                                                <td>{{actionType.name}}</td>
+                                                <td>{{actionType.description}}</td>
+                                                <td><button class="btn btn-success btn-sm" ng-click="vm.addAction($index, actionType)" ><%= __('scenario-action-add') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
-
-                                <form class="form-inline">
-                                    <div ng-show="!vm.selectedAction.optionspath" class="form-group">
-                                    <input type="text" class="form-control"  disabled="disabled" value="{{vm.selectedAction.name}}" />
-                                    </div>
-                                    <div class="form-group">
-                                    
-                                        <input ng-show="!vm.selectedAction.optionspath" id="actionparametre" type="text" class="form-control" ng-model="vm.newAction.parametre"  placeholder="<%= __('Parametre') %>">
-
-                                    <select ng-show="vm.selectedAction.optionspath" ng-model="vm.newAction.parametre" class="form-control" >
-                                        <option value="" selected="selected"><%= __('All') %></option>
-                                        <option ng-repeat="actionoption in vm.actionOptions" value="{{actionoption.id}}">{{actionoption.name}}</option>
-                                </select>
-                                    </div>
-                                    
-                                    <button type="submit" ng-click="vm.createAction()" class="btn btn-success"><%= __('Save action') %></button>
-
-                                    <button type="submit" ng-click="vm.finishScenario()" class="btn btn-default"><%= __('Next') %></button>
-                                </form>
-
-                                    <table class="table table-bordered table-hover" style="margin-top : 20px;">
-                                        <!-- <thead>
-                                            <th><%= __('Name') %></th>
-                                            <th><%= __('Action') %></th>
-                                        </thead>-->
-                                        <tbody>
-                                            <tr ng-repeat="savedaction in vm.savedActions">
-                                                <td>{{savedaction.name}} {{savedaction.parametre}} </td>
-                                                <td><button ng-click="vm.destroyAction($index,vm.savedActions,  savedaction.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-
 
                             </div>
+                            
+                           <div class="well">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <%= __('scenario-actions-explained') %>
+                                    </div>
+                                    <div class="col-md-4">
+                                             <div class="form-group">
+                                                <button type="submit" class="btn btn-success" ng-click="vm.insertAll();"><%= __('scenario-save') %></button>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="well" ng-repeat="action in vm.actions">
+                                
+                                <form class="form-horizontal">
+                                    
+                                    <h4>{{action.name}}</h4>
+                                   
+                                    <div class="form-group" ng-repeat="actionTypeParam in action.params">
+                                        <label for="inputEmail3" class="col-sm-2 control-label">{{actionTypeParam.name}} :</label>
+                                        <div class="col-sm-2" >
+                                            
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <select ng-show="actionTypeParam.options" ng-model="actionTypeParam.value" class="form-control" >
+                                                <option ng-repeat="option in actionTypeParam.options" value="{{option.id}}">{{option.name}}</option>
+                                            </select>
+                                            
+                                            <input ng-show="!actionTypeParam.options" id="actionTypeParam" type="text" ng-model="actionTypeParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                       </div>
+                                    </div>
+                                   
+                                </form>
+                                
+                                
+                            </div>
+                            
+                            
+                           
                         </div>
+                        
+                        
                     </div>
                     <!-- END OF STEP 3 -->
                 

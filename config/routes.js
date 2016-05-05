@@ -41,6 +41,16 @@ module.exports.routes = {
   //dashboard
   '/dashboard': 'DashboardController.index' ,
   
+  //Action
+  'post /action': 'ActionController.create',
+  'delete /action/:id': 'ActionController.delete',
+  'patch /action/:id': 'ActionController.update',
+  'post /action/:id/param': 'ActionController.addParam',
+  
+  
+  //ActionParam
+  'patch /actionparam/:id': 'ActionParamController.update',
+  
   //actionType
   'get /actiontype': 'ActionType.index',
   'get /actiontype/:id/params': 'ActionType.getParams',
@@ -93,6 +103,9 @@ module.exports.routes = {
   
   // Launcher
   'get /launcher': 'LauncherController.index',
+  'post /launcher': 'LauncherController.create',
+  'patch /launcher/:id': 'LauncherController.update',
+  'delete /launcher/:id': 'LauncherController.delete',
   'get /launcher/:id/action': 'LauncherController.getActions',
   'get /launcher/:id/state': 'LauncherController.getStates',
 
@@ -124,6 +137,8 @@ module.exports.routes = {
   
   // State
   'post /state': 'StateController.create',
+  'patch /state/:id': 'StateController.update',
+  'delete /state/:id': 'StateController.delete',
   
   // StateType
   'get /statetype': 'StateTypeController.index',

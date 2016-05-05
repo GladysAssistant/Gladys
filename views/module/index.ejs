@@ -55,8 +55,38 @@
                     <!-- END OF TAB 1 -->
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2">
-                Work in progress...
+              <div class="tab-pane" id="tab_2" data-ng-controller="StoreCtrl as vm">
+                <div class="row modules" >
+
+            
+                    <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modules">
+                        <a href="/fr/modules/cron" <h5="">{{module.name}}
+                        <div class="module-img">
+                            <img class="img-responsive img-rounded" src="{{module.img}}">
+                            <div class="description">
+                                <p class="text-justify">
+                                    {{module.description}}
+                                </p>
+                            </div>
+                        </div>
+                        </a>
+
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                 </div>
+                            <div class="col-xs-4 col-sm-6 text-right">
+                                <a href="/fr/modules/cron">{{module.nbReviews}} <%= __('modules-store-review') %> </a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
               </div>
               <!-- /.tab-pane -->
               

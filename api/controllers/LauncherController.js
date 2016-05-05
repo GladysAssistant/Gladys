@@ -19,6 +19,36 @@ module.exports = {
   },
   
   
+  create: function(req, res, next){
+    req.body.user = req.session.User.id;
+    
+    gladys.launcher.create(req.body)
+      .then(function(launcher){
+        return res.status(201).json(launcher);
+      })
+      .catch(next);
+  },
+  
+  
+  delete: function(req, res, next){
+    gladys.launcher.delete({id: req.params.id})
+      .then(function(){
+        return res.json({success: true});
+      })
+      .catch(next);
+  },
+  
+  
+  update: function(req, res, next){
+    req.body.id = req.params.id;
+    
+    gladys.launcher.update(req.body)
+      .then(function(launcher){
+        return res.json(launcher);
+      })
+      .catch(next);
+  },
+  
   getActions: function(req, res, next){
     gladys.launcher.getActions({id: req.params.id})
       .then(function(actions){

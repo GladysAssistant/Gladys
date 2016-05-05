@@ -14,9 +14,9 @@
         .module('gladys')
         .factory('recognitionService', recognitionService);
 
-    recognitionService.$inject = ['userService'];
+    recognitionService.$inject = ['userService', 'brainService'];
 
-    function recognitionService(userService) {
+    function recognitionService(userService, brainService) {
         
         var service = {
             start: start
@@ -48,6 +48,7 @@
               .then(function(user){
             
                 var recognition = new webkitSpeechRecognition();
+                var final_transcript = '';
                 
                 recognition.lang = user.language;
                 
@@ -59,7 +60,21 @@
                 }
                 
                 recognition.onresult = function(event) { 
-                    console.log(event);
+                    var interim_transcript = '';
+
+                    for (var i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            final_transcript += event.results[i][0].transcript;
+                            console.log('Final transcript : ');
+                            console.log(final_transcript);
+                            brainService.classify(final_transcript);
+                            final_transcript = '';
+                        } else {
+                            interim_transcript += event.results[i][0].transcript;
+                            console.log(interim_transcript);
+                            //brainService.classify(interim_transcript);
+                        }
+                     }
                 }
                 
                 recognition.onerror = function(event) { 

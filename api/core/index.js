@@ -7,6 +7,7 @@ gladys = new events.EventEmitter();
 gladys.load = function load() {
 
     // require all Gladys dependencies
+    gladys.action = require('./action/index.js');
     gladys.actionType = require('./actiontype/index.js');
     gladys.alarm = require('./alarm/index.js');
     gladys.area = require('./area/index.js');

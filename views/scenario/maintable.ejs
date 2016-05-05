@@ -3,75 +3,23 @@
 <table id="example2" class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th><%= __('Triggers') %></th>
-            <th><%= __('States') %></th>
-            <th><%= __('Actions') %></th>
+            <th><%= __('scenario-table-event') %></th>
+            <th><%= __('scenario-table-template') %></th>
             <th><%= __('Action') %></th>
         </tr>
     </thead>
     <tbody>
 
-
-        <tr ng-repeat="scenario in vm.scenarios" class="ng-cloak" >
+        <!-- LAUNCHER ROW -->
+        <tr ng-repeat="launcher in vm.launchers" class="ng-cloak" >
             <td>
-                <div ng-show="scenario.launcher.option">
-                    {{scenario.launcher.name}} "{{scenario.launcher.option.name}}"
-                </div>
-                <div ng-show="!scenario.launcher.option && scenario.parametre.length > 0">
-                    {{scenario.launcher.name}} {{scenario.operator}} {{scenario.parametre}}
-                </div>
-                
-                <div ng-show="!scenario.launcher.option && scenario.parametre.length == 0">
-                    {{scenario.launcher.name}} "<%= __('All') %>"
-                </div>
-                
-                
+               {{launcher.name}}                 
             </td>
-            <td>
-                <div ng-show="scenario.states.length == 0">
-                            <%= __('No states') %>
-                </div>
-                        
-                <table ng-show="scenario.states.length > 0" id="example2" class="table table-bordered table-hover">
-                    <thead>
-                        
-                    </thead>
-                    <tbody>
-                        
-                        <tr ng-repeat="state in scenario.states">
-                            <td>{{state.name}} {{state.operator}} {{state.parametre}}</td>
-                            <td><button ng-click="vm.destroyState($index, scenario.states, state.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
-                        </tr>
-                        <!--<tr>
-                            <td><button class="btn btn-success btn-sm" ng-click="createHouse()"><%= __('New') %></button></td>
-                        </tr>-->
-                    </tbody>
-                </table>
-
-            </td>
-            <td>
-                <div ng-show="scenario.actions.length == 0">
-                    <%= __('No actions') %>
-                </div>
-                <table ng-show="scenario.actions.length > 0" id="example2" class="table table-bordered table-hover">
-                    <thead>
-                        
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="action in scenario.actions">
-                            <td>{{action.name}} {{action.parametre}}</td>
-                            <td><button ng-click="vm.destroyAction($index, scenario.actions, action.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
-                        </tr>
-                        <!--<tr>
-                            <td><input type="text" ng-model="newHouse.name" /></td>
-                            <td><button class="btn btn-success btn-sm" ng-click="createHouse()"><%= __('New') %></button></td>
-                        </tr>-->
-                    </tbody>
-                </table>
-
-            </td>
-            <td><button ng-click="vm.destroyLauncher($index, scenario.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+            <td>{{launcher.condition_template}}</td>
+            <td><button ng-click="vm.deleteLauncher($index, launcher.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
         </tr>
+        <!-- END OF ROW -->
+        
         <tr>
             
             <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
