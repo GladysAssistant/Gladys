@@ -14,6 +14,6 @@ function validateLauncher(launcher) {
 	launcher.should.be.instanceOf(Object);
 	launcher.should.have.property('condition_template');
 	launcher.should.have.property('active');
-    launcher.should.have.property('eventtype');
+    //launcher.should.have.property('eventtype');
     launcher.should.have.property('user');
 }
