@@ -30,12 +30,12 @@ function verify(statetype, params) {
     }
 
     // we test if the service function exist
-    if (!global[statetype.service] || typeof global[statetype.service][statetype.function] !== "function") {
-        return Promise.reject(new Error(`${statetype.service}.${statetype.function} is not a function`));
+    if (!gladys.modules[statetype.service] || typeof gladys.modules[statetype.service][statetype.function] !== "function") {
+        return Promise.reject(new Error(`gladys.modules.${statetype.service}.${statetype.function} is not a function`));
     } else {
 
         // the service is an external service
-        verifyFunction = global[statetype.service][statetype.function];
+        verifyFunction = gladys.modules[statetype.service][statetype.function];
     }
 
     // if yes, we call the service
