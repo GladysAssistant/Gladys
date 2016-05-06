@@ -6,7 +6,9 @@
     "address": "102 avenue des Champs-Elysées",
     "city" : "Paris",
     "postcode" : "75008",
-    "country": "France"
+    "country": "France",
+    "latitude": 37.773972,
+    "longitude": -122.431297
   },
   {
     "id": 2,  
@@ -15,6 +17,8 @@
     "address": "26 Boulevard Eugène Gazagnair",
     "city" : "Cannes",
     "postcode" : "06400",
-    "country": "France"
+    "country": "France",
+    "latitude": 37.773972,
+    "longitude": -122.431297
   }
 ]

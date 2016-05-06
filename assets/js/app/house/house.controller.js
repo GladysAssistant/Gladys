@@ -89,15 +89,11 @@
         }
 
         function resetNewHouseFields() {
-            vm.newHouse.name = "";
-            vm.newHouse.address = "";
-            vm.newHouse.city = "";
-            vm.newHouse.postcode = "";
-            vm.newHouse.country = "";
+            vm.newHouse = {};
         }
 
         function resetNewRoomFields() {
-            vm.newRoom.name = "";
+            vm.newRoom = {};
         }
     }
 })();

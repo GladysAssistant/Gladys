@@ -50,31 +50,15 @@ module.exports = {
         },
 
         latitude: {
-            type: 'float'
+            type: 'float',
+            required: true
         },
 
         longitude: {
-            type: 'float'
+            type: 'float',
+            required: true
         }
 
-    },
-
-    beforeCreate: function(values, next) {
-
-        // If no latitude and longitude are set, get them
-
-        if (!values.latitude && !values.longitude && sails.config.environment == 'production') {
-            var address = values.address + ' ' + values.postcode + ' ' + values.city + ' ' + values.country;
-            AddressToCoordinateService.geocode(address, function(err, latitude, longitude) {
-                if (!err) {
-                    values.latitude = latitude;
-                    values.longitude = longitude;
-                }
-                next();
-            });
-        } else {
-            next();
-        }
     }
 
 };
