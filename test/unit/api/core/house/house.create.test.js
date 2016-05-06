@@ -13,6 +13,8 @@ describe('House', function() {
             postcode: '90265',
             city: 'Malibu, CA',
             country: 'USA',
+            latitude: 20,
+            longitude: 10,
             uuid: '22f978ff-dfb8-466d-a767-0b09431eb1dd'
           };
           

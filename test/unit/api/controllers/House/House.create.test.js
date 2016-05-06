@@ -12,6 +12,8 @@ describe('HouseController', function() {
             address: '10880 Malibu Point',
             city: 'Malibu',
             postcode: 90265,
+            latitude: 20,
+            longitude: 10,
             country: 'US'
         };
         
