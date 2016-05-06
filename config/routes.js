@@ -55,6 +55,13 @@ module.exports.routes = {
   'get /actiontype': 'ActionType.index',
   'get /actiontype/:id/params': 'ActionType.getParams',
   
+  
+  // Area
+  'get /area': 'AreaController.index',
+  'post /area': 'AreaController.create',
+  'patch /area/:id': 'AreaController.update',
+  'delete /area/:id': 'AreaController.delete',
+  
   // Box
   'get /box': 'BoxController.index',
   'post /box': 'BoxController.create',
@@ -145,6 +152,13 @@ module.exports.routes = {
   'get /statetype/:id/stateparam': 'StateTypeController.getStateParams',
   
   
+  // Token
+  'get /token': 'TokenController.index',
+  'post /token': 'TokenController.create',
+  'patch /token/:id': 'TokenController.update',
+  'delete /token/:id': 'TokenController.delete',
+  
+  
   // Update
   'get /update/verify': 'UpdateController.verify',
   'get /update/event': 'UpdateController.updateEvents',
@@ -160,9 +174,6 @@ module.exports.routes = {
   'delete /user/:id': 'UserController.delete',
   'get /user/whoami': 'UserController.whoami',
   
-  
-  // Weather
-  'get /weather': 'WeatherController.index'
 
 
 

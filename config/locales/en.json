@@ -120,6 +120,16 @@
   "scenario-save": "Save scenario",
   "scenario-delete": "Delete",
   "scenario-conditions-explained": "You can add as much conditions as you want, your actions will be executed only if all conditions are fulfilled.",
-  "scenario-actions-explained": "You can add as much actions as you want. Your actions will be executed in parallel. If you want more control, don't hesitate to create a script !"
-
+  "scenario-actions-explained": "You can add as much actions as you want. Your actions will be executed in parallel. If you want more control, don't hesitate to create a script !",
+  "area-box-title": "Zones",
+  "area-box-description": "Zones are defined places. When you enter into a specific zone, it creates an event in Gladys. It allows you to create scenarios like \"When I'm back at home\" => Do a specific action.",
+  "area-name": "Name",
+  "area-latitude": "Latitude",
+  "area-longitude": "Longitude",
+  "area-radius": "Radius (meters)",
+  "area-action": "Action",
+  "area-new": "New",
+  "area-delete": "Delete",
+  "house-box-title": "Houses",
+  "room-box-title": "Rooms"
 }

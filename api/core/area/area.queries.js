@@ -17,5 +17,7 @@ module.exports = {
     WHERE user = ?
     ORDER BY datetime DESC
     LIMIT 1;
-  `
+  `,
+  delete: 'DELETE FROM area WHERE id = ?;',
+  get: 'SELECT * FROM area WHERE user = ?;'
 };

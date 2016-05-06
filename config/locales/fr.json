@@ -283,5 +283,16 @@
   "scenario-save": "Enregister scénario",
   "scenario-delete": "Supprimer",
   "scenario-conditions-explained": "Vous pouvez ajouter autant de conditions à votre scénario que vous le souhaitez. Les actions ne seront exécutées que si toutes les conditions sont réunies.",
-  "scenario-actions-explained": "Vous pouvez ajouter autant d'actions que vous le souhaitez. Ces actions seront exécutées en parallèle pour être le plus performant possible, si vous souhaitez contrôler plus finement votre suite d'actions, vous pouvez faire un script !"
+  "scenario-actions-explained": "Vous pouvez ajouter autant d'actions que vous le souhaitez. Ces actions seront exécutées en parallèle pour être le plus performant possible, si vous souhaitez contrôler plus finement votre suite d'actions, vous pouvez faire un script !",
+  "area-box-title": "Zones",
+  "area-box-description": "Les zones sont des lieux qui déclenchent des évènements lorsque vous rentrez dans leur rayon. Pratique pour faire des scénarios \"Quand j'arrive vers chez moi\" => Faire une action.",
+  "area-name": "Nom",
+  "area-latitude": "Latitude",
+  "area-longitude": "Longitude",
+  "area-radius": "Rayon (mètre)",
+  "area-action": "Action",
+  "area-new": "Nouveau",
+  "area-delete": "Supprimer",
+  "house-box-title": "Maisons",
+  "room-box-title": "Pièces"
 }
