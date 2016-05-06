@@ -18,6 +18,10 @@ module.exports = function (params){
         .then(function(){
             sails.log.info(`Installing NPM dependencies for module ${params.slug}`);
             return npmInstall(path);
+        })
+        .then(function(){
+           params.status = 1;
+           return Module.create(params); 
         });
 };
 
