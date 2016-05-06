@@ -5,6 +5,7 @@ module.exports.update = {
     modesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/modes/',
     sentencesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/sentences/',
     actionTypeUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/actions/',
+    categoryBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/categories/',
     getLastVersionUrl: 'https://developer.gladysproject.com/api/gladys/version',
     icon: 'fa fa-refresh',
     iconColor: 'bg-light-blue',

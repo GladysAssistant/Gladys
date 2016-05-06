@@ -77,7 +77,7 @@ module.exports.routes = {
   
   //Category
   'get /category': 'CategoryController.index',
-  'get /category/:id/eventtype': 'CategoryController.getEventTypes',
+  'get /category/:service/eventtype': 'CategoryController.getEventTypes',
   
   // Device 
   'get /device': 'DeviceController.index',

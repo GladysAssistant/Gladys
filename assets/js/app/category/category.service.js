@@ -30,8 +30,8 @@
             return $http({method: 'GET', url: '/category' });
         }
         
-        function getEventTypes(id){
-            return $http({method: 'GET', url: '/category/' + id + '/eventtype' });
+        function getEventTypes(service){
+            return $http({method: 'GET', url: '/category/' + service + '/eventtype' });
         }
     }
 })();

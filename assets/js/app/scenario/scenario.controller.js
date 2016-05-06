@@ -30,12 +30,11 @@
         vm.createLauncher = createLauncher;
         vm.removeState = removeState;
         vm.removeAction = removeAction;
+        vm.initialiseVar = initialiseVar;
         vm.nextStep = nextStep;
         
         vm.actionTypes = [];
         vm.launchers = [];
-        vm.states = [];
-        vm.actions = [];
         
         activate();
 
@@ -50,13 +49,10 @@
         
         function initialiseVar(){
             vm.newLauncher = {};
-            vm.newLauncher.parametre = '';
             vm.newState = {};
-            vm.newState.parametre = '';
             vm.newAction = {};
-            vm.newAction.parametre = '';
-            vm.savedStates = []; 
-            vm.savedActions = [];
+            vm.states = [];
+            vm.actions = [];
             vm.step = 1;
         }
         
@@ -77,8 +73,8 @@
               });
         }
         
-        function selectCategory(id){
-            return categoryService.getEventTypes(id)
+        function selectCategory(service){
+            return categoryService.getEventTypes(service)
               .then(function(data){
                  vm.eventTypes = data.data; 
                  vm.step = 2;

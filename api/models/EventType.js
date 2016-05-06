@@ -34,7 +34,7 @@ module.exports = {
         },
         
         category: {
-            model: 'Category'
+            type: 'string'
         },
 
         service: {

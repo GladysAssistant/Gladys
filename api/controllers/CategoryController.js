@@ -20,7 +20,7 @@ module.exports = {
     }, 
     
     getEventTypes: function(req, res, next){
-      gladys.eventType.getByCategory({category: req.params.id})
+      gladys.eventType.getByCategory({category: req.params.service})
         .then(function(eventTypes){
             return res.json(eventTypes);
         })
