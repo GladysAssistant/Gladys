@@ -118,6 +118,7 @@
   "scenario-actions": "Actions",
   "scenario-action-add": "Add",
   "scenario-save": "Save scenario",
+  "scenario-delete": "Delete",
   "scenario-conditions-explained": "You can add as much conditions as you want, your actions will be executed only if all conditions are fulfilled.",
   "scenario-actions-explained": "You can add as much actions as you want. Your actions will be executed in parallel. If you want more control, don't hesitate to create a script !"
 

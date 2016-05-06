@@ -174,7 +174,7 @@
                                     </div>
                                     
                                    <div class="form-group">
-                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm"><%= __('scenario-delete') %></button>
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeState($index, state.id);"><%= __('scenario-delete') %></button>
                                     </div>
                                     
                                    
@@ -248,7 +248,7 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm"><%= __('scenario-delete') %></button>
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeAction($index, action.id);"><%= __('scenario-delete') %></button>
                                     </div>
                                    
                                 </form>

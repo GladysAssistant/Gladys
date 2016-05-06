@@ -28,6 +28,8 @@
         vm.insertAll = insertAll;
         vm.deleteLauncher = deleteLauncher;
         vm.createLauncher = createLauncher;
+        vm.removeState = removeState;
+        vm.removeAction = removeAction;
         vm.nextStep = nextStep;
         
         vm.actionTypes = [];
@@ -170,6 +172,14 @@
                   vm.actions.push(newAction);
               });
             
+        }
+        
+        function removeState(index, id){
+            vm.states.splice(index, 1);
+        }
+        
+        function removeAction(index, id){
+            vm.actions.splice(index, 1);
         }
         
         function deleteLauncher(index, id){

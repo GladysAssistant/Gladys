@@ -281,6 +281,7 @@
   "scenario-actions": "Actions",
   "scenario-action-add": "Ajouter",
   "scenario-save": "Enregister scénario",
+  "scenario-delete": "Supprimer",
   "scenario-conditions-explained": "Vous pouvez ajouter autant de conditions à votre scénario que vous le souhaitez. Les actions ne seront exécutées que si toutes les conditions sont réunies.",
   "scenario-actions-explained": "Vous pouvez ajouter autant d'actions que vous le souhaitez. Ces actions seront exécutées en parallèle pour être le plus performant possible, si vous souhaitez contrôler plus finement votre suite d'actions, vous pouvez faire un script !"
 }
