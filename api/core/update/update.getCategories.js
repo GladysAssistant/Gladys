@@ -9,10 +9,9 @@ module.exports = function(user) {
         .then(function(categories) {
             if(categories === 'Not Found') return Promise.reject(new Error('Not Found'));
             
-            // we put conccurrency of 1 to insert categories in order so it looks
-            // nice :)
-            return Promise.map(categories, function(category){
+            // promise.each so it's inserted in the right order
+            return Promise.each(categories, function(category){
                 return gladys.category.create(category);
-            }, {concurrency: 1});
+            });
         });
 };
