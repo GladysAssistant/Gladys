@@ -9,10 +9,7 @@ module.exports = function(user) {
              if(sentences === 'Not Found') return Promise.reject('Not Found');
              
             return Promise.map(sentences, function(sentence){
-                return gladys.sentence.create(sentence)
-                  .catch(function(err){
-                     return Promise.resolve(); 
-                  });
+                return gladys.sentence.create(sentence);
             });
         });
 };
