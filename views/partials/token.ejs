@@ -23,8 +23,8 @@
                                 <td><button ng-click="vm.destroyToken($index, token.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
                             </tr>
                             <tr>
-                                <td><input type="text" ng-model="vm.newTokenName" class="form-control" placeholder="<%= __('Name') %>"/></td>
-                                <td><button class="btn btn-success btn-sm" ng-click="vm.createToken()"><%= __('New') %></button></td>
+                                <td><input type="text" ng-model="vm.newToken.name" class="form-control" placeholder="<%= __('Name') %>"/></td>
+                                <td><button class="btn btn-success btn-sm" ng-click="vm.createToken();"><%= __('New') %></button></td>
                             </tr>
                         </tbody>
                     </table>

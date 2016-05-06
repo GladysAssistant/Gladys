@@ -7,7 +7,7 @@ module.exports = function create(params){
   var tokenObj = {
     name : params.name,
     value: token,
-    user : params.user.id 
+    user : params.user
   };
 
   return Token.create(tokenObj);
