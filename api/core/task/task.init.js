@@ -2,6 +2,7 @@
 module.exports = function(){
   
   // tasks started in dev and prod
+  
   gladys.script.init();
   
   // load gladys brain
@@ -22,6 +23,11 @@ module.exports = function(){
   
   // checking for update now      
   gladys.update.checkUpdate();
+  
+  
+  // install all modules not 
+  // fully installed
+  gladys.module.init();
 
   // Check for update interval
   setInterval(function(){
