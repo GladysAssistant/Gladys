@@ -294,5 +294,6 @@
   "area-new": "Nouveau",
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
-  "room-box-title": "Pièces"
+  "room-box-title": "Pièces",
+  "token-description": "Les tokens sont des clés qui permettent d'accéder à l'API de Gladys à distance en faisant des requêtes HTTP avec le token en paramètre. Exemple, pour récupérer les maisons : GET http://GLADYS_URL/house?token=VOTRE_TOKEN."
 }

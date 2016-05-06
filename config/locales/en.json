@@ -131,5 +131,6 @@
   "area-new": "New",
   "area-delete": "Delete",
   "house-box-title": "Houses",
-  "room-box-title": "Rooms"
+  "room-box-title": "Rooms",
+  "token-description": "Token are keys allowing you to contact Gladys HTTP API remotely. For example, to get houses : GET http://GLADYS_URL/house?token=YOUR_TOKEN"
 }
