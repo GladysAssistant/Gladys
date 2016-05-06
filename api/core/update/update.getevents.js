@@ -9,6 +9,7 @@ module.exports = function(user) {
             if(events === 'Not Found') return Promise.reject(new Error('Not Found'));
             
             return Promise.map(events, function(event){
+
                 return gladys.eventType.create(event)
                   .then(function(newEventType){
                       
@@ -22,9 +23,6 @@ module.exports = function(user) {
                   .spread(function(newEventType, params){
                       newEventType.params = params;
                       return newEventType;
-                  })
-                  .catch(function(err){
-                     return Promise.resolve(); 
                   });
             });
         });

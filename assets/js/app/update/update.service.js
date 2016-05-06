@@ -24,6 +24,7 @@
             updateModes: updateModes,
             updateBoxTypes: updateBoxTypes,
             updateSentences: updateSentences,
+            updateCategories: updateCategories
         };
 
         return service;
@@ -46,6 +47,10 @@
         
         function updateSentences(){
             return $http({method: 'GET', url: '/update/sentence'});
+        }
+        
+        function updateCategories(){
+            return $http({method: 'GET', url: '/update/category'});
         }
     }
 })();

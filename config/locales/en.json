@@ -81,6 +81,8 @@
   "installation-downloading-sentences": "Downloading sentences...",
   "installation-downloading-events": "Downloading events...",
   "installation-downloading-boxs": "Downloading boxs...",
+  "installation-downloading-categories": "Downloading categories...",
+  "installation-downloading-states": "Downloading conditions...",
   "installation-training-brain": "Training neural network...",
   "installation-checking-for-updates": "Checking for updates...",
   "installation-configuration-success": "I just configured myself successfully ! You can move to next step :)",

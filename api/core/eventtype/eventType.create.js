@@ -8,7 +8,7 @@ module.exports = function(type) {
             if (types.length) {
 
                 // event already exist
-                return Promise.resolve(type);
+                return Promise.resolve(types[0]);
             } else {
                 sails.log.info('Inserting new Event : ' + type.code);
                 return EventType.create(type);

@@ -166,6 +166,7 @@ module.exports.routes = {
   'get /update/mode': 'UpdateController.updateModes',
   'get /update/sentence': 'UpdateController.updateSentences',
   'get /update/box': 'UpdateController.updateBoxTypes',
+  'get /update/category': 'UpdateController.updateCategories',
   
   //User
   'get /user': 'UserController.index',

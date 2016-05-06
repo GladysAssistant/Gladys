@@ -243,6 +243,8 @@
   "installation-downloading-modes": "Téléchargement des modes...",
   "installation-downloading-sentences": "Téléchargement des commandes...",
   "installation-downloading-events": "Téléchargement des évènements...",
+  "installation-downloading-categories": "Téléchargement des catégories...",
+  "installation-downloading-states": "Téléchargement des conditions...",
   "installation-downloading-boxs": "Téléchargement des boxs...",
   "installation-training-brain": "Entrainement du réseau de neurones...",
   "installation-checking-for-updates": "Vérification des mises à jours...",

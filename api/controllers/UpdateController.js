@@ -55,5 +55,17 @@ module.exports = {
               return res.json(result); 
            })
            .catch(next);
-     }
+     },
+     
+     /**
+      * Check for new categories
+      */
+      updateCategories: function(req, res, next){
+          gladys.update.getCategories(req.session.User)
+            .then(function(result){
+                return res.json(result); 
+            })
+            .catch(next);
+      }
+      
 };
