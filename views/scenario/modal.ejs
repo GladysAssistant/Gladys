@@ -149,6 +149,8 @@
                             <div class="well" ng-repeat="state in vm.states">
                                 
                                  <form class="form-horizontal">
+                                     
+                                    <h4>{{state.name}}</h4>
                                    
                                     <div class="form-group" ng-repeat="stateParam in state.params">
                                         <label for="inputEmail3" class="col-sm-2 control-label">{{stateParam.name}} :</label>
@@ -169,6 +171,10 @@
                                             
                                             <input ng-show="!stateParam.options" id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
                                        </div>
+                                    </div>
+                                    
+                                   <div class="form-group">
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm"><%= __('scenario-delete') %></button>
                                     </div>
                                     
                                    
@@ -239,6 +245,10 @@
                                             
                                             <input ng-show="!actionTypeParam.options" id="actionTypeParam" type="text" ng-model="actionTypeParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm"><%= __('scenario-delete') %></button>
                                     </div>
                                    
                                 </form>
