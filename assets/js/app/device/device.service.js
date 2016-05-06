@@ -22,6 +22,7 @@
             get: get,
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
+            getDeviceTypeByRoom: getDeviceTypeByRoom,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
             updateDeviceType: updateDeviceType,
@@ -66,6 +67,10 @@
         
         function exec(deviceType, value){
             return $http({method: 'POST', url: '/devicetype/' + deviceType.id + '/exec', data: {value: value}});
+        }
+        
+        function getDeviceTypeByRoom(){
+            return $http({method: 'GET', url: '/devicetype/room'});
         }
         
         // all about deviceStates

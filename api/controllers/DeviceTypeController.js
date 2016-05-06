@@ -42,6 +42,15 @@ module.exports = {
                 return res.json(state);
             })
             .catch(next);
+  },
+  
+  
+  getByRoom: function(req, res, next){
+      gladys.deviceType.getByRoom()
+        .then(function(roomsDeviceTypes){
+           return res.json(roomsDeviceTypes); 
+        })
+        .catch(next);
   }
   
 };

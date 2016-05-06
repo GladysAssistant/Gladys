@@ -38,6 +38,7 @@
     function activate() {
       getDevices();
       getRooms();
+      getDeviceTypesByRoom();
       waitForNewValue();
       return ;
     }
@@ -48,6 +49,13 @@
         .then(function(data){
           vm.devices = data.data;
         });
+    }
+    
+    function getDeviceTypesByRoom(){
+       return deviceService.getDeviceTypeByRoom()
+         .then(function(data){
+            vm.roomDeviceTypes = data.data; 
+         });
     }
     
     function getRooms(){

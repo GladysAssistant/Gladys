@@ -17,14 +17,83 @@
                     
                      <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('devices-list') %></a></li>
-              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('devices-data') %></a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('devices-control') %></a></li>
+              <li><a href="#tab_2" data-toggle="tab" aria-expanded="true"><%= __('devices-list') %></a></li>
+              <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('devices-data') %></a></li>
 
               <li class="pull-right"><a href="#" class="ng-cloak" ng-show="vm.saving"><%= __('devices-saving') %>...</a></li>
             </ul>
             <div class="tab-content">
+                
               <div class="tab-pane active" id="tab_1">
-                    <!-- BEGINNING OF TAB 1 -->
+                  
+                  
+                  <div class="row">
+                    
+                    <div class="col-centered col-md-4" ng-repeat="room in vm.roomDeviceTypes">
+                    
+                    <div class="box box-default ng-cloak" >
+                        
+                        <div class="box-header with-border">
+                            <h3 class="box-title">{{room.name}}</h3>
+                        </div>
+                        
+                        <div class="box-body table-responsive">
+
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('device-name') %></th>
+                                                <th><%= __('device-action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="type in room.deviceTypes" class="ng-cloak">
+                                                <td>{{type.name}}</td>
+                                                <td>
+                                                    <!-- If the deviceType is a sensor, display last data -->
+                                                    <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
+                                                    
+                                                    <!-- If the deviceType is not a sensor and is not a binary, display input field -->
+                                                     <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                            <input 
+                                                                type="number" class="form-control input-sm" 
+                                                                ng-model="type.lastValue" 
+                                                            />
+                                                            <span class="input-group-btn">
+                                                            <button class="btn btn-success btn-sm" ng-click="vm.changeValue(type, type.lastValue);" ><%= __('devices-types-changevalue') %></button> 
+                                                            </span>
+                                                            </div>
+                                                        </div>
+                                                     </form>    
+                                                    <!-- If the deviceType is not a sensor and is  a binary, display on/off button -->
+                                                    <button ng-show="!type.sensor && type.type == 'binary'" ng-click="vm.changeValue(type, !type.lastValue);" 
+                                                            class="btn {{ type.lastValue && 'btn-danger' || 'btn-success' }} btn-sm">
+                                                            {{type.lastValue && '<%= __('devices-types-off') %>' || '<%= __('devices-types-on') %>' }}
+                                                    </button>
+                                                </td>
+                                               </tr>
+                                        </tbody>
+                                    </table>
+
+                        </div>     
+                        
+                        
+                        
+                        
+                    </div>
+                    <!-- box-->
+                   
+                    </div>
+                   </div>
+                   <!-- row -->
+              </div>
+              
+              
+              <div class="tab-pane" id="tab_2">
+                    <!-- BEGINNING OF TAB 2 -->
                         <div class="box-body table-responsive">
 
                                     <table id="example2" class="table table-bordered table-hover">
@@ -60,12 +129,12 @@
 
                         </div>          
                     
-                    <!-- END OF TAB 1 -->
+                    <!-- END OF TAB 2 -->
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2" data-ng-controller="DeviceStateCtrl as vm">
+              <div class="tab-pane" id="tab_3" data-ng-controller="DeviceStateCtrl as vm">
                   
-                  <!-- BEGINNING OF TAB 2 -->
+                  <!-- BEGINNING OF TAB 3 -->
                     <div class="row">
                         <div class="col-md-8 pull-right">
                             <form class="form-inline">
@@ -101,7 +170,7 @@
                                 </canvas> 
                       </div>
                      
-                  <!-- END OF TAB 2 -->
+                  <!-- END OF TAB 3 -->
               </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="tab_3">
