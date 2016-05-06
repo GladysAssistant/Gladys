@@ -1,3 +1,4 @@
+module.exports.action = require('./script.action.js');
 module.exports.create = require('./script.create.js');
 module.exports.delete = require('./script.delete.js');
 module.exports.exec = require('./script.exec.js');

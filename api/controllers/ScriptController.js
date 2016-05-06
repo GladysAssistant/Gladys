@@ -59,8 +59,7 @@ module.exports = {
     
     exec: function (req, res, next){
         var script = {id: req.params.id};
-        var user = req.session.User;
-        gladys.script.exec({script, user})
+        gladys.script.exec(script)
               .then(function(result){
                   return res.json(result);
               })

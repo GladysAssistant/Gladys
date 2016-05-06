@@ -5,7 +5,7 @@ module.exports = {
     WHERE eventtype.code = ? AND active = 1;
   `,
     getActionsLauncher: `
-  SELECT actiontype.*, action.id AS actionId
+  SELECT actiontype.service, actiontype.function, actiontype.name, action.id as actionId
   FROM action 
   INNER JOIN actiontype ON action.action = actiontype.id
   WHERE launcher = ?;

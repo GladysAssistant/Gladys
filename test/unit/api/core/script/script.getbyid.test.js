@@ -5,16 +5,12 @@ describe('Script', function() {
 
   describe('getById', function() {
     
-    it('should return a script', function (done) {
-     	var user = {
-             id: 1
-         };
-         
+    it('should return a script', function (done) {         
          var script = {
              id: 1
          };
         
-        gladys.script.getById({user, script})
+        gladys.script.getById(script)
             .then(function(result){
                 
                 validateScript(result);
@@ -24,15 +20,12 @@ describe('Script', function() {
     });
     
     it('should return error, script not found', function (done) {
-     	var user = {
-             id: 1
-         };
-         
+
          var script = {
              id: 12222
          };
         
-        gladys.script.getById({user, script})
+        gladys.script.getById(script)
             .then(function(result){
                 
                 done('No error detected');

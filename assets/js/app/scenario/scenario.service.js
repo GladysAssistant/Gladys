@@ -35,6 +35,10 @@
         // evaluator
         function generateTemplate(params){
             
+            if(!params){
+                return '';
+            }
+            
             // we initialize the template
             var template = '';
             

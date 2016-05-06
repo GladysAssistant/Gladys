@@ -4,11 +4,13 @@ var Promise = require('bluebird');
 
 module.exports = function(params) {
     
-    sails.log.info(`New event : ${params.code}`);
+    sails.log.info(`Scenario : Trigger : New event : ${params.code}`);
 
     // we get all launchers with this code
     return gladys.utils.sql(queries.getLaunchersWithCode, [params.code])
         .then(function(launchers) {
+            
+            sails.log.info(`Scenario : Trigger : Found ${launchers.length} launchers with code ${params.code}.`);
 
             // foreach launcher, we verify if the condition is satisfied
             // and if yes, start all the actions
@@ -32,7 +34,9 @@ function verifyAndStart(launcher, scope) {
             });
         })
         .then(function(conditions) {
-
+            
+            sails.log.info(`Scenario : Trigger : Conditions verified, starting all actions.`);
+            
             // it's ok, so we start all the actions
             var obj = {
                 launcher: launcher,
@@ -41,11 +45,13 @@ function verifyAndStart(launcher, scope) {
             return gladys.scenario.exec(obj);
         })
         .catch(function(err) {
-
+            
             // if the error is not a conditions_not_verified error, 
             // we propagate the error
             if (err.message !== 'conditions_not_verified') {
                 sails.log.error(err);
+            } else {
+                sails.log.info(`Scenario : Trigger : Condition not verified.`);
             }
         });
 }
@@ -57,6 +63,8 @@ function verifyLauncherCondition(launcher, scope) {
     try {
         var result = template('${' + launcher.condition_template + '}', scope);
         if (result == 'true') {
+            
+            sails.log.info(`Scenario : Trigger : Launcher condition verified.`);  
             return Promise.resolve(true);
         } else  {
             return Promise.reject(new Error('conditions_not_verified'));

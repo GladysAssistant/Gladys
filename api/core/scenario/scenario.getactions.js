@@ -18,7 +18,7 @@ function getParams(actions) {
     return Promise.map(actions, function(action, index) {
 
         // we get the params
-        return gladys.utils.sql(queries.getActionParams, [action.id])
+        return gladys.utils.sql(queries.getActionParams, [action.actionId])
             .then(function(actionparams) {
                 
                 // we init the param object

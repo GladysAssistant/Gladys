@@ -3,11 +3,11 @@ var Promise = require('bluebird');
 
 module.exports = function(options) {
 
-    if (!options || !options.script || !options.script.id || !options.user || !options.user.id) {
+    if (!options || !options.id) {
         return Promise.reject(new Error('Wrong parameters'));
     }
 
-    return gladys.utils.sql(queries.getById, [options.script.id, options.user.id])
+    return gladys.utils.sql(queries.getById, [options.id])
         .then(function(scripts) {
             if (scripts.length === 0) {
                 return Promise.reject(new Error('Script not found'));

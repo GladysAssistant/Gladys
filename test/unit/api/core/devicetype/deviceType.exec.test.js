@@ -40,7 +40,7 @@ describe('DeviceType', function() {
     it('should return error 404, deviceType not found', function (done) {
         
         var obj = {
-            devicetype: 2798787,
+            deviceType: 2798787,
             value: 1  
         };
         
@@ -57,7 +57,7 @@ describe('DeviceType', function() {
         
         
         var obj = {
-            devicetype: 1,
+            deviceType: 1,
             value: 120  
         };
         

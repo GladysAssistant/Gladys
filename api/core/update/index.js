@@ -1,3 +1,4 @@
+module.exports.getActions = require('./update.getActions.js');
 module.exports.getEvents = require('./update.getevents.js');
 module.exports.getLastVersion = require('./update.getlastversion.js');
 module.exports.checkUpdate = require('./update.checkUpdate.js');

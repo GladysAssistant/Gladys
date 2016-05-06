@@ -14,5 +14,13 @@
         "service": "TestService",
 		"faIcon": "fa fa-wrench", 
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 3,
+		"code": "devicetype-new-value",
+		"name": "DeviceType new Value",
+		"service": "DeviceType",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]

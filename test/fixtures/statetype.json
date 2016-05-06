@@ -1,11 +1,13 @@
 [
     {
+        "uuid": "8e4177a4-c9cd-4d47-ae21-b6a94f5f7e17",
         "id": 1,
         "name": "Test condition service",
         "service": "TestService",
         "function": "getValue"
     },
     {
+        "uuid": "9a636b01-ad88-4c69-94c8-f08fa2f0a3e3",
         "id": 2,
         "name": "Test condition service",
         "service": "UNKNOWSERVICE",

@@ -8,10 +8,15 @@ module.exports = function(params) {
     }
     
     sails.log.info(`Executing action "${params.actiontype.name}"`);
+    
+    var options = {
+        params: params.actiontype.params,
+        scope: params.scope
+    };
 
     // if it's a gladys core function
     if (gladys[params.actiontype.service] && typeof gladys[params.actiontype.service][params.actiontype.function] == "function") {
-        return gladys[params.actiontype.service][params.actiontype.function](params);
+        return gladys[params.actiontype.service][params.actiontype.function](options);
     }
 
     // testing if it's a module
@@ -22,5 +27,5 @@ module.exports = function(params) {
     }
 
     // executing action
-    return gladys.modules[params.actiontype.service][params.actiontype.function](params);
+    return gladys.modules[params.actiontype.service][params.actiontype.function](options);
 };

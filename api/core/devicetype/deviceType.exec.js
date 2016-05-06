@@ -46,7 +46,7 @@ function exec(param) {
         .then(function() {
 
             // creating DeviceState
-            return DeviceState.create(param);
+            return gladys.deviceState.create(param);
         })
         .then(function(deviceState){
            

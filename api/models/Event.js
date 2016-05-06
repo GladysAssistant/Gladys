@@ -14,7 +14,7 @@ module.exports = {
             required: true
         },
 
-        param: {
+        value: {
             type: 'string'
         },
 
