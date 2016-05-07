@@ -1,5 +1,5 @@
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="AreaCtrl as vm">
+<div class="box box-default" data-ng-controller="ParamCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('param-box-title') %> <small ng-show="vm.saving"><%= __('param-box-saving') %></small></h3>
     </div> 
@@ -19,7 +19,7 @@
                     <tr ng-repeat="param in vm.params" class="ng-cloak">
                         <td>{{param.name}}</td>
                         <td><input type="text" ng-model="param.value" ng-model-options='{ debounce: 500 }' ng-change="vm.updateParam(param.name, param);" class="form-control" /></td>
-                        <td><button ng-click="vm.deleteParam($index, area.id)" class= "btn btn-danger btn-sm"><%= __('param-delete') %></button></td>
+                        <td><button ng-click="vm.deleteParam($index, param.name)" class= "btn btn-danger btn-sm"><%= __('param-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" ng-model="vm.newParam.name" /></td>

@@ -300,5 +300,13 @@
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
   "room-box-title": "Pièces",
-  "token-description": "Les tokens sont des clés qui permettent d'accéder à l'API de Gladys à distance en faisant des requêtes HTTP avec le token en paramètre. Exemple, pour récupérer les maisons : GET http://GLADYS_URL/house?token=VOTRE_TOKEN."
+  "token-description": "Les tokens sont des clés qui permettent d'accéder à l'API de Gladys à distance en faisant des requêtes HTTP avec le token en paramètre. Exemple, pour récupérer les maisons : GET http://GLADYS_URL/house?token=VOTRE_TOKEN.",
+  "parameters-param": "Paramètres",
+  "param-box-title": "Paramètres",
+  "param-box-description": "Ces paramètres sont des associations clés-valeurs (identifiés par un nom unique) qui permettent aux modules d'enregister des paramètres (clés d'APIs, tokens, etc...) en base sans forcément créer une table pour cela, et sans demander à l'utilisateur de modifier des fichiers de configs. Ces paramètres sont mis en cache en RAM afin d'avoir des performances maximales lors de l'accès aux valeurs, ainsi il ne faut pas stocker de données lourdes dedans.",
+  "param-name": "Clé",
+  "param-value": "Valeur",
+  "param-action": "Action",
+  "param-delete": "Supprimer",
+  "param-new": "Nouveau"
 }

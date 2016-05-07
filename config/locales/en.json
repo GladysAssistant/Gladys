@@ -137,5 +137,13 @@
   "area-delete": "Delete",
   "house-box-title": "Houses",
   "room-box-title": "Rooms",
-  "token-description": "Token are keys allowing you to contact Gladys HTTP API remotely. For example, to get houses : GET http://GLADYS_URL/house?token=YOUR_TOKEN"
+  "token-description": "Token are keys allowing you to contact Gladys HTTP API remotely. For example, to get houses : GET http://GLADYS_URL/house?token=YOUR_TOKEN",
+  "parameters-param": "Parameters",
+  "param-box-title": "Parameters",
+  "param-box-description": "Parameters is a key-value association table in database which allows modules to store API keys, tokens without needing to create a specific table or asking the user to modify config files. Each key is unique. These key-value are cached in RAM for max performance, so please don't save heavy data in there.",
+  "param-name": "Key",
+  "param-value": "Value",
+  "param-action": "Action",
+  "param-delete": "Delete",
+  "param-new": "New"
 }
