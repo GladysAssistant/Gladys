@@ -2,6 +2,7 @@ var os = require('os');
 var Promise = require('bluebird');
 
 module.exports = function(){
+   
    var infos = {
      hostname: os.hostname(),
      type: os.type(),
@@ -15,5 +16,10 @@ module.exports = function(){
      cpus: os.cpus(),
      networkInterfaces: os.networkInterfaces()  
    };
+   
+   var usedMemory = infos.totalmem - infos.freemem;
+   var percentMemoryUsed = 100*usedMemory/infos.totalmem;
+   infos.percentMemoryUsed = percentMemoryUsed;
+   
    return Promise.resolve(infos);
 };

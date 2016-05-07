@@ -75,6 +75,7 @@ module.exports.policies = {
   Speak : ['checkToken'],
   State : ['checkToken'],
   StateType : ['checkToken'],
+  System : ['checkToken'],
   Timer: ['checkToken'],
   Token : ['checkToken'],
   Update: ['checkToken'],

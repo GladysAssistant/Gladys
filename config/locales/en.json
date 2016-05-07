@@ -145,5 +145,16 @@
   "param-value": "Value",
   "param-action": "Action",
   "param-delete": "Delete",
-  "param-new": "New"
+  "param-new": "New",
+  "system-box-title": "System",
+  "system-box-description": "Welcome in Gladys parameters ! Here you can see your system and configure your installation.",
+  "system-name": "Name",
+  "system-infos": "Infos",
+  "system-hostname": "Hostname",
+  "system-type": "Type",
+  "system-plateform": "Plateform",
+  "system-arch": "Architecture",
+  "system-release": "Release",
+  "system-uptime": "Uptime",
+  "system-memory-used": "Memory used"
 }

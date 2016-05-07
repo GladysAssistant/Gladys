@@ -159,6 +159,10 @@ module.exports.routes = {
   'get /statetype/:id/stateparam': 'StateTypeController.getStateParams',
   
   
+  // System
+  'get /system': 'SystemController.index',
+  
+  
   // Token
   'get /token': 'TokenController.index',
   'post /token': 'TokenController.create',

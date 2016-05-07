@@ -19,6 +19,8 @@ describe('System', function() {
                     result.should.have.property('totalmem');
                     result.should.have.property('freemem');
                     result.should.have.property('cpus');
+                    result.should.have.property('percentMemoryUsed');
+                    
                     done();
                 });
     });
