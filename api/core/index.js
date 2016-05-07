@@ -40,6 +40,7 @@ gladys.load = function load() {
     gladys.stateParam = require('./stateparam/index.js');
     gladys.stateType = require('./statetype/index.js');
     gladys.sun = require('./sun/index.js');
+    gladys.system = require('./system/index.js');
     gladys.task = require('./task/index.js');
     gladys.token = require('./token/index.js');
     gladys.update = require('./update/index.js');
