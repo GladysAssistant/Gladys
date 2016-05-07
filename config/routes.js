@@ -127,6 +127,12 @@ module.exports.routes = {
   // Notification
   'get /notification': 'NotificationController.index',
   
+  // Param
+  'get /param': 'ParamController.index',
+  'post /param': 'ParamController.create',
+  'patch /param/:name': 'ParamController.update',
+  'delete /param/:name': 'ParamController.delete',
+  
   // Script
   'get /script': 'ScriptController.index',
   'post /script': 'ScriptController.create',
