@@ -11,7 +11,8 @@ describe('Param', function() {
                 .then(function(value){
                     value.should.equal('Design is not just what it looks like and feels like. Design is how it works.');
                     done();
-                });
+                })
+                .catch(done);
     });
     
   });
