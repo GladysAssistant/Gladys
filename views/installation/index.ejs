@@ -155,9 +155,10 @@
                           <p ng-show="vm.downloadStep > 1"><%= __('installation-downloading-sentences') %></p>
                           <p ng-show="vm.downloadStep > 3"><%= __('installation-downloading-events') %></p>
                           <p ng-show="vm.downloadStep > 2"><%= __('installation-downloading-boxs') %></p>
-                          <p ng-show="vm.downloadStep > 4"><%= __('installation-training-brain') %></p>
-                          <p ng-show="vm.downloadStep > 5"><%= __('installation-checking-for-updates') %></p>
-                          <p ng-show="vm.downloadStep > 5"><%= __('installation-configuration-success') %></p>
+                          <p ng-show="vm.downloadStep > 4"><%= __('installation-downloading-categories') %></p>
+                          <p ng-show="vm.downloadStep > 5"><%= __('installation-training-brain') %></p>
+                          <p ng-show="vm.downloadStep > 6"><%= __('installation-checking-for-updates') %></p>
+                          <p ng-show="vm.downloadStep > 6"><%= __('installation-configuration-success') %></p>
                           
                           <p class="bg-danger" style="padding:15px;" ng-show="vm.downloadError">{{vm.downloadError}}</p>
                           <div class="progress progress-sm active">
@@ -221,6 +222,8 @@
     <script src="/js/app/actiontype/actiontype.service.js"></script>
     <script src="/js/app/alarm/alarm.controller.js"></script>
     <script src="/js/app/alarm/alarm.service.js"></script>
+    <script src="/js/app/area/area.controller.js"></script>
+    <script src="/js/app/area/area.service.js"></script>
     <script src="/js/app/box/box.controller.js"></script>
     <script src="/js/app/box/box.service.js"></script>
     <script src="/js/app/boxtype/boxtype.service.js"></script>
@@ -252,6 +255,8 @@
     <script src="/js/app/notification/notification.controller.js"></script>
     <script src="/js/app/notification/notification.service.js"></script>
     <script src="/js/app/now/now.controller.js"></script>
+    <script src="/js/app/param/param.controller.js"></script>
+    <script src="/js/app/param/param.service.js"></script>
     <script src="/js/app/recognition/recognition.service.js"></script>
     <script src="/js/app/room/room.service.js"></script>
     <script src="/js/app/scenario/scenario.controller.js"></script>
@@ -273,8 +278,6 @@
     <script src="/js/app/update/update.service.js"></script>
     <script src="/js/app/user/user.service.js"></script>
     <script src="/js/app/voice/voice.service.js"></script>
-    <script src="/js/app/weather/weather.controller.js"></script>
-    <script src="/js/app/weather/weather.service.js"></script>
     <script src="/js/AdminLTE/app.js"></script>
     <!--SCRIPTS END-->
 
