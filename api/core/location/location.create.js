@@ -13,6 +13,7 @@ module.exports = function create (location){
                return gladys.event.create({
                    code: 'enter-area',
                    user: location.user,
+                   value: area.name,
                    scope: area
                });
             });
