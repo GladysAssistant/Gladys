@@ -35,7 +35,13 @@ before(function(done) {
 });
 
 beforeEach(function(done){
-    fillDatabaseWithFixtures(done);
+    fillDatabaseWithFixtures(function(err){
+        if(err) return done(err);
+        
+        gladys.param.clearCache()
+          .then(done)
+          .catch(done);
+    });
 });
 
 after(function(done) {
