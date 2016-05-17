@@ -121,6 +121,12 @@ module.exports.routes = {
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
   
+  // Mode
+  'get /mode': 'ModeController.index',
+  'post /mode': 'ModeController.create',
+  'delete /mode/:id': 'ModeController.delete',
+  'post /house/:id/mode': 'ModeController.change', 
+  
   // Module
   'get /module': 'ModuleController.index',
   

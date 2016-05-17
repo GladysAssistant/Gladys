@@ -53,6 +53,7 @@ module.exports.policies = {
   Lock : ['checkToken'],
   Machine : ['checkToken'],
   Message : ['checkToken'],
+  Mode: ['checkToken'],
   Module : ['checkToken'],
   Motion : ['checkToken'],
   MotionSensor : ['checkToken'],
