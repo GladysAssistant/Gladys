@@ -74,6 +74,7 @@ function loadFixtures(barrels){
     var order = [
        'user',
        'house',
+       'mode',
        'room',
        'token',
        'alarm',
