@@ -1,13 +1,13 @@
 <!-- NEW BOX -->
 <div class="box box-default" data-ng-controller="SystemCtrl as vm">
     <div class="box-header with-border">
-        <h3 class="box-title"><%= __('system-box-title') %> <small ng-show="vm.saving"><%= __('system-box-saving') %></small></h3>
+        <h3 class="box-title"><%= __('system-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('system-box-saving') %></small></h3>
     </div> 
         <div class="box-body table-responsive" >
             <p>
             <%= __('system-box-description') %>
             </p>
-            <table id="example2" class="table table-bordered table-hover">
+            <table id="example2" class="table table-bordered table-hover ng-cloak">
                 <thead>
                     <tr>
                         <th><%= __('system-name') %></th>
