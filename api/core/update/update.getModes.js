@@ -9,10 +9,7 @@ module.exports = function(user) {
             if(modes === 'Not Found') return Promise.reject(new Error('Not Found'));
             
             return Promise.map(modes, function(mode){
-                return gladys.mode.create(mode)
-                  .catch(function(err){
-                     return Promise.resolve(); 
-                  });
+                return gladys.mode.create(mode);
             });
         });
 };
