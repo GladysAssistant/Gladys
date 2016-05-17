@@ -22,5 +22,13 @@
 		"service": "DeviceType",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 4,
+		"code": "house-mode-changed",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]
