@@ -29,6 +29,7 @@ gladys.load = function load() {
     gladys.mode = require('./mode/index.js');
     gladys.module = require('./module/index.js');
     gladys.notification = require('./notification/index.js');
+    gladys.notificationUser = require('./notificationuser/index.js');
     gladys.param = require('./param/index.js');
     gladys.room = require('./room/index.js');
     gladys.sentence = require('./sentence/index.js');
