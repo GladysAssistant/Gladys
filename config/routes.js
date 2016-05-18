@@ -133,6 +133,12 @@ module.exports.routes = {
   // Notification
   'get /notification': 'NotificationController.index',
   
+  // NotificationUser
+  'get /notificationuser': 'NotificationUserController.index',
+  'post /notificationuser': 'NotificationUserController.create',
+  'patch /notificationuser/:id': 'NotificationUserController.update',
+  'delete /notificationuser/:id': 'NotificationUserController.delete',
+  
   // Param
   'get /param': 'ParamController.index',
   'post /param': 'ParamController.create',

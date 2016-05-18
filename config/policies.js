@@ -59,6 +59,7 @@ module.exports.policies = {
   MotionSensor : ['checkToken'],
   Music : ['checkToken'],
   Notification : ['checkToken'],
+  NotificationUser : ['checkToken'],
   Param : ['checkToken'],
   Parametre : ['checkToken'],
   PhenixElectricDevice : ['checkToken'],
