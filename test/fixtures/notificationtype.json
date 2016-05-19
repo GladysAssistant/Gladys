@@ -1,10 +1,12 @@
 [
     {
         "id": 1,
+        "name": "TestService",
         "service": "TestService"
     },
     {
         "id": 2,
+        "name": "does not exist",
         "service": "ThisServiceDoesNotExist"
     }
 ]
