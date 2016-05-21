@@ -1,0 +1,37 @@
+<!-- NEW BOX -->
+<div class="box box-default" data-ng-controller="NotificationUserCtrl as vm">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('notification-box-title') %> <small ng-show="vm.saving"><%= __('notification-box-saving') %></small></h3>
+    </div> 
+        <div class="box-body table-responsive" >
+            <p>
+            <%= __('notification-box-description') %>
+            </p>
+            <table id="example2" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th><%= __('notification-name') %></th>
+                        <th><%= __('notification-priority') %></th>
+                        <th><%= __('notification-action') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="notificationUser in vm.notificationUsers" class="ng-cloak">
+                        <td>{{notificationUser.name}}</td>
+                        <td>{{notificationUser.priority}}</td>
+                        <td><button ng-click="vm.destroyNotificationUser($index, notificationUser.id)" class= "btn btn-danger btn-sm"><%= __('notification-delete') %></button></td>
+                    </tr>
+                    <tr>
+                        <td><select ng-model="vm.newNotificationUser.notificationtype" class="form-control" >
+                                <option ng-repeat="notificationType in vm.notificationTypes" value="{{notificationType.id}}">{{notificationType.name}}</option>
+                        </select>
+
+                        </td>
+                        <td><input type="text" class="form-control" ng-model="vm.newNotificationUser.priority" /></td>
+                        <td><button class="btn btn-success btn-sm" ng-click="vm.createNotificationUser(vm.newNotificationUser)"><%= __('notification-new') %></button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>  
+</div>

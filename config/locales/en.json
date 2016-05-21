@@ -93,6 +93,7 @@
   "parameters-account": "My account",
   "parameters-security": "Security",
   "parameters-boxs": "Box",
+  "parameters-notification": "Notifications",
   "parameters-box-title": "Box",
   "parameters-box-text": "Box are widgets, on the homescreen for example. X and Y are the position of the box in the grid. (x=1,y=1) is top left. (x can be only 1 or 2)",
   "parameters-box-table-boxtype": "Type",
@@ -163,5 +164,12 @@
   "system-arch": "Architecture",
   "system-release": "Release",
   "system-uptime": "Uptime",
-  "system-memory-used": "Memory used"
+  "system-memory-used": "Memory used",
+  "notification-box-title": "Notifications",
+  "notification-box-description": "Here, you can organize the different ways for Gladys to communicate with you. For example, you probably want Gladys to talk to you first if you are at home, then she can try to notify you on your desktop, and finally if you are far away she can just send you a mobile notification ! You just have to organize here the different priorities of each notification service. Easy, isn't it ?",
+  "notification-name": "Name",
+  "notification-priority": "Priority",
+  "notification-action": "Action",
+  "notification-delete": "Delete",
+  "notification-new": "New"
 }

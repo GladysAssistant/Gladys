@@ -256,6 +256,7 @@
   "parameters-account": "Mon compte",
   "parameters-security": "Sécurité",
   "parameters-boxs": "Box",
+  "parameters-notification": "Notifications",
   "parameters-box-title": "Box",
   "parameters-box-text": "Les boxs sont les widgets, sur la page d'accueil par exemple. X et Y correspondent à la position de la box sur la grille, x peut prendre comme valeur 0 ou 1. Par exemple: (x=1,y=1) place la box en haut à gauche.",
   "parameters-box-table-boxtype": "Type",
@@ -327,5 +328,12 @@
   "system-arch": "Architecture",
   "system-release": "Release",
   "system-uptime": "Uptime",
-  "system-memory-used": "RAM utilisée"
+  "system-memory-used": "RAM utilisée",
+  "notification-box-title": "Notifications",
+  "notification-box-description": "Ici, vous pouvez organiser l'ordre de priorité des différentes façons pour Gladys de vous notifier. On peut par exemple dire à Gladys de vous parler dans la pièce (si vous y êtes), ensuite de vous envoyer une notification desktop si vous êtes devant votre écran, et finalement si vous êtes à distance de vous envoyer une notification smartphone. C'est aussi simple que ça !",
+  "notification-name": "Nom",
+  "notification-priority": "Priorité",
+  "notification-action": "Action",
+  "notification-delete": "Supprimer",
+  "notification-new": "Nouveau"
 }

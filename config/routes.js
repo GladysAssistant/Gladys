@@ -133,6 +133,9 @@ module.exports.routes = {
   // Notification
   'get /notification': 'NotificationController.index',
   
+  // NotificationType
+  'get /notificationtype': 'NotificationTypeController.index',
+  
   // NotificationUser
   'get /notificationuser': 'NotificationUserController.index',
   'post /notificationuser': 'NotificationUserController.create',
