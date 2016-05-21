@@ -8,7 +8,8 @@ describe('Notification', function() {
     it('should return notificationType created', function (done) {
      	
         var type = {
-          service: 'PushBulletService'  
+          service: 'PushBulletService',
+          name: 'test'  
         };
         
         gladys.notification.install(type).then(function(result){
