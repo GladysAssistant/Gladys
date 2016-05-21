@@ -20,6 +20,7 @@
   "pagename-alarm":"Alarm",
   "pagename-me":"Me",
   "pagename-music":"Music",
+  "pagename-module": "Modules",
   "dashboard-default-box-title": "Welcome in Gladys !",
   "dashboard-default-box-text": "You are on the dashboard of Gladys. To add boxs on this dashboard, go to \"Parameters\" then \"Boxs\".",
   "modules-installed": "Installed Modules",

@@ -183,6 +183,7 @@
   "pagename-alarm":"Alarmes",
   "pagename-me":"Moi",
   "pagename-music":"Musique",
+  "pagename-module": "Modules",
   "dashboard-default-box-title": "Bienvenue dans Gladys !",
   "dashboard-default-box-text": "Vous êtes sur le dashboard principal de Gladys, c'est ici que sont regroupées les informations importantes. Pour ajouter des boxs sur ce dashboard, vous pouvez aller dans \"Paramètres\" puis \"Boxs\".",
   "modules-installed": "Modules installés",
