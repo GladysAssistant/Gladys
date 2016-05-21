@@ -19,6 +19,7 @@
             <ul class="nav nav-tabs">
               <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('modules-installed') %></a></li>
               <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('modules-store') %></a></li>
+              <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('modules-advanced') %></a></li>
               <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
             </ul>
             <div class="tab-content">
@@ -89,6 +90,44 @@
                 </div>
               </div>
               <!-- /.tab-pane -->
+              
+               <!-- BEGINNING OF TAB 3 -->
+              <div class="tab-pane" id="tab_3">
+                  
+
+                        <div class="box-body no-padding">
+                            <p><%= __('module-install-description') %></p>
+                            <form class="form-inline">
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-name') %></label>
+                                        <input type="text" ng-model="vm.newModule.name" class="form-control" id="giturl" placeholder="<%= __('module-name') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-version') %></label>
+                                        <input type="text" ng-model="vm.newModule.version" class="form-control" id="giturl" placeholder="<%= __('module-version') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-git-url') %></label>
+                                        <input type="text" ng-model="vm.newModule.url" class="form-control" id="giturl" placeholder="<%= __('module-git-url') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="slug"><%= __('module-slug') %></label>
+                                        <input type="text" ng-model="vm.newModule.slug" class="form-control" id="slug" placeholder="<%= __('module-slug') %>">
+                                    </div>
+                                    <button type="submit" ng-click="vm.installModule(vm.newModule);" class="btn btn-success">
+                                        
+                                        <div ng-show="vm.installationStep == 0"><%= __('module-install') %></div>
+                                        <div ng-show="vm.installationStep == 1"><%= __('module-install-downloading') %></div>
+                                        <div ng-show="vm.installationStep == 2"><%= __('module-install-installing-dependencies') %></div>
+                                        <div ng-show="vm.installationStep == 3"><%= __('module-install-creating-module') %></div>
+                                        <div ng-show="vm.installationStep == 4"><%= __('module-install-installed-success') %></div>
+                                        </button>
+                                    </form>
+                         
+                        
+                         </div>
+                    <!-- END OF TAB 1 -->
+              </div>
               
               <!-- /.tab-pane -->
             </div>

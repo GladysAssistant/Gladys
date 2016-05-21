@@ -19,13 +19,18 @@
     function moduleService($http) {
         
         var service = {
-            get: get
+            get: get,
+            install: install
         };
 
         return service;
 
         function get() {
             return $http({method: 'GET', url: '/module'});
+        }
+        
+        function install(module){
+            return $http({method: 'POST', url: '/module/install', data: module});
         }
     }
 })();

@@ -129,6 +129,7 @@ module.exports.routes = {
   
   // Module
   'get /module': 'ModuleController.index',
+  'post /module/install': 'ModuleController.install',
   
   // Notification
   'get /notification': 'NotificationController.index',
