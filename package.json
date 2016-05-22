@@ -53,6 +53,7 @@
     "suncalc": "^1.7.0"
   },
   "devDependencies": {
+    "fs-extra": "^0.30.0",
     "grunt-contrib-csslint": "^1.0.0",
     "grunt-mocha-istanbul": "^4.0.2",
     "istanbul": "^0.4.2",
