@@ -23,6 +23,7 @@
     vm.alarms = []; 
     vm.createAlarm = createAlarm;
     vm.createAlarmRecurring = createAlarmRecurring;
+    vm.createTimer = createTimer;
     vm.destroyAlarm = destroyAlarm;
     
     vm.newAlarm = {};
@@ -102,6 +103,16 @@
             $('#modalNewAlarm').modal('hide');
         }); 
        
+    }
+    
+    function createTimer(alarm){
+       alarm.duration = alarm.duration*3600;
+        return alarmService.createTimer(alarm)
+          .then(function(){
+            getAlarms();
+            vm.newTimer = {};
+            $('#modalNewAlarm').modal('hide');
+          });
     }
     
     function createAlarmRecurring(){

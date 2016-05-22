@@ -21,6 +21,7 @@
         
         var service = {
             create: create, 
+            createTimer: createTimer,
             get: get, 
             destroy: destroy
         };
@@ -29,6 +30,10 @@
 
         function create(alarm) {
           return $http({method: 'POST', url: '/alarm', data: alarm });
+        }
+        
+        function createTimer(alarm){
+          return $http({method: 'POST', url: '/alarm/timer', data: alarm });
         }
         
         function get(){

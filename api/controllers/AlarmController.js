@@ -26,6 +26,15 @@ module.exports = {
       .catch(next);
   },
   
+  timer: function(req, res, next){
+     req.body.user = req.session.User.id;
+     gladys.alarm.timer(req.body)
+       .then(function(alarm){
+         return res.status(201).json(alarm);
+       })
+       .catch(next);
+  },
+  
   delete: function(req, res, next){
     gladys.alarm.delete({id: req.params.id})
       .then(function(){

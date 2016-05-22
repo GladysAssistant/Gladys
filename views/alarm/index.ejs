@@ -81,6 +81,32 @@
                                                             </div>
                                                           </div>
                                                             <!-- END OF BOX -->
+                                                            
+                                                             <!-- NEW BOX -->
+                                                          <div class="box box-default">
+                                                          <div class="box-header with-border">
+                                                            <h3 class="box-title"><%= __('alarm-sleep-now') %></h3>
+                                                          </div>  
+                               
+                                                            <div class="box-body">
+                                                               <div class="row">
+                                                                    <div class='col-md-2'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newTimer.name" placeholder="<%= __('Name') %>" />
+                                                                    </div>
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                            <div>
+                                                                                <input type='text' class="form-control" ng-model="vm.newTimer.duration" id="NewAlarmDatetime" placeholder="<%= __('alarm-time-sleep') %>" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class='col-md-4'>
+                                                                        <button class="btn btn-success" ng-click="vm.createTimer(vm.newTimer)"><%= __('New') %></button>
+                                                                      </div>
+                                                                </div>
+                                                            </div>
+                                                          </div>
+                                                            <!-- END OF BOX -->
                                                          
                                                            <!-- NEW BOX -->
                                                           <div class="box box-default">

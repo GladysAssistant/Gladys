@@ -58,6 +58,7 @@ module.exports.routes = {
   // Alarm
   'get /alarm': 'AlarmController.index',
   'post /alarm': 'AlarmController.create',
+  'post /alarm/timer': 'AlarmController.timer',
   'delete /alarm/:id': 'AlarmController.delete',
   
   // Area
