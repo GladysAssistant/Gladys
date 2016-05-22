@@ -20,7 +20,8 @@
         
         var service = {
             get: get,
-            install: install
+            install: install,
+            config: config
         };
 
         return service;
@@ -31,6 +32,10 @@
         
         function install(module){
             return $http({method: 'POST', url: '/module/install', data: module});
+        }
+        
+        function config(slug){
+            return $http({method: 'POST', url: '/module/' + slug + '/config'});
         }
     }
 })();

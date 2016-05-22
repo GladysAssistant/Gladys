@@ -27,6 +27,15 @@ module.exports = {
                   return res.json(module);
               })
               .catch(next);
+    },
+    
+    
+    config: function(req, res, next){
+        gladys.module.config({slug: req.params.slug})
+          .then(function(){
+              return res.json({success: true});
+          })
+          .catch(next);
     }
 	
 };

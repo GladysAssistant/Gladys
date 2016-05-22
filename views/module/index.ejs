@@ -32,7 +32,7 @@
                   <th><%= __('Name') %></th>
                   <th><%= __('Version') %></th>
                   <th><%= __('Status') %></th>
-                  <th></th>
+                  <th><%= __('Configuration') %></th>
                   <th><%= __('Infos') %></th>
                 </tr>
                 
@@ -41,11 +41,7 @@
                   <td>{{module.name}}</td>
                   <td>{{module.version}}</td>
                   <td>{{module.status}}</td>
-                  <td>
-                   <!-- <div class="progress progress-xs" >
-                      <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                    </div>-->
-                  </td>
+                   <td><button class="btn btn-info btn-sm" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
                   <td><button class="btn btn-info btn-sm" ng-click="vm.displayModule(module);"><%= __('Infos') %></button></td>
                 </tr>
                 

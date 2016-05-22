@@ -14,14 +14,15 @@
         .module('gladys')
         .controller('ModuleCtrl', ModuleCtrl);
 
-    ModuleCtrl.$inject = ['moduleService', '$scope'];
+    ModuleCtrl.$inject = ['moduleService', '$scope', 'notificationService'];
 
-    function ModuleCtrl(moduleService, $scope) {
+    function ModuleCtrl(moduleService, $scope, notificationService) {
         /* jshint validthis: true */
         var vm = this;
         
         vm.modules = [];
         vm.installModule = installModule;
+        vm.configModule = configModule;
         vm.installationStep = 0;
         
         activate();
@@ -42,6 +43,10 @@
            return moduleService.install(module)
              .then(function(data){
                  vm.modules.push(data.data);
+                 notificationService.successNotificationTranslated('MODULE.INSTALLED_SUCCESS_NOTIFICATION', module.name);
+             })
+             .catch(function(){
+                 notificationService.errorNotificationTranslated('MODULE.INSTALLED_FAIL_NOTIFICATION', module.name);
              });
        }
        
@@ -64,6 +69,16 @@
            $scope.$apply(function(){
                vm.installationStep = step;
            });
+       }
+       
+       function configModule(slug){
+           return moduleService.config(slug)
+             .then(function(){
+                 notificationService.successNotificationTranslated('MODULE.CONFIG_SUCCESS_NOTIFICATION');
+             })
+             .catch(function(err){
+                 notificationService.errorNotificationTranslated('MODULE.CONFIG_FAIL_NOTIFICATION', err.data);
+             })
        }
     }
 })();

@@ -130,6 +130,7 @@ module.exports.routes = {
   // Module
   'get /module': 'ModuleController.index',
   'post /module/install': 'ModuleController.install',
+  'post /module/:slug/config': 'ModuleController.config',
   
   // Notification
   'get /notification': 'NotificationController.index',
