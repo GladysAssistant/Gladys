@@ -4,6 +4,7 @@ module.exports = {
                 WHERE active = 1
 		        AND ((dayofweek = -1 AND datetime > SYSDATE()) OR dayofweek <> -1 )`,
 
-    deleteAlarm: `DELETE FROM alarm WHERE id = ?`
+    deleteAlarm: `DELETE FROM alarm WHERE id = ?`,
+    get: 'SELECT * FROM alarm WHERE user = ?;'
 
 };

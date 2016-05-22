@@ -55,6 +55,10 @@ module.exports.routes = {
   'get /actiontype': 'ActionType.index',
   'get /actiontype/:id/params': 'ActionType.getParams',
   
+  // Alarm
+  'get /alarm': 'AlarmController.index',
+  'post /alarm': 'AlarmController.create',
+  'delete /alarm/:id': 'AlarmController.delete',
   
   // Area
   'get /area': 'AreaController.index',
