@@ -183,5 +183,7 @@
   "module-install-downloading": "Downloading...",
   "module-install-installing-dependencies": "Installing dependencies...",
   "module-install-creating-module": "Saving module...",
-  "module-install-installed-success": "Module installed with success ! Reboot is needed."
+  "module-install-installed-success": "Module installed with success ! Reboot is needed.",
+  "alarm-sleep-now": "Sleep now",
+  "alarm-time-sleep": "Sleep time (in hours)"
 }
