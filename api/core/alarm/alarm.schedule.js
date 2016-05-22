@@ -17,14 +17,19 @@ module.exports = function schedule(alarm) {
     var options = {
         rule: rule,
         event: {
-            name: 'alarmRing',
-            value: alarm.id
+            code: 'alarm',
+            value: alarm.id,
+            scope: {
+                alarm: alarm.id
+            }
         }
     };
 
     return gladys.scheduler.create(options)
         .then(function(index) {
             shared.tabAlarmScheduled[alarm.id] = index;
+            
+            sails.log.info(`Scheduled alarm ${alarm.name}, with id ${alarm.id}`);
             return Promise.resolve(alarm);
         });
 };

@@ -8,7 +8,7 @@ module.exports = function(alarm) {
 
     // deleting alarm from database
     return gladys.utils.sql(queries.deleteAlarm, [alarm.id])
-        .then(function(alarm) {
+        .then(function() {
 
             // cancelling alarm
             return gladys.alarm.cancel(alarm);

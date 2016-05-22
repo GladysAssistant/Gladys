@@ -50,28 +50,28 @@
     }
     
     function destroyAlarm(index, id){
-      return alarmService.destroyAlarm(id)
+      return alarmService.destroy(id)
         .then(function(data){
           vm.alarms.splice(index,1);
         });
     }
 
     function getAlarms() {
-      return alarmService.getAlarms()
+      return alarmService.get()
         .then(function(data){
           var alarms = data.data;
           for (var i = 0; i < alarms.length; i++) {
 
-            if (alarms[i].recurring == -1) {
+            if (alarms[i].dayofweek == -1) {
               alarms[i].moment = moment(alarms[i].datetime).format('LLL');
             } else {
               var now = moment();
               // if day of the week is already passed
               // we add +7 to the day number, so it will be next week
-  	          if(now.isBefore(moment().day(alarms[i].recurring))){
-                alarms[i].moment = moment().day(alarms[i].recurring).fromNow();
+  	          if(now.isBefore(moment().day(alarms[i].dayofweek))){
+                alarms[i].moment = moment().day(alarms[i].dayofweek).fromNow();
               }else{
-                alarms[i].moment = moment().day(alarms[i].recurring + 7).fromNow(); 	 
+                alarms[i].moment = moment().day(alarms[i].dayofweek + 7).fromNow(); 	 
               }
             }
           }
@@ -82,11 +82,9 @@
 
     function getLanguageCurrentUser(){
       return userService.whoAmI()
-        .then(function(data){
-          return new Promise(function(resolve, reject){
-            vm.language = data.data.language.substring(0,2).toLowerCase();
-            resolve();
-          });
+        .then(function(user){
+           vm.language = user.language.substring(0,2).toLowerCase();
+           return vm.language;
         }); 
     }
 
@@ -95,10 +93,9 @@
        var alarmObj = {
             datetime: vm.newAlarm.datetime.format(),
             time: null,
-            name: vm.newAlarm.name,
-            recurring: -1
+            name: vm.newAlarm.name
        };
-       return alarmService.createAlarm(alarmObj)
+       return alarmService.create(alarmObj)
         .then(function(data){
             getAlarms();
             vm.newAlarm.name = '';
@@ -113,15 +110,15 @@
         datetime: null,
         time: vm.newAlarmReccuring.time,
         name: vm.newAlarmReccuring.name,
-        recurring: vm.newAlarmReccuring.recurring
+        dayofweek: vm.newAlarmReccuring.dayofweek
       };
       
-      return alarmService.createAlarm(alarmObj)
+      return alarmService.create(alarmObj)
         .then(function(data){
             getAlarms();
             vm.newAlarmReccuring.time = '';
             vm.newAlarmReccuring.name = '';
-            vm.newAlarmReccuring.recurring = -1;
+            vm.newAlarmReccuring.dayofweek = -1;
             $('#modalNewAlarm').modal('hide');
         }); 
     }
