@@ -1,8 +1,8 @@
 [
     {
         "id": 1,
-        "name": "TestService",
-        "service": "TestService"
+        "name": "test",
+        "service": "test"
     },
     {
         "id": 2,

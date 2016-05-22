@@ -25,12 +25,13 @@ function create(notification) {
  */
 function startService(notification, type) {
 
-    if (!global[type.service] || typeof global[type.service].exec !== "function") {
+    if (!gladys.modules[type.service] || typeof gladys.modules[type.service].notify !== "function") {
         return Promise.reject(new Error(`${type.service} is not a valid service`));
     }
 
-    return global[type.service].exec(notification)
+    return gladys.modules[type.service].notify(notification)
         .then(function(ok) {
+            
             // if true is returned, we stop the promise chain
             // it means one notification worked! 
             if (ok === true) {

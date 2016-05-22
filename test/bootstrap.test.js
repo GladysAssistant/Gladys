@@ -130,6 +130,9 @@ function addTestModuleGladys(gladys){
         exec: function(){
             return Promise.resolve();
         },
+        notify: function(){
+            return Promise.resolve();
+        },
         install: function(){
             return Promise.resolve();
         }
