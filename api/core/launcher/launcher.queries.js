@@ -8,7 +8,7 @@ module.exports = {
    WHERE user = ?;
    `,
   getActions: `
-      SELECT * FROM action 
+      SELECT action.*, actiontype.uuid, actiontype.service, actiontype.function, actiontype.name, actiontype.optionspath  FROM action 
       JOIN actiontype ON action.action = actiontype.id
       WHERE launcher = ?;`,
   getActionParams: `
@@ -17,7 +17,7 @@ module.exports = {
     WHERE action = ?;
   `  ,
   getStates: `
-    SELECT * FROM state 
+    SELECT state.*, statetype.uuid, statetype.service, statetype.function, statetype.name FROM state 
     JOIN statetype ON state.state = statetype.id
     WHERE launcher = ?;
   `,

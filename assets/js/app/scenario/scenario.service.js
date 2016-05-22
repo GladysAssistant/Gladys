@@ -35,7 +35,7 @@
         // evaluator
         function generateTemplate(params){
             
-            if(!params){
+            if(!params || !(params instanceof Array)){
                 return '';
             }
             
@@ -49,13 +49,19 @@
                     template += ' && ';
                 }
                 
-                // if value is not a number, we transform it into a string escaped
-                if(!isNumber(param.value)){
-                    param.value = '"' + escapeDoubleQuotes(param.value) + '"';
+                if(!param.value){
+                    template += ' true ';
+                } else {
+                    
+                    // if value is not a number, we transform it into a string escaped
+                    if(!isNumber(param.value)){
+                        param.value = '"' + escapeDoubleQuotes(param.value) + '"';
+                    }
+                    
+                    // we add the condition
+                    template += param.variablename + ' ' + param.operator + ' ' + param.value; 
                 }
-                
-                // we add the condition
-                template += param.variablename + ' ' + param.operator + ' ' + param.value;
+
             });
             
             return template;
