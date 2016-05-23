@@ -9,6 +9,9 @@ function create(notification) {
             return [notification, gladys.utils.sql(queries.getNotificationTypes, [notification.user])];
         })
         .spread(function(notification, types) {
+            
+            sails.log.info(`Notification : create : Notification saved with success. Trying to send notification to user ID ${notification.user}`);
+            
             return Promise.mapSeries(types, function(type) {
                 return startService(notification, type);
             });
@@ -28,6 +31,8 @@ function startService(notification, type) {
     if (!gladys.modules[type.service] || typeof gladys.modules[type.service].notify !== "function") {
         return Promise.reject(new Error(`${type.service} is not a valid service`));
     }
+    
+    sails.log.info(`Notification : create : Trying to contact ${type.service}`);
 
     return gladys.modules[type.service].notify(notification)
         .then(function(ok) {

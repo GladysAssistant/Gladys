@@ -22,10 +22,11 @@ module.exports = {
           type: 'string',
           required: true  
         },
-
+        
         service: {
             type: 'string',
-            required: true
+            required: true,
+            unique: true
         }
 
     }
