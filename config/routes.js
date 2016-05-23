@@ -155,6 +155,12 @@ module.exports.routes = {
   'patch /param/:name': 'ParamController.update',
   'delete /param/:name': 'ParamController.delete',
   
+  // ParamUser
+  'get /paramuser': 'ParamUserController.index',
+  'post /paramuser': 'ParamUserController.create',
+  'patch /paramuser/:name': 'ParamUserController.update',
+  'delete /paramuser/:name': 'ParamUserController.delete',
+  
   // Script
   'get /script': 'ScriptController.index',
   'post /script': 'ScriptController.create',

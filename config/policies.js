@@ -62,6 +62,7 @@ module.exports.policies = {
   NotificationType : ['checkToken'],
   NotificationUser : ['checkToken'],
   Param : ['checkToken'],
+  ParamUser : ['checkToken'],
   Parametre : ['checkToken'],
   PhenixElectricDevice : ['checkToken'],
   ProfilePicture : ['checkToken'],

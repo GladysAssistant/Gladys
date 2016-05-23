@@ -40,6 +40,9 @@ beforeEach(function(done){
         if(err) return done(err);
         
         gladys.param.clearCache()
+          .then(function(){
+              return gladys.paramUser.clearCache();
+          })
           .then(done)
           .catch(done);
     });
@@ -102,7 +105,8 @@ function loadFixtures(barrels){
        'box',
        'module',
        'sentence',
-       'param'
+       'param',
+       'paramuser'
     ];
     
     return Promise.mapSeries(order, function(tableName){
