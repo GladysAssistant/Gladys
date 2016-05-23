@@ -12,11 +12,11 @@
 
     angular
         .module('gladys')
-        .controller('ParamCtrl', ParamCtrl);
+        .controller('ParamUserCtrl', ParamUserCtrl);
 
-    ParamCtrl.$inject = ['paramService'];
+    ParamUserCtrl.$inject = ['paramUserService'];
 
-    function ParamCtrl(paramService) {
+    function ParamUserCtrl(paramUserService) {
         /* jshint validthis: true */
         var vm = this;
         vm.params = [];
@@ -32,7 +32,7 @@
         }
 
         function get() {
-            return paramService.get()
+            return paramUserService.get()
                 .then(function(data){
                     vm.params = data.data;
                 });
@@ -40,21 +40,21 @@
         
         function updateParam(name, param){
             vm.saving = true;
-            return paramService.update(name, param)
+            return paramUserService.update(name, param)
               .then(function(){
                  vm.saving = false; 
               });
         }
         
         function deleteParam(index, name){
-            return paramService.destroy(name)
+            return paramUserService.destroy(name)
               .then(function(){
                   vm.params.splice(index, 1);
               });
         }
         
         function createParam(param){
-            return paramService.create(param)
+            return paramUserService.create(param)
               .then(function(data){
                   vm.params.push(data.data);
                   vm.newParam = {};
