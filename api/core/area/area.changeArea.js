@@ -12,7 +12,9 @@ module.exports = function enterArea(location){
         });
                 
         // we remove the areas where the user was already in
-        return removeDuplicateArea(lastAreasUser, areas);
+        var newAreas = removeDuplicateArea(lastAreasUser, areas);
+        var leftAreas = findLeftAreas(lastAreasUser, areas);
+        return {newAreas, leftAreas};
      });
 };
 
@@ -31,6 +33,27 @@ function getLastAreas(userId){
              return gladys.area.inArea(locations[0]);
          }
       });
+}
+
+function findLeftAreas(lastAreasUser, areas){
+    
+    var leftAreas = [];
+    
+    lastAreasUser.forEach(function(lastAreaUser){
+        var found = false;
+        var i = 0;
+        while(!found && i < areas.length){
+            if(areas[i].id === lastAreaUser.id){
+                found = true;
+            }
+            i++;
+        }
+        if(!found){
+            leftAreas.push(lastAreaUser);
+        }
+    });
+    
+    return leftAreas;
 }
 
 function removeDuplicateArea(lastAreasUser, areas){

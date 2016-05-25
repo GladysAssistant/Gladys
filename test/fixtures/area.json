@@ -6,5 +6,13 @@
         "longitude": -73.9896,
         "radius": 100,
         "user": 1
+    },
+    {
+        "id": 2,
+        "name": "House 2",
+        "latitude": 44,
+        "longitude": -72,
+        "radius": 100,
+        "user": 1
     }
 ]

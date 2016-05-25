@@ -30,5 +30,21 @@
 		"service": "mode",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 5,
+		"code": "enter-area",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
+	},
+	{
+		"id": 6,
+		"code": "left-area",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]
