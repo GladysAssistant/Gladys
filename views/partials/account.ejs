@@ -1,0 +1,28 @@
+<!-- NEW BOX -->
+<div class="box box-default" data-ng-controller="UserCtrl as vm">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+    </div> 
+        <div class="box-body table-responsive" >
+            <p>
+            <%= __('user-box-description') %>
+            </p>
+            <table id="example2" class="table table-bordered table-hover ng-cloak">
+                <thead>
+                    <tr>
+                        <th><%= __('user-name') %></th>
+                        <th><%= __('user-infos') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><%= __('user-id') %></td><td>{{vm.user.id}}</td></tr>
+                    <tr><td><%= __('user-firstname') %></td><td>{{vm.user.firstname}}</td></tr>
+                    <tr><td><%= __('user-lastname') %></td><td>{{vm.user.lastname}}</td></tr>
+                    <tr><td><%= __('user-email') %></td><td>{{vm.user.email}}</td></tr>
+                    <tr><td><%= __('user-password') %></td><td></td></tr>
+                    <tr><td><%= __('user-gender') %></td><td>{{vm.user.gender}}</td></tr>
+                </tbody>
+            </table>
+
+        </div>  
+</div>

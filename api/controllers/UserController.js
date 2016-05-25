@@ -47,8 +47,8 @@ module.exports = {
            
            // user is logged in
            req.session.User = user;
-		   req.session.authenticated = true;
-		   req.session.trueHuman = true;  
+           req.session.authenticated = true;
+           req.session.trueHuman = true;  
            sails.log.info(`User connected ${user.firstname}`);
            
            return res.json(user);  

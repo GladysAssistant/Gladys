@@ -351,5 +351,15 @@
   "module-install-creating-module": "Enregistrement du module...",
   "module-install-installed-success": "Module installé avec succès ! Reboot nécessaire.",
   "alarm-sleep-now": "Dormir maintenant",
-  "alarm-time-sleep": "Temps de sommeil (en heures)"
+  "alarm-time-sleep": "Temps de sommeil (en heures)",
+  "user-box-title": "Votre compte utilisateur",
+  "user-box-description": "Gérer ici votre compte Gladys. Ce compte est local à votre système, n'est stocké nul part ailleurs que sur votre machine.",
+  "user-name": "Nom",
+  "user-infos": "Info",
+  "user-id": "ID",
+  "user-firstname": "Prénom",
+  "user-lastname": "Nom",
+  "user-email": "Email",
+  "user-password": "Mot de passe",
+  "user-gender": "Genre"
 }
