@@ -103,6 +103,8 @@ module.exports.routes = {
   
   // Event
   'get /event': 'EventController.index',
+  'post /event': 'EventController.create',
+  'get /event/create': 'EventController.create', // allowing get request too for creating event (useful for connected object)
   
   //EventType
   'get /eventtype/:id/launcherparam': 'EventTypeController.getLauncherParams',
