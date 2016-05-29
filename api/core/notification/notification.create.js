@@ -35,12 +35,16 @@ function startService(notification, type) {
     sails.log.info(`Notification : create : Trying to contact ${type.service}`);
 
     return gladys.modules[type.service].notify(notification)
-        .then(function(ok) {
+        .then(function(result) {
             
-            // if true is returned, we stop the promise chain
+            // if module resolved, we stop the promise chain
             // it means one notification worked! 
-            if (ok === true) {
-                return Promise.reject(new Error('ok'));
-            }
+            return Promise.reject(new Error('ok'));
+        })
+        .catch(function(){
+           
+           // if notification does not work, we resolve
+           // it means that we need to continue the flow
+           return Promise.resolve(); 
         });
 }
