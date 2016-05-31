@@ -8,8 +8,8 @@ module.exports = function(name, userId){
    
    // get from cache
    if(shared.cache[userId] && shared.cache[userId][name]){
-       return shared.cache[userId][name];
-   } 
+       return Promise.resolve(shared.cache[userId][name]);
+   }
     
   // if not in cache, get in DB
   return gladys.utils.sql(queries.getValue, [name, userId])
