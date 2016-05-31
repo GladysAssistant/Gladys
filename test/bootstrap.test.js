@@ -136,6 +136,7 @@ function addTestModuleGladys(gladys){
             return Promise.resolve();
         },
         notify: function(){
+            console.log('Test notification');
             return Promise.resolve();
         },
         install: function(){

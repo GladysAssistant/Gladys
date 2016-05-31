@@ -37,11 +37,17 @@ function startService(notification, type) {
     return gladys.modules[type.service].notify(notification)
         .then(function(result) {
             
+            sails.log.info(`Notification threw ${type.service} sent with success. Aborting the chain.`);
+            
             // if module resolved, we stop the promise chain
             // it means one notification worked! 
             return Promise.reject(new Error('ok'));
         })
-        .catch(function(){
+        .catch(function(e){
+           
+           // if the error is because we want to exist the promise chain,
+           // we need to propagate the error
+           if(e.message === 'ok') return Promise.reject(e);
            
            // if notification does not work, we resolve
            // it means that we need to continue the flow
