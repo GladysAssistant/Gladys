@@ -61,6 +61,14 @@ module.exports = {
               return res.json(house);
           })
           .catch(next);
+    },
+    
+    getUsers: function(req, res, next){
+        gladys.house.getUsers({house: req.params.id})
+          .then(function(users){
+              return res.json(users);
+          })
+          .catch(next);
     }
 
 };

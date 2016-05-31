@@ -46,5 +46,13 @@
 		"service": "mode",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 7,
+		"code": "back-at-home",
+		"name": "User is back at home !",
+		"service": "house",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]

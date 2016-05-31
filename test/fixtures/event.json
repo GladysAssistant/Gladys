@@ -11,5 +11,12 @@
         "datetime": "2015-05-12 18:00:00",
         "house": 1,
         "value": "at-home"
+    },
+    {
+        "id": 3,
+        "eventtype": 7,
+        "datetime": "2015-05-12 18:00:00",
+        "user": 1,
+        "house": 1
     }
 ]

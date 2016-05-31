@@ -114,7 +114,7 @@ module.exports.routes = {
   'post /house': 'HouseController.create',
   'patch /house/:id': 'HouseController.update',
   'delete /house/:id': 'HouseController.delete',
-  
+  'get /house/:id/user': 'HouseController.getUsers',
   
   // Launcher
   'get /launcher': 'LauncherController.index',
