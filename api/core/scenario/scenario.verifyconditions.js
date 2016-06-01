@@ -30,7 +30,7 @@ function verify(statetype, params) {
     }
 
     // we test if the service function exist
-    if (!gladys.modules[statetype.service] || typeof gladys.modules[statetype.service][statetype.function] !== "function") {
+    else if (!gladys.modules[statetype.service] || typeof gladys.modules[statetype.service][statetype.function] !== "function") {
         return Promise.reject(new Error(`gladys.modules.${statetype.service}.${statetype.function} is not a function`));
     } else {
 
