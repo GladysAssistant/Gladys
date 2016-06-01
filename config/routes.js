@@ -139,6 +139,7 @@ module.exports.routes = {
   'get /module': 'ModuleController.index',
   'post /module/install': 'ModuleController.install',
   'post /module/:slug/config': 'ModuleController.config',
+  'delete /module/:id': 'ModuleController.uninstall',
   
   // Notification
   'get /notification': 'NotificationController.index',

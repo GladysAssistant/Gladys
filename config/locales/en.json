@@ -189,6 +189,7 @@
   "module-install-installing-dependencies": "Installing dependencies...",
   "module-install-creating-module": "Saving module...",
   "module-install-installed-success": "Module installed with success ! Reboot is needed.",
+  "module-uninstall": "Uninstall", 
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
   "user-box-title": "Your user account",

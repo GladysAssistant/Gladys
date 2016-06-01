@@ -36,6 +36,14 @@ module.exports = {
               return res.json({success: true});
           })
           .catch(next);
+    },
+    
+    uninstall: function(req, res, next){
+        gladys.module.uninstall({id: req.params.id})
+          .then(function(module){
+              return res.json(module);
+          })
+          .catch(next);
     }
 	
 };

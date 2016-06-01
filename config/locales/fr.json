@@ -353,6 +353,7 @@
   "module-install-installing-dependencies": "Installation des dépendances...",
   "module-install-creating-module": "Enregistrement du module...",
   "module-install-installed-success": "Module installé avec succès ! Reboot nécessaire.",
+  "module-uninstall": "Désinstallation", 
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
   "user-box-title": "Votre compte utilisateur",

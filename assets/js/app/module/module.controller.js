@@ -23,6 +23,7 @@
         vm.modules = [];
         vm.installModule = installModule;
         vm.configModule = configModule;
+        vm.uninstallModule = uninstallModule;
         vm.installationStep = 0;
         
         activate();
@@ -47,6 +48,13 @@
              })
              .catch(function(){
                  notificationService.errorNotificationTranslated('MODULE.INSTALLED_FAIL_NOTIFICATION', module.name);
+             });
+       }
+       
+       function uninstallModule(index, id){
+           return moduleService.uninstall(id)
+             .then(function(){
+                 vm.modules.splice(index, 1);
              });
        }
        

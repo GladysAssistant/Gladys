@@ -21,7 +21,8 @@
         var service = {
             get: get,
             install: install,
-            config: config
+            config: config,
+            uninstall: uninstall
         };
 
         return service;
@@ -36,6 +37,10 @@
         
         function config(slug){
             return $http({method: 'POST', url: '/module/' + slug + '/config'});
+        }
+        
+        function uninstall(id){
+            return $http({method: 'DELETE', url: '/module/' + id });
         }
     }
 })();
