@@ -107,7 +107,10 @@ function loadFixtures(barrels){
        'sentence',
        'param',
        'paramuser',
-       'location'
+       'location',
+       'statetypeparam',
+       'stateparam',
+       'statetemplateparam'
     ];
     
     return Promise.mapSeries(order, function(tableName){

@@ -9,24 +9,19 @@ module.exports = {
 
   attributes: {
       
-      name: {
-          type: 'string',
-          required: true
-      },
+    value: {
+        type: 'string'
+    },
         
-      variablename: {
-          type:'string',
-          required: true  
-      },
+    state: {
+        model: 'State',
+        required: true
+    },
 
-      path: {
-          type: 'string'
-      },
-
-      statetype: {
-          model: 'StateType',
-          required: true
-      }
+    statetypeparam: {
+        model: 'StateTypeParam',
+        required: true
+    }
 
   }
 };

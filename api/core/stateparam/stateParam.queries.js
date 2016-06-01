@@ -1,4 +1,4 @@
 
 module.exports = {
-  getByStateType: 'SELECT * FROM stateparam WHERE statetype = ?;'  
+  getByState: 'SELECT * FROM stateparam WHERE state = ?;'  
 };

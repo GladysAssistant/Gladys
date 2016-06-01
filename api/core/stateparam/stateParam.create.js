@@ -1,4 +1,4 @@
 
-module.exports = function (stateParam){
+module.exports = function(stateParam){
     return StateParam.create(stateParam);
 };
