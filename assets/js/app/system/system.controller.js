@@ -64,6 +64,11 @@
             })
             .then(function(){
                 
+                // get all states
+                return updateService.updateStates();
+            })
+            .then(function(){
+                
                 // train brain
                 return brainService.trainNew(); 
             })

@@ -66,6 +66,17 @@ module.exports = {
                 return res.json(result); 
             })
             .catch(next);
+      },
+      
+      /**
+       * Check for new StateTypes
+       */
+      updateStates: function(req, res, next){
+          gladys.update.getStates(req.session.User)
+            .then(function(result){
+                return res.json(result); 
+            })
+            .catch(next);
       }
       
 };

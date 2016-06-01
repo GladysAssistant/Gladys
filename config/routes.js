@@ -210,6 +210,7 @@ module.exports.routes = {
   'get /update/sentence': 'UpdateController.updateSentences',
   'get /update/box': 'UpdateController.updateBoxTypes',
   'get /update/category': 'UpdateController.updateCategories',
+  'get /update/state': 'UpdateController.updateStates',
   
   //User
   'get /user': 'UserController.index',
