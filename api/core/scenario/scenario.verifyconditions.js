@@ -53,8 +53,12 @@ function verify(statetype, params) {
              return verifyFunction(paramsToSend);
         })
         .then(function(scope) {
-
-            // when we have the result, we inject it in the condition template
+            
+            // module can send raw response if he don't need the template
+            if(scope === true) return Promise.resolve(scope);
+            if(scope === false) return Promise.reject(new Error('conditions_not_verified'));
+            
+            // if the scope is not a boolean, we inject it in the condition template
             try {
                 var result = template('${' + statetype.condition_template + '}', scope);
                 if (result == 'true') {
