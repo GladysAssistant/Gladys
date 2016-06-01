@@ -107,6 +107,7 @@ module.exports.routes = {
   'get /event/create': 'EventController.create', // allowing get request too for creating event (useful for connected object)
   
   //EventType
+  'get /eventtype': 'EventTypeController.index',
   'get /eventtype/:id/launcherparam': 'EventTypeController.getLauncherParams',
   
   // House
@@ -183,10 +184,12 @@ module.exports.routes = {
   'post /state': 'StateController.create',
   'patch /state/:id': 'StateController.update',
   'delete /state/:id': 'StateController.delete',
+  'post /state/:id/param': 'StateController.addParam',
   
   // StateType
   'get /statetype': 'StateTypeController.index',
-  'get /statetype/:id/stateparam': 'StateTypeController.getStateParams',
+  'get /statetype/:id/param': 'StateTypeController.getStateTypeParams',
+  'get /statetype/:id/templateparam': 'StateTypeController.getTemplateParams',
   
   
   // System

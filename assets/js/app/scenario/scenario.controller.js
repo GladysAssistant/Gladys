@@ -132,17 +132,33 @@
                 });
         }
         
-        function addState(index, stateTypeId){
+        function addState(index, stateType){
             var newState = {
                 launcher: vm.newLauncher.id,
-                state: stateTypeId
+                state: stateType.id,
+                name: stateType.name
             };
             
-            return stateTypeService.getParams(stateTypeId)
+            // first, we add the params 
+            return stateTypeService.getParams(stateType.id)
               .then(function(params){
                   
+                  // foreach parameter, we transform the argument 
+                  params.forEach(function(param){
+                     param.statetypeparam = param.id; 
+                     delete param.id;
+                  });
+                  
                   newState.params = params;
-                  vm.states.push(newState);
+                  
+                  // then, we get all the templateParams
+                  return stateTypeService.getTemplateParams(stateType.id);
+              })
+              .then(function(templateParams){
+                  
+                 
+                 newState.templateParams = templateParams;
+                 vm.states.push(newState); 
               });
         }
         

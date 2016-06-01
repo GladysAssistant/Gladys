@@ -43,6 +43,15 @@ module.exports = {
               return res.json(state);
           })
           .catch(next);
+    },
+    
+    addParam: function(req, res, next){
+        req.body.state = req.params.id;
+        gladys.stateParam.create(req.body)
+          .then(function(param){
+             return res.status(201).json(param); 
+          })
+          .catch(next);
     }
 };
 

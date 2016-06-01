@@ -123,7 +123,7 @@
                                             <tr ng-repeat="stateType in vm.stateTypes">
                                                 <td>{{stateType.name}}</td>
                                                 <td>{{stateType.description}}</td>
-                                                <td><button  class="btn btn-success btn-sm" ng-click="vm.addState($index, stateType.id)" ><%= __('scenario-state-add') %></button></td>
+                                                <td><button  class="btn btn-success btn-sm" ng-click="vm.addState($index, stateType)" ><%= __('scenario-state-add') %></button></td>
                                             </tr>
 
                                         </tbody>
@@ -152,18 +152,10 @@
                                      
                                     <h4>{{state.name}}</h4>
                                    
+                                   <!-- State Params -->
                                     <div class="form-group" ng-repeat="stateParam in state.params">
                                         <label for="inputEmail3" class="col-sm-2 control-label">{{stateParam.name}} :</label>
-                                        <div class="col-sm-2" >
-                                            <select ng-show="!stateParam.options" ng-model="stateParam.operator" class="form-control">
-                                                <option value="=="><%= __('scenario-equal') %></option>
-                                                <option value="!="><%= __('scenario-different') %></option>
-                                                <option value=">="><%= __('scenario-greater-or-equal') %></option>
-                                                <option value=">"><%= __('scenario-greater') %></option>
-                                                <option value="<="><%= __('scenario-less-or-equal') %></option>
-                                                <option value="<"><%= __('scenario-less') %></option>
-                                            </select>
-                                        </div>
+                                        
                                         <div class="col-sm-8">
                                             <select ng-show="stateParam.options" ng-model="stateParam.value" class="form-control" >
                                                 <option ng-repeat="option in stateParam.options" value="{{option.id}}">{{option.name}}</option>
@@ -172,6 +164,31 @@
                                             <input ng-show="!stateParam.options" id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
                                        </div>
                                     </div>
+                                    
+                                    <!-- State TemplateParams -->
+                                    <div class="form-group" ng-repeat="stateParam in state.templateParams">
+                                        <label for="inputEmail3" class="col-sm-2 control-label">{{stateParam.name}} :</label>
+                                        <div class="col-sm-2" ng-show="!stateParam.options">
+                                            <select ng-model="stateParam.operator" class="form-control">
+                                                <option value="=="><%= __('scenario-equal') %></option>
+                                                <option value="!="><%= __('scenario-different') %></option>
+                                                <option value=">="><%= __('scenario-greater-or-equal') %></option>
+                                                <option value=">"><%= __('scenario-greater') %></option>
+                                                <option value="<="><%= __('scenario-less-or-equal') %></option>
+                                                <option value="<"><%= __('scenario-less') %></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8" ng-show="stateParam.options" >
+                                            <select ng-model="stateParam.value" class="form-control" >
+                                                <option ng-repeat="option in stateParam.options" value="{{option.id}}">{{option.name}}</option>
+                                            </select>
+                                        </div>  
+                                        
+                                        <div class="col-sm-6" ng-show="!stateParam.options">
+                                            <input id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                        </div>
+                                    </div>
+                                    <!-- end of stateTemplateParams -->
                                     
                                    <div class="form-group">
                                         <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeState($index, state.id);"><%= __('scenario-delete') %></button>

@@ -24,11 +24,20 @@ module.exports = {
           .catch(next);
     },
     
-    getStateParams: function(req, res, next){
+    getTemplateParams: function(req, res, next){
         
-        gladys.stateParam.getByStateType({statetype: req.params.id})
-          .then(function(stateParams){
-              return res.json(stateParams);
+        gladys.stateTemplateParam.getByStateType({statetype: req.params.id})
+          .then(function(stateTemplateParams){
+              return res.json(stateTemplateParams);
+          })
+          .catch(next);
+    },
+    
+    getStateTypeParams: function(req, res, next){
+        
+        gladys.stateTypeParam.getByStateType({statetype: req.params.id})
+          .then(function(stateTypeParams){
+              return res.json(stateTypeParams);
           })
           .catch(next);
     }

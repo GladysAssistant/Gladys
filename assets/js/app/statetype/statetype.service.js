@@ -20,6 +20,7 @@
         
         var service = {
             get: get,
+            getTemplateParams: getTemplateParams,
             getParams: getParams
         };
 
@@ -30,7 +31,14 @@
         }
         
         function getParams(stateTypeId){
-            return $http({method: 'GET', url: '/statetype/' + stateTypeId + '/stateparam' })
+            return $http({method: 'GET', url: '/statetype/' + stateTypeId + '/param' })
+               .then(function(data){
+                   return addAllOptions(data.data);
+               });
+        }
+        
+        function getTemplateParams(stateTypeId){
+            return $http({method: 'GET', url: '/statetype/' + stateTypeId + '/templateparam' })
                .then(function(data){
                    return addAllOptions(data.data);
                });
