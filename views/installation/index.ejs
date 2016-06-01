@@ -156,9 +156,10 @@
                           <p ng-show="vm.downloadStep > 3"><%= __('installation-downloading-events') %></p>
                           <p ng-show="vm.downloadStep > 2"><%= __('installation-downloading-boxs') %></p>
                           <p ng-show="vm.downloadStep > 4"><%= __('installation-downloading-categories') %></p>
-                          <p ng-show="vm.downloadStep > 5"><%= __('installation-training-brain') %></p>
-                          <p ng-show="vm.downloadStep > 6"><%= __('installation-checking-for-updates') %></p>
-                          <p ng-show="vm.downloadStep > 6"><%= __('installation-configuration-success') %></p>
+                          <p ng-show="vm.downloadStep > 5"><%= __('installation-downloading-states') %></p>
+                          <p ng-show="vm.downloadStep > 6"><%= __('installation-training-brain') %></p>
+                          <p ng-show="vm.downloadStep > 7"><%= __('installation-checking-for-updates') %></p>
+                          <p ng-show="vm.downloadStep > 7"><%= __('installation-configuration-success') %></p>
                           
                           <p class="bg-danger" style="padding:15px;" ng-show="vm.downloadError">{{vm.downloadError}}</p>
                           <div class="progress progress-sm active">
@@ -250,13 +251,19 @@
     <script src="/js/app/launcher/launcher.service.js"></script>
     <script src="/js/app/machine/machine.controller.js"></script>
     <script src="/js/app/machine/machine.service.js"></script>
+    <script src="/js/app/mode/mode.controller.js"></script>
+    <script src="/js/app/mode/mode.service.js"></script>
     <script src="/js/app/module/module.controller.js"></script>
     <script src="/js/app/module/module.service.js"></script>
     <script src="/js/app/notification/notification.controller.js"></script>
     <script src="/js/app/notification/notification.service.js"></script>
+    <script src="/js/app/notificationuser/notificationuser.controller.js"></script>
+    <script src="/js/app/notificationuser/notificationuser.service.js"></script>
     <script src="/js/app/now/now.controller.js"></script>
     <script src="/js/app/param/param.controller.js"></script>
     <script src="/js/app/param/param.service.js"></script>
+    <script src="/js/app/paramuser/paramUser.controller.js"></script>
+    <script src="/js/app/paramuser/paramUser.service.js"></script>
     <script src="/js/app/recognition/recognition.service.js"></script>
     <script src="/js/app/room/room.service.js"></script>
     <script src="/js/app/scenario/scenario.controller.js"></script>
@@ -273,9 +280,13 @@
     <script src="/js/app/statetype/statetype.service.js"></script>
     <script src="/js/app/store/store.controller.js"></script>
     <script src="/js/app/store/store.service.js"></script>
+    <script src="/js/app/system/system.controller.js"></script>
+    <script src="/js/app/system/system.service.js"></script>
     <script src="/js/app/token/token.controller.js"></script>
     <script src="/js/app/token/token.service.js"></script>
+    <script src="/js/app/translate/translate.config.js"></script>
     <script src="/js/app/update/update.service.js"></script>
+    <script src="/js/app/user/user.controller.js"></script>
     <script src="/js/app/user/user.service.js"></script>
     <script src="/js/app/voice/voice.service.js"></script>
     <script src="/js/AdminLTE/app.js"></script>

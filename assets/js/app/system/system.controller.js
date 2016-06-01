@@ -82,7 +82,7 @@
             })
             .catch(function(err){
                  vm.updatingData = false;
-                 notificationService.errorNotificationTranslated('SYSTEM.UPDATE_DATA_SUCCESS', err);
+                 notificationService.errorNotificationTranslated('SYSTEM.UPDATE_DATA_FAIL', err);
             });
        }
     }

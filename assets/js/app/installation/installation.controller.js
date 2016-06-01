@@ -87,7 +87,7 @@
         
         vm.downloadStep = 1;
         vm.downloadProgress = 0;
-        var nbSteps = 7;
+        var nbSteps = 8;
         
         // get all modes
         updateService.updateModes()
@@ -117,6 +117,13 @@
               vm.downloadProgress += 100/nbSteps;
               // get all Categories
               return updateService.updateCategories();
+          })
+          .then(function(){
+              vm.downloadStep++;
+              vm.downloadProgress += 100/nbSteps;
+              
+              // get all statesTypes
+              return updateService.updateStates();
           })
           .then(function(){
               
