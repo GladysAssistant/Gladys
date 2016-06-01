@@ -38,8 +38,20 @@ function verify(statetype, params) {
         verifyFunction = gladys.modules[statetype.service][statetype.function];
     }
 
-    // if yes, we call the service
-    return verifyFunction(params)
+   
+     // we get all the params
+    return gladys.stateParam.getByState({state: statetype.stateId})
+        .then(function(stateParams){
+             
+             var paramsToSend = {};
+             
+             stateParams.forEach(function(stateParam){
+                 paramsToSend[stateParam.variablename] = stateParam.value;
+             });
+             
+              // we call the service
+             return verifyFunction(paramsToSend);
+        })
         .then(function(scope) {
 
             // when we have the result, we inject it in the condition template
