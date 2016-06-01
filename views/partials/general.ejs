@@ -29,6 +29,10 @@
                                 </div>
                           </div></td>
                    </tr>
+                   <tr><td><%= __('system-update-data') %></td><td><button class="btn btn-success btn-sm" ng-click="vm.updateAllData();">
+                       <div ng-show="!vm.updatingData"><%= __('system-update-data-button') %></div>
+                       <div ng-show="vm.updatingData"><%= __('system-updating-data') %></div>
+                   </button> </td></tr>
                 </tbody>
             </table>
 
