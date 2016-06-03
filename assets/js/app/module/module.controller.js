@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('ModuleCtrl', ModuleCtrl);
 
-    ModuleCtrl.$inject = ['moduleService', '$scope', 'notificationService', 'storeService'];
+    ModuleCtrl.$inject = ['moduleService', '$scope', 'notificationService', 'storeService', '$sce'];
 
-    function ModuleCtrl(moduleService, $scope, notificationService, storeService) {
+    function ModuleCtrl(moduleService, $scope, notificationService, storeService, $sce) {
         /* jshint validthis: true */
         var vm = this;
         
@@ -65,6 +65,7 @@
                  vm.installing = false;
                  module.installed = true;
                  module.localId = data.data.id;
+                 storeService.saveDownload(module.idModule);
                  notificationService.successNotificationTranslated('MODULE.INSTALLED_SUCCESS_NOTIFICATION', module.name);
              })
              .catch(function(){
@@ -100,6 +101,12 @@
            
            // showing the modal
            $('#modalShowModule').modal('show');
+           
+           // getting infos
+           storeService.getModuleInfos(module.slug)
+                .then(function(data){
+                    vm.selectedModule.instructions = $sce.trustAsHtml(data.data.instructionsHTML);
+                });
        }
        
        

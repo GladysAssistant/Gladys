@@ -65,8 +65,8 @@
                         <div class="panel panel-default view tab-content">
 
                             <!-- Informations View -->
-                            <div id="infos" class="tab-pane panel-body active">
-                                {{vm.selectedModule.description}}
+                            <div id="infos" class="tab-pane panel-body active" ng-bind-html="vm.selectedModule.instructions">
+
                             </div>
 
                             <!-- Avis View -->
