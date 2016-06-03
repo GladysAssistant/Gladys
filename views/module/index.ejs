@@ -17,8 +17,8 @@
           
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('modules-installed') %></a></li>
-              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('modules-store') %></a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab" ng-click="vm.refreshModule();" aria-expanded="true"><%= __('modules-installed') %></a></li>
+              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false" ng-click="vm.getModulesStore();"><%= __('modules-store') %></a></li>
               <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('modules-advanced') %></a></li>
               <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
             </ul>
@@ -34,6 +34,7 @@
                   <th><%= __('Status') %></th>
                   <th><%= __('Configuration') %></th>
                   <th><%= __('Infos') %></th>
+                  <th><%= __('module-uninstall') %></th>
                 </tr>
                 
                  <tr ng-repeat="module in vm.modules" class="ng-cloak">
@@ -43,6 +44,7 @@
                   <td>{{module.status}}</td>
                    <td><button class="btn btn-info btn-sm" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
                   <td><button class="btn btn-info btn-sm" ng-click="vm.displayModule(module);"><%= __('Infos') %></button></td>
+                   <td><button class="btn btn-danger btn-sm" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
                 </tr>
                 
               </tbody></table>
@@ -52,12 +54,12 @@
                     <!-- END OF TAB 1 -->
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2" data-ng-controller="StoreCtrl as vm">
+              <div class="tab-pane" id="tab_2" >
                 <div class="row modules" >
 
             
-                    <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modules">
-                        <a href="{{module.url}}"> <h5>{{module.name}}</h5>
+                    <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modulesFromStore" ng-click="vm.showModule(module);">
+                        <a> <h5>{{module.name}}</h5>
                         <div class="module-img">
                             <img class="img-responsive img-rounded" src="{{module.img}}">
                             <div class="description">
@@ -84,6 +86,9 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
+                
+                <%- partial ('./modal.ejs') %>
+                
               </div>
               <!-- /.tab-pane -->
               
@@ -132,6 +137,7 @@
 
     </section><!-- /.content -->
 </aside><!-- /.right-side -->
+
 
 <script>
     document.getElementById("moduleLi").className = "active";
