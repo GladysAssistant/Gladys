@@ -199,6 +199,7 @@
   "module-uninstall": "Uninstall", 
   "module-installing": "Installing...",
   "module-uninstalling": "Uninstalling...", 
+  "module-date": "Date",
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
   "user-box-title": "Your user account",

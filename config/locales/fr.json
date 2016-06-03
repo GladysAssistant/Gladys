@@ -363,6 +363,7 @@
   "module-uninstall": "Désinstallation", 
   "module-installing": "Installation...",
   "module-uninstalling": "Désinstallation...", 
+  "module-date": "Date",
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
   "user-box-title": "Votre compte utilisateur",
