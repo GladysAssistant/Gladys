@@ -49,23 +49,29 @@
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="type in room.deviceTypes" class="ng-cloak">
-                                                <td>{{type.name}}</td>
+                                                <td>{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}"> - {{type.type}}</span></td>
                                                 <td>
                                                     <!-- If the deviceType is a sensor, display last data -->
                                                     <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
                                                     
                                                     <!-- If the deviceType is not a sensor and is not a binary, display input field -->
                                                      <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                         
+                                                         <div class="device-value-slider">
+                                                            <slider data-slider-id="green" ng-model="type.lastValue" min="type.min" step="1" max="type.max" value="type.lastValue" ng-model-options='{ debounce: 100 }' ng-change="vm.changeValue(type, type.lastValue);" ></slider>
+                                                          </div>
+                                                           <!--
                                                         <div class="form-group">
                                                             <div class="input-group">
                                                             <input 
                                                                 type="number" class="form-control input-sm" 
                                                                 ng-model="type.lastValue" 
                                                             />
+                                                         
                                                             <span class="input-group-btn">
                                                             <button class="btn btn-success btn-sm" ng-click="vm.changeValue(type, type.lastValue);" ><%= __('devices-types-changevalue') %></button> 
                                                             </span>
-                                                            </div>
+                                                            </div>-->
                                                         </div>
                                                      </form>    
                                                     <!-- If the deviceType is not a sensor and is  a binary, display on/off button -->

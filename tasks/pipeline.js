@@ -27,6 +27,9 @@ var cssFilesToInject = [
   'styles/store.css',
   'styles/scenario.css',
   'styles/angular-chart/angular-chart.min.css',
+  'styles/bootstrap-slider/bootstrap-slider.min.css',
+  'styles/device.css',
+  
   // all styles, disabled by default
   //'styles/**/*.css',
   
@@ -69,6 +72,9 @@ var jsFilesToInject = [
   
   'js/dependencies/datepicker/bootstrap-datepicker.js',
   
+  'js/dependencies/bootstrap-slider.min.js',
+  
+  
   
   // Other dependecies
   //'js/dependencies/**/*.js',
@@ -82,6 +88,7 @@ var jsFilesToInject = [
     'js/smooth-scroll/angular-smooth-scroll.min.js',
     'js/angular-chart/angular-chart.min.js',
     'js/angular-translate/angular-translate.min.js',
+    'js/angular-slider/slider.js',
     
     // loading first AngularModule definition
    'js/app/app.module.js',
