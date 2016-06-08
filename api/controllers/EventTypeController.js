@@ -3,7 +3,11 @@
 module.exports = {
   
   index: function(req, res, next){
-      
+      gladys.eventType.get()
+        .then(function(eventTypes){
+          return res.json(eventTypes);
+        })
+        .catch(next);
   },
   
   /**
