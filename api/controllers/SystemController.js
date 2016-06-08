@@ -8,5 +8,9 @@ module.exports = {
               return res.json(infos);
           })
           .catch(next);
+    },
+    
+    shutdown: function(req, res, next){
+        gladys.system.shutDown();
     }
 }

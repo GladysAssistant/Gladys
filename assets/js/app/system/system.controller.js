@@ -24,6 +24,7 @@
         
         vm.infos = {};
         vm.updatingData = false;
+        vm.shutdown = shutdown;
         
         activate();
 
@@ -36,6 +37,10 @@
              .then(function(data){
                 vm.infos = data.data; 
              });
+       }
+       
+       function shutdown(){
+           systemService.shutdown();
        }
        
        function updateAllData(){

@@ -19,13 +19,18 @@
     function systemService($http) {
         
         var service = {
-            get: get
+            get: get,
+            shutdown: shutdown
         };
 
         return service;
 
         function get(){
             return $http({method: 'GET', url: '/system' });
+        }
+        
+        function shutdown(){
+            return $http({method: 'POST', url: '/system/shutdown' });
         }
       
         

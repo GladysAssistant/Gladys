@@ -195,7 +195,7 @@ module.exports.routes = {
   
   // System
   'get /system': 'SystemController.index',
-  
+  'post /system/shutdown': 'SystemController.shutdown',
   
   // Token
   'get /token': 'TokenController.index',
