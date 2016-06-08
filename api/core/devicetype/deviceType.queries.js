@@ -7,7 +7,7 @@ module.exports = {
     WHERE dt.id = ?;
   `,
    getByRoom: `
-    SELECT d.name, dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service,
+    SELECT d.name, dt.id, dt.type, dt.unit, dt.min, dt.max, dt.display, d.identifier, dt.device, d.service,
     ds.datetime as lastChanged, ds.value AS lastValue, ds.id AS lastValueId
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)

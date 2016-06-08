@@ -24,6 +24,7 @@
     vm.selectDevice = selectDevice;
     vm.changeValue = changeValue;
     vm.updateDeviceType = updateDeviceType;
+    vm.changeTypeDisplay = changeTypeDisplay;
     vm.saving = false;
     vm.devices = [];
     vm.rooms = [];
@@ -102,6 +103,13 @@
             .then(function(){
                 
             });
+    }
+    
+    function changeTypeDisplay(type){
+        if(type.display) type.display = 0;
+        else type.display = 1;
+        
+        return updateDeviceType(type);
     }
     
      // waiting for websocket message

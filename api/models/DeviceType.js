@@ -39,6 +39,12 @@ module.exports = {
             type: 'integer',
             required: true
         },
+        
+        // if the deviceType should be displayed in view
+        display: {
+          type:'boolean',
+          defaultsTo: true  
+        },
 
         device: {
             model: 'Device',

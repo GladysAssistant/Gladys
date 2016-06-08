@@ -48,7 +48,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="type in room.deviceTypes" class="ng-cloak">
+                                            <tr ng-show="type.display" ng-repeat="type in room.deviceTypes" class="ng-cloak">
                                                 <td>{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}"> - {{type.type}}</span></td>
                                                 <td>
                                                     <!-- If the deviceType is a sensor, display last data -->
@@ -210,6 +210,7 @@
                                                 <th><%= __('devices-types-min') %></th>
                                                 <th><%= __('devices-types-max') %></th>
                                                 <th><%= __('devices-types-isensor') %></th>
+                                                <th><%= __('devices-types-display') %></th>
                                                 <th><%= __('devices-types-lastvalue') %></th>
                                             </tr>
                                         </thead>
@@ -222,6 +223,12 @@
                                                 <td>{{type.min}}</td>
                                                 <td>{{type.max}}</td>
                                                 <td><div ng-show="type.sensor == 1"><%= __('devices-sensor-true') %></div><div ng-show="type.sensor == 0"><%= __('devices-sensor-false') %></div></td>
+                                                <td>
+                                                    <button ng-click="vm.changeTypeDisplay(type);" 
+                                                            class="btn {{ type.display && 'btn-danger' || 'btn-success' }} btn-sm">
+                                                            {{type.display && '<%= __('devices-types-display-no') %>' || '<%= __('devices-types-display-yes') %>' }}
+                                                    </button>
+                                                </td>
                                                 <td>
                                                     <!-- If the deviceType is a sensor, display last data -->
                                                     <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
