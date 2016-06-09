@@ -1,0 +1,30 @@
+<div class="table-responsive">
+
+<table id="example2" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th><%= __('scenario-table-event') %></th>
+            <th><%= __('scenario-table-template') %></th>
+            <th><%= __('Action') %></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <!-- LAUNCHER ROW -->
+        <tr ng-repeat="launcher in vm.launchers" class="ng-cloak" >
+            <td>
+               {{launcher.name}}                 
+            </td>
+            <td>{{launcher.condition_template}}</td>
+            <td><button ng-click="vm.deleteLauncher($index, launcher.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+        </tr>
+        <!-- END OF ROW -->
+        
+        <tr>
+            
+            <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+        </tr>
+    </tbody>
+
+</table>
+</div>

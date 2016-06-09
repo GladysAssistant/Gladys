@@ -30,6 +30,13 @@
  * `node app.js --silent --port=80 --prod`
  */
 
+
+// if no env variable is set, we are in production
+if(!process.env.NODE_ENV){
+    process.env.NODE_ENV = 'production';    
+}
+
+
 // Ensure we're in the project directory, so relative paths work as expected
 // no matter where we actually lift from.
 process.chdir(__dirname);
@@ -48,24 +55,15 @@ process.chdir(__dirname);
     console.error('but if it doesn\'t, the app will run with the global sails instead!');
     return;
   }
-
-  // Try to get `rc` dependency
-  var rc;
-  try {
-    rc = require('rc');
-  } catch (e0) {
-    try {
-      rc = require('sails/node_modules/rc');
-    } catch (e1) {
-      console.error('Could not find dependency: `rc`.');
-      console.error('Your `.sailsrc` file(s) will be ignored.');
-      console.error('To resolve this, run:');
-      console.error('npm install rc --save');
-      rc = function () { return {}; };
-    }
-  }
-
-
+  
+  var config = {
+        hooks: {
+            grunt: false
+        }
+  };
+  
   // Start server
-  sails.lift(rc('sails'));
+  sails.lift(config);
+  
+  module.exports = sails;
 })();

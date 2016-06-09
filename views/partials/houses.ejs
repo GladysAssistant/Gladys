@@ -1,0 +1,94 @@
+<div  data-ng-controller="HouseCtrl as vm">
+     
+<!-- NEW BOX -->
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('house-box-title') %></h3>
+    </div>
+
+<div class="box-body table-responsive">
+
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><%= __('Name') %></th>
+                <th><%= __('Address') %></th>
+                <th><%= __('City') %></th>
+                <th><%= __('PostCode') %></th>
+                <th><%= __('Country') %></th>
+                <th><%= __('Latitude') %></th>
+                <th><%= __('Longitude') %></th>
+                <th><%= __('Action') %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="house in vm.houses" class="ng-cloak">
+                <td>{{house.name}}</td>
+                <td>{{house.address}}</td>
+                <td>{{house.city}}</td>
+                <td>{{house.postcode}}</td>
+                <td>{{house.country}}</td>
+                <td>{{house.latitude}}</td>
+                <td>{{house.longitude}}</td>
+                <td><button ng-click="vm.deleteHouse($index, house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.name" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.address" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.city" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.postcode" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.country" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.latitude" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.longitude" /></td>
+                <td><button class="btn btn-success btn-sm" ng-click="vm.createHouse(vm.newHouse)"><%= __('New') %></button></td>
+            </tr>
+        </tbody>
+    </table>
+    
+  </div>
+  
+</div>
+
+<!-- END OF HOUSE BOX -->
+
+<!-- NEW BOX -->
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('room-box-title') %></h3>
+    </div>
+    
+    <div class="box-body table-responsive">
+
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><%= __('Name') %></th>
+                <th><%= __('House') %></th>
+                <th><%= __('Action') %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="room in vm.rooms" class="ng-cloak">
+                <td>{{room.name}}</td>
+                <td>{{room.houseName}}</td>
+                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+            </tr>
+            <tr class="ng-cloak"> 
+                <td><input type="text" class="form-control" ng-model="vm.newRoom.name" /></td>
+                <td><select ng-model="vm.newRoom.house" class="form-control" >
+                        <option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>
+                </select>
+
+                </td>
+                <td><button class="btn btn-success btn-sm" ng-click="vm.createRoom(vm.newRoom)"><%= __('New') %></button></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</div>
+
+</div>
+
+<%- partial ('./modes.ejs') %>

@@ -66,12 +66,8 @@
 ################################################
 
 node_modules
-bower_components
-.GladysBackUp
-music/**/*.mp3
-music/**/*.wav
-uploads
-voicecache/**/*.mp3
+coverage
+cache/*.json
 www
 api/hooks
 

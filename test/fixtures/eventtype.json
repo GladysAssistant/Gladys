@@ -1,99 +1,58 @@
 [
 	{ 
-		"name": "gladysInstallation", 
-		"BeautifulName": "Gladys installed", 
+        "id": 1,
+		"code": "test", 
+		"name": "test", 
+        "service": "TestService",
 		"faIcon": "fa fa-desktop", 
 		"iconColor": "bg-black"
 	},
 	{ 
-		"name": "gladysUpdate", 
-		"BeautifulName": "Gladys updated", 
+        "id": 2,
+		"code": "wakeup", 
+		"name": "Gladys updated", 
+        "service": "TestService",
 		"faIcon": "fa fa-wrench", 
 		"iconColor": "bg-black"
 	},
-	{ 
-		"name": "wakeUp", 
-		"BeautifulName" : "WakeUp",  
-		"faIcon" : "fa fa-bed", 
-		"iconColor": "bg-yellow"
-	},
-	{ 
-		"name": "goingToSleep", 
-		"BeautifulName": "Going To Sleep", 
-		"faIcon": "fa fa-bed",
-		"iconColor": "bg-blue"
-	},
-	{ 
-		"name": "playMusic", 
-		"BeautifulName":"Playing Music", 
-		"faIcon": "fa fa-music", 
-		"iconColor":"bg-orange" 
-	},
-	{ 
-		"name": "sendMail",
-		"BeautifulName":"Mail sent", 
-		"faIcon": "fa fa-paper-plane", 
-		"iconColor":"bg-green" 
-	},
-	{ 
-		"name": "motion",
-		"BeautifulName":"Motion detected", 
-		"faIcon": "fa fa-rss", 
-		"iconColor":"bg-green" 
-	},
-	{ 
-		"name": "received433UnknownValue", 
-		"BeautifulName":"Unknow 433Mhz signal received", 
-		"faIcon": "fa fa-rss", 
-		"iconColor":"bg-green", 
-		"display":"none"
-	},
-	{ 
-		"name": "backAtHome", 
-		"BeautifulName":"Back at home",
-		"faIcon": "fa fa-home", 
-		"iconColor": "bg-light-blue"
-	},
-	{ 
-		"name": "leftHome", 
-		"BeautifulName":"Left Home", 
-		"faIcon": "fa fa-home", 
-		"iconColor":"bg-light-blue"
-	},
-	{ 
-		"name": "lampOn", 
-		"BeautifulName": "Lamp Turned On", 
-		"faIcon" : "fa fa-power-off", 
-		"iconColor": "bg-yellow"
-	},
-	{ 
-		"name": "lampOff", 
-		"BeautifulName": "Lamp turned Off ", 
-		"faIcon": "fa fa-power-off", 
+	{
+		"id": 3,
+		"code": "devicetype-new-value",
+		"name": "DeviceType new Value",
+		"service": "DeviceType",
+		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
-	{ 
-		"name": "lampBrightnessChange",
-		"BeautifulName":"Lamp Brightness changed",
-		"faIcon": "fa fa-sliders", 
-		"iconColor": "bg-light-blue"
+	{
+		"id": 4,
+		"code": "house-mode-changed",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	},
-	{ 
-		"name": "lampColorChange",
-		"BeautifulName":"Lamp color changed", 
-		"faIcon": "fa fa-sliders", 
-		"iconColor": "bg-purple"
+	{
+		"id": 5,
+		"code": "enter-area",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	},
-	{ 
-		"name": "temperature",
-		"BeautifulName":"New temperature measured in room.", 
-		"faIcon": "fa fa-sun-o", 
-		"iconColor": "bg-yellow"
+	{
+		"id": 6,
+		"code": "left-area",
+		"name": "House Mode changed",
+		"service": "mode",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	},
-	{ 
-		"name": "humidity",
-		"BeautifulName":"New humidity measured in room.", 
-		"faIcon": "fa fa-tint", 
-		"iconColor": "bg-light-blue"
+	{
+		"id": 7,
+		"code": "back-at-home",
+		"name": "User is back at home !",
+		"service": "house",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]

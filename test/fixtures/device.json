@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Light",
+    "protocol": "milight",
+    "service": "test",
+    "room": 1
+  },
+  {
+    "id": 2,
+    "name": "TV",
+    "protocol": "zwave",
+    "service": "zwave",
+    "room": 1
+  }
+]

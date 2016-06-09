@@ -11,5 +11,5 @@
     'use strict';
 
     angular
-        .module('app', ['ng.deviceDetector', 'infinite-scroll', 'angularMoment', 'ui-notification', 'smoothScroll']);
+        .module('gladys', ['ng.deviceDetector', 'infinite-scroll', 'angularMoment', 'ui-notification', 'smoothScroll', 'chart.js', 'pascalprecht.translate', 'ui.bootstrap-slider']);
 })();

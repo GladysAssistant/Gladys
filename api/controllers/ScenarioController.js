@@ -15,27 +15,6 @@
  */
 
 module.exports = {
-	/**
-	 * Get all scenarios 
-	 * (Launcher + states + actions)
-	 * @method index
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	index: function(req,res,next){
-		Launcher.find({user: req.session.User.id})
-				.populate('states')
-				.populate('actions')
-				.populate('launcher')
-				.exec(function(err,launcher){
-					if(err) return res.json(err);
-
-					return res.json(launcher);
-				});
-
-	},
 
 };
 

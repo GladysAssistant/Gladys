@@ -1,6 +1,7 @@
 Gladys Project
 =======================
 
+[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys)
 
 ![Alt](http://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
 
@@ -44,7 +45,7 @@ Getting Started
 The easiest way to get started is to install Gladys with NPM :
 
 ```bash
-npm install -g gladys --unsafe-perm
+npm install -g gladys
 ```
 
 Gladys is now located where you global node_modules are.
@@ -57,18 +58,26 @@ For example on Raspbian or on a Mac, it's located in :
 
 #### Connect Gladys to MySQL
 
-To connect Gladys to your database, you need to enter your connections informations in the `config/connections.js` file.
+To connect Gladys to your database, you need to modify environment variables. 
+
+You can set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD` and `MYSQL_DATABASE`.
+
+
+
+**Dirty way :**
+
+If you are not able to modify environment variables, you can enter your connections informations in the `config/connections.js` file.
 
 Modify the following lines with your own informations :
 
 ```
- sailsmysql: {
+sailsmysql: {
     adapter: 'sails-mysql',
-    host: 'localhost', 
-    port: 8889, 
-    user: 'root', 
-    password: 'root',
-    database: 'gladys'
+    host: process.env.MYSQL_HOST || 'localhost',
+    port: process.env.MYSQL_PORT || 3306,
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || 'root',
+    database: process.env.MYSQL_DATABASE || 'gladys'
   },
 ```
 
@@ -76,50 +85,36 @@ Modify the following lines with your own informations :
 
 `CREATE DATABASE gladys;`
 
+
+#### Compile assets 
+
+If you want to recompile assets and run all tasks, you can run :
+
+```
+grunt buildProd
+```
+
 #### Create tables
 
-Gladys create automatically all the tables it needs. (only in development mode, not in production, so be sure to start Gladys one time in development mode before trying production mode).
+Gladys create automatically all the tables it needs.
+
+You need to execute the init file :
+
+```bash
+node init.js
+```
 
 #### Start Gladys 
 
 ```
-$ node app.js
+node app.js
 ```
 
 #### Visit Gladys dashboard
 
-If you are on localhost, visit : `http://localhost:1337` (in development mode), or`http://localhost` (in production).
+If you are on localhost, visit : `http://localhost:1337` (in development mode), or`http://localhost:8080` (in production).
 
-If you want to access Gladys anywhere on your local network, just visit : `http://ip_of_your_machine:1337`.
-
-#### Gladys on a server
-
-If you are trying to install Gladys on a VPS or a dedicated server, or any device which don't have an audio card ( a server can't play music, can't speak ), that's possible !
-
-You need to change the file `config/machine.js`. 
-Go to line 21 and change the line `soundCapable : true` to `soundCapable : false`.
-
-When you install the NPM dependencies, you can remove package linked to audio playing, because they won't be able to install on you server ( module lame, speaker and player ).
-
-
-Getting Google API KEY
-------------------
-
-If you want Gladys to be connected to your Google account ( to read your calendar for example ), you need to register in Gladys config file your Google API Key.
-
-- Visit [Google Developpers Console](https://console.developers.google.com/project)
-- Click **CREATE PROJECT**
-- Enter a *Project Name* (for example "Gladys") , then click **CREATE**
-- Then select *APIs & auth* from the sidebar and click on *Credentials* tab
-- Click **CREATE NEW CLIENT ID** button :
- - **Application Type**: Web Application
- - **Authorized Javascript origins**: http://localhost
- - **Authorized redirect URI**: http://localhost:1337/googleapi/create
-- Copy and paste *Client ID* and *Client secret* keys into `config/googleapis.js`
-
-You must allow the created project to access to your calendar, and your emails. Your developper console must look like that :
-
-![Alt](http://gladysproject.com/assets/images/presentation/api_authorization.png)
+If you want to access Gladys anywhere on your local network, just replace localhost by the ip of your machine.
 
 FAQ
 -------------
@@ -131,14 +126,6 @@ Make sure that node-gyp is working fine. Wait, what is node-gyp ?
 
 To be sure that you're doing that good, check [node-gyp installation guide](https://github.com/TooTallNate/node-gyp#installation).
 
-### Can't install npm package speaker
-
-On Debian/Ubuntu, the ALSA backend is selected by default, so be sure to have the alsa.h header file in place :
-
-`$ sudo apt-get install libasound2-dev`
-
-For more informations, check [node-speaker repository](https://github.com/TooTallNate/node-speaker).
-
 
 Contributing
 -------------
@@ -148,8 +135,8 @@ Pull request are welcome, but code must follow some guidelines.
 * For the Node.js part, follow [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide).
 * For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
 * Use [JSHint](https://github.com/jshint/jshint).
-* Try to Unit test your code as much as possible. Gladys is partially unit tested ( yes, that's bad ). The goal is to fully unit-test Gladys !
-
+* Try to Unit test your code as much as possible. No pull requests will be accepted without good unit tests.
+ 
 If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](http://gladysproject.com).
 
 

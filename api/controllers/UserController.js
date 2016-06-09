@@ -15,42 +15,73 @@
  */
 
 module.exports = {
+    
+    /**
+     * Get users with pagingation
+     */
+   index: function(req, res, next){
+      gladys.user.get(req.query)
+        .then(function(users){
+           return res.json(users); 
+        })
+        .catch(next);
+   },
+   
+   /**
+    * Create a user
+    */
+   create: function(req, res, next){
+       gladys.user.create(req.body)
+         .then(function(user){
+             return res.status(201).json(user);
+         })
+         .catch(next);
+   },
+   
+   /**
+    * User login
+    */
+   login: function(req, res, next){
+       gladys.user.login(req.body)
+         .then(function(user){
+           
+           // user is logged in
+           req.session.User = user;
+           req.session.authenticated = true;
+           req.session.trueHuman = true;  
+           sails.log.info(`User connected ${user.firstname}`);
+           
+           return res.json(user);  
+         })
+         .catch(next);
+   },
+   
+   /**
+    * Update a user
+    */
+   update: function(req, res, next){
+       req.body.id = req.params.id;
+       gladys.user.update(req.body)
+         .then(function(user){
+             return res.json(user);
+         })
+         .catch(next);
+   },
+   
+   /**
+    * Delete a user
+    */
+   delete: function(req, res, next){
+       gladys.user.delete({id: req.params.id})
+         .then(function(user){
+             return res.json(user);
+         })
+         .catch(next);
+   },
 
-  /**
-   * Get all the users
-   * @method index
-   * @param {} req
-   * @param {} res
-   * @param {} next
-   * @return
-   */
-  index: function(req, res, next) {
-    var request = "SELECT id,firstname, lastname, CONCAT(firstname, ' ', lastname) AS name FROM user";
-    User.query(request, [], function(err, users) {
-      if (err) return res.json(err);
-
-      res.json(users);
-    });
-  },
-  
-  setPreparationTime: function(req,res,next){
-     User.update({id:req.session.User.id}, {preparationTimeAfterWakeUp: req.param('preparationTime')})
-      .exec(function(err, user){
-          if(err) return res.json(err);
-          
-          return res.json(user);
-      });
-  },
-  
-  setAssistantName: function(req, res,next){
-     User.update({id:req.session.User.id}, {assistantName: req.param('assistantName')})
-      .exec(function(err, user){
-          if(err) return res.json(err);
-          
-          return res.json(user);
-      });
-  },
-
+/**
+ * return the current connected user
+ */
   whoami: function(req, res, next){
     var user = {
       firstname: req.session.User.firstname,
@@ -61,8 +92,6 @@ module.exports = {
       language: req.session.User.language,
       assistantName: req.session.User.assistantName,
       preparationTimeAfterWakeUp: req.session.User.preparationTimeAfterWakeUp,
-      parametres: req.session.User.parametres,
-      atHome: req.session.User.atHome,
       id: req.session.User.id
     };
     res.json(user);

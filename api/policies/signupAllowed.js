@@ -5,9 +5,13 @@
 		
 		
 module.exports = function(req, res, next) {
-	if(!sails.config.signup.active){
-			return res.forbidden('Signup not active');
-	}else{
-		next();
-	}		
+	gladys.utils.sql('SELECT * FROM user;')
+      .then(function(users){
+         if(users.length === 0){
+             next();
+         } else {
+             return res.forbidden('Signup not allowed');
+         }
+      })
+      .catch(next);
 };

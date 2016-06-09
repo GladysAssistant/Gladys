@@ -19,14 +19,17 @@ var cssFilesToInject = [
   'styles/bootstrap.min.css',
   'styles/font-awesome.min.css',
   'styles/ionicons.min.css',
-  'styles/morris/morris.css',
   'styles/datepicker/datepicker3.css',
   'styles/angular-ui-notification/angular-ui-notification.min.css',
   'styles/AdminLTE.css',
   'styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css',
-  'styles/scenariostep.css',
-  'styles/weatherjs.css',
-  'styles/sleep.css',
+  'styles/search.css',
+  'styles/store.css',
+  'styles/scenario.css',
+  'styles/angular-chart/angular-chart.min.css',
+  'styles/bootstrap-slider/bootstrap-slider.min.css',
+  'styles/device.css',
+  
   // all styles, disabled by default
   //'styles/**/*.css',
   
@@ -50,19 +53,27 @@ var jsFilesToInject = [
   // loading Bootstrap
   'js/dependencies/bootstrap.min.js',
    // loading Raphael
-  'js/dependencies/raphael-min.js',
+  //'js/dependencies/raphael-min.js',
+  
   // loading Morris JS
-  'js/dependencies/morris.min.js',
-  // loading Morris JS
+  //'js/dependencies/morris.min.js',
+  
+  // loading Moment with locales
   'js/dependencies/moment-with-locales.js',
+  
+  // loading Chart JS
+  'js/dependencies/chart.min.js',
+  
   // loading ace
   'js/dependencies/ace/ace.js',
-  //loading simpleWeather
-  'js/dependencies/jquery.simpleWeather.min.js',
+
   // loading bootstrap datetimepicker
   'js/dependencies/bootstrap-datetimepicker.min.js',
   
   'js/dependencies/datepicker/bootstrap-datepicker.js',
+  
+  'js/dependencies/bootstrap-slider.min.js',
+  
   
   
   // Other dependecies
@@ -75,6 +86,9 @@ var jsFilesToInject = [
     'js/angular-moment/angular-moment.min.js',
     'js/angular-ui-notification/angular-ui-notification.min.js',
     'js/smooth-scroll/angular-smooth-scroll.min.js',
+    'js/angular-chart/angular-chart.min.js',
+    'js/angular-translate/angular-translate.min.js',
+    'js/angular-slider/slider.js',
     
     // loading first AngularModule definition
    'js/app/app.module.js',

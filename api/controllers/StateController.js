@@ -17,63 +17,41 @@
  * @param {} callback
  * @return 
  */
-function haveRights(state, user,callback){
-	State.findOne({id : state, user: user}, function(err, state){
-		if(err) return callback(err);
-
-		callback(false, state);
-	});
-}
 
 module.exports = {
-
-	/**
-	 * Create a new State
-	 * @method create
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	create : function(req,res,next){
-		var stateObj = {
-			state:req.param('state'),
-			launcher:req.param('launcher'),
-			operator: req.param('operator'),
-			parametre:req.param('parametre'),
-			user:req.session.User.id
-		};
-
-		State.create(stateObj, function(err, state){
-			if(err) return res.json(err);
-
-			res.json(state);
-		});
-	},
-
-	/**
-	 * Destroy a state
-	 * @method destroy
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	destroy : function(req,res,next){
-		haveRights(req.param('id'), req.session.User.id, function(err, state){
-			if(err) return res.json(err);
-
-			if(state){
-				State.destroy({id:req.param('id')}, function(err, state){
-					if(err) return res.json(err);
-
-					res.json(state);
-				});
-			}else{
-				res.json('not found');
-			}
-		});
-	}
-	
+    
+    create: function(req, res, next){
+        gladys.state.create(req.body)
+          .then(function(state){
+              return res.status(201).json(state);
+          })
+          .catch(next);
+    },  
+    
+    delete: function(req, res, next){
+        gladys.state.delete({id: req.params.id})
+          .then(function(){
+              return res.json({success: true});
+          })
+          .catch(next);
+    },
+    
+    update: function(req, res, next){
+        req.body.id = req.params.id;
+        gladys.state.update(req.body)
+          .then(function(state){
+              return res.json(state);
+          })
+          .catch(next);
+    },
+    
+    addParam: function(req, res, next){
+        req.body.state = req.params.id;
+        gladys.stateParam.create(req.body)
+          .then(function(param){
+             return res.status(201).json(param); 
+          })
+          .catch(next);
+    }
 };
 

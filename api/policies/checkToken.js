@@ -15,34 +15,40 @@
  * @docs        :: http://sailsjs.org/#!documentation/policies
  *
  */
+
+var jwt = require('jsonwebtoken');
+
 module.exports = function(req, res, next) {
+  
   // if user is already authenticated, proceed to controller
   if (req.session.authenticated && req.session.User) {
     return next();
   }
-  // if no token is given, redirect
-  if(!req.param('token'))
-      return res.redirect('/login');
-
-  // find token in the database
-  Token.findOne()
-  .where({ value : req.param('token') })
-  .where({ status : true })
-  .populate('user')
-  .exec(function foundToken(err, token) {
-  		if (err) return res.forbidden('Access denied. Error while finding token');
-
-  		if (!token)
-				return res.forbidden('Access denied.');
-		else{
-			sails.log.info("Access with token : " + req.param('token'));
-      req.session.User = token.user;
-      req.session.authenticated = true;
-      req.session.trueHuman = false;
-			return next();
-		}
-
-  });
-
-
+  
+  // if the request has a JsonWebToken
+  if(req.headers.Authorization){
+     
+     // verifying the jsonwebtoken
+     jwt.verify(req.headers.Authorization, sails.config.jwt.secret, function(err, user) {
+       if(err) return next(err);
+       
+       req.session.User = user;
+       return next();
+     });   
+  } else if (req.param('token')){
+      
+      // check if get param 'token' is a valid
+      gladys.token.verify(req.param('token'))
+        .then(function(user){
+           sails.log.info('Access with token to user ' + user.firstname);
+           req.session.User = user; 
+           return next();
+        })
+        .catch(function(err){
+           sails.log.error(err);
+           res.forbidden(); 
+        });
+  } else {
+      return res.forbidden('Unauthorized');
+  }
 };

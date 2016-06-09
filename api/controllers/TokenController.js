@@ -13,87 +13,41 @@
  * @description :: Server-side logic for managing tokens
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
-var crypto = require('crypto');
 
 module.exports = {
 
-	/**
-	 * Get all the tokens of the current user
-	 * @method index
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
 	index : function(req,res,next) {
-		Token.find()
-		.where({ user : req.session.User.id })
-		.exec(function foundTokens(err,Tokens ) {
-				if (err)  return res.json(err);
-				
-				return res.json(Tokens);
-		});
+		gladys.token.get(req.session.User)
+		  .then(function(tokens){
+			  return res.json(tokens);
+		  })
+		  .catch(next);
 	},
 
-	/**
-	 * Create a new token
-	 * @method create
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
 	create : function(req, res, next) {
+		req.body.user = req.session.User.id;
+		gladys.token.create(req.body)
+		  .then(function(token){
+			  return res.status(201).json(token);
+		  })
+		  .catch(next);
+	},
 
-		var seed = crypto.randomBytes(20);
-		var token = crypto.createHash('sha1').update(seed).digest('hex');
+	delete : function(req,res,next) {
+		gladys.token.delete({id: req.params.id})
+		  .then(function(){
+			  return res.json({success: true});
+		  })
+		  .catch(next);
+	},
 
-		var tokenObj = {
-			name : req.param('name'),
-			value: token,
-			user : req.session.User.id 
-		};
-
-		Token.create(tokenObj, function tokenCreated(err,token){
-			  if(err) return res.json(err);
-
+	update: function(req,res,next) {
+		req.body.id = req.params.id;
+		gladys.token.update(req.body)
+		  .then(function(token){
 			  return res.json(token);
-		});
-
-	},
-
-	/**
-	 * Destroy a Token
-	 * @method destroy
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	destroy : function(req,res,next) {
-		Token.destroy({ id: req.param('id'), user:req.session.User.id}, function tokenDestroyed(err, token){
-			if(err) return res.json(err);
-
-			return res.json(token);
-		});
-	},
-
-	/**
-	 * Update the status of a token
-	 * (switch active from true to false, or from false to true)
-	 * @method updateStatus
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	updateStatus: function(req,res,next) {
-
-		Token.update({ id: req.param('id'), user:req.session.User.id}, { status : req.param('status') }, function tokenUpdated(err, token){
-			if(err) return res.json(err);
-
-			return res.json(token);
-		});
+		  })
+		  .catch(next);
 	}
 	
 };

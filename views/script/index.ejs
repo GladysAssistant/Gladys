@@ -1,84 +1,86 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
-                <!-- Content Header (Page header) -->
-                <section class="content-header">
-                    <h1>
-                        <%= __('Scripts') %>
-                        <small><%= __('Control Panel') %></small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
-                        <li class="active"><%= __('Scripts') %></li>
-                    </ol>
-                </section>
+<aside class="right-side">
+       
+       <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                <%= __('Scripts') %>
+                <small><%= __('Control Panel') %></small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                <li class="active"><%= __('Scripts') %></li>
+            </ol>
+        </section>
 
-                <!-- Main content -->
-                <section class="content">
-                <div data-ng-controller="ScriptCtrl as vm">
-                	<div class="row">
-                            <div class="form-group">
-                                <div class="col-md-2">
-                                <label class="form-control" for="scriptlistselect"><%= __('Script to edit') %> :</label>
+        <!-- Main content -->
+        <section class="content">
+        <div data-ng-controller="ScriptCtrl as vm">
+            <div class="row">
+                    <div class="form-group">
+                        <div class="col-md-2">
+                        <label class="form-control" for="scriptlistselect"><%= __('script-name') %> :</label>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="selectScript" id="selectScript" class="form-control"
+                            ng-options="script.name for script in vm.scripts track by script.id"
+                            ng-model="vm.currentScript">
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-success"  data-toggle="modal" data-target="#NewFileModal" ><%= __('script-new') %></button>
+                        </div>
+                    </div>
+            </div>
+            
+                <h4 class="page-header"></h4>
+        
+                    <div class="alert alert-danger ng-cloak" ng-show="vm.error"><%= __('script-error') %> !</div> 
+                    <div class="alert alert-danger ng-cloak" ng-show="vm.scriptError">{{ vm.scriptErrorMessage.message }}</div>      
+                <pre id="editor"></pre>
+                <button class="btn btn-info" ng-click="vm.exec(vm.currentScript.id)"><i class="fa fa-play"></i> <%= __('script-run-script') %></button>
+                <button class="btn btn-success" ng-click="vm.patch(vm.currentScript.id)">
+                    <div ng-show="vm.savingState == ''"><%= __('script-save') %></div>
+                    <div class="ng-cloak" ng-show="vm.savingState == 'saving'"><%= __('script-saving') %> ...</div>    
+                    <div class="ng-cloak" ng-show="vm.savingState == 'saved'"><%= __('script-saved') %> !</div>    
+                </button>
+                <button class="btn btn-danger" ng-click="vm.destroy(vm.currentScript.id)"><%= __('script-delete') %></button>
+
+            
+            
+            <!-- Small modal -->
+            <div class="modal fade bs-example-modal-md" id="NewFileModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="mySmallModalLabel"><%= __('script-modal-title') %></h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="alert alert-danger" ng-show="vm.newFileWarning"><%= __('script-modal-error') %></p>
+                        <div class="row">
+                                <div class="col-md-6">
+                                    <label for="filename" class="form-control" ><%= __('script-modal-name') %> :</label>
                                 </div>
                                 <div class="col-md-4">
-        	                	<select name="scriptlistselect" class="form-control" ng-change="vm.refresh()" ng-model="vm.currentScript">
-        	                		<option selected="selected" value="newScript" ><%= __('New script') %></option>
-        	                		<option class="ng-cloak" ng-repeat="ascript in vm.scripts">{{ascript.name}}</option>
-        	                	</select>
+                                    <input type="text" name="filename" ng-model="vm.newName" class="form-control" />
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success" ng-click="vm.create(vm.newName);"><%= __('script-modal-create') %></button>
                                 </div>
                             </div>
-                    </div>
-                 
-                    	<h4 class="page-header"></h4>
-                         <div class="alert alert-danger ng-cloak" ng-show="vm.error"><%= __('Error while saving/deleting your script') %> !</div> 
-                         <div class="alert alert-danger ng-cloak" ng-show="vm.scriptError">{{ vm.scriptErrorMessage.message }}</div>      
-    					<pre id="editor"></pre>
-                        <button class="btn btn-info" ng-click="vm.runScript(vm.script.name)"><i class="fa fa-play"></i> <%= __('Run script') %></button>
-    					<button class="btn btn-success" ng-click="vm.save(vm.script.name)">
-                            <div ng-show="vm.savingState == ''"><%= __('Save') %></div>
-                            <div class="ng-cloak" ng-show="vm.savingState == 'saving'"><%= __('Saving') %> ...</div>    
-                            <div class="ng-cloak" ng-show="vm.savingState == 'saved'"><%= __('Saved') %> !</div>    
-                        </button>
-    					<button class="btn btn-danger" ng-click="vm.destroy(vm.script.name)"><%= __('Delete') %></button>
-                   
-                   
-                   
-                   
-                   <!-- Small modal -->
-                    <div class="modal fade bs-example-modal-md" id="NewFileModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-md">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                              <h4 class="modal-title" id="mySmallModalLabel"><%= __('Create a new Script') %></h4>
-                            </div>
-                            <div class="modal-body">
-                              <p class="alert alert-danger" ng-show="vm.newFileWarning"><%= __('Invalid file name (must end with .js, and must not exist yet)') %></p>
-                              <div class="row">
-                                        <div class="col-md-6">
-                                            <label for="filename" class="form-control" ><%= __('Enter your filename') %> :</label>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" name="filename" ng-model="vm.newName" class="form-control" />
-                                        </div>
-                                        <div class="col-md-2">
-                                            <button class="btn btn-success" ng-click="vm.createScript()"><%= __('Create') %></button>
-                                        </div>
-                                    </div>
-                            </div> 
-                        </div>
-                      </div>
-                    </div>
-                   
-                   
-				</div>
-				</section>
+                    </div> 
+                </div>
+                </div>
+            </div>
+            
+            
+        </div>
+        </section>
 
-		</aside>
-
-	<!--	<script src="/js/dependencies/ace/ace.js" type="text/javascript"></script>-->
+</aside>
         
-         <script>
-                document.getElementById("scriptLi").className = "active";
-         </script>
+<script>
+    document.getElementById("scriptLi").className = "active";
+</script>
 		

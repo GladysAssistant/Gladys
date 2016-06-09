@@ -12,7 +12,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('calendarCtrl', calendarCtrl);
 
   calendarCtrl.$inject = ['calendarService'];

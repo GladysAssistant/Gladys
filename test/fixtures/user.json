@@ -1,24 +1,26 @@
 [
   {
+    "id": 1, 
     "firstname": "Tony",
     "lastname": "Stark",
-    "password" : "test",
-    "confirmation" : "test",
+    "password" : "test1234",
     "email": "tony.stark@starkindustry.com",
     "birthdate":"10/10/1960",
     "gender" : 1,
-    "language":"FR",
-    "preparationTimeAfterWakeUp": 20
+    "language":"fr-FR",
+    "preparationTimeAfterWakeUp": 20,
+    "role": "admin"
   },
   {
+    "id": 2,   
     "firstname": "Pepper",
     "lastname": "Pots",
-    "password" : "test",
-    "confirmation" : "test",
+    "password" : "test1234",
     "email": "pepper.pots@starkindustry.com",
     "birthdate":"02/01/1970",
     "gender" : 0,
-    "language":"FR",
-    "preparationTimeAfterWakeUp": 20
+    "language":"en-US",
+    "preparationTimeAfterWakeUp": 20,
+    "role": "habitant"
   }
 ]

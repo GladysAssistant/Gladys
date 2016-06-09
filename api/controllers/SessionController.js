@@ -16,55 +16,10 @@
  */
 
 var bcrypt = require('bcrypt');
-var crypto = require('crypto');
+var jwt = require('jsonwebtoken');
 
 module.exports = {
-
-	/**
-	 * Description
-	 * @method new
-	 * @param {} req
-	 * @param {} res
-	 * @return
-	 */
-	newUser: function(req, res,next) {
-		res.view('user/new', {
-			layout: null
-		});
-	},
-
-	/**
-	 * Create a user
-	 * @method create
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return
-	 */
-	createUser: function(req, res, next) {
-		
-		var userObj = {
-			firstname: req.param('firstname'),
-			lastname: req.param('lastname'),
-			email: req.param('email'),
-			birthdate: req.param('birthdate'),
-			password: req.param('password'),
-			confirmation: req.param('confirmationPassword'),
-			gender: req.param('gender'),
-			language: req.param('language')
-		};
-
-		User.create(userObj, function userCreated(err, user) {
-			if (err) {
-				req.flash('error', err);
-				return res.redirect('/register');
-			}
-			
-			return res.redirect('/login');
-		});
-
-
-	},
+    
 	/**
 	 * Description
 	 * @method create
@@ -128,17 +83,9 @@ module.exports = {
 				user.online = true;
 
 				// 
-				sails.log.info("New User connected : " + user.fullname());
-				// 
-				user.save(function(err, user) {
-					if (err) return next(err);
-					
-					if(user.preparationTimeAfterWakeUp){
-						res.redirect('/dashboard');
-					}else{
-						res.redirect('/dashboard/installation');
-					}
-				});
+				sails.log.info("New User connected : " + user.firstname);
+				
+                res.redirect('/dashboard');
 			});
 		});
 	},

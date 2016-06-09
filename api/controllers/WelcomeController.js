@@ -26,10 +26,14 @@ module.exports = {
 	 * @return
 	 */
 	index: function(req, res, next) {
-		res.view('welcome/homepage', {
-			layout: null,
-			signupActive: sails.config.signup.active
-		});
+        gladys.utils.sql('SELECT * FROM user;')
+          .then(function(users){
+             var signupAllowed = (users.length === 0); 
+             res.view('welcome/homepage', {
+                layout: null,
+                signupActive: signupAllowed
+             });
+          });
 	},
 	
 	/**
@@ -45,5 +49,11 @@ module.exports = {
 			layout: null,
 			signupActive: sails.config.signup.active
 		});	
-	}
+	},
+    
+    installation: function(req, res, next){
+        res.view('installation/index', {
+            layout: null
+        });
+    }
 };

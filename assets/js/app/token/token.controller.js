@@ -11,7 +11,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('tokenCtrl', tokenCtrl);
 
   tokenCtrl.$inject = ['tokenService'];
@@ -23,7 +23,7 @@
     vm.createToken = createToken;
     vm.destroyToken = destroyToken;
     vm.switchStatus = switchStatus;
-    
+    vm.newToken = {};
     activate();
 
     function activate() {
@@ -32,31 +32,31 @@
     }
   	
     function createToken() {
-      return tokenService.createToken(vm.newTokenName)
+      return tokenService.create(vm.newToken)
         .then(function(data){
           vm.tokens.push(data.data);
-          vm.newTokenName = "";
+          vm.newToken = {};
         });
     }
     
     function destroyToken(index, id) {
-      return tokenService.destroyToken(id)
+      return tokenService.destroy(id)
         .then(function(data){
-          vm.tokens.splice(index, 1);
+            vm.tokens.splice(index, 1);
         });
     }
     
     function getTokens() {
-      return tokenService.getTokens()
+      return tokenService.get()
         .then(function(data){
           vm.tokens = data.data;
         });
     }
     
     function switchStatus(index, id) {
-      return tokenService.updateStatus(id,!vm.tokens[index].status )
+      return tokenService.update(id, { active: !vm.tokens[index].active})
         .then(function(data){
-          vm.tokens[index].status = !vm.tokens[index].status;
+            vm.tokens[index].active = data.data.active;
         });
     }
     

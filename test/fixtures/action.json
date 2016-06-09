@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "action": 1,
+        "launcher": 1,
+        "user": 1
+    },
+    {
+        "id": 2,
+        "action": 2,
+        "launcher": 2,
+        "user": 1
+    }
+]

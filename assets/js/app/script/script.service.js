@@ -11,85 +11,41 @@
     'use strict';
 
     angular
-        .module('app')
-        .factory('scriptservice', scriptservice);
+        .module('gladys')
+        .factory('scriptService', scriptService);
 
-    scriptservice.$inject = ['$http'];
+    scriptService.$inject = ['$http'];
 
-    function scriptservice($http) {
+    function scriptService($http) {
+        
         var service = {
-            getAllScripts: getAllScripts,
-            getScript:getScript,
-            runScript:runScript,
-            saveScript:saveScript,
-            destroyScript: destroyScript
+            create: create,
+            get: get,
+            exec: exec,
+            update: update,
+            destroy: destroy
         };
 
         return service;
+        
+        function create(script) {
+            return $http({method: 'POST', url: '/script', data: script});
+        }
+        
+        function destroy(id) {
+            return $http({method: 'DELETE', url: '/script/' + id});
+        }
 
-        function getAllScripts() {
-            return $http({method: 'POST', url: '/script/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function get() {
+            return $http({method: 'GET', url: '/script'});
         }
         
-         function getScript(name) {
-            return $http({method: 'POST', url: '/script/get', data:{name:name}}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function exec(id) {
+            return $http({method: 'POST', url: '/script/' + id + '/exec'});
         }
         
-        function runScript(name) {
-            return $http({method: 'POST', url: '/script/run', data: {name:name} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function saveScript(script) {
-            return $http({method: 'POST', url: '/script/put', data: script}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
-        
-        function destroyScript(name) {
-            return $http({method: 'POST', url: '/script/destroy', data: {name: name}}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function update(id, script) {
+            return $http({method: 'PATCH', url: '/script/' + id, data: script});
         }
     }
 })();

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "value": 1,
+    "devicetype": 1
+  },
+  {
+    "id": 2,
+    "value": 0,
+    "devicetype": 1
+  },
+  {
+    "id": 3,
+    "value": 12,
+    "devicetype": 2
+  },
+  {
+    "id": 4,
+    "value": 0,
+    "devicetype": 3
+  }
+]

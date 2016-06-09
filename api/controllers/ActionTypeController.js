@@ -16,20 +16,28 @@
 module.exports = {
 
 	/**
-	 * Description
-	 * @method index
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return
+	 * Get all ActionType
 	 */
 	index: function(req, res, next) {
-		ActionType.find()
-			.exec(function(err, actionType) {
-				if (err) return res.json(err);
-
-				res.json(actionType);
-			});
+		
+		gladys.actionType.get()
+		  .then(function(actionsTypes){
+			  return res.json(actionsTypes);
+		  })
+		  .catch(next);	
+	},
+	
+	
+	/**
+	 * Get all actionTypeParams of a specificActionType
+	 */
+	getParams: function(req, res, next){
+		
+		gladys.actionType.getParams({id: req.params.id})
+		  .then(function(params){
+			  return res.json(params);
+		  })
+		  .catch(next);
 	}
 
 };

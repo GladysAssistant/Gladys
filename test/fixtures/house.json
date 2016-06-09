@@ -1,16 +1,24 @@
 [
   {
+    "id": 1,  
+    "uuid": "2094b316-c295-48d7-bbdd-40360d2543dd",
     "name": "Maison principale",
     "address": "102 avenue des Champs-Elysées",
     "city" : "Paris",
     "postcode" : "75008",
-    "country": "France"
+    "country": "France",
+    "latitude": 37.773972,
+    "longitude": -122.431297
   },
   {
+    "id": 2,  
+    "uuid": "2c3935c8-25e4-4956-ab20-e3c3eb798e2d",
     "name": "Maison de vacances",
     "address": "26 Boulevard Eugène Gazagnair",
     "city" : "Cannes",
     "postcode" : "06400",
-    "country": "France"
+    "country": "France",
+    "latitude": 37.773972,
+    "longitude": -122.431297
   }
 ]

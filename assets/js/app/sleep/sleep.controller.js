@@ -11,7 +11,7 @@
   'use strict';
 
   angular
-    .module('app')
+    .module('gladys')
     .controller('sleepCtrl', sleepCtrl);
 
   sleepCtrl.$inject = ['sleepService'];

@@ -11,71 +11,36 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('tokenService', tokenService);
 
     tokenService.$inject = ['$http'];
 
     function tokenService($http) {
+        
         var service = {
-            createToken: createToken,
-            destroyToken: destroyToken,
-            getTokens: getTokens,
-            updateStatus: updateStatus
+            create: create,
+            get: get,
+            destroy: destroy,
+            update: update
         };
 
         return service;
 
-        function createToken(name) {
-            return $http({method: 'POST', url: '/token/create', data:{name:name} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function create(token) {
+            return $http({method: 'POST', url: '/token', data: token });
         }
         
-        function destroyToken(id) {
-            return $http({method: 'POST', url: '/token/destroy', data:{id:id} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function destroy(id) {
+            return $http({method: 'DELETE', url: '/token/' + id });
         }
         
-        function getTokens() {
-            return $http({method: 'POST', url: '/token/index' }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function get() {
+            return $http({method: 'GET', url: '/token' });
         }
         
-        function updateStatus(id, status) {
-            return $http({method: 'POST', url: '/token/updateStatus', data:{id:id, status:status} }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function update(id, token) {
+            return $http({method: 'PATCH', url: '/token/' + id, data: token });
         }
     }
 })();

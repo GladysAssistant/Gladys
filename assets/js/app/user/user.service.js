@@ -11,71 +11,59 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .factory('userService', userService);
 
     userService.$inject = ['$http'];
 
     function userService($http) {
+        
         var service = {
-            getUsers: getUsers,
-            setPreparationTime: setPreparationTime,
-            setAssistantName:setAssistantName,
+            create: create, 
+            login: login,
+            get: get,
+            destroy: destroy,
+            update: update,
             whoAmI: whoAmI
         };
+        
+        var user = null;
 
         return service;
 
         function whoAmI(){
-            return $http({method: 'POST', url: '/user/whoami' }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+            
+            // looking in cache
+            if(user) return Promise.resolve(user);
+            
+            return $http({method: 'GET', url: '/user/whoami' })
+              .then(function(data){
+                  
+                  // caching current user
+                  user = data.data;
+                  
+                  return user;
+              });
         }
 
-        function getUsers() {
-            return $http({method: 'POST', url: '/user/index' }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function get(options) {
+            return $http({method: 'GET', url: '/user', params: options });
         }
         
-        function setPreparationTime(preparationTime) {
-            return $http({method: 'POST', url: '/user/setPreparationTime', data:{preparationTime:preparationTime } }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function login(user){
+            return $http({method: 'POST', url: '/user/login', data: user});
         }
         
-        function setAssistantName(name) {
-            return $http({method: 'POST', url: '/user/setAssistantName', data:{assistantName:name } }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+        function create(user){
+             return $http({method: 'POST', url: '/user', data: user });
+        }
+        
+        function update(id, user){
+             return $http({method: 'PATCH', url: '/user/' + id, data: user });
+        }
+        
+        function destroy(id){
+             return $http({method: 'DELETE', url: '/user/' + id});
         }
     }
 })();

@@ -32,10 +32,10 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  // cookie: {
-  //   maxAge: 24 * 60 * 60 * 1000
-  // }
-
+  cookie: {
+     maxAge: process.env.COOKIE_LIFETIME || 15 * 24 * 60 * 60 * 1000
+  }
+  
   /***************************************************************************
   *                                                                          *
   * In production, uncomment the following lines to set up a shared redis    *

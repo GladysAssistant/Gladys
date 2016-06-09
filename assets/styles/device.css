@@ -1,0 +1,14 @@
+
+.device-value-slider .slider-handle{
+    width: 18px;
+    height: 18px;
+    background-color: #444;
+    background-image: -webkit-linear-gradient(#444 0%, #444 100%);
+    background-image: -o-linear-gradient(#444 0%, #444 100%);
+    background-image: linear-gradient(#444 0%, #444 100%);
+}
+
+.device-value-slider .slider-selection {
+    background: #3c8dbc;
+    
+}

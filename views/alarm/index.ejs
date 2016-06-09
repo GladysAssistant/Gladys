@@ -28,8 +28,8 @@
                                         <tbody>
                                             <tr ng-repeat="alarm in vm.alarms" class="ng-cloak">
                                                 <td>{{alarm.name}}</td>
-                                                <td ng-show="alarm.recurring == -1" >{{alarm.moment}}</td>
-                                                <td ng-show="alarm.recurring != -1">{{alarm.moment}}, {{alarm.time}}</td>
+                                                <td ng-show="alarm.dayofweek == -1" >{{alarm.moment}}</td>
+                                                <td ng-show="alarm.dayofweek != -1">{{alarm.moment}}, {{alarm.time}}</td>
                                                 <td><button ng-click="vm.destroyAlarm($index, alarm.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr>
@@ -81,6 +81,32 @@
                                                             </div>
                                                           </div>
                                                             <!-- END OF BOX -->
+                                                            
+                                                             <!-- NEW BOX -->
+                                                          <div class="box box-default">
+                                                          <div class="box-header with-border">
+                                                            <h3 class="box-title"><%= __('alarm-sleep-now') %></h3>
+                                                          </div>  
+                               
+                                                            <div class="box-body">
+                                                               <div class="row">
+                                                                    <div class='col-md-2'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newTimer.name" placeholder="<%= __('Name') %>" />
+                                                                    </div>
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                            <div>
+                                                                                <input type='text' class="form-control" ng-model="vm.newTimer.duration" id="NewAlarmDatetime" placeholder="<%= __('alarm-time-sleep') %>" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class='col-md-4'>
+                                                                        <button class="btn btn-success" ng-click="vm.createTimer(vm.newTimer)"><%= __('New') %></button>
+                                                                      </div>
+                                                                </div>
+                                                            </div>
+                                                          </div>
+                                                            <!-- END OF BOX -->
                                                          
                                                            <!-- NEW BOX -->
                                                           <div class="box box-default">
@@ -96,7 +122,7 @@
                                                                     
                                                                     <div class='col-md-2'>
                                                                         <div class="form-group">
-                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.recurring">
+                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.dayofweek">
                                                                                 <option  selected value="1" ><%= __('Monday') %></option>
                                                                                 <option value="2"><%= __('Tuesday') %></option>
                                                                                 <option value="3"><%= __('Wednesday') %></option>

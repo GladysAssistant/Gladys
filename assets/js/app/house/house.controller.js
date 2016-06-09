@@ -11,12 +11,12 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('HouseCtrl', HouseCtrl);
 
-    HouseCtrl.$inject = ['houseService'];
+    HouseCtrl.$inject = ['houseService', 'roomService'];
 
-    function HouseCtrl(houseService) {
+    function HouseCtrl(houseService, roomService) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -28,7 +28,8 @@
         vm.getRooms = getRooms;
         vm.newHouse = {};
         vm.newRoom = {};
-        vm.relations = [];
+        
+        vm.houses = [];
         vm.rooms = [];
 
         activate();
@@ -39,66 +40,60 @@
             return ;
         }
 
-        function createHouse() {
-            return houseService.createHouse(vm.newHouse)
+        function createHouse(house) {
+            return houseService.create(house)
                 .then(function(data){
-                    if(!data.data.error){
-                        getHouses();
-                        resetNewHouseFields();
-                    }
+                    getHouses();
+                    resetNewHouseFields();
                 });
         }
 
-        function createRoom() {
-            return houseService.createRoom(vm.newRoom)
+        function createRoom(room) {
+            return roomService.create(room)
                 .then(function(data){
-                    if(!data.data.error){
-                        getRooms();
-                        resetNewRoomFields();
-                    }
+                    getRooms();
+                    resetNewRoomFields();
                 });
         }
 
         function deleteHouse(index, id) {
-            return houseService.deleteHouse(id)
+            return houseService.destroy(id)
                 .then(function(data){
+                    
                     // deleting House from houses array
-                    vm.relations.splice(index, 1);
+                    vm.houses.splice(index, 1);
                 });
         }
 
         function deleteRoom(index, id) {
-            return houseService.deleteRoom(id)
+            return roomService.destroy(id)
                 .then(function(data){
+                    
                     // deleting room from rooms array
                     vm.rooms.splice(index, 1);
                 });
         }
 
-        function getHouses() {
-            return houseService.getHouses()
+        function getHouses(options) {
+            return houseService.get(options)
                 .then(function(data){
-                    vm.relations = data.data;
+                    vm.houses = data.data;
                 });
         }
 
-        function getRooms() {
-            return houseService.getRooms()
+        function getRooms(options) {
+            return roomService.get(options)
                 .then(function(data){
                     vm.rooms = data.data;
                 });
         }
 
         function resetNewHouseFields() {
-            vm.newHouse.name = "";
-            vm.newHouse.address = "";
-            vm.newHouse.city = "";
-            vm.newHouse.postcode = "";
-            vm.newHouse.country = "";
+            vm.newHouse = {};
         }
 
         function resetNewRoomFields() {
-            vm.newRoom.name = "";
+            vm.newRoom = {};
         }
     }
 })();

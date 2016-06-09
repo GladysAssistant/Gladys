@@ -11,29 +11,26 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('ScriptCtrl', ScriptCtrl);
 
-    ScriptCtrl.$inject = ['$scope','scriptservice'];
+    ScriptCtrl.$inject = ['$scope','scriptService'];
 
-    function ScriptCtrl($scope, scriptservice) {
+    function ScriptCtrl($scope, scriptService) {
         /* jshint validthis: true */
         var vm = this;
         
-        vm.createScript = createScript;
-    	vm.currentScript = '';
+        vm.create = create;
+        vm.patch = patch;
+        vm.exec = exec;
         vm.destroy = destroy;
-        vm.error = false;
-        vm.newFileWarning = false;
-        vm.refresh = refresh;
-        vm.runScript = runScript;
-        vm.scriptError = false;
-        vm.scriptErrorMessage = {};
-        vm.script = {};
-        vm.scripts = [];  
-        vm.save = save;
-        vm.savingState = '';
         
+        vm.error = null;
+        vm.savingState = '';
+        vm.scripts = [];  
+        vm.currentScript = {
+            text: ''
+        };
         
         var editor;
 
@@ -41,14 +38,19 @@
 
         function activate() {
             activateEditor();
-            return getAllScripts();
+            return get();
         }
+        
+        $scope.$watch('vm.currentScript', function(newValue, oldValue){
+            editor.setValue(vm.currentScript.text);
+        });
         
         /**
          * Activate the AceEditor
          */
         function activateEditor(){
             editor = ace.edit("editor");
+            ace.config.set("basePath", "/js/dependencies/ace");
 			editor.setTheme("ace/theme/xcode");
 			editor.getSession().setMode("ace/mode/javascript");
 			editor.setOptions({
@@ -57,91 +59,54 @@
             });
         } 
         
-        function validFileName(name){
-        	var reg = /[a-zA-Z0-9]+\.js$/;
-        	if(!reg.test(name))
-                return false;
-            
-            var alreadyExist = false;
+        
+        function create(name){
+            return scriptService.create({name:name})
+               .then(function(data){
+                   
+                  // add new script to script list
+                  vm.scripts.push(data.data); 
+                  
+                  // set current script to new script
+                  vm.currentScript = data.data;
+                  
+                  // reset and close modal
+                  vm.newName = "";
+                  $('#NewFileModal').modal('hide');
+               });
+        }
+        
+        function destroy(id){
+            return scriptService.destroy(id)
+                .then(function(data){
+                    vm.currentScript = {};
+                    editor.setValue('');
+                    removeFromSelect(id); 
+                })
+                .catch(function(err){
+                    vm.error = true;
+                    setTimeout(removeError, 3000);
+                    console.log(err);
+                });
+        }
+        
+        function removeFromSelect(id){
             var i = 0;
-            while(!alreadyExist && i < vm.scripts.length){
-                alreadyExist = (vm.scripts[i].name == name);
-                i++;
-            }
-            return !alreadyExist;     
-        }
-        
-        function createScript(){
-            if(validFileName(vm.newName)){
-                var newScript = {
-                    name: vm.newName,
-                    id:vm.newName
-                };
-                vm.scripts.push(newScript);
-                vm.currentScript = vm.newName;
-                vm.script.name = vm.newName;
-                vm.script.content = "";
-                vm.newName = "";
-                $('#NewFileModal').modal('hide');
-                // reseting new File Form
-                vm.newFileWarning = false;
-            }else{
-                vm.newFileWarning = true;
-            }
-            
-        }
-        
-        function removeFromSelect(name){
-            var i=0;
-            var find = false;
-            while(!find && i < vm.scripts.length){
-                if(vm.scripts[i].name == name){
+            var found = false;
+            while(!found && i < vm.scripts.length){
+                if(vm.scripts[i].id === id){
                     vm.scripts.splice(i, 1);
-                    find = true;
+                    found = true;
                 }
                 i++;
             }
         }
-        
-        function destroy(name){
-            return scriptservice.destroyScript(name)
-                .then(function(data){
-                    if(data.data == '"ok"' || (data.data.code && data.data.code == 'ENOENT') ){
-                        vm.currentScript = '';
-        		  		editor.setValue('');
-          				vm.script.name= '';
-                        removeFromSelect(name);
-                        vm.script.index = null;
-                    }else{
-                        vm.error = true;
-                        setTimeout(removeError, 3000);
-                        console.log(data.data);
-                    }
-                   
-                });
-        }
 
-        function getAllScripts() {
-            return scriptservice.getAllScripts()
+        function get() {
+            return scriptService.get()
                 .then(function(data){
                     vm.scripts = data.data;
                 });
-        }
-        
-        function refresh(){
-            vm.scriptError = false;
-            if(vm.currentScript != 'newScript'){
-                return scriptservice.getScript(vm.currentScript)
-                    .then(function(data){
-                        editor.setValue(data.data.content);
-        				vm.script = data.data;
-                    });
-      		}
-      		else{
-      			editor.setValue('');
-      			vm.script.name= '';
-                $('#NewFileModal').modal('show');
-      		}
         }
         
         function resetSavingState(){
@@ -156,38 +121,30 @@
             });
         }
         
-        function runScript(name){
+        function exec(id){
            vm.scriptError = false;
-           return save(name)
-            .then(function(){
-               return scriptservice.runScript(name)
-                 .then(function(data){
-                       if(data.data != '"ok"'){
-                           vm.scriptErrorMessage = data.data;
-                           vm.scriptError = true;
-                       }
-                 });
-           });
+           return patch(id)
+             .then(function(){
+                 return scriptService.exec(id);
+             })
+             .catch(function(err){
+                 vm.scriptErrorMessage = err.data;
+                 vm.scriptError = true; 
+             });
         }
         
-        function save(name){
+        function patch(id){
             vm.savingState = 'saving';
-            return scriptservice.saveScript({name: name, content: editor.getValue()})
+            return scriptService.update(id, {text: editor.getValue()})
                 .then(function(data){
-                    return new Promise(function(resolve, reject){
-                        if(data.data == '"ok"'){
-                            vm.savingState = 'saved';
-                            setTimeout(resetSavingState, 3000);
-                            resolve();
-                        }else{
-                            vm.error = true;
-                            setTimeout(removeError, 3000);
-                            console.log(data.data);
-                            reject();
-                        } 
-                    });
-                    
-                });   
+                    vm.savingState = 'saved';
+                    setTimeout(resetSavingState, 3000);
+                })
+                .catch(function(err){
+                   vm.error = true;
+                   setTimeout(removeError, 3000);
+                   console.log(err); 
+                });
         }
     }
 })();

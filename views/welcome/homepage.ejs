@@ -19,37 +19,30 @@
     <link href="/styles/scenariostep.css" rel="stylesheet" type="text/css" />
     <!-- Custom Fonts -->
 
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="/js/dependencies/html5shiv.js"></script>
-        <script src="/js/dependencies/respond.min.js"></script>
-    <![endif]-->
-
 </head>
 
-<body ng-app="app">
+<body ng-app="gladys">
 
     <!-- Header -->
     <header id="top" class="header" >
         <div class="text-vertical-center">
-            <h1>Hi, I'm Gladys</h1>
+            <h1 id="gladystext">Hi, I'm Gladys</h1>
             <!--<h3>Your personnal assistant</h3>-->
             <br>
                 <!--<button class="btn btn-dark">Login</button>
                  <button class="btn btn-dark">Create account</button>   -->
             <% if(signupActive) { %>
-                <a href='/register' class="btn btn-dark"><%= __('Create my account') %></a>
+                <a href='/installation' class="btn btn-dark"><%= __('Create my account') %></a>
+            <% } else { %>
+                <a href='/login' class="btn btn-dark"><%= __('Sign me in') %></a>
             <% } %>
-            <a href='/login' class="btn btn-dark"><%= __('Sign me in') %></a>
         </div>
     </header>
 
 
 
     <!-- Footer -->
-   <!-- <footer>
+  <!-- <footer>
         <div class="container">
             <div class="row">
                 <div class="text-center">
@@ -58,9 +51,11 @@
                 </div>
             </div>
         </div>
-    </footer>-->
-    
+    </footer>
+    -->
     
 </body>
 
+<script src="/js/dependencies/theater.min.js"></script>
+<script src="/js/welcome/welcome.js"></script>
 </html>

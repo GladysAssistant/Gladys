@@ -1,0 +1,36 @@
+<!-- NEW BOX -->
+<div class="box box-default" data-ng-controller="ModeCtrl as vm">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('mode-box-title') %> <small ng-show="vm.saving"><%= __('mode-box-saving') %></small></h3>
+    </div> 
+        <div class="box-body table-responsive" >
+            <p>
+            <%= __('mode-box-description') %>
+            </p>
+            <table id="example2" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th><%= __('mode-code') %></th>
+                        <th><%= __('mode-name') %></th>
+                        <th><%= __('mode-description') %></th>
+                        <th><%= __('mode-action') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="mode in vm.modes" class="ng-cloak">
+                        <td>{{mode.code}}</td>
+                        <td>{{mode.name}}</td>
+                        <td>{{mode.description}}</td>
+                        <td><button ng-click="vm.destroyMode($index, mode.id)" class= "btn btn-danger btn-sm"><%= __('mode-delete') %></button></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.code" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.name" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.description" /></td>
+                        <td><button class="btn btn-success btn-sm" ng-click="vm.createMode(vm.newMode)"><%= __('mode-new') %></button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>  
+</div>

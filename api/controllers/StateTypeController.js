@@ -15,23 +15,32 @@
  */
 
 module.exports = {
-
-	/**
-	 * Get all the existing state types
-	 * @method index
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
-	index:function(req,res,next){
-		StateType.find()
-				  .exec(function(err, stateType){
-				  		if(err) return res.json(err);
-
-				  		res.json(stateType);
-				  });
-	}
+    
+    index: function(req, res, next){
+        gladys.stateType.get()
+          .then(function(stateTypes){
+              return res.json(stateTypes);
+          })
+          .catch(next);
+    },
+    
+    getTemplateParams: function(req, res, next){
+        
+        gladys.stateTemplateParam.getByStateType({statetype: req.params.id})
+          .then(function(stateTemplateParams){
+              return res.json(stateTemplateParams);
+          })
+          .catch(next);
+    },
+    
+    getStateTypeParams: function(req, res, next){
+        
+        gladys.stateTypeParam.getByStateType({statetype: req.params.id})
+          .then(function(stateTypeParams){
+              return res.json(stateTypeParams);
+          })
+          .catch(next);
+    }
 	
 };
 

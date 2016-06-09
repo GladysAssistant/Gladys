@@ -11,7 +11,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('gladys')
         .controller('NotificationCtrl', NotificationCtrl);
 
     NotificationCtrl.$inject = ['notificationService', 'Notification'];
@@ -20,18 +20,18 @@
         /* jshint validthis: true */
         var vm = this;
 
-        vm.getNotifications = getNotifications;
+        vm.get = get;
         vm.notifications = [];
 
         activate();
 
         function activate() {
             waitForNotification();
-            return getNotifications();
+            return get();
         }
 
-        function getNotifications() {
-            return notificationService.getNotifications()
+        function get() {
+            return notificationService.get()
                 .then(function(data){
                     vm.notifications = data.data;
                 });

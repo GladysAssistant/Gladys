@@ -1,0 +1,60 @@
+ <!-- MACHINE BOX -->
+<div class="box box-default">
+<div class="box-header with-border">
+<h3 class="box-title"><%= __('Gladys Machines') %></h3>
+</div>  
+    
+    <div class="box-body table-responsive" data-ng-controller="machineCtrl as vm" >
+                <p><%= __('here-you-can-register-machine') %> 
+                    <%= __('the-master-field-machine') %> 
+                    <%= __('the-me-field-machine') %></p>
+                <table id="example2" class="table table-bordered table-hover">
+                    
+                    <thead>
+                        <tr>
+                            <th><%= __('Name') %></th>
+                            <th><%= __('House') %></th>
+                            <th><%= __('IP') %></th>
+                            <th><%= __('Master') %></th>
+                            <th><%= __('Me') %></th>
+                            <th><%= __('Delete') %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="machine in vm.machines" class="ng-cloak">
+                            <td>{{machine.name}}</td>
+                            <td>{{machine.house}}</td>
+                            <td>{{machine.ip}}</td>
+                            <td><div ng-show="machine.master"><%= __('Yes') %></div><div ng-show="!machine.master"><%= __('No') %></div></td>
+                            <td><div ng-show="machine.me"><%= __('Yes') %></div><div ng-show="!machine.me"><%= __('No') %></div></td>
+                            <td><button ng-click="vm.destroyMachine($index, machine.id)" class="btn btn-danger btn-sm" ><%= __('Delete') %></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" />
+                            </td>
+                                <td><select ng-model="vm.newMachine.house" class="form-control" >
+                                    <option ng-repeat="relation in vm.relations" value="{{relation.house.id}}">{{relation.house.name}}</option>
+                            </select>
+                            </td>
+                                <td>
+                                <input type="text" class="form-control" ng-model="vm.newMachine.ip" placeholder="<%= __('IP') %>" />
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm" ng-show="vm.newMachine.master" ng-click="vm.newMachine.master = false" ><%= __('Yes') %></button>
+                                <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.master" ng-click="vm.newMachine.master = true" ><%= __('No') %></button>
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm" ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
+                                <button class="btn btn-danger btn-sm" ng-show="!vm.newMachine.me" ng-click="vm.newMachine.me = true" ><%= __('No') %></button>
+                            </td>
+                            <td>
+                                <button ng-click="vm.createMachine()" class="btn btn-success btn-sm"><%= __('Register machine') %></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+    </div>
+</div>
+<!-- END OF MACHINE BOX -->

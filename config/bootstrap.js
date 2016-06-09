@@ -9,25 +9,13 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.bootstrap.html
  */
 
+global.gladys = require('../api/core/index.js');
+
 module.exports.bootstrap = function(cb) {
-	DashboardBox.destroy()
-		.exec(function(err){
-			if(err) {
-				sails.log.error("Can't reset dashboard boxs list at startup.");
-				cb(err);
-			}else{
-				StartService.onStart();
-			}
-	});
-	
-	
-	// refresh events only in production mode to avoid flooding
-	// Github when developping
-	if(sails.config.environment == 'production'){
-		LifeEventService.syncEvents();
-	}
-	
-	cb();
+
+    gladys.load();
+    cb();
+      
 	//sails.hooks.orm.reload();
 	//
 	// Start all the function that need to be started at startup

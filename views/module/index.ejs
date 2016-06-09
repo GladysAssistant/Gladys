@@ -1,0 +1,149 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side" >
+    <!-- Content Header (Page header) -->
+    <section class="content-header" >
+        <h1>
+            <%= __('Module') %>
+            <small><%= __('Control panel') %></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Module') %></a></li>
+            <li class="active"><%= __('Control panel') %></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content"  data-ng-controller="ModuleCtrl as vm">
+          
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#tab_1" data-toggle="tab" ng-click="vm.refreshModule();" aria-expanded="true"><%= __('modules-installed') %></a></li>
+              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false" ng-click="vm.getModulesStore();"><%= __('modules-store') %></a></li>
+              <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('modules-advanced') %></a></li>
+              <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                    <!-- BEGINNING OF TAB 1 -->
+                        <div class="box-body no-padding">
+              <table class="table">
+                <tbody><tr>
+                  <th style="width: 10px"><%= __('ID') %></th>
+                  <th><%= __('Name') %></th>
+                  <th><%= __('Version') %></th>
+                  <th><%= __('Status') %></th>
+                  <th><%= __('Configuration') %></th>
+                  <th><%= __('Infos') %></th>
+                  <th><%= __('module-uninstall') %></th>
+                </tr>
+                
+                 <tr ng-repeat="module in vm.modules" class="ng-cloak">
+                  <td>{{module.id}}</td>
+                  <td>{{module.name}}</td>
+                  <td>{{module.version}}</td>
+                  <td>{{module.status}}</td>
+                   <td><button class="btn btn-info btn-sm" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
+                  <td><button class="btn btn-info btn-sm" ng-click="vm.displayModule(module);"><%= __('Infos') %></button></td>
+                   <td><button class="btn btn-danger btn-sm" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
+                </tr>
+                
+              </tbody></table>
+            </div>
+                    
+                    
+                    <!-- END OF TAB 1 -->
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_2" >
+                <div class="row modules" >
+
+            
+                    <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modulesFromStore" ng-click="vm.showModule(module);">
+                        <a> <h5>{{module.name}}</h5>
+                        <div class="module-img">
+                            <img class="img-responsive img-rounded" src="{{module.img}}">
+                            <div class="description">
+                                <p class="text-justify">
+                                    {{module.description}}
+                                </p>
+                            </div>
+                        </div>
+                        </a>
+
+                        <!--<div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                 </div>
+                            <div class="col-xs-4 col-sm-6 text-right">
+                                <a href="/fr/modules/cron">{{module.nbReviews}} <%= __('modules-store-review') %> </a>
+                            </div>
+                        </div>-->
+
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                
+                <%- partial ('./modal.ejs') %>
+                
+              </div>
+              <!-- /.tab-pane -->
+              
+               <!-- BEGINNING OF TAB 3 -->
+              <div class="tab-pane" id="tab_3">
+                  
+
+                        <div class="box-body no-padding">
+                            <p><%= __('module-install-description') %></p>
+                            <form class="form-inline">
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-name') %></label>
+                                        <input type="text" ng-model="vm.newModule.name" class="form-control" id="giturl" placeholder="<%= __('module-name') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-version') %></label>
+                                        <input type="text" ng-model="vm.newModule.version" class="form-control" id="giturl" placeholder="<%= __('module-version') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="giturl"><%= __('module-git-url') %></label>
+                                        <input type="text" ng-model="vm.newModule.url" class="form-control" id="giturl" placeholder="<%= __('module-git-url') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="sr-only" for="slug"><%= __('module-slug') %></label>
+                                        <input type="text" ng-model="vm.newModule.slug" class="form-control" id="slug" placeholder="<%= __('module-slug') %>">
+                                    </div>
+                                    <button type="submit" ng-click="vm.installModule(vm.newModule);" class="btn btn-success">
+                                        
+                                        <div ng-show="vm.installationStep == 0"><%= __('module-install') %></div>
+                                        <div ng-show="vm.installationStep == 1"><%= __('module-install-downloading') %></div>
+                                        <div ng-show="vm.installationStep == 2"><%= __('module-install-installing-dependencies') %></div>
+                                        <div ng-show="vm.installationStep == 3"><%= __('module-install-creating-module') %></div>
+                                        <div ng-show="vm.installationStep == 4"><%= __('module-install-installed-success') %></div>
+                                        </button>
+                                    </form>
+                         
+                        
+                         </div>
+                    <!-- END OF TAB 1 -->
+              </div>
+              
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+
+    </section><!-- /.content -->
+</aside><!-- /.right-side -->
+
+
+<script>
+    document.getElementById("moduleLi").className = "active";
+</script>
+
+
+
+
+        

@@ -10,12 +10,6 @@
         <link href="/styles/AdminLTE.css" rel="stylesheet" type="text/css" />
         <link href="/styles/login.css" rel="stylesheet" type="text/css" />
 
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="/js/dependencies/html5shiv.js"></script>
-          <script src="/js/dependencies/respond.min.js"></script>
-        <![endif]-->
     </head>
     <body>
 
@@ -23,7 +17,7 @@
             <div class="header"><%= __('Sign in') %></div>
             <form action="/session/create" method="post">
                 <div class="body bg-gray">
-                    <% if ( typeof req.session.flash !== 'undefined' ) { %>
+                    <% if ( typeof req.session.flash !== 'undefined') { %>
                                     <div id="login-alert" class="alert alert-danger">
                                             <%- JSON.stringify(req.flash('error')) %>
                                     </div>
@@ -38,10 +32,10 @@
                 <div class="footer">                                                               
                     <button type="submit" class="btn bg-olive btn-block"><%= __('Sign me in') %></button>  
                     
-                    <p><a href="#"><%= __('I forgot my password') %></a></p>
+                    <!--<p><a href="#"><%= __('I forgot my password') %></a></p>
                     <% if(signupActive) { %>
                         <a href="/register" class="text-center"><%= __('Register a new membership') %></a>
-                    <% } %>
+                    <% } %>-->
                 </div>
             </form>
 
