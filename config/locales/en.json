@@ -218,5 +218,8 @@
   "user-lastname": "Last name",
   "user-email": "Email",
   "user-password": "Password",
-  "user-gender": "Gender"
+  "user-gender": "Gender",
+  "login-error-password-email-required": "Please enter an email and a password.",
+  "login-error-invalid-email": "Can't find this email.",
+  "login-error-invalid-username-password": "Invalid password."
 }

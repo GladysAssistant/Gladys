@@ -11,7 +11,7 @@
                         
                                  <% if ( typeof req.session.flash !== 'undefined' ) { %>
                                     <div id="login-alert" class="alert alert-danger col-sm-12">
-                                            <%- JSON.stringify(req.flash('error')) %>
+                                            <%= req.flash('error') %>
                                     </div>
                             <% } %>
 

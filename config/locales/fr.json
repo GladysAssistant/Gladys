@@ -384,5 +384,8 @@
   "user-lastname": "Nom",
   "user-email": "Email",
   "user-password": "Mot de passe",
-  "user-gender": "Genre"
+  "user-gender": "Genre",
+  "login-error-password-email-required": "Veuillez rentrer un email et un mot de passe.",
+  "login-error-invalid-email": "Email introuvable.",
+  "login-error-invalid-username-password": "Mot de passe invalide."
 }

@@ -37,12 +37,17 @@
                 <!-- lockscreen credentials (contains the form) -->
                 <div class="lockscreen-credentials">   
 
+                <form id="loginform" method="post" action="/session/create" class="form-horizontal" role="form">
+
                     <div class="input-group">
-                        <input type="password" class="form-control" placeholder="password" />
+                        <input type="hidden" name="email" value="<%= User.email %>" />
+                        <input type="password"  name="password" class="form-control" placeholder="password" />
                         <div class="input-group-btn">
                             <button class="btn btn-flat"><i class="fa fa-arrow-right text-muted"></i></button>
                         </div>
                     </div>
+
+                    </form>
                 </div><!-- /.lockscreen credentials -->
 
             </div><!-- /.lockscreen-item -->

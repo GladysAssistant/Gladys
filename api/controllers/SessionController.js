@@ -33,12 +33,7 @@ module.exports = {
 		// redirect the browser back to the sign-in form.
 		if (!req.param('email') || !req.param('password')) {
 
-			var usernamePasswordRequiredError = [{
-				name: 'usernamePasswordRequired',
-				message: 'You must enter both a username and password.'
-			}];
-
-			req.flash('error', usernamePasswordRequiredError);
+			req.flash('error', req.__('login-error-password-email-required'));
 			return res.redirect('/login');
 		}
 
@@ -50,13 +45,9 @@ module.exports = {
 
 			// If no user is found...
 			if (!user) {
-				var noAccountError = [{
-					name: 'noAccount',
-					message: 'The email address ' + req.param('email') + ' not found.'
-				}];
+				
 
-				req.flash('error', noAccountError);
-
+				req.flash('error', req.__('login-error-invalid-email'));
 				return res.redirect('/login');
 			}
 
@@ -67,11 +58,7 @@ module.exports = {
 
 				// If the password from the form doesn't match the password from the database...
 				if (!valid) {
-					var usernamePasswordMismatchError = [{
-						name: 'usernamePasswordMismatch',
-						message: 'Invalid username and password combination.'
-					}];
-					req.flash('error', usernamePasswordMismatchError);
+					req.flash('error', req.__('login-error-invalid-username-password'));
 					res.redirect('/login');
 					return;
 				}
