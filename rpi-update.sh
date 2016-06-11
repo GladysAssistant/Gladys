@@ -66,5 +66,11 @@ rm -rf $GLADYS_TMP_PARENT_FOLDER
 # start init script
 node $INIT_SCRIPT
 
+# go to gladys folder
+cd $GLADYS_FOLDER
+
+#BuildProd 
+grunt buildProd
+
 # restart gladys
 pm2 start gladys
