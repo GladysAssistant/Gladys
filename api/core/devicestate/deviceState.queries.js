@@ -10,7 +10,7 @@ module.exports = {
     SELECT devicetype.id
     FROM device 
     JOIN devicetype ON (device.id = devicetype.device)
-    WHERE device.identifier = ? AND devicetype.type = ?;
+    WHERE device.identifier = ? AND device.service = ? AND devicetype.type = ?;
   `
 
 };

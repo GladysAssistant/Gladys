@@ -11,7 +11,7 @@ describe('DeviceState', function() {
             value: 12.1
         };
         
-        gladys.deviceState.createByIdentifier('THIS_IS_MY_IDENTIFIER', 'binary', state)
+        gladys.deviceState.createByIdentifier('THIS_IS_MY_IDENTIFIER', 'test', 'binary', state)
         .then(function(result){
            validateDeviceState(result);
            result.value.should.equal(state.value);
