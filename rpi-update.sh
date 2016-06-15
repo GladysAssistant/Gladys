@@ -21,7 +21,7 @@ TMP_CACHE_FOLDER="/usr/local/lib/node_modules/gladysupdate/gladys/cache"
 INIT_SCRIPT="/usr/local/lib/node_modules/gladys/init.js"
 
 # First we download the new file
-wget URL -O $DESTINATION_FILE
+wget $URL -O $DESTINATION_FILE
 
 # Cleaning Gladys update folder
 rm -rf $GLADYS_TMP_PARENT_FOLDER
@@ -65,6 +65,12 @@ rm -rf $GLADYS_TMP_PARENT_FOLDER
 
 # start init script
 node $INIT_SCRIPT
+
+# go to gladys folder
+cd $GLADYS_FOLDER
+
+#BuildProd 
+grunt buildProd
 
 # restart gladys
 pm2 start gladys
