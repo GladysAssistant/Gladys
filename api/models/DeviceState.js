@@ -10,7 +10,7 @@ module.exports = {
     attributes: {
 
         value: {
-            type: 'integer',
+            type: 'float',
             required: true
         },
 
