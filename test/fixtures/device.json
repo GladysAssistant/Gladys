@@ -3,6 +3,7 @@
     "id": 1,
     "name": "Light",
     "protocol": "milight",
+    "identifier":"THIS_IS_MY_IDENTIFIER",
     "service": "test",
     "room": 1
   },
