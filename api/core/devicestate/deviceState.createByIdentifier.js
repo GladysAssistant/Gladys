@@ -1,9 +1,9 @@
 var queries = require('./deviceState.queries.js');
 
-module.exports = function(identifier, type, state){
+module.exports = function(identifier, service, type, state){
     
     // we get the devicetype
-    return gladys.utils.sqlUnique(queries.getDeviceTypeByIdentifierAndType, [identifier, type])
+    return gladys.utils.sqlUnique(queries.getDeviceTypeByIdentifierAndType, [identifier, service, type])
       .then(function(deviceType){
           
           // we create the deviceState

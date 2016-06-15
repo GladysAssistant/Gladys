@@ -11,6 +11,10 @@ module.exports = function(state){
          return [state, gladys.event.create(event)]; 
       })
       .spread(function(state, event){
+
+         // broadcast news to everyone
+         gladys.socket.emit('newDeviceState', state); 
+
          return state; 
       });
 }
