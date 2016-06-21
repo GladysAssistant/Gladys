@@ -33,6 +33,17 @@ module.exports = {
       }) 
       .catch(next);
   },
+
+  /**
+   * Return all devices for a specific service
+   */
+  getDeviceByService: function(req, res, next){
+    gladys.device.getByService({service: req.params.service})
+      .then(function(devices){
+          return res.json(devices);
+      }) 
+      .catch(next);
+  },
   
   /**
    * Create a new device
