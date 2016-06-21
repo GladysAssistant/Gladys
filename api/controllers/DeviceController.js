@@ -33,7 +33,7 @@ module.exports = {
       }) 
       .catch(next);
   },
-  
+
   /**
    * Create a new device
    */
