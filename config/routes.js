@@ -90,6 +90,7 @@ module.exports.routes = {
   'patch /device/:id': 'DeviceController.update',
   'delete /device/:id': 'DeviceController.delete',
   'get /device/:id/devicetype': 'DeviceController.getDeviceTypes',
+  'get /device/:service': 'DeviceController.getDeviceByService',
   
   
   // DeviceState
