@@ -10,6 +10,7 @@ module.exports = function(params) {
     sails.log.info(`Executing action "${params.actiontype.name}"`);
     
     var options = {
+        id: params.actiontype.params.script,
         params: params.actiontype.params,
         scope: params.scope
     };
