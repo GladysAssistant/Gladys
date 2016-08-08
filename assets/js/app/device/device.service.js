@@ -20,9 +20,11 @@
         
         var service = {
             get: get,
+            create: create,
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
             getDeviceTypeByRoom: getDeviceTypeByRoom,
+            createType: createType,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
             updateDeviceType: updateDeviceType,
@@ -37,6 +39,10 @@
         
         function get() {
             return $http({method: 'GET', url: '/device'});
+        }
+
+        function create(device){
+            return $http({method: 'POST', url: '/device', data: device});
         }
         
         function updateDevice(device){
@@ -55,6 +61,10 @@
         // all about deviceTypes
         function getTypes(){
             return $http({method: 'GET', url: '/devicetype'});
+        }
+
+        function createType(deviceType){
+            return $http({method: 'POST', url: '/devicetype', data: deviceType});
         }
         
         function updateDeviceType(deviceType){
