@@ -20,7 +20,7 @@ module.exports = {
       WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
       GROUP by ds.devicetype
   ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
-   JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
+   LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
    WHERE d.room = ?;
   `,
   getByDevice: `
