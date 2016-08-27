@@ -89,6 +89,7 @@ var jsFilesToInject = [
     'js/angular-chart/angular-chart.min.js',
     'js/angular-translate/angular-translate.min.js',
     'js/angular-slider/slider.js',
+    'js/angular-device-detector/ng-device-detector.min.js',
     
     // loading first AngularModule definition
    'js/app/app.module.js',

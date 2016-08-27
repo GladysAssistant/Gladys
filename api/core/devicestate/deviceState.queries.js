@@ -1,4 +1,5 @@
 
+
 module.exports = {
   get: `SELECT *, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
         FROM devicestate
