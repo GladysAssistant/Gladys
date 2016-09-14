@@ -2,7 +2,11 @@ var vm = require('vm');
 var shared = require('./script.shared.js');
 
 module.exports = function(options) {
-    return gladys.script.getById(options)
+
+    // handle both direct call and scenario call
+    var id = options.id || options.params.id;
+
+    return gladys.script.getById({id})
         .then(function(script) {
             return execCode(script.text);
         });

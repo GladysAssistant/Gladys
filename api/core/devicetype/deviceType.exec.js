@@ -9,6 +9,9 @@ var queries = require('./deviceType.queries.js');
  */
 function exec(param) {
     
+    // handling scenarios
+    if(param.hasOwnProperty('params')) param = param.params;
+
     return gladys.utils.sql(queries.getDeviceType, [param.devicetype])
         .then(function(types) {
 
