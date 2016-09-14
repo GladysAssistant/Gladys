@@ -14,6 +14,17 @@ module.exports = {
      },
      
      /**
+      * Check for new Actions
+      */
+     updateActions: function(req, res, next){
+         gladys.update.getActions(req.session.User)
+           .then(function(result){
+              return res.json(result); 
+           })
+           .catch(next);
+     },
+
+     /**
       * Check for new boxTypes
       */
      updateBoxTypes: function(req, res, next){
