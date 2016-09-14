@@ -22,6 +22,7 @@
     "crypto": "~0.0.3",
     "ejs": "^2.4.1",
     "es6-template-strings": "^2.0.0",
+    "fs-extra": "^0.30.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
@@ -53,7 +54,6 @@
     "suncalc": "^1.7.0"
   },
   "devDependencies": {
-    "fs-extra": "^0.30.0",
     "grunt-contrib-csslint": "^1.0.0",
     "grunt-mocha-istanbul": "^5.0.1",
     "istanbul": "^0.4.2",
