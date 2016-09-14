@@ -59,6 +59,11 @@
             })
             .then(function(){
                 
+                // get all actions
+                return updateService.updateActions(); 
+            })
+            .then(function(){
+                
                 // get all boxTypes
                 return updateService.updateBoxTypes();
             })

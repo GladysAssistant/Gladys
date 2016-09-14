@@ -85,6 +85,7 @@
   "installation-invalid-birthdate": "Invalid birthdate, should be in format YYYY-MM-DD.",
   "installation-downloading-modes": "Downloading modes...",
   "installation-downloading-sentences": "Downloading sentences...",
+  "installation-downloading-actions": "Downloading actions...",
   "installation-downloading-events": "Downloading events...",
   "installation-downloading-boxs": "Downloading boxs...",
   "installation-downloading-categories": "Downloading categories...",

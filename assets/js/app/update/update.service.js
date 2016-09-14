@@ -20,6 +20,7 @@
         
         var service = {
             verify: verify,
+            updateActions: updateActions,
             updateEvents: updateEvents,
             updateModes: updateModes,
             updateBoxTypes: updateBoxTypes,
@@ -34,6 +35,10 @@
             return $http({method: 'GET', url: '/update/verify'});
         }
         
+        function updateActions(){
+            return $http({method: 'GET', url: '/update/action'});
+        }
+
         function updateEvents(){
             return $http({method: 'GET', url: '/update/event'});
         }

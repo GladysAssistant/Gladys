@@ -250,6 +250,7 @@
   "installation-invalid-birthdate": "Date de naissance invalide. Le format de la date doit être YYYY-MM-DD.",
   "installation-downloading-modes": "Téléchargement des modes...",
   "installation-downloading-sentences": "Téléchargement des commandes...",
+  "installation-downloading-actions": "Téléchargement des actions de scénarios...",
   "installation-downloading-events": "Téléchargement des évènements...",
   "installation-downloading-categories": "Téléchargement des catégories...",
   "installation-downloading-states": "Téléchargement des conditions...",
