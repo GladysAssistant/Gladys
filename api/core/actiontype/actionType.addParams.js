@@ -18,7 +18,8 @@ function createParam(param){
     return gladys.utils.sql(queries.getParamByActionTypeAndVariable, [param.actiontype, param.variablename])
       .then(function(params){
           if(params.length){
-              return Promise.resolve(params[0]);
+              return ActionTypeParam.update(params[0].id, param)
+                .then((actionTypeParams) => actionTypeParams[0]);
           } else {
               
               sails.log.info(`ActionType : addParams : Inserting new param ${param.name}`);
