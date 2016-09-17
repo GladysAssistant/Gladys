@@ -59,7 +59,7 @@
     "istanbul": "^0.4.2",
     "jshint-stylish": "^2.0.1",
     "mocha": "^3.0.2",
-    "should": "^10.0.0",
+    "should": "^11.0.0",
     "supertest": "^1.1.0"
   },
   "scripts": {
