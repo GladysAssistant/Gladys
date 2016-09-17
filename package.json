@@ -32,10 +32,10 @@
     "grunt-contrib-less": "^1.2.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-mocha-test": "^0.12.7",
+    "grunt-mocha-test": "^0.13.0",
     "grunt-sails-linker": "^0.10.1",
     "grunt-sync": "^0.5.2",
-    "include-all": "~0.1.3",
+    "include-all": "~1.0.5",
     "jsonwebtoken": "^7.0.0",
     "limdu": "^0.8.0",
     "md5": "^2.1.0",
@@ -58,9 +58,9 @@
     "grunt-mocha-istanbul": "^5.0.1",
     "istanbul": "^0.4.2",
     "jshint-stylish": "^2.0.1",
-    "mocha": "^2.3.4",
-    "should": "^10.0.0",
-    "supertest": "^1.1.0"
+    "mocha": "^3.0.2",
+    "should": "^11.1.0",
+    "supertest": "^2.0.0"
   },
   "scripts": {
     "start": "node app.js",
