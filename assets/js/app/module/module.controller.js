@@ -107,6 +107,7 @@
            storeService.getModuleInfos(module.slug)
                 .then(function(data){
                     vm.selectedModule.instructions = $sce.trustAsHtml(data.data.instructionsHTML);
+                    $scope.$apply();
                 });
        }
        
