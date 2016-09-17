@@ -14,14 +14,7 @@ function init(){
           
          // foreach module, exec install function
          return Promise.map(modules, function(module){
-             return execInstallFunction(module);
-         });
-      })
-      .then(function(modules){
-        
-         // foreach module, we update in db with the current status
-         return Promise.map(modules, function(module){
-           return gladys.module.update(module);
+             return execInstallFunction(module).reflect();
          });
       });
 }
@@ -31,13 +24,18 @@ function init(){
  * Execute the install function
  */
 function execInstallFunction(module){
+
+   // if the module is not present, we remove it from the list
+   if(!gladys.modules[module.slug]){
+      return gladys.module.uninstall(module);
+   }
    
    // we test if the module has an installation function
    if (typeof gladys.modules[module.slug].install !== "function") {
      
      // module installed with success, because no installation function is needed
      module.status = 0;
-     return Promise.resolve(module);
+     return gladys.module.update(module);
    }  
    
    return gladys.modules[module.slug].install()
@@ -46,6 +44,9 @@ function execInstallFunction(module){
        // module installed with success
        module.status = 0;
        return module;
+     })    
+     .then(() => {
+        return gladys.module.update(module);
      })
      .catch(function(){
        
