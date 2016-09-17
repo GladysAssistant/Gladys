@@ -50,7 +50,7 @@ module.exports.policies = {
   LauncherType : ['checkToken'],
   LifeEvent : ['checkToken'],
   Location : ['checkToken'],
-  Lock : ['checkToken'],
+  Lock : ['checkIfLocked'],
   Machine : ['checkToken'],
   Message : ['checkToken'],
   Mode: ['checkToken'],
