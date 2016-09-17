@@ -101,6 +101,7 @@ module.exports = {
       language: req.session.User.language,
       assistantName: req.session.User.assistantName,
       preparationTimeAfterWakeUp: req.session.User.preparationTimeAfterWakeUp,
+      role: req.session.User.role,
       id: req.session.User.id
     };
     res.json(user);

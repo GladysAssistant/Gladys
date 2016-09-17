@@ -93,6 +93,10 @@
   "installation-training-brain": "Training neural network...",
   "installation-checking-for-updates": "Checking for updates...",
   "installation-configuration-success": "I just configured myself successfully ! You can move to next step :)",
+  "installation-role": "Role",
+  "installation-role-admin": "Admin",
+  "installation-role-habitant": "Habitant",
+  "installation-role-guest": "Guest",
   "search-placeholder": "What can I do for you ?",
   "parameters-general": "General",
   "parameters-house": "Houses",
@@ -222,5 +226,13 @@
   "user-gender": "Gender",
   "login-error-password-email-required": "Please enter an email and a password.",
   "login-error-invalid-email": "Can't find this email.",
-  "login-error-invalid-username-password": "Invalid password."
+  "login-error-invalid-username-password": "Invalid password.",
+  "all-user-box-title": "Users",
+  "all-user-box-description": "You can manage here all Gladys accounts.",
+  "all-user-id": "id",
+  "all-user-name": "Name",
+  "all-user-delete": "Delete",
+  "all-user-delete-button": "Delete",
+  "create-user-button-create": "Create a new user",
+  "account-update-button": "Update my account"
 }

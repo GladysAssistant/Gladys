@@ -258,6 +258,10 @@
   "installation-training-brain": "Entrainement du réseau de neurones...",
   "installation-checking-for-updates": "Vérification des mises à jours...",
   "installation-configuration-success": "Ma configuration s'est terminée avec succès ! Vous pouvez passer à l'étape suivante :)",
+  "installation-role": "Rôle",
+  "installation-role-admin": "Administrateur",
+  "installation-role-habitant": "Habitant",
+  "installation-role-guest": "Invité",
   "search-placeholder": "Que puis-je faire pour vous ?",
   "parameters-general": "Général",
   "parameters-house": "Logements",
@@ -388,5 +392,13 @@
   "user-gender": "Genre",
   "login-error-password-email-required": "Veuillez rentrer un email et un mot de passe.",
   "login-error-invalid-email": "Email introuvable.",
-  "login-error-invalid-username-password": "Mot de passe invalide."
+  "login-error-invalid-username-password": "Mot de passe invalide.",
+  "all-user-box-title": "Utilisateurs",
+  "all-user-box-description": "Gérez ici les différents utilisateurs de votre Gladys",
+  "all-user-id": "id",
+  "all-user-name": "Nom",
+  "all-user-delete": "Supprimer",
+  "all-user-delete-button": "Supprimer",
+  "create-user-button-create": "Créer un nouvel utilisateur",
+  "account-update-button": "Mettre à jour mon compte"
 }

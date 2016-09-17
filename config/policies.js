@@ -87,7 +87,7 @@ module.exports.policies = {
     index: ['checkToken'],
     create: ['canCreateUser'],
     login: [],
-    delete: ['checkToken'],
+    delete: ['checkToken', 'isAdmin'],
     update: ['checkToken'],
     whoami: ['checkToken']
   },
