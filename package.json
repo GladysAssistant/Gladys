@@ -32,7 +32,7 @@
     "grunt-contrib-less": "^1.2.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-mocha-test": "^0.12.7",
+    "grunt-mocha-test": "^0.13.0",
     "grunt-sails-linker": "^0.10.1",
     "grunt-sync": "^0.5.2",
     "include-all": "~0.1.3",
