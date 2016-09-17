@@ -14,7 +14,7 @@ function init(){
           
          // foreach module, exec install function
          return Promise.map(modules, function(module){
-             return execInstallFunction(module).reflect();
+             return execInstallFunction(module);
          });
       });
 }
@@ -52,6 +52,6 @@ function execInstallFunction(module){
        
        // error while installing the module
        module.status = 2;
-       return module;
+       return Promise.resolve(module);
      });
 }
