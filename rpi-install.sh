@@ -47,14 +47,22 @@ sudo apt-get install -y libasound2-dev
 # NPM global modules
 sudo npm install -g pm2
 
+# create gladys folder
+cd /home/pi
+mkdir gladys
+cd gladys
+
 # Installing Gladys - One line ! :)
-sudo npm install -g gladys
+npm install gladys
 
 # Init script of Gladys
-cd /usr/local/lib/node_modules/gladys/
+cd node_modules/gladys
 node init.js
 
+# buildProd
+grunt buildProd
+
 # Starting Gladys at startup
-pm2 startup
-pm2 start /usr/local/lib/node_modules/gladys/app.js --name gladys
-pm2 save
+sudo pm2 startup
+sudo pm2 start /home/pi/gladys/node_modules/gladys/app.js --name gladys
+sudo pm2 save
