@@ -60,9 +60,18 @@ module.exports = {
     * Update a user
     */
    update: function(req, res, next){
+       if(req.params.id != req.session.User.id){
+          return res.forbidden('You cannot modify another user than you.');
+       }
+
        req.body.id = req.params.id;
        gladys.user.update(req.body)
          .then(function(user){
+
+             if(req.params.id == req.session.User.id){
+                req.session.User = user;
+             }
+
              return res.json(user);
          })
          .catch(next);

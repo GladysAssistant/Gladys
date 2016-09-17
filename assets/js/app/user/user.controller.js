@@ -14,11 +14,12 @@
     .module('gladys')
     .controller('UserCtrl', UserCtrl);
 
-  UserCtrl.$inject = ['userService'];
+  UserCtrl.$inject = ['userService', 'notificationService'];
 
-  function UserCtrl(userService) {
+  function UserCtrl(userService, notificationService) {
     /* jshint validthis: true */
     var vm = this;
+    vm.updateUser = updateUser;
     
     activate();
 
@@ -32,6 +33,21 @@
         userService.whoAmI()
           .then(function(user){
               vm.user = user;
+          });
+    }
+
+    function updateUser(id, user){
+        userService.update(id, user)
+          .then(function(data){
+              vm.user = data.data;
+              notificationService.successNotificationTranslated('USER.UPDATED_SUCCESS', vm.user.firstname);
+          })
+          .catch(function(err){
+              if(err.data && err.data.details){
+                  notificationService.errorNotificationTranslated('USER.UPDATED_FAILURE', err.data.details);
+              } else {
+                notificationService.errorNotificationTranslated('USER.UPDATED_FAILURE', vm.user.firstname);
+              }
           });
     }
     

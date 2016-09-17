@@ -8,7 +8,11 @@ var translationsEN = {
   SYSTEM: {
       UPDATE_DATA_SUCCESS: 'Data updated with success',
       UPDATE_DATA_FAIL: 'Failed to updated data : '
-  }  
+  },
+  USER: {
+      UPDATED_SUCCESS: 'User updated with success : ',
+      UPDATED_FAILURE: 'Failed to update user : '
+  }
 };
 
 var translationsFR = {
@@ -21,6 +25,10 @@ var translationsFR = {
   SYSTEM: {
       UPDATE_DATA_SUCCESS: 'Donnée Gladys mise à jour avec succès.',
       UPDATE_DATA_FAIL: 'Erreur lors de la mise à jour des données : '
+  },
+  USER: {
+      UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès : ',
+      UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : '
   }    
 };
 

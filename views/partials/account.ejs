@@ -7,6 +7,7 @@
             <p>
             <%= __('user-box-description') %>
             </p>
+
             <table id="example2" class="table table-bordered table-hover ng-cloak">
                 <thead>
                     <tr>
@@ -16,11 +17,17 @@
                 </thead>
                 <tbody>
                     <tr><td><%= __('user-id') %></td><td>{{vm.user.id}}</td></tr>
-                    <tr><td><%= __('user-firstname') %></td><td>{{vm.user.firstname}}</td></tr>
-                    <tr><td><%= __('user-lastname') %></td><td>{{vm.user.lastname}}</td></tr>
-                    <tr><td><%= __('user-email') %></td><td>{{vm.user.email}}</td></tr>
-                    <tr><td><%= __('user-password') %></td><td></td></tr>
-                    <tr><td><%= __('user-gender') %></td><td>{{vm.user.gender}}</td></tr>
+                    <tr><td><%= __('user-firstname') %></td><td><input type="text" ng-model="vm.user.firstname" class="form-control" /></td></tr>
+                    <tr><td><%= __('user-lastname') %></td><td><input type="text" ng-model="vm.user.lastname" class="form-control" /></td></td></tr>
+                    <tr><td><%= __('user-email') %></td><td><input type="text" ng-model="vm.user.email" class="form-control" /></td></td></tr>
+                    <tr><td><%= __('user-gender') %></td><td>
+                            <select ng-model="vm.user.gender" class="form-control">
+                                <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
+                                <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
+                            </select>
+                        </td></td>
+                    </tr>
+                    <tr><td><button class="btn btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button></td></tr>
                 </tbody>
             </table>
 
