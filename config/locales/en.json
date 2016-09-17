@@ -233,6 +233,7 @@
   "all-user-name": "Name",
   "all-user-delete": "Delete",
   "all-user-delete-button": "Delete",
+  "create-user-modal-title": "Create a user",
   "create-user-button-create": "Create a new user",
   "account-update-button": "Update my account"
 }
