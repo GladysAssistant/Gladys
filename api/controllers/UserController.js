@@ -17,10 +17,10 @@
 module.exports = {
     
     /**
-     * Get users with pagingation
+     * Get all users
      */
    index: function(req, res, next){
-      gladys.user.get(req.query)
+      gladys.user.get()
         .then(function(users){
            return res.json(users); 
         })
