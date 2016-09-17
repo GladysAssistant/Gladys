@@ -55,13 +55,22 @@
               </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="tab_2" >
+
+                <div class="row" ng-if="!vm.modulesFromStore">
+                    <div class="col-md-4 col-md-offset-4"> 
+                        <div id="waitspinner" class="spinner">  
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div> 
+                        </div>  
+                    </div>
+                </div>
+
                 <div class="row modules" >
 
-            
                     <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modulesFromStore" ng-click="vm.showModule(module);">
                         <a> <h5>{{module.name}}</h5>
                         <div class="module-img">
-                            <img class="img-responsive img-rounded" src="{{module.img}}">
+                            <img class="img-responsive img-rounded" ng-src="{{module.img}}">
                             <div class="description">
                                 <p class="text-justify">
                                     {{module.description}}

@@ -21,7 +21,7 @@
         var vm = this;
         
         vm.modules = [];
-        vm.modulesFromStore = [];
+        vm.modulesFromStore = null;
         vm.installModule = installModule;
         vm.configModule = configModule;
         vm.uninstallModule = uninstallModule;
@@ -50,6 +50,7 @@
            return storeService.getModules()
              .then(function(data){
                  vm.modulesFromStore = data.data;
+                 $scope.$apply();
              });
        }
        
