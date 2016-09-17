@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 module.exports = function(){
   return gladys.update.getLastVersion()
     .then(function(version){
-       if(version.name != gladys.version){
+       if(version.name > gladys.version){
            sails.log.info(`New version of Gladys available : ${version.name}`);
            return notificationAdmin(version.name);
        } else {
