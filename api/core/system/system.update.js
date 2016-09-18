@@ -1,18 +1,15 @@
-var child_process = require('child_process');
+const spawn = require('child_process').spawn;
 
 module.exports = function(){
-    return exec(sails.config.update.updateScript);
-}
-
-/**
- * Exec a shell command
- */
-function exec(command){
-    return new Promise(function(resolve, reject){
-        child_process.exec(command, function (err, stdout, stderr){
-            if(err) return reject(err);
-            
-            return resolve(stdout);
-        });
+    const child = spawn('sh', [sails.config.update.updateScript], {
+        detached: true,
+        stdio: 'ignore'
     });
+
+    child.on('error', (err) => {
+        sails.log.error('Failed to start update script');
+        sails.log.error(err);
+    });
+
+    child.unref();
 }
