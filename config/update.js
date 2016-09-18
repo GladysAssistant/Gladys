@@ -11,6 +11,6 @@ module.exports.update = {
     icon: 'fa fa-refresh',
     iconColor: 'bg-light-blue',
     link: '/dashboard/parameters',
-    updateScript: process.env.UPDATE_SCRIPT_PATH || `${__dirname}/rpi-update.sh`,
+    updateScript: process.env.UPDATE_SCRIPT_PATH || `${__dirname}/../rpi-update.sh`,
     checkUpdateInterval: process.env.CHECK_UPDATE_INTERVAL || 24*60*60*1000
 };
