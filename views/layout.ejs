@@ -41,12 +41,12 @@
                        
                         <!-- Notifications: style can be found in dropdown.less -->
                         <li class="dropdown notifications-menu" data-ng-controller="NotificationCtrl as vm" >
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="vm.read();">
                                 <i class="fa fa-warning"></i> 
-                                <span class="label label-info ng-cloak">{{ vm.notifications.length }}</span>
+                                <span class="label label-info ng-cloak">{{ vm.nbNotifications }}</span>
                             </a>
                             <ul class="dropdown-menu ng-cloak" >
-                                <li class="header"><%= __('You have') %> {{ vm.notifications.length }} <%= __('notification') %>{{ vm.notifications.length > 1 && 's' || ''}}</li>
+                                <li class="header"><%= __('You have') %> {{ vm.nbNotifications }} <%= __('notification') %>{{ vm.nbNotifications > 1 && 's' || ''}}</li>
                                 <li>
                                     <!-- inner menu: contains the actual data -->
                                     <ul class="menu">
