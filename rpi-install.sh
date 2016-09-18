@@ -63,6 +63,6 @@ node init.js
 grunt buildProd
 
 # Starting Gladys at startup
-sudo pm2 startup
-sudo pm2 start /home/pi/gladys/node_modules/gladys/app.js --name gladys
-sudo pm2 save
+pm2 startup
+pm2 start /home/pi/gladys/node_modules/gladys/app.js --name gladys
+pm2 save

@@ -36,7 +36,7 @@ fi
 
 # stopping gladys (silent is in case gladys is not running)
 # silent remove any errors cause by PM2
-#sudo pm2 stop --silent gladys
+pm2 stop --silent gladys
 
 cd $GLADYS_TOP_FOLDER
 
@@ -52,4 +52,4 @@ cd $GLADYS_FOLDER
 grunt buildProd
 
 # restart gladys
-sudo pm2 start gladys
+pm2 start gladys
