@@ -27,9 +27,9 @@ sudo apt-get install -y build-essential
 
 # Installing Node.js
 echo "Installing Node.js"
-wget https://nodejs.org/dist/v4.4.2/node-v4.4.2-linux-armv6l.tar.xz
-tar -xvf node-v4.4.2-linux-armv6l.tar.xz
-cd node-v4.4.2-linux-armv6l
+wget https://nodejs.org/dist/v4.5.0/node-v4.5.0-linux-armv6l.tar.xz
+tar -xvf node-v4.5.0-linux-armv6l.tar.xz
+cd node-v4.5.0-linux-armv6l
 sudo cp -R * /usr/local/
 
 # Install MySQL
