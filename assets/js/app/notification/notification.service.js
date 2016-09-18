@@ -20,6 +20,7 @@
         
         var service = {
             get: get,
+            read: read,
             waitForNotification: waitForNotification,
             successNotification: successNotification,
             errorNotification: errorNotification,
@@ -29,8 +30,12 @@
 
         return service;
 
-        function get() {
-            return $http({method: 'GET', url: '/notification'});
+        function get(take, skip) {
+            return $http({method: 'GET', url: '/notification', params: {take: take, skip: skip}});
+        }
+
+        function read(){
+            return $http({method: 'PATCH', url: '/notification/read'});
         }
         
         function waitForNotification(callback) {

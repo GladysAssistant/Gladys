@@ -87,6 +87,7 @@ function loadFixtures(barrels){
        'devicestate', 
        'notificationtype',
        'notificationuser',
+       'notification',
        'eventtype',
        'launcher',
        'actiontype',

@@ -145,6 +145,7 @@ module.exports.routes = {
   
   // Notification
   'get /notification': 'NotificationController.index',
+  'patch /notification/read': 'NotificationController.read',
   
   // NotificationType
   'get /notificationtype': 'NotificationTypeController.index',

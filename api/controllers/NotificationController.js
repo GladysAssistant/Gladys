@@ -27,6 +27,15 @@ module.exports = {
               return res.json(notifications);
           })
           .catch(next);
+    },
+
+    /**
+     * Read notifications from a particular user
+     */
+    read: function(req, res, next){
+        gladys.notification.read(req.session.User)
+          .then((notifications) => res.json(notifications))
+          .catch(next);
     }
     	
 };
