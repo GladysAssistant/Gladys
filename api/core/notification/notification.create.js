@@ -6,14 +6,17 @@ var queries = require('./notification.queries.js');
 function create(notification) {
     return Notification.create(notification)
         .then(function(notification) {
-            return [notification, gladys.utils.sql(queries.getNotificationTypes, [notification.user])];
+            return [notification, 
+                    gladys.utils.sql(queries.getNotificationTypes, [notification.user]), 
+                    gladys.user.getById({id: notification.user})
+            ];
         })
-        .spread(function(notification, types) {
+        .spread(function(notification, types, user) {
             
             sails.log.info(`Notification : create : Notification saved with success. Trying to send notification to user ID ${notification.user}`);
             
             return Promise.mapSeries(types, function(type) {
-                return startService(notification, type);
+                return startService(notification, type, user);
             });
         })
         .catch(function(err) {
@@ -26,7 +29,7 @@ function create(notification) {
 /**
  * Call the service related to the notification
  */
-function startService(notification, type) {
+function startService(notification, type, user) {
 
     if (!gladys.modules[type.service] || typeof gladys.modules[type.service].notify !== "function") {
         return Promise.reject(new Error(`${type.service} is not a valid service`));
@@ -34,7 +37,7 @@ function startService(notification, type) {
     
     sails.log.info(`Notification : create : Trying to contact ${type.service}`);
 
-    return gladys.modules[type.service].notify(notification)
+    return gladys.modules[type.service].notify(notification, user)
         .then(function(result) {
             
             sails.log.info(`Notification threw ${type.service} sent with success. Aborting the chain.`);
