@@ -10,6 +10,7 @@
   "here-you-can-register-machine":"Here you can register the machine who are running Gladys. Useful if you have multiple Gladys instance ( on a server and on a Raspberry for example ).",
   "the-master-field-machine":"The Master field indicate that the machine is the master of your installation.",
   "the-me-field-machine":"The \"Me\" field indicate that the machine you are registering is the machine where your are actually connected to ! (on this interface).",
+  "machines-saving": "Saving",
   "pagename-homepage":"Home",
   "pagename-parametres":"Parametres",
   "pagename-scenario":"Scenario",

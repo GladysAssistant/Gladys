@@ -175,6 +175,7 @@
   "here-you-can-register-machine":"Ici, vous pouvez déclarer vos différentes machines faisant tourner Gladys, si vous avez une ou plusieurs instances de Gladys ( sur un serveur, et sur un Raspberry par exemple).",
   "the-master-field-machine":"Le champs \"Maitre\" indique que la machine que vous enregistrez est la machine maître.",
   "the-me-field-machine":"Le champs \"Moi\" indique que la machine que vous enregistrez est la machine qui fait tourner l'interface que vous utilisez actuellement !",
+  "machines-saving": "Enregistrement en cours",
   "pagename-homepage":"Accueil",
   "pagename-parametres":"Paramètres",
   "pagename-scenario":"Scénarios",
