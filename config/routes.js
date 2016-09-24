@@ -99,6 +99,8 @@ module.exports.routes = {
   
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
+  'post /devicetype': 'DeviceTypeController.create',
+  'delete /devicetype/:id': 'DeviceTypeController.delete',
   'get /devicetype/room': 'DeviceTypeController.getByRoom',
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',

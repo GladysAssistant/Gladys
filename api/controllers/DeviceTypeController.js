@@ -51,6 +51,15 @@ module.exports = {
            return res.json(roomsDeviceTypes); 
         })
         .catch(next);
+  },
+
+  /** 
+   * Delete a deviceType
+   */
+  delete: function(req, res, next){
+      gladys.deviceType.delete({id: req.params.id})
+        .then(() => res.json({success: true}))
+        .catch(next);
   }
   
 };
