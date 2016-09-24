@@ -133,6 +133,12 @@ module.exports.routes = {
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
   
+  // Machine
+  'get /machine' : 'MachineController.get',
+  'post /machine': 'MachineController.create',
+  'patch /machine/:id': 'MachineController.update',
+  'delete /machine/:id': 'MachineController.delete',
+
   // Mode
   'get /mode': 'ModeController.index',
   'post /mode': 'ModeController.create',
