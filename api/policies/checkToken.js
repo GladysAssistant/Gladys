@@ -25,6 +25,9 @@ module.exports = function(req, res, next) {
     return next();
   }
   
+  /*
+  DISABLE FOR THE MOMENT
+  WE NEED TO GENERATE THE SECRET
   // if the request has a JsonWebToken
   if(req.headers.Authorization){
      
@@ -35,7 +38,9 @@ module.exports = function(req, res, next) {
        req.session.User = user;
        return next();
      });   
-  } else if (req.param('token')){
+  } */
+  
+  if (req.param('token')){
       
       // check if get param 'token' is a valid
       gladys.token.verify(req.param('token'))
