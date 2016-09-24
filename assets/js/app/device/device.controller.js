@@ -25,6 +25,11 @@
     vm.changeValue = changeValue;
     vm.updateDeviceType = updateDeviceType;
     vm.changeTypeDisplay = changeTypeDisplay;
+    vm.createDevice = createDevice;
+    vm.deleteDevice = deleteDevice;
+    vm.createDeviceType = createDeviceType;
+    vm.deleteDeviceType = deleteDeviceType;
+
     vm.saving = false;
     vm.devices = [];
     vm.rooms = [];
@@ -65,6 +70,21 @@
               vm.rooms = data.data;
           });
     }
+
+    function createDevice(device){
+        return deviceService.create(device)
+           .then(function(data){
+               vm.devices.push(data.data.device);
+               vm.newDevice = {};
+           });
+    }
+
+    function deleteDevice(index, id){
+        return deviceService.deleteDevice(id)
+          .then(function(){
+              vm.devices.splice(index, 1);
+          });
+    }
     
     function updateDevice(device){
         console.log('Updating device ' + device.name);
@@ -85,6 +105,9 @@
     
     function selectDevice(device){
         vm.selectedDevice = device;
+        vm.newType = {
+            device: device.id
+        };
         return deviceService.getDeviceTypesDevice(device.id)
           .then(function(data){
               vm.selectedDevice.types = data.data;
@@ -103,6 +126,24 @@
             .then(function(){
                 
             });
+    }
+
+    function createDeviceType(deviceType){
+        deviceType.sensor = deviceType.sensor || false;
+        return deviceService.createDeviceType(deviceType)
+          .then(function(data){
+              vm.selectedDevice.types.push(data.data);
+               vm.newType = {
+                    device: vm.selectedDevice.id
+               };
+          });
+    }
+
+    function deleteDeviceType(index, id){
+        return deviceService.deleteDeviceType(id)
+          .then(function(data){
+              vm.selectedDevice.types.splice(index, 1);
+          });
     }
     
     function changeTypeDisplay(type){

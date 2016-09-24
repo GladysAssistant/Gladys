@@ -107,16 +107,19 @@
                                             <tr>
                                                 <th><%= __('ID') %></th>
                                                 <th><%= __('Name') %></th>
+                                                <th><%= __('Identifier') %></th>
                                                 <th><%= __('Protocol') %></th>
                                                 <th><%= __('Service') %></th>
                                                 <th><%= __('Room') %></th>
                                                 <th><%= __('Action') %></th>
+                                                <th><%= __('Delete') %></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="device in vm.devices" class="ng-cloak">
                                                 <td>{{device.id}}</td>
                                                 <td><input type="text" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td>{{device.identifier}}</td>
                                                 <td>{{device.protocol}}</td>
                                                 <td>{{device.service}}</td>
                                                 <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
@@ -129,6 +132,22 @@
                                                    </select>
                                                 </td>
                                                 <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ng-click="vm.selectDevice(device);" ><%= __('Edit') %></button></td>
+                                                <td><button class="btn btn-danger btn-sm"  ng-click="vm.deleteDevice($index, device.id);" ><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                 <td></td>
+                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.name" placeholder="<%= __('device-create-name') %>" /></td>
+                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.identifier" placeholder="<%= __('device-create-identifier') %>" /></td>
+                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.protocol" placeholder="<%= __('device-create-protocol') %>" /></td>
+                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.service"  placeholder="<%= __('device-create-service') %>"/></td>
+                                                 <td>
+                                                    <select name="selectRoom" id="selectRoom" class="form-control"
+                                                            ng-options="room.name for room in vm.rooms track by room.id"
+                                                            ng-model="vm.newDevice.room" >
+                                                   </select>
+                                                </td>
+                                                <td></td>
+                                                 <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".create-device-modal" ng-click="vm.createDevice(vm.newDevice);" ><%= __('device-create-button') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -212,6 +231,7 @@
                                                 <th><%= __('devices-types-isensor') %></th>
                                                 <th><%= __('devices-types-display') %></th>
                                                 <th><%= __('devices-types-lastvalue') %></th>
+                                                <th><%= __('Action') %></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -253,6 +273,19 @@
                                                             {{type.lastValue && '<%= __('devices-types-off') %>' || '<%= __('devices-types-on') %>' }}
                                                     </button>
                                                 </td>
+                                                <td><button class="btn btn-sm btn-danger" ng-click="vm.deleteDeviceType($index, type.id);"><%= __('Delete') %></button></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.type" placeholder="<%= __('devices-types-type') %>" /></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.tag" placeholder="<%= __('devices-types-tag') %>" /></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.unit" placeholder="<%= __('devices-types-unit') %>" /></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.min" placeholder="<%= __('devices-types-min') %>" /></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.max" placeholder="<%= __('devices-types-max') %>" /></td>
+                                                <td><input type="checkbox" class="form-control"  ng-model="vm.newType.sensor" /></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td><button class="btn btn-sm btn-success" ng-click="vm.createDeviceType(vm.newType);"><%= __('Create') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
