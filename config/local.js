@@ -29,7 +29,7 @@
 
 module.exports = {
 
-  hookTimeout: 240000,
+  hookTimeout: 1800000,
 
   /***************************************************************************
    * Your SSL certificate and key, if you want to be able to serve HTTP      *
