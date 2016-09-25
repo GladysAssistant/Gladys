@@ -11,12 +11,15 @@ function validate(devicetype) {
 }
 
 function validateDeviceType(devicetype) {
-	device.should.be.instanceOf(Object);
-	device.should.have.property('id');
-	device.should.have.property('type');
-	device.should.have.property('tag');
-        device.should.have.property('sensor');
-        device.should.have.property('device');
-        device.should.have.property('min');
-        device.should.have.property('max');
+	devicetype.should.be.instanceOf(Object);
+	devicetype.should.have.property('id');
+	devicetype.should.have.property('type');
+	devicetype.should.have.property('unit');
+        devicetype.should.have.property('sensor');
+        devicetype.should.have.property('device');
+        devicetype.should.have.property('min');
+        devicetype.should.have.property('max');
+        devicetype.should.have.property('identifier');
+        devicetype.should.have.property('service');
+        devicetype.should.have.property('lastValue');
 }
