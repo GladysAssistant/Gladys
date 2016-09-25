@@ -31,14 +31,14 @@ function exec(param) {
             // if we send true or false, it's valid
             // but it won't insert in db because validator
             // need an integer
-            if(param.value === true){
+            if(param.value === true || param.value == 'true'){
                 param.value = 1;
-            } else if(param.value === false){
+            } else if(param.value === false || param.value == 'false'){
                 param.value = 0;
             }
             
-            // parseInt value
-            param.value = parseInt(param.value);
+            // parseFloat value
+            param.value = parseFloat(param.value);
 
             // calling service method
             return gladys.modules[types[0].service].exec({
