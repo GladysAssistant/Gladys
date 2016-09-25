@@ -7,9 +7,9 @@ describe('DeviceType', function() {
     
     it('should return a deviceType', function (done) {
         
-        var id = 1;
+        var device = {id :  1};
         
-        gladys.deviceType.getById(id).then(function(type){
+        gladys.deviceType.getById(device).then(function(type){
            validateDeviceType(type);
            done();
         }).catch(function(err){
