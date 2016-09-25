@@ -31,7 +31,6 @@ function getDeviceTypesInRoom(room){
     // get all deviceTypes in room
     return gladys.utils.sql(queries.getByRoom, [room.id])
       .then(function(deviceTypes){
-         
          // if there is some deviceTypes in this room
          if(deviceTypes.length){
              

@@ -3,7 +3,7 @@ var validateDeviceType = require('../../validator/deviceTypeValidator.js');
 
 describe('DeviceType', function() {
 
-  describe('getByType', function() {
+  describe('getById', function() {
     
     it('should return a deviceType', function (done) {
         
