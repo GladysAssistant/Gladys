@@ -38,6 +38,7 @@ module.exports = {
     JOIN devicetype dt ON (d.id = dt.device)
     JOIN room r ON (d.room = r.id);
   `,
+  getByDeviceAndIdentifier: 'SELECT id FROM devicetype WHERE device = ? AND identifier = ?;',
   delete : 'DELETE FROM devicetype WHERE id = ?;',
   deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;'
 };
