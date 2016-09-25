@@ -38,5 +38,6 @@ module.exports = {
     JOIN devicetype dt ON (d.id = dt.device)
     JOIN room r ON (d.room = r.id);
   `,
-  delete : 'DELETE FROM devicetype WHERE id = ?;'
+  delete : 'DELETE FROM devicetype WHERE id = ?;',
+  deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;'
 };
