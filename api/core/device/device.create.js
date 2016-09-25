@@ -15,7 +15,7 @@ function create(param) {
           if(devices.length){
               
                // if device already exist, we update it
-              return Device.udpate({id: devices[0].id}, param.device)
+              return Device.update({id: devices[0].id}, param.device)
                            .then((rows) => rows[0]);
           } else {
               
