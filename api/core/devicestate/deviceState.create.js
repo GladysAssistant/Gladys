@@ -1,6 +1,13 @@
 var Promise = require('bluebird');
 
 module.exports = function(state){
+    
+    if (state.value === true || state.value == 'true') {
+        state.value = 1;
+    } else if (state.value === false || state.value == 'false') {
+        state.value = 0;
+    }
+
     return DeviceState.create(state)
       .then(function(state){
          var event = {
