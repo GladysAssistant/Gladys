@@ -35,7 +35,7 @@ before(function(done) {
 });
 
 beforeEach(function(done){
-    this.timeout(20000);
+    this.timeout(40000);
     fillDatabaseWithFixtures(function(err){
         if(err) return done(err);
         
