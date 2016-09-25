@@ -51,6 +51,14 @@ module.exports = {
            return res.json(roomsDeviceTypes); 
         })
         .catch(next);
+  },
+
+  getById: function(req, res, next){
+      gladys.deviceType.getById(req.params('id'))
+        .then(function(deviceType){
+          return res.json(deviceType);
+        })
+       .catch(next);
   }
   
 };

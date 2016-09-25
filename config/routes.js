@@ -103,6 +103,8 @@ module.exports.routes = {
   'get /devicetype/room': 'DeviceTypeController.getByRoom',
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
+  'get /devicetype/:id': 'DeviceTypeController.getById',
+
   
   // Event
   'get /event': 'EventController.index',
