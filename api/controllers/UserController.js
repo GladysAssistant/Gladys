@@ -17,10 +17,10 @@
 module.exports = {
     
     /**
-     * Get users with pagingation
+     * Get all users
      */
    index: function(req, res, next){
-      gladys.user.get(req.query)
+      gladys.user.get()
         .then(function(users){
            return res.json(users); 
         })
@@ -60,9 +60,18 @@ module.exports = {
     * Update a user
     */
    update: function(req, res, next){
+       if(req.params.id != req.session.User.id){
+          return res.forbidden('You cannot modify another user than you.');
+       }
+
        req.body.id = req.params.id;
        gladys.user.update(req.body)
          .then(function(user){
+
+             if(req.params.id == req.session.User.id){
+                req.session.User = user;
+             }
+
              return res.json(user);
          })
          .catch(next);
@@ -92,6 +101,7 @@ module.exports = {
       language: req.session.User.language,
       assistantName: req.session.User.assistantName,
       preparationTimeAfterWakeUp: req.session.User.preparationTimeAfterWakeUp,
+      role: req.session.User.role,
       id: req.session.User.id
     };
     res.json(user);

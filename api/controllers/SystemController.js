@@ -11,6 +11,16 @@ module.exports = {
     },
     
     shutdown: function(req, res, next){
+
+        // we must answer before shutting down gladys :p
+        res.json({success: true});
         gladys.system.shutDown();
+    },
+
+    update: function(req, res, next){
+
+        // we must answer before starting update process
+        res.json({success: true});
+        gladys.system.update();
     }
 }

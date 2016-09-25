@@ -3,7 +3,8 @@
         "id": 1,
         "name": "Raspberry Pi kitchen",
         "uuid": "72844455-8634-4131-9875-612b47ad4397",
-        "ip": "192.168.1.100",
+        "host": "http://192.168.1.100",
+        "me": true,
         "house": 1
     }
 ]

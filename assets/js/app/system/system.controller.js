@@ -25,6 +25,7 @@
         vm.infos = {};
         vm.updatingData = false;
         vm.shutdown = shutdown;
+        vm.update = update;
         
         activate();
 
@@ -42,6 +43,10 @@
        function shutdown(){
            systemService.shutdown();
        }
+
+       function update(){
+           systemService.update();
+       }
        
        function updateAllData(){
            vm.updatingData = true;
@@ -56,6 +61,11 @@
                 
                 // get all events
                 return updateService.updateEvents(); 
+            })
+            .then(function(){
+                
+                // get all actions
+                return updateService.updateActions(); 
             })
             .then(function(){
                 

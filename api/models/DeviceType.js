@@ -9,9 +9,18 @@ module.exports = {
 
     attributes: {
 
+        name: {
+          type: 'string'  
+        },
+
         type: {
             type: 'string',
             required: true
+        },
+
+        // can be useful to identify a devicetype (ex: unique ID of a part of a device)
+        identifier: {
+          type: 'string'  
         },
         
         // the name of the deviceType for 

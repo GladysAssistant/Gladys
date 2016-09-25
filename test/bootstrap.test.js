@@ -87,6 +87,7 @@ function loadFixtures(barrels){
        'devicestate', 
        'notificationtype',
        'notificationuser',
+       'notification',
        'eventtype',
        'launcher',
        'actiontype',
@@ -138,7 +139,7 @@ function addTestModuleGladys(gladys){
         exec: function(){
             return Promise.resolve();
         },
-        notify: function(){
+        notify: function(notif, user){
             console.log('Test notification');
             return Promise.resolve();
         },

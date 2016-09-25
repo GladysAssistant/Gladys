@@ -13,5 +13,4 @@ function validate(machine) {
 function validateMachine(machine) {
 	machine.should.be.instanceOf(Object);
 	machine.should.have.property('uuid');
-	machine.should.have.property('ip');
 }

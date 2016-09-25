@@ -24,7 +24,7 @@
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
             getDeviceTypeByRoom: getDeviceTypeByRoom,
-            createType: createType,
+            createDeviceType: createDeviceType,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
             updateDeviceType: updateDeviceType,
@@ -41,16 +41,20 @@
             return $http({method: 'GET', url: '/device'});
         }
 
-        function create(device){
-            return $http({method: 'POST', url: '/device', data: device});
+        function create(device, types){
+            var data = {
+                device: device,
+                types: types || []
+            };
+            return $http({method: 'POST', url: '/device', data: data});
         }
         
         function updateDevice(device){
             return $http({method: 'PATCH', url: '/device/' + device.id, data: device});
         }
         
-        function deleteDevice(device){
-            return $http({method: 'DELETE', url: '/device/' + device.id, data: device});
+        function deleteDevice(id){
+            return $http({method: 'DELETE', url: '/device/' + id});
         }
         
         function getDeviceTypesDevice(id){
@@ -63,7 +67,7 @@
             return $http({method: 'GET', url: '/devicetype'});
         }
 
-        function createType(deviceType){
+        function createDeviceType(deviceType){
             return $http({method: 'POST', url: '/devicetype', data: deviceType});
         }
         
@@ -71,8 +75,8 @@
             return $http({method: 'PATCH', url: '/devicetype/' + deviceType.id, data: deviceType});
         }
         
-        function deleteDeviceType(deviceType){
-            return $http({method: 'DELETE', url: '/devicetype/' + deviceType.id, data: deviceType});
+        function deleteDeviceType(id){
+            return $http({method: 'DELETE', url: '/devicetype/' + id});
         }
         
         function exec(deviceType, value){

@@ -8,7 +8,8 @@ module.exports = function(actionType){
       .then(function(actionTypes){
          
          if(actionTypes.length){
-             return actionTypes[0];
+             return ActionType.update(actionTypes[0].id, actionType)
+                .then((actionTypes) => actionTypes[0]);
          } else {
              
              // inserting new actiontype

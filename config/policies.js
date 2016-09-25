@@ -50,7 +50,7 @@ module.exports.policies = {
   LauncherType : ['checkToken'],
   LifeEvent : ['checkToken'],
   Location : ['checkToken'],
-  Lock : ['checkToken'],
+  Lock : ['checkIfLocked'],
   Machine : ['checkToken'],
   Message : ['checkToken'],
   Mode: ['checkToken'],
@@ -79,7 +79,11 @@ module.exports.policies = {
   Speak : ['checkToken'],
   State : ['checkToken'],
   StateType : ['checkToken'],
-  System : ['checkToken'],
+  System : {
+    index: ['checkToken'],
+    shutdown: ['checkToken', 'isAdmin'],
+    update: ['checkToken', 'isAdmin']
+  },
   Timer: ['checkToken'],
   Token : ['checkToken'],
   Update: ['checkToken'],
@@ -87,7 +91,7 @@ module.exports.policies = {
     index: ['checkToken'],
     create: ['canCreateUser'],
     login: [],
-    delete: ['checkToken'],
+    delete: ['checkToken', 'isAdmin'],
     update: ['checkToken'],
     whoami: ['checkToken']
   },

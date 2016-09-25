@@ -8,6 +8,9 @@ module.exports = function (grunt) {
         var done = this.async();
         var path = './api/hooks/';
         var assetsDestination = './assets/hooks/';
+
+        // we first get sure that the hooks directory exist
+        fse.ensureDirSync(path);
         
         // first, we clean the assets hooks directory
         // if the directory does not exist, it is created

@@ -17,54 +17,31 @@
     machineService.$inject = ['$http'];
 
     function machineService($http) {
+        
         var service = {
-            getMachines:getMachines,
-			createMachine: createMachine,
-			destroyMachine: destroyMachine
+            create: create,
+            get: get, 
+            update: update,
+            delete: destroy
         };
 
         return service;
 
-        function getMachines() {
-            return $http({method: 'POST', url: '/machine/index'}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                    
-                });
+        function get() {
+            return $http({method: 'GET', url: '/machine'});
         }
 		
-		function createMachine(machine) {
-            return $http({method: 'POST', url: '/machine/create', data:machine}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                    
-                });
+		function create(machine) {
+            return $http({method: 'POST', url: '/machine', data: machine});
         }
-		
-		function destroyMachine(id) {
-            return $http({method: 'POST', url: '/machine/destroy', data:{id:id}}).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                    
-                });
+
+        function update(machine){
+            return $http({method: 'PATCH', url: '/machine/' + machine.id, data: machine});
         }
+
+        function destroy(id){
+            return $http({method: 'DELETE', url: '/machine/' + id});
+        }
+	
     }
 })();

@@ -1,5 +1,6 @@
+<div data-ng-controller="UserCtrl as vm">
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="UserCtrl as vm">
+<div class="box box-default" >
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
     </div> 
@@ -7,6 +8,7 @@
             <p>
             <%= __('user-box-description') %>
             </p>
+
             <table id="example2" class="table table-bordered table-hover ng-cloak">
                 <thead>
                     <tr>
@@ -16,13 +18,182 @@
                 </thead>
                 <tbody>
                     <tr><td><%= __('user-id') %></td><td>{{vm.user.id}}</td></tr>
-                    <tr><td><%= __('user-firstname') %></td><td>{{vm.user.firstname}}</td></tr>
-                    <tr><td><%= __('user-lastname') %></td><td>{{vm.user.lastname}}</td></tr>
-                    <tr><td><%= __('user-email') %></td><td>{{vm.user.email}}</td></tr>
-                    <tr><td><%= __('user-password') %></td><td></td></tr>
-                    <tr><td><%= __('user-gender') %></td><td>{{vm.user.gender}}</td></tr>
+                    <tr><td><%= __('user-firstname') %></td><td><input type="text" ng-model="vm.user.firstname" class="form-control" /></td></tr>
+                    <tr><td><%= __('user-lastname') %></td><td><input type="text" ng-model="vm.user.lastname" class="form-control" /></td></td></tr>
+                    <tr><td><%= __('user-email') %></td><td><input type="text" ng-model="vm.user.email" class="form-control" /></td></td></tr>
+                    <tr><td><%= __('user-gender') %></td><td>
+                            <select ng-model="vm.user.gender" class="form-control">
+                                <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
+                                <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
+                            </select>
+                        </td></td>
+                    </tr>
+                    <tr><td><button class="btn btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button></td></tr>
                 </tbody>
             </table>
 
         </div>  
 </div>
+
+<div class="box box-default ng-cloak" ng-if="vm.user.role === 'admin'">
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+    </div> 
+        <div class="box-body table-responsive" >
+            <p>
+                <%= __('all-user-box-description') %>
+            </p>
+
+            <table class="table table-bordered table-hover ng-cloak">
+                <thead>
+                    <tr>
+                        <th><%= __('all-user-id') %></th>
+                        <th><%= __('all-user-name') %></th>
+                        <th><%= __('all-user-delete') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="aUser in vm.users">
+                        <td>{{aUser.id}}</td>
+                        <td>{{aUser.firstname}} {{aUser.lastname}}</td>
+                        <td><button class="btn btn-danger" ng-click="vm.deleteUser($index, aUser.id);"><%= __('all-user-delete-button') %></button></td>
+                    </tr>
+                     <tr>
+                         <td><button class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+                     </tr>
+                </tbody>
+            </table>
+
+        </div>  
+</div>
+
+   <!-- MODAL -->
+        <!-- Large modal -->
+    <div id="modalNewUser" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="<%= __('Close') %>"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="myLargeModalLabel"><%= __('create-user-modal-title') %></h4>
+            </div>
+                <div class="modal-body">
+                   
+                    <!-- FORM -->
+                    <form class="form-horizontal">   
+                               <div class="row">
+                                   <div class="col-md-3"></div>
+                                   <div class="col-md-6">   
+                                       <form class="form-horizontal ng-cloak" >
+                                           
+                                           <p class="bg-danger" ng-show="vm.createAccountError" style="padding:15px;"></p>
+                                           <p class="bg-danger" ng-show="vm.invalidEmail" style="padding:15px;"><%= __('installation-invalid-email') %></p>
+                                           <p class="bg-danger" ng-show="vm.invalidPassword" style="padding:15px;"><%= __('installation-invalid-password') %></p>
+                                           <p class="bg-danger" ng-show="vm.invalidBirthdate" style="padding:15px;"><%= __('installation-invalid-birthdate') %></p>
+                                            
+                                            <!-- FirstName -->
+                                            <div class="form-group">
+                                                <label for="firstname" class="col-sm-4 control-label"><%= __('installation-firstname') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="text" ng-model="vm.newUser.firstname" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- LastName -->
+                                            <div class="form-group">
+                                                <label for="lastname" class="col-sm-4 control-label"><%= __('installation-lastname') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="text" ng-model="vm.newUser.lastname" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Email -->
+                                            <div ng-class="{'form-group': !vm.invalidEmail , 'form-group has-error': vm.invalidEmail }">
+                                                <label for="email" class="col-sm-4 control-label"   ><%= __('installation-email') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="email" ng-model="vm.newUser.email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Password -->
+                                            <div ng-class="{'form-group': !vm.invalidPassword , 'form-group has-error': vm.invalidPassword }">
+                                                <label for="password"  class="col-sm-4 control-label" ><%= __('installation-password') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="password" ng-model="vm.newUser.password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
+                                                </div>
+                                            </div>
+                                            
+                                             <!-- Birthdate -->
+                                            <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
+                                                <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Country code -->
+                                            <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
+                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
+                                                <div class="col-sm-8">
+                                                <select class="form-control" id="countrycode"  ng-model="vm.newUser.language">
+                                                    <option value="en-US">English</option>
+                                                    <option value="fr-FR">Français</option>
+                                                </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Role -->
+                                            <div ng-class="{'form-group': !vm.invalidRole , 'form-group has-error': vm.invalidRole }">
+                                                <label for="role" class="col-sm-4 control-label"><%= __('installation-role') %></label>
+                                                <div class="col-sm-8">
+                                                <select class="form-control" id="role"  ng-model="vm.newUser.role">
+                                                    <option value="admin"><%= __('installation-role-admin') %></option>
+                                                    <option value="habitant"><%= __('installation-role-habitant') %></option>
+                                                    <option value="guest"><%= __('installation-role-guest') %></option>
+                                                </select>   
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Preparation time -->
+                                            <!--<div class="form-group">
+                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-preparation-time') %></label>
+                                                <div class="col-sm-8">
+                                                <input type="text" ng-model="vm.newUser.preparationTime" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
+                                                </div>
+                                            </div>-->
+                                            
+                                            
+                                            <!-- Gender -->
+                                             <div class="form-group">
+                                                <label for="gender" class="col-sm-4 control-label">
+                                                     <%= __('installation-gender') %>
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <select ng-model="vm.newUser.gender" class="form-control" id="gender">
+                                                        <option value="0"><%= __('installation-male') %></option>
+                                                        <option value="1"><%= __('installation-female') %></option>
+                                                    </select>
+                                                </div>
+                                             </div>
+
+                                             <div class="form-group">
+                                                 <button class="btn btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
+                                             </div>
+                                             
+                                         </form>      
+                                        
+                                </div>           
+                             </div>
+                             
+                             </form>
+                     <!-- END OF FORM -->
+
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END OF MODAL -->
+
+
+</div>
+

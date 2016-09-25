@@ -100,6 +100,8 @@ module.exports.routes = {
   
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
+  'post /devicetype': 'DeviceTypeController.create',
+  'delete /devicetype/:id': 'DeviceTypeController.delete',
   'get /devicetype/room': 'DeviceTypeController.getByRoom',
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
@@ -134,6 +136,12 @@ module.exports.routes = {
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
   
+  // Machine
+  'get /machine' : 'MachineController.get',
+  'post /machine': 'MachineController.create',
+  'patch /machine/:id': 'MachineController.update',
+  'delete /machine/:id': 'MachineController.delete',
+
   // Mode
   'get /mode': 'ModeController.index',
   'post /mode': 'ModeController.create',
@@ -148,6 +156,7 @@ module.exports.routes = {
   
   // Notification
   'get /notification': 'NotificationController.index',
+  'patch /notification/read': 'NotificationController.read',
   
   // NotificationType
   'get /notificationtype': 'NotificationTypeController.index',
@@ -201,6 +210,7 @@ module.exports.routes = {
   // System
   'get /system': 'SystemController.index',
   'post /system/shutdown': 'SystemController.shutdown',
+  'post /system/update': 'SystemController.update',
   
   // Token
   'get /token': 'TokenController.index',
@@ -211,6 +221,7 @@ module.exports.routes = {
   
   // Update
   'get /update/verify': 'UpdateController.verify',
+  'get /update/action': 'UpdateController.updateActions',
   'get /update/event': 'UpdateController.updateEvents',
   'get /update/mode': 'UpdateController.updateModes',
   'get /update/sentence': 'UpdateController.updateSentences',

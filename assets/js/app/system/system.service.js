@@ -20,7 +20,8 @@
         
         var service = {
             get: get,
-            shutdown: shutdown
+            shutdown: shutdown,
+            update: update
         };
 
         return service;
@@ -31,6 +32,10 @@
         
         function shutdown(){
             return $http({method: 'POST', url: '/system/shutdown' });
+        }
+
+        function update(){
+            return $http({method: 'POST', url: '/system/update' });
         }
       
         

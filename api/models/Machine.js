@@ -32,8 +32,13 @@ module.exports = {
             model: 'House'
         },
 
-        ip: {
+        host: {
             type: 'string'
+        },
+
+        me: {
+            type: 'boolean',
+            defaultsTo: false
         }
 
     }

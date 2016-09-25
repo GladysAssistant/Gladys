@@ -1,6 +1,8 @@
 [
   {
     "id": 1,  
+    "name": "Switch",
+    "identifier": "UNIQUE_IDENTIFIER",
     "type": "binary",
     "tag": "light",
     "sensor": false,
@@ -10,6 +12,7 @@
   },
   {
     "id": 2,  
+    "name": "name",
     "type":"multilevel",
     "sensor": false,
     "tag": "light",
@@ -20,6 +23,7 @@
   },
   {
     "id": 3,  
+    "name": "other name",
     "type": "binary",
     "sensor": false,
     "device": 2,

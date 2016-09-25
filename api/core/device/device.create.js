@@ -14,35 +14,27 @@ function create(param) {
          
           if(devices.length){
               
-               // if device already exist, we don't create it again
-              return param;
+               // if device already exist, we update it
+              return Device.update({id: devices[0].id}, param.device)
+                           .then((rows) => rows[0]);
           } else {
               
               // if not, we create the device
-              return createDevice(param);
+              return Device.create(param.device);
           }
-      });   
-}
+      })
+      .then((device) => {
 
-function createDevice(param){
-    
-    // first, we create the device
-    return Device.create(param.device)
-        .then(function(device) {
+          // foreach deviceType, we create it if not exist
+          return Promise.map(param.types, function(type){
+               type.device = device.id;
+               return gladys.deviceType.create(type);
+          })
+          .then((types) => {
 
-            // we create all the types
-            return Promise.map(param.types, function(type) {
-                type.device = device.id;
-                return DeviceType.create(type);
-            })
+              // we return device and types
+              return {device: device, types: types};
+          });
 
-            // we return the results
-            .then(function(types) {
-                var result = {
-                    device: device,
-                    types: types
-                };
-                return Promise.resolve(result);
-            });
-        });
+      });
 }

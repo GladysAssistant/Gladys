@@ -1,3 +1,4 @@
+const fs = require('fs');
 
 module.exports = function(){
   
@@ -11,7 +12,7 @@ module.exports = function(){
         sails.log.info('Gladys brain loaded with success !');
     })
     .catch(function(){
-        sails.log.err('Cannot load gladys.brain.');
+        sails.log.error('Cannot load gladys.brain.');
     });
   
   
@@ -20,6 +21,10 @@ module.exports = function(){
   }
   
   // tasks started only in prod
+  fs.chmod(sails.config.update.updateScript, '755', function(err, result){
+      if(err) return sails.log.error(err);
+  });
+
   
   // checking for update now      
   gladys.update.checkUpdate();
