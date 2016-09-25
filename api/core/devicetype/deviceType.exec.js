@@ -46,7 +46,8 @@ function exec(param) {
                     state: param
                 });
         })
-        .then(function() {
+        .then(function(hasStateFeedback) {
+            if(hasStateFeedback === true) return param;
 
             // creating DeviceState
             return gladys.deviceState.create(param);
