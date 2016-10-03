@@ -1,0 +1,20 @@
+module.exports = validate;
+
+var should = require('should');
+
+function validate(deviceType) {
+	if(deviceType instanceof Array) {
+		deviceType.forEach(validateDeviceType);
+	} else {
+		validateDevice(deviceType);
+	}
+}
+
+function validateDeviceType(deviceType) {
+	deviceType.should.be.instanceOf(Object);
+	deviceType.should.have.property('type');
+	deviceType.should.have.property('sensor');
+	deviceType.should.have.property('min');
+    deviceType.should.have.property('max');
+    deviceType.should.have.property('device');
+}
