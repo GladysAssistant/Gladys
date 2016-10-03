@@ -39,6 +39,14 @@ module.exports = {
     LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
     WHERE dt.device = ?;
   `,
+  getByIdentifier: `
+    SELECT dt.*
+    FROM devicetype dt
+    JOIN device d ON (d.id = dt.device)
+    WHERE d.identifier = ?
+    AND d.service = ?
+    AND dt.identifier = ?;
+  `,
   getAll: `
     SELECT CONCAT(d.name, " - ", dt.type) AS name, d.service, d.protocol, dt.id, dt.type, dt.tag,  dt.unit, dt.min, dt.max, dt.device, r.name AS roomName, r.id as roomId 
     FROM device d

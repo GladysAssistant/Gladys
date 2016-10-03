@@ -6,7 +6,7 @@ function validate(deviceType) {
 	if(deviceType instanceof Array) {
 		deviceType.forEach(validateDeviceType);
 	} else {
-		validateDevice(deviceType);
+		validateDeviceType(deviceType);
 	}
 }
 
