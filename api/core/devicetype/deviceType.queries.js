@@ -55,5 +55,38 @@ module.exports = {
   `,
   getByDeviceAndIdentifier: 'SELECT id FROM devicetype WHERE device = ? AND identifier = ?;',
   delete : 'DELETE FROM devicetype WHERE id = ?;',
-  deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;'
+  deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;',
+  getById: `
+    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+      FROM device d
+      JOIN devicetype dt ON (d.id = dt.device)
+      LEFT JOIN (
+        SELECT ds.devicetype, MAX(id) as id
+        FROM devicestate ds 
+        INNER JOIN (
+          SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
+        ) as dsJoin
+        WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
+        GROUP by ds.devicetype
+    ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
+      LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
+      WHERE dt.id = ?;
+  `, 
+  getByType: `
+    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+      FROM device d
+      JOIN devicetype dt ON (d.id = dt.device)
+      LEFT JOIN (
+        SELECT ds.devicetype, MAX(id) as id
+        FROM devicestate ds 
+        INNER JOIN (
+          SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
+        ) as dsJoin
+        WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
+        GROUP by ds.devicetype
+    ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
+      LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
+      WHERE dt.type = ?;
+  `, 
+  
 };
