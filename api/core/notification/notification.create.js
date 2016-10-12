@@ -3,7 +3,13 @@ module.exports = create;
 var Promise = require('bluebird');
 var queries = require('./notification.queries.js');
 
-function create(notification) {
+function create(options) {
+
+    // handle scenarios
+    var notification;
+    if(options && options.params) notification = options.params;
+    else notification = options;
+
     return Notification.create(notification)
         .then(function(notification) {
             return [notification, 
