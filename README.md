@@ -1,7 +1,7 @@
 Gladys Project
 =======================
 
-[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys)
+[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys) [![Code Climate](https://codeclimate.com/github/GladysProject/Gladys/badges/gpa.svg)](https://codeclimate.com/github/GladysProject/Gladys)
 
 ![Alt](http://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
 
