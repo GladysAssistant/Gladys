@@ -33,7 +33,7 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-mocha-test": "^0.13.0",
-    "grunt-sails-linker": "^0.10.1",
+    "grunt-sails-linker": "^1.0.3",
     "grunt-sync": "^0.5.2",
     "include-all": "~1.0.5",
     "jsonwebtoken": "^7.0.0",
