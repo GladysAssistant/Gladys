@@ -6,9 +6,12 @@
   * You may not use this software for commercial purposes.
   * @author :: Pierre-Gilles Leymarie
   */
+
+
   
 /**
- * Allow any authenticated user.
+ * @apiDefine authenticated Connected user only
+ * Allow only a connected user to pass
  */
 module.exports = function(req, res, next) {
 
