@@ -54,6 +54,7 @@
     "suncalc": "^1.7.0"
   },
   "devDependencies": {
+    "grunt-apidoc": "^0.11.0",
     "grunt-contrib-csslint": "^1.0.0",
     "grunt-mocha-istanbul": "^5.0.1",
     "istanbul": "^0.4.2",
