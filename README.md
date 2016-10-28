@@ -10,13 +10,21 @@ The Project
 
 Gladys is an home automation assistant to help you in your everyday life.
 
-Yes, like a kind of JARVIS!
+Yes, like a kind of **JARVIS**!
 
-When you see this kind of project, you say "Uhh, I'm sure this doesn't work, it's based on speech recognition, even Siri isn't capable of being JARVIS". But the goal of Gladys project is **completely different**. We believe that speech recognition is not working fine today, so we've tried a different approach : If instead of having an assistant waiting for your orders, we have an assistant analyzing all your environment ( analyzing your calendar, reading your emails ) and **predicting your needs**. Because in fact, with all the APIs which exists, we can gather all the information we want to optimize our life.
+Gladys is connected to all your devices in your home, she is connected to your calendar, to a lots of API to help you. But let's pick an example :
 
-With this system, it's not the user who ask something to his assistant : it's the assistant which tells informations to the user, **at the right moment**.
+It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 PM, and that according to the traffic, you'll need 30min to go to work with your car. She knows that you like 30 min to get ready.
+She wakes you up with a soft progressive warm light thanks to your Philips Hue, and puts a nice music in your room.
+It's 8.10 AM, Gladys detects thanks to a motion sensor that you are getting out of bed. She immediately starts the wake-up scenario : she tells the coffee machine to prepare the coffee, and opens the blinds.
+At 8.30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
+At 6.30 PM, you are getting back home : Everything is ready when you arrive.
+You are going to sleep, so you simply put your phone on your nightstand where a NFC tag is sticked. It immediately sends a request to Gladys to tell here you are going to sleep. She starts the "Going to sleep" scenario, and turns off all lights.
+This is just a simple scenario, possibilities with Gladys are just endless ! Don't hesitate to propose yours :)
 
-**Website :** [http://gladysproject.com](http://gladysproject.com)
+Interested in Gladys ? [Try it at home](http://gladysproject.com/en/installation), it's free and Open Source !
+
+**Website :** [https://gladysproject.com](http://gladysproject.com)
 
 Specifications
 -------------
@@ -29,7 +37,7 @@ Gladys is 100% written in Node.js, with the [sails.js](http://sailsjs.org/) fram
 Prerequisites
 -------------
 
-- [Node.js](http://nodejs.org) ( >= v4.2.2, not compatible with v5 for now )
+- [Node.js](http://nodejs.org) ( >= v4.x.x )
 - [MySQL](http://www.mysql.com/)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
@@ -132,24 +140,17 @@ Contributing
 
 Pull request are welcome, but code must follow some guidelines.
 
-* For the Node.js part, follow [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide).
-* For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
 * Use [JSHint](https://github.com/jshint/jshint).
-* Try to Unit test your code as much as possible. No pull requests will be accepted without good unit tests.
+* For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
+* Please Unit test your code. We use Mocha and Istanbul for code coverage. No pull requests will be accepted without good unit tests.
  
 If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](http://gladysproject.com).
-
-
-Roadmap
--------------
-
-All the work is listed on our [Trello](https://trello.com/b/cxtyidIH) !
 
 Links
 -------------
 
 - [Website](http://gladysproject.com)
 - [Developer Website](http://developer.gladysproject.com)
-- [Trello](https://trello.com/b/cxtyidIH)
 - [Twitter](https://twitter.com/gladysproject)
 - [Instagram](https://www.instagram.com/gladysproject/)
+- [Trello](https://trello.com/b/cxtyidIH)
