@@ -21,10 +21,10 @@ mkdir $TMP_HOOK_FOLDER
 mkdir $TMP_CACHE_FOLDER
 
 # We copy the hooks repository of the old folder
-cp -r /home/pi/gladys/node_modules/gladys/api/hooks/* $TMP_HOOK_FOLDER
+cp -ar /home/pi/gladys/node_modules/gladys/api/hooks/. $TMP_HOOK_FOLDER
 
 # We copy the cache folder of the old gladys
-cp -r /home/pi/gladys/node_modules/gladys/cache/* $TMP_CACHE_FOLDER
+cp -ar /home/pi/gladys/node_modules/gladys/cache/. $TMP_CACHE_FOLDER
 
 # stopping gladys (silent is in case gladys is not running)
 # silent remove any errors cause by PM2
@@ -35,8 +35,8 @@ cd $GLADYS_TOP_FOLDER
 npm update gladys
 
 # we copy back the hook and cache folder
-cp -r /tmp/gladys_hooks/* $HOOK_FOLDER
-cp -r /tmp/gladys_cache/*  $CACHE_FOLDER
+cp -ar /tmp/gladys_hooks/. $HOOK_FOLDER
+cp -ar /tmp/gladys_cache/. $CACHE_FOLDER
 
 # start init script
 node $INIT_SCRIPT

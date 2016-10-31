@@ -5,16 +5,19 @@ describe('DeviceType', function() {
 
   describe('getById', function() {
     
-    it('should return a deviceType', function (done) {
+    it('should return a deviceType by his id', function (done) {
         
-        var device = {id :  1};
+        var device = {
+          id : 1
+        };
         
-        gladys.deviceType.getById(device).then(function(type){
-           validateDeviceType(type);
-           done();
-        }).catch(function(err){
-            done(err);
-        });
+        gladys.deviceType.getById(device)
+          .then(function(type){
+            type.should.be.instanceOf(Object);
+            validateDeviceType(type);
+            done();
+          })
+          .catch(done);
 
     });
     

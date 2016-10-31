@@ -1,0 +1,25 @@
+engines:
+    eslint:
+        enabled: true
+    csslint:
+        enabled: true
+
+ratings:
+   paths:
+   - "api/**/*"
+   - "assets/js/app/**/*"
+
+exclude_paths:
+- "test/"
+- "api/hooks"
+- "assets/js/dependencies"
+- "assets/js/AdminLTE"
+- "assets/js/angular-chart"
+- "assets/js/angular-device-detector"
+- "assets/js/angular-moment"
+- "assets/js/angular-slider"
+- "assets/js/angular-translate"
+- "assets/js/angular-ui-notification"
+- "assets/js/ng-device-detector"
+- "assets/js/ng-infinite-scroll"
+- "assets/js/smooth-scroll"
