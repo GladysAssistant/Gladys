@@ -3,13 +3,13 @@ var validateDeviceType = require('../../validator/deviceTypeValidator.js');
 
 describe('DeviceType', function() {
 
-  describe('getById', function() {
+  describe('getByType', function() {
     
     it('should return a deviceType', function (done) {
         
-        var device = {id :  1};
+        var device = {type : 'binary'};
         
-        gladys.deviceType.getById(device).then(function(type){
+        gladys.deviceType.getByType(device).then(function(type){
            validateDeviceType(type);
            done();
         }).catch(function(err){

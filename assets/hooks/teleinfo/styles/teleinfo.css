@@ -1,0 +1,27 @@
+#teleinfo-content {
+    min-height: 100px;
+}
+
+.teleinfo-circle {
+    border-radius: 50px;
+    float: left;
+    font-size: 1.0em;
+    height: 65px;
+    margin-right: 20px;
+    text-align: center;
+    width: 65px;
+    color: #777;
+}
+
+.teleinfo-danger {
+   border: 10px solid #f56954;
+}
+
+.teleinfo-warning {
+   border: 10px solid #f39c12;
+}
+
+.teleinfo-normal {
+   border: 10px solid #3c8dbc;
+}
+

@@ -11,7 +11,6 @@ module.exports = function (grunt) {
 
         // we first get sure that the hooks directory exist
         fse.ensureDirSync(path);
-        
         // first, we clean the assets hooks directory
         // if the directory does not exist, it is created
         fse.emptyDirSync(assetsDestination);

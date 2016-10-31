@@ -3,7 +3,7 @@ var fs = require('fs');
 var Promise = require('bluebird');
 
 module.exports = function (params){
-    
+
     if(!params.slug || params.slug.length === 0 || !params.url || params.url.length === 0){
         return Promise.reject(new Error('Slug or url not provided'));
     }

@@ -88,8 +88,8 @@
         }
         
         // all about deviceStates
-        function getStates(deviceType, skip){
-            return $http({method: 'GET', url: '/devicestate', params: {devicetype: deviceType, skip:skip}});
+        function getStates(deviceType, skip, take){
+            return $http({method: 'GET', url: '/devicestate', params: {devicetype: deviceType, skip:skip, take: take}});
         }
     }
 })();

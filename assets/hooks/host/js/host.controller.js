@@ -88,7 +88,8 @@
     }
 
     function createHost(host) {
-      host.types[0].tag = host.types[0].tag + ';' + host.types[0].additional;
+      host.types[0].identifier = host.types[0].identifier + ';' + host.types[0].additional;
+      host.types[0].name = host.name;
       return hostService.create(host)
       .then(function() {
         vm.hosts.push(host.device);

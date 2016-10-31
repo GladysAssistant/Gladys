@@ -16,7 +16,7 @@ before(function(done) {
   if(process.env.TRAVIS) {
      connectionName = 'travis'; 
   } 
-   
+
   Sails.lift({
     models: {
       connection: connectionName,

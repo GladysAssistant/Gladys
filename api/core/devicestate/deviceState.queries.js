@@ -1,7 +1,7 @@
 
 
 module.exports = {
-  get: `SELECT *, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
+  get: `SELECT CAST(value as signed) as value, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
         FROM devicestate
         WHERE devicetype = ?
         ORDER BY datetime DESC

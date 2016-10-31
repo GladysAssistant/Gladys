@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-
     attributes: {
 
         value: {
@@ -27,7 +26,7 @@ module.exports = {
     },
 
     beforeValidate: function(values, cb) {
-        // If no datetime is set, set to actual time
+       // If no datetime is set, set to actual time
         if (!values.datetime) {
             values.datetime = new Date();
         }

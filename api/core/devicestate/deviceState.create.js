@@ -15,6 +15,7 @@ module.exports = function(state){
            value: state.devicetype, 
            scope: state
          };
+
          return [state, gladys.event.create(event)]; 
       })
       .spread(function(state, event){
