@@ -3,6 +3,5 @@ module.exports = {
         SELECT * FROM event
         JOIN eventtype ON (event.eventtype = eventtype.id)
         WHERE user = ? ORDER BY datetime DESC LIMIT ? OFFSET ?;`,
-    getByCode: 'SELECT * FROM eventtype WHERE code = ?;',
-    getById: 'SELECT * FROM eventtype WHERE id = ?;'
+    getByCode: 'SELECT * FROM eventtype WHERE code = ?;'
 };
