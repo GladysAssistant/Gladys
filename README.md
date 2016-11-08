@@ -14,7 +14,7 @@ Yes, like a kind of **JARVIS**!
 
 Gladys is connected to all your devices in your home, she is connected to your calendar, to a lots of API to help you. But let's pick an example :
 
-- It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 PM, and that according to the traffic, you'll need 30min to go to work with your car. She knows that you like 30 min to get ready.
+- It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 AM, and that according to the traffic, you'll need 30min to go to work with your car. She knows that you like 30 min to get ready.
 She wakes you up with a soft progressive warm light thanks to your Philips Hue, and puts a nice music in your room.
 - It's 8.10 AM, Gladys detects thanks to a motion sensor that you are getting out of bed. She immediately starts the wake-up scenario : she tells the coffee machine to prepare the coffee, and opens the blinds.
 - At 8.30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
