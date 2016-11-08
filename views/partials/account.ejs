@@ -3,7 +3,7 @@
 <div class="box box-default" >
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
-    </div> 
+    </div>
         <div class="box-body table-responsive" >
             <p>
             <%= __('user-box-description') %>
@@ -25,6 +25,7 @@
                             <select ng-model="vm.user.gender" class="form-control">
                                 <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
                                 <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
+                                <option value="2" ng-selected="vm.user.gender === 2"><%= __('installation-other') %></option>
                             </select>
                         </td></td>
                     </tr>
@@ -32,13 +33,13 @@
                 </tbody>
             </table>
 
-        </div>  
+        </div>
 </div>
 
 <div class="box box-default ng-cloak" ng-if="vm.user.role === 'admin'">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
-    </div> 
+    </div>
         <div class="box-body table-responsive" >
             <p>
                 <%= __('all-user-box-description') %>
@@ -64,7 +65,7 @@
                 </tbody>
             </table>
 
-        </div>  
+        </div>
 </div>
 
    <!-- MODAL -->
@@ -77,19 +78,19 @@
                     <h4 class="modal-title" id="myLargeModalLabel"><%= __('create-user-modal-title') %></h4>
             </div>
                 <div class="modal-body">
-                   
+
                     <!-- FORM -->
-                    <form class="form-horizontal">   
+                    <form class="form-horizontal">
                                <div class="row">
                                    <div class="col-md-3"></div>
-                                   <div class="col-md-6">   
+                                   <div class="col-md-6">
                                        <form class="form-horizontal ng-cloak" >
-                                           
+
                                            <p class="bg-danger" ng-show="vm.createAccountError" style="padding:15px;"></p>
                                            <p class="bg-danger" ng-show="vm.invalidEmail" style="padding:15px;"><%= __('installation-invalid-email') %></p>
                                            <p class="bg-danger" ng-show="vm.invalidPassword" style="padding:15px;"><%= __('installation-invalid-password') %></p>
                                            <p class="bg-danger" ng-show="vm.invalidBirthdate" style="padding:15px;"><%= __('installation-invalid-birthdate') %></p>
-                                            
+
                                             <!-- FirstName -->
                                             <div class="form-group">
                                                 <label for="firstname" class="col-sm-4 control-label"><%= __('installation-firstname') %></label>
@@ -97,7 +98,7 @@
                                                 <input type="text" ng-model="vm.newUser.firstname" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- LastName -->
                                             <div class="form-group">
                                                 <label for="lastname" class="col-sm-4 control-label"><%= __('installation-lastname') %></label>
@@ -105,7 +106,7 @@
                                                 <input type="text" ng-model="vm.newUser.lastname" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- Email -->
                                             <div ng-class="{'form-group': !vm.invalidEmail , 'form-group has-error': vm.invalidEmail }">
                                                 <label for="email" class="col-sm-4 control-label"   ><%= __('installation-email') %></label>
@@ -113,7 +114,7 @@
                                                 <input type="email" ng-model="vm.newUser.email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- Password -->
                                             <div ng-class="{'form-group': !vm.invalidPassword , 'form-group has-error': vm.invalidPassword }">
                                                 <label for="password"  class="col-sm-4 control-label" ><%= __('installation-password') %></label>
@@ -121,7 +122,7 @@
                                                 <input type="password" ng-model="vm.newUser.password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
                                                 </div>
                                             </div>
-                                            
+
                                              <!-- Birthdate -->
                                             <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
                                                 <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
@@ -129,7 +130,7 @@
                                                 <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- Country code -->
                                             <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
                                                 <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
@@ -149,10 +150,10 @@
                                                     <option value="admin"><%= __('installation-role-admin') %></option>
                                                     <option value="habitant"><%= __('installation-role-habitant') %></option>
                                                     <option value="guest"><%= __('installation-role-guest') %></option>
-                                                </select>   
+                                                </select>
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- Preparation time -->
                                             <!--<div class="form-group">
                                                 <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-preparation-time') %></label>
@@ -160,8 +161,8 @@
                                                 <input type="text" ng-model="vm.newUser.preparationTime" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
                                                 </div>
                                             </div>-->
-                                            
-                                            
+
+
                                             <!-- Gender -->
                                              <div class="form-group">
                                                 <label for="gender" class="col-sm-4 control-label">
@@ -178,16 +179,16 @@
                                              <div class="form-group">
                                                  <button class="btn btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
                                              </div>
-                                             
-                                         </form>      
-                                        
-                                </div>           
+
+                                         </form>
+
+                                </div>
                              </div>
-                             
+
                              </form>
                      <!-- END OF FORM -->
 
-                     
+
                 </div>
             </div>
         </div>
@@ -196,4 +197,3 @@
 
 
 </div>
-
