@@ -19,10 +19,16 @@
     function eventTypeService($http) {
         
         var service = {
-            getLauncherParams: getLauncherParams
+            getLauncherParams: getLauncherParams,
+            get: get
         };
 
         return service;
+
+
+        function get(){
+            return $http({method: 'GET', url: '/eventtype' });
+        }
 
         function getLauncherParams(id) {
             return $http({method: 'GET', url: '/eventtype/' + id + '/launcherparam' })
