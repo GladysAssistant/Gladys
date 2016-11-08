@@ -19,23 +19,6 @@ describe('Event', function() {
                     done();
                 }).catch(done);
     });
-
-    it('should return event created with eventtype id (scenario)', function (done) {
-     	 
-          var event = {
-            params: {
-              datetime: '2014-11-03 19:43:37',
-              user: 1,
-              eventtype: 7
-            }
-          };
-          
-          gladys.event.create(event)
-                .then(function(result){
-                    validateEvent(result);
-                    done();
-                }).catch(done);
-    });
     
   });
 
