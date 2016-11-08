@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('EventBoxCtrl', EventBoxCtrl);
 
-    EventBoxCtrl.$inject = ['eventService', 'eventTypeService', 'notificationService'];
+    EventBoxCtrl.$inject = ['eventService', 'eventTypeService', 'notificationService', 'userService', 'houseService'];
 
-    function EventBoxCtrl(eventService, eventTypeService, notificationService) {
+    function EventBoxCtrl(eventService, eventTypeService, notificationService, userService, houseService) {
         /* jshint validthis: true */
         var vm = this;
     	vm.createEvent = createEvent;
@@ -26,6 +26,8 @@
 
         function activate(){
             getEventTypes();
+            getUsers();
+            getHouses();
         }
 
         function getEventTypes() {
@@ -35,9 +37,22 @@
               });
         }
 
+        function getUsers(){
+            return userService.get()
+                .then(function(data){
+                    vm.users = data.data;
+                });
+        }
 
-        function createEvent(code) {
-            return eventService.create({code: code})
+        function getHouses(){
+            return houseService.get()
+                .then(function(data){
+                    vm.houses = data.data;
+                });
+        }
+
+        function createEvent(event) {
+            return eventService.create(event)
                 .then(function(){
                     notificationService.successNotificationTranslated('EVENT.CREATED_SUCCESS_NOTIFICATION', code);
                 })
