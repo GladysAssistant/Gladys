@@ -28,6 +28,7 @@ describe('Music', function() {
 
     var functionsAvailable = [
        'getCurrentTrack',
+       'getQueue',
        'getMuted',
        'getPlaylists',
        'getVolume',

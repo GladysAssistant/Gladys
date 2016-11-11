@@ -1,4 +1,5 @@
 module.exports.getCurrentTrack = require('./music.getCurrentTrack.js');
+module.exports.getQueue = require('./music.getQueue.js');
 module.exports.getMuted = require('./music.getMuted.js');
 module.exports.getPlaylists = require('./music.getPlaylists.js');
 module.exports.getVolume = require('./music.getVolume.js');
