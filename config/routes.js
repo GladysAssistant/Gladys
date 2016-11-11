@@ -150,6 +150,23 @@ module.exports.routes = {
   'post /module/install': 'ModuleController.install',
   'post /module/:slug/config': 'ModuleController.config',
   'delete /module/:id': 'ModuleController.uninstall',
+
+  // Music
+  'post /music/flushqueue': 'MusicController.flushQueue',
+  'get /music/currenttrack': 'MusicController.getCurrentTrack',
+  'get /music/queue': 'MusicController.getQueue',
+  'get /music/muted': 'MusicController.getMuted',
+  'get /music/playlist': 'MusicController.getPlaylists',
+  'get /music/volume': 'MusicController.getVolume',
+  'post /music/next': 'MusicController.next',
+  'post /music/pause': 'MusicController.pause',
+  'post /music/play': 'MusicController.play',
+  'post /music/playplaylist': 'MusicController.playPlaylist',
+  'post /music/previous': 'MusicController.previous',
+  'post /music/queue': 'MusicController.queue',
+  'post /music/muted': 'MusicController.setMuted',
+  'post /music/volume': 'MusicController.setVolume',
+  'post /music/stop': 'MusicController.stop',
   
   // Notification
   'get /notification': 'NotificationController.index',
