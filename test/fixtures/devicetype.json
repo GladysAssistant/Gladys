@@ -29,5 +29,14 @@
     "device": 2,
     "min": 0,
     "max": 1
+  },
+  {
+    "id": 4,  
+    "name": "Music player",
+    "type": "music",
+    "sensor": false,
+    "device": 3,
+    "min": 0,
+    "max": 0
   }
 ]

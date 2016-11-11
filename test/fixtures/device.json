@@ -13,5 +13,12 @@
     "protocol": "zwave",
     "service": "zwave",
     "room": 1
+  },
+  {
+    "id": 3,
+    "name": "Music Player",
+    "protocol": "wifi",
+    "service": "test",
+    "room": 1
   }
 ]
