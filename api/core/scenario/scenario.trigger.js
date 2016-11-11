@@ -1,8 +1,12 @@
 var queries = require('./scenario.queries.js');
 var template = require('es6-template-strings');
+var clone = require('clone');
 var Promise = require('bluebird');
 
 module.exports = function(params) {
+    
+    // clone params so that original object is not affected
+    params = clone(params);
 
     sails.log.info(`Scenario : Trigger : New event : ${params.code}`);
 
