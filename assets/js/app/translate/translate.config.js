@@ -12,7 +12,11 @@ var translationsEN = {
   USER: {
       UPDATED_SUCCESS: 'User updated with success : ',
       UPDATED_FAILURE: 'Failed to update user : '
-  }
+  },
+  EVENT: {
+      CREATED_SUCCESS_NOTIFICATION: 'Event created with success : ',
+      CREATED_FAIL_NOTIFICATION: 'Failed to create event : '
+  }   
 };
 
 var translationsFR = {
@@ -29,6 +33,10 @@ var translationsFR = {
   USER: {
       UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès : ',
       UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : '
+  },
+  EVENT: {
+      CREATED_SUCCESS_NOTIFICATION: 'Event créé avec succès : ',
+      CREATED_FAIL_NOTIFICATION: 'Erreur lors de la création de l\'event : '
   }    
 };
 
