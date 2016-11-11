@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "3.2.2",
+  "version": "3.2.4",
   "description": "Your personnal assistant, always here.",
   "keywords": [
     "home",
@@ -19,6 +19,7 @@
     "barrels": "^1.6.2",
     "bcrypt": "^0.8.5",
     "bluebird": "^3.3.4",
+    "clone": "^2.0.0",
     "crypto": "~0.0.3",
     "ejs": "^2.4.1",
     "es6-template-strings": "^2.0.0",

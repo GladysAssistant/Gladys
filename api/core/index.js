@@ -28,6 +28,7 @@ gladys.load = function load() {
     gladys.machine = require('./machine/index.js');
     gladys.mode = require('./mode/index.js');
     gladys.module = require('./module/index.js');
+    gladys.music = require('./music/index.js');
     gladys.notification = require('./notification/index.js');
     gladys.notificationType = require('./notificationtype/index.js');
     gladys.notificationUser = require('./notificationuser/index.js');

@@ -1,9 +1,13 @@
 var queries = require('./scenario.queries.js');
 var template = require('es6-template-strings');
+var clone = require('clone');
 var Promise = require('bluebird');
 
 module.exports = function(params) {
     
+    // clone params so that original object is not affected
+    params = clone(params);
+
     sails.log.info(`Scenario : Trigger : New event : ${params.code}`);
 
     // we get all launchers with this code
@@ -11,6 +15,14 @@ module.exports = function(params) {
         .then(function(launchers) {
             
             sails.log.info(`Scenario : Trigger : Found ${launchers.length} launchers with code ${params.code}.`);
+
+            // initialize scope
+            params.scope = params.scope || {};
+            if(params.house) params.scope.house = params.house;
+            if(params.user) params.scope.user = params.user;
+            if(params.room) params.scope.room = params.room;
+            if(params.value) params.scope.value = params.value;
+            if(params.datetime) params.scope.datetime = params.datetime;
 
             // foreach launcher, we verify if the condition is satisfied
             // and if yes, start all the actions

@@ -145,6 +145,23 @@ function addTestModuleGladys(gladys){
         },
         install: function(){
             return Promise.resolve();
+        },
+        music: {
+            flushQueue: function() {return Promise.resolve()},
+            getCurrentTrack: function() {return Promise.resolve({title: 'test', artist:'test'})},
+            getQueue: function() {return Promise.resolve([{title: 'test', artist:'test'}])},
+            getMuted: function() {return Promise.resolve({muted: true})},
+            getPlaylists: function() {return Promise.resolve([{title: 'test'}])},
+            getVolume: function() {return Promise.resolve({volume: 1})},
+            next: function() {return Promise.resolve()},
+            pause: function() {return Promise.resolve()},
+            play: function() {return Promise.resolve()},
+            playPlaylist: function() {return Promise.resolve()},
+            previous: function() {return Promise.resolve()},
+            queue: function() {return Promise.resolve()},
+            setMuted: function() {return Promise.resolve()},
+            setVolume: function() {return Promise.resolve()},
+            stop: function() {return Promise.resolve()},
         }
     };
 }
