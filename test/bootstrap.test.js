@@ -147,6 +147,7 @@ function addTestModuleGladys(gladys){
             return Promise.resolve();
         },
         music: {
+            flushQueue: function() {return Promise.resolve()},
             getCurrentTrack: function() {return Promise.resolve()},
             getQueue: function() {return Promise.resolve()},
             getMuted: function() {return Promise.resolve()},

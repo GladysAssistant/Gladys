@@ -1,3 +1,4 @@
+module.exports.flushQueue = require('./music.flushQueue.js');
 module.exports.getCurrentTrack = require('./music.getCurrentTrack.js');
 module.exports.getQueue = require('./music.getQueue.js');
 module.exports.getMuted = require('./music.getMuted.js');

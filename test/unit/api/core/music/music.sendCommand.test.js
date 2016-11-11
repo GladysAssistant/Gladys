@@ -27,6 +27,7 @@ describe('Music', function() {
      */
 
     var functionsAvailable = [
+       'flushQueue',
        'getCurrentTrack',
        'getQueue',
        'getMuted',
