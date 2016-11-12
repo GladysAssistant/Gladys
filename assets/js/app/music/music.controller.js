@@ -32,14 +32,18 @@
         vm.getCurrentTrack = getCurrentTrack;
         vm.getQueue = getQueue;
 
-        activate();
+        vm.init = init;
 
         function activate(){
             getRoomId();
             if(vm.displayAskRoomForm) getRooms();
             else refreshMusicData();
         }
-        
+
+        function init(boxId){
+            vm.boxId = boxId;
+            activate();
+        }
         
         function getRoomId() {
             vm.roomId =  musicService.getSavedRoomBox(vm.boxId);
