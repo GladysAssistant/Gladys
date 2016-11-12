@@ -47,8 +47,8 @@
                         if(boxs[i].x == 1) {
                 %>                
                                      
-                    <div class="box <%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> >
-                        
+                    <div class="box <%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> ng-init="vm.init(<%= boxs[i].boxId %>);" >
+
                         <div class="box-header">
                             <i class="<%= boxs[i].icon %>"></i>
                             <h3 class="box-title"><%= boxs[i].title %></h3>
@@ -87,8 +87,7 @@
                         if(boxs[i].x == 2) {
                 %>                
                                      
-                    <div class="box <%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> >
-                        
+                    <div class="box <%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> ng-init="vm.init(<%= boxs[i].boxId %>);" >
                         <div class="box-header">
                             <i class="<%= boxs[i].icon %>"></i>
                             <h3 class="box-title"><%= boxs[i].title %></h3>
