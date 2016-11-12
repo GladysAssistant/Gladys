@@ -31,6 +31,7 @@ describe('Music', function() {
        'getCurrentTrack',
        'getQueue',
        'getMuted',
+       'getPlaying',
        'getPlaylists',
        'getVolume',
        'next',

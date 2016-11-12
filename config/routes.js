@@ -156,6 +156,7 @@ module.exports.routes = {
   'get /music/currenttrack': 'MusicController.getCurrentTrack',
   'get /music/queue': 'MusicController.getQueue',
   'get /music/muted': 'MusicController.getMuted',
+  'get /music/playing': 'MusicController.getPlaying',
   'get /music/playlist': 'MusicController.getPlaylists',
   'get /music/volume': 'MusicController.getVolume',
   'post /music/next': 'MusicController.next',

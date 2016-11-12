@@ -70,6 +70,21 @@ describe('MusicController', function() {
 
     });
 
+     it('GET /music/playing ', function (done) {
+        
+     	request(sails.hooks.http.app)
+        .get('/music/playing?token=test&room=1')
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+
+            res.body.should.have.property('playing');
+            
+            done();
+        });
+
+    });
+
     it('GET /music/playlist ', function (done) {
         
      	request(sails.hooks.http.app)

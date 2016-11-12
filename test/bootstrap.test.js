@@ -151,6 +151,7 @@ function addTestModuleGladys(gladys){
             getCurrentTrack: function() {return Promise.resolve({title: 'test', artist:'test'})},
             getQueue: function() {return Promise.resolve([{title: 'test', artist:'test'}])},
             getMuted: function() {return Promise.resolve({muted: true})},
+            getPlaying: function() {return Promise.resolve({playing: true})},
             getPlaylists: function() {return Promise.resolve([{title: 'test'}])},
             getVolume: function() {return Promise.resolve({volume: 1})},
             next: function() {return Promise.resolve()},
