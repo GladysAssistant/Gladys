@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.2] - 2016-11-12
+### Changed
+- Added roomName in deviceType get requests so that you don't have to query room to get room name.
+
 ## [3.3.1] - 2016-11-12
 ### Changed
 - Bugfix: In scenario, test if trigger scope has property before overidding it.
