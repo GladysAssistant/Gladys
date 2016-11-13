@@ -1,9 +1,10 @@
 
 module.exports = {
   getDeviceType: `
-    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, dt.identifier as deviceTypeIdentifier
+    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, dt.identifier as deviceTypeIdentifier, room.name as roomName
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
+    LEFT JOIN room ON d.room = room.id 
     WHERE dt.id = ?;
   `,
    getByRoom: `
@@ -57,7 +58,7 @@ module.exports = {
   delete : 'DELETE FROM devicetype WHERE id = ?;',
   deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;',
   getById: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId, room.name as roomName
       FROM device d
       JOIN devicetype dt ON (d.id = dt.device)
       LEFT JOIN (
@@ -70,10 +71,11 @@ module.exports = {
         GROUP by ds.devicetype
     ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
       LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
+      LEFT JOIN room ON d.room = room.id 
       WHERE dt.id = ?;
   `, 
   getByType: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId, room.name as roomName
       FROM device d
       JOIN devicetype dt ON (d.id = dt.device)
       LEFT JOIN (
@@ -86,6 +88,7 @@ module.exports = {
         GROUP by ds.devicetype
     ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
       LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
+      LEFT JOIN room ON d.room = room.id 
       WHERE dt.type = ?;
   `, 
   
