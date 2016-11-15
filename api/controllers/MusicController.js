@@ -25,6 +25,12 @@ module.exports = {
             .catch(next);
     },
 
+    getPlaying: function(req, res, next){
+        gladys.music.getPlaying(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
     getPlaylists: function(req, res, next){
         gladys.music.getPlaylists(req.query)
             .then((result) => res.json(result))

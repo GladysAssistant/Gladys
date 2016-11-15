@@ -2,6 +2,7 @@ module.exports.flushQueue = require('./music.flushQueue.js');
 module.exports.getCurrentTrack = require('./music.getCurrentTrack.js');
 module.exports.getQueue = require('./music.getQueue.js');
 module.exports.getMuted = require('./music.getMuted.js');
+module.exports.getPlaying = require('./music.getPlaying.js');
 module.exports.getPlaylists = require('./music.getPlaylists.js');
 module.exports.getVolume = require('./music.getVolume.js');
 module.exports.next = require('./music.next.js');
