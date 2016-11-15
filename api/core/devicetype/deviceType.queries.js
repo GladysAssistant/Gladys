@@ -83,9 +83,10 @@ module.exports = {
       WHERE dt.id = ?;
   `, 
   getByType: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+    SELECT dt.*, r.name as room, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
       FROM device d
       JOIN devicetype dt ON (d.id = dt.device)
+      JOIN room r ON (r.id = d.room) 
       LEFT JOIN (
         SELECT ds.devicetype, MAX(id) as id
         FROM devicestate ds 
