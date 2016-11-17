@@ -50,7 +50,7 @@
     "request": "^2.70.0",
     "sails": "^0.12.3",
     "sails-mysql": "^0.12.1",
-    "sails-util-mvcsloader": "^0.3.2",
+    "sails-util-mvcsloader": "^0.4.0",
     "serialization": "^0.2.0",
     "suncalc": "^1.7.0"
   },
