@@ -3,7 +3,7 @@ module.exports = isNight;
 var SunCalc = require('suncalc');
 var Promise = require('bluebird');
 
-function isNight(data){
+function isNight(options){
     
     // foreach house
     return gladys.house.getAll()
@@ -11,7 +11,7 @@ function isNight(data){
           
           // we look for the right house
           return Promise.map(houses, function(house){
-             if(house.id === data.id) return sunState(house); 
+             if(house.id === options.id) return sunState(house); 
           });
       });
 }
@@ -21,5 +21,5 @@ function sunState(house){
    var times = SunCalc.getTimes(new Date(), house.latitude , house.longitude);
    var now = new Date();
    
-   return Promise.resolve(now > times.sunset || now < times.sunrise);
+   return now > times.sunset || now < times.sunrise;
 }
