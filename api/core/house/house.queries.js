@@ -3,6 +3,7 @@
 module.exports = {
   delete: 'DELETE FROM house WHERE id = ?;',
   get: `SELECT * FROM house LIMIT ? OFFSET ?;`,
+  getById: 'SELECT * FROM house WHERE id = ?;',
   getAll: `SELECT * FROM house;`,
   getUsers: `
     SELECT user.*,
