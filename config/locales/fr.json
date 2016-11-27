@@ -285,6 +285,7 @@
   "parameters-box-table-delete": "Supprimer",
   "scenario-list": "Mes scénarios",
   "scenario-help": "Aide",
+  "scenario-table-title": "Nom",
   "scenario-table-event": "Déclencheur",
   "scenario-table-template": "Template de la règle",
   "scenario-modal-choose-category": "Choisissez une catégorie",
