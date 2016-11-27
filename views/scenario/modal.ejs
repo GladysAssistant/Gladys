@@ -236,7 +236,16 @@
                                     <div class="col-md-8">
                                         <%= __('scenario-actions-explained') %>
                                     </div>
-                                    <div class="col-md-4">
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <%= __('scenario-title') %>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <input id="scenarioTitle" type="text" ng-model="scenario.title" class="form-control" placeholder="<%= __('Title') %>">
+                                    </div>
+                                    <div class="col-md-2">
                                              <div class="form-group">
                                                 <button type="submit" class="btn btn-success" ng-click="vm.insertAll();"><%= __('scenario-save') %></button>
                                             </div>
