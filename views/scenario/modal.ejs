@@ -34,7 +34,15 @@
                     
                     
                     <!-- STEP 1 SELECT CATEGORY -->
-                    <div  class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                    <div id="step-1" class="row" ng-show="vm.step == 1">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <input id="scenarioTitle" class="form-control" ng-model="vm.newLauncher.title" placeholder="<%= __('scenario-modal-title') %>" type="text">
+                        </div>
+                        <div class="col-md-4"> </div>
+                    </div>
+                    <br>
+                    <div class="row setup-content">
 
                         <div class="col-xs-12 col-md-4" ng-repeat="category in vm.categories" ng-click="vm.selectCategory(category.service);">
                             <div class="panel panel-default">
@@ -235,15 +243,6 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <%= __('scenario-actions-explained') %>
-                                    </div>
-                                </div>
-                                <br>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <%= __('scenario-modal-title') %>
-                                    </div>
-                                    <div class="col-md-7">
-                                        <input id="scenarioTitle" type="text" ng-model="scenario.title" class="form-control" placeholder="<%= __('Name') %>">
                                     </div>
                                     <div class="col-md-2">
                                              <div class="form-group">
