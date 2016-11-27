@@ -40,24 +40,25 @@
                             <div class="col-md-4">
                                 <input id="scenarioTitle" class="form-control" ng-model="vm.newLauncher.title" placeholder="<%= __('scenario-modal-title') %>" type="text">
                             </div>
-                            <div class="col-md-4"> </div>
-                            <br>
+                            <div class="col-md-4"></div>
+                            </br>
                         </div>
                         <div class="row setup-content">
 
-                        <div class="col-xs-12 col-md-4" ng-repeat="category in vm.categories" ng-click="vm.selectCategory(category.service);">
-                            <div class="panel panel-default">
-                                <div class="panel-image">
-                                    <img class="img-responsive" ng-src="{{category.image}}">
+                            <div class="col-xs-12 col-md-4" ng-repeat="category in vm.categories" ng-click="vm.selectCategory(category.service);">
+                                <div class="panel panel-default">
+                                    <div class="panel-image">
+                                        <img class="img-responsive" ng-src="{{category.image}}">
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <h4 style="text-transform: capitalize;">{{category.name}}</h4>
+                                    </div>
+                                    <div class="panel-footer text-center">
+                                            <a><%= __('scenario-modal-select-service') %></a>
+                                    </div>
                                 </div>
-                                <div class="panel-body text-center">
-                                    <h4 style="text-transform: capitalize;">{{category.name}}</h4>
-                                </div>
-                                <div class="panel-footer text-center">
-                                        <a><%= __('scenario-modal-select-service') %></a>
-                                </div>
-                            </div>
-                        </div> 
+                            </div> 
+                        </div>
                     </div>
                     
                     <!-- ENF OD STEP 1 SELECT CATEGORY -->
