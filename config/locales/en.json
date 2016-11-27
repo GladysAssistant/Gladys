@@ -120,6 +120,7 @@
   "parameters-box-table-delete": "Delete",
   "scenario-list": "My scenario",
   "scenario-help": "Help",
+  "scenario-table-title": "Name",
   "scenario-table-event": "Trigger",
   "scenario-table-template": "Rule template",
   "scenario-modal-choose-category": "Choose a category",
