@@ -13,6 +13,9 @@
         <!-- LAUNCHER ROW -->
         <tr ng-repeat="launcher in vm.launchers" class="ng-cloak" >
             <td>
+               {{launcher.title}}                 
+            </td>
+            <td>
                {{launcher.name}}                 
             </td>
             <td>{{launcher.condition_template}}</td>
