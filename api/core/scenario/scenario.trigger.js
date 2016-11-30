@@ -72,6 +72,12 @@ function verifyAndStart(launcher, scope) {
 // verify a condition. Ex: temperature > 10. scope is an object injected in
 // the template
 function verifyLauncherCondition(launcher, scope) {
+    
+    // if the condition_template is empty, it's ok
+    if(launcher.condition_template === null || launcher.condition_template == '') {
+        return Promise.resolve(true);
+    }
+    
     try {
         var result = template('${' + launcher.condition_template + '}', scope);
         if (result == 'true') {
