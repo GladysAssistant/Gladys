@@ -36,14 +36,14 @@ function callAction(text, service, label){
                 return gladys[service].command(scope);
             }
 
-            // testing if it's a Service
-            if (!global[service] || typeof global[service].command != "function") {
+            // testing if it's a module
+            if (!gladys.modules[service] || typeof gladys.modules[service].command != "function") {
 
                 // the function does not exist, rejecting
-                return Promise.reject(new Error(`${service}.command is not a function`));
+                return Promise.reject(new Error(`gladys.modules.${service}.command is not a function`));
             }
 
             // executing action
-            return global[service].command(scope);
+            return gladys.modules[service].command(scope);
       }); 
 }

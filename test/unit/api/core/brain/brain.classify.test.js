@@ -4,7 +4,7 @@ describe('Brain', function() {
 
   describe('classify', function() {
     
-    it.skip('should classify a sentence and call a service', function (done) {
+    it('should classify a sentence and call a service', function (done) {
      	
         gladys.brain.trainNew()
             .then(function(){
