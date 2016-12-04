@@ -14,8 +14,7 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService']
-;
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService'];
 
     function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService, actionTypeService, actionService) {
         /* jshint validthis: true */
@@ -23,7 +22,7 @@
         
         
         vm.selectCategory = selectCategory;
-    	vm.selectEventType = selectEventType;
+    	   vm.selectEventType = selectEventType;
         vm.addState = addState;
         vm.addAction = addAction;
         vm.insertAll = insertAll;
