@@ -22,6 +22,7 @@ module.exports = {
             type: 'string',
             required: true
         },
+        
         condition_template: {
             type: 'string'
         },
