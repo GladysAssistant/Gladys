@@ -14,7 +14,8 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService'];
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService']
+;
 
     function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService, actionTypeService, actionService) {
         /* jshint validthis: true */
@@ -77,7 +78,7 @@
             return categoryService.getEventTypes(service)
               .then(function(data){
                  vm.eventTypes = data.data; 
-                 vm.step = 2;
+                 vm.step = 3;
               });
         }
         
@@ -205,6 +206,16 @@
        function insertAll(){
            return actionService.insertActions(vm.actions)
              .then(function(result){
+            return launcherService.destroy(id)
+              .then(function(){
+                  vm.launchers.splice(index, 1);
+              });
+        }
+       
+       
+       function insertAll(){
+           return actionService.insertActions(vm.actions)
+             .then(function(result){
                  return stateService.insertOrUpdateStates(vm.states);
              })
              .then(function(){
@@ -216,18 +227,22 @@
         
         function nextStep(){
             switch(vm.step){
-                case 2:
+                case 1:
+                    vm.step++;
+                break;
+
+                case 3:
                     createLauncher(vm.newLauncher, vm.launcherParams)
                       .then(function(){
                             vm.step++;
                       });
                 break;
                     
-                case 3:
+                case 4:
                     vm.step++;
                 break;
                 
-                case 4: 
+                case 5: 
                     // save everything
                 break;
             }
