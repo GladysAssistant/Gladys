@@ -21,7 +21,7 @@
     "bluebird": "^3.3.4",
     "clone": "^2.0.0",
     "crypto": "~0.0.3",
-    "ejs": "^2.4.1",
+    "ejs": "^2.5.4",
     "es6-template-strings": "^2.0.0",
     "fs-extra": "^0.30.0",
     "grunt": "^1.0.1",
