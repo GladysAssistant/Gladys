@@ -17,7 +17,7 @@
   "dependencies": {
     "async": "^2.0.0",
     "barrels": "^1.6.2",
-    "bcrypt": "^0.8.5",
+    "bcrypt": "^1.0.1",
     "bluebird": "^3.3.4",
     "clone": "^2.0.0",
     "crypto": "~0.0.3",
