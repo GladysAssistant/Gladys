@@ -95,7 +95,7 @@ module.exports.routes = {
   // DeviceState
   'get /devicestate': 'DeviceStateController.index',
   'post /devicestate': 'DeviceStateController.create',
-  'get /devicestate/create': 'DeviceStateController.create', // allowing get request too for creating devicestate
+  'get /devicestate/create': 'DeviceStateController.createGet', // allowing get request too for creating devicestate
   
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
@@ -109,7 +109,7 @@ module.exports.routes = {
   // Event
   'get /event': 'EventController.index',
   'post /event': 'EventController.create',
-  'get /event/create': 'EventController.create', // allowing get request too for creating event (useful for connected object)
+  'get /event/create': 'EventController.createGet', // allowing get request too for creating event (useful for connected object)
   
   //EventType
   'get /eventtype': 'EventTypeController.index',
