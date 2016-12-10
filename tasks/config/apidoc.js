@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 
 	grunt.config.set('apidoc', {
 		myapp: {
-            src: "api/",
+            src: "api/controllers",
             dest: "apidoc/"
         }
 	});
