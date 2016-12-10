@@ -53,6 +53,12 @@ module.exports = {
         .catch(next);
   },
 
+  getById: function(req, res, next) {
+      gladys.deviceType.getById({id: req.params.id})
+        .then((deviceType) => res.json(deviceType))
+        .catch(next);
+  },
+
   /** 
    * Delete a deviceType
    */
