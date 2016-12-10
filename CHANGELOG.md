@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.3] - 2016-12-10
+###Added
+- new route: GET /devicetype/:id
+- scenario now accept empty templates
+- new function: gladys.house.getById()
+
+### Changed
+- Bugfixed mode.change, now working !
+- full REST API documentation thanks to apidoc
+- brain now call module functions and not global services anymore
+
 ## [3.3.2] - 2016-11-12
 ### Changed
 - Added roomName in deviceType get requests so that you don't have to query room to get room name.
