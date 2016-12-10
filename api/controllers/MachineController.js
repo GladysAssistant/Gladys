@@ -6,13 +6,6 @@
   * You may not use this software for commercial purposes.
   * @author :: Pierre-Gilles Leymarie
   */
-  
-/**
- * LockController
- *
- * @description :: Server-side logic for managing locks
- * @help        :: See http://links.sailsjs.org/docs/controllers
- */
 
 module.exports = {
 
