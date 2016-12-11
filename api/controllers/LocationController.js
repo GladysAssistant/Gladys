@@ -8,23 +8,36 @@
   */
   
 /**
- * LocationController
- *
- * @description :: Server-side logic for managing Location of Users
- * @help        :: See http://links.sailsjs.org/docs/controllers
+ * @apiDefine LocationSuccess
+ * @apiSuccess {datetime} datetime Datetime of the location
+ * @apiSuccess {float} latitude Latitude
+ * @apiSuccess {float} longitude  Longitude
+ * @apiSuccess {float} altitude  Altitude
+ * @apiSuccess {float} accuracy  Accuracy in meters
+ * @apiSuccess {integer} user  User ID
+ */
+
+/**
+ * @apiDefine LocationParam
+ * @apiParam {datetime} [datetime] Datetime of the location
+ * @apiParam {float} latitude Latitude
+ * @apiParam {float} longitude  Longitude
+ * @apiParam {float} [altitude]  Altitude
+ * @apiParam {float} [accuracy]  Accuracy in meters
  */
 
 module.exports = {
 
 	/**
-	 * Create a new Location
-	 * (Save the actual position of the user)
-	 * @method create
-	 * @param {} req
-	 * @param {} res
-	 * @param {} next
-	 * @return 
-	 */
+     * @api {post} /location create location
+     * @apiName createLocation
+     * @apiGroup Location
+     * @apiPermission authenticated
+     *
+     * @apiUse LocationParam
+     * 
+     * @apiUse LocationSuccess
+     */
 	create : function(req,res, next){
         
         var location;

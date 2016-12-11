@@ -8,16 +8,38 @@
   */
   
 /**
- * HouseController
- *
- * @description :: Server-side logic for managing Houses
- * @help        :: See http://links.sailsjs.org/docs/controllers
+ * @apiDefine HouseSuccess
+ * @apiSuccess {uuid} uuid House unique id
+ * @apiSuccess {String} name  The name of the house
+ * @apiSuccess {String} address  The address of the house
+ * @apiSuccess {String} city  The city
+ * @apiSuccess {integer} postcode  Postcode
+ * @apiSuccess {String} country  Country
+ * @apiSuccess {float} latitude  Latitude of the house
+ * @apiSuccess {float} longitude  Longitude of the house
+ */
+
+/**
+ * @apiDefine HouseParam
+ * @apiParam {uuid} uuid House unique id
+ * @apiParam {String} name  The name of the house
+ * @apiParam {String} address  The address of the house
+ * @apiParam {String} city  The city
+ * @apiParam {integer} postcode  Postcode
+ * @apiParam {String} country  Country
+ * @apiParam {float} latitude  Latitude of the house
+ * @apiParam {float} longitude  Longitude of the house
  */
 
 module.exports = {
     
     /**
-     * Get all houses
+     * @api {get} /house get all houses
+     * @apiName GetHouses
+     * @apiGroup House
+     * @apiPermission authenticated
+     *
+     * @apiUse HouseSuccess
      */
     index: function(req, res, next){
         gladys.house.get()
@@ -28,7 +50,14 @@ module.exports = {
     },
     
     /**
-     * Create a house
+     * @api {post} /house create a house
+     * @apiName createHouse
+     * @apiGroup House
+     * @apiPermission authenticated
+     *
+     * @apiUse HouseParam
+     * 
+     * @apiUse HouseSuccess
      */
     create: function(req, res, next){
         gladys.house.create(req.body)
@@ -38,8 +67,15 @@ module.exports = {
           .catch(next);
     },
     
-    /**
-     * Update a house
+     /**
+     * @api {patch} /house/:id create a house
+     * @apiName createHouse
+     * @apiGroup House
+     * @apiPermission authenticated
+     *
+     * @apiUse HouseParam
+     * 
+     * @apiUse HouseSuccess
      */
     update: function(req, res, next){
         
@@ -52,7 +88,11 @@ module.exports = {
     },
     
     /**
-     * Delete a house
+     * @api {delete} /house/:id delete a house
+     * @apiName deleteHouse
+     * @apiGroup House
+     * @apiPermission authenticated
+     *
      */
     delete: function(req, res, next){
         req.body.id = req.params.id;
@@ -63,6 +103,14 @@ module.exports = {
           .catch(next);
     },
     
+    /**
+     * @api {get} /house/:id/user get all user in a house
+     * @apiName getUserHouse
+     * @apiGroup House
+     * @apiPermission authenticated
+     *
+     * @apiUse UserSuccess 
+     */
     getUsers: function(req, res, next){
         gladys.house.getUsers({house: req.params.id})
           .then(function(users){

@@ -6,18 +6,33 @@
   * You may not use this software for commercial purposes.
   * @author :: Pierre-Gilles Leymarie
   */
-  
+
 /**
- * RoomController
- * @description :: Server-side logic for managing rooms
- * @help :: See http://links.sailsjs.org/docs/controllers
+ * @apiDefine RoomSuccess
+ * @apiSuccess {String} name The Name of the room
+ * @apiSuccess {Integer} house House ID
+ * @apiSuccess {Integer} permission Permission
  */
 
+/**
+ * @apiDefine RoomParam
+ * @apiParam {String} name The Name of the room
+ * @apiParam {Integer} house House ID
+ * @apiParam {Integer} [permission] Permission
+ */
 
 module.exports = {
     
     /**
-     * Get rooms with pagination
+     * @api {get} /room get rooms
+     * @apiName getRooms
+     * @apiGroup Room
+     * @apiPermission authenticated
+     * 
+     * @apiParam {integer} take number of rooms to return
+     * @apiParam {integer} skip number of rooms to skip
+     *
+     * @apiUse RoomSuccess
      */
     index: function(req, res, next){
         gladys.room.get(req.query)
@@ -28,7 +43,14 @@ module.exports = {
     },
     
     /**
-     * Create a room
+     * @api {post} /room create room
+     * @apiName createRoom
+     * @apiGroup Room
+     * @apiPermission authenticated
+     * 
+     * @apiUse RoomParam
+     *
+     * @apiUse RoomSuccess
      */
     create: function(req, res, next){
         gladys.room.create(req.body)
@@ -39,7 +61,14 @@ module.exports = {
     },
     
     /**
-     * Update a room
+     * @api {patch} /room/:id update room
+     * @apiName updateRoom
+     * @apiGroup Room
+     * @apiPermission authenticated
+     * 
+     * @apiUse RoomParam
+     *
+     * @apiUse RoomSuccess
      */
     update: function(req, res, next){
         
@@ -51,8 +80,11 @@ module.exports = {
           .catch(next);
     },
     
-    /** 
-     * Delete a room
+    /**
+     * @api {delete} /room/:id delete room
+     * @apiName deleteRoom
+     * @apiGroup Room
+     * @apiPermission authenticated
      */
     delete: function(req, res, next){
         gladys.room.delete({id: req.params.id})

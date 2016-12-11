@@ -17,7 +17,6 @@ module.exports = function(params)  {
 
 
 function verify(statetype, params) {
-
     var verifyFunction;
     
     sails.log.info(`Verifying condition "${statetype.name}" with template (${statetype.condition_template})`);
@@ -48,7 +47,6 @@ function verify(statetype, params) {
              stateParams.forEach(function(stateParam){
                  paramsToSend[stateParam.variablename] = stateParam.value;
              });
-             
               // we call the service
              return verifyFunction(paramsToSend);
         })

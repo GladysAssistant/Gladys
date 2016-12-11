@@ -146,6 +146,9 @@ function addTestModuleGladys(gladys){
         install: function(){
             return Promise.resolve();
         },
+        command: function() {
+            return Promise.resolve();
+        },
         music: {
             flushQueue: function() {return Promise.resolve()},
             getCurrentTrack: function() {return Promise.resolve({title: 'test', artist:'test'})},

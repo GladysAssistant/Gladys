@@ -1,9 +1,15 @@
 
-
-
 module.exports = {
     
     
+    /**
+   * @api {get} /brain/classify send a question to gladys
+   * @apiName classify
+   * @apiGroup Brain
+   * @apiPermission authenticated
+   *
+   * @apiParam {String} q the message for Gladys
+   */
     classify: function(req, res, next){
         gladys.brain.classify(req.query.q)
               .then(function(result){
@@ -13,9 +19,12 @@ module.exports = {
     },
     
     /**
-     * Train a new classifier with sentences
-     * in DB
-     */
+   * @api {post} /brain/trainnew re-train the sentence model
+   * @apiName train
+   * @apiGroup Brain
+   * @apiPermission authenticated
+   *
+   */
     trainNew: function(req, res, next){
         gladys.brain.trainNew()
           .then(function(){

@@ -56,7 +56,12 @@ module.exports = {
               .catch(next);
     },
     
-    
+     /**
+     * @api {post} /script/:id/exec Execute a script
+     * @apiName execScript
+     * @apiGroup Script
+     * @apiPermission authenticated
+     */
     exec: function (req, res, next){
         var script = {id: req.params.id};
         gladys.script.exec(script)
