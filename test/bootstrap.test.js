@@ -4,6 +4,10 @@ var Sails = require('sails'),
 var Barrels = require('barrels');
 var Promise = require('bluebird');
 
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config();
+}
+
 /*
 log: {
       level: 'error'

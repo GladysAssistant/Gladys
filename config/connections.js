@@ -34,11 +34,11 @@ module.exports.connections = {
 
   test: {
     adapter: 'sails-mysql',
-    host: 'localhost',
-    port: 8889,
-    user: 'root',
-    password: 'root',
-    database: 'gladystest'
+    host: process.env.MYSQL_HOST_TEST,
+    port: process.env.MYSQL_PORT_TEST,
+    user: process.env.MYSQL_USER_TEST,
+    password: process.env.MYSQL_PASSWORD_TEST,
+    database: process.env.MYSQL_DATABASE_TEST
   },
 
   /***************************************************************************
@@ -51,11 +51,11 @@ module.exports.connections = {
   ***************************************************************************/
   sailsmysql: {
     adapter: 'sails-mysql',
-    host: process.env.MYSQL_HOST || 'localhost',
-    port: process.env.MYSQL_PORT || 3306,
-    user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || 'root',
-    database: process.env.MYSQL_DATABASE || 'gladys'
+    host: process.env.MYSQL_HOST,
+    port: process.env.MYSQL_PORT,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE
   },
   
   travis: {
