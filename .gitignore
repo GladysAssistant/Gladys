@@ -119,3 +119,4 @@ nbproject
 .editorconfig
 typings
 jsconfig.json
+.env
