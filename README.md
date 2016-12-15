@@ -64,35 +64,16 @@ For example on Raspbian or on a Mac, it's located in :
 
 #### Connect Gladys to MySQL
 
-To connect Gladys to your database, you need to modify environment variables. 
+To connect Gladys to your database, you will need to set some environment variables.
+To do so, you'll have to create a `.env` file at the root of this project. The content of this file can be found by looking at `.env-sample`, which lists all the customizable env vars.
 
-You can set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD` and `MYSQL_DATABASE`.
+**Note :** You will need to create the database as well in MySQL:
 
-
-
-**Dirty way :**
-
-If you are not able to modify environment variables, you can enter your connections informations in the `config/connections.js` file.
-
-Modify the following lines with your own informations :
-
-```
-sailsmysql: {
-    adapter: 'sails-mysql',
-    host: process.env.MYSQL_HOST || 'localhost',
-    port: process.env.MYSQL_PORT || 3306,
-    user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || 'root',
-    database: process.env.MYSQL_DATABASE || 'gladys'
-  },
+```sql
+CREATE DATABASE gladys; -- or whatever name you've set in your .env file.`
 ```
 
-**Note :** You need to create the database first in MySQL :
-
-`CREATE DATABASE gladys;`
-
-
-#### Compile assets 
+#### Compile assets
 
 If you want to recompile assets and run all tasks, you can run :
 

@@ -33,9 +33,12 @@
 
 // if no env variable is set, we are in production
 if(!process.env.NODE_ENV){
-    process.env.NODE_ENV = 'production';    
+  process.env.NODE_ENV = 'production';
 }
 
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config();
+}
 
 // Ensure we're in the project directory, so relative paths work as expected
 // no matter where we actually lift from.
