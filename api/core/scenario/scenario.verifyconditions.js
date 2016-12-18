@@ -47,6 +47,7 @@ function verify(statetype, params) {
              
              stateParams.forEach(function(stateParam){
                  paramsToSend[stateParam.variablename] = stateParam.value;
+                 paramsToSend.user = params.user;
              });
              
               // we call the service
