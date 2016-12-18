@@ -8,3 +8,5 @@ module.exports.getAll = require('./house.getAll.js');
 module.exports.isEmpty = require('./house.isEmpty.js');
 module.exports.isUserAtHome = require('./house.isUserAtHome.js');
 module.exports.update = require('./house.update.js');
+module.exports.isEmptyBefore = require('./house.isEmptyBefore.js')
+module.exports.isEmptyAfter = require('./house.isEmptyAfter.js');
