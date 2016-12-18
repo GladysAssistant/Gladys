@@ -201,17 +201,6 @@
               });
         }
        
-       
-       function insertAll(){
-           return actionService.insertActions(vm.actions)
-             .then(function(result){
-            return launcherService.destroy(id)
-              .then(function(){
-                  vm.launchers.splice(index, 1);
-              });
-        }
-       
-       
        function insertAll(){
            return actionService.insertActions(vm.actions)
              .then(function(result){
