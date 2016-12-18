@@ -5,10 +5,11 @@ module.exports = function(options) {
 
     // handle both direct call and scenario call
     var id = options.id || options.params.id;
+    if (options.scope && options.scope.user) var user = options.scope.user;
 
     return gladys.script.getById({id})
         .then(function(script) {
-            return execCode(script.text, options.scope.user);
+            return execCode(script.text, user);
         });
 };
 
