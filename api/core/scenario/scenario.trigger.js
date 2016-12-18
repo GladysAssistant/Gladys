@@ -42,7 +42,8 @@ function verifyAndStart(launcher, scope) {
 
             // then, we verify the states conditions 
             return gladys.scenario.verifyConditions({
-                launcher: launcher
+                launcher: launcher,
+                user: scope.user
             });
         })
         .then(function(conditions) {
