@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 
 module.exports = function create(calendars) {
     
-    if(!calendars instanceof Array) calendars = [calendars];
+    if(!(calendars instanceof Array)) calendars = [calendars];
 
     return Promise.map(calendars, function(calendar) {
         return insertCalendarIfNotExist(calendar);
