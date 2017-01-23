@@ -79,6 +79,8 @@ module.exports.routes = {
   'get /brain/classify': 'BrainController.classify', 
   'post /brain/trainnew': 'BrainController.trainNew', 
   
+  // CalendarEvent
+  'get /calendarevent' : 'CalendarEventController.index',
   
   //Category
   'get /category': 'CategoryController.index',

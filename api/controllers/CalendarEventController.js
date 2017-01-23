@@ -15,4 +15,13 @@
 
 module.exports = {
 
+   index: function(req, res, next){
+     var options = req.query;
+     options.user = req.session.User;
+
+      gladys.calendar.getEventsDates(options)
+        .then((calendarEvents) =>  res.json(calendarEvents))
+        .catch(next);
+   }
+
 };
