@@ -33,13 +33,16 @@ module.exports = {
         },
 
         start: {
-            type: 'datetime',
-            required: true
+            type: 'datetime'
         },
 
         end: {
-            type: 'datetime',
-            required: true
+            type: 'datetime'
+        },
+
+        fullday: {
+            type: 'boolean',
+            defaultsTo: false
         },
 
         calendar: {

@@ -1,5 +1,8 @@
 module.exports = {
     
+    getCalendarByExternalId: 'SELECT * FROM calendar WHERE externalid = ?;',
+    getByService: 'SELECT * FROM calendar WHERE service = ?;',
+    getCalendarEventByExternalId: 'SELECT * FROM calendarevent WHERE externalid = ?;',
     authorizationCalendar: `SELECT * FROM calendar WHERE id = ? and user = ?;`,
     authorizationCalendarEvent: `
         SELECT * FROM calendarevent 
@@ -26,12 +29,12 @@ module.exports = {
     `,
     
     getEventsDates: `
-        SELECT *.calendarevent 
+        SELECT calendarevent.*
         FROM calendarevent
 		INNER JOIN calendar ON(calendarevent.calendar = calendar.id)
 		WHERE user = ? 
-		AND start > ?
-        AND end < ?
+		AND end > ?
+        AND start <= ?
 		AND calendar.active = 1 
 		ORDER BY start;
     `,

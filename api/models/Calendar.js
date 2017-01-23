@@ -32,6 +32,10 @@ module.exports = {
             type: 'string'
         },
 
+        service: {
+            type: 'string'
+        },
+
         active: {
             type: 'boolean',
             defaultsTo: true
