@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.4] - 2016-12-10
+###Changed
+- Fix critical bug when getting deviceType by room
+- add unit tests to GET /devicetype/room to prevent that
+
 ## [3.3.3] - 2016-12-10
 ###Added
 - new route: GET /devicetype/:id
