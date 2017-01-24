@@ -18,36 +18,25 @@
 
     function calendarService($http) {
         var service = {
-            getNextEvents: getNextEvents,
             loadEvents: loadEvents
         };
 
         return service;
 
         function loadEvents(date) {
-            return $http({method: 'POST', url: '/CalendarEvent/index', data : { date: date } }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
+            var start = new Date(date);
+            start.setHours(0);
+            start.setMinutes(0);
+            start.setSeconds(0);
+
+            var end = new Date(date);
+            end.setHours(23);
+            end.setMinutes(59);
+            end.setSeconds(59);
+
+
+            return $http({method: 'GET', url: '/calendarevent', params: {start: start, end: end} });
         }
         
-        function getNextEvents() {
-            return $http({method: 'POST', url: '/CalendarEvent/getNextEvent' }).
-                success(function(data, status, headers, config) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-        }
     }
 })();
