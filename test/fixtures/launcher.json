@@ -1,6 +1,7 @@
 [
     {
         "id": 1,
+        "title": "Launcher 1",
         "condition_template": "true",
         "eventtype": 1,
         "active": 1,
@@ -8,6 +9,7 @@
     },
      {
         "id": 2,
+        "title": "Launcher 2",
         "condition_template": "true",
         "eventtype": 1,
         "active": 1,
@@ -15,6 +17,7 @@
     },
     {
         "id": 3,
+        "title": "Launcher 3",
         "condition_template": "true",
         "eventtype": 1,
         "active": 1,

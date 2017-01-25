@@ -14,27 +14,43 @@
                             <ul class="nav nav-pills nav-justified thumbnail setup-panel">
                                 <li ng-class="{ 'active': vm.step == 1 }" ng-click="vm.initialiseVar();"><a href="#step-1" >
                                     <h4 class="list-group-item-heading"><%= __('Step') %> 1</h4>
+                                    <p class="list-group-item-text"><%= __('scenario-modal-give-a-name') %></p>
+                                </a></li>
+                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step < 2 }"><a href="#step-2" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-category') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step < 2 }"><a href="#step-1" >
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
+                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step < 3 }"><a href="#step-3" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-trigger') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step < 3 }"><a href="#step-2" >
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
+                                <li ng-class="{ 'active': vm.step == 4, 'disabled': vm.step < 4 }"><a href="#step-4" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 4</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-add-conditions') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 4, 'disabled': vm.step < 3 }"><a href="#step-3">
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 4</h4>
+                                <li ng-class="{ 'active': vm.step == 5, 'disabled': vm.step < 5 }"><a href="#step-5">
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 5</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-actions') %></p>
                                 </a></li>
                             </ul>
                         </div>
                     </div>
                     
-                    
-                    <!-- STEP 1 SELECT CATEGORY -->
-                    <div  class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                    <!-- STEP 1 NAMING CATEGORY -->
+                    <div class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                        <div class="col-md-4">
+                              <input id="scenarioTitle" class="form-control" ng-model="vm.newLauncher.title" placeholder="<%= __('scenario-modal-title') %>" type="text">
+                        </div>
+                        <div class="form-group">
+                              <div class="col-md-2 col-md-offset-10">
+                              <button type="submit" class="btn btn-success" ng-class="{'disabled': vm.newLauncher.title === ''}" ng-click="vm.nextStep();"><%= __('scenario-next-st
+ep') %></button>
+                              </div>
+                        </div>
+                    </div>
+                    <!-- END OF STEP 1 -->
+                    <!-- STEP 2 SELECT CATEGORY -->
+                    <div  class="row setup-content" id="step-2" ng-show="vm.step == 2">
 
                         <div class="col-xs-12 col-md-4" ng-repeat="category in vm.categories" ng-click="vm.selectCategory(category.service);">
                             <div class="panel panel-default">
@@ -51,11 +67,11 @@
                         </div> 
                     </div>
                     
-                    <!-- ENF OD STEP 1 SELECT CATEGORY -->
+                    <!-- END OF STEP 2 SELECT CATEGORY -->
 
 
-                    <!-- STEP 2 CHOOSE TRIGGER  -->
-                    <div class="row setup-content" id="step-2" ng-show="vm.step == 2">
+                    <!-- STEP 3 CHOOSE TRIGGER  -->
+                    <div class="row setup-content" id="step-3" ng-show="vm.step == 3">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
                                     <table class="table table-bordered table-hover">
@@ -68,7 +84,8 @@
                                             <tr ng-repeat="eventType in vm.eventTypes">
                                                 <td>{{eventType.name}}</td>
                                                 <td>{{eventType.description}}</td>
-                                                <td><input type="radio" name="eventTypeRadio" id="eventTypeRadio" value="{{eventType.id}}" ng-click="vm.selectEventType($index, eventType.id)"></td>
+                                                <td><input type="radio" name="eventTypeRadio" id="eventTypeRadio" value="{{eventType.id}}" ng-click="vm.selectEventType($index, eve
+ntType.id)"></td>
                                             </tr>
 
                                         </tbody>
@@ -92,7 +109,8 @@
                                                 <option ng-repeat="option in launcherParam.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
                                             
-                                            <input ng-show="!launcherParam.options" id="launcherparametre" type="text" ng-model="launcherParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                            <input ng-show="!launcherParam.options" id="launcherparametre" type="text" ng-model="launcherParam.value" class="form-control" placehol
+der="<%= __('Parametre') %>">
                                        </div>
                                     </div>
                                     
@@ -106,10 +124,10 @@
                             </div>
                         </div>
                     </div>
-                    <!-- END OF STEP 2 -->
+                    <!-- END OF STEP 3 -->
                     
-                     <!-- STEP 3 CHOOSE CONDITION  -->
-                    <div class="row setup-content" id="step-2" ng-show="vm.step == 3">
+                     <!-- STEP 4 CHOOSE CONDITION  -->
+                    <div class="row setup-content" id="step-4" ng-show="vm.step == 4">
                         <div class="col-xs-12">
                             
                             <div class="col-md-12 well text-center">
@@ -123,7 +141,8 @@
                                             <tr ng-repeat="stateType in vm.stateTypes">
                                                 <td>{{stateType.name}}</td>
                                                 <td>{{stateType.description}}</td>
-                                                <td><button  class="btn btn-success btn-sm" ng-click="vm.addState($index, stateType)" ><%= __('scenario-state-add') %></button></td>
+                                                <td><button  class="btn btn-success btn-sm" ng-click="vm.addState($index, stateType)" ><%= __('scenario-state-add') %></button></td
+>
                                             </tr>
 
                                         </tbody>
@@ -161,7 +180,8 @@
                                                 <option ng-repeat="option in stateParam.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
                                             
-                                            <input ng-show="!stateParam.options" id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                            <input ng-show="!stateParam.options" id="stateParametre" type="text" ng-model="stateParam.value" class="form-control" placeholder="<%= 
+__('Parametre') %>">
                                        </div>
                                     </div>
                                     
@@ -191,7 +211,8 @@
                                     <!-- end of stateTemplateParams -->
                                     
                                    <div class="form-group">
-                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeState($index, state.id);"><%= __('scenario-delete') %></button>
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeState($index, state.id);"><%= __('scenario-delete')
+ %></button>
                                     </div>
                                     
                                    
@@ -203,14 +224,14 @@
                             
                         </div>
                     </div>
-                    <!-- END OF STEP 3 -->
+                    <!-- END OF STEP 4 -->
 
 
 
                    
 
-                        <!-- STEP 4 CHOOSE ACTIONS -->
-                    <div class="row setup-content" id="step-3" ng-show="vm.step == 4">
+                        <!-- STEP 5 CHOOSE ACTIONS -->
+                    <div class="row setup-content" id="step-5" ng-show="vm.step == 5">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
                                 <h1 class="text-center"><%= __('scenario-actions') %></h1>
@@ -224,7 +245,8 @@
                                             <tr ng-repeat="actionType in vm.actionTypes">
                                                 <td>{{actionType.name}}</td>
                                                 <td>{{actionType.description}}</td>
-                                                <td><button class="btn btn-success btn-sm" ng-click="vm.addAction($index, actionType)" ><%= __('scenario-action-add') %></button></td>
+                                                <td><button class="btn btn-success btn-sm" ng-click="vm.addAction($index, actionType)" ><%= __('scenario-action-add') %></button></
+td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -260,12 +282,14 @@
                                                 <option ng-repeat="option in actionTypeParam.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
                                             
-                                            <input ng-show="!actionTypeParam.options" id="actionTypeParam" type="text" ng-model="actionTypeParam.value" class="form-control" placeholder="<%= __('Parametre') %>">
+                                            <input ng-show="!actionTypeParam.options" id="actionTypeParam" type="text" ng-model="actionTypeParam.value" class="form-control" placeh
+older="<%= __('Parametre') %>">
                                        </div>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeAction($index, action.id);"><%= __('scenario-delete') %></button>
+                                        <button class="pull-right scenario-delete-row btn btn-danger btn-sm" ng-click="vm.removeAction($index, action.id);"><%= __('scenario-delete
+') %></button>
                                     </div>
                                    
                                 </form>
@@ -279,7 +303,7 @@
                         
                         
                     </div>
-                    <!-- END OF STEP 3 -->
+                    <!-- END OF STEP 5 -->
                 
             </div>
     </div>
