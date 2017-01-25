@@ -135,6 +135,7 @@ module.exports.routes = {
   // Location
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
+  'get /location': 'LocationController.get',
   
   // Machine
   'get /machine' : 'MachineController.get',

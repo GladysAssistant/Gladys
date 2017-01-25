@@ -56,7 +56,13 @@ module.exports = {
               return res.status(201).json(location);
           })
           .catch(next);
-	}
+	},
+
+    get: function(req, res, next){
+        gladys.location.get()
+            .then(locations => res.json(locations))
+            .catch(next);
+    }
 
 };
 
