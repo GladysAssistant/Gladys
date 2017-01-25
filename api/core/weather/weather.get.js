@@ -6,9 +6,7 @@ const Promise = require('bluebird');
  * {
  *   latitude,
  *   longitude,
- *   units (celsius/fahrenheit),
- *   date ('now', '2017-01-25')
- *   time {optional} ( '12:00' )
+ *   offset (in hour) ex: 1 (to see the weather in 1 hour)
  * }
  * 
  * returns =>
@@ -22,6 +20,7 @@ const Promise = require('bluebird');
 module.exports = function get(options){
 
     if(!options || !options.latitude || !options.longitude) return Promise.reject(new Error('Weather : Latitude and longitude are required.'));
+    if(!options.hasOwnProperty('offset')) options.offset = 0;
 
     return getWeatherProvider(0, options);    
 };
