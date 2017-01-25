@@ -29,6 +29,7 @@ var cssFilesToInject = [
   'styles/angular-chart/angular-chart.min.css',
   'styles/bootstrap-slider/bootstrap-slider.min.css',
   'styles/device.css',
+  'styles/leaflet/leaflet.css',
   
   // all styles, disabled by default
   //'styles/**/*.css',
@@ -73,6 +74,8 @@ var jsFilesToInject = [
   'js/dependencies/datepicker/bootstrap-datepicker.js',
   
   'js/dependencies/bootstrap-slider.min.js',
+
+  'js/dependencies/leaflet.js',
   
   
   
