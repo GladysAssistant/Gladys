@@ -153,6 +153,9 @@ function addTestModuleGladys(gladys){
         command: function() {
             return Promise.resolve();
         },
+        weather: {
+            get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9}); }
+        },
         music: {
             flushQueue: function() {return Promise.resolve()},
             getCurrentTrack: function() {return Promise.resolve({title: 'test', artist:'test'})},
@@ -172,4 +175,7 @@ function addTestModuleGladys(gladys){
             stop: function() {return Promise.resolve()},
         }
     };
+
+    // register weather module
+    gladys.weather.addProvider('test');
 }
