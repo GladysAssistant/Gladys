@@ -33,6 +33,10 @@ module.exports = {
   script:function(req,res,next){
     res.view('script/index',  { User: req.session.User, pageName: req.__('pagename-script') });
   },
+
+  maps:function(req,res,next){
+    res.view('maps/index',  { User: req.session.User, pageName: req.__('pagename-maps') });
+  },
   
   device: function(req,res,next){
     res.view('device/index',  { User: req.session.User, pageName: req.__('pagename-device') });

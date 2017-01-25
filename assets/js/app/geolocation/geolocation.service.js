@@ -17,8 +17,10 @@
     geoLocationService.$inject = ['$http'];
 
     function geoLocationService($http) {
+        
         var service = {
             create: create,
+            get: get,
             getCurrentPosition: getCurrentPosition
         };
 
@@ -32,6 +34,10 @@
               altitude: location.altitude
             };
             return $http({method: 'POST', url: '/location', data: locationObj });
+        }
+
+        function get(){
+           return $http({ method: 'GET', url: '/location'}); 
         }
 
         function getCurrentPosition() {

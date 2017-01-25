@@ -34,5 +34,12 @@ module.exports = function create (location){
         
         // we create the location in database
         return Location.create(location);
+    })
+    .then((location) => {
+        
+        // broadcast news to everyone
+        gladys.socket.emit('newLocation', location);
+
+        return location; 
     });
 };
