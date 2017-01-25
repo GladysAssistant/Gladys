@@ -39,7 +39,7 @@
                     
                     vm.locations.forEach(function(location){
                         markerUser[location.user] = L.marker([location.latitude, location.longitude]).addTo(leafletMap);
-                        markerUser[location.user].bindPopup(location.firstname + ' ' + location.lastname);
+                        markerUser[location.user].bindTooltip(location.firstname + ' ' + location.lastname).openTooltip();
                     });
 
                     waitForNewValue();
