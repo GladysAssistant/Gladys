@@ -1,9 +1,9 @@
-module.exports = state;
+module.exports = getState;
 
 var SunCalc = require('suncalc');
 var Promise = require('bluebird');
 
-function state(options){
+function getState(options){
     // foreach house
     return gladys.house.getById({id: options.house})
       .then(function(house){
