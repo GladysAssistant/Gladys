@@ -255,7 +255,10 @@ module.exports.routes = {
   'patch /user/:id': 'UserController.update',
   'delete /user/:id': 'UserController.delete',
   'get /user/whoami': 'UserController.whoami',
-  
+
+
+  // Weather
+  'get /weather': 'WeatherController.get'
 
 
 
