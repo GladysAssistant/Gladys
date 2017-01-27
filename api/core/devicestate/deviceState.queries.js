@@ -17,6 +17,11 @@ module.exports = {
     FROM device 
     JOIN devicetype ON (device.id = devicetype.device)
     WHERE devicetype.identifier = ? AND device.service = ?;
+  `,
+  purge: `
+    DELETE FROM devicestate
+    WHERE devicetype = ?
+    AND datetime < NOW() - INTERVAL ? DAY;
   `
 
 };
