@@ -15,7 +15,8 @@ describe('DeviceState', function() {
         
         gladys.deviceState.createByIdentifier('THIS_IS_MY_IDENTIFIER', 'test', 'binary', state)
         .then(function(result){
-           options = {
+
+           var options = {
              devicetype : result.devicetype,
              days : 365
            }
@@ -23,24 +24,16 @@ describe('DeviceState', function() {
            return gladys.deviceState.purge(options);
         })
         .then(function() {
-           states = {
-              devicetype : 1
-           }
 
-           return gladys.deviceState.get(states);
+           return gladys.deviceState.get({devicetype: 1});
         })
         .then(function(result){
            validateDeviceState(result);
            result.should.be.instanceof(Array);
            result.should.have.length(2);
            done();
-        }).catch(function(err){
-            done(err);
-        });
-
+        })
+        .catch(done)
     });
-    
-    
   });
-
 });
