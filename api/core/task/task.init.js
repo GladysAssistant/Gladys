@@ -5,6 +5,10 @@ module.exports = function(){
   // tasks started in dev and prod
   
   gladys.script.init();
+
+  // start sunrise & sunset schedule
+  gladys.sun.init()
+    .catch(sails.log.warn);
   
   // load gladys brain
   gladys.brain.load()
