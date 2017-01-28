@@ -11,6 +11,7 @@
     <table id="example2" class="table table-bordered table-hover">
         <thead>
             <tr>
+                <th><%= __('ID') %></th>
                 <th><%= __('Name') %></th>
                 <th><%= __('Address') %></th>
                 <th><%= __('City') %></th>
@@ -23,6 +24,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="house in vm.houses" class="ng-cloak">
+                <td>{{house.id}}</td>
                 <td>{{house.name}}</td>
                 <td>{{house.address}}</td>
                 <td>{{house.city}}</td>
@@ -33,6 +35,7 @@
                 <td><button ng-click="vm.deleteHouse($index, house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
             </tr>
             <tr>
+                <td></td>
                 <td><input type="text" class="form-control" ng-model="vm.newHouse.name" /></td>
                 <td><input type="text" class="form-control" ng-model="vm.newHouse.address" /></td>
                 <td><input type="text" class="form-control" ng-model="vm.newHouse.city" /></td>
@@ -62,6 +65,7 @@
     <table id="example2" class="table table-bordered table-hover">
         <thead>
             <tr>
+                <th><%= __('ID') %></th>
                 <th><%= __('Name') %></th>
                 <th><%= __('House') %></th>
                 <th><%= __('Action') %></th>
@@ -69,11 +73,13 @@
         </thead>
         <tbody>
             <tr ng-repeat="room in vm.rooms" class="ng-cloak">
+                <td>{{room.id}}</td>
                 <td>{{room.name}}</td>
                 <td>{{room.houseName}}</td>
                 <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
             </tr>
             <tr class="ng-cloak"> 
+                <td></td>
                 <td><input type="text" class="form-control" ng-model="vm.newRoom.name" /></td>
                 <td><select ng-model="vm.newRoom.house" class="form-control" >
                         <option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>
