@@ -63,7 +63,11 @@ module.exports = {
      * @apiPermission authenticated
      */
     exec: function (req, res, next){
-        var script = {id: req.params.id};
+        var script = {
+          id: req.params.id,
+          scope: {user: req.session.User.id}
+        };
+
         gladys.script.exec(script)
               .then(function(result){
                   return res.json(result);
