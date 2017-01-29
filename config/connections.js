@@ -35,7 +35,7 @@ module.exports.connections = {
   test: {
     adapter: 'sails-mysql',
     host: process.env.MYSQL_HOST_TEST || 'localhost',
-    port: process.env.MYSQL_PORT_TEST || 8889,
+    port: process.env.MYSQL_PORT_TEST || 3306,
     user: process.env.MYSQL_USER_TEST || 'root',
     password: (typeof process.env.MYSQL_PASSWORD_TEST !== 'undefined') ? process.env.MYSQL_PASSWORD_TEST : 'root',
     database: process.env.MYSQL_DATABASE_TEST || 'gladystest'
