@@ -21,7 +21,7 @@ describe('DeviceType', function() {
 
     });
 
-    it.only('should get deviceType by category and room', function (done) {
+    it('should get deviceType by category and room', function (done) {
         
         gladys.deviceType.getByDevice({category: 'light', room: 12})
             .then(function(types){
