@@ -21,7 +21,8 @@
         
         var service = {
             get: get,
-            set: set
+            set: set,
+            clear: clear
         };
 
         return service;
@@ -58,7 +59,6 @@
          * Set value in the localStorage
          */
         function set(key, value, expiration){
-            
             if(localStorage){
                 var record = {
                     value: value, 
@@ -66,6 +66,10 @@
                 };
                 localStorage.setItem(key, JSON.stringify(record));
             }
+        }
+
+        function clear(){
+            if(localStorage) localStorage.clear();
         }
     }
 })();
