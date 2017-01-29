@@ -36,5 +36,12 @@ function create(param) {
               return {device: device, types: types};
           });
 
+      })
+      .then((result) => {
+
+         // broadcast news to everyone
+         gladys.socket.emit('newDevice', result);
+
+         return result;
       });
 }

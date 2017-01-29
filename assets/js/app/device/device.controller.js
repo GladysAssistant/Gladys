@@ -157,10 +157,15 @@
     function waitForNewValue(){
         
         io.socket.on('newDeviceState', function (deviceState) {
-            console.log(deviceState);
             updateValueType(deviceState);
         });
+
+        io.socket.on('newDevice', function (result) {
+            vm.devices.push(result.device);
+            $scope.$apply();
+        });
     }
+    
     
     // loop foreach device and upadte the value when the type is found
     function updateValueType(deviceState){
