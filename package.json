@@ -18,7 +18,7 @@
     "async": "^2.0.0",
     "barrels": "^1.6.2",
     "bcrypt": "^1.0.0",
-    "bluebird": "^3.3.4",
+    "bluebird": "^3.4.7",
     "clone": "^2.0.0",
     "crypto": "~0.0.3",
     "dotenv": "^2.0.0",
