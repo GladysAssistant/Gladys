@@ -13,9 +13,18 @@ module.exports = {
           type: 'string'  
         },
 
+        // binary, multilevel. Useful for display in views
         type: {
             type: 'string',
             required: true
+        },
+
+        // ex: "light", "tv"
+        // useful for gladys if you ask "turn on the lights in the living room"
+        // that she need to select all "binary" that are not sensors, that are categorized 
+        // as "light" and that are in the living room.
+        category: {
+            type: 'string'
         },
 
         // can be useful to identify a devicetype (ex: unique ID of a part of a device)
