@@ -26,9 +26,11 @@ var cssFilesToInject = [
   'styles/search.css',
   'styles/store.css',
   'styles/scenario.css',
+  'styles/global.css',
   'styles/angular-chart/angular-chart.min.css',
   'styles/bootstrap-slider/bootstrap-slider.min.css',
   'styles/device.css',
+  'styles/weather.css',
   'styles/leaflet/leaflet.css',
   
   // all styles, disabled by default

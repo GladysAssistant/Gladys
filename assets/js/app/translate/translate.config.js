@@ -16,6 +16,11 @@ var translationsEN = {
   EVENT: {
       CREATED_SUCCESS_NOTIFICATION: 'Event created with success : ',
       CREATED_FAIL_NOTIFICATION: 'Failed to create event : '
+  },
+  WEATHER: {
+      day: 'Day',
+      night: 'Night',
+      HUMIDITY: 'Humidity'
   }   
 };
 
@@ -37,7 +42,12 @@ var translationsFR = {
   EVENT: {
       CREATED_SUCCESS_NOTIFICATION: 'Event créé avec succès : ',
       CREATED_FAIL_NOTIFICATION: 'Erreur lors de la création de l\'event : '
-  }    
+  },
+  WEATHER: {
+      day: 'Jour',
+      night: 'Nuit',
+      HUMIDITY: 'Humidité'
+  }      
 };
 
 
