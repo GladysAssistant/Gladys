@@ -1,5 +1,6 @@
 const shared = require('./weather.shared.js');
 const Promise = require('bluebird');
+const SunCalc = require('suncalc');
 
 /**
  * Options 
@@ -22,7 +23,18 @@ module.exports = function get(options){
     if(!options || !options.latitude || !options.longitude) return Promise.reject(new Error('Weather : Latitude and longitude are required.'));
     if(!options.hasOwnProperty('offset')) options.offset = 0;
 
-    return getWeatherProvider(0, options);    
+    return getWeatherProvider(0, options)
+        .then((result) => {
+
+            var now = new Date();
+            // add day or night info to result
+            var times = SunCalc.getTimes(now, options.latitude , options.longitude);
+
+            if(now > times.sunset || now < times.sunrise) result.sun = 'night';
+            else result.sun = 'day';
+
+            return result;
+        });  
 };
 
 function getWeatherProvider(index, options){
