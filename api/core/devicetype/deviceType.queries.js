@@ -91,5 +91,14 @@ module.exports = {
       LEFT JOIN room ON d.room = room.id 
       WHERE dt.type = ?;
   `, 
+
+  getDeviceTypeByCategory:
+  `
+    SELECT deviceType.* FROM deviceType 
+    JOIN device ON deviceType.device = device.id 
+    WHERE category = ?
+    AND (room = ? OR ? IS NULL);
+  `
+
   
 };

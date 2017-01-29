@@ -4,6 +4,7 @@
     "name": "Switch",
     "identifier": "UNIQUE_IDENTIFIER",
     "type": "binary",
+    "category": "light",
     "tag": "light",
     "sensor": false,
     "device": 1,
