@@ -37,6 +37,22 @@ describe('Alarm', function() {
                 })
                 .catch(done);
     });
+
+    it('should return alarm with cronrule created', function (done) {
+     	 
+          var alarm = {
+            cronrule: '1 1 1 1 1 1',
+            user: 1,
+            name: 'test'  
+          };
+          
+          gladys.alarm.create(alarm)
+                .then(function(alarm){
+                    validateAlarm(alarm);
+                    done();
+                })
+                .catch(done);
+    });
     
     it('should return error, wrong parameters', function (done) {
      	 

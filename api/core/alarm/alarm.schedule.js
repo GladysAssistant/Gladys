@@ -3,8 +3,11 @@ var shared = require('./alarm.shared.js');
 module.exports = function schedule(alarm) {
     var rule;
 
-    // if the alarm is reccuring 
-    if (alarm.dayofweek === -1) {
+    // if alarm is a cronrule
+    if(alarm.cronrule) {
+        rule = alarm.cronrule;
+    } // if the alarm is reccuring  
+    else if (alarm.dayofweek === -1) {
         rule = new Date(alarm.datetime);
     } else {
         rule = {

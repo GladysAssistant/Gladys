@@ -28,8 +28,9 @@
                                         <tbody>
                                             <tr ng-repeat="alarm in vm.alarms" class="ng-cloak">
                                                 <td>{{alarm.name}}</td>
-                                                <td ng-show="alarm.dayofweek == -1" >{{alarm.moment}}</td>
-                                                <td ng-show="alarm.dayofweek != -1">{{alarm.moment}}, {{alarm.time}}</td>
+                                                <td ng-show="alarm.dayofweek == -1 && !alarm.cronrule" >{{alarm.moment}}</td>
+                                                <td ng-show="alarm.dayofweek != -1 && !alarm.cronrule">{{alarm.moment}}, {{alarm.time}}</td>
+                                                <td ng-show="alarm.cronrule">{{alarm.cronrule}}</td>
                                                 <td><button ng-click="vm.destroyAlarm($index, alarm.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr>
@@ -151,6 +152,33 @@
                                                                    
                                                                 </div>
                                                             <!-- End of DateTime Boostrap Picker -->
+                                                            
+                                                            </div>
+                                                          </div>
+                                                          <!-- END OF BOX -->
+
+                                                          <!-- NEW BOX -->
+                                                          <div class="box box-default">
+                                                          <div class="box-header with-border">
+                                                            <h3 class="box-title"><%= __('alarm-cron-rule') %></h3>
+                                                          </div>  
+                               
+                                                            <div class="box-body">
+                                                               <p><%= __('alarm-cron-rule-text') %> <a href="https://github.com/node-schedule/node-schedule" >https://github.com/node-schedule/node-schedule</a>.</p>
+                                                               <div class="row">
+                                                                    <div class='col-md-2'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newAlarmCron.name" placeholder="<%= __('Name') %>" />
+                                                                    </div>
+                                                                    
+                                                                    <div class='col-md-4'>
+                                                                        <input type="text" class="form-control" ng-model="vm.newAlarmCron.cronrule" placeholder="* * * * * *" />
+                                                                    </div>
+                                                                
+                                                                     <div class='col-md-4'>
+                                                                         <button class="btn btn-success" ng-click="vm.createAlarmCron()"><%= __('New') %></button>
+                                                                      </div>
+                                                                   
+                                                                </div>
                                                             
                                                             </div>
                                                           </div>

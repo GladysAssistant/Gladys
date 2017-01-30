@@ -12,7 +12,12 @@ module.exports = function(params) {
             if (!alarms[0].active) {
                 return gladys.alarm.cancel(alarms[0]);
             } else {
-                return Promise.resolve(alarms[0]);
+
+                // re-schedule the alarm
+                return gladys.alarm.cancel(alarms[0])
+                    .then(() => {
+                        return gladys.alarm.schedule(alarms[0]);
+                    });
             }
         });
 };

@@ -391,6 +391,8 @@
   "module-date": "Date",
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
+  "alarm-cron-rule": "Règles cron",
+  "alarm-cron-rule-text": "Vous pouvez définir ici des règles cron. Le format est classique, si vous vouler effectuer une tâche toutes les heures, simplement tapez : '0 0 * * * *'. Plus d'infos ici :",
   "user-box-title": "Votre compte utilisateur",
   "user-box-description": "Gérer ici votre compte Gladys. Ce compte est local à votre système, n'est stocké nul part ailleurs que sur votre machine.",
   "user-name": "Nom",

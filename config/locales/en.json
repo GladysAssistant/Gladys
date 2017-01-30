@@ -225,6 +225,8 @@
   "module-date": "Date",
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
+    "alarm-cron-rule": "Cron rules",
+  "alarm-cron-rule-text": "You can define here cron rules. The format is simple, for example if you want to schedule an alarm each hour, simply enter : '0 0 * * * *'. More informations here :",
   "user-box-title": "Your user account",
   "user-box-description": "You can manage here your Gladys account. This account is local, your user informations are never stored anywhere, just in your local machine.",
   "user-name": "Name",

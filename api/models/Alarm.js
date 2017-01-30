@@ -50,6 +50,10 @@ module.exports = {
             defaultsTo: -1
         },
 
+        cronrule: {
+            type: 'string'
+        },
+
         active: {
             type: 'boolean',
             defaultsTo: true
