@@ -14,9 +14,9 @@
     .module('gladys')
     .controller('WeatherCtrl', WeatherCtrl);
 
-  WeatherCtrl.$inject = ['weatherService', 'geoLocationService', 'cacheService', '$timeout'];
+  WeatherCtrl.$inject = ['weatherService', 'geoLocationService', 'cacheService', 'notificationService', '$timeout'];
 
-  function WeatherCtrl(weatherService, geoLocationService, cacheService, $timeout) {
+  function WeatherCtrl(weatherService, geoLocationService, cacheService, notificationService, $timeout) {
 
     /* jshint validthis: true */
     var vm = this;
@@ -67,6 +67,9 @@
 
                     return null;
                   }
+              })
+              .catch(function(err) {
+                  notificationService.errorNotificationTranslated('WEATHER.GET_GEOLOCATION_FAILED', err);
               });
         }
     }

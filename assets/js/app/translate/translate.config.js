@@ -20,7 +20,8 @@ var translationsEN = {
   WEATHER: {
       day: 'Day',
       night: 'Night',
-      HUMIDITY: 'Humidity'
+      HUMIDITY: 'Humidity',
+      GET_GEOLOCATION_FAILED: 'Geolocation failed.'
   }   
 };
 
@@ -46,7 +47,8 @@ var translationsFR = {
   WEATHER: {
       day: 'Jour',
       night: 'Nuit',
-      HUMIDITY: 'Humidité'
+      HUMIDITY: 'Humidité',
+      GET_GEOLOCATION_FAILED: 'Erreur lors de la géolocalisation :' 
   }      
 };
 
