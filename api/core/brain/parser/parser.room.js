@@ -22,5 +22,5 @@ module.exports = function(text){
  * Return true if the roomName is present in the sentence
  */
 function present(text, type){
-    return (text.indexOf(type) > -1);
+    return (text.indexOf(type.toLowerCase()) > -1);
 }
