@@ -1,4 +1,5 @@
 const fs = require('fs');
+const schedule = require('node-schedule');
 
 module.exports = function(){
   
@@ -7,8 +8,7 @@ module.exports = function(){
   gladys.script.init();
 
   // start sunrise & sunset schedule
-  gladys.sun.init()
-    .catch(sails.log.warn);
+  gladys.sun.init().catch(sails.log.warn);
   
   // load gladys brain
   gladys.brain.load()
@@ -24,9 +24,22 @@ module.exports = function(){
     return ;   
   }
   
+  
   // tasks started only in prod
+
+
   fs.chmod(sails.config.update.updateScript, '755', function(err, result){
       if(err) return sails.log.error(err);
+  });
+
+
+  // start sunrise & sunset schedule each day at 00.01 
+  var rule = new schedule.RecurrenceRule();
+  rule.hour = 0;
+  rule.minute = 1;
+
+  var j = schedule.scheduleJob(rule, function(){
+      gladys.sun.init().catch(sails.log.warn);
   });
 
   
