@@ -21,7 +21,7 @@
     /* jshint validthis: true */
     var vm = this;
     vm.weather = [];
-    var EXPIRATION = 30*60*60*1000;
+    var EXPIRATION = 30*60*1000;
     
     activate();
 
