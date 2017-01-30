@@ -33,6 +33,19 @@ describe('DeviceType', function() {
             .catch(done);
 
     });
+
+    it('should get deviceType by category and type', function (done) {
+        
+        gladys.deviceType.getByDevice({category: 'light', type: 'UNKNOWN'})
+            .then(function(types){
+
+                types.length.should.equal(0);
+                
+                done();
+            })
+            .catch(done);
+
+    });
     
   });
 
