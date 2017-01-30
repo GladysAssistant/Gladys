@@ -23,7 +23,7 @@ function scheduleOne(house){
    var scheduledSunrise = {
        event:{
            code: 'sunrise',
-           value: house.id
+           house: house.id
        },
        rule: times.sunrise
    };
@@ -31,7 +31,7 @@ function scheduleOne(house){
    var scheduledSunset = {
        event:{
            code: 'sunset',
-           value: house.id
+           house: house.id
        },
        rule: times.sunset
    };
