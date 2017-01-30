@@ -212,6 +212,7 @@
   "devices-types-ID": "ID",
   "devices-types-identifier": "Identifier",
   "devices-types-type": "type",
+  "devices-types-category": "Catégorie",
   "devices-types-tag": "tag",
   "devices-types-unit": "Unité",
   "devices-types-min": "min",

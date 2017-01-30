@@ -225,6 +225,7 @@
                                                 <th><%= __('devices-types-ID') %></th>
                                                 <th><%= __('devices-types-identifier') %></th>
                                                 <th><%= __('devices-types-type') %></th>
+                                                <th><%= __('devices-types-category') %></th>
                                                 <th><%= __('devices-types-tag') %></th>
                                                 <th><%= __('devices-types-unit') %></th>
                                                 <th><%= __('devices-types-min') %></th>
@@ -240,6 +241,7 @@
                                                 <td>{{type.id}}</td>
                                                 <td><input type="text" class="form-control" ng-model="type.identifier"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td>{{type.type}}</td>
+                                                <td><input type="text" class="form-control" ng-model="type.category"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td><input type="text" class="form-control" ng-model="type.tag"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td>{{type.unit}}</td>
                                                 <td>{{type.min}}</td>
@@ -281,6 +283,7 @@
                                                 <td></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newType.identifier" placeholder="<%= __('devices-types-identifier') %>" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newType.type" placeholder="<%= __('devices-types-type') %>" /></td>
+                                                <td><input type="text" class="form-control" ng-model="vm.newType.category" placeholder="<%= __('devices-types-category') %>" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newType.tag" placeholder="<%= __('devices-types-tag') %>" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newType.unit" placeholder="<%= __('devices-types-unit') %>" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newType.min" placeholder="<%= __('devices-types-min') %>" /></td>
