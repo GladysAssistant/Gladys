@@ -156,6 +156,9 @@ function addTestModuleGladys(gladys){
         weather: {
             get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9}); }
         },
+        calendar: {
+            sync: function() {return Promise.resolve()},
+        },
         music: {
             flushQueue: function() {return Promise.resolve()},
             getCurrentTrack: function() {return Promise.resolve({title: 'test', artist:'test'})},

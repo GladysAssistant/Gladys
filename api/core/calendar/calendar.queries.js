@@ -38,4 +38,8 @@ module.exports = {
 		AND calendar.active = 1 
 		ORDER BY start;
     `,
+    getAllCalendarService: 
+    `
+        SELECT DISTINCT service FROM calendar;
+    `
 };
