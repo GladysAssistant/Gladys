@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4] - 2017-01-31
+### Added
+- new method gladys.paramUser.getValues()
+- handling calendar/calendarevent with all API routes
+- real-time map of the family in the dashboard
+- added identifier to the devicetype modal
+- native weather implementation in Gladys
+- added sunrise/sunset schedule to init tasks (inited each day at 00.01)
+- added House & room ID to parameters view in dashboard
+- added gladys.deviceState.purge() function to clean deviceState table
+- added gladys.sun.isItDay(), gladys.sun.isItNight(), gladys.sun.getState()
+- device now added in real-time on the device list view
+- added 'category' field on the deviceType table to identify properly each category of device (ex: 'light')
+- new deviceType.getByCategory() function
+- passing user starting the script in a context object in each script 
+- brain : parsing room name with lowercase
+- deviceType.command can now select lights in a room
+- Schedule alarms with cron-rules ! 
+
 ## [3.3.4] - 2016-12-10
 ###Changed
 - Fix critical bug when getting deviceType by room
