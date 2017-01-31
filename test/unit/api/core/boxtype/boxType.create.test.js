@@ -8,6 +8,7 @@ describe('BoxType', function() {
     it('should return boxType created', function (done) {
      	
          var boxType = {
+           uuid: 'dec933b6-2bf7-4b2b-9f65-198ef7f763e9',
            title: 'test',
            html:'test',
            icon:'fa fa-test',
