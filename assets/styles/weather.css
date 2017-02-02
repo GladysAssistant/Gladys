@@ -15,7 +15,7 @@
 	background: #3D6AA2;
 }
 
-article {
+.city-selected article {
 	position: relative;
 	z-index: 2;
 	color: #fff;
@@ -109,32 +109,6 @@ article {
 	font-weight: bold;
 }
 
-svg {
-	color: #fff;
-	fill: currentColor;
-	width: 32px;
-	height: 32px;
-}
-
-.svg path {
-	color: #fff;
-	fill: white;
-}
-
-img svg {
-	fill: currentColor;
-}
-
-.svg {
-	color: #fff;
-	fill: currentColor;
-}
-
-#Layer_1 path{
-	color: #0000;
-	fill: white;
-}
-
 .wind svg {
 	width: 18px;
 	height: 18px;
@@ -153,7 +127,7 @@ img svg {
 }
 
 
-figure {
+.city-selected figure {
     width: 100%;
     height: 100%;
     position: absolute;
