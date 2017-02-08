@@ -25,6 +25,17 @@
     
         getPoints();
 
+        var icon = L.icon({
+            iconUrl: '/styles/leaflet/images/marker-icon.png',
+            iconRetinaUrl: '/styles/leaflet/images/marker-icon-2x.png',
+            shadowUrl: '/styles/leaflet/images/marker-shadow.png',
+            iconSize:[25,41],
+            iconAnchor:[12,41],
+            popupAnchor:[1,-34],
+            tooltipAnchor:[16,-28],
+            shadowSize:[41,41]
+        });
+
         function getPoints(){
             geoLocationService.get()
                 .then(function(data) {
@@ -38,7 +49,7 @@
                     }
                     
                     vm.locations.forEach(function(location){
-                        markerUser[location.user] = L.marker([location.latitude, location.longitude]).addTo(leafletMap);
+                        markerUser[location.user] = L.marker([location.latitude, location.longitude], {icon: icon}).addTo(leafletMap);
                         markerUser[location.user].bindTooltip(location.firstname + ' ' + location.lastname).openTooltip();
                     });
 
