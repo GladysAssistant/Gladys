@@ -42,10 +42,11 @@ module.exports = function(){
       gladys.sun.init().catch(sails.log.warn);
   });
 
+  // schedule alarm
+  gladys.alarm.init().catch(sails.log.error);
   
   // checking for update now      
   gladys.update.checkUpdate();
-  
   
   // install all modules not 
   // fully installed

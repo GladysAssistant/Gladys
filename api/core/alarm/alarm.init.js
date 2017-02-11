@@ -1,11 +1,10 @@
 var queries = require('./alarm.queries.js');
 var Promise = require('bluebird');
-var getAlarmsPromise = Promise.promisify(Alarm.query);
 
 module.exports = function() {
 
     // get all alarms in database
-    return getAlarmsPromise(queries.getAlarms, [])
+    return gladys.utils.sql(queries.getAlarms, [])
         .then(function(alarms) {
 
             // foreach alarm, we program it via gladys.alarm.schedule
