@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.2] - 2017-02-11
+### Changed
+- Fix issue with leaflet CSS in production mode
+- Bugfix: Alarm are now re-scheduled when gladys restart
+
+## [3.4.1] - 2017-01-31
+### Changed
+- BoxType.create update boxType if already exist
+
 ## [3.4] - 2017-01-31
 ### Added
 - new method gladys.paramUser.getValues()
