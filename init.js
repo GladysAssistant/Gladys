@@ -16,7 +16,8 @@ var sailsApp = require('./index.js');
 
 var config = {
     hooks: {
-        grunt: false
+        grunt: false,
+        userhooks: false
     }
 };
 
@@ -27,6 +28,7 @@ sailsApp.start(config, function(err, app){
     }
     
     console.log('Gladys started with success');
+    console.log(gladys.modules);
     
     app.after('lifted', function(){
        
