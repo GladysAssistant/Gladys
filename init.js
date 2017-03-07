@@ -28,7 +28,6 @@ sailsApp.start(config, function(err, app){
     }
     
     console.log('Gladys started with success');
-    console.log(gladys.modules);
     
     app.after('lifted', function(){
        
