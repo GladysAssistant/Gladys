@@ -54,5 +54,13 @@
 		"service": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 8,
+		"code": "user-seen-at-home",
+		"name": "User has been seen at home !",
+		"service": "house",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]

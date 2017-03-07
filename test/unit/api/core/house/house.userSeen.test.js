@@ -19,6 +19,21 @@ describe('House', function() {
                 done();
             }).catch(done);
     });
+
+    it('should create a user-seen-at-home event', function (done) {
+        
+        var options = {
+            house: 1,
+            user: 1
+        };
+          
+        gladys.house.userSeen(options)
+            .then(function(result){
+                should.exist(result);
+                
+                done();
+            }).catch(done);
+    });
     
   });
 });
