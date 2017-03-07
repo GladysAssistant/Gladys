@@ -94,8 +94,8 @@ module.exports = {
 
   getDeviceTypeByCategory:
   `
-    SELECT deviceType.* FROM deviceType 
-    JOIN device ON deviceType.device = device.id 
+    SELECT devicetype.* FROM devicetype 
+    JOIN device ON devicetype.device = device.id 
     WHERE category = ?
     AND (room = ? OR ? IS NULL)
     AND (type = ? OR ? IS NULL);
