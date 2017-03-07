@@ -111,6 +111,7 @@
                                                 <th><%= __('Protocol') %></th>
                                                 <th><%= __('Service') %></th>
                                                 <th><%= __('Room') %></th>
+                                                <th><%= __('User') %></th>
                                                 <th><%= __('Action') %></th>
                                                 <th><%= __('Delete') %></th>
                                             </tr>
@@ -131,6 +132,12 @@
                                                             ng-model="device.room" ng-change="vm.updateDevice(device);">
                                                    </select>
                                                 </td>
+                                                <td>
+                                                    <select name="selectUser" class="form-control"
+                                                            ng-options="user.id as user.name for user in vm.users"
+                                                            ng-model="device.user" ng-change="vm.updateDevice(device);">
+                                                   </select>
+                                                </td>
                                                 <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ng-click="vm.selectDevice(device);" ><%= __('Edit') %></button></td>
                                                 <td><button class="btn btn-danger btn-sm"  ng-click="vm.deleteDevice($index, device.id);" ><%= __('Delete') %></button></td>
                                             </tr>
@@ -144,6 +151,12 @@
                                                     <select name="selectRoom" id="selectRoom" class="form-control"
                                                             ng-options="room.name for room in vm.rooms track by room.id"
                                                             ng-model="vm.newDevice.room" >
+                                                   </select>
+                                                </td>
+                                                <td>
+                                                    <select name="selectUser" class="form-control"
+                                                            ng-options="user.name for user in vm.users track by user.id"
+                                                            ng-model="vm.newDevice.user">
                                                    </select>
                                                 </td>
                                                 <td></td>

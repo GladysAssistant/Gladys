@@ -15,9 +15,9 @@
     .module('gladys')
     .controller('DeviceCtrl', DeviceCtrl);
 
-  DeviceCtrl.$inject = ['deviceService','roomService', '$scope'];
+  DeviceCtrl.$inject = ['deviceService','roomService', 'userService', '$scope'];
 
-  function DeviceCtrl(deviceService, roomService, $scope) {
+  function DeviceCtrl(deviceService, roomService, userService, $scope) {
     /* jshint validthis: true */
     var vm = this;
     
@@ -33,6 +33,7 @@
     vm.saving = false;
     vm.devices = [];
     vm.rooms = [];
+    vm.users = [];
     vm.selectedDevice = {
         types: []
     };
@@ -42,9 +43,14 @@
     activate();
 
     function activate() {
-      getDevices();
-      getRooms();
-      getDeviceTypesByRoom();
+        
+      // get deviceType first
+      getDeviceTypesByRoom()
+        .then(function(){
+            getDevices();
+            getRooms();
+            getUsers();
+        });
       waitForNewValue();
       return ;
     }
@@ -68,7 +74,16 @@
         return roomService.get()
           .then(function(data){
               vm.rooms = data.data;
+              vm.rooms.unshift({id: null, name: '----'});
           });
+    }
+
+    function getUsers(){
+        return userService.get()
+            .then(function(data) {
+                vm.users = data.data;
+                vm.users.unshift({id: null, name: '----'});
+            });
     }
 
     function createDevice(device){
@@ -92,6 +107,7 @@
         var newDevice = {
             id: device.id,
             room: device.room.id,
+            user: device.user,
             name: device.name
         };
         return deviceService.updateDevice(newDevice)
