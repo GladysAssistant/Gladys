@@ -31,6 +31,11 @@ module.exports = {
 
         room: {
             model: 'Room',
+        },
+
+        // if this device is linked to a user (like a phone/laptop/Smart Watch)
+        user: {
+            model: 'User'
         }
 
     }
