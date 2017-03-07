@@ -62,5 +62,13 @@
 		"service": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 9,
+		"code": "left-home",
+		"name": "User has left home !",
+		"service": "house",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]

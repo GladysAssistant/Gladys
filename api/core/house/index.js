@@ -1,4 +1,5 @@
 
+module.exports.checkUsersPresence = require('./house.checkUsersPresence.js');
 module.exports.create = require('./house.create.js');
 module.exports.delete = require('./house.delete.js');
 module.exports.get = require('./house.get.js');
