@@ -40,7 +40,7 @@ module.exports = {
         },
 
         postcode: {
-            type: 'integer',
+            type: 'string',
             required: true
         },
 
