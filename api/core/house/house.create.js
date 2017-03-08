@@ -1,4 +1,4 @@
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 module.exports = function(house){
     house.uuid = house.uuid || uuid.v4();

@@ -46,14 +46,14 @@
     "ncp": "^2.0.0",
     "node-dir": "~0.1.6",
     "node-schedule": "^1.1.0",
-    "node-uuid": "^1.4.7",
     "rc": "^1.1.6",
     "request": "^2.70.0",
     "sails": "^0.12.3",
     "sails-mysql": "^0.12.1",
     "sails-util-mvcsloader": "^0.3.2",
     "serialization": "^0.2.0",
-    "suncalc": "^1.7.0"
+    "suncalc": "^1.7.0",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "grunt-apidoc": "^0.11.0",
