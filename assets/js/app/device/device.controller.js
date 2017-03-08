@@ -31,6 +31,7 @@
     vm.deleteDeviceType = deleteDeviceType;
 
     vm.saving = false;
+    vm.ready = false;
     vm.devices = [];
     vm.rooms = [];
     vm.users = [];
@@ -47,6 +48,7 @@
       // get deviceType first
       getDeviceTypesByRoom()
         .then(function(){
+            vm.ready = true;
             getDevices();
             getRooms();
             getUsers();

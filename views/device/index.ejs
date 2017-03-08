@@ -26,9 +26,19 @@
             <div class="tab-content">
                 
               <div class="tab-pane active" id="tab_1">
+
+                  <div class="row" ng-show="!vm.ready">
+                      <div class="col-centered col-md-4 col-md-offset-4">
+                          <div class="spinner-box">
+                            <div class="spinner">
+                                    <div class="double-bounce1"></div>
+                                    <div class="double-bounce2"></div>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
                   
-                  
-                  <div class="row">
+                  <div class="row" ng-show="vm.ready">
                     
                     <div class="col-centered col-md-4" ng-repeat="room in vm.roomDeviceTypes">
                     
