@@ -4,7 +4,7 @@ var shared = require('./alarm.shared.js');
 module.exports = function cancel(alarm) {
     
     if(!alarm.id){
-        return Promise.reject(new Error('Alarm : cancel : Missing argument, no id provided'));
+        return Promise.reject(new Error('ALARM_NOT_FOUND'));
     }
     
     if (shared.tabAlarmScheduled.hasOwnProperty(alarm.id)) {

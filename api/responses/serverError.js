@@ -29,9 +29,6 @@ module.exports = function serverError (data, options) {
   var res = this.res;
   var sails = req._sails;
 
-  // Set status code
-  res.status(500);
-
   // Log error to console
   if (data !== undefined) {
     sails.log.error('Sending 500 ("Server Error") response: \n',data);
@@ -45,9 +42,17 @@ module.exports = function serverError (data, options) {
     data = undefined;
   }
 
+  var response;
+
+  if(sails.config.errors[data.message]) response = sails.config.errors[data.message];
+  else response = sails.config.errors.DEFAULT;
+
+  // set the response status
+  res.status = response.status;
+
   // If the user-agent wants JSON, always respond with JSON
   if (req.wantsJSON) {
-    return res.jsonx(data);
+    return res.json(response);
   }
 
   // If second argument is a string, we take that to mean it refers to a view.
