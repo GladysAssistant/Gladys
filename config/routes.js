@@ -172,6 +172,10 @@ module.exports.routes = {
   'post /music/muted': 'MusicController.setMuted',
   'post /music/volume': 'MusicController.setVolume',
   'post /music/stop': 'MusicController.stop',
+
+  // Message
+  'post /message': 'MessageController.send',
+  'get /message/user/:id' : 'MessageController.getByUser',
   
   // Notification
   'get /notification': 'NotificationController.index',
