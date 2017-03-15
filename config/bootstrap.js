@@ -13,14 +13,5 @@ global.gladys = require('../api/core/index.js');
 
 module.exports.bootstrap = function(cb) {
 
-    gladys.load();
-    cb();
-      
-	//sails.hooks.orm.reload();
-	//
-	// Start all the function that need to be started at startup
-	
-	// It's very important to trigger this callback method when you are finished
-	// with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-	
+    gladys.load(cb);
 };

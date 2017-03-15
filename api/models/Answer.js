@@ -24,6 +24,16 @@ module.exports = {
       text: {
           type: 'string',
           required: true
+      },
+
+      language: {
+          type: 'string',
+          required: true
+      },
+
+      needAnswer: {
+            type: 'boolean',
+            defaultsTo: false
       }
 
   }

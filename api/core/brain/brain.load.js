@@ -30,7 +30,7 @@ function load(path){
                 
                 return resolve();
            } catch(e) {
-                return Promise.reject(new Error(e));   
+                return reject(e);
            }
         });
     });

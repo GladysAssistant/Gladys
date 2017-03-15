@@ -1,10 +1,9 @@
 const fs = require('fs');
 const schedule = require('node-schedule');
 
-module.exports = function(){
+module.exports = function(cb){
   
   // tasks started in dev and prod
-  
   gladys.script.init();
 
   // start sunrise & sunset schedule
@@ -14,6 +13,7 @@ module.exports = function(){
   gladys.brain.load()
     .then(function(){
         sails.log.info('Gladys brain loaded with success !');
+        cb();
     })
     .catch(function(){
         sails.log.error('Cannot load gladys.brain.');
@@ -41,6 +41,8 @@ module.exports = function(){
   var j = schedule.scheduleJob(rule, function(){
       gladys.sun.init().catch(sails.log.warn);
   });
+
+  console.log(j);
 
   // schedule alarm
   gladys.alarm.init().catch(sails.log.error);

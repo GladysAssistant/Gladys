@@ -4,7 +4,7 @@ var fs = require('fs');
 var gladys = {};
 gladys = new events.EventEmitter();
 
-gladys.load = function load() {
+gladys.load = function load(cb) {
 
     // require all Gladys dependencies
     gladys.action = require('./action/index.js');
@@ -26,6 +26,7 @@ gladys.load = function load() {
     gladys.launcherParam = require('./launcherparam/index.js');
     gladys.location = require('./location/index.js');
     gladys.machine = require('./machine/index.js');
+    gladys.message = require('./message/index.js');
     gladys.mode = require('./mode/index.js');
     gladys.module = require('./module/index.js');
     gladys.music = require('./music/index.js');
@@ -63,15 +64,17 @@ gladys.load = function load() {
     } catch (e) {
         sails.log.warn('Cannot parse package.json');
     }
-    
-    // init tasks
-    gladys.task.init();
-    
+
     // gladys modules contains all public methods of hooks
     gladys.modules = sails.hooks;
     
-    // gladys is ready
-    gladys.emit('ready');
+    // init tasks
+    gladys.task.init(function(){
+
+        // gladys is ready
+        gladys.emit('ready'); 
+        cb();
+    });
 };
 
 module.exports = gladys;

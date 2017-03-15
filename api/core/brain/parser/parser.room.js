@@ -1,18 +1,30 @@
 
-module.exports = function(text){
+module.exports = function(originalText){
   return gladys.room.getAll()
     .then(function(rooms){
         
         var result = [];
+        var replaceRegex = '';
            
         // foreach room, we verify if the room is present in the sentence
         rooms.forEach(function(room){
-            if(present(text, room.name)){
+            if(present(originalText, room.name)){
                 result.push(room);
+                if(replaceRegex.length > 0) replaceRegex += '|';
+                replaceRegex += room.name;
             }
         });
 
-        return result;
+        var text = originalText;
+        
+        if(replaceRegex.length > 0) {
+            text = originalText.replace(new RegExp(replaceRegex, 'g'), '%ROOM%');
+        }
+
+        return {
+            text, 
+            rooms: result
+        };
     });
 };
 
