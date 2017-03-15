@@ -1,0 +1,20 @@
+[   
+    {
+        "sender": 1,
+        "receiver": null,
+        "text": "Can you buy me a car ?",
+        "conversation": "05e81660-3998-4574-be8e-82c0c722b8fa"
+    },
+    {
+        "sender": null,
+        "receiver": 1,
+        "text": "Which color do you want ?",
+        "conversation": "05e81660-3998-4574-be8e-82c0c722b8fa"
+    },
+    {
+        "sender": 1,
+        "receiver": null,
+        "text": "I want a blue one.",
+        "conversation": "05e81660-3998-4574-be8e-82c0c722b8fa"
+    }
+]
