@@ -18,7 +18,12 @@ function init(){
 
 // schedule sunset and sunrise for this house
 function scheduleOne(house){
-   var times = SunCalc.getTimes(new Date(), house.latitude , house.longitude);
+   
+   // calculate at midday to fix bug in SunCalc library with timezone
+   // see : https://github.com/mourner/suncalc/issues/11
+   var date = new Date();
+   var midday = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0, 0);
+   var times = SunCalc.getTimes(midday, house.latitude , house.longitude);
    
    var scheduledSunrise = {
        event:{
