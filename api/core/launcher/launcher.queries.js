@@ -1,7 +1,7 @@
 
 module.exports = {
   get: `
-   SELECT launcher.id, launcher.condition_template, launcher.createdAt, launcher.updatedAt, launcher.user, launcher.active,
+   SELECT launcher.title, launcher.id, launcher.condition_template, launcher.createdAt, launcher.updatedAt, launcher.user, launcher.active,
    eventtype.name, eventtype.faIcon, eventtype.iconColor, eventtype.category
    FROM launcher 
    JOIN eventtype ON launcher.eventtype = eventtype.id 
