@@ -11,7 +11,7 @@ module.exports = {
    * @apiParam {String} q the message for Gladys
    */
     classify: function(req, res, next){
-        gladys.brain.classify(req.query.q)
+        gladys.brain.classify(req.session.User, {text: req.query.q})
               .then(function(result){
                 return res.json(result);
               })

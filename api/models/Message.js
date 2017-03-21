@@ -24,6 +24,10 @@ module.exports = {
             type: 'uuid'
         },
 
+        service: {
+            type: 'string'
+        },
+
         isRead: {
             type: 'boolean',
             defaultsTo: false

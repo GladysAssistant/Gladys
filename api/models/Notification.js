@@ -36,7 +36,7 @@ module.exports = {
             type: 'integer',
             min: -2,
             max: 2,
-            required: true
+            defaultsTo: 0
         },
 
         isRead: {

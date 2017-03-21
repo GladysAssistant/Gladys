@@ -2,20 +2,20 @@ const Promise = require('bluebird');
 const clone = require('clone');
 const shared = require('./brain.shared.js');
 const parser = require('./parser/parser.js');
-const injector = require('./injector/injector.js');
+const answer = require('./brain.answer.js');
 
-module.exports = function classify(originalText, language){
+module.exports = function classify(user, message){
     var start = process.hrtime();
     
-    if(!originalText || originalText.length === 0){
+    if(!message.text || message.text.length === 0){
         return Promise.reject(new Error('BRAIN_NO_TEXT_GIVEN'));
     }
 
-    return parser.parse(originalText)
+    return parser.parse(message.text)
         .then((scope) => {
 
             // add language to scope so that called module can adapt to the current language
-            scope.language = language;
+            scope.language = user.language;
 
             var classifier = shared.getClassifier();
 
@@ -30,7 +30,7 @@ module.exports = function classify(originalText, language){
                 var splitted = classification.split(sails.config.brain.separator);
                 sails.log.info(`brain : classify : Identified label ${classification} `);
                 return callAction(clone(scope), splitted[0], splitted[1])
-                    .then((result) => getAnswer(language, result));
+                    .then((result) => answer(result, user));
             });
         })
         .then((result) => {
@@ -42,7 +42,7 @@ module.exports = function classify(originalText, language){
         });
 };
 
-function callAction(scope, service, label){
+function callAction(scope, service, label) {
     var toCall;
 
     scope.label = label;
@@ -78,24 +78,23 @@ function callAction(scope, service, label){
                 },
                 response
             };
+      })
+      .catch((err) => {
+
+            sails.log.warn(`Brain : classify : Error while executing command in service = ${service}, label = ${label}`);
+            sails.log.warn(err);
+
+            var response = {
+                label: 'error'
+            };
+
+            return {
+                message: {
+                    label,
+                    service,
+                    scope
+                },
+                response
+            };
       });
-}
-
-function getAnswer(language, result) {
-
-    return gladys.utils.sql('SELECT text FROM answer WHERE language = ? AND label = ?;', [language, result.response.label])
-        .then((answers) => {
-
-            // pick one answer randomly
-            var randomRow = Math.floor(Math.random() * (answers.length - 1)) + 0;
-            
-            // test if answer exist, if yes pick the text
-            if(randomRow != -1 && answers[randomRow] != undefined) result.response.text = answers[randomRow].text;
-            else result.response.text = null;
-
-            // replace variables by values
-            result.response.text = injector.inject(result.response.text, result.response.scope);
-            
-            return result;
-        });
 }

@@ -1,4 +1,5 @@
 var request = require('supertest');
+var validateMessage = require('../../validator/messageValidator.js');
 
 describe('MessageController', function() {
 
@@ -13,9 +14,7 @@ describe('MessageController', function() {
         .end(function(err, res) {
             if(err) return done(err);
             
-            res.body.should.have.property('message');
-            res.body.should.have.property('responses');
-            res.body.responses.should.be.instanceOf(Array);
+            validateMessage(res.body);
 
             done();
         });

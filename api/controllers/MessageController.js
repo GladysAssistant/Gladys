@@ -34,8 +34,7 @@ module.exports = {
      * @apiPermission authenticated
      *
      * @apiUse MessageParam
-     * @apiSuccess Object message message Object
-     * @apiSuccess Array responses Array of response
+     * @apiUse MessageSuccess
      */
     send: function(req, res, next) {
         gladys.message.send(req.session.User, req.body)
