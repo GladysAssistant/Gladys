@@ -9,18 +9,18 @@
 
 /**
  * @apiDefine MessageSuccess
- * @apiSuccess Integer id primary key
- * @apiSuccess String text Message content
- * @apiSuccess Datetime datetime Datetime of the message
- * @apiSuccess Integer sender Message sender id
- * @apiSuccess Integer receiver Message receiver id
- * @apiSuccess Integer sender Message sender id
- * @apiSuccess uuid conversation Conversation unique ID (identify uniquely a discussion)
+ * @apiSuccess {Integer} id primary key
+ * @apiSuccess {String} text Message content
+ * @apiSuccess {Datetime} datetime Datetime of the message
+ * @apiSuccess {Integer} sender Message sender id
+ * @apiSuccess {Integer} receiver Message receiver id
+ * @apiSuccess {Integer} sender Message sender id
+ * @apiSuccess {uuid} conversation Conversation unique ID (identify uniquely a discussion)
  */
 
 /**
  * @apiDefine MessageParam 
- * @apiParam String text Message content
+ * @apiParam {String} text Message content
  * @apiParam {Integer} receiver The person you are sending the message too. Put null to contact Gladys.
  */
 
