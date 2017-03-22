@@ -8,8 +8,8 @@ module.exports = function answer(result, user) {
         .then((answers) => {
 
             // pick one answer randomly
-            var randomRow = Math.floor(Math.random() * (answers.length - 1)) + 0;
-            
+            var randomRow = Math.floor(Math.random() * answers.length) + 0;
+
             // test if answer exist, if yes pick the text
             if(randomRow != -1 && answers[randomRow] != undefined) {
                 result.response.text = answers[randomRow].text;
