@@ -2,6 +2,6 @@
 module.exports = function command(scope) {
 
     return Promise.resolve({
-        label: 'default'
+        label: 'no-command-detected'
     });
 };
