@@ -6,5 +6,7 @@ module.exports = function create(message) {
     message.sender = message.sender || null;
     message.receiver = message.receiver || null;
 
+    if(!message.text || message.text.length == 0) return Promise.reject(new Error('MESSAGE.TEXT_CANNOT_BE_EMPTY'));
+
     return Message.create(message);
 };

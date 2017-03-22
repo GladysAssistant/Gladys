@@ -59,41 +59,68 @@ function callAction(scope, message, service, label) {
     
     // the function does not exist, rejecting
     else {
-        return Promise.reject(new Error(`gladys.modules.${service}.command is not a function`));
+        return errorMessage(`gladys.modules.${service}.command is not a function`, scope, message, service, label);
     }
 
-    // call the command function
-   return toCall(scope)
-      .then((response) => {
+    // get all messages from conversation
+   return gladys.message.getConversation(message.conversation)
+        .then((conversationMessages) => {
 
-            response = response || {};
-            response.label = response.label || 'default';
-            response.scope = response.scope || {};
+            sails.log.debug(`Getting conversation ${message.conversation}, found ${conversationMessages.length} messages.`);
 
-            message.label = label;
-            message.scope = scope;
+            // if there is only one element in array, return empty
+            if(conversationMessages.length <= 1) return [];
 
-            return {
-                message,
-                response
-            };
-      })
-      .catch((err) => {
+            // remove last element, it is the current message
+            conversationMessages.pop();
 
-            sails.log.warn(`Brain : classify : Error while executing command in service = ${service}, label = ${label}`);
-            sails.log.warn(err);
+            // then, foreach message, analyze it
+            return Promise.map(conversationMessages, function(conversationMessage) {
+                return parser.parse(conversationMessage.text);
+            });
+        })
+        .then((conversationMessages) => {
 
-            var response = {
-                label: 'error'
-            };
+            scope.conversationMessages = conversationMessages;
 
-            return {
-                message: {
-                    label,
-                    service,
-                    scope
-                },
-                response
-            };
-      });
+             // call the command function
+            return toCall(scope);
+        })
+        .then((response) => {
+
+                response = response || {};
+                response.label = response.label || 'default';
+                response.scope = response.scope || {};
+
+                message.label = label;
+                message.scope = scope;
+
+                return {
+                    message,
+                    response
+                };
+        })
+        .catch((err) => {
+                return errorMessage(err, scope, message, service, label);
+        });
+}
+
+/**
+ * Return an error message
+ */
+function errorMessage(err, scope, message, service, label){
+    sails.log.warn(`Brain : classify : Error while executing command in service = ${service}, label = ${label}`);
+    sails.log.warn(err);
+
+    var response = {
+        label: 'error'
+    };
+
+    message.label = label;
+    message.scope = scope;
+
+    return Promise.resolve({
+        message,
+        response
+    });
 }

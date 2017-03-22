@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const injector = require('./injector/injector.js');
 
 module.exports = function answer(result, user) {
+
     return gladys.utils.sql(queries.getAnswers, [user.language, result.response.label])
         .then((answers) => {
 
@@ -10,8 +11,14 @@ module.exports = function answer(result, user) {
             var randomRow = Math.floor(Math.random() * (answers.length - 1)) + 0;
             
             // test if answer exist, if yes pick the text
-            if(randomRow != -1 && answers[randomRow] != undefined) result.response.text = answers[randomRow].text;
-            else result.response.text = null;
+            if(randomRow != -1 && answers[randomRow] != undefined) {
+                result.response.text = answers[randomRow].text;
+                result.response.needAnswer = answers[randomRow].needAnswer;
+            }
+            else {
+                result.response.text = null;
+                result.response.needAnswer = false;
+            }
 
             // replace variables by values
             result.response.text = injector.inject(result.response.text, result.response.scope);
@@ -28,6 +35,7 @@ module.exports = function answer(result, user) {
 
             // adding senderName
             newMessage.senderName = user.assistantName;
+            newMessage.needAnswer = result.response.needAnswer;
 
             // test each notification system
             return Promise.mapSeries(notificationTypes, function(notificationType) {
