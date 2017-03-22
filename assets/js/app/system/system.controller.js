@@ -69,6 +69,11 @@
             })
             .then(function(){
                 
+                // get all answers
+                return updateService.updateAnswers(); 
+            })
+            .then(function(){
+                
                 // get all boxTypes
                 return updateService.updateBoxTypes();
             })
