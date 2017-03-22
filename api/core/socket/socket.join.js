@@ -1,3 +1,4 @@
+var users = require('./socket.users.js');
 
 module.exports = function join(userId, socketId){
     
@@ -8,10 +9,8 @@ module.exports = function join(userId, socketId){
         sails.log.debug(`User ${userId} subscribed to room everybody`);
     });
     
-    // join his own room
-    sails.sockets.join(socketId, 'user' + userId, function(err){
-        if(err) sails.log.error(err);
-        
-        sails.log.debug(`User ${userId} subscribed to his own room`);
-    });
+    users[userId] = users[userId] || [];
+
+    if(users[userId].indexOf(socketId) == -1) users[userId].push(socketId);
+    console.log(users);
 };

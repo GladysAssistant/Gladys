@@ -20,11 +20,16 @@ module.exports.sockets = {
   *                                                                          *
   ***************************************************************************/
 
- /* afterDisconnect: function (session, socket, cb) {
+ afterDisconnect: function (session, socket, cb) {
+
+   // remove only if user is connected
+   if(session && session.User && session.User.id) {
+        gladys.socket.leave(session.User.id, socket.id); 
+   }
 
     // Be sure to call the callback
     return cb();
-  }*/
+  }
   
   
 
