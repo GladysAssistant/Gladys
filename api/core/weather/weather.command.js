@@ -14,7 +14,13 @@ module.exports = function command(scope) {
             var response = {
                 label: 'tell-weather',
                 scope: {
-                    '%WEATHER_TEMP%': weather.temperature
+                    '%WEATHER_TEMP%': weather.temperature,
+                    '%WEATHER_HUMIDITY%': weather.humidity,
+                    '%WEATHER_PRESSURE%': weather.pressure,
+                    '%WEATHER_DATETIME%': weather.datetime,
+                    '%WEATHER_UNITS%': weather.units,
+                    '%WEATHER_WINDSPEED%': weather.windSpeed,
+                    '%WEATHER_DESCRIPTION%': weather.weather
                 }
             };         
 
