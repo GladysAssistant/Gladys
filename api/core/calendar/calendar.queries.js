@@ -27,6 +27,17 @@ module.exports = {
 		LIMIT ?
         OFFSET ?;
     `,
+
+    getNextEventUser: `
+        SELECT calendarevent.* 
+        FROM calendarevent
+		INNER JOIN calendar ON (calendarevent.calendar = calendar.id)
+		WHERE user = ? 
+		AND start > SYSDATE()
+		AND calendar.active = 1 
+		ORDER BY start 
+		LIMIT 1;
+    `,
     
     getEventsDates: `
         SELECT calendarevent.*

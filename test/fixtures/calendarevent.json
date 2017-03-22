@@ -7,5 +7,14 @@
         "start":"2015-05-12 18:00:00",
         "end": "2015-05-12 20:00:00",
         "calendar": 1
+    },
+    {
+        "id": 2,
+        "externalid": "ad7d8062-585f-4ad8-b260-2150cffaa19b",
+        "name": "Meeting",
+        "location": "San Fransisco",
+        "start":"2090-05-12 18:00:00",
+        "end": "2090-05-12 20:00:00",
+        "calendar": 1
     }
 ]
