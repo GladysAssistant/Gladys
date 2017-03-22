@@ -7,9 +7,7 @@ module.exports = {
       */
      verify: function(req, res, next){
          gladys.update.checkUpdate()
-           .then(function(result){
-               return res.json(result);
-           })
+           .then((result) => res.json(result))
            .catch(next);
      },
      
@@ -18,9 +16,16 @@ module.exports = {
       */
      updateActions: function(req, res, next){
          gladys.update.getActions(req.session.User)
-           .then(function(result){
-              return res.json(result); 
-           })
+           .then((result) => res.json(result))
+           .catch(next);
+     },
+
+      /**
+      * Check for new Answers
+      */
+     updateAnswers: function(req, res, next){
+         gladys.update.getAnswers(req.session.User)
+           .then((result) => res.json(result))
            .catch(next);
      },
 
@@ -29,9 +34,7 @@ module.exports = {
       */
      updateBoxTypes: function(req, res, next){
          gladys.update.getBoxTypes(req.session.User)
-           .then(function(result){
-              return res.json(result); 
-           })
+           .then((result) => res.json(result))
            .catch(next);
      },
      
@@ -40,9 +43,7 @@ module.exports = {
       */
      updateEvents: function(req, res, next){
          gladys.update.getEvents(req.session.User)
-           .then(function(result){
-              return res.json(result); 
-           })
+           .then((result) => res.json(result))
            .catch(next);
      },
      
@@ -51,9 +52,7 @@ module.exports = {
       */
      updateModes: function(req, res, next){
          gladys.update.getModes(req.session.User)
-           .then(function(result){
-              return res.json(result); 
-           })
+           .then((result) => res.json(result))
            .catch(next);
      },
      
@@ -62,9 +61,7 @@ module.exports = {
       */
      updateSentences: function(req, res, next){
          gladys.update.getSentences(req.session.User)
-           .then(function(result){
-              return res.json(result); 
-           })
+           .then((result) => res.json(result))
            .catch(next);
      },
      
@@ -73,9 +70,7 @@ module.exports = {
       */
       updateCategories: function(req, res, next){
           gladys.update.getCategories(req.session.User)
-            .then(function(result){
-                return res.json(result); 
-            })
+            .then((result) => res.json(result))
             .catch(next);
       },
       
@@ -84,9 +79,7 @@ module.exports = {
        */
       updateStates: function(req, res, next){
           gladys.update.getStates(req.session.User)
-            .then(function(result){
-                return res.json(result); 
-            })
+            .then((result) => res.json(result))
             .catch(next);
       }
       

@@ -1,5 +1,6 @@
 
 module.exports.update = {
+    answersUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/answers/',
     eventsBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/events/',
     boxTypesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/boxs/',
     modesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/modes/',

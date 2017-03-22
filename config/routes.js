@@ -245,6 +245,7 @@ module.exports.routes = {
   // Update
   'get /update/verify': 'UpdateController.verify',
   'get /update/action': 'UpdateController.updateActions',
+  'get /update/answer': 'UpdateController.updateAnswers',
   'get /update/event': 'UpdateController.updateEvents',
   'get /update/mode': 'UpdateController.updateModes',
   'get /update/sentence': 'UpdateController.updateSentences',
