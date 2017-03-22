@@ -6,6 +6,4 @@ module.exports = function join(userId, socketId){
 
     var position = users[userId].indexOf(socketId);
     if(position != -1) users[userId].splice(position, 1);
-
-    console.log(users);
 };
