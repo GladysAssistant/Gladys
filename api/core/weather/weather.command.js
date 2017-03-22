@@ -1,3 +1,4 @@
+const moment = require('moment');
 
 module.exports = function command(scope) {
 
@@ -17,7 +18,7 @@ module.exports = function command(scope) {
                     '%WEATHER_TEMP%': weather.temperature,
                     '%WEATHER_HUMIDITY%': weather.humidity,
                     '%WEATHER_PRESSURE%': weather.pressure,
-                    '%WEATHER_DATETIME%': weather.datetime,
+                    '%WEATHER_DATETIME%':  moment(weather.datetime).locale(scope.user.language).format('LLL'),
                     '%WEATHER_UNITS%': weather.units,
                     '%WEATHER_WINDSPEED%': weather.windSpeed,
                     '%WEATHER_DESCRIPTION%': weather.weather
