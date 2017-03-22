@@ -16,6 +16,9 @@ module.exports = function classify(user, message){
 
             // add language to scope so that called module can adapt to the current language
             scope.language = user.language;
+            
+            // add user to scope so that called module can adapt to current user
+            scope.user = user;
 
             var classifier = shared.getClassifier();
 
