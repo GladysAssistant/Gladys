@@ -6,10 +6,13 @@ module.exports = function create(sentence){
 	return gladys.utils.sql(queries.getByUuid, [sentence.uuid])
 	  .then(function(sentences){
 		 
+		 // if sentence exist, update it
 		 if(sentences.length){
-			 return sentences[0];
+			 
+			 return Sentence.update({id: sentences[0].id}, sentence);
 		 } else {
 			 
+			 // else, create it
 			 sails.log.info(`Sentence : create : Inserting sentence ${sentence.uuid}`);
 			 return Sentence.create(sentence);
 		 }
