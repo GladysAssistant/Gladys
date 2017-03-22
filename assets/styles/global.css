@@ -35,3 +35,7 @@
   -webkit-animation-delay: -1.0s;
   animation-delay: -1.0s;
 }
+
+.typing-indicator {
+  font-style: italic;
+}

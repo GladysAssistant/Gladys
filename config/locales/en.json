@@ -249,5 +249,8 @@
   "all-user-delete-button": "Delete",
   "create-user-modal-title": "Create a user",
   "create-user-button-create": "Create a new user",
-  "account-update-button": "Update my account"
+  "account-update-button": "Update my account",
+  "dashboard-chat-box-title": "Chat",
+  "dashboard-chat-box-text-box-placeholder": "Write your message",
+  "dashboard-chat-box-typing": "Typing"
 }

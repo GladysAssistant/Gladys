@@ -1875,8 +1875,9 @@ body > .header .logo .icon {
   padding: 5px 20px 5px 10px;
 }
 .box .chat .item {
-  margin-bottom: 10px;
+   margin-top: 30px;
 }
+
 .box .chat .item:before,
 .box .chat .item:after {
   display: table;
@@ -1900,8 +1901,7 @@ body > .header .logo .icon {
   border: 2px solid #f56954;
 }
 .box .chat .item > .message {
-  margin-left: 55px;
-  margin-top: -40px;
+  margin-top: -30px;
 }
 .box .chat .item > .message > .name {
   display: block;

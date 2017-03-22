@@ -1,4 +1,8 @@
 var translationsEN = {
+  MESSAGE: {
+    SEND_MESSAGE_FAILED: 'Failed to send message',
+    TEXT_CANNOT_BE_EMPTY: 'Message text cannot be empty.'
+  },
   MODULE: {
       CONFIG_FAIL_NOTIFICATION: 'Module configuration failed.',
       CONFIG_SUCCESS_NOTIFICATION: 'Module configured with success !',
@@ -26,6 +30,10 @@ var translationsEN = {
 };
 
 var translationsFR = {
+  MESSAGE: {
+    SEND_MESSAGE_FAILED: 'Erreur lors de l\'envoi du message.',
+    TEXT_CANNOT_BE_EMPTY: 'Un message ne peut pas être vide.'
+  },
   MODULE: {
       CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module.',
       CONFIG_SUCCESS_NOTIFICATION: 'Le module a été configuré avec succès !',
