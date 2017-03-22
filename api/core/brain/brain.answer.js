@@ -15,14 +15,28 @@ module.exports = function answer(result, user) {
 
             // replace variables by values
             result.response.text = injector.inject(result.response.text, result.response.scope);
-            
-            return gladys.utils.sql(queries.getNotificationTypes, [user.id]);
+
+            var newMessage = {
+                sender: null,
+                receiver: user.id,
+                text: result.response.text
+            };
+
+            return [gladys.message.create(newMessage), gladys.utils.sql(queries.getNotificationTypes, [user.id])];
         })
-        .then((notificationTypes) => {
+        .spread((newMessage, notificationTypes) => {
+
+            // adding senderName
+            newMessage.senderName = user.assistantName;
 
             // test each notification system
             return Promise.mapSeries(notificationTypes, function(notificationType) {
-                return trySendingMessage(result.response, notificationType, user);
+                return trySendingMessage(newMessage, notificationType, user)
+                    .catch((err) => {
+
+                        // if error is normal, propagate error to abort chain
+                        if(err.message == 'ok') return Promise.reject(err);
+                    });
             })
             .catch(function(err) {
                 if (err.message !== 'ok') {
@@ -36,20 +50,21 @@ module.exports = function answer(result, user) {
 /**
  * Call the service related to the notification
  */
-function trySendingMessage(response, type, user) {
+function trySendingMessage(newMessage, type, user) {
 
-    if (!gladys.modules[type.service] || typeof gladys.modules[type.service].notify !== "function") {
+    var toCall;
+
+    if (gladys.modules[type.service] && typeof gladys.modules[type.service].notify == "function") {
+        toCall = gladys.modules[type.service].notify;
+    } else if(gladys[type.service] && typeof gladys[type.service].notify == "function") {
+        toCall = gladys[type.service].notify;
+    } else {
         return Promise.reject(new Error(`${type.service} is not a valid service`));
     }
     
     sails.log.info(`Brain : answer : Trying to contact ${type.service}`);
 
-    var notification = {
-        title: user.assistantName,
-        text: response.text
-    };
-
-    return gladys.modules[type.service].notify(notification, user)
+    return toCall(newMessage, user)
         .then(function(result) {
             
             sails.log.info(`Message sent with success with ${type.service}. Aborting the chain.`);

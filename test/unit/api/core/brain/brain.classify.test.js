@@ -25,7 +25,6 @@ describe('Brain', function() {
                     item.should.have.property('message');
                     item.should.have.property('response');
                     item.message.should.have.property('label');
-                    item.message.should.have.property('service');
                     item.message.should.have.property('scope');
                     item.response.should.have.property('label');
                     item.response.should.have.property('text');

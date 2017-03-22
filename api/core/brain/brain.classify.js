@@ -29,7 +29,7 @@ module.exports = function classify(user, message){
             return Promise.map(classifications, function(classification){
                 var splitted = classification.split(sails.config.brain.separator);
                 sails.log.info(`brain : classify : Identified label ${classification} `);
-                return callAction(clone(scope), splitted[0], splitted[1])
+                return callAction(clone(scope), message, splitted[0], splitted[1])
                     .then((result) => answer(result, user));
             });
         })
@@ -42,7 +42,7 @@ module.exports = function classify(user, message){
         });
 };
 
-function callAction(scope, service, label) {
+function callAction(scope, message, service, label) {
     var toCall;
 
     scope.label = label;
@@ -70,12 +70,11 @@ function callAction(scope, service, label) {
             response.label = response.label || 'default';
             response.scope = response.scope || {};
 
+            message.label = label;
+            message.scope = scope;
+
             return {
-                message: {
-                    label,
-                    service,
-                    scope
-                },
+                message,
                 response
             };
       })
