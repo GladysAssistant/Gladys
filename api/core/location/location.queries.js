@@ -16,5 +16,6 @@ module.exports = {
         JOIN location ON location.datetime = locationUsers.datetime
         JOIN user ON location.user = user.id
         GROUP BY location.user;
-    `  
+    `,
+    getLastLocationOneUser: `SELECT * FROM location WHERE user = ? AND accuracy <= ? ORDER BY datetime DESC LIMIT 1;`  
 };
