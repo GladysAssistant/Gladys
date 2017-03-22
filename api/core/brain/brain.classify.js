@@ -31,7 +31,7 @@ module.exports = function classify(user, message){
             // foreach classified label
             return Promise.map(classifications, function(classification){
                 var splitted = classification.split(sails.config.brain.separator);
-                sails.log.info(`brain : classify : Identified label ${classification} `);
+                sails.log.info(`brain : classify : Identified label ${classification}`);
                 return callAction(clone(scope), message, splitted[0], splitted[1])
                     .then((result) => answer(result, user));
             });
@@ -39,7 +39,7 @@ module.exports = function classify(user, message){
         .then((result) => {
             var elapsed = process.hrtime(start)[1] / 1000000;
             var executionTime = process.hrtime(start)[0] + 's, ' + elapsed.toFixed(3) + ' ms';
-            sails.log.debug(`brain : classify : Classified in ${executionTime}`);
+            sails.log.debug(`brain : classify : Answered in ${executionTime}`);
 
             return result;
         });
