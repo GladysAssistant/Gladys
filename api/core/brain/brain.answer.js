@@ -4,6 +4,8 @@ const injector = require('./injector/injector.js');
 
 module.exports = function answer(result, user) {
 
+    sails.log.info(`Brain : answer : Answering with label ${result.response.label} in language ${user.language}`);
+
     return gladys.utils.sql(queries.getAnswers, [user.language, result.response.label])
         .then((answers) => {
 
