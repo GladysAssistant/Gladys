@@ -4,7 +4,7 @@ module.exports.update = {
     eventsBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/events/',
     boxTypesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/boxs/',
     modesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/modes/',
-    sentencesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/sentences/',
+    sentencesBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/sentences/v2/',
     actionTypeUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/actions/',
     categoryBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/categories/',
     stateBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/states/',
