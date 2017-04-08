@@ -21,5 +21,8 @@ module.exports = function sendCommand(functionName, params) {
 function getDeviceType(params){
     if(params.devicetype) return gladys.utils.sqlUnique(queries.getDeviceTypeById, [params.devicetype]);
     else if(params.room) return gladys.utils.sqlUnique(queries.getMusicDeviceTypeByRoom, [params.room]);
-    else return Promise.reject(new Error(`You should specify a room or a devicetype.`));
+
+    // if user does not specify a room, or a devicetype, we suppose there is only one 
+    // and return this one
+    else return gladys.utils.sqlUnique(queries.getDefaultDeviceType, []);
 }
