@@ -1,9 +1,9 @@
 Gladys Project
 =======================
 
-[![Join the chat at https://gitter.im/GladysProject/Gladys](https://badges.gitter.im/GladysProject/Gladys.svg)](https://gitter.im/GladysProject/Gladys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![npm version](https://badge.fury.io/js/gladys.svg)](https://www.npmjs.com/package/gladys)
 [![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys) [![Code Climate](https://codeclimate.com/github/GladysProject/Gladys/badges/gpa.svg)](https://codeclimate.com/github/GladysProject/Gladys)
+[![Join the chat at https://gitter.im/GladysProject/Gladys](https://badges.gitter.im/GladysProject/Gladys.svg)](https://gitter.im/GladysProject/Gladys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![Alt](http://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
 
