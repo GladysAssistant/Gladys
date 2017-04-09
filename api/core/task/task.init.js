@@ -42,13 +42,14 @@ module.exports = function(cb){
       gladys.sun.init().catch(sails.log.warn);
   });
 
-  console.log(j);
-
   // schedule alarm
   gladys.alarm.init().catch(sails.log.error);
   
   // checking for update now      
   gladys.update.checkUpdate();
+
+  // be sure that Gladys has socket notification type
+  gladys.socket.createNotificationType();
   
   // install all modules not 
   // fully installed
