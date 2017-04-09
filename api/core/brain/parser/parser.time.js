@@ -1,14 +1,17 @@
-
-var Promise = require('bluebird');
-var regex = /(([0-1]{0,1}[0-9])|(2[0-3]))(:|h)[0-5]{0,1}[0-9]?/g;
-
+const Promise = require('bluebird');
+const chrono = require('chrono-node');
 
 module.exports = function(originalText){
-    var res = originalText.match(regex);
-    var text = originalText.replace(regex, '%TIME%');
 
+    var results = chrono.parse(originalText);
+    text = originalText;
+
+    for(var i = 0; i < results.length; i++){
+        text = text.replace(results[i].text, '%TIME%');
+    }
+    
     return Promise.resolve({
         text,
-        times: res
+        times: results
     });
 };
