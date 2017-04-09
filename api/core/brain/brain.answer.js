@@ -9,6 +9,8 @@ module.exports = function answer(result, user) {
     return gladys.utils.sql(queries.getAnswers, [user.language, result.response.label])
         .then((answers) => {
 
+            sails.log.debug(`Brain : answer : Found ${answers.length} possible.`);
+
             // pick one answer randomly
             var randomRow = Math.floor(Math.random() * answers.length) + 0;
 
@@ -18,9 +20,15 @@ module.exports = function answer(result, user) {
                 result.response.needAnswer = answers[randomRow].needAnswer;
             }
             else {
-                result.response.text = null;
+                result.response.text = sails.__({ phrase: 'default-answer-gladys-brain', locale: user.language});
                 result.response.needAnswer = false;
             }
+
+            // add default values
+            result.response.scope = result.response.scope || {};
+            result.response.scope['%USER_FIRSTNAME%'] = user.firstname;
+            result.response.scope['%USER_LASTNAME%'] = user.lastname;
+            result.response.scope['%USER_EMAIL%'] = user.email;
 
             // replace variables by values
             result.response.text = injector.inject(result.response.text, result.response.scope);
@@ -51,10 +59,19 @@ module.exports = function answer(result, user) {
             .catch(function(err) {
                 if (err.message !== 'ok') {
                     sails.log.warn(err);
+
+                    return Promise.resolve(false);
                 }
+                
+                return Promise.resolve(true);
             });
         })
-        .then(() => result);
+        .then((messageSent) => {
+
+            if(messageSent !== true) sails.log.info(`User is not available on any service. Cannot contact him.`);
+
+            return result;
+        });
 };
 
 /**
@@ -89,6 +106,8 @@ function trySendingMessage(newMessage, type, user) {
            // we need to propagate the error
            if(e.message === 'ok') return Promise.reject(e);
            
+           sails.log.info(`Unable to reach user with service ${type.service}. Trying with other services.`);
+
            // if notification does not work, we resolve
            // it means that we need to continue the flow
            return Promise.resolve(); 

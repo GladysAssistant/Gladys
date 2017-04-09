@@ -252,5 +252,6 @@
   "account-update-button": "Update my account",
   "dashboard-chat-box-title": "Chat",
   "dashboard-chat-box-text-box-placeholder": "Write your message",
-  "dashboard-chat-box-typing": "Typing"
+  "dashboard-chat-box-typing": "Typing",
+  "default-answer-gladys-brain": "I don't have the answer, I'm sorry :/"
 }
