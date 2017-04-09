@@ -417,7 +417,5 @@
   "create-user-button-create": "Créer un nouvel utilisateur",
   "account-update-button": "Mettre à jour mon compte",
   "dashboard-chat-box-title": "Chat",
-  "dashboard-chat-box-text-box-placeholder": "Tapez votre message",
-  "dashboard-chat-box-typing": "En train d'écrire",
   "default-answer-gladys-brain": "Je ne sais pas quoi dire, désolé :/"
 }

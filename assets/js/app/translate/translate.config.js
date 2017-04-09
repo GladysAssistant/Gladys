@@ -26,6 +26,10 @@ var translationsEN = {
       night: 'Night',
       HUMIDITY: 'Humidity',
       GET_GEOLOCATION_FAILED: 'Geolocation failed.'
+  },
+  CHAT: {
+      TEXT_BOX_PLACEHOLDER: 'Write your message',
+      TYPING: 'Typing'
   }   
 };
 
@@ -57,7 +61,11 @@ var translationsFR = {
       night: 'Nuit',
       HUMIDITY: 'Humidité',
       GET_GEOLOCATION_FAILED: 'Erreur lors de la géolocalisation :' 
-  }      
+  },
+  CHAT: {
+      TEXT_BOX_PLACEHOLDER: 'Tapez votre message',
+      TYPING: 'En train d\'écrire'
+  }    
 };
 
 
