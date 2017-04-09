@@ -11,6 +11,7 @@ module.exports = {
    WHERE user = ?
    AND title = ? 
    AND text = ?;
-   `
+   `,
+   getNotificationTypeByService: 'SELECT * FROM notificationtype WHERE service = ?;'
 
 };
