@@ -6,7 +6,6 @@ HOOK_FOLDER="$GLADYS_FOLDER/api/hooks"
 CACHE_FOLDER="$GLADYS_FOLDER/cache"
 TMP_HOOK_FOLDER="/tmp/gladys_hooks"
 TMP_CACHE_FOLDER="/tmp/gladys_cache"
-INIT_SCRIPT="$GLADYS_FOLDER/init.js"
 
 # Cleaning Gladys hook folder
 rm -rf $TMP_HOOK_FOLDER
@@ -38,11 +37,11 @@ npm update gladys
 cp -ar /tmp/gladys_hooks/. $HOOK_FOLDER
 cp -ar /tmp/gladys_cache/. $CACHE_FOLDER
 
-# start init script
-node $INIT_SCRIPT
-
 # go to gladys folder
 cd $GLADYS_FOLDER
+
+# start init script
+node init.js
 
 #BuildProd 
 grunt buildProd
