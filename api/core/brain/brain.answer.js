@@ -6,7 +6,10 @@ module.exports = function answer(result, user) {
 
     sails.log.info(`Brain : answer : Answering with label ${result.response.label} in language ${user.language}`);
 
-    return gladys.utils.sql(queries.getAnswers, [user.language, result.response.label])
+    // put language in lower case and only with 2 first characters 
+    var language = user.language.substr(0,2).toLowerCase();
+
+    return gladys.utils.sql(queries.getAnswers, [language, result.response.label])
         .then((answers) => {
 
             sails.log.debug(`Brain : answer : Found ${answers.length} possible.`);
@@ -20,7 +23,7 @@ module.exports = function answer(result, user) {
                 result.response.needAnswer = answers[randomRow].needAnswer;
             }
             else {
-                result.response.text = sails.__({ phrase: 'default-answer-gladys-brain', locale: user.language});
+                result.response.text = sails.__({ phrase: 'default-answer-gladys-brain', locale: language});
                 result.response.needAnswer = false;
             }
 
