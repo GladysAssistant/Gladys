@@ -30,6 +30,8 @@ Interested in Gladys ? [Try it at home](http://gladysproject.com/en/installation
 **Website :** [https://gladysproject.com](http://gladysproject.com) <br>
 **Community :** [https://community.gladysproject.com/](https://community.gladysproject.com/)
 
+🎉🎉 Subscribe to our newsletter in [English](http://eepurl.com/bvg-CT) or in [French](http://eepurl.com/bUaySX) 🎉🎉
+
 Specifications
 -------------
 
@@ -126,13 +128,16 @@ Pull request are welcome, but code must follow some guidelines.
 * For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
 * Please Unit test your code. We use Mocha and Istanbul for code coverage. No pull requests will be accepted without good unit tests.
  
-If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](http://gladysproject.com).
+If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](https://gladysproject.com).
 
 Links
 -------------
 
-- [Website](http://gladysproject.com)
-- [Developer Website](http://developer.gladysproject.com)
+- [Website](https://gladysproject.com)
+- [Community](https://community.gladysproject.com/)
+- [Developer Website](https://developer.gladysproject.com)
 - [Twitter](https://twitter.com/gladysproject)
 - [Instagram](https://www.instagram.com/gladysproject/)
-- [Trello](https://trello.com/b/cxtyidIH)
+- [Facebook](https://www.facebook.com/gladysproject)
+- [English Newsletter](http://eepurl.com/bvg-CT)
+- [French Newsletter](http://eepurl.com/bUaySX)
