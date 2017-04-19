@@ -27,7 +27,7 @@ This is just a simple scenario, possibilities with Gladys are just endless ! Don
 
 Interested in Gladys ? [Try it at home](http://gladysproject.com/en/installation), it's free and Open Source !
 
-**Website :** [https://gladysproject.com](http://gladysproject.com) 
+**Website :** [https://gladysproject.com](http://gladysproject.com) <br>
 **Community :** [https://community.gladysproject.com/](https://community.gladysproject.com/)
 
 Specifications
