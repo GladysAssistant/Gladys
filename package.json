@@ -25,7 +25,7 @@
     "dotenv": "^2.0.0",
     "ejs": "^2.4.1",
     "es6-template-strings": "^2.0.0",
-    "fs-extra": "^1.0.0",
+    "fs-extra": "^3.0.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
