@@ -519,6 +519,12 @@ charenc@~0.0.1:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
 
+chrono-node@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/chrono-node/-/chrono-node-1.3.1.tgz#d0dc762a4d926051b75016ad63c100caff9d1d84"
+  dependencies:
+    moment "^2.10.3"
+
 clean-css@~3.4.2:
   version "3.4.25"
   resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-3.4.25.tgz#9e9a52d5c1e6bc5123e1b2783fa65fe958946ede"
@@ -2695,7 +2701,7 @@ mock-res@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/mock-res/-/mock-res-0.3.0.tgz#0c2034cc6336d0595a3af109f7448283ee9c47f5"
 
-moment@2.x.x, moment@^2.12.0:
+moment@2.x.x, moment@^2.10.3, moment@^2.12.0:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.17.1.tgz#fed9506063f36b10f066c8b59a144d7faebe1d82"
 
