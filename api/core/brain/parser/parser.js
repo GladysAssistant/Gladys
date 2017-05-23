@@ -1,12 +1,14 @@
 var Promise = require('bluebird');
 var parseDeviceType = require('./parser.devicetype.js');
 var parseRoom = require('./parser.room.js');
+var parseHouse = require('./parser.house.js');
 var parseTime = require('./parser.time.js');
 
 module.exports.parse = function parse(text) {
 
     var deviceTypes = [];
     var rooms = [];
+    var houses = [];
     var times = [];
     var replacedText = '';
 
@@ -26,8 +28,14 @@ module.exports.parse = function parse(text) {
         .then((result) => {
 
             times = result.times;
+
+            return parseHouse(result.text);
+        }) 
+        .then((result) => {
+
+            houses = result.houses;
             replacedText = result.text;
 
-            return Promise.resolve({deviceTypes, rooms, times, replacedText});
+            return Promise.resolve({deviceTypes, rooms, houses, times, replacedText});
         });
 };
