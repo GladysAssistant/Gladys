@@ -30,6 +30,12 @@ var translationsEN = {
   CHAT: {
       TEXT_BOX_PLACEHOLDER: 'Write your message',
       TYPING: 'Typing'
+  },
+  VALIDATION: {
+      ERROR: 'Some fields are invalid !'
+  },
+  DEFAULT: {
+      ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
   }   
 };
 
@@ -65,7 +71,13 @@ var translationsFR = {
   CHAT: {
       TEXT_BOX_PLACEHOLDER: 'Tapez votre message',
       TYPING: 'En train d\'écrire'
-  }    
+  },
+  VALIDATION: {
+      ERROR: 'Certains champs sont invalides !'
+  },
+  DEFAULT: {
+      ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
+  }     
 };
 
 

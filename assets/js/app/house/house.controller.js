@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('HouseCtrl', HouseCtrl);
 
-    HouseCtrl.$inject = ['houseService', 'roomService'];
+    HouseCtrl.$inject = ['houseService', 'roomService', 'notificationService'];
 
-    function HouseCtrl(houseService, roomService) {
+    function HouseCtrl(houseService, roomService, notificationService) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -45,6 +45,13 @@
                 .then(function(data){
                     getHouses();
                     resetNewHouseFields();
+                })
+                .catch(err => {
+                    if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                        notificationService.errorNotificationTranslated('VALIDATION.ERROR');
+                    } else {
+                        notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                    }
                 });
         }
 
@@ -53,6 +60,13 @@
                 .then(function(data){
                     getRooms();
                     resetNewRoomFields();
+                })
+                .catch(err => {
+                    if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                        notificationService.errorNotificationTranslated('VALIDATION.ERROR');
+                    } else {
+                        notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                    }
                 });
         }
 
