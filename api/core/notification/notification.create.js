@@ -37,13 +37,18 @@ function create(options) {
  */
 function startService(notification, type, user) {
 
-    if (!gladys.modules[type.service] || typeof gladys.modules[type.service].notify !== "function") {
+    var notify = null;
+    if(gladys[type.service] && typeof gladys[type.service].notify === "function"){
+        notify = gladys[type.service].notify;
+    } else if (gladys.modules[type.service] || typeof gladys.modules[type.service].notify === "function") {
+        notify = gladys.modules[type.service].notify;
+    } else {
         return Promise.reject(new Error(`${type.service} is not a valid service`));
     }
     
     sails.log.info(`Notification : create : Trying to contact ${type.service}`);
 
-    return gladys.modules[type.service].notify(notification, user)
+    return notify(notification, user)
         .then(function(result) {
             
             sails.log.info(`Notification threw ${type.service} sent with success. Aborting the chain.`);
