@@ -46,7 +46,7 @@
                     getHouses();
                     resetNewHouseFields();
                 })
-                .catch(err => {
+                .catch(function(err){
                     if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
                         notificationService.errorNotificationTranslated('VALIDATION.ERROR');
                     } else {
@@ -61,7 +61,7 @@
                     getRooms();
                     resetNewRoomFields();
                 })
-                .catch(err => {
+                .catch(function(err) {
                     if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
                         notificationService.errorNotificationTranslated('VALIDATION.ERROR');
                     } else {
