@@ -20,6 +20,7 @@ gladys.load = function load(cb) {
     gladys.device = require('./device/index.js');
     gladys.deviceState = require('./devicestate/index.js');
     gladys.deviceType = require('./devicetype/index.js');
+    gladys.direction = require('./direction/index.js');
     gladys.event = require('./event/index.js');
     gladys.eventType = require('./eventtype/index.js');
     gladys.house = require('./house/index.js');
