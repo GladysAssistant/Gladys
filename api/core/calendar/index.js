@@ -13,6 +13,7 @@ module.exports.get = require('./calendar.get.js');
 module.exports.getEventsDates = require('./calendar.getEventsDates.js');
 module.exports.getByService = require('./calendar.getByService.js');
 module.exports.getEvents = require('./calendar.getEvents.js');
+module.exports.getFirstEventTodayUser = require('./calendar.getFirstEventTodayUser.js');
 module.exports.getNextEventUser = require('./calendar.getNextEventUser.js');
 module.exports.sync = require('./calendar.sync.js');
 module.exports.update = require('./calendar.update.js');
