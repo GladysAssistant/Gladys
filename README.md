@@ -53,18 +53,20 @@ Prerequisites
 Getting Started
 ---------------
 
-The easiest way to get started is to install Gladys with NPM :
+The easiest way to get started is to install on a Raspberry Pi Gladys with the Raspbian image. See [https://gladysproject.com](https://gladysproject.com) for more informations.
+
+But you can also install Gladys manually to develop on it:
 
 ```bash
-npm install -g gladys
+git clone https://github.com/GladysProject/gladys gladys
 ```
 
-Gladys is now located where you global node_modules are.
-
-For example on Raspbian or on a Mac, it's located in :
- 
+```bash
+cd gladys
 ```
-/usr/local/lib/node_modules/gladys
+
+```bash
+npm install
 ```
 
 #### Connect Gladys to MySQL
