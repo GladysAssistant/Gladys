@@ -33,7 +33,9 @@ sailsApp.start(config, function(err, app){
        
        // if we don't wait, it crashed for already in use port
        setTimeout(function(){
-        app.lower();    
+        app.lower(function(){
+            process.exit();
+        });    
         console.log('Init with success !');
        }, 200);
     });
