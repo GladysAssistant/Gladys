@@ -23,6 +23,7 @@
     vm.alarms = []; 
     vm.createAlarm = createAlarm;
     vm.createAlarmRecurring = createAlarmRecurring;
+    vm.createAlarmAutoWakeUp = createAlarmAutoWakeUp;
     vm.createTimer = createTimer;
     vm.destroyAlarm = destroyAlarm;
     vm.createAlarmCron = createAlarmCron;
@@ -141,6 +142,17 @@
                 getAlarms();
                 vm.newAlarmCron.name = '';
                 vm.newAlarmCron.cronrule = '';
+                $('#modalNewAlarm').modal('hide');
+            }); 
+    }
+
+    function createAlarmAutoWakeUp(){
+       vm.newAlarmAutoWakeUp.autoWakeUp = true;
+        return alarmService.create(vm.newAlarmAutoWakeUp)
+            .then(function(data){
+                getAlarms();
+                vm.newAlarmAutoWakeUp.name = '';
+                vm.newAlarmAutoWakeUp.dayofweek = -1;
                 $('#modalNewAlarm').modal('hide');
             }); 
     }

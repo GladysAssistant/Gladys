@@ -1,3 +1,5 @@
+module.exports.checkAllAutoWakeUp = require('./alarm.checkAllAutoWakeUp.js');
+module.exports.checkAutoWakeUp = require('./alarm.checkAutoWakeUp.js');
 module.exports.command = require('./alarm.command.js');
 module.exports.cancel = require('./alarm.cancel.js');
 module.exports.create = require('./alarm.create.js');
