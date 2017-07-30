@@ -10,3 +10,4 @@ module.exports.isEmpty = require('./house.isEmpty.js');
 module.exports.isUserAtHome = require('./house.isUserAtHome.js');
 module.exports.update = require('./house.update.js');
 module.exports.userSeen = require('./house.userSeen.js');
+module.exports.isNotEmpty = require('./house.isNotEmpty.js');
