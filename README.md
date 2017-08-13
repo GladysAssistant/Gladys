@@ -69,6 +69,12 @@ cd gladys
 npm install
 ```
 
+If you want to use grunt, install grunt-cli :
+
+```bash
+npm install -g grunt-cli
+```
+
 #### Connect Gladys to MySQL
 
 To connect Gladys to your database, you will need to set some environment variables.
