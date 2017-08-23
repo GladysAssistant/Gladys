@@ -77,10 +77,10 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pjap93/Gladys"
+    "url": "https://github.com/GladysProject/Gladys"
   },
   "bugs": {
-    "url": "hhttps://github.com/pjap93/Gladys/issues"
+    "url": "https://github.com/GladysProject/Gladys/issues"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "CC-BY-NC-SA-3.0"
