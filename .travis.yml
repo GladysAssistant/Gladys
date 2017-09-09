@@ -1,9 +1,9 @@
 language: node_js
+dist: precise
 
 node_js:
   - '4'
   - '6'
-  - '7'
   
 services:
   - mysql
