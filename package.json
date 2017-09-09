@@ -64,7 +64,7 @@
     "jshint-stylish": "^2.0.1",
     "mocha": "^3.0.2",
     "should": "^11.1.0",
-    "supertest": "^2.0.0"
+    "supertest": "^3.0.0"
   },
   "scripts": {
     "start": "node app.js",
