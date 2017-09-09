@@ -55,6 +55,7 @@ module.exports = {
             AND house = ?
             ORDER BY datetime DESC LIMIT 1 ) = 'back-at-home'
     )
+    GROUP BY user.id
     HAVING datetime < DATE_SUB(NOW(), INTERVAL ? MINUTE)
   `
 };
