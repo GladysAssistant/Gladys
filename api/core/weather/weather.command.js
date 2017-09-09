@@ -13,7 +13,7 @@ module.exports = function command(scope) {
         .then((weather) => {
 
             var response = {
-                label: 'tell-weather',
+                label: 'tell-' + weather.weather + '-weather-' + weather.timing,
                 scope: {
                     '%WEATHER_TEMP%': weather.temperature,
                     '%WEATHER_HUMIDITY%': weather.humidity,
