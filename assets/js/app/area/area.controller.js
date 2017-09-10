@@ -15,9 +15,9 @@
     .module('gladys')
     .controller('AreaCtrl', AreaCtrl);
 
-  AreaCtrl.$inject = ['areaService'];
+  AreaCtrl.$inject = ['areaService', 'notificationService'];
 
-  function AreaCtrl(areaService) {
+  function AreaCtrl(areaService, notificationService) {
     /* jshint validthis: true */
     var vm = this;
     vm.areas = [];
@@ -45,7 +45,18 @@
          .then(function(data){
              vm.areas.push(data.data);
              vm.newArea = {};
-         });
+         })
+         .catch(function(err) {
+            if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                for(var key in err.data.invalidAttributes) {
+                    if(err.data.invalidAttributes.hasOwnProperty(key)){
+                        notificationService.errorNotificationTranslated('AREA.INVALID_' + key.toUpperCase());
+                    }
+                }
+            } else {
+                notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+            }
+       });
    }
    
    function deleteArea(index, id){

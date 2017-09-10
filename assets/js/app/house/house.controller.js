@@ -48,7 +48,11 @@
                 })
                 .catch(function(err){
                     if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
-                        notificationService.errorNotificationTranslated('VALIDATION.ERROR');
+                        for(var key in err.data.invalidAttributes){
+                            if(err.data.invalidAttributes.hasOwnProperty(key)){
+                                notificationService.errorNotificationTranslated('HOUSE.INVALID_' + key.toUpperCase());
+                            }
+                        }
                     } else {
                         notificationService.errorNotificationTranslated('DEFAULT.ERROR');
                     }
@@ -63,7 +67,11 @@
                 })
                 .catch(function(err) {
                     if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
-                        notificationService.errorNotificationTranslated('VALIDATION.ERROR');
+                        for(var key in err.data.invalidAttributes){
+                            if(err.data.invalidAttributes.hasOwnProperty(key)){
+                                notificationService.errorNotificationTranslated('ROOM.INVALID_' + key.toUpperCase());
+                            }
+                        }
                     } else {
                         notificationService.errorNotificationTranslated('DEFAULT.ERROR');
                     }

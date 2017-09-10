@@ -43,7 +43,7 @@
 
         function create(device, types){
             var data = {
-                device: device,
+                device: device || {},
                 types: types || []
             };
             return $http({method: 'POST', url: '/device', data: data});
