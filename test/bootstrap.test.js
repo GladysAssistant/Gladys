@@ -156,7 +156,7 @@ function addTestModuleGladys(gladys){
             return Promise.resolve();
         },
         weather: {
-            get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9}); }
+            get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9, weather: 'rain'}); }
         },
         calendar: {
             sync: function() {return Promise.resolve()},

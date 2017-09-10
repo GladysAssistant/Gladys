@@ -15,7 +15,7 @@ module.exports = function command(scope) {
                 offset: 0
             };
 
-            if(scope.times.length > 0) {
+            if(scope.times && scope.times.length > 0) {
 
                 // calculate offset in hour
                 var currentTimestamp = new Date().getTime();
