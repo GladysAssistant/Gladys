@@ -77,7 +77,7 @@
             return categoryService.getEventTypes(service)
               .then(function(data){
                  vm.eventTypes = data.data; 
-                 vm.step = 2;
+                 vm.step++;
               });
         }
         
@@ -215,19 +215,24 @@
         
         
         function nextStep(){
+            console.log(vm.step);
             switch(vm.step){
-                case 2:
+                case 1: 
+                    vm.step++;
+                break;
+
+                case 3:
                     createLauncher(vm.newLauncher, vm.launcherParams)
                       .then(function(){
                             vm.step++;
                       });
                 break;
                     
-                case 3:
+                case 4:
                     vm.step++;
                 break;
                 
-                case 4: 
+                case 5: 
                     // save everything
                 break;
             }

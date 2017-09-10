@@ -18,6 +18,10 @@ module.exports = {
 
     attributes: {
 
+        title: {
+            type: 'string'
+        },
+
         condition_template: {
             type: 'string'
         },
