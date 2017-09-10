@@ -33,11 +33,12 @@
                     </div>
             </div>
             
+            <div class="ng-cloak" ng-show="vm.currentScript !== null">
                 <h4 class="page-header"></h4>
         
                     <div class="alert alert-danger ng-cloak" ng-show="vm.error"><%= __('script-error') %> !</div> 
                     <div class="alert alert-danger ng-cloak" ng-show="vm.scriptError">{{ vm.scriptErrorMessage.message }}</div>      
-                <pre id="editor"></pre>
+                <pre  id="editor"></pre>
                 <button class="btn btn-info" ng-click="vm.exec(vm.currentScript.id)"><i class="fa fa-play"></i> <%= __('script-run-script') %></button>
                 <button class="btn btn-success" ng-click="vm.patch(vm.currentScript.id)">
                     <div ng-show="vm.savingState == ''"><%= __('script-save') %></div>
@@ -45,7 +46,7 @@
                     <div class="ng-cloak" ng-show="vm.savingState == 'saved'"><%= __('script-saved') %> !</div>    
                 </button>
                 <button class="btn btn-danger" ng-click="vm.destroy(vm.currentScript.id)"><%= __('script-delete') %></button>
-
+            </div>
             
             
             <!-- Small modal -->
