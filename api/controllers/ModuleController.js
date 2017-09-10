@@ -24,11 +24,10 @@ module.exports = {
      * Install a given module
      */
     install: function(req, res, next){
-        gladys.module.install(req.body)
-              .then(function(module){
-                  return res.json(module);
-              })
-              .catch(next);
+        
+        gladys.module.install(req.body);
+
+        return res.json({message: 'Installation started with success'});
     },
     
     
