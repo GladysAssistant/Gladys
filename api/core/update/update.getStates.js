@@ -11,6 +11,10 @@ module.exports = function(user) {
             
             if(stateTypes === 'Not Found') return Promise.reject(new Error('Not Found'));
             
-            return gladys.stateType.insertBatch(stateTypes);
+            // Insert all stateTypes
+            return gladys.stateType.insertBatch(stateTypes)
+
+                // then clean duplicate (due to old versions of Gladys :/)
+                .then(() => gladys.stateTypeParam.cleanDuplicate());
         });
 };
