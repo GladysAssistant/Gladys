@@ -165,6 +165,21 @@ module.exports = {
       id: req.session.User.id
     };
     res.json(user);
+  },
+
+  /**
+   * @api {post} /user/:id/house/:id/seen Mark user as seen
+   * @apiName Mark user as seen
+   * @apiGroup User
+   * @apiPermission authenticated
+   * 
+   * @apiDescription Mark user as seen in a house
+   * 
+   */
+  seen: function(req, res, next){
+    gladys.house.userSeen({user: req.params.user_id, house: req.params.house_id})
+      .then((result) => res.json(result))
+      .catch(next);
   }
 
 };

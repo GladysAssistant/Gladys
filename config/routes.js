@@ -260,6 +260,7 @@ module.exports.routes = {
   'patch /user/:id': 'UserController.update',
   'delete /user/:id': 'UserController.delete',
   'get /user/whoami': 'UserController.whoami',
+  'post /user/:user_id/house/:house_id/seen': 'UserController.seen',
 
 
   // Weather
