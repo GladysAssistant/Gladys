@@ -14,8 +14,9 @@ describe('House', function() {
           
         gladys.house.userSeen(options)
             .then(function(result){
-                should.exist(result);
-                
+                result.should.have.property('user', 2);
+                result.should.have.property('house', 1);
+                result.should.have.property('eventtype', 7);
                 done();
             }).catch(done);
     });
@@ -29,8 +30,10 @@ describe('House', function() {
           
         gladys.house.userSeen(options)
             .then(function(result){
-                should.exist(result);
-                
+                result.should.have.property('user', 1);
+                result.should.have.property('house', 1);
+                result.should.have.property('eventtype', 8);
+
                 done();
             }).catch(done);
     });

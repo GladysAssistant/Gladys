@@ -5,6 +5,19 @@ module.exports = {
   get: `SELECT * FROM house LIMIT ? OFFSET ?;`,
   getById: 'SELECT * FROM house WHERE id = ?;',
   getAll: `SELECT * FROM house;`,
+  getLastEventHouseUser: `
+    SELECT event.*, eventtype.code
+    FROM event
+    JOIN eventtype ON event.eventtype = eventtype.id
+    WHERE ( 
+      eventtype.code = 'back-at-home' 
+      OR eventtype.code = 'left-home' 
+      OR eventtype.code = 'user-seen-at-home' 
+    )
+    AND event.user = ? AND event.house = ?
+    ORDER BY event.datetime DESC
+    LIMIT 1;
+  `, 
   getUsers: `
     SELECT user.*,
       ( 
