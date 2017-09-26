@@ -8,17 +8,21 @@ var Promise = require('bluebird');
  */
 function create(param) {
 
+    var deviceUpdated = false;
+
     // we test first if the device and it's identifier already exist or not
     return gladys.utils.sql(queries.getByIdentifier, [param.device.identifier, param.device.service])
       .then(function(devices){
          
           if(devices.length){
+
+              deviceUpdated = true;
               
                // if device already exist, we update it
               return Device.update({id: devices[0].id}, param.device)
                            .then((rows) => rows[0]);
           } else {
-              
+
               // if not, we create the device
               return Device.create(param.device);
           }
@@ -39,8 +43,10 @@ function create(param) {
       })
       .then((result) => {
 
-         // broadcast news to everyone
-         gladys.socket.emit('newDevice', result);
+        if(!deviceUpdated) {
+            // broadcast news to everyone
+            gladys.socket.emit('newDevice', result);
+        }
 
          return result;
       });
