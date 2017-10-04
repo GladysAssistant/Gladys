@@ -68,8 +68,8 @@ module.exports = {
     },
     
      /**
-     * @api {patch} /house/:id create a house
-     * @apiName createHouse
+     * @api {patch} /house/:id update a house
+     * @apiName updateHouse
      * @apiGroup House
      * @apiPermission authenticated
      *
