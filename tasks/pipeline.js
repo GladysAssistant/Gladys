@@ -69,6 +69,9 @@ var jsFilesToInject = [
   
   // loading ace
   'js/dependencies/ace/ace.js',
+  
+  // loading ace language_tools
+  'js/dependencies/ace/ext-language_tools.js',
 
   // loading bootstrap datetimepicker
   'js/dependencies/bootstrap-datetimepicker.min.js',
