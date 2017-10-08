@@ -32,6 +32,8 @@
         vm.refreshModule = get;
         vm.installationStep = 0;
         
+        vm.modulesCurrentlyInstalled = {};
+        
         activate();
 
         function activate() {
@@ -62,12 +64,8 @@
            if(module.link) module.url = module.link;
            return moduleService.install(module)
              .then(function(data){
-                 vm.modules.push(data.data);
-                 vm.installing = false;
-                 module.installed = true;
-                 module.localId = data.data.id;
-                 storeService.saveDownload(module.idModule);
-                 notificationService.successNotificationTranslated('MODULE.INSTALLED_SUCCESS_NOTIFICATION', module.name);
+                vm.modulesCurrentlyInstalled[module.slug] = module;
+                storeService.saveDownload(module.idModule);
              })
              .catch(function(){
                  notificationService.errorNotificationTranslated('MODULE.INSTALLED_FAIL_NOTIFICATION', module.name);
@@ -153,9 +151,20 @@
                  
                  // if module is installed with success,
                  // reset after 2 seconds
-                 if(data.step == 4){
-                     vm.newModule = {};
-                     setTimeout(function(){
+                 if(data.step == 4) {
+                    
+                    vm.modules.push(data.module);
+                    vm.installing = false;
+                    if(vm.modulesCurrentlyInstalled[data.module.slug]) {
+                        vm.modulesCurrentlyInstalled[data.module.slug].installed = true;
+                        vm.modulesCurrentlyInstalled[data.module.slug].localId = data.module.id;
+                        delete vm.modulesCurrentlyInstalled[data.module.slug];
+                    }
+                    notificationService.successNotificationTranslated('MODULE.INSTALLED_SUCCESS_NOTIFICATION', data.module.name);
+                    
+                    vm.newModule = {};
+                    
+                    setTimeout(function(){
                         updateInstallationStep(0);
                     }, 2000);
                  }

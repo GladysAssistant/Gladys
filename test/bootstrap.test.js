@@ -156,10 +156,13 @@ function addTestModuleGladys(gladys){
             return Promise.resolve();
         },
         weather: {
-            get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9}); }
+            get: function(options) {return Promise.resolve({temperature: 12, humidity: 0.9, weather: 'rain'}); }
         },
         calendar: {
             sync: function() {return Promise.resolve()},
+        },
+        direction: {
+            travelTime: function() {return Promise.resolve({departure_time: 1495915223, arrival_time: 1495918128, duration: 2905})}
         },
         music: {
             flushQueue: function() {return Promise.resolve()},
@@ -180,6 +183,9 @@ function addTestModuleGladys(gladys){
             stop: function() {return Promise.resolve()},
         }
     };
+
+    // register direction module
+    gladys.direction.addProvider('test');
 
     // register weather module
     gladys.weather.addProvider('test');

@@ -9,7 +9,15 @@ module.exports = function(options) {
 
     return gladys.script.getById({id})
         .then(function(script) {
-            return execCode(script.text, options.user);
+            
+            // handle both starting script from view (so user passed in controller)
+            var user = options.user;
+
+            // and starting script from scenario
+            if(options.scope && options.scope.user) user = parseInt(options.scope.user);
+
+            // execCode with script code & user passed
+            return execCode(script.text, user);
         });
 };
 

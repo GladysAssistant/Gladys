@@ -1,6 +1,13 @@
 
 module.exports = {
-  get: `SELECT *, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
+  get: `
+    SELECT *
+    FROM devicestate
+    ORDER BY datetime DESC
+    LIMIT ?
+    OFFSET ?;
+  `,
+  getByDeviceType: `SELECT *, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
         FROM devicestate
         WHERE devicetype = ?
         ORDER BY datetime DESC

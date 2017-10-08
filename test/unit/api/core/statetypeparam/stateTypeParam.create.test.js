@@ -5,7 +5,7 @@ describe('StateTypeParam', function() {
 
   describe('create', function() {
     
-    it('should return StateTypeParam created', function (done) {
+    it('should return StateTypeParam updated', function (done) {
      	
          var stateTypeParam = {
              statetype: 1,
@@ -21,6 +21,23 @@ describe('StateTypeParam', function() {
             }).catch(done);
 
     });
+
+    it('should return StateTypeParam created', function (done) {
+        
+        var stateTypeParam = {
+            statetype: 1,
+            variablename: 'test2',
+            name: 'Test'
+        };
+       
+       gladys.stateTypeParam.create(stateTypeParam)
+           .then(function(result){
+               
+               validateStateTypeParam(result);
+               done();
+           }).catch(done);
+
+   });
    
   });
 

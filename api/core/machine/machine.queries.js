@@ -5,6 +5,6 @@ module.exports = {
   getMyHouse: `
     SELECT house.* FROM house 
     JOIN machine ON machine.house = house.id
-    WHERE machine.me = true;
+    WHERE machine.me = 1;
     `
 };

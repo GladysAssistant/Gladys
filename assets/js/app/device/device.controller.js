@@ -15,9 +15,9 @@
     .module('gladys')
     .controller('DeviceCtrl', DeviceCtrl);
 
-  DeviceCtrl.$inject = ['deviceService','roomService', 'userService', '$scope'];
+  DeviceCtrl.$inject = ['deviceService','roomService', 'userService', '$scope', 'notificationService'];
 
-  function DeviceCtrl(deviceService, roomService, userService, $scope) {
+  function DeviceCtrl(deviceService, roomService, userService, $scope, notificationService) {
     /* jshint validthis: true */
     var vm = this;
     
@@ -91,10 +91,20 @@
     function createDevice(device){
         return deviceService.create(device)
            .then(function(data){
-               vm.devices.push(data.data.device);
                vm.newDevice = {};
+           })
+           .catch(function(err) {
+                if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                    for(var key in err.data.invalidAttributes) {
+                        if(err.data.invalidAttributes.hasOwnProperty(key)){
+                            notificationService.errorNotificationTranslated('DEVICE.INVALID_' + key.toUpperCase());
+                        }
+                    }
+                } else {
+                    notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                }
            });
-    }
+    }   
 
     function deleteDevice(index, id){
         return deviceService.deleteDevice(id)
@@ -154,7 +164,18 @@
                vm.newType = {
                     device: vm.selectedDevice.id
                };
-          });
+          })
+          .catch(function(err) {
+            if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                for(var key in err.data.invalidAttributes) {
+                    if(err.data.invalidAttributes.hasOwnProperty(key)){
+                        notificationService.errorNotificationTranslated('DEVICETYPE.INVALID_' + key.toUpperCase());
+                    }
+                }
+            } else {
+                notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+            }
+       });
     }
 
     function deleteDeviceType(index, id){

@@ -54,6 +54,11 @@ module.exports = {
             type: 'string'
         },
 
+        autoWakeUp: {
+            type: 'boolean',
+            defaultsTo: false
+        },
+
         active: {
             type: 'boolean',
             defaultsTo: true

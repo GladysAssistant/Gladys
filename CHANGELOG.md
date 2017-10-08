@@ -4,6 +4,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [3.6.1] - 2017-05-28
+
+### Changed
+- Correct bug: process.exit() in init.js script to ensure process exit as fast as possible.
+
+## [3.6.0] - 2017-05-28
+
+### Added
+- New gladys.direction API !
+- Gladys auto wake up feature !
+
+## [3.5.4] - 2017-05-27
+
+### Changed
+- Bugfix: remove arrow function in client code to stay ES5
+
+## [3.5.3] - 2017-05-27
+
+### Added
+- Identifying house name in sentences
+- Recognizing house & rooms in gladys.event.command()
+
+### Changed
+- Call service with protocol in gladys.deviceType.exec()
+- Try to call Gladys service first in gladys.notification.create()
+
+## [3.5.2] - 2017-05-16
+
+### Changed
+- add house description in parameters
+- expose gladys.brain.answer()
+- Change update script info
+
+## [3.5.1] - 2017-04-10
+
+### Changed
+- bugfix in brain answer : keep only 2 first character of user language
+- update rpi-update.sh, start directly node init.js in folder
+
+## [3.5.0] - 2017-04-09
+
+### Added
+- Big refactor of Gladys brain
+- Added gladys.message(send, getByUser, create, getConversation)
+- gladys.time.command()
+- Refactor gladys.socket to handle disconnect and keep track of connected user
+- Gladys chat box view
+- gladys.weather.command()
+- gladys.alarm.command()
+
+## [3.4.4] - 2017-03-08
+
+### Added
+- Added yarn.lock
+- gladys.house.userSeen()
+- if user is already at home, create event user seen at home
+- Device now have a `user` attribute
+
+### Changed
+- Disable Gladys module when init Gladys
+- Postcode in house is now a string
+- fix bug, devicetype is lowercase in SQL request
+
 ## [3.4.2] - 2017-02-11
 ### Changed
 - Fix issue with leaflet CSS in production mode

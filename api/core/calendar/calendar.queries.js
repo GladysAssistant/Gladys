@@ -38,6 +38,17 @@ module.exports = {
 		ORDER BY start 
 		LIMIT 1;
     `,
+
+    getFirstEventTodayUser: `
+        SELECT calendarevent.* 
+        FROM calendarevent
+		INNER JOIN calendar ON (calendarevent.calendar = calendar.id)
+		WHERE user = ? 
+		AND calendar.active = 1
+        AND DATE(start) = DATE(NOW())
+		ORDER BY start 
+		LIMIT 1;
+    `,
     
     getEventsDates: `
         SELECT calendarevent.*

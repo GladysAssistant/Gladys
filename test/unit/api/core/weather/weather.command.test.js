@@ -16,7 +16,7 @@ describe('Weather', function() {
 
          gladys.weather.command(scope)
             .then((response) => {
-                response.should.have.property('label', 'tell-weather');
+                response.should.have.property('label', 'tell-rain-weather-now');
                 response.should.have.property('scope');
                 response.scope.should.have.property('%WEATHER_TEMP%');
                 response.scope.should.have.property('%WEATHER_HUMIDITY%');

@@ -28,9 +28,7 @@
         vm.error = null;
         vm.savingState = '';
         vm.scripts = [];  
-        vm.currentScript = {
-            text: ''
-        };
+        vm.currentScript = null;
         
         var editor;
 
@@ -79,7 +77,7 @@
         function destroy(id){
             return scriptService.destroy(id)
                 .then(function(data){
-                    vm.currentScript = {};
+                    vm.currentScript = null;
                     editor.setValue('');
                     removeFromSelect(id); 
                 })
@@ -96,6 +94,18 @@
             while(!found && i < vm.scripts.length){
                 if(vm.scripts[i].id === id){
                     vm.scripts.splice(i, 1);
+                    found = true;
+                }
+                i++;
+            }
+        }
+
+        function updateInSelect(id, text){
+            var i = 0;
+            var found = false;
+            while(!found && i < vm.scripts.length){
+                if(vm.scripts[i].id === id){
+                    vm.scripts[i].text = text;
                     found = true;
                 }
                 i++;
@@ -138,6 +148,7 @@
             return scriptService.update(id, {text: editor.getValue()})
                 .then(function(data){
                     vm.savingState = 'saved';
+                    updateInSelect(id, data.data.text);
                     setTimeout(resetSavingState, 3000);
                 })
                 .catch(function(err){

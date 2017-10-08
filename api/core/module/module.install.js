@@ -12,7 +12,7 @@ module.exports = function (params){
     
     return gladys.utils.pathExist(path)
         .then(function(result){
-           gladys.socket.emit('moduleInstallationProgress', {step: 1});
+           gladys.socket.emit('moduleInstallationProgress', {step: 1, slug: params.slug});
            if(result){
                sails.log.info(`Gladys module ${params.slug} already cloned, skipping to install.`);
                return true;
@@ -22,18 +22,18 @@ module.exports = function (params){
            }
         })
         .then(function(){
-            gladys.socket.emit('moduleInstallationProgress', {step: 2});
+            gladys.socket.emit('moduleInstallationProgress', {step: 2, slug: params.slug });
             sails.log.info(`Installing NPM dependencies for module ${params.slug}`);
             return npmInstall(path);
         })
         .then(function(){
-           gladys.socket.emit('moduleInstallationProgress', {step: 3});
+           gladys.socket.emit('moduleInstallationProgress', {step: 3, slug: params.slug});
            sails.log.info(`Dependencies installed for module ${params.slug}`);
            params.status = 1;
            return Module.create(params); 
         })
         .then(function(module){
-            gladys.socket.emit('moduleInstallationProgress', {step: 4});
+            gladys.socket.emit('moduleInstallationProgress', {step: 4, module: module});
             sails.log.info(`Module ${params.slug} installed with success. Need reboot.`);
             return module;
         });

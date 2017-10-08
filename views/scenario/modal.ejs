@@ -13,19 +13,24 @@
                         <div class="col-xs-12">
                             <ul class="nav nav-pills nav-justified thumbnail setup-panel">
                                 <li ng-class="{ 'active': vm.step == 1 }" ng-click="vm.initialiseVar();"><a href="#step-1" >
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 1</h4>
+                                        <h4 class="list-group-item-heading"><%= __('Step') %> 1</h4>
+                                        <p class="list-group-item-text"><%= __('scenario-modal-choose-title') %></p>
+                                    </a>
+                                </li>
+                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step < 2 }" ><a href="#step-2" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-category') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 2, 'disabled': vm.step < 2 }"><a href="#step-1" >
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 2</h4>
+                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step < 3 }"><a href="#step-3" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-trigger') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 3, 'disabled': vm.step < 3 }"><a href="#step-2" >
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 3</h4>
+                                <li ng-class="{ 'active': vm.step == 4, 'disabled': vm.step < 4 }"><a href="#step-4" >
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 4</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-add-conditions') %></p>
                                 </a></li>
-                                <li ng-class="{ 'active': vm.step == 4, 'disabled': vm.step < 3 }"><a href="#step-3">
-                                    <h4 class="list-group-item-heading"><%= __('Step') %> 4</h4>
+                                <li ng-class="{ 'active': vm.step == 5, 'disabled': vm.step < 3 }"><a href="#step-5">
+                                    <h4 class="list-group-item-heading"><%= __('Step') %> 5</h4>
                                     <p class="list-group-item-text"><%= __('scenario-modal-choose-actions') %></p>
                                 </a></li>
                             </ul>
@@ -33,8 +38,24 @@
                     </div>
                     
                     
-                    <!-- STEP 1 SELECT CATEGORY -->
-                    <div  class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                    <!-- STEP 1 ADD TITLE -->
+                    <div class="row setup-content" id="step-1" ng-show="vm.step == 1">
+                            <div class="col-md-4">
+                                    <label><%= __('scenario-modal-enter-title') %> :</label>
+                            </div>
+                            <div class="col-md-4">
+                                  <input id="scenarioTitle" class="form-control" ng-model="vm.newLauncher.title" placeholder="<%= __('scenario-modal-title') %>" type="text">
+                            </div>
+                            <div class="form-group">
+                                  <div class="col-md-2 col-md-offset-10">
+                                    <button class="btn btn-success" ng-class="{'disabled': (vm.newLauncher.title === '' || vm.newLauncher.title === undefined) }" ng-click="vm.nextStep();"><%= __('scenario-next-step') %></button>
+                                  </div>
+                            </div>
+                    </div>
+                    <!-- END OF STEP 1 -->
+
+                    <!-- STEP 2 SELECT CATEGORY -->
+                    <div  class="row setup-content" id="step-2" ng-show="vm.step == 2">
 
                         <div class="col-xs-12 col-md-4" ng-repeat="category in vm.categories" ng-click="vm.selectCategory(category.service);">
                             <div class="panel panel-default">
@@ -51,11 +72,11 @@
                         </div> 
                     </div>
                     
-                    <!-- ENF OD STEP 1 SELECT CATEGORY -->
+                    <!-- ENF OD STEP 2 SELECT CATEGORY -->
 
 
-                    <!-- STEP 2 CHOOSE TRIGGER  -->
-                    <div class="row setup-content" id="step-2" ng-show="vm.step == 2">
+                    <!-- STEP 3 CHOOSE TRIGGER  -->
+                    <div class="row setup-content" id="step-3" ng-show="vm.step == 3">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
                                     <table class="table table-bordered table-hover">
@@ -109,7 +130,7 @@
                     <!-- END OF STEP 2 -->
                     
                      <!-- STEP 3 CHOOSE CONDITION  -->
-                    <div class="row setup-content" id="step-2" ng-show="vm.step == 3">
+                    <div class="row setup-content" id="step-4" ng-show="vm.step == 4">
                         <div class="col-xs-12">
                             
                             <div class="col-md-12 well text-center">
@@ -210,7 +231,7 @@
                    
 
                         <!-- STEP 4 CHOOSE ACTIONS -->
-                    <div class="row setup-content" id="step-3" ng-show="vm.step == 4">
+                    <div class="row setup-content" id="step-5" ng-show="vm.step == 5">
                         <div class="col-xs-12">
                             <div class="col-md-12 well text-center">
                                 <h1 class="text-center"><%= __('scenario-actions') %></h1>

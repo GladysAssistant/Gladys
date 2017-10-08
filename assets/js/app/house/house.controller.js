@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('HouseCtrl', HouseCtrl);
 
-    HouseCtrl.$inject = ['houseService', 'roomService'];
+    HouseCtrl.$inject = ['houseService', 'roomService', 'notificationService'];
 
-    function HouseCtrl(houseService, roomService) {
+    function HouseCtrl(houseService, roomService, notificationService) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -45,6 +45,17 @@
                 .then(function(data){
                     getHouses();
                     resetNewHouseFields();
+                })
+                .catch(function(err){
+                    if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                        for(var key in err.data.invalidAttributes){
+                            if(err.data.invalidAttributes.hasOwnProperty(key)){
+                                notificationService.errorNotificationTranslated('HOUSE.INVALID_' + key.toUpperCase());
+                            }
+                        }
+                    } else {
+                        notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                    }
                 });
         }
 
@@ -53,6 +64,17 @@
                 .then(function(data){
                     getRooms();
                     resetNewRoomFields();
+                })
+                .catch(function(err) {
+                    if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                        for(var key in err.data.invalidAttributes){
+                            if(err.data.invalidAttributes.hasOwnProperty(key)){
+                                notificationService.errorNotificationTranslated('ROOM.INVALID_' + key.toUpperCase());
+                            }
+                        }
+                    } else {
+                        notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                    }
                 });
         }
 

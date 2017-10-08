@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('ParamUserCtrl', ParamUserCtrl);
 
-    ParamUserCtrl.$inject = ['paramUserService'];
+    ParamUserCtrl.$inject = ['paramUserService', 'notificationService'];
 
-    function ParamUserCtrl(paramUserService) {
+    function ParamUserCtrl(paramUserService, notificationService) {
         /* jshint validthis: true */
         var vm = this;
         vm.params = [];
@@ -58,7 +58,18 @@
               .then(function(data){
                   vm.params.push(data.data);
                   vm.newParam = {};
-              });
+              })
+              .catch(function(err) {
+                if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                    for(var key in err.data.invalidAttributes) {
+                        if(err.data.invalidAttributes.hasOwnProperty(key)){
+                            notificationService.errorNotificationTranslated('PARAM.INVALID_' + key.toUpperCase());
+                        }
+                    }
+                } else {
+                    notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                }
+             });
         }
     }
 })();

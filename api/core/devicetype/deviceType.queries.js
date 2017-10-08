@@ -1,14 +1,14 @@
 
 module.exports = {
   getDeviceType: `
-    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, dt.identifier as deviceTypeIdentifier, room.name as roomName
+    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.protocol, dt.identifier as deviceTypeIdentifier, room.name as roomName
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
     LEFT JOIN room ON d.room = room.id 
     WHERE dt.id = ?;
   `,
    getByRoom: `
-   SELECT d.name, dt.id, dt.type, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
+   SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
    ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
    FROM device d
    JOIN devicetype dt ON (d.id = dt.device)
