@@ -53,7 +53,10 @@
 			editor.getSession().setMode("ace/mode/javascript");
 			editor.setOptions({
 				minLines:5,
-				maxLines: 25
+				maxLines: 25,
+				enableBasicAutocompletion: true,
+				enableSnippets: true,
+				enableLiveAutocompletion: true
             });
         } 
         
