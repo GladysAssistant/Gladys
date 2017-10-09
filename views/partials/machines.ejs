@@ -34,17 +34,17 @@
                         <tr>
                             <td></td>
                             <td>
-                                <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" />
+                                <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" data-toggle="tooltip" data-original-title="Donnez un nom à votre machine" />
                             </td>
                                 <td>
                                     
                                     <select  class="form-control"
                                             ng-options="house.name for house in vm.houses track by house.id"
-                                            ng-model="vm.newMachine.house" >
+                                            ng-model="vm.newMachine.house" data-toggle="tooltip" data-original-title="Sélectionnez la maison dans laquelle se trouve la machine" >
                                     </select>
                             </td>
                                 <td>
-                                <input type="text" class="form-control" ng-model="vm.newMachine.host" placeholder="<%= __('Host') %>" />
+                                <input type="text" class="form-control" ng-model="vm.newMachine.host" placeholder="<%= __('Host') %>" data-toggle="tooltip" data-original-title="Renseignez l'adresse IP de votre machine" />
                             </td>
                             <td>
                                 <button class="btn btn-success btn-sm" ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
