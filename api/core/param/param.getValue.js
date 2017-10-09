@@ -13,7 +13,7 @@ module.exports = function getValue(name){
       .then(function(values){
          
          if(values.length === 0){
-             return Promise.reject(new Error('Param not found'));
+             return Promise.reject(new Error(`Param ${name} not found`));
          } 
          
          shared.cache[name] = values[0].value;
