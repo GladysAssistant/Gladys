@@ -40,13 +40,13 @@
             </tr>
             <tr>
                 <td></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.name" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.address" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.city" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.postcode" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.country" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.latitude" /></td>
-                <td><input type="text" class="form-control" ng-model="vm.newHouse.longitude" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.name" data-toggle="tooltip" data-original-title="Donnez un nom à votre maison" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.address" data-toggle="tooltip" data-original-title="Saisissez votre addresse" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.city" data-toggle="tooltip" data-original-title="Saisissez votre ville" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.postcode" data-toggle="tooltip" data-original-title="Saisissez votre code postal" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.country" data-toggle="tooltip" data-original-title="Saisissez votre pays" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.latitude" data-toggle="tooltip" data-original-title="Entrez la latitude correspondante à votre adresse" /></td>
+                <td><input type="text" class="form-control" ng-model="vm.newHouse.longitude" data-toggle="tooltip" data-original-title="Entrez la longitude correspondante à votre adresse" /></td>
                 <td><button class="btn btn-success btn-sm" ng-click="vm.createHouse(vm.newHouse)"><%= __('New') %></button></td>
             </tr>
         </tbody>
@@ -84,8 +84,8 @@
             </tr>
             <tr class="ng-cloak"> 
                 <td></td>
-                <td><input type="text" class="form-control" ng-model="vm.newRoom.name" /></td>
-                <td><select ng-model="vm.newRoom.house" class="form-control" >
+                <td><input type="text" class="form-control" ng-model="vm.newRoom.name" data-toggle="tooltip" data-original-title="Donnez un nom à votre pièce" /></td>
+                <td><select ng-model="vm.newRoom.house" class="form-control" data-toggle="tooltip" data-original-title="Sélectionnez la maison associé à la pièce" >
                         <option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>
                 </select>
 
