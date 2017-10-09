@@ -26,10 +26,10 @@
                         <td><button ng-click="vm.deleteArea($index, area.id)" class= "btn btn-danger btn-sm"><%= __('area-delete') %></button></td>
                     </tr>
                     <tr>
-                        <td><input type="text" class="form-control" ng-model="vm.newArea.name" /></td>
-                        <td><input type="text" class="form-control" ng-model="vm.newArea.latitude" /></td>
-                        <td><input type="text" class="form-control" ng-model="vm.newArea.longitude" /></td>
-                        <td><input type="text" class="form-control" ng-model="vm.newArea.radius" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newArea.name" data-toggle="tooltip" data-original-title="Donnez un nom à votre zone" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newArea.latitude" data-toggle="tooltip" data-original-title="Entrez la latitude par ex. 42.6542" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newArea.longitude" data-toggle="tooltip" data-original-title="Entrez la longitude par ex. 4.5482" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newArea.radius" data-toggle="tooltip" data-original-title="Entrez un rayon en mètres par ex. 25" /></td>
                         <td><button class="btn btn-success btn-sm" ng-click="vm.createArea(vm.newArea)"><%= __('area-new') %></button></td>
                     </tr>
                 </tbody>
