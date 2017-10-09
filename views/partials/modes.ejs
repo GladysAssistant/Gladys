@@ -24,9 +24,9 @@
                         <td><button ng-click="vm.destroyMode($index, mode.id)" class= "btn btn-danger btn-sm"><%= __('mode-delete') %></button></td>
                     </tr>
                     <tr>
-                        <td><input type="text" class="form-control" ng-model="vm.newMode.code" /></td>
-                        <td><input type="text" class="form-control" ng-model="vm.newMode.name" /></td>
-                        <td><input type="text" class="form-control" ng-model="vm.newMode.description" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.code" data-toggle="tooltip" data-original-title="Attribuez un code à votre état, il doit être unique et sans espace" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.name" data-toggle="tooltip" data-original-title="Donnez lui un nom" /></td>
+                        <td><input type="text" class="form-control" ng-model="vm.newMode.description" data-toggle="tooltip" data-original-title="Ajoutez une description pour vous" /></td>
                         <td><button class="btn btn-success btn-sm" ng-click="vm.createMode(vm.newMode)"><%= __('mode-new') %></button></td>
                     </tr>
                 </tbody>
