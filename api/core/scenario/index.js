@@ -1,5 +1,7 @@
 module.exports.create = require('./scenario.create.js');
 module.exports.exec = require('./scenario.exec.js');
+module.exports.export = require('./scenario.export.js');
+module.exports.import = require('./scenario.import.js');
 module.exports.trigger = require('./scenario.trigger.js');
 
 

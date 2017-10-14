@@ -1,0 +1,1 @@
+module.exports.getByActionType = require('./actiontypeparam.getByActionType.js');

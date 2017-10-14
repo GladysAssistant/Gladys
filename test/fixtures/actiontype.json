@@ -10,7 +10,7 @@
     {
        "id": 2,
        "uuid": "aaac0ee0-40f4-44d8-82c4-f24717c770fa",
-       "service": "test",
+       "service": "test2",
        "function": "exec",
        "name": "Retrieve all device",
        "description": "Awesome function get all devices."
