@@ -10,6 +10,7 @@ module.exports = function insertBatch(elements) {
             sentence.service = element.service;
             sentence.label = element.label;
             sentence.language = element.language;
+            sentence.status = 'official';
 
             return gladys.sentence.create(sentence);
         });
