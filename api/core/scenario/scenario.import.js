@@ -60,7 +60,11 @@ module.exports = function(params) {
             result.actions = actions;
             sails.log.info(`Scenario : import : Action inserted with success !`);
             
-            return result;
+            return {
+                trigger: result.launcher,
+                conditions: result.states,
+                actions: result.actions
+            };
         });
     
 };
