@@ -205,6 +205,7 @@ module.exports.routes = {
   // Scenario 
   'post /scenario/:id/export': 'ScenarioController.exportScenario',
   'post /scenario': 'ScenarioController.importScenario',
+  'patch /scenario/:id': 'ScenarioController.updateScenario',
   
   // Script
   'get /script': 'ScriptController.index',
