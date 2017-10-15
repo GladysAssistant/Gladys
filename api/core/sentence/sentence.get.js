@@ -6,7 +6,7 @@ module.exports = function(options){
   options.take = parseInt(options.take) || 50;
   options.status = options.status || false;
   
-  let query = queries.get;
+  var query = queries.get;
   
   if(options.status === 'official') query = queries.getOffical;
   if(options.status === 'approved') query = queries.getApproved;
