@@ -54,5 +54,9 @@ module.exports = {
     res.view('me/index', {User: req.session.User, pageName: req.__('pagename-me')});
   },
 
+  sentence(req, res, next) {
+    res.view('sentence/index', {User: req.session.User, pageName: req.__('pagename-sentence')});
+  }
+
 };
 

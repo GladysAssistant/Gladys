@@ -67,6 +67,10 @@ var translationsEN = {
     VALIDATION: {
         ERROR: 'Some fields are invalid !'
     },
+    BRAIN: {
+        TRAINNED_SUCCESS_NOTIFICATION: 'Brain trained with success !',
+        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !'
+    },
     SCENARIO: {
         CREATE_ERROR: 'Cannot create scenario, the scenario may not be valid.',
         UPDATE_ERROR: 'Cannot update scenario, the scenario may not be valid.'
@@ -144,6 +148,10 @@ var translationsFR = {
     },
     VALIDATION: {
         ERROR: 'Certains champs sont invalides !'
+    },
+    BRAIN: {
+        TRAINNED_SUCCESS_NOTIFICATION: 'Le Brain a été entrainé avec succès !',
+        TRAINNED_FAIL_NOTIFICATION: 'Il y a eu une erreur durant l\'entrainement du Brain'
     },
     SCENARIO: {
         CREATE_ERROR: 'Impossible de créer le scénario, le scénario est peut-être invalide.',

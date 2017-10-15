@@ -107,6 +107,11 @@ module.exports.routes = {
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
   'get /devicetype/:id': 'DeviceTypeController.getById',
+
+  // Sentence
+  'get /sentence': 'SentenceController.index',
+  'get /sentence/label': 'SentenceController.getLabels',
+  'patch /sentence/:id': 'SentenceController.update',
   
   // Event
   'get /event': 'EventController.index',

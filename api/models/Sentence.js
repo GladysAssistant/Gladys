@@ -34,7 +34,12 @@ module.exports = {
   	language: {
   		type: 'string',
   		required: true
-  	}
+    }, 
+    status: {
+      type: 'string',
+      enum: ['pending', 'rejected', 'approved', 'official'],
+      defaultsTo: 'pending'
+    }
 
   }
 };

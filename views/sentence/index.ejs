@@ -1,0 +1,80 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side" >
+                <!-- Content Header (Page header) -->
+                <section class="content-header" >
+                    <h1>
+                        <%= __('Brain') %>
+                        <small><%= __('Control panel') %></small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-bolt"></i> <%= __('Brain') %></a></li>
+                        <li class="active"><%= __('Control panel') %></li>
+                    </ol>
+                </section>
+                <!-- Main content -->
+                <section class="content"  data-ng-controller="SentenceCtrl as vm">
+                     <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li ng-class="vm.status === false && 'active'"><a ng-click="vm.setStatus(false)" aria-expanded="true"><%= __('sentence-all') %></a></li>
+              <li ng-class="vm.status === 'pending' && 'active'"><a ng-click="vm.setStatus('pending')" aria-expanded="true"><%= __('sentence-pending') %></a></li>
+              <li ng-class="vm.status === 'approved' && 'active'"><a ng-click="vm.setStatus('approved')" aria-expanded="true"><%= __('sentence-approved') %></a></li>
+              <li ng-class="vm.status === 'official' && 'active'"><a ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
+              <li ng-class="vm.status === 'rejected' && 'active'"><a ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
+
+              <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" aria-expanded="true"> <%= __('brain-train-new') %> </a></li>
+              <li ng-show="vm.training" class="pull-right"> <%= __('brain-trainning') %> </li>
+            </ul>
+            <div class="tab-content">
+                
+                <div class="tab-pane active" id="tab_1">
+                    <!-- BEGINNING OF TAB 1 -->
+                        <div class="box-body table-responsive">
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><%= __('ID') %></th>
+                                                <th><%= __('Text') %></th>
+                                                <th><%= __('Label') %></th>
+                                                <th><%= __('Status') %></th>
+                                                <th><%= __('Action') %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr infinite-scroll="vm.loadMore()" ng-repeat="sentence in vm.sentences" class="ng-cloak">
+                                                <td>{{sentence.id}}</td>
+                                                <td>{{sentence.text}}</td>
+                                                <td>                                                    
+                                                    <select name="selectRoom" id="selectRoom" class="form-control" ng-model="sentence.label" ng-change="vm.change(sentence)">
+                                                            <option ng-value="label.label" ng-repeat="label in vm.labels" ng-selected="vm.eq(label.label, sentence.label)">{{label.label}}</option>
+                                                   </select>
+                                                </td>
+                                                <td>{{sentence.status}}</td>
+                                                <td>
+                                                    <button ng-hide="vm.oneOf(sentence.status, ['approved', 'official'])" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
+                                                    <button ng-hide="vm.eq(sentence.status, 'rejected')" class="btn btn-danger btn-sm"  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                        </div>          
+                    <!-- END OF TAB 1 -->
+                </div>
+                
+              <div class="tab-pane" id="tab_2">
+                    <!-- BEGINNING OF TAB 2 -->     
+                    <!-- END OF TAB 2 -->
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_3" data-ng-controller="DeviceStateCtrl as vm">
+                  <!-- BEGINNING OF TAB 3 -->
+                  <!-- END OF TAB 3 -->
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_3">
+              </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+        </section><!-- /.content -->
+    </aside><!-- /.right-side -->

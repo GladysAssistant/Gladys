@@ -25,6 +25,7 @@
   "pagename-music":"Music",
   "pagename-module": "Modules",
   "pagename-device": "Device",
+  "pagename-sentence": "Brain",
   "dashboard-default-box-title": "Welcome in Gladys !",
   "dashboard-default-box-text": "You are on the dashboard of Gladys. To add boxs on this dashboard, go to \"Parameters\" then \"Boxs\".",
   "modules-installed": "Installed Modules",
@@ -268,5 +269,11 @@
   "create-user-button-create": "Create a new user",
   "account-update-button": "Update my account",
   "dashboard-chat-box-title": "Chat",
-  "default-answer-gladys-brain": "I don't have the answer, I'm sorry :/"
+  "default-answer-gladys-brain": "I don't have the answer, I'm sorry :/",
+  "sentence-all": "All sentences",
+  "sentence-pending": "Pending sentences",
+  "sentence-approved": "Approved sentences",
+  "sentence-official": "Official sentences",
+  "sentence-rejected": "Rejected sentences",
+  "brain-train-new": "Train the Brain"
 }
