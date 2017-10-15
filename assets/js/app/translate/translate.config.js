@@ -67,6 +67,10 @@ var translationsEN = {
     VALIDATION: {
         ERROR: 'Some fields are invalid !'
     },
+    SCENARIO: {
+        CREATE_ERROR: 'Cannot create scenario, the scenario may not be valid.',
+        UPDATE_ERROR: 'Cannot update scenario, the scenario may not be valid.'
+    },
     DEFAULT: {
         ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
     }
@@ -140,6 +144,10 @@ var translationsFR = {
     },
     VALIDATION: {
         ERROR: 'Certains champs sont invalides !'
+    },
+    SCENARIO: {
+        CREATE_ERROR: 'Impossible de créer le scénario, le scénario est peut-être invalide.',
+        UPDATE_ERROR: 'Impossible de mettre à jour le scénario, le scénario est peut-être invalide.'
     },
     DEFAULT: {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'

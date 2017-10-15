@@ -20,13 +20,28 @@
         
         var service = {           
            getOptions: getOptions,
-           generateTemplate: generateTemplate
+           generateTemplate: generateTemplate,
+           exportScenario: exportScenario,
+           importScenario: importScenario,
+           updateScenario: updateScenario
         };
 
         return service;
         
         function getOptions(path){
             return $http({method: 'GET', url: path});
+        }
+
+        function exportScenario(id){
+            return $http({method: 'POST', url: '/scenario/' + id + '/export'});
+        }
+
+        function importScenario(data){
+            return $http({method: 'POST', url: '/scenario', data: data});
+        }
+
+        function updateScenario(id, data){
+            return $http({method: 'PATCH', url: '/scenario/' + id, data: data});
         }
         
         // will generate a templateString like
