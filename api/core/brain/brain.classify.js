@@ -33,7 +33,8 @@ module.exports = function classify(user, message){
                 var splitted = classification.split(sails.config.brain.separator);
                 sails.log.info(`brain : classify : Identified label ${classification}`);
                 return callAction(clone(scope), message, splitted[0], splitted[1])
-                    .then((result) => answer(result, user));
+                    .then((result) => answer(result, user))
+                    .then( result => gladys.sentence.createLocal({ text: scope.replacedText, language: scope.language, service: splitted[0], label: splitted[1] }).then(() => result))
             });
         })
         .then((result) => {
