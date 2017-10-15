@@ -3,9 +3,9 @@ var validateAction = require('../../validator/actionValidator.js');
 
 describe('Scenario', function() {
 
-  describe('import', function() {
+  describe('update', function() {
     
-    it('should import a scenario', function (done) {
+    it('should update a scenario', function (done) {
           
         var scenario = {
             "trigger":  {
@@ -35,9 +35,9 @@ describe('Scenario', function() {
             ]
         };
         
-        gladys.scenario.import(scenario)
+        gladys.scenario.update(1, scenario)
             .then(function(result){
-
+        
                 result.should.have.property('trigger');
                 result.should.have.property('conditions');
                 result.should.have.property('actions');

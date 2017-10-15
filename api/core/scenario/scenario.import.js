@@ -9,14 +9,19 @@ module.exports = function(params) {
         .then((eventType) => {
 
             sails.log.info(`Scenario : import : creating launcher with code "${eventType.code}"`);
-            
-            return gladys.launcher.create({
+
+            var launcher = {
                 eventtype: eventType.id,
                 title: params.trigger.title,
                 condition_template: params.trigger.condition_template,
                 active: params.trigger.active,
                 user: params.trigger.user
-            });
+            };
+
+            // if we want to create the launcher with a specific idea, it's possible
+            if(params.trigger.id) launcher.id = params.trigger.id;
+            
+            return gladys.launcher.create(launcher);
         })
         .then((launcher) => {
 
