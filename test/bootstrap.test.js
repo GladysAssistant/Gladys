@@ -184,6 +184,12 @@ function addTestModuleGladys(gladys){
         }
     };
 
+    gladys.modules.test2 = {
+        exec: function(){
+            return Promise.resolve();
+        }
+    };
+
     // register direction module
     gladys.direction.addProvider('test');
 

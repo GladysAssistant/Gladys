@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('scenarioCtrl', scenarioCtrl);
 
-    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService'];
+    scenarioCtrl.$inject = ['scenarioService', 'categoryService', 'eventTypeService', 'stateTypeService', 'launcherService',  'stateService', 'actionTypeService', 'actionService', 'notificationService', '$scope'];
 
-    function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService, actionTypeService, actionService) {
+    function scenarioCtrl(scenarioService, categoryService, eventTypeService, stateTypeService, launcherService, stateService, actionTypeService, actionService, notificationService, $scope) {
         /* jshint validthis: true */
         var vm = this;
         
@@ -32,6 +32,9 @@
         vm.removeAction = removeAction;
         vm.initialiseVar = initialiseVar;
         vm.nextStep = nextStep;
+        vm.editScenario = editScenario;
+        vm.updateScenario = updateScenario;
+        vm.startCreateScenarioTextModal = startCreateScenarioTextModal;
         
         vm.actionTypes = [];
         vm.launchers = [];
@@ -56,7 +59,19 @@
             vm.step = 1;
         }
         
-        
+        var editor;
+
+        $scope.$watch('vm.currentScenario', function(newValue, oldValue){
+            if(editor) {
+                editor.setValue(vm.currentScenario.yaml);
+            }
+        });
+
+        $('#modalUpdateScenario').on('shown.bs.modal', function () {
+            if(!editor) {
+                activateEditor();
+            }
+        });
         
         function getLaunchers(){
            return launcherService.get()
@@ -199,6 +214,81 @@
               .then(function(){
                   vm.launchers.splice(index, 1);
               });
+        }
+
+        function activateEditor(){
+            editor = ace.edit("scenario-editor");
+            ace.config.set("basePath", "/js/dependencies/ace");
+			editor.setTheme("ace/theme/xcode");
+			editor.getSession().setMode("ace/mode/yaml");
+			editor.setOptions({
+				minLines:5,
+				maxLines: 25
+            });
+        } 
+
+
+        function startCreateScenarioTextModal(){
+            vm.currentScenario = {
+                yaml: jsyaml.safeDump({
+                    trigger: {
+                        title: '',
+                        condition_template: 'true',
+                        active: 1,
+                        code: '',
+                        user: ''
+                    }, 
+                    conditions: [], 
+                    actions: []
+                })
+            };
+            $('#modalUpdateScenario').modal('show');
+        }
+        
+
+        function editScenario(index, id){
+            
+            // if editor already exist, clean data
+            if(editor) {
+                editor.setValue('');
+            }
+
+            scenarioService.exportScenario(id)
+                .then((data) => {
+                    vm.currentScenario = {
+                        yaml: jsyaml.safeDump(data.data),
+                        index: index,
+                        id: id
+                    };
+                    if(editor) {
+                        editor.setValue('');
+                    }
+                    $('#modalUpdateScenario').modal('show');
+                })
+                .catch((err) => notificationService.errorNotificationTranslated('DEFAULT.ERROR'));
+        }
+
+        function updateScenario(currentScenario) {
+           
+            // if we are updating an existing scenario
+            if(currentScenario.id) {
+                scenarioService.updateScenario(currentScenario.id, jsyaml.safeLoad(editor.getValue()))
+                    .then((data) => {
+                        vm.launchers[vm.currentScenario.index] = data.data.trigger;
+                        $('#modalUpdateScenario').modal('hide');
+                    })
+                    .catch(() => notificationService.errorNotificationTranslated('SCENARIO.UPDATE_ERROR'));
+            } 
+            
+            // creating a new scenario
+            else {
+                scenarioService.importScenario(jsyaml.safeLoad(editor.getValue()))
+                    .then((data) => {
+                        vm.launchers.push(data.data.trigger);
+                        $('#modalUpdateScenario').modal('hide');
+                    })
+                    .catch(() => notificationService.errorNotificationTranslated('SCENARIO.CREATE_ERROR'));
+            }
         }
        
        

@@ -78,6 +78,8 @@ var jsFilesToInject = [
   'js/dependencies/bootstrap-slider.min.js',
 
   'js/dependencies/leaflet.js',
+
+  'js/dependencies/js-yaml.min.js',
   
   
   

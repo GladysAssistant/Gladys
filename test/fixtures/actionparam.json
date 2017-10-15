@@ -4,5 +4,11 @@
         "value": 1,
         "action": 1,
         "actiontypeparam": 1
+    },
+    {
+        "id": 2,
+        "value": 1,
+        "action": 1,
+        "actiontypeparam": 2
     }
 ]

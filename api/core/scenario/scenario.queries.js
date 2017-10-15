@@ -19,5 +19,29 @@ module.exports = {
     FROM state
     INNER JOIN statetype ON state.state = statetype.id
     WHERE launcher = ?; 
+  `,
+  getLauncher: `
+    SELECT launcher.title, launcher.condition_template, launcher.active, eventtype.code, launcher.user
+    FROM launcher 
+    JOIN eventtype ON launcher.eventtype = eventtype.id
+    WHERE launcher.id = ?;
+  `,
+  getStates: `
+    SELECT CONCAT(statetype.service, '.', statetype.function) as code, state.condition_template, state.active,
+    stateparam.value, statetypeparam.variablename
+    FROM state 
+    JOIN statetype ON state.state = statetype.id
+    JOIN stateparam ON stateparam.state = state.id
+    JOIN statetypeparam ON statetypeparam.id = stateparam.statetypeparam
+    WHERE launcher = ?;
+  `,
+  getActions: 
+  ` 
+    SELECT CONCAT(actiontype.service, '.', actiontype.function) as code, actionparam.value, actiontypeparam.variablename
+    FROM action 
+    JOIN actiontype ON action.action = actiontype.id
+    JOIN actionparam ON actionparam.action = action.id
+    JOIN actiontypeparam ON actiontypeparam.id = actionparam.actiontypeparam
+    WHERE launcher = ?; 
   `
 };

@@ -5,5 +5,19 @@
         "path": "/house",
         "variablename": "houseId",
         "actiontype": 1
+    },
+    {
+        "id": 2,
+        "name": "User id",
+        "path": "/user",
+        "variablename": "userId",
+        "actiontype": 1
+    },
+    {
+        "id": 3,
+        "name": "Test",
+        "path": "/test",
+        "variablename": "test",
+        "actiontype": 1
     }
 ]

@@ -9,6 +9,7 @@ gladys.load = function load(cb) {
     // require all Gladys dependencies
     gladys.action = require('./action/index.js');
     gladys.actionType = require('./actiontype/index.js');
+    gladys.actionTypeParam = require('./actiontypeparam/index.js');
     gladys.alarm = require('./alarm/index.js');
     gladys.answer = require('./answer/index.js');
     gladys.area = require('./area/index.js');

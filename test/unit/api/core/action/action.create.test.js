@@ -9,7 +9,10 @@ describe('Action', function() {
      	 
           var action = {
             launcher: 1,
-            action: 1
+            action: 1,
+            params: {
+              test: 'test'
+            }
           };
           
           gladys.action.create(action)

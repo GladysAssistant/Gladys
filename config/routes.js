@@ -206,6 +206,11 @@ module.exports.routes = {
   'post /paramuser': 'ParamUserController.create',
   'patch /paramuser/:name': 'ParamUserController.update',
   'delete /paramuser/:name': 'ParamUserController.delete',
+
+  // Scenario 
+  'post /scenario/:id/export': 'ScenarioController.exportScenario',
+  'post /scenario': 'ScenarioController.importScenario',
+  'patch /scenario/:id': 'ScenarioController.updateScenario',
   
   // Script
   'get /script': 'ScriptController.index',

@@ -67,6 +67,14 @@ var translationsEN = {
     VALIDATION: {
         ERROR: 'Some fields are invalid !'
     },
+    BRAIN: {
+        TRAINNED_SUCCESS_NOTIFICATION: 'Brain trained with success !',
+        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !'
+    },
+    SCENARIO: {
+        CREATE_ERROR: 'Cannot create scenario, the scenario may not be valid.',
+        UPDATE_ERROR: 'Cannot update scenario, the scenario may not be valid.'
+    },
     DEFAULT: {
         ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
     }
@@ -142,8 +150,12 @@ var translationsFR = {
         ERROR: 'Certains champs sont invalides !'
     },
     BRAIN: {
-        TRAINNED_SUCCESS_NOTIFICATION: 'Brain trained with success !',
-        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !'
+        TRAINNED_SUCCESS_NOTIFICATION: 'Le Brain a été entrainé avec succès !',
+        TRAINNED_FAIL_NOTIFICATION: 'Il y a eu une erreur durant l\'entrainement du Brain'
+    },
+    SCENARIO: {
+        CREATE_ERROR: 'Impossible de créer le scénario, le scénario est peut-être invalide.',
+        UPDATE_ERROR: 'Impossible de mettre à jour le scénario, le scénario est peut-être invalide.'
     },
     DEFAULT: {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
