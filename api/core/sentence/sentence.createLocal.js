@@ -12,7 +12,7 @@ module.exports = function createLocal({ text, label, service, language }){
 				uuid: uuid.v4(), 
 				text, 
 				label,
-				status: label === 'no-command-detected' ? 'pending' : 'approuve',
+				status: label === 'no-command-detected' ? 'pending' : 'approved',
 				service,
 				language
 			});

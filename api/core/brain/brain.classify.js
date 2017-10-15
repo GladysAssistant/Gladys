@@ -29,7 +29,7 @@ module.exports = function classify(user, message){
             }
 
             // foreach classified label
-            return Promise.map(classifications, function(classification){
+            return Promise.map(classifications, function(classification) {
                 var splitted = classification.split(sails.config.brain.separator);
                 sails.log.info(`brain : classify : Identified label ${classification}`);
                 return callAction(clone(scope), message, splitted[0], splitted[1])

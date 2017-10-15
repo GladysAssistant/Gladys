@@ -69,6 +69,7 @@ module.exports.policies = {
   Room : ['checkToken'],
   Scenario : ['checkToken'],
   Script : ['checkToken'],
+  Sentence : ['checkToken'],
   Session : {
     newUser: ['signupAllowed'],
     createUser: ['signupAllowed'],

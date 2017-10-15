@@ -37,7 +37,7 @@ module.exports.connections = {
     host: process.env.MYSQL_HOST_TEST || 'localhost',
     port: process.env.MYSQL_PORT_TEST || 3306,
     user: process.env.MYSQL_USER_TEST || 'root',
-    password: (typeof process.env.MYSQL_PASSWORD_TEST !== 'undefined') ? process.env.MYSQL_PASSWORD_TEST : 'root',
+    password: process.env.MYSQL_PASSWORD_TEST,
     database: process.env.MYSQL_DATABASE_TEST || 'gladystest'
   },
 
@@ -54,7 +54,7 @@ module.exports.connections = {
     host: process.env.MYSQL_HOST || 'localhost',
     port: process.env.MYSQL_PORT || 3306,
     user: process.env.MYSQL_USER || 'root',
-    password: (typeof process.env.MYSQL_PASSWORD !== 'undefined') ? process.env.MYSQL_PASSWORD : 'root',
+    password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE || 'gladys'
   },
   
