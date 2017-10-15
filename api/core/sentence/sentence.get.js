@@ -4,5 +4,15 @@ module.exports = function(options){
   options = options || {};
   options.skip = parseInt(options.skip) || 0;
   options.take = parseInt(options.take) || 50;
-  return gladys.utils.sql(queries.get, [options.take, options.skip]);  
+  options.status = options.status || false;
+  
+  let query = queries.get;
+  
+  if(options.status === 'official') query = queries.getOffical;
+  if(options.status === 'approved') query = queries.getApproved;
+  if(options.status === 'rejected') query = queries.getRejected;
+  if(options.status === 'pending') query = queries.getPending;
+
+  return gladys.utils.sql(query, [options.take, options.skip]);
 };
+

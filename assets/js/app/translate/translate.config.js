@@ -141,6 +141,10 @@ var translationsFR = {
     VALIDATION: {
         ERROR: 'Certains champs sont invalides !'
     },
+    BRAIN: {
+        TRAINNED_SUCCESS_NOTIFICATION: 'Brain trained with success !',
+        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !'
+    },
     DEFAULT: {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
     }

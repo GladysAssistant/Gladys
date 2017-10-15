@@ -15,9 +15,9 @@
     .module('gladys')
     .controller('SentenceCtrl', SentenceCtrl);
 
-  SentenceCtrl.$inject = ['sentenceService', '$scope', 'notificationService'];
+  SentenceCtrl.$inject = ['sentenceService', '$scope', 'notificationService', 'brainService'];
 
-  function SentenceCtrl(sentenceService, $scope, notificationService) {
+  function SentenceCtrl(sentenceService, $scope, notificationService, brainService) {
     /* jshint validthis: true */
     var vm = this;
     vm.sentences = [];
@@ -31,15 +31,42 @@
     vm.noMoreSentences = false;
     vm.startValue = 0;
     vm.nbElementToGet = 50;
+    vm.setStatus = setStatus;
+    vm.status = 'pending';
+    vm.trainNew = trainNew;
+    vm.training = false;
     // helpers
     vm.eq = (a, b) => a === b;
     vm.neq = (a, b) => a != b;
+    vm.oneOf = (value, array) => ~array.indexOf(value);
 
     activate();
 
     function activate() {
         return getLabels()
         .then(loadMore());
+    }
+
+    function trainNew() {
+        vm.training = true;
+         brainService.trainNew()
+         .then(() => {
+             vm.training = false
+             notificationService.successNotificationTranslated('BRAIN.TRAINNED_SUCCESS_NOTIFICATION');
+        })
+        .catch(() => {
+             vm.training = false
+             notificationService.errorNotificationTranslated('BRAIN.TRAINNED_FAIL_NOTIFICATION');
+        });
+    }
+     
+    function setStatus( status ) {
+        if(status === vm.status) return Promise.resolve();
+        vm.status = status;
+        vm.startValue = 0;
+        vm.sentences = [];
+        vm.noMoreSentences = false;
+        return loadMore();
     }
 
     function change(sentence) {
@@ -59,16 +86,16 @@
     }
     function loadMore(){
         if(!vm.remoteIsBusy && !vm.noMoreSentences){
-            return get(vm.startValue+vm.nbElementToGet, vm.startValue)
+            return get(vm.status, vm.startValue+vm.nbElementToGet, vm.startValue)
             .then(() => vm.startValue += vm.nbElementToGet)
         }
         else {
             Promise.resolve()
         }
     }
-    function get(take, skip) {
+    function get(status, take, skip) {
         vm.remoteIsBusy = true;
-        return sentenceService.get(take, skip)
+        return sentenceService.get({status}, take, skip)
             .then(function(data){
                 if(data.data.length === 0){
                     vm.noMoreSentences = true;

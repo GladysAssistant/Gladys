@@ -30,8 +30,8 @@
         
         // all about sentences 
         
-        function get(take, skip) {
-            return $http({method: 'GET', url: '/sentence', params: {take: take, skip: skip}});
+        function get(options, take, skip) {
+            return $http({method: 'GET', url: '/sentence', params: { status: options.status, take: take, skip: skip}});
         }
         
         function update(sentence){

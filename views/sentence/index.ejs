@@ -15,14 +15,17 @@
                 <section class="content"  data-ng-controller="SentenceCtrl as vm">
                      <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('sentence-approved') %></a></li>
-              <li><a href="#tab_2" data-toggle="tab" aria-expanded="true"><%= __('sentence-declined') %></a></li>
-              <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('sentence-rejected') %></a></li>
+              <li ng-class="vm.status === false && 'active'"><a ng-click="vm.setStatus(false)" aria-expanded="true"><%= __('sentence-all') %></a></li>
+              <li ng-class="vm.status === 'pending' && 'active'"><a ng-click="vm.setStatus('pending')" aria-expanded="true"><%= __('sentence-pending') %></a></li>
+              <li ng-class="vm.status === 'approved' && 'active'"><a ng-click="vm.setStatus('approved')" aria-expanded="true"><%= __('sentence-approved') %></a></li>
+              <li ng-class="vm.status === 'official' && 'active'"><a ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
+              <li ng-class="vm.status === 'rejected' && 'active'"><a ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
+
+              <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" aria-expanded="true"> <%= __('brain-train-new') %> </a></li>
+              <li ng-show="vm.training" class="pull-right"> <%= __('brain-trainning') %> </li>
             </ul>
             <div class="tab-content">
                 
-
-
                 <div class="tab-pane active" id="tab_1">
                     <!-- BEGINNING OF TAB 1 -->
                         <div class="box-body table-responsive">
@@ -47,7 +50,7 @@
                                                 </td>
                                                 <td>{{sentence.status}}</td>
                                                 <td>
-                                                    <button ng-hide="vm.eq(sentence.status, 'approved')" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
+                                                    <button ng-hide="vm.oneOf(sentence.status, ['approved', 'official'])" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
                                                     <button ng-hide="vm.eq(sentence.status, 'rejected')" class="btn btn-danger btn-sm"  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
                                                 </td>
                                             </tr>
@@ -56,6 +59,7 @@
                         </div>          
                     <!-- END OF TAB 1 -->
                 </div>
+                
               <div class="tab-pane" id="tab_2">
                     <!-- BEGINNING OF TAB 2 -->     
                     <!-- END OF TAB 2 -->

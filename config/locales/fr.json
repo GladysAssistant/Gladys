@@ -432,5 +432,11 @@
   "create-user-button-create": "Créer un nouvel utilisateur",
   "account-update-button": "Mettre à jour mon compte",
   "dashboard-chat-box-title": "Chat",
-  "default-answer-gladys-brain": "Je ne sais pas quoi dire, désolé :/"
+  "default-answer-gladys-brain": "Je ne sais pas quoi dire, désolé :/",
+  "sentence-all": "Toutes les phrases",
+  "sentence-pending": "Phrases en attentes",
+  "sentence-approved": "Phrases approuvées",
+  "sentence-official": "Phrases officiels",
+  "sentence-rejected": "Phrases rejetées",
+  "brain-train-new": "Entrainer le Brain"
 }
