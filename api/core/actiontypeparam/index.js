@@ -1,1 +1,1 @@
-module.exports.getByActionType = require('./actiontypeparam.getByActionType.js');
+module.exports.getByActionType = require('./actionTypeParam.getByActionType.js');
