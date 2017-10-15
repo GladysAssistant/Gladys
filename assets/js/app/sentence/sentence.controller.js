@@ -35,10 +35,6 @@
     vm.status = 'pending';
     vm.trainNew = trainNew;
     vm.training = false;
-    // helpers
-    vm.eq = (a, b) => a === b;
-    vm.neq = (a, b) => a != b;
-    vm.oneOf = (value, array) => ~array.indexOf(value);
 
     activate();
 
@@ -50,11 +46,11 @@
     function trainNew() {
         vm.training = true;
          brainService.trainNew()
-         .then(() => {
+         .then(function() {
              vm.training = false
              notificationService.successNotificationTranslated('BRAIN.TRAINNED_SUCCESS_NOTIFICATION');
         })
-        .catch(() => {
+        .catch(function () {
              vm.training = false
              notificationService.errorNotificationTranslated('BRAIN.TRAINNED_FAIL_NOTIFICATION');
         });
@@ -71,23 +67,33 @@
 
     function change(sentence) {
         sentence.status = "approved";
-        return sentenceService.update(sentence)
+        return sentenceService.update(sentence);
     }
-    function reject(id) {
+
+    function reject(id, index) {
         return sentenceService.reject(id)
-        .then( ({ data }) => vm.sentences[vm.sentences.findIndex(sentence => sentence.id === data.id)] = data)
+            .then(function(data){
+                vm.sentences[index] = data.data;
+            });
     }
-    function approve(id) {
+    function approve(id, index) {
         return sentenceService.approve(id)
-        .then( ({ data }) => vm.sentences[vm.sentences.findIndex(sentence => sentence.id === data.id)] = data)
+            .then(function(){
+                vm.sentences[index] = data.data;
+            });
     }
     function getLabels() {
-        return sentenceService.getLabels().then(data => vm.labels = data.data);    
+        return sentenceService.getLabels()
+            .then(function(data){
+                vm.labels = data.data;
+            });    
     }
     function loadMore(){
         if(!vm.remoteIsBusy && !vm.noMoreSentences){
             return get(vm.status, vm.startValue+vm.nbElementToGet, vm.startValue)
-            .then(() => vm.startValue += vm.nbElementToGet)
+            .then( function() {
+                vm.startValue += vm.nbElementToGet;
+            });
         }
         else {
             Promise.resolve()
@@ -95,7 +101,7 @@
     }
     function get(status, take, skip) {
         vm.remoteIsBusy = true;
-        return sentenceService.get({status}, take, skip)
+        return sentenceService.get({status: status}, take, skip)
             .then(function(data){
                 if(data.data.length === 0){
                     vm.noMoreSentences = true;

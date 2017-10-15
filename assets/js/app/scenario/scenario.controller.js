@@ -254,7 +254,7 @@
             }
 
             scenarioService.exportScenario(id)
-                .then((data) => {
+                .then(function (data) {
                     vm.currentScenario = {
                         yaml: jsyaml.safeDump(data.data),
                         index: index,
@@ -265,7 +265,9 @@
                     }
                     $('#modalUpdateScenario').modal('show');
                 })
-                .catch((err) => notificationService.errorNotificationTranslated('DEFAULT.ERROR'));
+                .catch(function (err) {
+                    notificationService.errorNotificationTranslated('DEFAULT.ERROR')
+                });
         }
 
         function updateScenario(currentScenario) {
@@ -273,21 +275,25 @@
             // if we are updating an existing scenario
             if(currentScenario.id) {
                 scenarioService.updateScenario(currentScenario.id, jsyaml.safeLoad(editor.getValue()))
-                    .then((data) => {
+                    .then(function (data) {
                         vm.launchers[vm.currentScenario.index] = data.data.trigger;
                         $('#modalUpdateScenario').modal('hide');
                     })
-                    .catch(() => notificationService.errorNotificationTranslated('SCENARIO.UPDATE_ERROR'));
+                    .catch(function () {
+                        notificationService.errorNotificationTranslated('SCENARIO.UPDATE_ERROR')
+                    });
             } 
             
             // creating a new scenario
             else {
                 scenarioService.importScenario(jsyaml.safeLoad(editor.getValue()))
-                    .then((data) => {
+                    .then(function(data){
                         vm.launchers.push(data.data.trigger);
                         $('#modalUpdateScenario').modal('hide');
                     })
-                    .catch(() => notificationService.errorNotificationTranslated('SCENARIO.CREATE_ERROR'));
+                    .catch(function () {
+                        notificationService.errorNotificationTranslated('SCENARIO.CREATE_ERROR')
+                    });
             }
         }
        

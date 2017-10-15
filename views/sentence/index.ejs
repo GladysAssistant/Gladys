@@ -45,13 +45,13 @@
                                                 <td>{{sentence.text}}</td>
                                                 <td>                                                    
                                                     <select name="selectRoom" id="selectRoom" class="form-control" ng-model="sentence.label" ng-change="vm.change(sentence)">
-                                                            <option ng-value="label.label" ng-repeat="label in vm.labels" ng-selected="vm.eq(label.label, sentence.label)">{{label.label}}</option>
+                                                            <option ng-value="label.label" ng-repeat="label in vm.labels" ng-selected="(label.label == sentence.label)">{{label.label}}</option>
                                                    </select>
                                                 </td>
                                                 <td>{{sentence.status}}</td>
                                                 <td>
-                                                    <button ng-hide="vm.oneOf(sentence.status, ['approved', 'official'])" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
-                                                    <button ng-hide="vm.eq(sentence.status, 'rejected')" class="btn btn-danger btn-sm"  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
+                                                    <button ng-hide="['approved', 'official'].indexOf(sentence.status) != -1" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
+                                                    <button ng-hide="(sentence.status == 'rejected')" class="btn btn-danger btn-sm"  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
                                                 </td>
                                             </tr>
                                         </tbody>
