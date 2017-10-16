@@ -27,7 +27,7 @@ module.exports = {
     WHERE launcher.id = ?;
   `,
   getStates: `
-    SELECT CONCAT(statetype.service, '.', statetype.function) as code, state.condition_template, state.active,
+    SELECT state.id, CONCAT(statetype.service, '.', statetype.function) as code, state.condition_template, state.active,
     stateparam.value, statetypeparam.variablename
     FROM state 
     JOIN statetype ON state.state = statetype.id
@@ -37,7 +37,7 @@ module.exports = {
   `,
   getActions: 
   ` 
-    SELECT CONCAT(actiontype.service, '.', actiontype.function) as code, actionparam.value, actiontypeparam.variablename
+    SELECT action.id, CONCAT(actiontype.service, '.', actiontype.function) as code, actionparam.value, actiontypeparam.variablename
     FROM action 
     JOIN actiontype ON action.action = actiontype.id
     JOIN actionparam ON actionparam.action = action.id

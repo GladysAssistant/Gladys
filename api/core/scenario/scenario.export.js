@@ -20,20 +20,20 @@ module.exports = function exportScenario(id){
         });
 };
 
-function normalize(data){
+function normalize(data) {
     var newArray = [];
     var dictionnary = {};
     data.forEach(function(elem){
-        if(dictionnary[elem.code]){
-            dictionnary[elem.code].params[elem.variablename] = elem.value;
+        if(dictionnary[elem.id]){
+            dictionnary[elem.id].params[elem.variablename] = elem.value;
         } else {
-            dictionnary[elem.code] = {
+            dictionnary[elem.id] = {
                 code: elem.code,
                 params: {
                     [elem.variablename]: elem.value
                 }
             };
-            newArray.push(dictionnary[elem.code]);
+            newArray.push(dictionnary[elem.id]);
         }
     });
     return newArray;
