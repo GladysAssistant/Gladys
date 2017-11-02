@@ -35,7 +35,7 @@
         }
         
         function update(id, house) {
-            return $http({method: 'DELETE', url: '/house/' + id, data: house});
+            return $http({method: 'PATCH', url: '/house/' + id, data: house});
         }
         
         function destroy(id) {
