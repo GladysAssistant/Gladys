@@ -32,6 +32,8 @@ var cssFilesToInject = [
   'styles/device.css',
   'styles/weather.css',
   'styles/leaflet/leaflet.css',
+
+  'styles/onoffswitch.css',
   
   // all styles, disabled by default
   //'styles/**/*.css',
