@@ -85,10 +85,14 @@
                                                         </div>
                                                      </form>    
                                                     <!-- If the deviceType is not a sensor and is  a binary, display on/off button -->
-                                                    <button ng-show="!type.sensor && type.type == 'binary'" ng-click="vm.changeValue(type, !type.lastValue);" 
-                                                            class="btn {{ type.lastValue && 'btn-danger' || 'btn-success' }} btn-sm">
-                                                            {{type.lastValue && '<%= __('devices-types-off') %>' || '<%= __('devices-types-on') %>' }}
-                                                    </button>
+                                                     <!--<button ng-show="!type.sensor && type.type == 'binary'" ng-click="vm.changeValue(type, !type.lastValue);" 
+                                                             class="btn {{ type.lastValue && 'btn-danger' || 'btn-success' }} btn-sm"> 
+                                                             {{type.lastValue && '<%= __('devices-types-off') %>' || '<%= __('devices-types-on') %>' }} 
+                                                     </button>-->
+                                                     <div class="onoffswitch" ng-click="vm.changeValue(type, !type.lastValue);">
+                                                            <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="onoffswitch-checkbox" />
+                                                            <label class="onoffswitch-label" for="myonoffswitch" ng-show="!type.sensor && type.type == 'binary'"></label>
+                                                     </div>
                                                 </td>
                                                </tr>
                                         </tbody>
