@@ -23,7 +23,8 @@ module.exports = function(originalText){
 
         return {
             text, 
-            houses: result
+            houses: result,
+            allHouses: houses
         };
     });
 };

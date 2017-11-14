@@ -15,6 +15,11 @@ module.exports = function command(scope) {
     if(scope.rooms && scope.rooms.length == 1){
         event.room = scope.rooms[0].id;
     }
+
+    // if there is only one house and you say "I'm back at home" "I left home", Gladys suppose it's your only house
+    if((scope.label === 'back-at-home' || scope.label === 'left-home') && !event.house && scope.allHouses.length === 1) {
+        event.house = scope.allHouses[0];
+    }
     
     return gladys.event.create(event)
         .then(() => {
