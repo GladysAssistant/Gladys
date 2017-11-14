@@ -83,7 +83,8 @@ module.exports.policies = {
   System : {
     index: ['checkToken'],
     shutdown: ['checkToken', 'isAdmin'],
-    update: ['checkToken', 'isAdmin']
+    update: ['checkToken', 'isAdmin'],
+    healthCheck: true
   },
   Timer: ['checkToken'],
   Token : ['checkToken'],

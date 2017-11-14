@@ -22,5 +22,9 @@ module.exports = {
         // we must answer before starting update process
         res.json({success: true});
         gladys.system.update();
+    },
+
+    healthCheck: function(req, res, next){
+        return res.json({success: true});
     }
 }
