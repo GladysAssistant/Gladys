@@ -19,6 +19,8 @@
     function SystemCtrl(systemService, updateService, notificationService, brainService) {
         /* jshint validthis: true */
         var vm = this;
+
+        var TIME_BETWEEN_REBOOT_CHECK = 5000;
         
         vm.updateAllData = updateAllData;
         
@@ -26,6 +28,9 @@
         vm.updatingData = false;
         vm.shutdown = shutdown;
         vm.update = update;
+        vm.rebooting = false;
+        vm.lastCheck;
+        
         
         activate();
 
@@ -41,7 +46,24 @@
        }
        
        function shutdown(){
-           systemService.shutdown();
+            systemService.shutdown();
+            vm.rebooting = true;
+            vm.lastCheck = new Date();
+            $('#modalReboot').modal('show');
+            setTimeout(checkIfRebootFinished, TIME_BETWEEN_REBOOT_CHECK); 
+       }
+
+       function checkIfRebootFinished(){
+        return systemService.healthCheck()
+            .then(function(gladysLive){
+                vm.lastCheck = new Date();
+                if(gladysLive) {
+                    vm.rebooting = false;
+                    window.location.reload(false);
+                } else {
+                    setTimeout(checkIfRebootFinished, TIME_BETWEEN_REBOOT_CHECK);
+                }
+            });
        }
 
        function update(){

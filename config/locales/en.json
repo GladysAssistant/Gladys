@@ -276,5 +276,8 @@
   "sentence-official": "Official sentences",
   "sentence-rejected": "Rejected sentences",
   "brain-train-new": "Train the Brain",
-  "brain-training": "Training"
+  "brain-training": "Training",
+  "system-gladys-rebooting-title": "Gladys is rebooting",
+  "system-gladys-rebooting-text": "Gladys is rebooting... Waiting for Gladys to be available again. This page will reload automatically !",
+  "system-gladys-rebooting-last-check": "Last check"
 }
