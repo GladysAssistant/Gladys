@@ -239,6 +239,7 @@
   "module-installing": "Installing...",
   "module-uninstalling": "Uninstalling...", 
   "module-date": "Date",
+  "module-upgrade": "Upgrade",
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
     "alarm-cron-rule": "Cron rules",

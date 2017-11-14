@@ -33,7 +33,7 @@
                   <th><%= __('Version') %></th>
                   <th><%= __('Status') %></th>
                   <th><%= __('Configuration') %></th>
-                  <th><%= __('Infos') %></th>
+                  <th><%= __('module-upgrade') %></th>
                   <th><%= __('module-uninstall') %></th>
                 </tr>
                 
@@ -43,7 +43,7 @@
                   <td>{{module.version}}</td>
                   <td>{{module.status}}</td>
                    <td><button class="btn btn-info btn-sm" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
-                  <td><button class="btn btn-info btn-sm" ng-click="vm.displayModule(module);"><%= __('Infos') %></button></td>
+                  <td><button class="btn btn-success btn-sm" ng-click="vm.upgradeModule($index, module);"><%= __('module-upgrade') %></button></td>
                    <td><button class="btn btn-danger btn-sm" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
                 </tr>
                 
