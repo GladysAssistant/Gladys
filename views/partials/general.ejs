@@ -39,4 +39,28 @@
             </table>
 
         </div>  
+
+        <!-- Modal -->
+    <div class="modal fade" id="modalReboot" tabindex="-1" role="dialog" aria-labelledby="modalReboot">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="modalReboot"><%= __('system-gladys-rebooting-title') %></h4>
+            </div>
+            <div class="modal-body">
+              <p><%= __('system-gladys-rebooting-text') %></p>
+
+              <p><%= __('system-gladys-rebooting-last-check') %>: <span>{{vm.lastCheck | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
 </div>
+
+
+
+
+
+

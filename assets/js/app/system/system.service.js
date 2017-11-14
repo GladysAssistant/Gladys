@@ -21,7 +21,8 @@
         var service = {
             get: get,
             shutdown: shutdown,
-            update: update
+            update: update,
+            healthCheck: healthCheck
         };
 
         return service;
@@ -36,6 +37,20 @@
 
         function update(){
             return $http({method: 'POST', url: '/system/update' });
+        }
+
+        /**
+         *  return true if Gladys is live
+         *  false if not
+         */
+        function healthCheck(){
+            return $http({method: 'GET', url: '/system/health' })
+                .then(function(){
+                    return true;
+                })
+                .catch(function(){
+                    return false;
+                });
         }
       
         

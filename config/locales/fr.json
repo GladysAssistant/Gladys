@@ -442,5 +442,8 @@
   "sentence-official": "Phrases officiels",
   "sentence-rejected": "Phrases rejetées",
   "brain-train-new": "Entrainer le Brain",
-  "brain-training": "En cours"
+  "brain-training": "En cours",
+  "system-gladys-rebooting-title": "Gladys redémarre",
+  "system-gladys-rebooting-text": "Gladys redémarre... Merci d'attendre. Cette page se rafraîchira automatiquement !",
+  "system-gladys-rebooting-last-check": "Dernière vérification"
 }
