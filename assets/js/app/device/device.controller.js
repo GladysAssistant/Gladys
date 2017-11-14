@@ -29,6 +29,11 @@
     vm.deleteDevice = deleteDevice;
     vm.createDeviceType = createDeviceType;
     vm.deleteDeviceType = deleteDeviceType;
+    vm.loadMore = loadMore;
+    vm.startValue = 0;
+    vm.nbElementToGet = 50;
+    vm.remoteIsBusy = false;
+    vm.noMoreElements = false;
 
     vm.saving = false;
     vm.ready = false;
@@ -49,19 +54,30 @@
       getDeviceTypesByRoom()
         .then(function(){
             vm.ready = true;
-            getDevices();
             getRooms();
             getUsers();
+            loadMore();
         });
       waitForNewValue();
       return ;
     }
+
+    function loadMore(){
+        if(!vm.remoteIsBusy && !vm.noMoreElements){
+            getDevices(vm.nbElementToGet, vm.startValue);
+            vm.startValue += vm.nbElementToGet; 
+        }
+    }
     
-    
-    function getDevices() {
-      return deviceService.get()
+    function getDevices(take, skip) {
+      vm.remoteIsBusy = true;
+      return deviceService.get(take, skip)
         .then(function(data){
-          vm.devices = data.data;
+            if(data.data.length === 0){
+                vm.noMoreElements = true;
+            }
+            vm.devices = vm.devices.concat(data.data);
+            vm.remoteIsBusy = false;
         });
     }
     

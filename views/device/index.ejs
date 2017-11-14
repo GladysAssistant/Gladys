@@ -131,7 +131,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="device in vm.devices" class="ng-cloak">
+                                            <tr infinite-scroll="vm.loadMore()" ng-repeat="device in vm.devices" class="ng-cloak">
                                                 <td>{{device.id}}</td>
                                                 <td><input type="text" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td>{{device.identifier}}</td>
