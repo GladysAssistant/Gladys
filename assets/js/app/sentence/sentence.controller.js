@@ -62,41 +62,52 @@
         vm.startValue = 0;
         vm.sentences = [];
         vm.noMoreSentences = false;
-        return loadMore();
+        loadMore();
+        return;
     }
 
     function change(sentence) {
-        sentence.status = "approved";
-        return sentenceService.update(sentence);
+        var parts = sentence.serviceLabelConcat.split('.');
+        var updatedSentence = {
+            id: sentence.id,
+            status: 'approved',
+            service: parts[0],
+            label: parts[1]
+        };
+        return sentenceService.update(updatedSentence)
+            .then(function() {
+                notificationService.successNotificationTranslated('BRAIN.SENTENCE_UPDATED_SUCCESS_NOTIFICATION');
+            })
+            .catch(function () {
+                notificationService.errorNotificationTranslated('BRAIN.SENTENCE_UPDATED_FAIL_NOTIFICATION');
+            });
     }
 
     function reject(id, index) {
         return sentenceService.reject(id)
             .then(function(data){
-                vm.sentences[index] = data.data;
+                vm.sentences.splice(index, 1);
             });
     }
     function approve(id, index) {
         return sentenceService.approve(id)
-            .then(function(){
-                vm.sentences[index] = data.data;
+            .then(function(data){
+                vm.sentences.splice(index, 1);
             });
     }
     function getLabels() {
         return sentenceService.getLabels()
             .then(function(data){
+                data.data.forEach(function(elem, index){
+                    elem.serviceLabelConcat = elem.service + '.' + elem.label;
+                });
                 vm.labels = data.data;
             });    
     }
     function loadMore(){
         if(!vm.remoteIsBusy && !vm.noMoreSentences){
-            return get(vm.status, vm.startValue+vm.nbElementToGet, vm.startValue)
-            .then( function() {
-                vm.startValue += vm.nbElementToGet;
-            });
-        }
-        else {
-            Promise.resolve()
+            get(vm.status, vm.nbElementToGet, vm.startValue);
+            vm.startValue += vm.nbElementToGet;
         }
     }
     function get(status, take, skip) {
@@ -106,6 +117,10 @@
                 if(data.data.length === 0){
                     vm.noMoreSentences = true;
                 }
+                data.data.forEach(function(elem, index){
+                    elem.serviceLabelConcat = elem.service + '.' + elem.label;
+                });
+                console.log(data.data);
                 vm.sentences = vm.sentences.concat(data.data);
                 vm.remoteIsBusy = false;
             });

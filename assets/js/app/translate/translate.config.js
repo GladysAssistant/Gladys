@@ -69,7 +69,9 @@ var translationsEN = {
     },
     BRAIN: {
         TRAINNED_SUCCESS_NOTIFICATION: 'Brain trained with success !',
-        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !'
+        TRAINNED_FAIL_NOTIFICATION: 'Brain trained failure !',
+        SENTENCE_UPDATED_SUCCESS_NOTIFICATION: 'Sentence updated with success !',
+        SENTENCE_UPDATED_FAIL_NOTIFICATION: 'Fail to update sentence !'
     },
     SCENARIO: {
         CREATE_ERROR: 'Cannot create scenario, the scenario may not be valid.',
@@ -151,7 +153,9 @@ var translationsFR = {
     },
     BRAIN: {
         TRAINNED_SUCCESS_NOTIFICATION: 'Le Brain a été entrainé avec succès !',
-        TRAINNED_FAIL_NOTIFICATION: 'Il y a eu une erreur durant l\'entrainement du Brain'
+        TRAINNED_FAIL_NOTIFICATION: 'Il y a eu une erreur durant l\'entrainement du Brain',
+        SENTENCE_UPDATED_SUCCESS_NOTIFICATION: 'Phrase mise à jour avec succès !',
+        SENTENCE_UPDATED_FAIL_NOTIFICATION: 'Echec de l\'enregistrement de la phrase !'
     },
     SCENARIO: {
         CREATE_ERROR: 'Impossible de créer le scénario, le scénario est peut-être invalide.',

@@ -8,6 +8,6 @@ module.exports = {
   getApproved: 'SELECT * FROM sentence WHERE status="approved" LIMIT ? OFFSET ?;',
   getRejected: 'SELECT * FROM sentence WHERE status="rejected" LIMIT ? OFFSET ?;',
   getPending: 'SELECT * FROM sentence WHERE status="pending" LIMIT ? OFFSET ?;',
-  getLabels: 'SELECT DISTINCT label from sentence;',
+  getLabels: 'SELECT DISTINCT label, service from sentence;',
   cleanSentencesTable: 'DELETE FROM sentence;'
 };
