@@ -34,8 +34,9 @@ module.exports.parse = function parse(text) {
         .then((result) => {
 
             houses = result.houses;
+            allHouses = result.allHouses;
             replacedText = result.text;
 
-            return Promise.resolve({deviceTypes, rooms, houses, times, replacedText});
+            return Promise.resolve({deviceTypes, rooms, houses, times, replacedText, allHouses});
         });
 };
