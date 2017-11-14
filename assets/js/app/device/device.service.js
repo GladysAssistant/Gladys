@@ -36,9 +36,9 @@
         return service;
         
         // all about devices 
-        
-        function get() {
-            return $http({method: 'GET', url: '/device'});
+
+        function get(take, skip) {
+            return $http({method: 'GET', url: '/device', params: {take: take, skip: skip}});
         }
 
         function create(device, types){
