@@ -21,8 +21,8 @@
               <li ng-class="vm.status === 'official' && 'active'"><a ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
               <li ng-class="vm.status === 'rejected' && 'active'"><a ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
 
-              <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" aria-expanded="true"> <%= __('brain-train-new') %> </a></li>
-              <li ng-show="vm.training" class="pull-right"> <%= __('brain-trainning') %> </li>
+              <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" style="cursor:pointer"> <%= __('brain-train-new') %> </a></li>
+              <li ng-show="vm.training" class="pull-right"><a ><%= __('brain-training') %>...</a></li>
             </ul>
             <div class="tab-content">
                 
@@ -44,8 +44,8 @@
                                                 <td>{{sentence.id}}</td>
                                                 <td>{{sentence.text}}</td>
                                                 <td>                                                    
-                                                    <select name="selectRoom" id="selectRoom" class="form-control" ng-model="sentence.label" ng-change="vm.change(sentence)">
-                                                            <option ng-value="label.label" ng-repeat="label in vm.labels" ng-selected="(label.label == sentence.label)">{{label.label}}</option>
+                                                    <select name="selectRoom" id="selectRoom" class="form-control" ng-model="sentence.serviceLabelConcat" ng-change="vm.change(sentence)">
+                                                            <option ng-value="label.serviceLabelConcat" ng-repeat="label in vm.labels" ng-selected="label.serviceLabelConcat == sentence.serviceLabelConcat">{{label.service}}.{{label.label}}</option>
                                                    </select>
                                                 </td>
                                                 <td>{{sentence.status}}</td>
