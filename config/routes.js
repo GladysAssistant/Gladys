@@ -244,6 +244,7 @@ module.exports.routes = {
   'get /system': 'SystemController.index',
   'post /system/shutdown': 'SystemController.shutdown',
   'post /system/update': 'SystemController.update',
+  'get /system/health': 'SystemController.healthCheck',
   
   // Token
   'get /token': 'TokenController.index',
