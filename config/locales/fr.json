@@ -405,6 +405,7 @@
   "module-installing": "Installation...",
   "module-uninstalling": "Désinstallation...", 
   "module-date": "Date",
+  "module-upgrade": "Mettre à jour",
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
   "alarm-cron-rule": "Règles cron",

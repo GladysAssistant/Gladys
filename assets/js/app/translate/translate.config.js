@@ -40,7 +40,9 @@ var translationsEN = {
         CONFIG_FAIL_NOTIFICATION: 'Module configuration failed.',
         CONFIG_SUCCESS_NOTIFICATION: 'Module configured with success !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installed with success : ',
-        INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : '
+        INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : ',
+        CURRENTLY_UPGRADING_NOTIFICATION: 'Module upgrading : ',
+        FAIL_UPGRADING_NOTIFICATION: 'Fail to upgrade module : '
     },
     SYSTEM: {
         UPDATE_DATA_SUCCESS: 'Data updated with success',
@@ -124,7 +126,9 @@ var translationsFR = {
         CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module.',
         CONFIG_SUCCESS_NOTIFICATION: 'Le module a été configuré avec succès !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installé avec succès : ',
-        INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : '
+        INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : ',
+        CURRENTLY_UPGRADING_NOTIFICATION: 'Module en cours de mise à jour :',
+        FAIL_UPGRADING_NOTIFICATION: 'Erreur lors de la mise à jour du module : '
     },
     SYSTEM: {
         UPDATE_DATA_SUCCESS: 'Donnée Gladys mise à jour avec succès.',

@@ -22,7 +22,8 @@
             get: get,
             install: install,
             config: config,
-            uninstall: uninstall
+            uninstall: uninstall,
+            upgrade: upgrade
         };
 
         return service;
@@ -41,6 +42,10 @@
         
         function uninstall(id){
             return $http({method: 'DELETE', url: '/module/' + id });
+        }
+
+        function upgrade(id, version){
+            return $http({method: 'POST', url: '/module/' + id + '/upgrade', data: {version: version}});
         }
     }
 })();

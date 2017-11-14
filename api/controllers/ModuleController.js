@@ -45,6 +45,11 @@ module.exports = {
               return res.json(module);
           })
           .catch(next);
+    },
+
+    upgrade: function(req, res, next){
+        gladys.module.upgrade({id: req.params.id, version: req.body.version});
+        return res.json({message: 'Upgrade started with success'});
     }
 	
 };

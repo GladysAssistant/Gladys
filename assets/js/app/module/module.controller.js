@@ -30,6 +30,7 @@
         vm.getReviews = getReviews;
         vm.getVersions = getVersions;
         vm.refreshModule = get;
+        vm.upgradeModule = upgradeModule;
         vm.installationStep = 0;
         
         vm.modulesCurrentlyInstalled = {};
@@ -143,6 +144,19 @@
              .catch(function(){
                  vm.uninstalling = false;
              });
+       }
+
+       function upgradeModule(index, module){
+        storeService.getModuleInfos(module.slug)
+            .then(function(data) {
+                vm.modules.splice(index, 1);
+                notificationService.successNotificationTranslated('MODULE.CURRENTLY_UPGRADING_NOTIFICATION', module.name);
+                return moduleService.upgrade(module.id, data.data.version);
+            })
+            .catch(function(err){
+                notificationService.errorNotificationTranslated('MODULE.FAIL_UPGRADING_NOTIFICATION', module.name);
+                return Promise.reject(err);
+            });
        }
        
        function waitForInstallationStep(){
