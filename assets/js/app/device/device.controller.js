@@ -25,6 +25,7 @@
     vm.changeValue = changeValue;
     vm.updateDeviceType = updateDeviceType;
     vm.changeTypeDisplay = changeTypeDisplay;
+    vm.changeTypeSensor = changeTypeSensor;
     vm.createDevice = createDevice;
     vm.deleteDevice = deleteDevice;
     vm.createDeviceType = createDeviceType;
@@ -211,6 +212,13 @@
         return updateDeviceType(type);
     }
     
+    function changeTypeSensor(type){
+        if(type.sensor) type.sensor = 0;
+        else type.sensor = 1;
+        
+        return updateDeviceType(type);
+    }
+   
      // waiting for websocket message
     function waitForNewValue(){
         
