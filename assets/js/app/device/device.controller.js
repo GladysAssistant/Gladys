@@ -136,7 +136,10 @@
             id: device.id,
             room: device.room.id,
             user: device.user,
-            name: device.name
+            name: device.name,
+            identifier: device.identifier,
+            protocol: device.protocol,
+            service: device.service
         };
         return deviceService.updateDevice(newDevice)
              .then(function(device){
