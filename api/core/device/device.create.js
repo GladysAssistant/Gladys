@@ -18,7 +18,8 @@ function create(param) {
 
               deviceUpdated = true;
               
-               // if device already exist, we update it
+               // if device already exist, we update it and no change name
+              param.device.name = devices[0].name;
               return Device.update({id: devices[0].id}, param.device)
                            .then((rows) => rows[0]);
           } else {
