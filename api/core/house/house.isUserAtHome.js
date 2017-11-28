@@ -1,6 +1,6 @@
 var queries = require('./house.queries.js');
 
-module.exports = function get (options){
+module.exports = function isUserAtHome(options){
     
     return gladys.utils.sql(queries.isUserAtHome, [options.house, options.user])
       .then((rows) => {
