@@ -5,9 +5,9 @@ module.exports = function get (options){
     return gladys.utils.sql(queries.isUserAtHome, [options.house, options.user])
       .then((rows) => {
           
-          // if user is present in house, return true
-          if (rows.length) return true;
+          // if user is not present in house, return true
+          if(rows.length) return false;
 
-          return false;
+          return true;
         });
 };
