@@ -118,7 +118,7 @@ If you want to access Gladys anywhere on your local network, just replace localh
 
 ## Starting Gladys in development mode
 
-To start Gladys on your machine in development mode, and connects to your local MySQL instance, you can create a `.env` file at the root of your repository with the following content: 
+To start Gladys on your machine in development mode, and connect to your local MySQL instance, you can create a `.env` file at the root of your Gladys folder with the following content: 
 
 ```
 MYSQL_HOST=localhost
