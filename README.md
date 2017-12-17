@@ -116,6 +116,24 @@ If you are on localhost, visit : `http://localhost:1337` (in development mode), 
 
 If you want to access Gladys anywhere on your local network, just replace localhost by the ip of your machine.
 
+## Starting Gladys in development mode
+
+To start Gladys on your machine in development mode, and connects to your local MySQL instance, you can create a `.env` file at the root of your repository with the following content: 
+
+```
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=YOUR_MYSQL_USER
+MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
+MYSQL_DATABASE=YOUR_GLADYS_DBNAME
+```
+
+Then, to start Gladys in dev mode:
+
+```
+npm start
+```
+
 FAQ
 -------------
 

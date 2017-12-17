@@ -2,6 +2,10 @@
   "name": "gladys",
   "version": "3.7.3",
   "description": "Your personnal assistant, always here.",
+  "scripts": {
+    "start": "NODE_ENV=development node app.js",
+    "test": "grunt test"
+  },
   "keywords": [
     "home",
     "assistant",
@@ -58,14 +62,6 @@
     "mocha": "^3.5.0",
     "should": "^13.0.1",
     "supertest": "^3.0.0"
-  },
-  "scripts": {
-    "start": "node app.js",
-    "debug": "node debug app.js",
-    "test": "grunt test",
-    "publish:patch": "npm version patch && npm publish",
-    "publish:minor": "npm version minor && npm publish",
-    "publish:major": "npm version major && npm publish"
   },
   "main": "app.js",
   "repository": {
