@@ -70,5 +70,20 @@ module.exports = {
     )
     GROUP BY user.id
     HAVING datetime < DATE_SUB(NOW(), INTERVAL ? MINUTE)
+  `,
+  isUserAsleep: `
+    SELECT user.*,
+      ( 
+        SELECT eventtype.code
+        FROM event 
+        JOIN eventtype ON event.eventtype = eventtype.id
+        WHERE 
+        ( eventtype.code = 'going-to-sleep' OR eventtype.code = 'wake-up' )
+        AND user = user.id 
+        AND house = ?
+        ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
+      FROM user 
+      WHERE user.id = ?
+      HAVING lastHouseEvent = 'going-to-sleep'
   `
 };
