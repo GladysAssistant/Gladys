@@ -1,4 +1,4 @@
-##LifeEvent
+## LifeEvent
 
 This object let you manipulate LifeEvents. 
 
@@ -31,7 +31,7 @@ createdAt you simply can't !
 The room attribute is optional, it's if you want to specify a specific room where
 the LifeEvent took place.
 
-###Create
+### Create
 
 **Params**
 
@@ -57,7 +57,7 @@ gladys.lifeEvent.create(lifeEvent)
 ```
 
 
-###addType
+### addType
 
 **Params**
 
@@ -79,7 +79,7 @@ gladys.alarm.delete(alarm)
       });
 ```
 
-###Update
+### Update
 
 **Params**
 
@@ -97,6 +97,33 @@ var alarm = {
 gladys.alarm.update(alarm)
       .then(function(alarm){
           // alarm updated ! 
+      })
+      .catch(function(err){
+         // something bad happened ! :/ 
+      });
+```
+
+
+
+### Purge
+
+**Params**
+
+`gladys.event.purge` need an object containing : 
+the eventType id of the event and the values of the event to update and if we want to specify it, the days to purge.
+
+**Example**
+
+```javascript
+var option = {
+    eventtype: 1,
+    value: 1,
+    days: 5
+};
+
+gladys.event.purge(option)
+      .then(function(){
+          // events purged ! 
       })
       .catch(function(err){
          // something bad happened ! :/ 
