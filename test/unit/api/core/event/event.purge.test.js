@@ -20,7 +20,7 @@ describe('Event', function() {
         .then(function(result){
 
            var options = {
-             evnettype : 3,
+             eventtype : 3,
              days : 1,
              value: 1
            }
