@@ -1,4 +1,4 @@
-##LifeEvent
+## LifeEvent
 
 This object let you manipulate LifeEvents. 
 
@@ -31,25 +31,25 @@ createdAt you simply can't !
 The room attribute is optional, it's if you want to specify a specific room where
 the LifeEvent took place.
 
-###Create
+### Create
 
 **Params**
 
-`gladys.lifeEvent.create` need an object containing the LifeEvent. 
+`gladys.event.create` need an object containing the LifeEvent. 
 It returns a Promise.
 
 **Example**
 
 ```javascript
-var lifeEvent = {
+var event = {
   datetime: '2014-11-03 19:43:37',
   code: 'wakeup',
   user: 1
 };
 
-gladys.lifeEvent.create(lifeEvent)
-      .then(function(lifeEvent){
-         // lifeEvent created ! 
+gladys.event.create(event)
+      .then(function(event){
+         // event created ! 
       })
       .catch(function(err){
           // something bad happened ! :/
@@ -57,11 +57,11 @@ gladys.lifeEvent.create(lifeEvent)
 ```
 
 
-###addType
+### addType
 
 **Params**
 
-`gladys.lifeEvent.addType` need an object containing the new type to create.
+`gladys.event.addType` need an object containing the new type to create.
 
 **Example**
 
@@ -79,26 +79,50 @@ gladys.alarm.delete(alarm)
       });
 ```
 
-###Update
+### Update
 
 **Params**
 
-`gladys.alarm.update` need an object containing : the id of the alarm to update, 
+`gladys.event.update` need an object containing : the id of the event to update, 
 and the values of the attributes to update.
 
 **Example**
 
 ```javascript
-var alarm = {
+var event = {
     id: 1,
     name: 'Name updated'
 };
 
-gladys.alarm.update(alarm)
-      .then(function(alarm){
-          // alarm updated ! 
+gladys.event.update(event)
+      .then(function(event){
+          // event updated ! 
       })
       .catch(function(err){
          // something bad happened ! :/ 
       });
 ```
+
+### Purge
+
+**Params**
+
+`gladys.event.purge` need an object containing : the eventtype id of the event to purge,
+and the values of the event to update, optionnaly, you can provide the days to purge.
+
+**Example**
+
+```javascript
+var event = {
+    eventtype: 1,
+    value: 1,
+    days: 5
+};
+
+gladys.event.purge(event)
+      .then(function(){
+          // event purged ! 
+      })
+      .catch(function(err){
+         // something bad happened ! :/
+    
