@@ -5,7 +5,7 @@ Gladys Project
 [![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys) [![Code Climate](https://codeclimate.com/github/GladysProject/Gladys/badges/gpa.svg)](https://codeclimate.com/github/GladysProject/Gladys)
 [![Join the chat at https://gitter.im/GladysProject/Gladys](https://badges.gitter.im/GladysProject/Gladys.svg)](https://gitter.im/GladysProject/Gladys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![Alt](http://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
+![Alt](https://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
 
 The Project
 -------------
@@ -31,6 +31,9 @@ Interested in Gladys ? [Try it at home](http://gladysproject.com/en/installation
 **Community :** [https://community.gladysproject.com/](https://community.gladysproject.com/)
 
 🎉🎉 Subscribe to our newsletter in [English](http://eepurl.com/bvg-CT) or in [French](http://eepurl.com/bUaySX) 🎉🎉
+
+
+Gladys Raspbian image has **more than 26 000 downloads**, and Gladys community has more than **2 000 members** ! 
 
 Specifications
 -------------
@@ -116,6 +119,24 @@ If you are on localhost, visit : `http://localhost:1337` (in development mode), 
 
 If you want to access Gladys anywhere on your local network, just replace localhost by the ip of your machine.
 
+## Starting Gladys in development mode
+
+To start Gladys on your machine in development mode, and connect to your local MySQL instance, you can create a `.env` file at the root of your Gladys folder with the following content: 
+
+```
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=YOUR_MYSQL_USER
+MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
+MYSQL_DATABASE=YOUR_GLADYS_DBNAME
+```
+
+Then, to start Gladys in dev mode:
+
+```
+npm start
+```
+
 FAQ
 -------------
 
@@ -149,3 +170,13 @@ Links
 - [Facebook](https://www.facebook.com/gladysproject)
 - [English Newsletter](http://eepurl.com/bvg-CT)
 - [French Newsletter](http://eepurl.com/bUaySX)
+
+
+Community
+-------------
+
+Gladys it's not just a project, it's a community of people. And we like to meet in real life!
+
+See more on our Instagram account:
+
+[![Alt](https://gladysproject.com/assets/images/external/screenshot-instagram.png)](https://www.instagram.com/gladysproject/)
