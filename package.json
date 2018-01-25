@@ -45,6 +45,7 @@
     "moment": "^2.18.1",
     "node-schedule": "^1.2.4",
     "rc": "^1.2.1",
+    "redis": "^2.8.0",
     "request": "^2.81.0",
     "sails": "^0.12.13",
     "sails-mysql": "^0.12.1",

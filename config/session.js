@@ -34,7 +34,7 @@ module.exports.session = {
 
   cookie: {
      maxAge: process.env.COOKIE_LIFETIME || 15 * 24 * 60 * 60 * 1000
-  }
+  },
   
   /***************************************************************************
   *                                                                          *
@@ -88,5 +88,5 @@ module.exports.session = {
   // auto_reconnect: false,
   // ssl: false,
   // stringify: true
-
+  
 };
