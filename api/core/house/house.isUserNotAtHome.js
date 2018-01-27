@@ -1,13 +1,13 @@
 var queries = require('./house.queries.js');
 
-module.exports = function isUserAtHome(options){
+module.exports = function isUserNotAtHome(options){
     
     return gladys.utils.sql(queries.isUserAtHome, [options.house, options.user])
       .then((rows) => {
           
-          // if user is present in house, return true
-          if (rows.length) return true;
+          // if user is not present in house, return true
+          if(rows.length) return false;
 
-          return false;
+          return true;
         });
 };
