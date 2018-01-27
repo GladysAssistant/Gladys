@@ -16,7 +16,7 @@
 
   runBlock.$inject = ['languageService', 'socketService', 'recognitionService'];
 
-  function runBlock(languageService,socketService, recognitionService) {
+  function runBlock(languageService, socketService, recognitionService) {
     languageService.initialize();
     socketService.subscribe();
     //recognitionService.start();

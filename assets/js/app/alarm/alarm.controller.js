@@ -78,7 +78,6 @@
               }
             }
           }
-          
           vm.alarms = alarms;
         });
     }

@@ -8,14 +8,13 @@
         display: none !important;
     }
     </style>
-    <link href="/styles/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/styles/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/AdminLTE/bower_components/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
-    <link href="/styles/ionicons.min.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="/styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css">
+    <link href="/AdminLTE/bower_components/Ionicons/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/AdminLTE/bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
      <!-- Theme style -->
-     <link href="/styles/AdminLTE.css" rel="stylesheet" type="text/css" />
-    <link href="/styles/scenariostep.css" rel="stylesheet" type="text/css" />
+     <link href="/AdminLTE/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
   </head>
   <body ng-app="gladys">
     
@@ -29,20 +28,22 @@
             <!-- /.row -->  
         	<div class="row form-group">
                 <div class="col-xs-12">
-                    <ul class="nav nav-pills nav-justified thumbnail setup-panel">
-                        <li ng-click="vm.changeStep(1)" ng-class="{ 'active': vm.step == 1  }"><a href="#step-1">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 1</h4>
-                            <p class="list-group-item-text"><%= __('installation-create-account') %></p>
-                        </a></li>
-                        <li ng-click="vm.changeStep(2)" ng-class="{ 'active': vm.step == 2 }"><a href="#step-2">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 2</h4>
-                            <p class="list-group-item-text"><%= __('installation-configuration') %></p>
-                        </a></li>
-                        <li ng-click="vm.changeStep(3)" ng-class="{ 'active': vm.step == 3  }"><a href="#step-3">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 3</h4>
-                            <p class="list-group-item-text"><%= __('installation-congrats') %></p>
-                        </a></li>
-                    </ul>
+                        <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li ng-click="vm.changeStep(1)" ng-class="{ 'active': vm.step == 1  }"><a href="#step-1">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 1</h4>
+                                <p class="list-group-item-text"><%= __('installation-create-account') %></p>
+                            </a></li>
+                            <li ng-click="vm.changeStep(2)" ng-class="{ 'active': vm.step == 2 }"><a href="#step-2">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 2</h4>
+                                <p class="list-group-item-text"><%= __('installation-configuration') %></p>
+                            </a></li>
+                            <li ng-click="vm.changeStep(3)" ng-class="{ 'active': vm.step == 3  }"><a href="#step-3">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 3</h4>
+                                <p class="list-group-item-text"><%= __('installation-congrats') %></p>
+                            </a></li>
+                        </ul>
+                    </div>
                 </div>
         	</div>
             <div class="row setup-content ng-cloak" id="step-1" ng-show="vm.step == 1">
@@ -98,7 +99,7 @@
                                             <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
                                                 <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
+                                                <input ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
                                                 </div>
                                             </div>
                                             
@@ -141,7 +142,7 @@
                              </div>
                              
                              </form>
-                            <div class="pull-right"><button ng-click="vm.changeStep(2)" class="btn btn-primary"><%= __('Next') %></button></div>
+                            <div class="pull-right"><button ng-click="vm.changeStep(2)" class="btn btn-flat btn-primary"><%= __('Next') %></button></div>
                         
                     </div>
                 </div>
@@ -156,19 +157,19 @@
                           <p ng-show="vm.downloadStep > 3"><%= __('installation-downloading-events') %></p>
                           <p ng-show="vm.downloadStep > 2"><%= __('installation-downloading-boxs') %></p>
                           <p ng-show="vm.downloadStep > 4"><%= __('installation-downloading-categories') %></p>
-                          <p ng-show="vm.downloadStep > 5"><%= __('installation-downloading-states') %></p>
-                          <p ng-show="vm.downloadStep > 6"><%= __('installation-training-brain') %></p>
-                          <p ng-show="vm.downloadStep > 7"><%= __('installation-checking-for-updates') %></p>
-                          <p ng-show="vm.downloadStep > 7"><%= __('installation-configuration-success') %></p>
+                          <p ng-show="vm.downloadStep > 6"><%= __('installation-downloading-states') %></p>
+                          <p ng-show="vm.downloadStep > 7"><%= __('installation-training-brain') %></p>
+                          <p ng-show="vm.downloadStep > 8"><%= __('installation-checking-for-updates') %></p>
+                          <p ng-show="vm.downloadStep > 9"><%= __('installation-configuration-success') %></p>
                           
                           <p class="bg-danger" style="padding:15px;" ng-show="vm.downloadError">{{vm.downloadError}}</p>
-                          <div class="progress progress-sm active">
+                          <div class="progress active">
                                 <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ vm.downloadProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{vm.downloadProgress}}%">
                                 <!--<span class="sr-only">20% Complete</span>-->
                                 </div>
                           </div>
                          
-                          <div class="pull-right"><button  ng-click="vm.changeStep(3)" class="btn btn-primary"><%= __('Next') %></button></div>
+                          <div class="pull-right"><button  ng-click="vm.changeStep(3)" class="btn btn-flat btn-primary"><%= __('Next') %></button></div>
                              
                         
                     </div>
@@ -190,7 +191,7 @@
                             <div class="row"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://gladysproject.com" data-text="I'm using Gladys, the smart home automation assistant, and I love it !" data-size="large" data-via="gladysproject" data-count="none">Tweet</a>
                             </div>
                             
-                             <div class="pull-right"><a href="/dashboard" class="btn btn-primary"><%= __('Finish') %></a></div>
+                             <div class="pull-right"><a href="/dashboard" class="btn btn-flat btn-primary"><%= __('Finish') %></a></div>
                     </div>
                 </div>
             </div>

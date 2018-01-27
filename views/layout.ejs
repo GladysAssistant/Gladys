@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
     <title><%= pageName %> | <%= User.assistantName %></title>
     <!-- Viewport mobile tag for sensible mobile support -->
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
@@ -13,94 +14,90 @@
     
     <style>
     [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-        display: none !important;
+        display: none;
     }
     </style>
-
+    
   </head>
 
-  <body class="skin-blue" ng-app="gladys"> 
-      
-        <header class="header">
-            <a href="#" class="logo">
-                <!-- Add the class icon to your logo image or logo icon to add the margining -->
-                <%= User.assistantName %>
-            </a>
-            <!-- Header Navbar: style can be found in header.less -->
-            <nav class="navbar navbar-static-top" role="navigation">
-                <!-- Sidebar toggle button-->
-                <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a>
-                <div class="navbar-right">
-                    <ul class="nav navbar-nav">
+  <body id="body" class="hold-transition sidebar-mini skin-blue" ng-app="gladys"> 
+        <div class="wrapper">
+                <header class="main-header">
+                        <a href="/dashboard" style="text-decoration:none" class="logo">
+                            <!-- Add the class icon to your logo image or logo icon to add the margining -->
+                            <span class="logo-mini">
+                                <b>G</b>
+                            </span>
+                            <span class="logo-lg">
+                                 <%= User.assistantName %>
+                            </span>
 
-                       
-                        <!-- Notifications: style can be found in dropdown.less -->
-                        <li class="dropdown notifications-menu" data-ng-controller="NotificationCtrl as vm" >
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="vm.read();">
-                                <i class="fa fa-warning"></i> 
-                                <span class="label label-info ng-cloak">{{ vm.nbNotifications }}</span>
+                        </a>
+                        <!-- Header Navbar: style can be found in header.less -->
+                        <nav class="navbar navbar-static-top" role="navigation">
+                            <!-- Sidebar toggle button-->
+                            <a class="sidebar-toggle" style="text-decoration:none" data-toggle="push-menu" role="button">
+                                <span class="sr-only">Toggle navigation</span>
                             </a>
-                            <ul class="dropdown-menu ng-cloak" >
-                                <li class="header"><%= __('You have') %> {{ vm.nbNotifications }} <%= __('notification') %>{{ vm.nbNotifications > 1 && 's' || ''}}</li>
-                                <li>
-                                    <!-- inner menu: contains the actual data -->
-                                    <ul class="menu">
-                                        <li ng-repeat="notification in vm.notifications" >
-                                            <a href="#">
-                                                <i class="{{notification.icon}} {{notification.iconColor}}"></i> {{notification.title}}
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <!--<li class="footer"><a href="/dashboard/me"><%= __('View all') %></a></li>-->
-                            </ul>
-                        </li>
-
-                        <!-- User Account: style can be found in dropdown.less -->
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="glyphicon glyphicon-user"></i>
-                                <span><%= User.firstname + ' ' + User.lastname %> <i class="caret"></i></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                               
-                                <!-- Menu Footer-->
-                                <li class="user-footer">
-                                    
-                                    <div class="pull-left">
-                                        <a href="/lock" class="btn btn-default btn-flat"><%= __('Lock') %></a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="/session/destroy" class="btn btn-default btn-flat"><%= __('Sign out') %></a>
-                                    </div>
-                                </li>
-                                
-                            </ul>
-                        </li>
-                       
-                    </ul>
-                </div>
-            </nav>
-        </header>
-        <div class="wrapper row-offcanvas row-offcanvas-left">
+                            <div class="navbar-custom-menu">
+                                <ul class="nav navbar-nav">
+                                    <!-- Notifications: style can be found in dropdown.less -->
+                                    <li class="dropdown notifications-menu" data-ng-controller="NotificationCtrl as vm" >
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="vm.read();">
+                                            <i class="fa fa-bell"></i> 
+                                            <span class="label label-info ng-cloak">{{ vm.nbNotifications }}</span>
+                                        </a>
+                                        <ul class="dropdown-menu ng-cloak" >
+                                            <li class="header"><%= __('You have') %> {{ vm.nbNotifications }} <%= __('notification') %>{{ vm.nbNotifications > 1 && 's' || ''}}</li>
+                                            <li>
+                                                <!-- inner menu: contains the actual data -->
+                                                <ul class="menu">
+                                                    <li ng-repeat="notification in vm.notifications" >
+                                                        <a href="#">
+                                                            <i class="{{notification.icon}} {{notification.iconColor}}"></i> {{notification.title}}
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <!--<li class="footer"><a href="/dashboard/me"><%= __('View all') %></a></li>-->
+                                        </ul>
+                                    </li>
+            
+                                    <!-- User Account: style can be found in dropdown.less -->
+                                    <li class="dropdown user user-menu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            <span><%= User.firstname + ' ' + User.lastname %> <i class="caret"></i></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                           
+                                            <!-- Menu Footer-->
+                                            <li class="user-footer">
+                                                
+                                                <div class="pull-left">
+                                                    <a href="/lock" class="btn btn-flat btn-default"><%= __('Lock') %></a>
+                                                </div>
+                                                <div class="pull-right">
+                                                    <a href="/session/destroy" class="btn btn-flat btn-default"><%= __('Sign out') %></a>
+                                                </div>
+                                            </li>                                            
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </header>
             <!-- Left side column. contains the logo and sidebar -->
-            <aside class="left-side sidebar-offcanvas">
+            <aside class="main-sidebar">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <section class="sidebar">
                     <!-- Sidebar user panel -->
                     <div class="user-panel">
-                        <!--<div class="pull-left image">
-                            <img src="/img/avatar3.png" class="img-circle" alt="User Image" />
-                        </div>-->
+                        <div class="pull-left image">
+                            <img src="/AdminLTE/dist/img/avatar1.png" class="img-circle" alt="User Image" />
+                        </div>
                         <div class="pull-left info">
                             <p><%= __('Hello') %> <%= User.firstname %> !</p>
-
-                            <a href="#"><i class="fa fa-circle text-success"></i> <%= __('Online') %></a>
+                            <a href="#" class="disabled"><i class="fa fa-circle text-success"></i> <%= __('Online') %></a>
                         </div>
                     </div>
                     <!-- search form -->
@@ -108,7 +105,7 @@
                         <div class="input-group">
                             <input type="text" name="q" class="form-control" placeholder="Search..."/>
                             <span class="input-group-btn">
-                                <button type='submit' name='seach' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>
+                                <button type='submit' name='seach' id='search-btn' class="btn  "><i class="fa fa-search"></i></button>
                             </span>
                         </div>
                     </form>-->
@@ -172,30 +169,31 @@
                 <!-- /.sidebar -->
             </aside>
 
-         <!-- Include the view file for the current controller/route -->
-         <%- body %>
+            <!-- Include the view file for the current controller/route -->
+           
+            <%- body %>                    
          
-         
+
         <!-- Location Controller -->
             <div data-ng-controller="geoLocationCtrl as vm" ></div>
         <!-- End of Location Controller -->
 
-
-
-        </div><!-- ./wrapper -->
-
-        <footer class="main-footer hidden-sm hidden-xs">
-          <div class="pull-right">
-            <span>Gladys <%= gladys.version %></span>
-            <a class="fa fa-github-alt" href="https://github.com/GladysProject/Gladys" target="_blank"></a>
-            <a class="fa fa-link" href="http://gladysproject.com" target="_blank"></a>
-          </div>            
+        <footer class="main-footer">
+                <div class="hidden-xs pull-right">
+                    <%= __('Sources') %>  
+                    <a class="fa fa-github-alt" style="text-decoration:none" href="https://github.com/GladysProject/Gladys" target="_blank"></a>
+                    <%= __('Website') %>
+                    <a class="fa fa-link" style="text-decoration:none" href="https://gladysproject.com" target="_blank"></a>
+                </div>
+                Gladys <%= gladys.version %>  
         </footer>
-   
+    
+    </div><!-- ./wrapper -->
+
         <!-- search bar -->
         <%- partial ('./partials/search.ejs') %>
         <!-- end of search bar -->
-    <!--
+    <!--    
 
       Client-side Javascript
       ========================
@@ -249,6 +247,6 @@
       http://sailsjs.org/#!documentation/asset-management
 
     -->
-
+       
     </body>
 </html>
