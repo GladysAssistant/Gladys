@@ -45,7 +45,7 @@ module.exports = {
         ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
       FROM user 
       WHERE user.id = ?
-      HAVING lastHouseEvent = 'back-at-home'
+      HAVING ( lastHouseEvent = 'back-at-home' OR lastHouseEvent = 'user-seen-at-home' )
   `,
   getUserAtHomeAndNotSeenSince: 
   `
