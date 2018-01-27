@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('My timeline') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Me') %></li>
                     </ol>
                 </section>
@@ -44,8 +44,8 @@
                                         </div>
                                         <!--
                                         <div class="timeline-footer">
-                                            <a class="btn btn-primary btn-xs"  data-toggle="modal" data-target="#myModal" >Préviens mes collaborateurs</a>
-                                            <a class="btn btn-danger btn-xs">Annule la réunion</a>
+                                            <a class="btn btn-flat btn-primary btn-xs"  data-toggle="modal" data-target="#myModal" >Préviens mes collaborateurs</a>
+                                            <a class="btn btn-flat btn-danger btn-xs">Annule la réunion</a>
                                         </div>-->
                                     </div>
                                 </li>
@@ -66,7 +66,7 @@
                                     <i class="{{event.faIcon}} {{event.iconColor}}"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="fa fa-clock-o"></i> <span am-time-ago="event.datetime"></span></span>
-                                        <h3 class="timeline-header" ng-class="{ 'no-border': !event.sentence }"><a href="#">{{event.name }} <span ng-show="event.value">( {{event.value}} )</span></a></h3>
+                                        <h3 class="timeline-header" ng-class="{ 'no-border': !event.sentence }"><a href="#" class="disabled">{{event.name }} <span ng-show="event.value">( {{event.value}} )</span></a></h3>
                                         <div class="timeline-footer" ng-show="event.sentence.length > 0">
                                             
                                         </div>
@@ -131,7 +131,7 @@
                 </section>
 
 
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
             <script>
                 document.getElementById("meLi").className = "active";

@@ -33,7 +33,6 @@ var cssFilesToInject = [
 
   //Inject AdminLTE files
   'AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css',
-  'AdminLTE/bower_components/select2/dist/css/select2.min.css',
   'AdminLTE/bower_components/font-awesome/css/font-awesome.min.css',
   'AdminLTE/dist/css/skins/_all-skins.min.css',
   'AdminLTE/bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
@@ -66,7 +65,7 @@ var jsFilesToInject = [
   'AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js',
   
   // loading Moment with locales
-  'AdminLTE/bower_components/moment/min/moment.min.js',
+  'AdminLTE/bower_components/moment/min/moment-with-locales.min.js',
   
   // loading Chart JS
   'AdminLTE/bower_components/chart.js/dist/Chart.min.js',
@@ -87,31 +86,31 @@ var jsFilesToInject = [
   //'js/dependencies/**/*.js',
   
   
-     //loading other modules 
-    'js/ng-device-detector/ng-device-detector.min.js',
-    'js/ng-infinite-scroll/ng-infinite-scroll.js',
-    'js/angular-moment/angular-moment.min.js',
-    'js/angular-ui-notification/angular-ui-notification.min.js',
-    'js/smooth-scroll/angular-smooth-scroll.min.js',
-    'js/angular-chart/dist/angular-chart.min.js',
-    'js/angular-translate/angular-translate.min.js',
-    'js/angular-slider/slider.js',
-    'js/angular-device-detector/ng-device-detector.min.js',
-    
-    // loading first AngularModule definition
-   'js/app/app.module.js',
-   
-   'js/app/app.run.js',
-    // all the rest of the angular application
-   'js/app/**/*.js',
-   
-   // loading hooks JS scripts
-   'hooks/**/*.js',
-   
-   // loading AdminLTE app
-   'AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js',
+  //loading other modules 
+  'js/ng-device-detector/ng-device-detector.min.js',
+  'js/ng-infinite-scroll/ng-infinite-scroll.js',
+  'js/angular-moment/angular-moment.min.js',
+  'js/angular-ui-notification/angular-ui-notification.min.js',
+  'js/smooth-scroll/angular-smooth-scroll.min.js',
+  'js/angular-chart/dist/angular-chart.min.js',
+  'js/angular-translate/angular-translate.min.js',
+  'js/angular-slider/slider.js',
+  'js/angular-device-detector/ng-device-detector.min.js',
+  
+  // loading first AngularModule definition
+  'js/app/app.module.js',
+  
+  'js/app/app.run.js',
+  // all the rest of the angular application
+  'js/app/**/*.js',
+  
+  // loading hooks JS scripts
+  'hooks/**/*.js',
+  
+  // loading AdminLTE app
+  'AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js',
   //'AdminLTE/bower_components/fullcalendar/dist/locale-all.js',
-   'AdminLTE/dist/js/adminlte.min.js',
+  'AdminLTE/dist/js/adminlte.min.js',
   // All of the rest of your client-side js files
   // will be injected here in no particular order.
   //'js/**/*.js'

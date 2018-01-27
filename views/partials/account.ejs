@@ -1,6 +1,6 @@
 <div data-ng-controller="UserCtrl as vm">
 <!-- NEW BOX -->
-<div class="box box-default" >
+<div class="box skin-box box-primary" >
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
     </div> 
@@ -29,14 +29,15 @@
                             </select>
                         </td></td>
                     </tr>
-                    <tr><td><button class="btn btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button></td></tr>
+                    <tr><td><button class="btn btn-flat btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button></td></tr>
                 </tbody>
             </table>
 
         </div>  
 </div>
 
-<div class="box box-default ng-cloak" ng-if="vm.user.role === 'admin'">
+<div class="ng-cloak">
+<div class="box skin-box box-primary" ng-if="vm.user.role === 'admin'">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
     </div> 
@@ -57,15 +58,16 @@
                     <tr ng-repeat="aUser in vm.users">
                         <td>{{aUser.id}}</td>
                         <td>{{aUser.firstname}} {{aUser.lastname}}</td>
-                        <td><button class="btn btn-danger" ng-click="vm.deleteUser($index, aUser.id);"><%= __('all-user-delete-button') %></button></td>
+                        <td><button class="btn btn-flat btn-danger" ng-click="vm.deleteUser($index, aUser.id);"><%= __('all-user-delete-button') %></button></td>
                     </tr>
                      <tr>
-                         <td><button class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+                         <td><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
                      </tr>
                 </tbody>
             </table>
 
         </div>  
+</div>
 </div>
 
    <!-- MODAL -->
@@ -138,6 +140,7 @@
                                                 <select class="form-control" id="countrycode"  ng-model="vm.newUser.language">
                                                     <option value="en-US">English</option>
                                                     <option value="fr-FR">Français</option>
+                                                    <option value="es">Espagnol</option>
                                                 </select>
                                                 </div>
                                             </div>
@@ -177,7 +180,7 @@
                                              </div>
 
                                              <div class="form-group">
-                                                 <button class="btn btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
+                                                 <button class="btn btn-flat btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
                                              </div>
                                              
                                          </form>      

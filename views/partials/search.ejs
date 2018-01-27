@@ -2,7 +2,7 @@
    <!-- <button type="button" class="close">×</button> -->
     <form>
         <input id="searchInput" type="search" ng-model="vm.text" ng-keypress="$event.keyCode == 13 && vm.classify(vm.text)"  value="" placeholder="<%= __('search-placeholder') %>" autocomplete="off" />
-       <!-- <button type="submit" class="btn btn-primary">Search</button>-->
+       <!-- <button type="submit" class="btn btn-flat btn-primary">Search</button>-->
     </form>
     <p id="searchResult" ng-model="vm.answer"></p>
 </div>
