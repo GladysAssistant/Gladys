@@ -24,18 +24,17 @@ module.exports = {
       ngcontroller: {
           type: 'string'
       },
+
+      header: {
+        type: 'text',
+      },
       
       html: {
-          type: 'text'
+          type: 'text',
       },
       
       footer: {
           type: 'text'
-      },
-      
-      icon: {
-          type: 'string',
-          required: true
       },
       
       type: {
