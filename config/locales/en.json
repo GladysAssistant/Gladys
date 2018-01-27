@@ -240,6 +240,7 @@
   "module-uninstalling": "Uninstalling...", 
   "module-date": "Date",
   "module-upgrade": "Upgrade",
+  "module-version-description": "This module does not come from the official store. Please specify the new version number to continue the update.",
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
     "alarm-cron-rule": "Cron rules",
