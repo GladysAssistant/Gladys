@@ -25,6 +25,7 @@
         var typingMaxTime = 600;
 
         vm.messages = [];
+        vm.msg = []
 
         activate();
 
@@ -41,6 +42,17 @@
             return messageService.getByUser('null')
                 .then(function(data) {
                     vm.messages = data.data;
+                    for(var i = 0; i < vm.messages.length; i++){
+                        if(vm.messages[i].sender == null){
+                            vm.messages[i].type = ""
+                            vm.messages[i].chat = "pull-left"
+                            vm.messages[i].timeAgo = "pull-right"
+                        }else{
+                            vm.messages[i].type = "right"
+                            vm.messages[i].chat = "pull-right"
+                            vm.messages[i].timeAgo = "pull-left"
+                        }
+                    }
                     scrollToLastMessage();
                 });
         }
@@ -60,6 +72,9 @@
                 var randomWait = Math.floor(Math.random() * typingMaxTime) + typingMinTime;
                 $timeout(function() {
                     vm.typing = false;
+                    message.type = ""
+                    message.chat = "pull-left"
+                    message.timeAgo = "pull-right"
                     vm.messages.push(message);
                     scrollToLastMessage();
                 }, randomWait, true);
@@ -79,7 +94,11 @@
             
             return messageService.send(message)
                 .then(function(data) {
-                    vm.messages.push(data.data);
+                    vm.msg = data.data
+                    vm.msg.type = "right"
+                    vm.msg.chat = "pull-right"
+                    vm.msg.timeAgo = "pull-left"
+                    vm.messages.push(vm.msg);
                     vm.newMessageText = '';
                     scrollToLastMessage();
                 })

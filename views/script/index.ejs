@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-<aside class="right-side">
+<aside class="content-wrapper">
        
        <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -8,7 +8,7 @@
                 <small><%= __('Control Panel') %></small>
             </h1>
             <ol class="breadcrumb">
-                <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                 <li class="active"><%= __('Scripts') %></li>
             </ol>
         </section>
@@ -28,7 +28,7 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-success"  data-toggle="modal" data-target="#NewFileModal" ><%= __('script-new') %></button>
+                            <button class="btn btn-flat btn-success"  data-toggle="modal" data-target="#NewFileModal" ><%= __('script-new') %></button>
                         </div>
                     </div>
             </div>
@@ -39,13 +39,13 @@
                     <div class="alert alert-danger ng-cloak" ng-show="vm.error"><%= __('script-error') %> !</div> 
                     <div class="alert alert-danger ng-cloak" ng-show="vm.scriptError">{{ vm.scriptErrorMessage.name }}: {{ vm.scriptErrorMessage.message }}</div>      
                 <pre  id="editor"></pre>
-                <button class="btn btn-info" ng-click="vm.exec(vm.currentScript.id)"><i class="fa fa-play"></i> <%= __('script-run-script') %></button>
-                <button class="btn btn-success" ng-click="vm.patch(vm.currentScript.id)">
+                <button class="btn btn-flat btn-info" ng-click="vm.exec(vm.currentScript.id)"><i class="fa fa-play"></i> <%= __('script-run-script') %></button>
+                <button class="btn btn-flat btn-success" ng-click="vm.patch(vm.currentScript.id)">
                     <div ng-show="vm.savingState == ''"><%= __('script-save') %></div>
                     <div class="ng-cloak" ng-show="vm.savingState == 'saving'"><%= __('script-saving') %> ...</div>    
                     <div class="ng-cloak" ng-show="vm.savingState == 'saved'"><%= __('script-saved') %> !</div>    
                 </button>
-                <button class="btn btn-danger" ng-click="vm.destroy(vm.currentScript.id)"><%= __('script-delete') %></button>
+                <button class="btn btn-flat btn-danger" ng-click="vm.destroy(vm.currentScript.id)"><%= __('script-delete') %></button>
             </div>
             
             
@@ -67,7 +67,7 @@
                                     <input type="text" name="filename" ng-model="vm.newName" class="form-control" />
                                 </div>
                                 <div class="col-md-2">
-                                    <button class="btn btn-success" ng-click="vm.create(vm.newName);"><%= __('script-modal-create') %></button>
+                                    <button class="btn btn-flat btn-success" ng-click="vm.create(vm.newName);"><%= __('script-modal-create') %></button>
                                 </div>
                             </div>
                     </div> 

@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Maps') %></li>
                     </ol>
                 </section>
@@ -16,7 +16,7 @@
                 <section class="content" ng-controller="MapsCtrl" data-ng-init="init()" >
                              <div id="map" style="width : 100%; height : 500px;"></div>
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
 <script>
     document.getElementById("mapsLi").className = "active";

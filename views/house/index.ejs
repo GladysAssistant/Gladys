@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('My Houses') %></li>
                     </ol>
                 </section>
@@ -35,7 +35,7 @@
                                                 <td>{{relation.house.city}}</td>
                                                 <td>{{relation.house.postcode}}</td>
                                                 <td>{{relation.house.country}}</td>
-                                                <td><button ng-click="vm.deleteHouse($index, relation.house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="vm.deleteHouse($index, relation.house.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr>
                                                 <td><input type="text" class="form-control" ng-model="vm.newHouse.name" /></td>
@@ -43,7 +43,7 @@
                                                 <td><input type="text" class="form-control" ng-model="vm.newHouse.city" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newHouse.postcode" /></td>
                                                 <td><input type="text" class="form-control" ng-model="vm.newHouse.country" /></td>
-                                                <td><button class="btn btn-success btn-sm" ng-click="vm.createHouse()"><%= __('New') %></button></td>
+                                                <td><button class="btn btn-flat btn-success  " ng-click="vm.createHouse()"><%= __('New') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -62,7 +62,7 @@
                                             <tr ng-repeat="room in vm.rooms" class="ng-cloak">
                                                 <td>{{room.name}}</td>
                                                 <td>{{room.house}}</td>
-                                                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr class="ng-cloak"> 
                                                 <td><input type="text" class="form-control" ng-model="vm.newRoom.name" /></td>
@@ -71,7 +71,7 @@
                                                 </select>
 
                                                 </td>
-                                                <td><button class="btn btn-success btn-sm" ng-click="vm.createRoom()"><%= __('New') %></button></td>
+                                                <td><button class="btn btn-flat btn-success  " ng-click="vm.createRoom()"><%= __('New') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -81,7 +81,7 @@
 
                         </div>
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
             <script>
                 document.getElementById("houseLi").className = "active";
