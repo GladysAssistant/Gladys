@@ -59,6 +59,7 @@ function npmInstall(path){
  */
 function exec(command){
     return new Promise(function(resolve, reject){
+        child_process.exec("git config --global core.ignorecase true")
         child_process.exec(command, function (err, stdout, stderr){
             if(err) return reject(err);
             
