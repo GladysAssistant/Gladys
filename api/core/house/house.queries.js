@@ -30,7 +30,7 @@ module.exports = {
         AND house = ?
         ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
       FROM user 
-      HAVING lastHouseEvent = 'back-at-home'
+      HAVING ( lastHouseEvent = 'back-at-home' OR lastHouseEvent = 'user-seen-at-home' )
   `,
   isUserAtHome: `
     SELECT user.*,
