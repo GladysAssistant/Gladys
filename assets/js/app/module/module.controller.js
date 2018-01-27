@@ -59,6 +59,8 @@
        
        function installModule(module){
            vm.installing = true;
+
+           module.slug = module.slug.toLowerCase();
            
            // url is the url of the module on the developper website
            // we want here the url of the git repository, stored in link

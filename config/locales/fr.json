@@ -384,7 +384,7 @@
   "notification-delete": "Supprimer",
   "notification-new": "Nouveau",
   "modules-advanced": "Avancé",
-  "module-install-description": "Vous pouvez ici installer manuellement un module à partir d'un repo git. Le slug correspond au nom du dossier où sera cloné le module dans le dossier api/hooks. Il doit être unique !",
+  "module-install-description": "Vous pouvez ici installer manuellement un module à partir d'un repo git. Le slug correspond au nom du dossier où sera cloné le module dans le dossier api/hooks. Il doit être unique et doit être composé que de minuscules, dans le cas contraire toute majuscle sera transformée en minuscule !",
   "module-name": "Nom",
   "module-version": "Version",
   "module-git-url": "URL git (HTTPS)",
