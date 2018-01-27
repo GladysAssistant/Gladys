@@ -406,6 +406,7 @@
   "module-uninstalling": "Désinstallation...", 
   "module-date": "Date",
   "module-upgrade": "Mettre à jour",
+  "module-version-description": "Ce module ne provient pas du store officiel. Veuillez s'il vous plait spécifer le nouveau numéro de version pour continuer la mise à jour.",
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
   "alarm-cron-rule": "Règles cron",

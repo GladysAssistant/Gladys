@@ -42,7 +42,8 @@ var translationsEN = {
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installed with success : ',
         INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : ',
         CURRENTLY_UPGRADING_NOTIFICATION: 'Module upgrading : ',
-        FAIL_UPGRADING_NOTIFICATION: 'Fail to upgrade module : '
+        EMPTY_VERSION_FAIL_NOTIFICATION: 'The version is invalid !',
+        FAIL_UPGRADING_NOTIFICATION: 'Fail to upgrade module !'
     },
     SYSTEM: {
         UPDATE_DATA_SUCCESS: 'Data updated with success',
@@ -128,6 +129,7 @@ var translationsFR = {
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installé avec succès : ',
         INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : ',
         CURRENTLY_UPGRADING_NOTIFICATION: 'Module en cours de mise à jour :',
+        EMPTY_VERSION_FAIL_NOTIFICATION: 'La version est invalide !',
         FAIL_UPGRADING_NOTIFICATION: 'Erreur lors de la mise à jour du module : '
     },
     SYSTEM: {
