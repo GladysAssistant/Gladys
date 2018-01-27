@@ -19,6 +19,24 @@ describe('DeviceController', function() {
         });
 
     });
+
+    it('should return devices filtered by service', function (done) {
+        request(sails.hooks.http.app)
+       .get('/device?token=test&service=zwave')
+       .expect(200)
+       .end(function(err, res) {
+           if(err) return done(err);
+
+           res.body.should.be.instanceOf(Array);
+           res.body.length.should.equal(1);
+           validateDevice(res.body);
+           res.body.forEach((device) => {
+               device.service.should.equal('zwave');
+           });
+           done();
+       });
+
+   });
     
     it('should return 0 device (pagination test)', function (done) {
      	request(sails.hooks.http.app)
@@ -35,6 +53,4 @@ describe('DeviceController', function() {
     });
     
   });
-
-
 });
