@@ -5,7 +5,7 @@ describe('Event', function() {
 
     describe('purge', function() {
 
-        it('should return 3 events', function(done) {
+        it('should return 4 events', function(done) {
 
             var event = {
                 params: {
@@ -38,7 +38,7 @@ describe('Event', function() {
                 .then(function(result) {
                     validateEvent(result);
                     result.should.be.instanceof(Array);
-                    result.should.have.length(3);
+                    result.should.have.length(4);
                     done();
                 })
                 .catch(done)
