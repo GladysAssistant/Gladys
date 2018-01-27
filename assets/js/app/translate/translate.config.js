@@ -36,6 +36,10 @@ var translationsEN = {
         SEND_MESSAGE_FAILED: 'Failed to send message',
         TEXT_CANNOT_BE_EMPTY: 'Message text cannot be empty.'
     },
+    MODE: {
+        CREATED_FAIL_NOTIFICATION: 'Failed to change mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changed successfully. '
+    },
     MODULE: {
         CONFIG_FAIL_NOTIFICATION: 'Module configuration failed.',
         CONFIG_SUCCESS_NOTIFICATION: 'Module configured with success !',
@@ -121,6 +125,10 @@ var translationsFR = {
     MESSAGE: {
         SEND_MESSAGE_FAILED: 'Erreur lors de l\'envoi du message.',
         TEXT_CANNOT_BE_EMPTY: 'Un message ne peut pas être vide.'
+    },
+    MODE: {
+        CREATED_FAIL_NOTIFICATION: 'Impossible de changer de mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changé avec succès. '
     },
     MODULE: {
         CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module.',
