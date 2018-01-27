@@ -1,5 +1,5 @@
 <!-- NEW BOX -->
-<div class="box box-default">
+<div class="box skin-box box-primary">
 <div class="box-header with-border">
     <h3 class="box-title"><%= __('parameters-box-title') %></h3>
 </div>
@@ -13,7 +13,7 @@
                                 <th><%= __('parameters-box-table-boxtype') %></th>
                                 <th><%= __('parameters-box-table-x') %></th>
                                 <th><%= __('parameters-box-table-y') %></th>
-                                <th><%= __('parameters-box-table-active') %></th>
+                                <!--<th><%= __('parameters-box-table-active') %></th>-->
                                 <th><%= __('parameters-box-table-delete') %></th>
                             </tr>
                         </thead>
@@ -22,8 +22,8 @@
                                 <td>{{box.boxType.title}}</td>
                                 <td>{{box.x}}</td>
                                 <td>{{box.y}}</td>
-                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn {{ box.active && 'btn-success' || 'btn-danger' }} btn-sm">{{box.active && 'On' || 'Off' }}</button></td>
-                                <td><button ng-click="vm.destroy($index, box.id);" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                <!--<td><button ng-click="vm.switchStatus($index, token.id)"class="btn btn-flat {{ box.active && 'btn-success' || 'btn-danger' }}  ">{{box.active && 'On' || 'Off' }}</button></td>-->
+                                <td><button ng-click="vm.destroy($index, box.id);" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                             </tr>
                             <tr>
                                 <td><select name="selectBoxType" id="selectBoxType" class="form-control"
@@ -34,8 +34,8 @@
                                 </td>
                                 <td><input type="text" ng-model="vm.newBox.x"class="form-control" placeholder="x"/></td>
                                 <td><input type="text" ng-model="vm.newBox.y"class="form-control" placeholder="y"/></td>
-                                <td><input type="text" disabled ng-model="vm.newBox.active"class="form-control" value="1" /></td>
-                                <td><button class="btn btn-success btn-sm" ng-click="vm.create(vm.newBox)"><%= __('New') %></button></td>
+                                <!--<td><input type="text" disabled ng-model="vm.newBox.active"class="form-control" value="1" /></td>-->
+                                <td><button class="btn btn-flat btn-success  " ng-click="vm.create(vm.newBox)"><%= __('Add') %></button></td>
                             </tr>
                         </tbody>
                     </table>
