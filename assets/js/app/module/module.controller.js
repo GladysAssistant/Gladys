@@ -59,6 +59,8 @@
        
        function installModule(module){
            vm.installing = true;
+
+           module.slug = module.slug.toLowerCase();
            
            // url is the url of the module on the developper website
            // we want here the url of the git repository, stored in link
@@ -149,9 +151,24 @@
        function upgradeModule(index, module){
         storeService.getModuleInfos(module.slug)
             .then(function(data) {
-                vm.modules.splice(index, 1);
-                notificationService.successNotificationTranslated('MODULE.CURRENTLY_UPGRADING_NOTIFICATION', module.name);
-                return moduleService.upgrade(module.id, data.data.version);
+                if(data.data.version){
+                    vm.modules.splice(index, 1);
+                    notificationService.successNotificationTranslated('MODULE.CURRENTLY_UPGRADING_NOTIFICATION', module.name);
+                    return moduleService.upgrade(module.id, data.data.version);
+                }else{
+                    $('#modalModuleVersion').modal('show')
+                    $('#validateButton').click(function (e) {
+                        var version = $('#inputModuleVersion').val()
+                        if(version){
+                            vm.modules.splice(index, 1);
+                            notificationService.successNotificationTranslated('MODULE.CURRENTLY_UPGRADING_NOTIFICATION', module.name);
+                            return moduleService.upgrade(module.id, version);
+                        }else{
+                            notificationService.errorNotificationTranslated('MODULE.EMPTY_VERSION_FAIL_NOTIFICATION');
+                        }
+                    })
+                }
+                
             })
             .catch(function(err){
                 notificationService.errorNotificationTranslated('MODULE.FAIL_UPGRADING_NOTIFICATION', module.name);
