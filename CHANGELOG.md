@@ -1,6 +1,17 @@
 ### Changelog
 All notable changes to this project will be documented in this file.
 
+#### [v3.7.4](https://github.com/GladysProject/Gladys/compare/v3.7.3...v3.7.4)
+> 28 January 2018
+- correction of the UPDATE function in HOUSESERVICE. [`#243`](https://github.com/GladysProject/Gladys/pull/243)
+- Don&#x27;t change name of device when updating it [`#257`](https://github.com/GladysProject/Gladys/pull/257)
+- Fix #278 : add snow.svg in white [`#278`](https://github.com/GladysProject/Gladys/issues/278)
+- Fix #262 : house.getUsers() function now return user back-at-home + user-seen-at-home events [`#262`](https://github.com/GladysProject/Gladys/issues/262)
+- Fix #264 : Remove sensible data in brain classify response [`#264`](https://github.com/GladysProject/Gladys/issues/264)
+- update CHANGELOG.md [`1a08460`](https://github.com/GladysProject/Gladys/commit/1a08460720d59fc9c7b6be6ba5bd37eed833e7c1)
+- Add tooltip in views &amp; update fr and en json [`b8b0ad3`](https://github.com/GladysProject/Gladys/commit/b8b0ad35405e33b9adad4e2e4773f16e2dadb4f4)
+- Add .vscode to gitignore [`6d83794`](https://github.com/GladysProject/Gladys/commit/6d83794a6245e515375fc77b7a80533e3b16dcb2)
+
 #### [v3.7.3](https://github.com/GladysProject/Gladys/compare/v3.7.2...v3.7.3)
 > 14 November 2017
 - Fix #236 : Handle null value &amp; uppercase value in house, room &amp; deviceType name in parser [`#236`](https://github.com/GladysProject/Gladys/issues/236)
