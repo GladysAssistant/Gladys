@@ -25,5 +25,20 @@
         "datetime": "2015-05-12 18:00:00",
         "user": 2,
         "house": 1
+    },
+    {
+        "id": 5,
+        "eventtype": 3,
+        "value": 1,
+        "datetime": "2015-05-12 18:00:00",
+        "user": 1
+    },
+    {
+        "id": 6,
+        "eventtype": 10,
+        "value": 1,
+        "datetime": "2015-05-12 18:00:00",
+        "user": 1,
+        "house": 1
     }
 ]

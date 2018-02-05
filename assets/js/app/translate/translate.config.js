@@ -42,6 +42,7 @@ var translationsEN = {
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installed with success : ',
         INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : ',
         CURRENTLY_UPGRADING_NOTIFICATION: 'Module upgrading : ',
+        EMPTY_VERSION_FAIL_NOTIFICATION: 'The version is invalid !',
         FAIL_UPGRADING_NOTIFICATION: 'Fail to upgrade module : '
     },
     SYSTEM: {
@@ -81,6 +82,11 @@ var translationsEN = {
     },
     DEFAULT: {
         ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
+    },
+    MODE: {
+        CHANGE_SUCCESS_NOTIFICATION: 'Mode changed with success !',
+        CHANGE_FAIL_NOTIFICATION: 'Failed to change mode !',
+        PARAMS_FAIL_NOTIFICATION: 'Invalid parameters !'
     }
 };
 
@@ -128,6 +134,7 @@ var translationsFR = {
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installé avec succès : ',
         INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : ',
         CURRENTLY_UPGRADING_NOTIFICATION: 'Module en cours de mise à jour :',
+        EMPTY_VERSION_FAIL_NOTIFICATION: 'La version est invalide !',
         FAIL_UPGRADING_NOTIFICATION: 'Erreur lors de la mise à jour du module : '
     },
     SYSTEM: {
@@ -167,6 +174,11 @@ var translationsFR = {
     },
     DEFAULT: {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
+    },
+    MODE: {
+        CHANGE_SUCCESS_NOTIFICATION: 'Mode changé avec succès !',
+        CHANGE_FAIL_NOTIFICATION: 'Erreur lors du changement de mode !',
+        PARAMS_FAIL_NOTIFICATION: 'Paramètres invalides !'
     }
 };
 

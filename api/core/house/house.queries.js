@@ -30,7 +30,7 @@ module.exports = {
         AND house = ?
         ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
       FROM user 
-      HAVING lastHouseEvent = 'back-at-home'
+      HAVING ( lastHouseEvent = 'back-at-home' OR lastHouseEvent = 'user-seen-at-home' )
   `,
   isUserAtHome: `
     SELECT user.*,
@@ -45,7 +45,7 @@ module.exports = {
         ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
       FROM user 
       WHERE user.id = ?
-      HAVING lastHouseEvent = 'back-at-home'
+      HAVING ( lastHouseEvent = 'back-at-home' OR lastHouseEvent = 'user-seen-at-home' )
   `,
   getUserAtHomeAndNotSeenSince: 
   `
@@ -70,5 +70,20 @@ module.exports = {
     )
     GROUP BY user.id
     HAVING datetime < DATE_SUB(NOW(), INTERVAL ? MINUTE)
+  `,
+  isUserAsleep: `
+    SELECT user.*,
+      ( 
+        SELECT eventtype.code
+        FROM event 
+        JOIN eventtype ON event.eventtype = eventtype.id
+        WHERE 
+        ( eventtype.code = 'going-to-sleep' OR eventtype.code = 'wake-up' )
+        AND user = user.id 
+        AND house = ?
+        ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
+      FROM user 
+      WHERE user.id = ?
+      HAVING lastHouseEvent = 'going-to-sleep'
   `
 };

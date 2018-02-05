@@ -70,5 +70,13 @@
 		"service": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
+	},
+	{
+		"id": 10,
+		"code": "going-to-sleep",
+		"name": "User is going to sleep",
+		"service": "house",
+		"faIcon": "fa fa-desktop",
+		"iconColor": "bg-black"
 	}
 ]
