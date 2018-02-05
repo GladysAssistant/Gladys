@@ -20,6 +20,9 @@ module.exports = function classify(user, message){
             // add user to scope so that called module can adapt to current user
             scope.user = user;
 
+            // clean password so we don't expose sensible data
+            if(scope.user.password) delete scope.user.password;
+
             var classifier = shared.getClassifier();
 
             var classifications = classifier.classify(scope.replacedText);

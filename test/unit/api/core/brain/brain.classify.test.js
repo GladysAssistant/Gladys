@@ -8,7 +8,8 @@ describe('Brain', function() {
 
         var user = {
           id: 1,
-          language: 'en'
+          language: 'en',
+          password: 'KJKLJSDKLFJKLSDJFL'
         };
         
         var message = {
@@ -26,6 +27,8 @@ describe('Brain', function() {
                     item.should.have.property('response');
                     item.message.should.have.property('label');
                     item.message.should.have.property('scope');
+                    item.message.scope.should.have.property('user');
+                    item.message.scope.user.should.not.have.property('password');
                     item.response.should.have.property('label');
                     item.response.should.have.property('text');
                     item.response.should.have.property('scope');

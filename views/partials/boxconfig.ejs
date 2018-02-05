@@ -28,12 +28,12 @@
                             <tr>
                                 <td><select name="selectBoxType" id="selectBoxType" class="form-control"
                                                             ng-options="boxType.title for boxType in vm.boxTypes track by boxType.id"
-                                                            ng-model="vm.newBox.boxtype" >
+                                                            ng-model="vm.newBox.boxtype" data-toggle="tooltip" data-original-title="<%= __('tooltip-boxtype') %>" >
                                      </select>
                                 </select>
                                 </td>
-                                <td><input type="text" ng-model="vm.newBox.x"class="form-control" placeholder="x"/></td>
-                                <td><input type="text" ng-model="vm.newBox.y"class="form-control" placeholder="y"/></td>
+                                <td><input type="text" ng-model="vm.newBox.x"class="form-control" placeholder="x" data-toggle="tooltip" data-original-title="<%= __('tooltip-box-x') %>" /></td>
+                                <td><input type="text" ng-model="vm.newBox.y"class="form-control" placeholder="y" data-toggle="tooltip" data-original-title="<%= __('tooltip-box-y') %>" /></td>
                                 <td><input type="text" disabled ng-model="vm.newBox.active"class="form-control" value="1" /></td>
                                 <td><button class="btn btn-success btn-sm" ng-click="vm.create(vm.newBox)"><%= __('New') %></button></td>
                             </tr>
