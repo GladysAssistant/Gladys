@@ -69,7 +69,9 @@ module.exports.routes = {
   
   // Box
   'get /box': 'BoxController.index',
+  'get /box/:id': 'BoxController.getById',
   'post /box': 'BoxController.create',
+  'patch /box/:id': 'BoxController.update',
   'delete /box/:id': 'BoxController.delete',
   
   //BoxType
@@ -78,9 +80,10 @@ module.exports.routes = {
   // Brain
   'get /brain/classify': 'BrainController.classify', 
   'post /brain/trainnew': 'BrainController.trainNew', 
-  
+
   // CalendarEvent
   'get /calendarevent' : 'CalendarEventController.index',
+  'get /calendarevent/all' : 'CalendarEventController.get',
   
   //Category
   'get /category': 'CategoryController.index',
@@ -246,7 +249,7 @@ module.exports.routes = {
   'post /system/shutdown': 'SystemController.shutdown',
   'post /system/update': 'SystemController.update',
   'get /system/health': 'SystemController.healthCheck',
-  
+
   // Token
   'get /token': 'TokenController.index',
   'post /token': 'TokenController.create',

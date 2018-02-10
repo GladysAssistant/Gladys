@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side" >
+            <aside class="content-wrapper" >
                 <!-- Content Header (Page header) -->
                 <section class="content-header" >
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Sensors') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Sensors') %></li>
                     </ol>
                 </section>
@@ -30,10 +30,10 @@
                                                 <td>{{sensor.name}}</td>
                                                 <td>{{sensor.code}}</td>
                                                 <td>{{sensor.room}}</td>
-                                                <td><button ng-click="vm.deleteSensor($index, sensor.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="vm.deleteSensor($index, sensor.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr>
-                                                <td><button  class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg"><%= __('Add a new sensor') %></button></td>
+                                                <td><button  class="btn btn-flat btn-success  " data-toggle="modal" data-target=".bs-example-modal-lg"><%= __('Add a new sensor') %></button></td>
 
                                             </tr>
                                         </tbody>
@@ -63,7 +63,7 @@
                                     </li>
                                 </ul>
 
-                                <button id="waitforsignalbutton" class="btn btn-success" ng-click="vm.switchDiscoveryMode()" ><%= __('Wait for signal') %> {{vm.timeLeft && '( ' +vm.timeLeft + ' <%= __('seconds left') %> )' }}</button>
+                                <button id="waitforsignalbutton" class="btn btn-flat btn-success" ng-click="vm.switchDiscoveryMode()" ><%= __('Wait for signal') %> {{vm.timeLeft && '( ' +vm.timeLeft + ' <%= __('seconds left') %> )' }}</button>
 
                                 <!-- form new Motion Sensor --> 
                                 <div id="formNewMotionSensor" class="ng-cloak" ng-show="vm.displayForm" >
@@ -89,7 +89,7 @@
                            
                                     
                                         <div class="form-group">
-                                          <button type="submit" ng-click="vm.createSensor()" class="btn btn-success"><%= __('Save sensor') %></button>
+                                          <button type="submit" ng-click="vm.createSensor()" class="btn btn-flat btn-success"><%= __('Save sensor') %></button>
                                         </div>
 
 
@@ -102,7 +102,7 @@
                 </div>
 
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
             
             <script>
                 document.getElementById("sensorLi").className = "active";

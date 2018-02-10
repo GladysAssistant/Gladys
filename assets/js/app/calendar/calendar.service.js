@@ -18,7 +18,8 @@
 
     function calendarService($http) {
         var service = {
-            loadEvents: loadEvents
+            loadEvents: loadEvents,
+            loadAllEvents: loadAllEvents,
         };
 
         return service;
@@ -37,6 +38,9 @@
 
             return $http({method: 'GET', url: '/calendarevent', params: {start: start, end: end} });
         }
-        
+
+        function loadAllEvents() {
+            return $http({method: 'GET', url: '/calendarevent/all'});
+        }        
     }
 })();

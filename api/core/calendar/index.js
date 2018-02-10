@@ -18,3 +18,4 @@ module.exports.getNextEventUser = require('./calendar.getNextEventUser.js');
 module.exports.sync = require('./calendar.sync.js');
 module.exports.update = require('./calendar.update.js');
 module.exports.updateEvent = require('./calendar.updateEvent.js');
+module.exports.getAllEvents = require('./calendar.getAllEvents.js');

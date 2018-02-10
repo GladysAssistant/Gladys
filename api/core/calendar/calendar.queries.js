@@ -60,6 +60,16 @@ module.exports = {
 		AND calendar.active = 1 
 		ORDER BY start;
     `,
+
+    getAllEvents: `
+        SELECT calendarevent.*
+        FROM calendarevent
+        INNER JOIN calendar ON(calendarevent.calendar = calendar.id)
+        WHERE user = ?
+        AND calendar.active = 1 
+        ORDER BY start;
+    `,
+    
     getAllCalendarService: 
     `
         SELECT DISTINCT service FROM calendar;

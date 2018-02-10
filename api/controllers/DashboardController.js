@@ -13,12 +13,15 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
+const path = require('path');
+const BASE_PATH = path.join(__dirname, '../../');
+
 module.exports = {
 
    index : function (req, res, next){
         gladys.box.get({user:req.session.User, view: 'dashboard'})
             .then(function(boxs){
-                return res.view('dashboard/index', { User: req.session.User, boxs: boxs, pageName: req.__('pagename-homepage') }); 
+                return res.view('dashboard/index', { User: req.session.User, boxs: boxs, pageName: req.__('pagename-homepage'), basePath: BASE_PATH}); 
             }); 
   },
 
