@@ -3,12 +3,13 @@ var validateBox = require('../../validator/boxValidator.js');
 
 describe('Box', function() {
 
-  describe('update', function() {
+  describe('getById', function() {
     
-    it('should update a box', function (done) {
-     	
-        gladys.box.update({id:1, active: 0, params: {test: 'test'}}).then(function(result){
+    it('should return box by id', function (done) {
+        
+        gladys.box.getById(1).then(function(result){
            validateBox(result);
+           result.should.have.property('params');
            done();
         }).catch(function(err){
             done(err);
