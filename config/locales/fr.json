@@ -497,5 +497,7 @@
   "box-camera-explanation": "Entrez ici l'URL de votre image ou de votre flux vidéo :",
   "box-camera-tutorial": "Exemple de tutoriel :",
   "box-camera-placeholder": "URL du flux vidéo",
-  "box-camera-validate": "Enregistrer"
+  "box-camera-validate": "Enregistrer",
+  "box-mode-title": "Changement de modes",
+  "box-mode-validate": "Changer"
 }

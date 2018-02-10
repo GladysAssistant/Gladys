@@ -335,5 +335,7 @@
   "box-camera-explanation": "Enter here the URL of the image/video flux :",
   "box-camera-tutorial": "Tutorial example :",
   "box-camera-placeholder": "Video flux URL",
-  "box-camera-validate": "Save"
+  "box-camera-validate": "Save",
+  "box-mode-title": "Modes",
+  "box-mode-validate": "Change"
 }
