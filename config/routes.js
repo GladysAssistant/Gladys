@@ -145,6 +145,7 @@ module.exports.routes = {
   'post /location': 'LocationController.create',
   'get /location/create': 'LocationController.create',
   'get /location': 'LocationController.get',
+  'get /user/:id/location': 'LocationController.getByUser',
   
   // Machine
   'get /machine' : 'MachineController.get',
