@@ -299,5 +299,10 @@
   "box-chat-title": "Chat",
   "box-calendar-title": "Calendar",
   "box-weather-title": "Weather",
-  "box-event-title": "Event"
+  "box-event-title": "Event",
+  "box-camera-title": "Camera",
+  "box-camera-explanation": "Enter here the URL of the image/video flux :",
+  "box-camera-tutorial": "Tutorial example :",
+  "box-camera-placeholder": "Video flux URL",
+  "box-camera-validate": "Save"
 }

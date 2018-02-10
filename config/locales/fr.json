@@ -465,5 +465,10 @@
   "box-chat-title": "Chat",
   "box-calendar-title": "Calendrier",
   "box-weather-title": "Météo",
-  "box-event-title": "Event"
+  "box-event-title": "Event",
+  "box-camera-title": "Camera",
+  "box-camera-explanation": "Entrez ici l'URL de votre image ou de votre flux vidéo :",
+  "box-camera-tutorial": "Exemple de tutoriel :",
+  "box-camera-placeholder": "URL du flux vidéo",
+  "box-camera-validate": "Enregistrer"
 }
