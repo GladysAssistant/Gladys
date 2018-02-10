@@ -28,6 +28,10 @@ module.exports = {
           model: 'User',
           required: true
       },
+
+      params: {
+          type: 'text'
+      },
       
       active: {
            type: 'boolean',
