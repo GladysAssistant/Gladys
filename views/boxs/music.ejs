@@ -22,9 +22,9 @@
                 <table class="table ">
                     <tbody>
                         <tr>
-                            <th>Titre</th>
-                            <th>Artiste</th>
-                            <th>Album</th>
+                            <th><%= __('box-music-music-title') %></th>
+                            <th><%= __('box-music-music-artist') %></th>
+                            <th><%= __('box-music-music-album') %></th>
                         </tr>
                         <tr ng-repeat="music in vm.queue">
                             <td>{{music.title}}</td>
@@ -36,14 +36,14 @@
             </div>
         </div>
         <div ng-show="vm.displayAskRoomForm" class="ng-cloak">
-            <p>Sélectionnez la pièce ou est situéle lecteur de musique que vous souhaitez contrôler dans cette box :</p>
+            <p><%= __('box-music-music-select-room') %></p>
             <div class="row">
                 <div class="col-xs-offset-2 col-xs-6">
                     <select ng-model="vm.selectedRoomId" class="form-control">
                         <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
                     </select>
                 </div>
-                <div class="col-xs-2"> <button class="btn btn-success" ng-click="vm.selectRoomId(vm.selectedRoomId);">Valider</button>
+                <div class="col-xs-2"> <button class="btn btn-success" ng-click="vm.selectRoomId(vm.selectedRoomId);"><%= __('box-music-music-validate') %></button>
                 </div>
             </div>
         </div>
