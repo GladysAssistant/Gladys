@@ -1,11 +1,5 @@
 module.exports.boxTypes = [
     {
-        "uuid": "81afa4ed-c084-45b3-ba8a-e9e22c9753ae",
-        "title": "Calendar",
-        "path": "views/boxs/calendar.ejs",
-        "view": "dashboard"
-    },
-    {
         "uuid": "3b78ede7-5ee7-4504-a932-2e9d7c3413f2",
         "title": "Event",
         "path": "views/boxs/event.ejs",
