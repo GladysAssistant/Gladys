@@ -69,16 +69,11 @@ var jsFilesToInject = [
   
   // loading Chart JS
   'AdminLTE/bower_components/chart.js/dist/Chart.min.js',
-  
-  // loading ace
-  'js/dependencies/ace/ace.js',
 
   // loading bootstrap datetimepicker
   'AdminLTE/bower_components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
   
   'AdminLTE/bower_components/bootstrap-slider/bootstrap-slider.js',
-
-  'js/dependencies/leaflet.js',
 
   'js/dependencies/js-yaml.min.js',
 
@@ -108,8 +103,7 @@ var jsFilesToInject = [
   'hooks/**/*.js',
   
   // loading AdminLTE app
-  'AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js',
-  //'AdminLTE/bower_components/fullcalendar/dist/locale-all.js',
+
   'AdminLTE/dist/js/adminlte.min.js',
   // All of the rest of your client-side js files
   // will be injected here in no particular order.
