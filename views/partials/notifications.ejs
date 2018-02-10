@@ -1,5 +1,6 @@
+
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="NotificationUserCtrl as vm">
+<div class="box skin-box box-primary" data-ng-controller="NotificationUserCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('notification-box-title') %> <small ng-show="vm.saving"><%= __('notification-box-saving') %></small></h3>
     </div> 
@@ -19,7 +20,7 @@
                     <tr ng-repeat="notificationUser in vm.notificationUsers" class="ng-cloak">
                         <td>{{notificationUser.name}}</td>
                         <td>{{notificationUser.priority}}</td>
-                        <td><button ng-click="vm.destroyNotificationUser($index, notificationUser.id)" class= "btn btn-danger btn-sm"><%= __('notification-delete') %></button></td>
+                        <td><button ng-click="vm.destroyNotificationUser($index, notificationUser.id)" class= "btn btn-flat btn-danger  "><%= __('notification-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><select ng-model="vm.newNotificationUser.notificationtype" class="form-control" data-toggle="tooltip" data-original-title="<%= __('tooltip-notification-name') %>" >

@@ -23,10 +23,19 @@
     
     vm.previousStates = previousStates;
     vm.nextStates = nextStates;
+    vm.options;
 
     activate();
 
     function activate() {
+
+        vm.options = {
+            legend: {
+                display: true,
+                onClick: null
+            }
+        }
+
       getDeviceTypes();
       waitForNewValue();
       return ;
@@ -68,10 +77,18 @@
         }        
         return deviceService.getStates(deviceType.id, deviceType.skip)
           .then(function(data){
-              var chartData = formatDataChartjs(data.data);
-              chartData.series = [deviceType.name + ' ' + deviceType.unit];
-              chartData.data = [chartData.data];
-              vm.chart = chartData;
+                if(data.data.length > 0 || vm.currentDeviceType.id != deviceType.id){
+                    var chartData = formatDataChartjs(data.data);                
+                    chartData.series = [deviceType.name + ' ' + deviceType.unit];
+                    chartData.data = [chartData.data];
+                    vm.chart = chartData;
+                }else{
+                    vm.currentDeviceType.skip -= 5;
+                    if(vm.currentDeviceType.skip < 0){
+                        vm.currentDeviceType.skip = 0;
+                    }
+                }
+                vm.currentDeviceType = deviceType
           });
     }
     

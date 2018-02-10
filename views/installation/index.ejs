@@ -8,14 +8,11 @@
         display: none !important;
     }
     </style>
-    <link href="/styles/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/styles/font-awesome.min.css" rel="stylesheet" type="text/css" />
-    <!-- Ionicons -->
-    <link href="/styles/ionicons.min.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="/styles/bootstrap-datetimepicker.min/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/AdminLTE/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/AdminLTE/bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
      <!-- Theme style -->
-     <link href="/styles/AdminLTE.css" rel="stylesheet" type="text/css" />
-    <link href="/styles/scenariostep.css" rel="stylesheet" type="text/css" />
+     <link href="/AdminLTE/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
   </head>
   <body ng-app="gladys">
     
@@ -29,20 +26,22 @@
             <!-- /.row -->  
         	<div class="row form-group">
                 <div class="col-xs-12">
-                    <ul class="nav nav-pills nav-justified thumbnail setup-panel">
-                        <li ng-click="vm.changeStep(1)" ng-class="{ 'active': vm.step == 1  }"><a href="#step-1">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 1</h4>
-                            <p class="list-group-item-text"><%= __('installation-create-account') %></p>
-                        </a></li>
-                        <li ng-click="vm.changeStep(2)" ng-class="{ 'active': vm.step == 2 }"><a href="#step-2">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 2</h4>
-                            <p class="list-group-item-text"><%= __('installation-configuration') %></p>
-                        </a></li>
-                        <li ng-click="vm.changeStep(3)" ng-class="{ 'active': vm.step == 3  }"><a href="#step-3">
-                            <h4 class="list-group-item-heading"><%= __('installation-step') %> 3</h4>
-                            <p class="list-group-item-text"><%= __('installation-congrats') %></p>
-                        </a></li>
-                    </ul>
+                        <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li ng-click="vm.changeStep(1)" ng-class="{ 'active': vm.step == 1  }"><a href="#step-1">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 1</h4>
+                                <p class="list-group-item-text"><%= __('installation-create-account') %></p>
+                            </a></li>
+                            <li ng-click="vm.changeStep(2)" ng-class="{ 'active': vm.step == 2 }"><a href="#step-2">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 2</h4>
+                                <p class="list-group-item-text"><%= __('installation-configuration') %></p>
+                            </a></li>
+                            <li ng-click="vm.changeStep(3)" ng-class="{ 'active': vm.step == 3  }"><a href="#step-3">
+                                <h4 class="list-group-item-heading"><%= __('installation-step') %> 3</h4>
+                                <p class="list-group-item-text"><%= __('installation-congrats') %></p>
+                            </a></li>
+                        </ul>
+                    </div>
                 </div>
         	</div>
             <div class="row setup-content ng-cloak" id="step-1" ng-show="vm.step == 1">
@@ -98,7 +97,7 @@
                                             <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
                                                 <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
                                                 <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
+                                                <input ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
                                                 </div>
                                             </div>
                                             
@@ -141,7 +140,7 @@
                              </div>
                              
                              </form>
-                            <div class="pull-right"><button ng-click="vm.changeStep(2)" class="btn btn-primary"><%= __('Next') %></button></div>
+                            <div class="pull-right"><button ng-click="vm.changeStep(2)" class="btn btn-flat btn-primary"><%= __('Next') %></button></div>
                         
                     </div>
                 </div>
@@ -156,19 +155,19 @@
                           <p ng-show="vm.downloadStep > 3"><%= __('installation-downloading-events') %></p>
                           <p ng-show="vm.downloadStep > 2"><%= __('installation-downloading-boxs') %></p>
                           <p ng-show="vm.downloadStep > 4"><%= __('installation-downloading-categories') %></p>
-                          <p ng-show="vm.downloadStep > 5"><%= __('installation-downloading-states') %></p>
-                          <p ng-show="vm.downloadStep > 6"><%= __('installation-training-brain') %></p>
-                          <p ng-show="vm.downloadStep > 7"><%= __('installation-checking-for-updates') %></p>
-                          <p ng-show="vm.downloadStep > 7"><%= __('installation-configuration-success') %></p>
+                          <p ng-show="vm.downloadStep > 6"><%= __('installation-downloading-states') %></p>
+                          <p ng-show="vm.downloadStep > 7"><%= __('installation-training-brain') %></p>
+                          <p ng-show="vm.downloadStep > 8"><%= __('installation-checking-for-updates') %></p>
+                          <p ng-show="vm.downloadStep > 9"><%= __('installation-configuration-success') %></p>
                           
                           <p class="bg-danger" style="padding:15px;" ng-show="vm.downloadError">{{vm.downloadError}}</p>
-                          <div class="progress progress-sm active">
+                          <div class="progress active">
                                 <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ vm.downloadProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{vm.downloadProgress}}%">
                                 <!--<span class="sr-only">20% Complete</span>-->
                                 </div>
                           </div>
                          
-                          <div class="pull-right"><button  ng-click="vm.changeStep(3)" class="btn btn-primary"><%= __('Next') %></button></div>
+                          <div class="pull-right"><button  ng-click="vm.changeStep(3)" class="btn btn-flat btn-primary"><%= __('Next') %></button></div>
                              
                         
                     </div>
@@ -190,7 +189,7 @@
                             <div class="row"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://gladysproject.com" data-text="I'm using Gladys, the smart home automation assistant, and I love it !" data-size="large" data-via="gladysproject" data-count="none">Tweet</a>
                             </div>
                             
-                             <div class="pull-right"><a href="/dashboard" class="btn btn-primary"><%= __('Finish') %></a></div>
+                             <div class="pull-right"><a href="/dashboard" class="btn btn-flat btn-primary"><%= __('Finish') %></a></div>
                     </div>
                 </div>
             </div>
@@ -200,111 +199,7 @@
     
     
     <!--SCRIPTS-->
-    <script src="/js/dependencies/sails.io.js"></script>
-    <script src="/js/dependencies/angular.min.js"></script>
-    <script src="/js/dependencies/angular-route.min.js"></script>
-    <script src="/js/dependencies/jquery.min.js"></script>
-    <script src="/js/dependencies/bootstrap.min.js"></script>
-    <script src="/js/dependencies/moment-with-locales.js"></script>
-    <script src="/js/dependencies/chart.min.js"></script>
-    <script src="/js/dependencies/ace/ace.js"></script>
-    <script src="/js/dependencies/bootstrap-datetimepicker.min.js"></script>
-    <script src="/js/dependencies/datepicker/bootstrap-datepicker.js"></script>
-    <script src="/js/dependencies/bootstrap-slider.min.js"></script>
-    <script src="/js/dependencies/leaflet.js"></script>
-    <script src="/js/dependencies/js-yaml.min.js"></script>
-    <script src="/js/ng-device-detector/ng-device-detector.min.js"></script>
-    <script src="/js/ng-infinite-scroll/ng-infinite-scroll.js"></script>
-    <script src="/js/angular-moment/angular-moment.min.js"></script>
-    <script src="/js/angular-ui-notification/angular-ui-notification.min.js"></script>
-    <script src="/js/smooth-scroll/angular-smooth-scroll.min.js"></script>
-    <script src="/js/angular-chart/angular-chart.min.js"></script>
-    <script src="/js/angular-translate/angular-translate.min.js"></script>
-    <script src="/js/angular-slider/slider.js"></script>
-    <script src="/js/angular-device-detector/ng-device-detector.min.js"></script>
-    <script src="/js/app/app.module.js"></script>
-    <script src="/js/app/app.run.js"></script>
-    <script src="/js/app/action/action.service.js"></script>
-    <script src="/js/app/actiontype/actiontype.service.js"></script>
-    <script src="/js/app/alarm/alarm.controller.js"></script>
-    <script src="/js/app/alarm/alarm.service.js"></script>
-    <script src="/js/app/area/area.controller.js"></script>
-    <script src="/js/app/area/area.service.js"></script>
-    <script src="/js/app/box/box.controller.js"></script>
-    <script src="/js/app/box/box.service.js"></script>
-    <script src="/js/app/boxtype/boxtype.service.js"></script>
-    <script src="/js/app/brain/brain.controller.js"></script>
-    <script src="/js/app/brain/brain.service.js"></script>
-    <script src="/js/app/browser/browser.service.js"></script>
-    <script src="/js/app/cache/cacheService.js"></script>
-    <script src="/js/app/calendar/calendar.controller.js"></script>
-    <script src="/js/app/calendar/calendar.service.js"></script>
-    <script src="/js/app/category/category.service.js"></script>
-    <script src="/js/app/device/device.controller.js"></script>
-    <script src="/js/app/device/device.service.js"></script>
-    <script src="/js/app/device/deviceState.controller.js"></script>
-    <script src="/js/app/event/event.box.controller.js"></script>
-    <script src="/js/app/event/event.controller.js"></script>
-    <script src="/js/app/event/event.service.js"></script>
-    <script src="/js/app/eventtype/eventtype.service.js"></script>
-    <script src="/js/app/geocoder/geocoder.service.js"></script>
-    <script src="/js/app/geolocation/geolocation.controller.js"></script>
-    <script src="/js/app/geolocation/geolocation.service.js"></script>
-    <script src="/js/app/global/language.service.js"></script>
-    <script src="/js/app/house/house.controller.js"></script>
-    <script src="/js/app/house/house.service.js"></script>
-    <script src="/js/app/installation/installation.controller.js"></script>
-    <script src="/js/app/installation/installation.service.js"></script>
-    <script src="/js/app/launcher/launcher.service.js"></script>
-    <script src="/js/app/machine/machine.controller.js"></script>
-    <script src="/js/app/machine/machine.service.js"></script>
-    <script src="/js/app/maps/maps.controller.js"></script>
-    <script src="/js/app/message/message.controller.js"></script>
-    <script src="/js/app/message/message.service.js"></script>
-    <script src="/js/app/mode/mode.controller.js"></script>
-    <script src="/js/app/mode/mode.service.js"></script>
-    <script src="/js/app/module/module.controller.js"></script>
-    <script src="/js/app/module/module.service.js"></script>
-    <script src="/js/app/music/music.controller.js"></script>
-    <script src="/js/app/music/music.service.js"></script>
-    <script src="/js/app/notification/notification.controller.js"></script>
-    <script src="/js/app/notification/notification.service.js"></script>
-    <script src="/js/app/notificationuser/notificationuser.controller.js"></script>
-    <script src="/js/app/notificationuser/notificationuser.service.js"></script>
-    <script src="/js/app/now/now.controller.js"></script>
-    <script src="/js/app/param/param.controller.js"></script>
-    <script src="/js/app/param/param.service.js"></script>
-    <script src="/js/app/paramuser/paramUser.controller.js"></script>
-    <script src="/js/app/paramuser/paramUser.service.js"></script>
-    <script src="/js/app/recognition/recognition.service.js"></script>
-    <script src="/js/app/room/room.service.js"></script>
-    <script src="/js/app/scenario/scenario.controller.js"></script>
-    <script src="/js/app/scenario/scenario.service.js"></script>
-    <script src="/js/app/script/script.controller.js"></script>
-    <script src="/js/app/script/script.service.js"></script>
-    <script src="/js/app/sensor/sensor.controller.js"></script>
-    <script src="/js/app/sensor/sensor.service.js"></script>
-    <script src="/js/app/sentence/sentence.controller.js"></script>
-    <script src="/js/app/sentence/sentence.service.js"></script>
-    <script src="/js/app/sleep/sleep.controller.js"></script>
-    <script src="/js/app/sleep/sleep.service.js"></script>
-    <script src="/js/app/socket/socket.service.js"></script>
-    <script src="/js/app/sound/sound.service.js"></script>
-    <script src="/js/app/state/state.service.js"></script>
-    <script src="/js/app/statetype/statetype.service.js"></script>
-    <script src="/js/app/store/store.service.js"></script>
-    <script src="/js/app/system/system.controller.js"></script>
-    <script src="/js/app/system/system.service.js"></script>
-    <script src="/js/app/token/token.controller.js"></script>
-    <script src="/js/app/token/token.service.js"></script>
-    <script src="/js/app/translate/translate.config.js"></script>
-    <script src="/js/app/update/update.service.js"></script>
-    <script src="/js/app/user/user.controller.js"></script>
-    <script src="/js/app/user/user.service.js"></script>
-    <script src="/js/app/voice/voice.service.js"></script>
-    <script src="/js/app/weather/weather.controller.js"></script>
-    <script src="/js/app/weather/weather.service.js"></script>
-    <script src="/js/AdminLTE/app.js"></script>
+    <script src="/min/production.min.js"></script>
     <!--SCRIPTS END-->
 
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>

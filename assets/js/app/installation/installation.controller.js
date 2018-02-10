@@ -48,7 +48,7 @@
       $('#birthdatepicker').datetimepicker({
         format: 'YYYY-MM-DD',
         locale: 'en',
-       // disabledHours: true
+        //disabledHours: true
       });
     }
     
@@ -137,12 +137,10 @@
           .then(function(){
               vm.downloadStep++;
               vm.downloadProgress += 100/nbSteps;
-              
               // get all statesTypes
               return updateService.updateStates();
           })
           .then(function(){
-              
               vm.downloadStep++;
               vm.downloadProgress += 100/nbSteps;
               // train brain

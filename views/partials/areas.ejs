@@ -1,5 +1,6 @@
+
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="AreaCtrl as vm">
+<div class="box skin-box box-primary" data-ng-controller="AreaCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('area-box-title') %> <small ng-show="vm.saving"><%= __('area-box-saving') %></small></h3>
     </div> 
@@ -23,7 +24,7 @@
                         <td><input type="text" ng-model="area.latitude" ng-model-options='{ debounce: 500 }' ng-change="vm.updateArea(area.id, area);" class="form-control" /></td>
                         <td><input type="text" ng-model="area.longitude" ng-model-options='{ debounce: 500 }' ng-change="vm.updateArea(area.id, area);" class="form-control" /></td>
                         <td><input type="text" ng-model="area.radius" ng-model-options='{ debounce: 500 }' ng-change="vm.updateArea(area.id, area);" class="form-control" /></td>
-                        <td><button ng-click="vm.deleteArea($index, area.id)" class= "btn btn-danger btn-sm"><%= __('area-delete') %></button></td>
+                        <td><button ng-click="vm.deleteArea($index, area.id)" class= "btn btn-flat btn-danger  "><%= __('area-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" ng-model="vm.newArea.name" data-toggle="tooltip" data-original-title="<%= __('tooltip-area-name') %>" /></td>

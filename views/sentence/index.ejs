@@ -1,25 +1,25 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side" >
+            <aside class="content-wrapper" >
                 <!-- Content Header (Page header) -->
                 <section class="content-header" >
                     <h1>
                         <%= __('Brain') %>
-                        <small><%= __('Control panel') %></small>
+                        <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-bolt"></i> <%= __('Brain') %></a></li>
-                        <li class="active"><%= __('Control panel') %></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
+                        <li class="active"><%= __('Brain') %></li>
                     </ol>
                 </section>
                 <!-- Main content -->
                 <section class="content"  data-ng-controller="SentenceCtrl as vm">
-                     <div class="nav-tabs-custom">
+                     <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
             <ul class="nav nav-tabs">
-              <li ng-class="vm.status === false && 'active'"><a ng-click="vm.setStatus(false)" aria-expanded="true"><%= __('sentence-all') %></a></li>
-              <li ng-class="vm.status === 'pending' && 'active'"><a ng-click="vm.setStatus('pending')" aria-expanded="true"><%= __('sentence-pending') %></a></li>
-              <li ng-class="vm.status === 'approved' && 'active'"><a ng-click="vm.setStatus('approved')" aria-expanded="true"><%= __('sentence-approved') %></a></li>
-              <li ng-class="vm.status === 'official' && 'active'"><a ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
-              <li ng-class="vm.status === 'rejected' && 'active'"><a ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
+              <li ng-class="vm.status === false && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus(false)" aria-expanded="true"><%= __('sentence-all') %></a></li>
+              <li ng-class="vm.status === 'pending' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('pending')" aria-expanded="true"><%= __('sentence-pending') %></a></li>
+              <li ng-class="vm.status === 'approved' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('approved')" aria-expanded="true"><%= __('sentence-approved') %></a></li>
+              <li ng-class="vm.status === 'official' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
+              <li ng-class="vm.status === 'rejected' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
 
               <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" style="cursor:pointer"> <%= __('brain-train-new') %> </a></li>
               <li ng-show="vm.training" class="pull-right"><a ><%= __('brain-training') %>...</a></li>
@@ -48,10 +48,15 @@
                                                             <option ng-value="label.serviceLabelConcat" ng-repeat="label in vm.labels" ng-selected="label.serviceLabelConcat == sentence.serviceLabelConcat">{{label.service}}.{{label.label}}</option>
                                                    </select>
                                                 </td>
-                                                <td>{{sentence.status}}</td>
+                                                <td ng-switch="sentence.status">
+                                                    <p ng-switch-when="official"><%= __('official') %></p>
+                                                    <p ng-switch-when="approved"><%= __('approved') %></p>
+                                                    <p ng-switch-when="pending"><%= __('pending') %></p>
+                                                    <p ng-switch-when="rejected"><%= __('rejected') %></p>
+                                                </td>
                                                 <td>
-                                                    <button ng-hide="['approved', 'official'].indexOf(sentence.status) != -1" class="btn btn-primary btn-sm"  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
-                                                    <button ng-hide="(sentence.status == 'rejected')" class="btn btn-danger btn-sm"  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
+                                                    <button ng-hide="['approved', 'official'].indexOf(sentence.status) != -1" class="btn btn-flat btn-primary  "  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
+                                                    <button ng-hide="(sentence.status == 'rejected')" class="btn btn-flat btn-danger  "  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -77,7 +82,7 @@
             <!-- /.tab-content -->
           </div>
         </section><!-- /.content -->
-    </aside><!-- /.right-side -->
+    </aside><!-- /.content-wrapper -->
 
 
 <script>

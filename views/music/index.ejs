@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Musics') %></li>
                     </ol>
                 </section>
@@ -16,7 +16,6 @@
                 <section class="content">
                          <div class="box-body table-responsive" ng-controller="musicCtrl">
 
-                                    
                                     <table id="example2" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
@@ -31,12 +30,11 @@
                                                 <td>{{music.title}}</td>
                                                 <td>{{music.artist}}</td>
                                                 <td>{{music.album}}</td>
-                                                <td><button ng-click="deleteHouse($index, relation.house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="deleteHouse($index, relation.house.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr>
-
                                                 
-                                                <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
+                                                <td><button class="btn btn-flat btn-success  " data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>  
@@ -46,7 +44,7 @@
 
                         </div>
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
 
                 

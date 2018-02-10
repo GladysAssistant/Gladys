@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Demo') %></li>
                     </ol>
                 </section>
@@ -27,12 +27,12 @@
                                         <tbody>
                                             <tr>
                                                 <td>Réveil</td>
-                                                <td><button ng-click="demoReveil()" class= "btn btn-success btn-sm"><%= __('Lancer la démo') %></button>
-                                                <button ng-click="stopmusic()" class= "btn btn-success btn-sm"><%= __('Couper la musique') %></button></td>
+                                                <td><button ng-click="demoReveil()" class= "btn btn-flat btn-success  "><%= __('Lancer la démo') %></button>
+                                                <button ng-click="stopmusic()" class= "btn btn-flat btn-success  "><%= __('Couper la musique') %></button></td>
                                             </tr>
                                             <tr>
                                                 <td>Notification</td>
-                                                <td><button ng-click="notif()" class= "btn btn-success btn-sm"><%= __('Lancer la démo') %></button>
+                                                <td><button ng-click="notif()" class= "btn btn-flat btn-success  "><%= __('Lancer la démo') %></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -65,7 +65,7 @@
 
                         </div>
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
 
                 

@@ -1,7 +1,7 @@
 <div  data-ng-controller="HouseCtrl as vm">
      
 <!-- NEW BOX -->
-<div class="box box-default">
+<div class="box skin-box box-primary">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('house-box-title') %></h3>
     </div>
@@ -36,7 +36,7 @@
                 <td>{{house.country}}</td>
                 <td>{{house.latitude}}</td>
                 <td>{{house.longitude}}</td>
-                <td><button ng-click="vm.deleteHouse($index, house.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                <td><button ng-click="vm.deleteHouse($index, house.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
             </tr>
             <tr>
                 <td></td>
@@ -59,7 +59,7 @@
 <!-- END OF HOUSE BOX -->
 
 <!-- NEW BOX -->
-<div class="box box-default">
+<div class="box skin-box box-primary">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('room-box-title') %></h3>
     </div>
@@ -80,7 +80,7 @@
                 <td>{{room.id}}</td>
                 <td>{{room.name}}</td>
                 <td>{{room.houseName}}</td>
-                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
             </tr>
             <tr class="ng-cloak"> 
                 <td></td>
@@ -90,7 +90,7 @@
                 </select>
 
                 </td>
-                <td><button class="btn btn-success btn-sm" ng-click="vm.createRoom(vm.newRoom)"><%= __('New') %></button></td>
+                <td><button class="btn btn-flat btn-success  " ng-click="vm.createRoom(vm.newRoom)"><%= __('New') %></button></td>
             </tr>
         </tbody>
     </table>
