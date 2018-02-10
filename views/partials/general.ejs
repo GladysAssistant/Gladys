@@ -21,14 +21,6 @@
                     <tr><td><%= __('system-arch') %></td><td>{{vm.infos.arch}}</td></tr>
                     <tr><td><%= __('system-release') %></td><td>{{vm.infos.release}}</td></tr>
                     <tr><td><%= __('system-uptime') %></td><td>{{vm.infos.uptime | amDurationFormat : 'seconds' }}</td></tr>
-                    <tr>
-                        <td><%= __('system-memory-used') %></td>
-                        <td><div class="progress">
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{vm.infos.percentMemoryUsed}}" aria-valuemin="0" aria-valuemax="100" style="width: {{vm.infos.percentMemoryUsed}}%">
-                                <span>{{vm.infos.percentMemoryUsed | number : 0 }} %</span>
-                                </div>
-                          </div></td>
-                   </tr>
                    <tr><td><%= __('system-update-data') %></td><td><button class="btn btn-flat btn-success  " ng-click="vm.updateAllData();">
                        <div ng-show="!vm.updatingData"><%= __('system-update-data-button') %></div>
                        <div ng-show="vm.updatingData"><%= __('system-updating-data') %></div>
