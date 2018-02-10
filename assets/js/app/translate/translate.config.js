@@ -85,10 +85,9 @@ var translationsEN = {
         ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
     },
     MODE: {
-        CHANGE_SUCCESS_NOTIFICATION: 'Mode changed with success !',
-        CHANGE_FAIL_NOTIFICATION: 'Failed to change mode !',
-        PARAMS_FAIL_NOTIFICATION: 'Invalid parameters !'
-    }
+        CREATED_FAIL_NOTIFICATION: 'Failed to change mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changed successfully. '
+    },
 };
 
 var translationsFR = {
@@ -178,9 +177,8 @@ var translationsFR = {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
     },
     MODE: {
-        CHANGE_SUCCESS_NOTIFICATION: 'Mode changé avec succès !',
-        CHANGE_FAIL_NOTIFICATION: 'Erreur lors du changement de mode !',
-        PARAMS_FAIL_NOTIFICATION: 'Paramètres invalides !'
+        CREATED_FAIL_NOTIFICATION: 'Impossible de changer de mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changé avec succès. '
     }
 };
 

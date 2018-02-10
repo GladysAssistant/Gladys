@@ -28,5 +28,11 @@ module.exports.boxTypes = [
         "title": "Camera",
         "path": "views/boxs/camera.ejs",
         "view": "dashboard"
+    },
+    {
+        "uuid": "c1d66ac1-4529-4e2b-8f16-d0855dad77ad",
+        "title": "Mode",
+        "path": "views/boxs/mode.ejs",
+        "view": "dashboard"
     }
 ];
