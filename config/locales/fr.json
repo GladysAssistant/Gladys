@@ -455,5 +455,10 @@
   "official": "officielle",
   "approved": "approuvée",
   "pending": "en attente",
-  "rejected": "rejetée"
+  "rejected": "rejetée",
+  "box-music-title": "Musique",
+  "box-chat-title": "Chat",
+  "box-calendar-title": "Calendrier",
+  "box-weather-title": "Météo",
+  "box-event-title": "Event"
 }

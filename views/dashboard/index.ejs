@@ -36,37 +36,19 @@
                     </div>
                 
               <% }  %>
-              <!-- end of default box -->      
+              <!-- end of default box --> 
                 
                 
                 <!-- ALL LEFT BOX COMES HERE -->
-                
                 <% 
                    for(var i = 0; i < boxs.length; i++) { 
                         if(boxs[i].x == 1) {
                 %> 
-                    <div class="<%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> ng-init="vm.init(<%= boxs[i].boxId %>);" >
-
-                        <% if(boxs[i].footer) { %>
-                            <%- boxs[i].header %>
-                            <!-- /.box-header -->
-                        <% } %>
-
-                        <% if(boxs[i].footer) { %>
-                            <%- boxs[i].html %>
-                            <!-- /.box-body -->
-                        <% } %>
-                        
-                        <% if(boxs[i].footer) { %>
-                            <%- boxs[i].footer %>
-                            <!-- /.box-footer -->
-                        <% } %>
-                    </div><!-- /.box -->
-                    
-               <%
+                    <%- partial (basePath + '/' + boxs[i].path, {boxId: boxs[i].boxId}) %>
+                <%
                     } // end of if
                  } // end of for loop
-               %>
+                %>
                
                <!-- END OF LOOP OF LEFT BOXS --> 
 
@@ -79,31 +61,14 @@
                     
                 <!-- ALL RIGHT BOX COMES HERE --> 
                 <% 
-                   for(var i = 0; i < boxs.length; i++) { 
+                    for(var i = 0; i < boxs.length; i++) { 
                         if(boxs[i].x == 2) {
                 %> 
-                    <div class="<%= boxs[i].type %>"  <% if(boxs[i].ngcontroller && boxs[i].ngcontroller.length > 0 ) { %> data-ng-controller="<%= boxs[i].ngcontroller %>" <% } %> ng-init="vm.init(<%= boxs[i].boxId %>);" >
-
-                        <% if(boxs[i].footer) { %>
-                            <%- boxs[i].header %>
-                            <!-- /.box-header -->
-                        <% } %>
-                        
-                        <% if(boxs[i].footer) { %>
-                            <%- boxs[i].html %>
-                            <!-- /.box-body -->
-                        <% } %>
-                        
-                        <% if(boxs[i].footer) { %>
-                             <%- boxs[i].footer %>
-                         <% } %>
-                    </div><!-- /.box -->
-                    
-               <%
+                    <%- partial (basePath + '/' + boxs[i].path, {boxId: boxs[i].boxId}) %>
+                <%
                     } // end of if
-                 } // end of for loop
-               %>
-               
+                } // end of for loop
+                %>
                <!-- END OF LOOP OF RIGHT BOXS -->                  
 
                                             
