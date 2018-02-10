@@ -28,5 +28,11 @@ module.exports.boxTypes = [
         "title": "Chat",
         "path": "views/boxs/chat.ejs",
         "view": "dashboard"
+    },
+    {
+        "uuid": "07024831-ab32-4bfa-9843-d1845992447d",
+        "title": "Camera",
+        "path": "views/boxs/camera.ejs",
+        "view": "dashboard"
     }
 ];

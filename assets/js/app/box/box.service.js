@@ -20,6 +20,7 @@
         
         var service = {
             get:get, 
+            getById: getById,
             create:create,
             destroy: destroy,
             update: update
@@ -33,6 +34,10 @@
         
         function create(box) {
             return $http({method: 'POST', url: '/box', data: box});
+        }
+
+        function getById(id){
+            return $http({method: 'GET', url: '/box/' + id});
         }
         
         function destroy(id){
