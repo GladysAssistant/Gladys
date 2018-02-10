@@ -1,0 +1,22 @@
+<div class="box box-success" data-ng-controller="CalendarBoxCtrl as vm">
+    <div class="box-header with-border">
+      <i class="fa fa-sun-o"></i>
+      <h3 class="box-title"><%= __('box-calendar-title') %></h3>
+
+      <div class="box-tools pull-right">
+        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+        </button>
+        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+      </div>
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body no-padding">
+        <div id="calendarBox"></div>
+    </div>
+    <!-- /.box-body -->
+
+    <div class="box-footer">
+            <div class="row"> <div class="col-sm-6"> <!-- Progress bars --> <div class="clearfix ng-cloak" ng-repeat="dayevent in vm.dayEvents" > <span class="pull-left"><b>{{dayevent.start|amDateFormat:'HH:mm'}} - {{dayevent.end|amDateFormat:'HH:mm'}} :</b> {{dayevent.name}}</span> <small class="pull-right"></small> </div> </div><!-- /.col --> </div><!-- /.row -->
+    </div>
+  </div>

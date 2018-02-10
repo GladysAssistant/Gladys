@@ -289,5 +289,10 @@
   "official": "official",
   "approved": "approved",
   "pending": "pending",
-  "rejected": "rejected"
+  "rejected": "rejected",
+  "box-music-title": "Music",
+  "box-chat-title": "Chat",
+  "box-calendar-title": "Calendar",
+  "box-weather-title": "Weather",
+  "box-event-title": "Event"
 }
