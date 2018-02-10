@@ -1,4 +1,4 @@
-FROM node:boron
+FROM node:carbon
 
 # Create src folder
 RUN mkdir /src
