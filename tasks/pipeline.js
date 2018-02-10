@@ -61,6 +61,9 @@ var jsFilesToInject = [
   'js/dependencies/angular-route.min.js',
   // loading JQuery
   'AdminLTE/bower_components/jquery/dist/jquery.min.js',
+
+  'js/dependencies/popper.min.js',
+
   // loading Bootstrap
   'AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js',
   

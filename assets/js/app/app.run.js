@@ -19,6 +19,9 @@
   function runBlock(languageService,socketService, recognitionService) {
     languageService.initialize();
     socketService.subscribe();
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
     //recognitionService.start();
   }
   
