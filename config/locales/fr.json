@@ -499,5 +499,6 @@
   "box-camera-placeholder": "URL du flux vidéo",
   "box-camera-validate": "Enregistrer",
   "box-mode-title": "Changement de modes",
-  "box-mode-validate": "Changer"
+  "box-mode-validate": "Changer",
+  "box-chart-title": "Courbes"
 }

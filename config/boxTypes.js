@@ -34,5 +34,11 @@ module.exports.boxTypes = [
         "title": "Mode",
         "path": "views/boxs/mode.ejs",
         "view": "dashboard"
+    },
+    {
+        "uuid": "c02be824-a1df-4a1a-a004-5bd5041b5655",
+        "title": "Chart",
+        "path": "views/boxs/chart.ejs",
+        "view": "dashboard"
     }
 ];

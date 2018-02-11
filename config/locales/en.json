@@ -337,5 +337,6 @@
   "box-camera-placeholder": "Video flux URL",
   "box-camera-validate": "Save",
   "box-mode-title": "Modes",
-  "box-mode-validate": "Change"
+  "box-mode-validate": "Change",
+  "box-chart-title": "Charts"
 }
