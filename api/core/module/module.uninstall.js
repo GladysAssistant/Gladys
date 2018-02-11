@@ -3,6 +3,12 @@ var Promise = require('bluebird');
 var fse = require('fs-extra');
 
 module.exports = function(module){
+
+    // if the module is installed remotely, send the info
+    if(module.machine && module.machine.length){
+        gladys.emit('module-uninstall', module);
+        return Promise.resolve(module);
+    }
     
     // getting module in DB
     return gladys.utils.sqlUnique(queries.getById, [module.id])

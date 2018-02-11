@@ -5,13 +5,19 @@ module.exports = function sendCommand(functionName, params) {
     return getDeviceType(params)
       .then((deviceType) => {
 
+          params.deviceType = deviceType;
+
+          // if the device is not on this machine
+          if(deviceType.machine && deviceType.machine.length){
+             gladys.emit(`music-${functionName}`, params);
+             return Promise.resolve();
+          }
+
           if(!gladys.modules[deviceType.service] || !gladys.modules[deviceType.service].music)
                 return Promise.reject(new Error(`Music : Module ${deviceType.service} does not exist or does not handle music.`));
          
           if(typeof gladys.modules[deviceType.service].music[functionName] != 'function')
                return Promise.reject(new Error(`Music : Module ${deviceType.service} does not have function ${functionName}`)); 
-
-          params.deviceType = deviceType;
         
           // calling music module
           return gladys.modules[deviceType.service].music[functionName](params);

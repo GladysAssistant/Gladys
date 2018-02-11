@@ -40,11 +40,19 @@ function exec(param) {
             // parseFloat value
             param.value = parseFloat(param.value);
 
+            var data = {
+                deviceType: types[0],
+                state: param
+            };
+
+            // if the device is not on this machine
+            if(types[0].machine && types[0].machine.length){
+                gladys.emit('devicetype-exec', data);
+                return Promise.resolve(true);
+            }
+
             // calling service method
-            return gladys.modules[types[0].service].exec({
-                    deviceType: types[0],
-                    state: param
-                });
+            return gladys.modules[types[0].service].exec(data);
         })
         .then(function(hasStateFeedback) {
             if(hasStateFeedback === true) return param;

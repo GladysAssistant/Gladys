@@ -7,6 +7,13 @@ module.exports = function (params){
     if(!params.slug || params.slug.length === 0 || !params.url || params.url.length === 0){
         return Promise.reject(new Error('Slug or url not provided'));
     }
+
+    // if a machine is specified, it means we need to install this module
+    // on a remote machine. Emit an event, so a potential module will handle the install
+    if(params.machine && params.machine.length){
+        gladys.emit('module-install', params);
+        return Promise.resolve();
+    }
     
     var path = './api/hooks/' + params.slug;
     
