@@ -15,20 +15,25 @@
       .module('gladys')
       .controller('CalendarBoxCtrl', CalendarBoxCtrl);
   
-    CalendarBoxCtrl.$inject = ['calendarService', 'userService'];
+    CalendarBoxCtrl.$inject = ['calendarService', 'userService', 'calendarConfig'];
   
-    function CalendarBoxCtrl(calendarService, userService) {
+    function CalendarBoxCtrl(calendarService, userService, calendarConfig) {
       /* jshint validthis: true */
       var vm = this;
-      vm.calendarView = calendarView;
+
+      vm.calendarView = 'day';
+      vm.viewDate = moment().toDate();
+      vm.events = [];
+
       vm.loadAllEvents = loadAllEvents;
   
       activate();
   
       function activate() {
         getCurrentUser()
-        .then(function(userLanguage){
-          calendarView(userLanguage);
+        .then(function(user){
+          vm.language = user.language.substring(0,2).toLowerCase();
+          moment.locale(vm.language);
           loadAllEvents();
         });
         return;
@@ -36,53 +41,32 @@
   
       function getCurrentUser(){
         return userService.whoAmI()
-          .then(function(userData){
-            return userData.language.substring(0,2).toLowerCase();
+          .then(function(user){
+            return user;
           }); 
-      }
-  
-      function calendarView(userLanguage) {
-  
-        $("#calendarBox").fullCalendar({
-          header    : {
-            left  : 'prev,next today',
-            center: 'title',
-            right : ''
-          },
-          defaultView: 'agendaDay',
-          locale: userLanguage,
-          allDaySlot: false,
-          allDayDefault: false,
-          timezone: 'local',
-          eventLimit: true,
-          editable: false,
-          droppable: false,
-        })
       }
 
       function loadAllEvents() {
         return calendarService.loadAllEvents()
           .then(function(data){
-            vm.allEvents = data.data;
+            vm.events = []
   
-            var events = []
-  
-            for(var i = 0; i < vm.allEvents.length; i++ ){
+            for(var i =0; i < data.data.length; i++){
   
               var event = {
-                id: vm.allEvents[i].id,
-                title: vm.allEvents[i].name,
-                start: vm.allEvents[i].start,
-                end: vm.allEvents[i].end,
-                allDay: vm.allEvents[i].fullday,
+                id: data.data[i].id,
+                title: data.data[i].name,
+                color: calendarConfig.colorTypes.important,
+                startsAt: moment(data.data[i].start).toDate(),
+                endsAt: moment(data.data[i].end).toDate(),
+                draggable: false,
+                resizable: false,
+                cssClass: 'custom-class'
               }
   
-              events.push(event)
-  
+              vm.events.push(event)
             }
-            $('#calendarBox').fullCalendar('addEventSource', events)
-  
           });
-        }
+      }
     }
   })();
