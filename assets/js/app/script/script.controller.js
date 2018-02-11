@@ -40,7 +40,9 @@
         }
         
         $scope.$watch('vm.currentScript', function(newValue, oldValue){
-            editor.setValue(vm.currentScript.text);
+            if(vm.currentScript){
+                editor.setValue(vm.currentScript.text);
+            }
         });
         
         /**
