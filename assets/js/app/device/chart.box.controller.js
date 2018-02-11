@@ -33,7 +33,7 @@
       vm.box = null;
       vm.deviceTypes =[];
       vm.chart = {}
-      vm.currentDeviceType = {};
+      vm.currentDeviceType = null;
 
       function init(id){
         vm.boxId = id;
@@ -41,14 +41,15 @@
             .then(function(data) {
                 vm.box = data.data;
                 if(vm.box.params && vm.box.params.device) {
-                    vm.currentDeviceType.id = vm.box.params.device
-                    vm.currentDeviceType.name = vm.box.params.name
-                    vm.currentDeviceType.unit = vm.box.params.unit
-                    getStatesDevice(vm.currentDeviceType)
+                    vm.currentDeviceType = {};
+                    vm.currentDeviceType.id = vm.box.params.device;
+                    vm.currentDeviceType.name = vm.box.params.name;
+                    vm.currentDeviceType.unit = vm.box.params.unit;
+                    getStatesDevice(vm.currentDeviceType);
+                    activate();
                 }
             });
         getDeviceTypes();
-        activate();
       }
   
       function activate() {
@@ -124,7 +125,8 @@
                       var chartData = formatDataChartjs(data.data);
                       vm.chart.data = [chartData.data];
                       vm.chart.labels = chartData.labels; 
-                      vm.chart.series = [deviceType.name + ' ' + deviceType.unit];
+                      vm.chart.series = [deviceType.name];
+                      if(deviceType.unit) vm.chart.series[0] += ' ' + deviceType.unit;
                   }else{
                       vm.currentDeviceType.skip -= 5;
                       if(vm.currentDeviceType.skip < 0){
