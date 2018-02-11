@@ -29,5 +29,26 @@ module.exports = function userSeen(options) {
                 };
                 return gladys.event.update(newEvent);
             }
+        })
+        .then((event) => {
+            
+            // we save the new location of the user 
+            // based on the latitude + longitude of his house
+            return gladys.house.getById({id: options.house})
+                .then((house) => {
+
+                    // if house has a latitude & a longitude
+                    if(house.latitude && house.longitude) {
+                        return gladys.location.create({
+                            latitude: house.latitude,
+                            longitude: house.longitude,
+                            accuracy: 0,
+                            user: options.user
+                        });
+                    } else {
+                        return null;
+                    }
+                })
+                .then(() => event);
         });
 };
