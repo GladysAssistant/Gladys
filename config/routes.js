@@ -203,6 +203,7 @@ module.exports.routes = {
   
   // Param
   'get /param': 'ParamController.index',
+  'get /param/:name': 'ParamController.getByName',
   'post /param': 'ParamController.create',
   'patch /param/:name': 'ParamController.update',
   'delete /param/:name': 'ParamController.delete',
