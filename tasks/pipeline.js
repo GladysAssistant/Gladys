@@ -36,7 +36,6 @@ var cssFilesToInject = [
   'AdminLTE/bower_components/font-awesome/css/font-awesome.min.css',
   'AdminLTE/dist/css/skins/_all-skins.min.css',
   'AdminLTE/bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
-  'AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.css',
   
   // all styles, disabled by default
   //'styles/**/*.css',
