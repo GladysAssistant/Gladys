@@ -83,7 +83,7 @@
                     chartData.data = [chartData.data];
                     vm.chart = chartData;
                 }else{
-                    vm.currentDeviceType.skip -= 5;
+                    vm.currentDeviceType.skip -= 25;
                     if(vm.currentDeviceType.skip < 0){
                         vm.currentDeviceType.skip = 0;
                     }
