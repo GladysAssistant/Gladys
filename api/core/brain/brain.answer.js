@@ -82,6 +82,16 @@ module.exports = function answer(result, user) {
  */
 function trySendingMessage(newMessage, type, user) {
 
+    // if the module is not installed locally
+    if(type.machine && type.machine.length){
+        gladys.emit('message-notify', {
+            message,
+            type,
+            user
+        });
+        return Promise.reject(new Error('ok'));
+    }
+
     var toCall;
 
     if (gladys.modules[type.service] && typeof gladys.modules[type.service].notify == "function") {
