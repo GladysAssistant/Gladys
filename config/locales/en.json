@@ -340,5 +340,9 @@
   "box-camera-placeholder": "Video flux URL",
   "box-camera-validate": "Save",
   "box-mode-title": "Modes",
-  "box-mode-validate": "Change"
+  "box-mode-validate": "Change",
+  "box-who-is-at-home-title": "Who's at home ?",
+  "box-who-is-at-home-explanation": "Select a house :",
+  "box-who-is-at-home-validate": "Save",
+  "box-who-is-at-home-nobody": "Nobody."
 }

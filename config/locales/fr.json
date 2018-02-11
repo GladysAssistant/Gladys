@@ -503,5 +503,9 @@
   "box-mode-title": "Changement de modes",
   "box-mode-validate": "Changer",
   "Previous": "Précédent",
-  "Today": "Aujourd'hui"
+  "Today": "Aujourd'hui",
+  "box-who-is-at-home-title": "A la maison",
+  "box-who-is-at-home-explanation": "Sélectionnez une maison à surveiller :",
+  "box-who-is-at-home-validate": "Enregistrer",
+  "box-who-is-at-home-nobody": "Personne."
 }
