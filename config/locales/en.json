@@ -324,6 +324,7 @@
   "approved": "approved",
   "pending": "pending",
   "rejected": "rejected",
+  "machine-last-seen": "Last seen",
   "box-music-title": "Music",
   "box-music-music-title": "Title",
   "box-music-music-artist": "Artist",

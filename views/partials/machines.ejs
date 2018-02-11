@@ -16,6 +16,7 @@
                             <th><%= __('House') %></th>
                             <th><%= __('Host') %></th>
                             <th><%= __('Me') %></th>
+                            <th><%= __('machine-last-seen') %></th>
                             <th><%= __('Delete') %></th>
                         </tr>
                     </thead>
@@ -29,6 +30,9 @@
                                 </td>
                             <td><input type="text" class="form-control" ng-model="machine.host" ng-model-options='{ debounce: 500 }' ng-change="vm.updateMachine(machine);" /></td>
                             <td><div ng-show="machine.me"><%= __('Yes') %></div><div ng-show="!machine.me"><%= __('No') %></div></td>
+                            <td>
+                                <span am-time-ago="machine.lastSeen"></span>
+                            </td>
                             <td><button ng-click="vm.deleteMachine($index, machine.id)" class="btn btn-flat btn-danger  " ><%= __('Delete') %></button></td>
                         </tr>
                         <tr>
@@ -50,6 +54,7 @@
                                 <button class="btn btn-flat btn-success  " ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
                                 <button class="btn btn-flat btn-danger  " ng-show="!vm.newMachine.me" ng-click="vm.newMachine.me = true" ><%= __('No') %></button>
                             </td>
+                            <td></td>
                             <td>
                                 <button ng-click="vm.createMachine(vm.newMachine)" class="btn btn-flat btn-success  "><%= __('Register machine') %></button>
                             </td>
