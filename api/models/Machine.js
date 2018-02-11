@@ -39,6 +39,10 @@ module.exports = {
         me: {
             type: 'boolean',
             defaultsTo: false
+        },
+
+        lastSeen: {
+            type: 'datetime'
         }
 
     }
