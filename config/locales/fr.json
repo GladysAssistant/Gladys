@@ -508,5 +508,6 @@
   "box-who-is-at-home-explanation": "Sélectionnez une maison à surveiller :",
   "box-who-is-at-home-validate": "Enregistrer",
   "box-who-is-at-home-nobody": "Personne.",
-  "box-chart-title": "Courbes"
+  "box-chart-title": "Courbes",
+  "box-chart-empty-state": "Sélectionnez un périphérique !"
 }
