@@ -25,7 +25,9 @@
     <!-- /.box-header -->
     <div class="box-body ng-cloak">
             <div ng-show="vm.currentDeviceType === null">
-                <h4 class="text-center" style="padding: 20px">Please select a device !</h4>
+                <h4 class="text-center" style="padding: 20px">
+                        <%= __('box-chart-empty-state') %>
+                </h4>
             </div>
             <canvas ng-show="vm.currentDeviceType" id="line" 
                     class="chart chart-line" 
