@@ -41,7 +41,11 @@
                   <td>{{module.id}}</td>
                   <td>{{module.name}}</td>
                   <td>{{module.version}}</td>
-                  <td>{{module.status}}</td>
+                  <td>
+                      <span ng-show="module.status == 0"><%= __('module-status-0') %></span>
+                      <span ng-show="module.status == 1"><%= __('module-status-1') %></span>
+                      <span ng-show="module.status == 2"><%= __('module-status-2') %></span>
+                   </td>
                    <td><button class="btn btn-flat btn-info" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
                   <td><button class="btn btn-flat btn-success" ng-click="vm.upgradeModule($index, module);"><%= __('module-upgrade') %></button></td>
                    <td><button class="btn btn-flat btn-danger" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
