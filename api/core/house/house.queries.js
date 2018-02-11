@@ -25,7 +25,7 @@ module.exports = {
         FROM event 
         JOIN eventtype ON event.eventtype = eventtype.id
         WHERE 
-        ( eventtype.code = 'back-at-home' OR eventtype.code = 'left-home' )
+        ( eventtype.code = 'back-at-home' OR eventtype.code = 'left-home' OR eventtype.code = 'user-seen-at-home' )
         AND user = user.id
         AND house = ?
         ORDER BY datetime DESC LIMIT 1 ) AS lastHouseEvent
