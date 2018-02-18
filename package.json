@@ -41,7 +41,7 @@
     "grunt-sync": "^0.6.2",
     "include-all": "~4.0.3",
     "jsonwebtoken": "^8.0.0",
-    "limdu": "^0.9.3",
+    "limdu": "0.9.4",
     "moment": "^2.18.1",
     "node-schedule": "^1.2.4",
     "rc": "^1.2.1",
