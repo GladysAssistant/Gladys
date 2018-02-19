@@ -52,6 +52,9 @@ module.exports = function(cb){
 
   // be sure that Gladys has socket notification type
   gladys.socket.createNotificationType();
+
+  // check if db mgiration is needed
+  gladys.task.checkDbVersion();
   
   // install all modules not 
   // fully installed
