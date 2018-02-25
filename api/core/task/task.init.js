@@ -8,18 +8,6 @@ module.exports = function(cb){
 
   // start sunrise & sunset schedule
   gladys.sun.init().catch(sails.log.warn);
-
-  // check if db migration is needed
-  gladys.task.checkDbVersion()
-    .then(() => {
-        sails.log.info('Successfully checked DB version.');
-        cb();
-    })
-    .catch((err) => {
-        sails.log.error(`Error while performing DB migration.`);
-        sails.log.error(err);
-        cb();
-    });
   
   gladys.brain.load()
     .then(() => {
@@ -33,8 +21,20 @@ module.exports = function(cb){
    gladys.alarm.checkAllAutoWakeUp();
   
   if(sails.config.environment !== 'production') {
-    return ;   
+    return cb();   
   }
+
+    // check if db migration is needed
+   gladys.task.checkDbVersion()
+    .then(() => {
+        sails.log.info('Successfully checked DB version.');
+        cb();
+    })
+    .catch((err) => {
+        sails.log.error(`Error while performing DB migration.`);
+        sails.log.error(err);
+        cb();
+    });
   
   
   // tasks started only in prod
