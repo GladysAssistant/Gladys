@@ -13,11 +13,11 @@
   
     angular
       .module('gladys')
-      .controller('ChartBoxCtrl', ChartBoxCtrlCtrl);
+      .controller('ChartBoxCtrl', ChartBoxCtrl);
   
-    ChartBoxCtrlCtrl.$inject = ['deviceService', 'boxService', '$scope'];
+    ChartBoxCtrl.$inject = ['deviceService', 'boxService', '$scope'];
   
-    function ChartBoxCtrlCtrl(deviceService, boxService, $scope) {
+    function ChartBoxCtrl(deviceService, boxService, $scope) {
       /* jshint validthis: true */
       var vm = this;
       
