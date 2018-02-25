@@ -18,7 +18,7 @@
             <div class="col-md-4"> <select ng-model="vm.newEvent.house" class="form-control"><option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>        </select> </div>
         </div>
         <div class="row" style="margin-top:20px;">
-            <div class="col-md-12"> <button class="btn btn-block btn-success" ng-click="vm.createEvent(vm.newEvent);">Créer</button></div>
+            <div class="col-md-12"> <button class="btn btn-block btn-success btn-flat" ng-click="vm.createEvent(vm.newEvent);"><%= __('box-event-create') %></button></div>
         </div>
     </div>
     <!-- /.box-body -->
