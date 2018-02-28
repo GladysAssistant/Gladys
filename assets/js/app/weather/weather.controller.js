@@ -14,9 +14,9 @@
     .module('gladys')
     .controller('WeatherCtrl', WeatherCtrl);
 
-  WeatherCtrl.$inject = ['weatherService', 'geoLocationService', 'cacheService', 'notificationService', '$timeout'];
+  WeatherCtrl.$inject = ['weatherService', 'geoLocationService', 'cacheService', 'notificationService', '$timeout', 'houseService'];
 
-  function WeatherCtrl(weatherService, geoLocationService, cacheService, notificationService, $timeout) {
+  function WeatherCtrl(weatherService, geoLocationService, cacheService, notificationService, $timeout, houseService) {
 
     /* jshint validthis: true */
     var vm = this;
@@ -49,7 +49,29 @@
         } 
         // if not, get geoloc from browser
         else {
+
+            // trying to geoloc from browser
             return geoLocationService.getCurrentPosition()
+              .catch(function(err) {
+
+                // if it fails, fallback from house
+                return houseService.get()
+                  .then(function(data){
+                      var houses = data.data;
+                      if(houses.length === 0) {
+                        return Promise.reject(new Error('NO_HOUSE_DEFINED'));
+                      } else {
+                        var geolocData = {
+                          coords: {
+                            latitude: houses[0].latitude,
+                            longitude: houses[0].longitude,
+                            accuracy: 0
+                          }
+                        };
+                        return geolocData;
+                      }
+                  });
+              })
               .then(function(data) {
 
                   if(data.coords && data.coords.latitude && data.coords.longitude) {
@@ -69,7 +91,11 @@
                   }
               })
               .catch(function(err) {
-                  notificationService.errorNotificationTranslated('WEATHER.GET_GEOLOCATION_FAILED', err);
+                  if(err && err.message == 'NO_HOUSE_DEFINED') {
+                    notificationService.errorNotificationTranslated('WEATHER.GET_GEOLOCATION_FAILED_CREATE_HOUSE'); 
+                  } else {
+                    notificationService.errorNotificationTranslated('WEATHER.GET_GEOLOCATION_FAILED', err);
+                  }
               });
         }
     }

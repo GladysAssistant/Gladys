@@ -1,0 +1,69 @@
+<div class="box box-danger" data-ng-controller="CalendarBoxCtrl as vm">
+    <div class="box-header with-border">
+        <i class="fa fa-calendar"></i>
+        <h3 class="box-title"><%= __('box-calendar-title') %></h3>
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body ng-cloak">
+        <div class="row">
+            <div class="col-md-2 text-center">
+                <div class="btn-group">
+                    <button
+                        class="btn btn-danger btn-flat"
+                        mwl-date-modifier
+                        date="vm.viewDate"
+                        decrement="vm.calendarView"
+                        ng-click="vm.cellIsOpen = false">
+                        <%= __('Previous') %>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <button
+                    class="btn btn-default btn-flat"
+                    mwl-date-modifier
+                    date="vm.viewDate"
+                    set-to-today
+                    ng-click="vm.cellIsOpen = false">
+                    <%= __('Today') %>
+                </button>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <h4>{{ vm.calendarTitle }}</h4>
+            </div>
+            
+            <div class="col-md-2 text-center">
+                <div class="btn-group">
+                    <button
+                        class="btn btn-danger btn-flat"
+                        mwl-date-modifier
+                        date="vm.viewDate"
+                        increment="vm.calendarView"
+                        ng-click="vm.cellIsOpen = false">
+                        <%= __('Next') %>
+                    </button>
+                </div>
+            </div>
+            </div>
+            <br>
+            <div style="height: 400px; overflow: auto">
+            <mwl-calendar
+                events="vm.events"
+                view="vm.calendarView"
+                view-title="vm.calendarTitle"
+                view-date="vm.viewDate"
+                day-view-start="06:00"
+                day-view-end="22:01">
+            </mwl-calendar>
+        </div>
+    </div>
+    <!-- /.box-body -->
+    <style type="text/css">
+        .custom-class a {
+            pointer-events: none;
+            cursor: default;
+        }
+    </style>
+</div>

@@ -54,10 +54,10 @@
         function createEvent(event) {
             return eventService.create(event)
                 .then(function(){
-                    notificationService.successNotificationTranslated('EVENT.CREATED_SUCCESS_NOTIFICATION', code);
+                    notificationService.successNotificationTranslated('EVENT.CREATED_SUCCESS_NOTIFICATION', event.code);
                 })
                 .catch(function(){
-                    notificationService.errorNotificationTranslated('EVENT.CREATED_FAIL_NOTIFICATION', code);
+                    notificationService.errorNotificationTranslated('EVENT.CREATED_FAIL_NOTIFICATION', event.code);
                 });
         }
 

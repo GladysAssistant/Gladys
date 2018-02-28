@@ -1,0 +1,31 @@
+<div class="box box-warning direct-chat direct-chat-warning ng-cloak" data-ng-controller="MessageCtrl as vm">
+    <div class="box-header with-border">
+        <i class="fa fa-comments-o"></i>
+        <h3 class="box-title">
+            <%= __('box-chat-title') %>
+        </h3>
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body no-padding">
+            <div class="direct-chat-messages ng-cloak" id="chat-box">
+                <div class="direct-chat-msg {{message.type}}" ng-repeat="message in vm.messages">
+                    <div class="direct-chat-info clearfix"><span class="direct-chat-name {{message.chat}}">{{message.senderName}}</span><span am-time-ago="message.datetime" class="direct-chat-timestamp {{message.timeAgo}}"></span></div>
+                    <div class="direct-chat-text {{message.chat}}">{{message.text}}</div>
+                </div>
+                <span class="typing-indicator ng-pristine ng-untouched ng-valid ng-binding ng-empty ng-hide" ng-show="vm.typing" ng-model="vm.typingText"> {{ 'CHAT.TYPING' | translate }}... </span>
+            </div>
+    </div>
+    <!-- /.box-body -->
+
+    <div class="box-footer">
+        <div class="input-group ng-cloak">
+            <input type="text" ng-keydown="$event.keyCode == 13 ? vm.send(vm.newMessageText) : null" placeholder="{{ 'CHAT.TEXT_BOX_PLACEHOLDER' | translate }}..." class="form-control" ng-model="vm.newMessageText" />
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-warning btn-flat" ng-click="vm.send(vm.newMessageText);">
+                    <i class=" fa fa-send"></i>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>

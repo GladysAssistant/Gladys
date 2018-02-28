@@ -21,6 +21,7 @@
         var service = {
             create: create,
             get: get,
+            getByUser: getByUser,
             getCurrentPosition: getCurrentPosition
         };
 
@@ -38,6 +39,10 @@
 
         function get(){
            return $http({ method: 'GET', url: '/location'}); 
+        }
+
+        function getByUser(id, options){
+            return $http({ method: 'GET', url: '/user/' + id + '/location', params: options}); 
         }
 
         function getCurrentPosition() {

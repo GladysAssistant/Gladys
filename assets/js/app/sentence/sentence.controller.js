@@ -120,7 +120,6 @@
                 data.data.forEach(function(elem, index){
                     elem.serviceLabelConcat = elem.service + '.' + elem.label;
                 });
-                console.log(data.data);
                 vm.sentences = vm.sentences.concat(data.data);
                 vm.remoteIsBusy = false;
             });

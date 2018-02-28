@@ -119,6 +119,10 @@ accepts@~1.2.12, accepts@~1.2.13:
     mime-types "~2.1.6"
     negotiator "0.5.3"
 
+acorn@^5.1.1:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.4.1.tgz#fdc58d9d17f4a4e98d102ded826a9b9759125102"
+
 after@0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/after/-/after-0.8.1.tgz#ab5d4fb883f596816d3515f8f791c0af486dd627"
@@ -457,12 +461,11 @@ braces@^1.8.2:
     preserve "^0.2.0"
     repeat-element "^1.1.2"
 
-brain@*:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/brain/-/brain-0.7.0.tgz#a6d0718c064a9d50d9bff39f38557b6b94d4466c"
+brain.js@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/brain.js/-/brain.js-1.0.5.tgz#925ae1d4e0f14e70fed8239c85757baeaa5c8b1f"
   dependencies:
-    inherits "~2.0.1"
-    underscore ">=1.5.1"
+    gpu.js "^1.0.0"
 
 browser-stdout@1.3.0:
   version "1.3.0"
@@ -1568,6 +1571,12 @@ globule@^1.0.0:
     lodash "~4.16.4"
     minimatch "~3.0.2"
 
+gpu.js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-1.0.0.tgz#97c268dfb37048d49670aa71862382bd2a5c86dd"
+  dependencies:
+    acorn "^5.1.1"
+
 graceful-fs@*, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
@@ -2333,12 +2342,12 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-limdu@^0.9.3:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/limdu/-/limdu-0.9.3.tgz#6fe88833d35469511fe6b81235ff0495cb2639a3"
+limdu@0.9.4:
+  version "0.9.4"
+  resolved "https://registry.yarnpkg.com/limdu/-/limdu-0.9.4.tgz#70e24c4f73d0f83f8499e034b3eba9dd5cd2beba"
   dependencies:
     async "*"
-    brain "*"
+    brain.js "^1.0.5"
     graph-paths latest
     languagemodel latest
     sprintf "*"
@@ -4294,7 +4303,7 @@ underscore.string@~3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/underscore.string/-/underscore.string-3.2.3.tgz#806992633665d5e5fcb4db1fb3a862eb68e9e6da"
 
-underscore@*, underscore@>=1.5.1, underscore@~1.6.0:
+underscore@*, underscore@~1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.6.0.tgz#8b38b10cacdef63337b8b24e4ff86d45aea529a8"
 

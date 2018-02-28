@@ -1,0 +1,52 @@
+<div class="box box-info" data-ng-controller="MusicCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <div class="box-header with-border">
+        <i class="fa fa-music"></i>
+        <h3 class="box-title">
+            <%= __('box-music-title') %>
+        </h3>
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div ng-show="vm.roomId" class="ng-cloak">
+            <div class="row" style="margin-bottom: 20px">
+                <center>{{vm.currentTrack.title}} - {{vm.currentTrack.artist}}</center>
+            </div>
+            <div class="row" style="margin-bottom: 20px"> 
+                <div class="col-xs-offset-4 col-xs-1"> <button ng-click="vm.previous();" class="btn btn-default btn-flat"><i class="fa fa-fast-backward"></i></button> </div> 
+                <div class="col-xs-1"> <button ng-click="vm.stop();" class="btn btn-default btn-flat"><i class="fa fa-stop"></i></button> </div>  
+                <div class="col-xs-1"> <button ng-show="vm.playing" ng-click="vm.pause();" class="btn btn-default btn-flat"><i class="fa fa-pause"></i></button> <button ng-show="!vm.playing" ng-click="vm.play();" class="btn btn-default btn-flat"><i class="fa fa-play"></i></button> </div>
+                <div class="col-xs-1"> <button ng-click="vm.next();" class="btn btn-default btn-flat"><i class="fa fa-fast-forward"></i></button> </div>
+            </div>
+            <div class="table-responsive" ng-show="vm.queue && vm.queue.length" style="height: 200px; overflow:auto;">
+                <table class="table ">
+                    <tbody>
+                        <tr>
+                            <th><%= __('box-music-music-title') %></th>
+                            <th><%= __('box-music-music-artist') %></th>
+                            <th><%= __('box-music-music-album') %></th>
+                        </tr>
+                        <tr ng-repeat="music in vm.queue">
+                            <td>{{music.title}}</td>
+                            <td>{{music.artist}}</td>
+                            <td>{{music.album}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div ng-show="vm.displayAskRoomForm" class="ng-cloak">
+            <p><%= __('box-music-music-select-room') %></p>
+            <div class="row">
+                <div class="col-xs-offset-2 col-xs-6">
+                    <select ng-model="vm.selectedRoomId" class="form-control">
+                        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+                    </select>
+                </div>
+                <div class="col-xs-2"> <button class="btn btn-success btn-flat" ng-click="vm.selectRoomId(vm.selectedRoomId);"><%= __('box-music-music-validate') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

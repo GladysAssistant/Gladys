@@ -7,7 +7,7 @@
   * @author :: pjap93
   */
   
-(function () {
+  (function () {
     'use strict';
 
     angular
@@ -37,6 +37,9 @@
             return modeService.get()
               .then(function(data){
                   vm.modes = data.data;
+                  if(vm.modes.length > 0){
+                      vm.newMode.mode = vm.modes[0].code;
+                  } 
               });
         }
         
@@ -44,10 +47,13 @@
             return houseService.get()
                 .then(function(data){
                     vm.houses = data.data;
+                    if(vm.houses.length > 0) {
+                        vm.newMode.house = vm.houses[0].id;
+                    }
                 });
         }
 		
-        function changeMode(event) {
+        function changeMode(event) {
             return modeService.changeMode(event.house,event.mode)
                 .then(function(){
                     notificationService.successNotificationTranslated('MODE.CREATED_SUCCESS_NOTIFICATION', event.mode);

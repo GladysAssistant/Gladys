@@ -20,27 +20,9 @@ module.exports = {
           type: 'string',
           required: true
       },
-      
-      ngcontroller: {
-          type: 'string'
-      },
-      
-      html: {
-          type: 'text'
-      },
-      
-      footer: {
-          type: 'text'
-      },
-      
-      icon: {
-          type: 'string',
-          required: true
-      },
-      
-      type: {
-          type:'string',
-          required: true
+
+      path: {
+        type: 'string'
       },
       
       // the view where the module should be displayed

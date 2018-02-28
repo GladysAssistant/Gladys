@@ -32,7 +32,7 @@ module.exports.policies = {
   Alarm : ['checkToken'],
   Area : ['checkToken'],
   Brain: [ 'checkToken'],
-  Box: [ 'authenticated'],
+  Box: ['checkToken'],
   BoxType: [ 'authenticated'],
   CalendarEvent : ['checkToken'],
   CalendarList : ['checkToken'],

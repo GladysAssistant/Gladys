@@ -1,5 +1,5 @@
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="ModeCtrl as vm">
+<div class="box skin-box box-primary" data-ng-controller="ModeCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('mode-box-title') %> <small ng-show="vm.saving"><%= __('mode-box-saving') %></small></h3>
     </div> 
@@ -21,13 +21,13 @@
                         <td>{{mode.code}}</td>
                         <td>{{mode.name}}</td>
                         <td>{{mode.description}}</td>
-                        <td><button ng-click="vm.destroyMode($index, mode.id)" class= "btn btn-danger btn-sm"><%= __('mode-delete') %></button></td>
+                        <td><button ng-click="vm.destroyMode($index, mode.id)" class= "btn btn-flat btn-danger  "><%= __('mode-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" ng-model="vm.newMode.code" data-toggle="tooltip" data-original-title="<%= __('tooltip-mode-code') %>" /></td>
                         <td><input type="text" class="form-control" ng-model="vm.newMode.name" data-toggle="tooltip" data-original-title="<%= __('tooltip-mode-name') %>" /></td>
                         <td><input type="text" class="form-control" ng-model="vm.newMode.description" data-toggle="tooltip" data-original-title="<%= __('tooltip-mode-description') %>" /></td>
-                        <td><button class="btn btn-success btn-sm" ng-click="vm.createMode(vm.newMode)"><%= __('mode-new') %></button></td>
+                        <td><button class="btn btn-success btn-flat btn-sm" ng-click="vm.createMode(vm.newMode)"><%= __('mode-new') %></button></td>
                     </tr>
                 </tbody>
             </table>

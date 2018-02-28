@@ -1,0 +1,31 @@
+<div class="box box-success" data-ng-controller="ModeBoxCtrl as vm">
+    <div class="box-header with-border">
+        <i class="fa fa-dot-circle-o"></i>
+        <h3 class="box-title">
+            <%= __('box-mode-title') %>
+        </h3>
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="row ng-cloak">
+            <div class="col-md-6">
+                <select ng-model="vm.newMode.mode" class="form-control">
+                    <option ng-repeat="mode in vm.modes" value="{{mode.code}}">{{mode.name}}</option>
+                </select>
+            </div>
+            <div class="col-md-6"> 
+                <select ng-model="vm.newMode.house" class="form-control"> 
+                    <option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>
+                </select> 
+            </div>
+        </div>
+        <div class="row" style="margin-top:20px;">
+            <div class="col-md-12"> <button class="btn btn-block btn-success btn-flat" ng-click="vm.changeMode(vm.newMode);">
+                    <%= __('box-mode-validate') %>
+            </button> 
+        </div>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>
