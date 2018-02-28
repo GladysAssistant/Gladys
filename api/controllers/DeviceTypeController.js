@@ -92,6 +92,24 @@ module.exports = {
             })
             .catch(next);
   },
+
+  /**
+   * @api {get} /devicetype/:id/exec change a deviceType state (GET)
+   * @apiName execDeviceTypeGet
+   * @apiGroup DeviceType
+   * @apiPermission authenticated
+   *
+   * @apiParam {float} [value] New value to apply to the deviceType
+   * 
+   * @apiUse DeviceStateSuccess
+   */
+  execGet: function(req, res, next){
+    gladys.deviceType.exec({devicetype: req.params.id, value: req.query.value})
+          .then(function(state){
+              return res.json(state);
+          })
+          .catch(next);
+},
   
   /**
    * @api {get} /devicetype/room get by room

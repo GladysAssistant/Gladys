@@ -1,26 +1,26 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-<aside class="right-side" >
+<aside class="content-wrapper" >
     <!-- Content Header (Page header) -->
     <section class="content-header" >
         <h1>
             <%= __('Module') %>
-            <small><%= __('Control panel') %></small>
+            <small><%= __('Control Panel') %></small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Module') %></a></li>
-            <li class="active"><%= __('Control panel') %></li>
+            <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
+            <li class="active"><%= __('Module') %></li>
         </ol>
     </section>
 
     <!-- Main content -->
     <section class="content"  data-ng-controller="ModuleCtrl as vm">
           
-          <div class="nav-tabs-custom">
+          <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#tab_1" data-toggle="tab" ng-click="vm.refreshModule();" aria-expanded="true"><%= __('modules-installed') %></a></li>
               <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false" ng-click="vm.getModulesStore();"><%= __('modules-store') %></a></li>
               <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('modules-advanced') %></a></li>
-              <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
+              <!-- <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li> -->
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
@@ -41,10 +41,14 @@
                   <td>{{module.id}}</td>
                   <td>{{module.name}}</td>
                   <td>{{module.version}}</td>
-                  <td>{{module.status}}</td>
-                   <td><button class="btn btn-info btn-sm" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
-                  <td><button class="btn btn-success btn-sm" ng-click="vm.upgradeModule($index, module);"><%= __('module-upgrade') %></button></td>
-                   <td><button class="btn btn-danger btn-sm" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
+                  <td>
+                      <span ng-show="module.status == 0"><%= __('module-status-0') %></span>
+                      <span ng-show="module.status == 1"><%= __('module-status-1') %></span>
+                      <span ng-show="module.status == 2"><%= __('module-status-2') %></span>
+                   </td>
+                   <td><button class="btn btn-flat btn-info" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
+                  <td><button class="btn btn-flat btn-success" ng-click="vm.upgradeModule($index, module);"><%= __('module-upgrade') %></button></td>
+                   <td><button class="btn btn-flat btn-danger" ng-click="vm.uninstallModule($index, module.id);"><%= __('module-uninstall') %></button></td>
                 </tr>
                 
               </tbody></table>
@@ -70,8 +74,8 @@
                 <div class="row modules" >
 
                     <div class="col-lg-3 col-sm-4 col-xs-6 module" ng-repeat="module in vm.modulesFromStore" ng-click="vm.showModule(module);">
-                        <a> <h5>{{module.name}}</h5>
-                        <div class="module-img">
+                        <a style="cursor: pointer"> <h5>{{module.name}}</h5>
+                        <div class="module-img" style="cursor: pointer">
                             <img class="img-responsive img-rounded" ng-src="{{module.img}}">
                             <div class="description">
                                 <p class="text-justify">
@@ -126,7 +130,7 @@
                                         <label class="sr-only" for="slug"><%= __('module-slug') %></label>
                                         <input type="text" ng-model="vm.newModule.slug" class="form-control" id="slug" placeholder="<%= __('module-slug') %>">
                                     </div>
-                                    <button type="submit" ng-click="vm.installModule(vm.newModule);" class="btn btn-success">
+                                    <button type="submit" ng-click="vm.installModule(vm.newModule);" class="btn btn-flat btn-success">
                                         
                                         <div ng-show="vm.installationStep == 0"><%= __('module-install') %></div>
                                         <div ng-show="vm.installationStep == 1"><%= __('module-install-downloading') %></div>
@@ -162,7 +166,7 @@
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" id="validateButton" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                    <button type="button" id="validateButton" class="btn btn-primary btn-flat" data-dismiss="modal">Ok</button>
                   </div>
                 </div>
                 <!-- /.modal-content -->
@@ -170,7 +174,7 @@
           </div>
 
     </section><!-- /.content -->
-</aside><!-- /.right-side -->
+</aside><!-- /.content-wrapper -->
 
 
 <script>

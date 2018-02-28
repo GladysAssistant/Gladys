@@ -1,5 +1,5 @@
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="ParamCtrl as vm">
+<div class="box skin-box box-primary" data-ng-controller="ParamCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('param-box-title') %> <small ng-show="vm.saving"><%= __('param-box-saving') %></small></h3>
     </div> 
@@ -19,12 +19,12 @@
                     <tr ng-repeat="param in vm.params" class="ng-cloak">
                         <td>{{param.name}}</td>
                         <td><input type="text" ng-model="param.value" ng-model-options='{ debounce: 500 }' ng-change="vm.updateParam(param.name, param);" class="form-control" /></td>
-                        <td><button ng-click="vm.deleteParam($index, param.name)" class= "btn btn-danger btn-sm"><%= __('param-delete') %></button></td>
+                        <td><button ng-click="vm.deleteParam($index, param.name)" class= "btn btn-flat btn-danger  "><%= __('param-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" ng-model="vm.newParam.name" /></td>
                         <td><input type="text" class="form-control" ng-model="vm.newParam.value" /></td>
-                        <td><button class="btn btn-success btn-sm" ng-click="vm.createParam(vm.newParam)"><%= __('param-new') %></button></td>
+                        <td><button class="btn btn-flat btn-success  " ng-click="vm.createParam(vm.newParam)"><%= __('param-new') %></button></td>
                     </tr>
                 </tbody>
             </table>
@@ -33,7 +33,7 @@
 </div>
 
 <!-- NEW BOX -->
-<div class="box box-default" data-ng-controller="ParamUserCtrl as vm">
+<div class="box skin-box box-primary" data-ng-controller="ParamUserCtrl as vm">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('param-user-box-title') %> <small ng-show="vm.saving"><%= __('param-box-saving') %></small></h3>
     </div> 
@@ -53,12 +53,12 @@
                     <tr ng-repeat="param in vm.params" class="ng-cloak">
                         <td>{{param.name}}</td>
                         <td><input type="text" ng-model="param.value" ng-model-options='{ debounce: 500 }' ng-change="vm.updateParam(param.name, param);" class="form-control" /></td>
-                        <td><button ng-click="vm.deleteParam($index, param.name)" class= "btn btn-danger btn-sm"><%= __('param-delete') %></button></td>
+                        <td><button ng-click="vm.deleteParam($index, param.name)" class= "btn btn-flat btn-danger  "><%= __('param-delete') %></button></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" ng-model="vm.newParam.name" /></td>
                         <td><input type="text" class="form-control" ng-model="vm.newParam.value" /></td>
-                        <td><button class="btn btn-success btn-sm" ng-click="vm.createParam(vm.newParam)"><%= __('param-new') %></button></td>
+                        <td><button class="btn btn-flat btn-success  " ng-click="vm.createParam(vm.newParam)"><%= __('param-new') %></button></td>
                     </tr>
                 </tbody>
             </table>

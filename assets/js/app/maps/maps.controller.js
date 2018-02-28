@@ -22,6 +22,9 @@
         
         var leafletMap;
         var markerUser = {};
+
+        var lastDrawnId = null;
+        var lastDrawnPolyLine = null;
     
         getPoints();
 
@@ -51,6 +54,9 @@
                     vm.locations.forEach(function(location){
                         markerUser[location.user] = L.marker([location.latitude, location.longitude], {icon: icon}).addTo(leafletMap);
                         markerUser[location.user].bindTooltip(location.firstname + ' ' + location.lastname).openTooltip();
+                        markerUser[location.user].on('click', function() {
+                            drawLinesUser(location.user);
+                        });
                     });
 
                     waitForNewValue();
@@ -76,6 +82,31 @@
 
         function updateValue(location) {
             markerUser[location.user].setLatLng(L.latLng(location.latitude, location.longitude));
+        }
+
+        function drawLinesUser(id) {
+            
+            if(id == lastDrawnId){
+                lastDrawnId = null;
+                lastDrawnPolyLine.remove();
+                return;
+            }
+
+            if(lastDrawnPolyLine){
+                lastDrawnPolyLine.remove();
+            }
+
+            geoLocationService.getByUser(id, {take: 200})
+                .then(function(data) {
+                    var locations = data.data;
+                    var latlngs = [];
+                    locations.forEach(function(location){
+                        latlngs.push([location.latitude, location.longitude]);
+                    });
+
+                    lastDrawnPolyLine = L.polyline(latlngs, {color: '#518cb8'}).addTo(leafletMap);
+                    lastDrawnId = id;
+                });
         }
 
     }

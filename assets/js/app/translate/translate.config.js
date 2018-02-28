@@ -61,7 +61,8 @@ var translationsEN = {
         day: 'Day',
         night: 'Night',
         HUMIDITY: 'Humidity',
-        GET_GEOLOCATION_FAILED: 'Geolocation failed.'
+        GET_GEOLOCATION_FAILED: 'Geolocation failed.',
+        GET_GEOLOCATION_FAILED_CREATE_HOUSE: 'Geolocation Failed. I tried first to geolocate you with your browser, but it failed. Then, I tried to get your house latitude & longitude, but it failed too. Please define a house in the parameters.'
     },
     CHAT: {
         TEXT_BOX_PLACEHOLDER: 'Write your message',
@@ -84,10 +85,9 @@ var translationsEN = {
         ERROR: 'Something bad happened :/ Check Gladys logs for more informations.'
     },
     MODE: {
-        CHANGE_SUCCESS_NOTIFICATION: 'Mode changed with success !',
-        CHANGE_FAIL_NOTIFICATION: 'Failed to change mode !',
-        PARAMS_FAIL_NOTIFICATION: 'Invalid parameters !'
-    }
+        CREATED_FAIL_NOTIFICATION: 'Failed to change mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changed successfully. '
+    },
 };
 
 var translationsFR = {
@@ -153,7 +153,8 @@ var translationsFR = {
         day: 'Jour',
         night: 'Nuit',
         HUMIDITY: 'Humidité',
-        GET_GEOLOCATION_FAILED: 'Erreur lors de la géolocalisation :'
+        GET_GEOLOCATION_FAILED: 'Erreur lors de la géolocalisation :',
+        GET_GEOLOCATION_FAILED_CREATE_HOUSE: 'Erreur lors de la récupération de la météo. Je n\'ai pas réussi à vous localiser via votre navigateur, puis je n\'ai pas réussi à récupérer la latitude et la longitude de votre maison. Merci de définir une maison dans les paramètres.'
     },
     CHAT: {
         TEXT_BOX_PLACEHOLDER: 'Tapez votre message',
@@ -176,9 +177,8 @@ var translationsFR = {
         ERROR: 'Une erreur inconnue est arrivée :/ Regardez les logs Gladys pour plus d\'informations.'
     },
     MODE: {
-        CHANGE_SUCCESS_NOTIFICATION: 'Mode changé avec succès !',
-        CHANGE_FAIL_NOTIFICATION: 'Erreur lors du changement de mode !',
-        PARAMS_FAIL_NOTIFICATION: 'Paramètres invalides !'
+        CREATED_FAIL_NOTIFICATION: 'Impossible de changer de mode. ',
+        CREATED_SUCCESS_NOTIFICATION: 'Mode changé avec succès. '
     }
 };
 

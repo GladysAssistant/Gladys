@@ -1,0 +1,25 @@
+<div class="box box-success" data-ng-controller="CameraBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+        <div class="box-header with-border">
+            <i class="fa fa-camera"></i>
+            <h3 class="box-title">
+                <%= __('box-camera-title') %>
+            </h3>
+        </div>
+        <div class="box-body ng-cloak">
+            <div ng-show="vm.enterUrl === true" class="ng-cloak">
+                <p><%= __('box-camera-explanation') %></p>
+                <p><%= __('box-camera-tutorial') %> <a href="https://hackernoon.com/spy-your-pet-with-a-raspberry-pi-camera-server-e71bb74f79ea">Spy your pet with a Raspberry Pi Camera Server</a></a></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input class="form-control" type="text" ng-model="vm.newCameraUrl" placeholder="<%= __('box-camera-placeholder') %>"/>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success btn-flat" ng-click="vm.saveCameraUrl(vm.newCameraUrl);"><%= __('box-camera-validate') %></button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <img class="img-responsive" ng-src="{{ vm.cameraUrl || '//:0' }}"/>
+            </div>
+        </div>
+</div>

@@ -16,7 +16,7 @@
                             <img class="img-responsive img-rounded" alt="" ng-src="{{vm.selectedModule.img}}">
                         </div>
                         <div class="form-group">
-                            <div class="row infos">
+                            <!-- <div class="row infos">
                                 <div class="col-xs-6">
                                     <strong>{{vm.selectedModule.nbNotes}}</strong> <%= __('module-reviews') %>
                                 </div>
@@ -27,7 +27,7 @@
                                     <i ng-show="vm.selectedModule.note > 3" class="fa fa-star"></i><i ng-show="vm.selectedModule.note < 4" class="fa fa-star-o"></i>
                                     <i ng-show="vm.selectedModule.note > 4" class="fa fa-star"></i><i ng-show="vm.selectedModule.note < 5" class="fa fa-star-o"></i>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="row infos">
                                 <div class="col-xs-6">
                                     <%= __('module-install-version') %> <strong>{{vm.selectedModule.version}}</strong>
@@ -46,11 +46,11 @@
                             </div>
                         </div>
                         <div class="download-module-button form-group">
-                           <button ng-show="!vm.selectedModule.installed" type="button" ng-click="vm.installModule(vm.selectedModule);" class="btn btn-success btn-lg btn-block">
+                           <button ng-show="!vm.selectedModule.installed" type="button" ng-click="vm.installModule(vm.selectedModule);" class="btn btn-flat btn-success btn-lg btn-block">
                                <div ng-show="!vm.installing"><%= __('module-install') %></div>
                                <div ng-show="vm.installing"><%= __('module-installing') %></div>
                            </button>
-                           <button ng-show="vm.selectedModule.installed" type="button" ng-click="vm.uninstallModule(null, vm.selectedModule.localId);" class="btn btn-danger btn-lg btn-block">
+                           <button ng-show="vm.selectedModule.installed" type="button" ng-click="vm.uninstallModule(null, vm.selectedModule.localId);" class="btn btn-flat btn-danger btn-lg btn-block">
                                <div ng-show="!vm.uninstalling"><%= __('module-uninstall') %></div>
                                <div ng-show="vm.uninstalling"><%= __('module-uninstalling') %></div>
                            </button>
@@ -59,7 +59,7 @@
                     <div class="col-md-8">
                         <ul class="nav nav-tabs">
                             <li role="presentation" class="active" ng-class="vm.resetModal" ><a href="#infos" data-toggle="tab"><%= __('module-infos') %></a></li>
-                            <li role="presentation" ng-click="vm.getReviews(vm.selectedModule.idModule);"><a href="#review" data-toggle="tab"><%= __('module-reviews') %></a></li>
+                            <!-- <li role="presentation" ng-click="vm.getReviews(vm.selectedModule.idModule);"><a href="#review" data-toggle="tab"><%= __('module-reviews') %></a></li> -->
                             <li role="presentation" ng-click="vm.getVersions(vm.selectedModule.idModule);"><a href="#changelog" data-toggle="tab"><%= __('module-changelog') %></a></li>
                         </ul>
                         <div class="panel panel-default view tab-content">
@@ -70,6 +70,7 @@
                             </div>
 
                             <!-- Avis View -->
+                            <!--
                             <div id="review" class="tab-pane">
                                 <ul class="list-group">
                                        <li class="list-group-item" ng-repeat="review in vm.selectedModule.reviews">
@@ -81,6 +82,7 @@
                                         </li>                                
                                 </ul>
                             </div>
+                        -->
 
                             <div class="tab-pane" id="changelog">
                                 <table class="table table-striped">

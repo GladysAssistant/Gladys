@@ -62,6 +62,12 @@ module.exports = {
         gladys.location.get()
             .then(locations => res.json(locations))
             .catch(next);
+    },
+
+    getByUser: function(req, res, next){
+        gladys.location.getByUser({user: req.params.id, take: req.query.take, skip: req.query.skip})
+            .then(locations => res.json(locations))
+            .catch(next);
     }
 
 };

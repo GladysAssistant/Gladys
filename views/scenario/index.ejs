@@ -1,5 +1,6 @@
+<script src="/js/dependencies/ace/ace.js"></script>
 <!-- Right side column. Contains the navbar and content of the page -->
-<aside class="right-side">
+<aside class="content-wrapper">
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -7,7 +8,7 @@
         <small><%= __('Control Panel') %></small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
         <li class="active"><%= __('Scenario') %></li>
     </ol>
 </section>
@@ -15,11 +16,11 @@
 <!-- Main content -->
 <section class="content" data-ng-controller="scenarioCtrl as vm" >
     <div class="box-body" >
-         <div class="nav-tabs-custom">
+         <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('scenario-list') %></a></li>
-              <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('scenario-help') %></a></li>
-              <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
+              <!-- <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('scenario-help') %></a></li> -->
+              <!-- <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li> -->
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
@@ -37,12 +38,12 @@
             </div>
             <!-- end of tab-content -->
          </div>
-         <!-- end of nav-tabs-custom -->
+         <!-- end of nav-tabs-custom {{vm.skins.tab}} -->
     </div>
          <%- partial ('./modal.ejs') %>
          <%- partial ('./edit-scenario.ejs') %>
     </section><!-- /.content -->
-</aside><!-- /.right-side -->
+</aside><!-- /.content-wrapper -->
 
 
 <script>

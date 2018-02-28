@@ -1,5 +1,5 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="right-side">
+            <aside class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -7,7 +7,7 @@
                         <small><%= __('Control Panel') %></small>
                     </h1>
                     <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> <%= __('Home') %></a></li>
+                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
                         <li class="active"><%= __('Permissions') %></li>
                     </ol>
                 </section>
@@ -17,7 +17,7 @@
                     
                     
                       <!-- NEW BOX -->
-                  <div class="box box-default">
+                  <div class="box skin-box box-primary">
                   <div class="box-header with-border">
                     <h3 class="box-title"><%= __('User House Relations') %></h3>
                   </div>  
@@ -37,7 +37,7 @@
                                                 <td>{{userhouserelation.houseName}}</td>
                                                 <td>{{userhouserelation.userName}}</td>
                                                 <td>{{vm.userHouseRelationTypes[userhouserelation.userhouserelationtype-1].name}}</td>
-                                                <td><button ng-click="vm.destroyRelation($index, userhouserelation.id)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="vm.destroyRelation($index, userhouserelation.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr class="ng-cloak">
                                                 <td><select ng-model="vm.newRelation.house" class="form-control" >
@@ -52,7 +52,7 @@
                                                         <option ng-repeat="userhouserelationtype in vm.userHouseRelationTypes" value="{{userhouserelationtype.id}}">{{userhouserelationtype.name}}</option>
                                                 </select>
                                                 </td>
-                                                <td><button class="btn btn-success btn-sm" ng-click="vm.addRelation()"><%= __('New') %></button></td>
+                                                <td><button class="btn btn-flat btn-success  " ng-click="vm.addRelation()"><%= __('New') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -64,7 +64,7 @@
 
                         
                       <!-- NEW BOX -->
-                  <div class="box box-default">
+                  <div class="box skin-box box-primary">
                   <div class="box-header with-border">
                     <h3 class="box-title"><%= __('Define user\'s sleep room') %></h3>
                   </div>  
@@ -81,7 +81,7 @@
                                             <tr ng-repeat="sleepin in vm.sleepIn" class="ng-cloak">
                                                 <td>{{sleepin.roomName}}</td>
                                                 <td>{{sleepin.userName}}</td>
-                                                <td><button ng-click="vm.destroySleepin($index, sleepin.roomId, sleepin.userId)" class= "btn btn-danger btn-sm"><%= __('Delete') %></button></td>
+                                                <td><button ng-click="vm.destroySleepin($index, sleepin.roomId, sleepin.userId)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                                             </tr>
                                             <tr class="ng-cloak">
                                                 <td><select ng-model="vm.newSleepIn.room" class="form-control" >
@@ -93,7 +93,7 @@
                                                 </select>
                                                 </td>
                                                 
-                                                <td><button class="btn btn-success btn-sm" ng-click="vm.defineSleepIn()"><%= __('New') %></button></td>
+                                                <td><button class="btn btn-flat btn-success  " ng-click="vm.defineSleepIn()"><%= __('New') %></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -104,7 +104,7 @@
                   
                   
                 </section><!-- /.content -->
-            </aside><!-- /.right-side -->
+            </aside><!-- /.content-wrapper -->
 
             <script>
                 document.getElementById("roomLi").className = "active";
