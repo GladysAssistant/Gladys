@@ -5,4 +5,4 @@ function isItNight(options){
           if(result.state === 'night') return true; 
           return false;
       });
-} 
+};
