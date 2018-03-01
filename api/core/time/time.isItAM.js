@@ -5,4 +5,4 @@ function isItAM(options){
           if(result.state === 'morning') return true; 
           return false;
       });
-} 
+};
