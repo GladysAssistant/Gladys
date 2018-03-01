@@ -5,4 +5,4 @@ function isItEvening(options){
           if(result.state === 'evening') return true; 
           return false;
       });
-} 
+}; 
