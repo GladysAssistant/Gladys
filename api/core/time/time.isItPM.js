@@ -5,4 +5,4 @@ function isItPM(options){
           if(result.state === 'afternoon') return true; 
           return false;
       });
-} 
+};
