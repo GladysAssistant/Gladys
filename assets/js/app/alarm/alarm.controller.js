@@ -92,11 +92,12 @@
     }
 
     function createAlarm(){
-  	   vm.newAlarm.datetime = $('#datetimepicker2').data("DateTimePicker").date().second(0);
+       vm.newAlarm.datetime = $('#datetimepicker2').data("DateTimePicker").date().second(0);
        var alarmObj = {
             datetime: vm.newAlarm.datetime.format(),
             time: null,
-            name: vm.newAlarm.name
+            name: vm.newAlarm.name,
+            isWakeUp: (vm.newAlarm.isWakeUp == 1)
        };
        return alarmService.create(alarmObj)
         .then(function(data){
@@ -109,6 +110,7 @@
     
     function createTimer(alarm){
        alarm.duration = alarm.duration*3600;
+       alarm.isWakeUp = (alarm.isWakeUp == 1);
         return alarmService.createTimer(alarm)
           .then(function(){
             getAlarms();
@@ -119,11 +121,13 @@
     
     function createAlarmRecurring(){
       vm.newAlarmReccuring.time = $('#datetimepicker3').data("DateTimePicker").date().format("HH:mm");
+      
       var alarmObj = {
         datetime: null,
         time: vm.newAlarmReccuring.time,
         name: vm.newAlarmReccuring.name,
-        dayofweek: vm.newAlarmReccuring.dayofweek
+        dayofweek: vm.newAlarmReccuring.dayofweek,
+        isWakeUp: ( vm.newAlarmReccuring.isWakeUp == 1)
       };
       
       return alarmService.create(alarmObj)
@@ -136,7 +140,8 @@
         }); 
     }
 
-    function createAlarmCron(){
+    function createAlarmCron() {
+        vm.newAlarmCron.isWakeUp = (vm.newAlarmCron.isWakeUp == 1);
         return alarmService.create(vm.newAlarmCron)
             .then(function(data){
                 getAlarms();
@@ -148,7 +153,9 @@
 
     function createAlarmAutoWakeUp(){
        vm.newAlarmAutoWakeUp.autoWakeUp = true;
-        return alarmService.create(vm.newAlarmAutoWakeUp)
+       vm.newAlarmAutoWakeUp.isWakeUp = true;
+      
+       return alarmService.create(vm.newAlarmAutoWakeUp)
             .then(function(data){
                 getAlarms();
                 vm.newAlarmAutoWakeUp.name = '';
