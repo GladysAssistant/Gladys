@@ -40,6 +40,11 @@ module.exports = function(oldVersion) {
             .then(() => gladys.task.dbMigration('3.7.5'));
     }
 
+    if(semver.lt(oldVersion, '3.7.8')) {
+        return gladys.utils.sql(`ALTER TABLE alarm ADD COLUMN isWakeUp tinyint(1) DEFAULT NULL;`).reflect()
+            .then(() => gladys.task.dbMigration('3.7.8'))
+    }
+
     // default, we save in DB the current version of Gladys
     return gladys.task.updateDbVersion(gladys.version);
 };
