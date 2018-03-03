@@ -59,7 +59,9 @@
                                                 </div>
                                                 <div class="modal-body">
                                                   
-                                                            <!-- DateTime Boostrap Picker -->
+                                                            <p>
+                                                                <%= __('alarm-explanation') %>
+                                                            </p>
 
                                                              <!-- NEW BOX -->
                                                           <div class="box box-solid">
@@ -79,6 +81,14 @@
                                                                                 <span class="input-group-addon"><span class="fa fa-calendar "></span>
                                                                                 </span>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class='col-md-2'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarm.isWakeUp">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
                                                                         </div>
                                                                     </div>
                                                                      <div class='col-md-4'>
@@ -105,6 +115,14 @@
                                                                             <div>
                                                                                 <input type='text' class="form-control" ng-model="vm.newTimer.duration" id="NewAlarmDatetime" placeholder="<%= __('alarm-time-sleep') %>" />
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class='col-md-2'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newTimer.isWakeUp">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
                                                                         </div>
                                                                     </div>
                                                                      <div class='col-md-4'>
@@ -138,6 +156,15 @@
                                                                                 <option value="6"><%= __('Saturday') %></option>
                                                                                 <option value="0"><%= __('Sunday') %></option>
                                                                                 
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class='col-md-2'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.isWakeUp">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
                                                                             </select>
                                                                         </div>
                                                                     </div>
@@ -178,6 +205,15 @@
                                                                     
                                                                     <div class='col-md-4'>
                                                                         <input type="text" class="form-control" ng-model="vm.newAlarmCron.cronrule" placeholder="* * * * * *" />
+                                                                    </div>
+
+                                                                    <div class='col-md-2'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarmCron.isWakeUp">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
+                                                                        </div>
                                                                     </div>
                                                                 
                                                                      <div class='col-md-4'>

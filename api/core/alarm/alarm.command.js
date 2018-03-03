@@ -11,7 +11,7 @@ module.exports = function command(scope) {
 
             toCall = Promise.map(scope.times, function(time){
                 if(time && time.start && time.start.date()) {
-                    return gladys.alarm.create({name: 'Alarm', datetime: time.start.date(), user: scope.user.id});
+                    return gladys.alarm.create({name: 'Alarm', datetime: time.start.date(), user: scope.user.id, isWakeUp: true});
                 }
             })
             .then((alarms) => {
