@@ -42,6 +42,7 @@ module.exports = function(oldVersion) {
 
     if(semver.lt(oldVersion, '3.7.8')) {
         return gladys.utils.sql(`ALTER TABLE alarm ADD COLUMN isWakeUp tinyint(1) DEFAULT NULL;`).reflect()
+            .then(() => gladys.task.updateDbVersion('3.7.8'))
             .then(() => gladys.task.dbMigration('3.7.8'))
     }
 
