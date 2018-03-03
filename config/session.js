@@ -12,6 +12,9 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.session.html
  */
 
+const crypto = require('crypto');
+const seed = crypto.randomBytes(20);
+const sessionSecret = crypto.createHash('sha1').update(seed).digest('hex');
 
 module.exports.session = {
 
@@ -22,7 +25,7 @@ module.exports.session = {
   * of your users, forcing them to log in again.                             *
   *                                                                          *
   ***************************************************************************/
-  secret: '7a6b5e8257aaa49ef371a24e669cece4',
+  secret: sessionSecret,
 
 
   /***************************************************************************
