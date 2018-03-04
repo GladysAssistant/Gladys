@@ -23,7 +23,8 @@ module.exports = function(oldVersion) {
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN html;').reflect(),
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN footer;').reflect(),
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN type;').reflect(),
-                gladys.utils.sql('ALTER TABLE boxtype ADD COLUMN path VARCHAR(255);').reflect()
+                gladys.utils.sql('ALTER TABLE boxtype ADD COLUMN path VARCHAR(255);').reflect(),
+                gladys.utils.sql('ALTER TABLE box ADD COLUMN params longtext;').reflect()
             ]))
             .then(() => gladys.utils.sql(`
                 CREATE TABLE gladysversion (
