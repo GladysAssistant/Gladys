@@ -39,10 +39,6 @@ module.exports = function(cb){
   
   // tasks started only in prod
 
-  fs.chmod(sails.config.update.updateScript, '755', function(err, result){
-      if(err) return sails.log.error(err);
-  });
-
 
   // start sunrise & sunset schedule each day at 00.01 
   // start auto wake up feature each day at 00.01 

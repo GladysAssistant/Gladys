@@ -28,6 +28,19 @@ module.exports = function schedule(alarm) {
         }
     };
 
+    // If this alarm is a wake up alarm, we don't throw the "alarm" event 
+    // but the "user-need-to-wake-up" event
+    if(alarm.isWakeUp === true || alarm.isWakeUp === 1){
+        options.event = {
+            code: 'user-need-to-wake-up',
+            value: alarm.user,
+            scope: {
+                user: alarm.user,
+                alarm: alarm.id
+            }
+        }
+    }
+
     return gladys.scheduler.create(options)
         .then(function(index) {
             shared.tabAlarmScheduled[alarm.id] = index;

@@ -64,6 +64,12 @@ module.exports = {
             defaultsTo: true
         },
 
+        // determine if this alarm is an alarm for wake up or not
+        isWakeUp: {
+            type: 'boolean',
+            defaultsTo: false
+        },
+
         user: {
             model: 'User',
             required: true
