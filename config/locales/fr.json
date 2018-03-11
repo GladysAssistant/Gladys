@@ -210,6 +210,7 @@
   "devices-skip-previous": "Précédents",
   "devices-skip-next": "Suivant",
   "devices-types-ID": "ID",
+  "devices-types-name": "Nom",
   "devices-types-identifier": "Identifier",
   "devices-types-type": "type",
   "devices-types-category": "Catégorie",

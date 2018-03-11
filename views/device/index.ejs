@@ -231,6 +231,7 @@
                                         <thead>
                                             <tr>
                                                 <th><%= __('devices-types-ID') %></th>
+                                                <th><%= __('devices-types-name') %></th>
                                                 <th><%= __('devices-types-identifier') %></th>
                                                 <th><%= __('devices-types-type') %></th>
                                                 <th><%= __('devices-types-category') %></th>
@@ -247,6 +248,7 @@
                                         <tbody>
                                             <tr ng-repeat="type in vm.selectedDevice.types" class="ng-cloak">
                                                 <td>{{type.id}}</td>
+                                                <td><input type="text" class="form-control" ng-model="type.name"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td><input type="text" class="form-control" ng-model="type.identifier"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td>{{type.type}}</td>
                                                 <td>

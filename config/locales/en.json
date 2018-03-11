@@ -46,6 +46,7 @@
   "devices-skip-previous": "Previous",
   "devices-skip-next": "Next",
   "devices-types-ID": "ID",
+  "devices-types-name": "Name",
   "devices-types-identifier": "Identifier",
   "devices-types-type": "type",
   "devices-types-category": "Category",
