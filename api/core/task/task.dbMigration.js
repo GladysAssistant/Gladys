@@ -23,7 +23,8 @@ module.exports = function(oldVersion) {
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN html;').reflect(),
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN footer;').reflect(),
                 gladys.utils.sql('ALTER TABLE boxtype DROP COLUMN type;').reflect(),
-                gladys.utils.sql('ALTER TABLE boxtype ADD COLUMN path VARCHAR(255);').reflect()
+                gladys.utils.sql('ALTER TABLE boxtype ADD COLUMN path VARCHAR(255);').reflect(),
+                gladys.utils.sql('ALTER TABLE box ADD COLUMN params longtext;').reflect()
             ]))
             .then(() => gladys.utils.sql(`
                 CREATE TABLE gladysversion (
@@ -38,6 +39,12 @@ module.exports = function(oldVersion) {
             .then(() => gladys.update.getBoxTypes())
             .then(() => gladys.task.updateDbVersion('3.7.5'))
             .then(() => gladys.task.dbMigration('3.7.5'));
+    }
+
+    if(semver.lt(oldVersion, '3.7.8')) {
+        return gladys.utils.sql(`ALTER TABLE alarm ADD COLUMN isWakeUp tinyint(1) DEFAULT NULL;`).reflect()
+            .then(() => gladys.task.updateDbVersion('3.7.8'))
+            .then(() => gladys.task.dbMigration('3.7.8'))
     }
 
     // default, we save in DB the current version of Gladys
