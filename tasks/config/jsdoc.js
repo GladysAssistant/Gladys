@@ -13,7 +13,14 @@ module.exports = function(grunt) {
                 destination: 'docs',
                 access: ['public'],
                 theme: 'node_modules/documentation-flat-theme',
-                order: ['House.create','House.get']
+                order: ['gladys.house.create',
+                        'gladys.house.update',
+                        'gladys.house.delete',
+                        'gladys.house.get',
+                        'gladys.house.getById',
+                        'gladys.house.getUsers',
+                        'gladys.house.checkUserPresence'
+                    ]
             }
 		}
     });
