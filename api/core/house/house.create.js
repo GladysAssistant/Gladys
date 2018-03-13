@@ -2,8 +2,9 @@ var uuid = require('uuid');
 
 /**
  * @public
+ * @module gladys/house/create
  * @description This function create an house
- * @name House.create
+ * @name gladys.house.create
  * @param {Object} house
  * @param {String} house.name The name of the house
  * @param {String} house.address The address of the house
@@ -12,7 +13,7 @@ var uuid = require('uuid');
  * @param {String} house.country The country of the house
  * @param {float} house.latitude The latitude of the house
  * @param {float} house.longitude The longitude of the house
- * @returns {House:} house
+ * @returns {House} house
  * @example
  * var house = {
  *      name: "Maison",
