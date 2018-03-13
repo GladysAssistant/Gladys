@@ -1,5 +1,20 @@
 var queries = require('./house.queries.js');
 
+/**
+ * @public
+ * @description This function return all houses
+ * @name House.get
+ * @param {Object} options
+ * @param {number} options.take number of houses to return (optional)
+ * @param {number} options.skip number of houses to skip (optional)
+ * @returns {Array<houses>} houses
+ * @example
+ * gladys.house.get()
+ *  .then(function(houses){
+ *      // do something
+ *  })
+ */
+
 module.exports = function get (options){
     
     options = options || {};
