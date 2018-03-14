@@ -3,7 +3,7 @@ var queries = require('./area.queries.js');
 /**
  * @public
  * @description This function return all area of the user
- * @name gladys.area.update
+ * @name gladys.area.get
  * @param {Object} user
  * @param {integer} user.id The id of the user's areas
  * @returns {Array<areas>} area
