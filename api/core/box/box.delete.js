@@ -11,7 +11,7 @@ var queries = require('./box.queries.js');
  * var box = {
  *      id: 1
  * };
-
+ *
  * gladys.box.delete(box)
  *      .then(function(box){
  *         // box deleted ! 

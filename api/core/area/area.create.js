@@ -18,7 +18,7 @@
  *      radius: 40,
  *      user: 1
  * };
-
+ *
  * gladys.area.create(area)
  *      .then(function(area){
  *         // area created ! 

@@ -11,7 +11,7 @@ var queries = require('./area.queries.js');
  * var area = {
  *      id: 1
  * };
-
+ *
  * gladys.area.delete(area)
  *      .then(function(area){
  *         // area deleted ! 

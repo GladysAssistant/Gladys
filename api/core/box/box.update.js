@@ -19,7 +19,7 @@
  *      param: {"first param":"hello world !"}
  *      user: 1
  * };
-
+ *
  * gladys.box.update(box)
  *      .then(function(box){
  *         // box updated ! 
