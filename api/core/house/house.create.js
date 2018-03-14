@@ -2,7 +2,6 @@ var uuid = require('uuid');
 
 /**
  * @public
- * @module gladys/house/create
  * @description This function create an house
  * @name gladys.house.create
  * @param {Object} house
@@ -26,9 +25,9 @@ var uuid = require('uuid');
  * }
  * 
  * gladys.house.create(house)
- *  .then(function(house){
- *      // do something
- *  })
+ *      .then(function(house){
+ *          // do something
+ *      })
  */
 
 module.exports = function(house){

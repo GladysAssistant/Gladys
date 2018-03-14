@@ -11,13 +11,13 @@
  * }
  * 
  * gladys.house.getById(house)
- *  .then(function(isEmpty){
- *      if(isEmpty){
- *          //House is not empty
- *      }else{
- *          //House is empty
- *      }
- *  })
+ *      .then(function(isEmpty){
+ *          if(isEmpty){
+ *              //House is not empty
+ *          }else{
+ *              //House is empty
+ *          }
+ *      })
  */
 
 module.exports = function(options){
