@@ -6,7 +6,7 @@ var queries = require('./alarm.queries.js');
  * @name gladys.alarm.get
  * @param {Object} user
  * @param {integer} user.id The id of the user whose alarms we want
- * @returns {Alarm} alarm
+ * @returns {Array<alarms>} alarm
  * @example
  * var user = {
  *      id: 1,
