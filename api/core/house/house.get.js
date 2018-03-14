@@ -14,9 +14,9 @@ var queries = require('./house.queries.js');
  *      skip: 0
  * }
  * gladys.house.get(options)
- *  .then(function(houses){
- *      // do something
- *  })
+ *      .then(function(houses){
+ *          // do something
+ *      })
  */
 
 module.exports = function get (options){

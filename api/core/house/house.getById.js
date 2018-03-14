@@ -13,9 +13,9 @@ var queries = require('./house.queries.js');
  * }
  * 
  * gladys.house.getById(house)
- *  .then(function(house){
- *      // do something
- *  })
+ *      .then(function(house){
+ *          // do something
+ *      })
  */
 
 module.exports = function getById(options){

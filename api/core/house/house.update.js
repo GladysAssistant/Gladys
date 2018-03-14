@@ -27,9 +27,9 @@ var Promise = require('bluebird');
  * }
  * 
  * gladys.house.update(house)
- *  .then(function(house){
- *      // do something
- *  })
+ *      .then(function(house){
+ *          // do something
+ *      })
  */
 
 module.exports = function update (house) {

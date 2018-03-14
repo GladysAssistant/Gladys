@@ -12,9 +12,9 @@ var queries = require('./house.queries.js');
  * }
  * 
  * gladys.house.delete(house)
- *  .then(function(house){
- *      // do something
- *  })
+ *      .then(function(house){
+ *          // do something
+ *      })
  */
 
 module.exports = function(house){
