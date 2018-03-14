@@ -54,7 +54,7 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "documentation-flat-theme": "^0.1.0",
+    "documentation-flat-theme": "^0.1.1",
     "grunt-apidoc": "^0.11.0",
     "grunt-contrib-csslint": "^2.0.0",
     "grunt-documentation": "^1.2.3",
