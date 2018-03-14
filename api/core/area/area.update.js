@@ -21,7 +21,7 @@ var Promise = require('bluebird');
  *      radius: 40,
  *      user: 1
  * };
-
+ *
  * gladys.area.update(area)
  *      .then(function(area){
  *         // area updated ! 

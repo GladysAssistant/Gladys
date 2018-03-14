@@ -15,7 +15,7 @@
  *      y: 1,
  *      user: 1
  * };
-
+ *
  * gladys.box.create(box)
  *      .then(function(box){
  *         // box created ! 
