@@ -5,8 +5,8 @@ var queries = require('./calendar.queries.js');
  * @description This function return all events
  * @name gladys.calendar.getEvents
  * @param {Object} options
- * @param {number} options.take number of events to return (optional)
- * @param {number} options.skip number of events to skip (optional)
+ * @param {integer} options.take The number of events to return (optional)
+ * @param {integer} options.skip The number of events to skip (optional)
  * @returns {Array<events>} events
  * @example
  * var options = {
