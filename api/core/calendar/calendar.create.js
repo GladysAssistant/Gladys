@@ -1,6 +1,35 @@
 var queries = require('./calendar.queries.js');
 const Promise = require('bluebird');
 
+/**
+ * @public
+ * @description This function create an calendar
+ * @name gladys.calendar.create
+ * @param {Object} calendar
+ * @param {String} calendar.externalid The externalId of the calendar
+ * @param {String} calendar.name The name of the calendar
+ * @param {String} calendar.description The description of the calendar
+ * @param {String} calendar.service The service of the calendar
+ * @param {User} calendar.user The id of the calendar's user
+ * @returns {calendar} calendar
+ * @example
+ * var calendar = {
+ *      externalid: "gladys-calendar123456789", //This is an example, do not use it, it must be unique
+ *      name: "My awesome calendar",
+ *      description: "calendar description",
+ *      service: "google"
+ *      user: 1
+ * };
+ *
+ * gladys.calendar.create(calendar)
+ *      .then(function(calendar){
+ *         // calendar created ! 
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
+ */
+
 module.exports = function create(calendars) {
     
     if(!(calendars instanceof Array)) calendars = [calendars];
