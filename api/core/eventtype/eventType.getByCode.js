@@ -11,7 +11,7 @@ var queries = require('./eventType.queries.js');
  * var type = {
  *      code: "back-at-home"
  * }
- * gladys.event.getByCode(type)
+ * gladys.eventType.getByCode(type)
  *      .then(function(eventType){
  *          // do something
  *      })

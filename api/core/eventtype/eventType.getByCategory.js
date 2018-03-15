@@ -11,7 +11,7 @@ var queries = require('./eventType.queries.js');
  * var type = {
  *      category: "user"
  * }
- * gladys.event.getByCategory(options)
+ * gladys.eventType.getByCategory(options)
  *      .then(function(eventTypes){
  *          // do something
  *      })
