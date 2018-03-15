@@ -68,6 +68,10 @@ module.exports = function(grunt) {
                     'gladys.location.create',
                     'gladys.location.get',
                     'gladys.location.getByUser',
+                    'gladys.machine.create',
+                    'gladys.machine.update',
+                    'gladys.machine.delete',
+                    'gladys.machine.get',
                     'gladys.weather.get'
                 ]
             }
