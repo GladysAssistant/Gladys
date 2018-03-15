@@ -65,6 +65,9 @@ module.exports = function(grunt) {
                     'gladys.house.getById',
                     'gladys.house.getUsers',
                     'gladys.house.checkUserPresence',
+                    'gladys.location.create',
+                    'gladys.location.get',
+                    'gladys.location.getByUser',
                     'gladys.weather.get'
                 ]
             }
