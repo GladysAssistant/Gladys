@@ -6,7 +6,7 @@ var queries = require('./eventType.queries.js');
  * @name gladys.eventType.get
  * @returns {Array<eventType>} eventType
  * @example
- * gladys.event.get()
+ * gladys.eventType.get()
  *      .then(function(eventTypes){
  *          // do something
  *      })

@@ -23,7 +23,7 @@ var queries = require('./eventType.queries.js');
  *      faIcon: "fa fa-home",
  *      iconColor: "bg-light-blue" 
  * }
- * gladys.event.create(type)
+ * gladys.eventType.create(type)
  *      .then(function(eventType){
  *          // do something
  *      })
