@@ -81,6 +81,10 @@ module.exports = function(grunt) {
                     'gladys.param.get',
                     'gladys.param.getValue',
                     'gladys.param.getValues',
+                    'gladys.paramUser.setValue',
+                    'gladys.paramUser.delete',
+                    'gladys.paramUser.get',
+                    'gladys.paramUser.getValue',
                     'gladys.weather.get'
                 ]
             }
