@@ -5,8 +5,8 @@ var queries = require('./deviceState.queries.js');
  * @description This function return all deviceState
  * @name gladys.deviceState.get
  * @param {Object} options
- * @param {number} options.take Number of deviceStates to return (optional)
- * @param {number} options.skip Number of deviceStates to skip (optional)
+ * @param {integer} options.take The number of deviceStates to return (optional)
+ * @param {integer} options.skip The number of deviceStates to skip (optional)
  * @returns {Array<deviceStates>} deviceStates
  * @example
  * var options = {
