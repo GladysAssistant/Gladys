@@ -5,7 +5,7 @@ const queries = require('./calendar.queries.js');
  * @description This function returns the next event of the specified user's day
  * @name gladys.calendar.getNextEventUser
  * @param {Object} user
- * @param {integer} id The id of user
+ * @param {integer} user.id The id of user
  * @returns {event} event
  * @example
  * var user = {

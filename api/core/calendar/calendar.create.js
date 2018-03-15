@@ -5,15 +5,15 @@ const Promise = require('bluebird');
  * @public
  * @description This function create an calendar
  * @name gladys.calendar.create
- * @param {Object} calendar
- * @param {String} calendar.externalid The externalId of the calendar
- * @param {String} calendar.name The name of the calendar
- * @param {String} calendar.description The description of the calendar
- * @param {String} calendar.service The service of the calendar
- * @param {User} calendar.user The id of the calendar's user
+ * @param {Object} calendars
+ * @param {String} calendars.externalid The externalId of the calendar
+ * @param {String} calendars.name The name of the calendar
+ * @param {String} calendars.description The description of the calendar
+ * @param {String} calendars.service The service of the calendar
+ * @param {User} calendars.user The id of the calendar's user
  * @returns {calendar} calendar
  * @example
- * var calendar = {
+ * var calendars = {
  *      externalid: "gladys-calendar123456789", //This is an example, do not use it, it must be unique
  *      name: "My awesome calendar",
  *      description: "calendar description",
@@ -21,7 +21,7 @@ const Promise = require('bluebird');
  *      user: 1
  * };
  *
- * gladys.calendar.create(calendar)
+ * gladys.calendar.create(calendars)
  *      .then(function(calendar){
  *         // calendar created ! 
  *      })
