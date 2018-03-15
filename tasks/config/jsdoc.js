@@ -52,6 +52,8 @@ module.exports = function(grunt) {
                     'gladys.deviceState.createByDeviceTypeIdentifier',
                     'gladys.deviceState.get',
                     'gladys.deviceState.purge',
+                    'gladys.event.create',
+                    'gladys.event.get',
                     'gladys.house.create',
                     'gladys.house.update',
                     'gladys.house.delete',
