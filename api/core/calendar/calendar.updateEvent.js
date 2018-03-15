@@ -3,18 +3,18 @@
  * @public
  * @description This function update an event
  * @name gladys.calendar.updateEvent
- * @param {Object} event
- * @param {integer} event.id The id of the event
- * @param {String} event.externalid The externalId of the event
- * @param {String} event.name The name of the event
- * @param {String} event.location The location of the event
- * @param {datetime} event.start The start of the event
- * @param {datetime} event.end The end of the event
- * @param {boolean} event.fullday If the event lasts a full day
- * @param {Calendar} event.calendar The id of the calendar
+ * @param {Object} calendarEvent
+ * @param {integer} calendarEvent.id The id of the event
+ * @param {String} calendarEvent.externalid The externalId of the event
+ * @param {String} calendarEvent.name The name of the event
+ * @param {String} calendarEvent.location The location of the event
+ * @param {datetime} calendarEvent.start The start of the event
+ * @param {datetime} calendarEvent.end The end of the event
+ * @param {boolean} calendarEvent.fullday If the event lasts a full day
+ * @param {calendar} calendarEvent.calendar The id of the calendar
  * @returns {event} event
  * @example
- * var event = {
+ * var calendarEvent = {
  *      id: 1,
  *      externalid: "gladys-calendarevent123456789", //This is an example, do not use it, it must be unique
  *      name: "My new awesom event name",
@@ -25,7 +25,7 @@
  *      calendar: 1
  * };
  *
- * gladys.calendar.updateEvent()
+ * gladys.calendar.updateEvent(calendarEvent)
  *      .then(function(event){
  *         // event updated ! 
  *      })

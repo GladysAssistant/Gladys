@@ -6,7 +6,7 @@
  * @name gladys.alarm.update
  * @param {Object} params
  * @param {integer} params.id The id of alarm
- * @param {Object} params.alarm
+ * @param {Object} params.alarm 
  * @param {String} params.alarm.name The name of the alarm
  * @param {datetime} params.alarm.datetime Datetime of the alarm when the alarm is at a specific date
  * @param {time} params.alarm.time Time of the alarm when it's a reccurring alarm
