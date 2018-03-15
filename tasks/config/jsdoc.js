@@ -73,6 +73,9 @@ module.exports = function(grunt) {
                     'gladys.machine.delete',
                     'gladys.machine.get',
                     'gladys.message.send',
+                    'gladys.notification.create',
+                    'gladys.notification.install',
+                    'gladys.notification.get',
                     'gladys.weather.get'
                 ]
             }
