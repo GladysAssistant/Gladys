@@ -1,7 +1,7 @@
 // update an alarm
 
 /**
- * @public
+ * @private
  * @description This function update an alarm
  * @name gladys.alarm.update
  * @param {Object} params
