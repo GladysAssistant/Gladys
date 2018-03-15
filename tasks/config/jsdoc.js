@@ -76,6 +76,11 @@ module.exports = function(grunt) {
                     'gladys.notification.create',
                     'gladys.notification.install',
                     'gladys.notification.get',
+                    'gladys.param.setValue',
+                    'gladys.param.delete',
+                    'gladys.param.get',
+                    'gladys.param.getValue',
+                    'gladys.param.getValues',
                     'gladys.weather.get'
                 ]
             }
