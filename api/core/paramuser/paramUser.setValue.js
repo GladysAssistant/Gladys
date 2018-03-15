@@ -3,6 +3,27 @@ var shared = require('./paramUser.shared.js');
 var setCacheValue = require('./paramUser.setCacheValue.js');
 var Promise = require('bluebird');
 
+/**
+ * @public
+ * @description This function set value of an param user
+ * @name gladys.paramUser.setValue
+ * @param {Object} paramUser
+ * @param {String} paramUser.name The name of the param, it must be unique
+ * @param {String} paramUser.value The value of the param
+ * @returns {ParamUser} paramUser
+ * @example
+ * var paramUser = {
+ *      user: 1,
+ *      name: "api_key",
+ *      value: "djfudf5d95f23d6d5f5"
+ * }
+ * 
+ * gladys.paramUser.setValue(paramUser)
+ *      .then(function(param){
+ *          // value seted
+ *      })
+ */
+
 module.exports = function(paramUser){
     
     // we test if the param already exist
