@@ -17,9 +17,9 @@ var Promise = require('bluebird');
  * @param {String} device.service The service of the device, the module to which it must be connected
  * @param {Array} types
  * @param {String} types.type The type of the deviceType (binary or multilevel)
- * @param {bolean} types.sensor The identifer of the device, it must be unique
- * @param {integer} types.min The protocol of the device
- * @param {integer} types.max The service of the device, the module to which it must be connected
+ * @param {bolean} types.sensor If the type is an sensor
+ * @param {integer} types.min The min of the deviceType
+ * @param {integer} types.max The max of the deviceType
  * @returns {Device} device
  * @example
  * var param = {
