@@ -5,6 +5,12 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+ /**
+ * @public
+ * @name Box
+ * @class
+ */
+
 module.exports = {
 
   attributes: {

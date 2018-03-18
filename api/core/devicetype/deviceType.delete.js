@@ -4,16 +4,16 @@ var queries = require('./deviceType.queries.js');
  * @public
  * @description This function delete an deviceType
  * @name gladys.deviceType.delete
- * @param {Object} devicType
- * @param {integer} devicType.id The id of the deviceType
+ * @param {Object} deviceType
+ * @param {integer} deviceType.id The id of the deviceType
  * @returns {DeviceType} deviceType
  * @example
- * var devicType = {
+ * var deviceType = {
  *      id: 1
  * };
  * 
- * gladys.deviceType.delete(devicType)
- *      .then(function(devicType){
+ * gladys.deviceType.delete(deviceType)
+ *      .then(function(deviceType){
  *         // deviceType deleted ! 
  *      })
  *      .catch(function(err){
