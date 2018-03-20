@@ -47,6 +47,14 @@ module.exports = function(oldVersion) {
             .then(() => gladys.task.dbMigration('3.7.8'))
     }
 
+    if(semver.lt(oldVersion, '3.8.1')) {
+        return gladys.utils.sql(`ALTER TABLE devicetype ADD COLUMN lastValue float DEFAULT NULL;`).reflect()
+            .then(() => gladys.utils.sql(`ALTER TABLE devicetype ADD COLUMN lastValueDatetime datetime DEFAULT NULL;`).reflect())
+            .then(() => gladys.deviceState.refreshDeviceTypeLastValue())
+            .then(() => gladys.task.updateDbVersion('3.8.1'))
+            .then(() => gladys.task.dbMigration('3.8.1'));
+    }
+
     // default, we save in DB the current version of Gladys
     return gladys.task.updateDbVersion(gladys.version);
 };
