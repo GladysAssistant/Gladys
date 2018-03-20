@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('MapsCtrl', MapsCtrl);
 
-    MapsCtrl.$inject = ['geoLocationService'];
+    MapsCtrl.$inject = ['geoLocationService', 'areaService'];
 
-    function MapsCtrl(geoLocationService) {
+    function MapsCtrl(geoLocationService, areaService) {
         /* jshint validthis: true */
         var vm = this;
         
@@ -71,6 +71,16 @@
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(leafletMap);
+            getAreas();
+        }
+
+        function getAreas(){
+            areaService.get()
+                .then(function(data){
+                    data.data.forEach(function(area){
+                        L.circle([area.latitude, area.longitude], {radius: area.radius}).addTo(leafletMap);
+                    });
+                });
         }
 
         function waitForNewValue(){
