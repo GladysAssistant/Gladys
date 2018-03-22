@@ -22,6 +22,7 @@
         
         var leafletMap;
         var markerUser = {};
+        var areaUser = {};
 
         var lastDrawnId = null;
         var lastDrawnPolyLine = null;
@@ -78,7 +79,10 @@
             areaService.get()
                 .then(function(data){
                     data.data.forEach(function(area){
-                        L.circle([area.latitude, area.longitude], {radius: area.radius}).addTo(leafletMap);
+                        areaUser[area.name] = L.circle([area.latitude, area.longitude], {radius: area.radius}).addTo(leafletMap);
+                        areaUser[area.name].on('mouseover', function(){
+                            areaUser[area.name].bindTooltip(area.name).openTooltip();
+                        })
                     });
                 });
         }
