@@ -7,6 +7,13 @@ module.exports = {
     LEFT JOIN room ON d.room = room.id 
     WHERE dt.id = ?;
   `,
+  getByRooms: `
+    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
+    dt.lastValueDatetime as lastChanged, dt.lastValue AS lastValue, room.id as roomId, room.name as roomName, room.house as roomHouse
+    FROM device d
+    JOIN devicetype dt ON d.id = dt.device
+    JOIN room ON d.room = room.id;
+  `,
    getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
    ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId

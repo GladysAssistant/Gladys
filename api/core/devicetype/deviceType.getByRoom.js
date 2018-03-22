@@ -2,27 +2,33 @@ var queries = require('./deviceType.queries.js');
 var Promise = require('bluebird');
 
 module.exports = function(){
+
+    var rooms = [];
+    var roomDictionnary = {};
     
     // get all rooms
-    return gladys.room.getAll()
-      .then(function(rooms){
-          var arrayToReturn = [];
-          return Promise.map(rooms, function(room){
-              return getDeviceTypesInRoom(room)
-                .then(function(result){
-                    
-                    // we add the room only if the room 
-                    // has deviceTypes
-                    if(result){
-                        arrayToReturn.push(result);
-                    }
-                });
-          })
-          .then(function(){
-             return arrayToReturn; 
-          });
-      });
-      
+    return gladys.utils.sql(queries.getByRooms, [])
+        .then((deviceTypes) => {
+            deviceTypes.forEach(deviceType => {
+                
+                if(!roomDictionnary.hasOwnProperty(deviceType.roomId)) {
+                    roomDictionnary[deviceType.roomId] = rooms.length;
+                    rooms.push({
+                        id: deviceType.roomId,
+                        name: deviceType.roomName,
+                        house: deviceType.roomHouse,
+                        deviceTypes: []
+                    });
+                }
+
+                var roomId = deviceType.roomId;
+                delete deviceType.roomId;
+                delete deviceType.roomName;
+                
+                rooms[roomDictionnary[roomId]].deviceTypes.push(deviceType);
+            });
+            return rooms;
+        });
 };
 
 
