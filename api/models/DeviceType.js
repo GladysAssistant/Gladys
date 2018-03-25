@@ -64,6 +64,14 @@ module.exports = {
           defaultsTo: true  
         },
 
+        lastValue: {
+            type: 'float'
+        },
+
+        lastValueDatetime: {
+            type: 'datetime'
+        },
+
         device: {
             model: 'Device',
             required: true

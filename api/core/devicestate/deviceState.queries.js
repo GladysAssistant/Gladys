@@ -29,6 +29,14 @@ module.exports = {
     DELETE FROM devicestate
     WHERE devicetype = ?
     AND datetime < NOW() - INTERVAL ? DAY;
+  `,
+  updateDeviceTypeLastValue: `
+    UPDATE devicetype SET lastValue = ?, lastValueDatetime = ? WHERE id = ? AND ( lastValueDatetime <= ? OR lastValueDatetime IS NULL);
+  `,
+  getAllDeviceType: `
+    SELECT * FROM devicetype;
+  `,
+  getLastDeviceState: `
+    SELECT * FROM devicestate WHERE devicetype = ? ORDER BY datetime DESC LIMIT 1;
   `
-
 };
