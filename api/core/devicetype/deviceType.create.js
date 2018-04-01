@@ -38,8 +38,13 @@ module.exports = function create(type){
     return deviceTypeExist(type)
       .then((exist) => {
 
-          // if exist, update
           if(exist) {
+
+              // If the deviceType already exists, we update it but not its name, display and tag param
+              type.name = exist.name;
+              type.display = exist.display;
+              type.tag = exist.tag;
+
               return DeviceType.update({id: exist.id}, type)
                                .then((rows) => {
                                    if(rows.length) return rows[0];
