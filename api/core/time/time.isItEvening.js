@@ -1,7 +1,6 @@
-module.exports = isItEvening;
-function isItEvening(options){
-    return gladys.time.getTime(options)
-      .then(function(result){
+module.exports = function isItEvening(options) {
+    return gladys.time.getMomentOfTheDay(options)
+      .then((result) => {
           if(result.state === 'evening') return true; 
           return false;
       });
