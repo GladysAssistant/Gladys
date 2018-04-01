@@ -14,14 +14,15 @@
         .module('gladys')
         .controller('MapsCtrl', MapsCtrl);
 
-    MapsCtrl.$inject = ['geoLocationService'];
+    MapsCtrl.$inject = ['geoLocationService', 'areaService'];
 
-    function MapsCtrl(geoLocationService) {
+    function MapsCtrl(geoLocationService, areaService) {
         /* jshint validthis: true */
         var vm = this;
         
         var leafletMap;
         var markerUser = {};
+        var areaUser = {};
 
         var lastDrawnId = null;
         var lastDrawnPolyLine = null;
@@ -71,6 +72,19 @@
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(leafletMap);
+            getAreas();
+        }
+
+        function getAreas(){
+            areaService.get()
+                .then(function(data){
+                    data.data.forEach(function(area){
+                        areaUser[area.name] = L.circle([area.latitude, area.longitude], {radius: area.radius}).addTo(leafletMap);
+                        areaUser[area.name].on('mouseover', function(){
+                            areaUser[area.name].bindTooltip(area.name).openTooltip();
+                        })
+                    });
+                });
         }
 
         function waitForNewValue(){
