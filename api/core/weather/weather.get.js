@@ -3,6 +3,28 @@ const Promise = require('bluebird');
 const SunCalc = require('suncalc');
 
 /**
+ * @public
+ * @name gladys.weather.get
+ * @description This function return weather of location
+ * @param {Object} options
+ * @param {float} options.latitude The latitude where you want the weather
+ * @param {float} options.longitude The longitude where you want the weather
+ * @param {integer} options.offset (in hour) If you want to get the weather in the future
+ * @returns {results} results
+ * @example
+ * var options = {
+ *      latitude: 42,
+ *      longitude: 43,
+ *      offset: 1
+ * }
+ * 
+ * gladys.weather.get(options)
+ *      .then(function(results){
+ *          // do something
+ *      })
+ */
+
+/**
  * Options 
  * {
  *   latitude,
@@ -18,6 +40,7 @@ const SunCalc = require('suncalc');
  *    weather: 'cloud' || 'rain' || 'snow'  
  * }
  */
+
 module.exports = function get(options){
 
     if(!options || !options.latitude || !options.longitude) return Promise.reject(new Error('Weather : Latitude and longitude are required.'));

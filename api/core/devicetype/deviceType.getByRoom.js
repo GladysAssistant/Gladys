@@ -1,6 +1,18 @@
 var queries = require('./deviceType.queries.js');
 var Promise = require('bluebird');
 
+/**
+ * @public
+ * @description This function return all deviceTypes ordered by room
+ * @name gladys.deviceType.getByRoom
+ * @returns {Array<deviceType>} deviceType
+ * @example
+ * gladys.deviceType.getByRoom()
+ *      .then(function(deviceTypes){
+ *          // do something
+ *      })
+ */
+
 module.exports = function(){
 
     var rooms = [];
