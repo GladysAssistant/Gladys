@@ -5,6 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+   /**
+ * @public
+ * @name DeviceState
+ * @class
+ */
+
 module.exports = {
 
     attributes: {

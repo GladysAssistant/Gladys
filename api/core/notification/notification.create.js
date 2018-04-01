@@ -3,6 +3,37 @@ module.exports = create;
 var Promise = require('bluebird');
 var queries = require('./notification.queries.js');
 
+/**
+ * @public
+ * @description This function create an notification
+ * @name gladys.notification.create
+ * @param {Object} options
+ * @param {String} options.title The title of the notification
+ * @param {String} options.text The text of the notification
+ * @param {String} options.link The link of view
+ * @param {String} options.icon The icon of the notification
+ * @param {String} options.iconColor The icon color of the notification icon
+ * @param {User} options.user The id of the user of the notification
+ * @returns {Notification} notification
+ * @example
+ * var options = {
+ *      title: "Update available !",
+ *      text: "Gladys Update 3.8.0 is available",
+ *      link: "/dashboard"
+ *      icon: "fa fa-refresh",
+ *      iconColor: "bg-light-blue",
+ *      user: 1
+ * }
+ * 
+ * gladys.notification.create(options)
+ *      .then(function(notification){
+ *          // notification created
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
+ */
+
 function create(options) {
 
     // handle scenarios

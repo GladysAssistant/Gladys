@@ -14,6 +14,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+ /**
+ * @public
+ * @name Alarm
+ * @class
+ */
+
 module.exports = {
 
     types: {
