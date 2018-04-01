@@ -12,7 +12,7 @@ var queries = require('./device.queries.js');
  *      id: 1
  * };
  * 
- * gladys.device.deelte(device)
+ * gladys.device.delete(device)
  *      .then(function(device){
  *         // device deleted ! 
  *      })
