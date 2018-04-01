@@ -115,10 +115,10 @@
                                         <tbody>
                                             <tr infinite-scroll="vm.loadMore()" ng-repeat="device in vm.devices" class="ng-cloak">
                                                 <td>{{device.id}}</td>
-                                                <td><input type="text" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-name') %>" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-identifier') %>" class="form-control" ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-protocol') %>" class="form-control" ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-service') %>" class="form-control" ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
                                                     <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
                                                     </select>-->
