@@ -1,6 +1,39 @@
 const Promise = require('bluebird');
 const queries = require('./deviceType.queries.js');
 
+/**
+ * @public
+ * @description This function create an deviceType
+ * @name gladys.deviceType.create
+ * @param {Object} type
+ * @param {String} type.name The name of the deviceType
+ * @param {String} type.type The type of the deviceType (binary or multilevel)
+ * @param {bolean} type.sensor If the deviceType is an sensor
+ * @param {integer} type.min The min of the deviceType
+ * @param {integer} type.max The max of the deviceType
+ * @param {String} type.unit The unit of the deviceType
+ * @param {Device} type.device The id of device to which it is assigned
+ * @returns {DeviceType} deviceType
+ * @example
+ * var type = {
+ *      name: "My deviceType",
+ *      type: 'multilevel',
+ *      sensor: true,
+ *      min: 0,
+ *      max: 50,
+ *      unit: "%",
+ *      device: 1
+ * };
+ * 
+ * gladys.deviceType.create(type)
+ *      .then(function(devicType){
+ *         // deviceType created ! 
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
+ */
+
 module.exports = function create(type){
     return deviceTypeExist(type)
       .then((exist) => {
