@@ -14,6 +14,13 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+ 
+  /**
+ * @public
+ * @name CalendarEvent
+ * @class
+ */
+
 module.exports = {
 
     attributes: {
