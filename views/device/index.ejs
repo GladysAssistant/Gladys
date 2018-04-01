@@ -115,10 +115,10 @@
                                         <tbody>
                                             <tr infinite-scroll="vm.loadMore()" ng-repeat="device in vm.devices" class="ng-cloak">
                                                 <td>{{device.id}}</td>
-                                                <td><input type="text" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td>{{device.identifier}}</td>
-                                                <td>{{device.protocol}}</td>
-                                                <td>{{device.service}}</td>
+                                                <td><input type="text" placeholder="<%= __('device-create-name') %>" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-identifier') %>" class="form-control" ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-protocol') %>" class="form-control" ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
+                                                <td><input type="text" placeholder="<%= __('device-create-service') %>" class="form-control" ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
                                                     <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
                                                     </select>-->
@@ -250,7 +250,7 @@
                                                 <td>{{type.id}}</td>
                                                 <td><input type="text" class="form-control" ng-model="type.name"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td><input type="text" class="form-control" ng-model="type.identifier"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td>{{type.type}}</td>
+                                                <td><input type="text" class="form-control" ng-model="type.type"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
                                                 <td>
                                                     <select class="form-control" ng-model="type.category" ng-change="vm.updateDeviceType(type);" >
                                                         <option value="light"><%= __('devices-types-category-light') %></option>
@@ -262,13 +262,15 @@
                                                     </select>
                                                 </td>
                                                 <td><input type="text" class="form-control" ng-model="type.tag"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td>{{type.unit}}</td>
-                                                <td>{{type.min}}</td>
-                                                <td>{{type.max}}</td>
+                                                <td><input type="text" class="form-control" ng-model="type.unit"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
+                                                <td><input type="text" class="form-control" ng-model="type.min"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
+                                                <td><input type="text" class="form-control" ng-model="type.max"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
 
                                                 <td>                                                   
-                                                    <div ng-show="type.sensor == 1"><%= __('devices-sensor-true') %></div>
-                                                    <div ng-show="type.sensor == 0"><%= __('devices-sensor-false') %></div>
+                                                    <button ng-click="vm.changeTypeSensor(type);" 
+                                                            class="btn {{ type.sensor && 'btn-danger' || 'btn-success' }} btn-sm">
+                                                            {{type.sensor && '<%= __('devices-sensor-false') %>' || '<%= __('devices-sensor-true') %>' }}
+                                                    </button>                                                    
                                                 </td>
                                                 
                                                 <td>
