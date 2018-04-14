@@ -8,7 +8,7 @@
             <button type="button" class="btn btn-danger btn-sm no-border" data-toggle="dropdown">
                 <i class="fa fa-bars"></i>
             </button> 
-            <ul class="dropdown-menu" role="menu" style="height: 100px; overflow: auto">
+            <ul class="dropdown-menu" role="menu" style="max-height: 200px; overflow: auto">
                 <li ng-repeat="deviceType in vm.deviceTypes">
                     <a href="" ng-click="vm.currentDeviceType = deviceType; vm.saveCurrentDeviceType()">{{deviceType.name}}</a>
                 </li>
