@@ -498,7 +498,7 @@
   "box-chat-title": "Chat",
   "box-calendar-title": "Calendrier",
   "box-weather-title": "Météo",
-  "box-event-title": "Event",
+  "box-event-title": "Evénement",
   "box-event-create": "Créer",
   "box-camera-title": "Camera",
   "box-camera-explanation": "Entrez ici l'URL de votre image ou de votre flux vidéo :",
@@ -514,5 +514,7 @@
   "box-who-is-at-home-validate": "Enregistrer",
   "box-who-is-at-home-nobody": "Personne.",
   "box-chart-title": "Courbes",
-  "box-chart-empty-state": "Sélectionnez un périphérique !"
+  "box-chart-empty-state": "Sélectionnez un périphérique !",
+  "Create-event": "Créer un événement",
+  "New-event": "Nouvel événement"
 }
