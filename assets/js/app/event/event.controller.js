@@ -31,6 +31,7 @@
 
         function activate() {
             loadMore();
+            waitForNewEvent()
             return ;
         }
         
@@ -51,6 +52,14 @@
                     vm.events = vm.events.concat(data.data);
                     vm.remoteIsBusy = false;
                 });
+        }
+
+        // waiting for websocket message
+        function waitForNewEvent(){
+            
+            io.socket.on('newEvent', function (events) {
+                vm.events = events
+            });
         }
         
     }
