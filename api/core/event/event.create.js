@@ -82,9 +82,10 @@ module.exports = function create(event){
         })
         .then((eventSaved) => {
             // get new events and broadcast to everyone
-            return gladys.utils.sql(queries.getByUser, [eventSaved.user, 50, 0])
+            gladys.utils.sql(queries.getByUser, [eventSaved.user, 50, 0])
                 .then((events) => {
                     gladys.socket.emit('newEvent', events);
                 })
+            return eventSaved;
         })
 };
