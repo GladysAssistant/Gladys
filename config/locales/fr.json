@@ -514,5 +514,12 @@
   "box-who-is-at-home-validate": "Enregistrer",
   "box-who-is-at-home-nobody": "Personne.",
   "box-chart-title": "Courbes",
-  "box-chart-empty-state": "Sélectionnez un périphérique !"
+  "box-chart-empty-state": "Sélectionnez un périphérique !",
+  "manage-area": "Gérer les zones",
+  "how-create-area": "Comment créer une zone ?",
+  "how-create-area-text": "Pour créer une zone faite un clic droit sur la carte à l'endroit où vous souhaitez créer cette zone et cliquez sur le bouton nouvelle zone, puis remplissez les champs.",
+  "how-edit-area": "Comment modifier une zone ?",
+  "how-edit-area-text": "Pour modifier une zone cliquez sur celle-ci puis sur le bouton modifier, vous pourrez alors la modifier. Vous pouvez aussi la déplacer en cliquant dessus et en la faisant glisser.",
+  "how-delete-area": "Comment supprimer une zone ?",
+  "how-delete-area-text": "Pour supprimer une zone cliquez sur celle-ci puis sur le bouton supprimer."
 }
