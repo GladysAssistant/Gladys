@@ -24,18 +24,23 @@ before_install:
 script:
   - "grunt coverage"
   - "grunt documentation"
-    
+  - "grunt apidoc"
+  - "mkdir documentation"
+  - "mv docs jsdoc"
+  - "mv ./jsdoc/ ./documentation/"
+  - "mv ./apidoc/ ./documentation/"
+
 env:
   - CXX=g++-4.8
 
 deploy:
  provider: pages
- repo: GladysProject/js-documentation
+ repo: GladysProject/documentation
  skip_cleanup: true
  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
- local_dir: docs
+ local_dir: documentation
  target-branch: gh-pages
- fqdn: jsdoc.gladysproject.com
+ fqdn: documentation.gladysproject.com
  verbose: true
  on:
    branch: master
