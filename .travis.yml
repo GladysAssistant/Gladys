@@ -30,7 +30,7 @@ env:
 
 deploy:
  provider: pages
- repo: js-documentation
+ repo: GladysProject/js-documentation
  skip_cleanup: true
  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
  local_dir: docs
