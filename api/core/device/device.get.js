@@ -2,6 +2,25 @@ module.exports = get;
 
 var queries = require('./device.queries.js');
 
+/**
+ * @public
+ * @description This function return all device
+ * @name gladys.device.get
+ * @param {Object} options
+ * @param {integer} options.take The number of devices to return (optional)
+ * @param {integer} options.skip The number of devices to skip (optional)
+ * @returns {Array<devices>} devices
+ * @example
+ * var options = {
+ *      take: 50,
+ *      skip: 0
+ * }
+ * gladys.device.get(options)
+ *      .then(function(devices){
+ *          // do something
+ *      })
+ */
+
 function get(options) {
 
     // default params

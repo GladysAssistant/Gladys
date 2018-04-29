@@ -231,7 +231,7 @@ module.exports = {
     },
 
      /**
-     * @api {post} /music/volum Set Volume 
+     * @api {post} /music/volume Set Volume 
      * @apiName MusicSetVolume
      * @apiGroup Music
      * @apiPermission authenticated

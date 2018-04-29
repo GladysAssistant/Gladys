@@ -80,6 +80,7 @@ module.exports = {
    * @apiName execDeviceType
    * @apiGroup DeviceType
    * @apiPermission authenticated
+   * @apiDescription This API is not for sensors ! It's only for devices that need to execute an action. Ex: A lamp. If you want to save the state of a sensor, you need to use the POST /devicestate route. 
    *
    * @apiParam {float} [value] New value to apply to the deviceType
    * 
@@ -98,7 +99,7 @@ module.exports = {
    * @apiName execDeviceTypeGet
    * @apiGroup DeviceType
    * @apiPermission authenticated
-   *
+   * @apiDescription This API is not for sensors ! It's only for devices that need to execute an action. Ex: A lamp. If you want to save the state of a sensor, you need to use the POST /devicestate route. 
    * @apiParam {float} [value] New value to apply to the deviceType
    * 
    * @apiUse DeviceStateSuccess

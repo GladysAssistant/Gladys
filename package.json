@@ -54,8 +54,10 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
+    "documentation-flat-theme": "^0.2.0",
     "grunt-apidoc": "^0.11.0",
     "grunt-contrib-csslint": "^2.0.0",
+    "grunt-documentation": "^1.2.3",
     "grunt-mocha-istanbul": "^5.0.2",
     "istanbul": "^0.4.5",
     "jshint-stylish": "^2.2.1",
