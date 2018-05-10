@@ -6,8 +6,8 @@ const Promise = require('bluebird');
  * @description This function return true or false is it the right time
  * @name gladys.time.isItRightTime
  * @param {Object} option
- * @param {string} option.start Beginning of the interval for validation (HH:MM:SS) default 00:00:00 if not specified
- * @param {string} option.end End of the interval for validation (HH:MM:SS) default 23:59:59 if not specified
+ * @param {string} option.start Beginning of the interval for validation (HH:MM:SS)
+ * @param {string} option.end End of the interval for validation (HH:MM:SS)
  * @returns {Time} time
  * 
  * @example
