@@ -41,14 +41,18 @@ module.exports = function create(event){
    } else {
        sails.log.info(`Event : create : new Event with code : ${event.code}`);
    }
+
+   var eventType;
      
    // looking if the eventtype exist (by code or by id)
    return gladys.utils.sql(query, [param])
-        .then(function(types) {
+        .then((types) => {
             
             if(types.length === 0){
                 return Promise.reject(new Error('EventType not found'));
             }
+
+            eventType = types[0];
             
             var eventToSave = {
               eventtype: types[0].id,
@@ -78,6 +82,19 @@ module.exports = function create(event){
         })
         .then(function(eventSaved){
             gladys.scenario.trigger(event);
+            return eventSaved;
+        })
+        .then((eventSaved) => {
+            gladys.socket.emit('newEvent', {
+                id: eventSaved.id,
+                name: eventType.name,
+                iconColor: eventType.iconColor,
+                faIcon: eventType.faIcon,
+                datetime: eventSaved.datetime,
+                user: eventSaved.user,
+                house: eventSaved.user,
+                room: eventSaved.room
+            });
             return eventSaved;
         });
 };
