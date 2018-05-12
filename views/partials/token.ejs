@@ -21,7 +21,12 @@
                             <tr ng-repeat="token in vm.tokens" class="ng-cloak">
                                 <td>{{token.name}}</td>
                                 <td>{{token.value}}</td>
-                                <td><button ng-click="vm.switchStatus($index, token.id)"class="btn btn-flat {{ token.active && 'btn-success' || 'btn-danger' }}  ">{{token.active && 'On' || 'Off' }}</button></td>
+                                <td>
+                                    <div class="toogle" ng-click="vm.switchStatus($index, token.id)">
+                                        <input type="checkbox" ng-model="token.active == 1" class="toogle-checkbox toogle-blue" />
+                                        <label class="toogle-label" for="mytoogle"></label>
+                                    </div>
+                                </td>
                                 <td><button ng-click="vm.destroyToken($index, token.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
                             </tr>
                             <tr>
