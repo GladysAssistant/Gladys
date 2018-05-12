@@ -30,6 +30,16 @@
     function activate() {
 
         vm.options = {
+            scales: {
+                xAxes: [{
+                    display: true,
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
+                }]
+            },
             legend: {
                 display: true,
                 onClick: null
