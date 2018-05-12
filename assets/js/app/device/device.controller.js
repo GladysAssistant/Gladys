@@ -35,7 +35,8 @@
     vm.nbElementToGet = 50;
     vm.remoteIsBusy = false;
     vm.noMoreElements = false;
-
+    vm.getDeviceTypesByRoom = getDeviceTypesByRoom;
+    
     vm.saving = false;
     vm.ready = false;
     vm.devices = [];
@@ -85,7 +86,16 @@
     function getDeviceTypesByRoom(){
        return deviceService.getDeviceTypeByRoom()
          .then(function(data){
-            vm.roomDeviceTypes = data.data; 
+            vm.roomDeviceTypes = [];
+
+            // only display rooms that have devices inside
+            data.data.forEach((room) => {
+                var numberOfDevices = 0;
+                room.deviceTypes.forEach((deviceType) => {
+                    if(deviceType.display) numberOfDevices++;
+                });
+                if(numberOfDevices > 0) vm.roomDeviceTypes.push(room);
+            });
          });
     }
     
