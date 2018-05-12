@@ -88,6 +88,12 @@ var translationsEN = {
         CREATED_FAIL_NOTIFICATION: 'Failed to change mode. ',
         CREATED_SUCCESS_NOTIFICATION: 'Mode changed successfully. '
     },
+    MAPS: {
+        AREA: 'Area',
+        NEW: 'New area',
+        EDIT: 'Modifier',
+        DELETE: 'Suprimer'
+    }
 };
 
 var translationsFR = {
@@ -179,6 +185,12 @@ var translationsFR = {
     MODE: {
         CREATED_FAIL_NOTIFICATION: 'Impossible de changer de mode. ',
         CREATED_SUCCESS_NOTIFICATION: 'Mode changé avec succès. '
+    },
+    MAPS: {
+        AREA: 'Zone',
+        NEW: 'Nouvelle zone',
+        EDIT: 'Modifier',
+        DELETE: 'Suprimer'
     }
 };
 
