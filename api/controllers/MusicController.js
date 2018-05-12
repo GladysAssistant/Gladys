@@ -50,7 +50,7 @@ module.exports = {
 
     /**
      * @api {get} /music/queue Get Queue
-     * @apiName MusicGetCurrentTrack
+     * @apiName MusicGetQueue
      * @apiGroup Music
      * @apiPermission authenticated
      *
