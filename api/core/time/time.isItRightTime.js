@@ -51,6 +51,6 @@ module.exports = function isItRightTime(options){
     options.start = date;
     options.end = endDate;
 
-    if(now >= date && now <= endDate) return true;
-	return false;
+    if(now >= date && now <= endDate) return Promise.resolve(true);
+	return Promise.resolve(false);
 };
