@@ -498,7 +498,7 @@
   "box-chat-title": "Chat",
   "box-calendar-title": "Calendrier",
   "box-weather-title": "Météo",
-  "box-event-title": "Event",
+  "box-event-title": "Evénement",
   "box-event-create": "Créer",
   "box-camera-title": "Camera",
   "box-camera-explanation": "Entrez ici l'URL de votre image ou de votre flux vidéo :",
@@ -516,5 +516,7 @@
   "box-chart-title": "Courbes",
   "box-chart-empty-state": "Sélectionnez un périphérique !",
   "box-device-value-title": "Device",
-  "Edit": "Editer"
+  "Edit": "Editer",
+  "Create-event": "Créer un événement",
+  "New-event": "Nouvel événement"
 }
