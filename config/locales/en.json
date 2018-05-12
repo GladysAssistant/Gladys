@@ -355,5 +355,7 @@
   "box-chart-title": "Charts",
   "box-chart-empty-state": "Please select a device !",
   "box-device-value-title": "Device",
-  "Action": "Action"
+  "Action": "Action",
+  "Create-event": "Create an event",
+  "New-event": "New event"
 }
