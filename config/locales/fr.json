@@ -72,7 +72,7 @@
   "City":"Ville",
   "PostCode":"Code Postal",
   "Country" : "Pays",
-  "Action" : "Modifier",
+  "Action" : "Action",
   "Delete": "Supprimer",
   "New": "Nouveau",
   "Room": "Pièce",
@@ -515,5 +515,6 @@
   "box-who-is-at-home-nobody": "Personne.",
   "box-chart-title": "Courbes",
   "box-chart-empty-state": "Sélectionnez un périphérique !",
-  "box-device-value-title": "Device"
+  "box-device-value-title": "Device",
+  "Edit": "Editer"
 }
