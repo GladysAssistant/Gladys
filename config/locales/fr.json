@@ -514,5 +514,6 @@
   "box-who-is-at-home-validate": "Enregistrer",
   "box-who-is-at-home-nobody": "Personne.",
   "box-chart-title": "Courbes",
-  "box-chart-empty-state": "Sélectionnez un périphérique !"
+  "box-chart-empty-state": "Sélectionnez un périphérique !",
+  "box-device-value-title": "Device"
 }
