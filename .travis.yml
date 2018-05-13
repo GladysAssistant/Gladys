@@ -23,6 +23,7 @@ before_install:
 
 script:
   - "grunt coverage"
+  - "grunt buildProd"
   - "grunt documentation"
   - "grunt apidoc"
   - "mkdir documentation"
