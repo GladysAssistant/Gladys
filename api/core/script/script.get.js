@@ -6,4 +6,5 @@ module.exports = function(options) {
     options = options || {};
 
     return gladys.utils.sql(queries.getScripts, [options.user.id]);
+    
 };
