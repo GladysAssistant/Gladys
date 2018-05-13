@@ -8,8 +8,8 @@ module.exports = function userSeen(options) {
 
             // if user has never had events
             if(rows.length === 0) {
-                return gladys.event.create({code: 'user-seen-at-home', user: options.user, house: options.house});
-            } 
+                return gladys.event.create({code: 'back-at-home', user: options.user, house: options.house});
+            }
             
             // if user was not at home
             else if(rows[0].code === 'left-home') {
