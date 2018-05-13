@@ -20,7 +20,6 @@ var cssFilesToInject = [
   'styles/search.css',
   'styles/store.css',
   'styles/scenario.css',
-  'styles/global.css',
   'styles/angular-chart/angular-chart.min.css',
   'AdminLTE/bower_components/bootstrap-slider/slider.css',
   'styles/device.css',
@@ -46,6 +45,7 @@ var cssFilesToInject = [
 
   //Inject AdminLTE at the end
   'AdminLTE/dist/css/AdminLTE.min.css',
+  'styles/global.css',
 ];
 
 

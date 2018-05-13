@@ -39,3 +39,8 @@
 .typing-indicator {
   font-style: italic;
 }
+
+.notification-item-a{
+  overflow: auto !important;
+  white-space: normal !important;
+}

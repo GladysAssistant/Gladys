@@ -59,10 +59,9 @@
                 xAxes: [{
                     display: true,
                     ticks: {
-                        callback: function(dataLabel, index) {
-                            // Hide the label of every 2nd dataset. return null to hide the grid line too
-                            return index % 2 === 0 ? dataLabel : '';
-                        }
+                        autoSkip: true,
+                        maxRotation: 0,
+                        minRotation: 0
                     }
                 }]
             },
