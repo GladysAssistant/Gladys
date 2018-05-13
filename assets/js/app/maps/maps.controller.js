@@ -94,7 +94,7 @@
                 $scope.$apply()
                 popup
                     .setLatLng(e.latlng)
-                    .setContent(`<b>${areaText}</b><br><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".area-modal" style="margin-top:10px">${newButtonText}</button>`)
+                    .setContent('<b>' + areaText + '</b><br><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".area-modal" style="margin-top:10px">' + newButtonText + '</button>')
                     .openOn(leafletMap)
             })
 
@@ -200,7 +200,7 @@
                 vm.area = {}
                 vm.area = areaUser[area.id].options;
                 $scope.$apply()
-                areaUser[area.id].bindPopup(`<b>${area.name}</b><br><button class="btn btn-flat btn-primary" data-toggle="modal" data-target=".area-modal" style="margin-bottom:5px; margin-top:10px">${editButtonText}</button><br><button class="btn btn-flat btn-danger" id="deleteAreaButton">${deleteButtonText}</button>`).openPopup();
+                areaUser[area.id].bindPopup('<b>' + area.name + '</b><br><button class="btn btn-flat btn-primary" data-toggle="modal" data-target=".area-modal" style="margin-bottom:5px; margin-top:10px">' + editButtonText + '</button><br><button class="btn btn-flat btn-danger" id="deleteAreaButton">' + deleteButtonText + '</button>').openPopup();
 
                 $('#deleteAreaButton').click(function(){
                     deleteArea(vm.area.id)
