@@ -204,6 +204,20 @@ module.exports = {
       gladys.deviceType.delete({id: req.params.id})
         .then(() => res.json({success: true}))
         .catch(next);
+  },
+
+   /**
+   * @api {patch} /devicetype/:id patch deviceType
+   * @apiName patchDeviceType
+   * @apiGroup DeviceType
+   * @apiPermission authenticated
+   * 
+   * @apiUse DeviceTypeSuccess
+   */
+  update: function(req, res, next) {
+      gladys.deviceType.update(req.params.id, req.body)
+        .then((deviceType) => res.json(deviceType))
+        .catch(next);
   }
   
 };
