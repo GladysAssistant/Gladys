@@ -13,14 +13,18 @@ var Promise = require('bluebird');
  *      })
  */
 
-module.exports = function(){
+module.exports = function(options){
+
+    options = options || {};
 
     var rooms = [];
     var roomDictionnary = {};
     
-    // get all rooms
-    return gladys.utils.sql(queries.getByRooms, [])
+    // get all deviceTypes, filter or not by room
+    return gladys.utils.sql(queries.getByRooms, [options.room, options.room])
         .then((deviceTypes) => {
+
+            // reorganize rooms in tree
             deviceTypes.forEach(deviceType => {
                 
                 if(!roomDictionnary.hasOwnProperty(deviceType.roomId)) {
@@ -42,23 +46,3 @@ module.exports = function(){
             return rooms;
         });
 };
-
-
-function getDeviceTypesInRoom(room){
-    
-    // get all deviceTypes in room
-    return gladys.utils.sql(queries.getByRoom, [room.id])
-      .then(function(deviceTypes){
-         
-         // if there is some deviceTypes in this room
-         if(deviceTypes.length){
-             
-             // return room with deviceTypes
-             room.deviceTypes = deviceTypes;
-             return room; 
-         } else {
-             return null;
-         }
-         
-      });
-}
