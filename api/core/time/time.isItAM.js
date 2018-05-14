@@ -1,4 +1,6 @@
- **
+const Promise = require('bluebird');
+
+/**
  * @public
  * @description This function return true or false is it the a.m.
  * @name gladys.time.isItAM
@@ -24,7 +26,7 @@
 module.exports = function isItAM(options){
     return gladys.time.getMomentOfTheDay(options)
       .then((result) => {
-          if(result.state === 'morning') return true; 
-          return false;
+          if(result.state === 'morning') return Promise.resolve(true); 
+          return Promise.resolve(false);
       });
 };
