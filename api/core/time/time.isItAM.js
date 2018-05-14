@@ -16,9 +16,9 @@ const Promise = require('bluebird');
  * gladys.time.isItAM(house)
  *      .then(function(isItAM){
  *          if(isItAM){
- *              //The time in the selected house is in the night.
+ *              //The time in the selected house is morning.
  *          }else{
- *              //The time in the selected house is not in the night.
+ *              //The time in the selected house is not morning.
  *          }
  *      });
  */
