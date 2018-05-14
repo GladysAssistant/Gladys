@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 
  /**
  * @public
- * @description This function return true or false, test is afternoon.
+ * @description This function return true or false, test if it's afternoon.
  * @name gladys.time.isItPM
  * @param {Object} house
  * @param {integer} house.house The id of the house
