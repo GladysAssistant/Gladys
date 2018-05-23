@@ -364,5 +364,9 @@
   "how-edit-area": "How edit an area ?",
   "how-edit-area-text": "To edit an area click on this one then on the edit button, you can then modify. You can also click on the link above.",
   "how-delete-area": "How delete an area ?",
-  "how-delete-area-text": "To delete an area click on it and delete this"
+  "how-delete-area-text": "To delete an area click on it and delete this",
+  "box-device-room-default-title": "Choose a room",
+  "box-devices-select-room": "Choose the room you want to display in this box:",
+  "box-devices-room-validate": "Save",
+  "box-device-room-title": "Device per room"
 }

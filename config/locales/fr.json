@@ -525,5 +525,9 @@
   "how-edit-area": "Comment modifier une zone ?",
   "how-edit-area-text": "Pour modifier une zone cliquez sur celle-ci puis sur le bouton modifier, vous pourrez alors la modifier. Vous pouvez aussi la déplacer en cliquant dessus et en la faisant glisser.",
   "how-delete-area": "Comment supprimer une zone ?",
-  "how-delete-area-text": "Pour supprimer une zone cliquez sur celle-ci puis sur le bouton supprimer."
+  "how-delete-area-text": "Pour supprimer une zone cliquez sur celle-ci puis sur le bouton supprimer.",
+  "box-device-room-default-title": "Choisissez une pièce",
+  "box-devices-select-room": "Sélectionnez la pièce que vous souhaitez surveiller sur cette box :",
+  "box-devices-room-validate": "Valider",
+  "box-device-room-title": "Device par pièce"
 }
