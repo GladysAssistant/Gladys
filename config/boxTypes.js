@@ -58,5 +58,11 @@ module.exports.boxTypes = [
         "title": "device-value",
         "path": "views/boxs/device-value.ejs",
         "view": "dashboard"
+    },
+    {
+        "uuid": "e477b1ad-5393-4da3-b10f-484626458530",
+        "title": "device-room",
+        "path": "views/boxs/device-room.ejs",
+        "view": "dashboard"
     }
 ];
