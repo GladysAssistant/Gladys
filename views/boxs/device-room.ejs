@@ -32,7 +32,12 @@
                                     </td>
                                     <td>
                                         <!-- If the deviceType is a sensor, display last data -->
-                                        <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
+                                        <div ng-show="type.sensor == 1 && type.type != 'binary'">{{type.lastValue }} {{type.unit}}</div>
+                                        <div ng-show="type.sensor == 1 && type.type == 'binary'">
+                                            <i ng-show="type.lastValue == 1" class="fa fa-circle" aria-hidden="true"></i>
+                                            <i ng-show="type.lastValue == 0" class="fa fa-circle-o" aria-hidden="true"></i>
+                                        </div>
+                                        
                                         
                                         <!-- If the deviceType is not a sensor and is not a binary, display input field -->
                                         <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
