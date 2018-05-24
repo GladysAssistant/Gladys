@@ -27,6 +27,7 @@
     "clone": "^2.1.1",
     "dotenv": "^4.0.0",
     "es6-template-strings": "^2.0.1",
+    "express-rate-limit": "^2.11.0",
     "fs-extra": "^4.0.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
