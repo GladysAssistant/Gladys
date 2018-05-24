@@ -1,5 +1,3 @@
-const Promise = require('bluebird');
-
 /**
  * @public
  * @description This function return true or false, test if it's morning.
