@@ -9,7 +9,15 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.http.html
  */
 
+var trustProxy = true;
+
+if(process.env.TRUST_PROXY === 'false'){
+  trustProxy = false;
+}
+
 module.exports.http = {
+
+  trustProxy: trustProxy
 
   /****************************************************************************
   *                                                                           *
