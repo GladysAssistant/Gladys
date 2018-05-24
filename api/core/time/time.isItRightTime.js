@@ -34,10 +34,10 @@ module.exports = function isItRightTime(options){
     var arrayOfEnd = options.end.split(":");
 
     // default start time 00:00:00
-    var date = new Date();
-    date.setHours(arrayOfSart[0] || 0);
-    date.setMinutes(arrayOfSart[1] || 0);
-    date.setSeconds(arrayOfSart[2] || 0);
+    var startDate = new Date();
+    startDate.setHours(arrayOfSart[0] || 0);
+    startDate.setMinutes(arrayOfSart[1] || 0);
+    startDate.setSeconds(arrayOfSart[2] || 0);
 
     
     // end time default is the end of the day
@@ -46,11 +46,6 @@ module.exports = function isItRightTime(options){
     endDate.setMinutes(arrayOfEnd[1] || 59);
     endDate.setSeconds(arrayOfEnd[2] || 59);
 
-    // settings default options if not defined
-    options = options || {};
-    options.start = date;
-    options.end = endDate;
-
-    if(now >= date && now <= endDate) return Promise.resolve(true);
+    if(now >= startDate && now <= endDate) return Promise.resolve(true);
 	return Promise.resolve(false);
 };
