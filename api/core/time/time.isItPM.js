@@ -26,7 +26,7 @@ const Promise = require('bluebird');
 module.exports = function isItPM(options){
     return gladys.time.getMomentOfTheDay(options)
       .then((result) => {
-          if(result.state === 'afternoon') return Promise.resolve(true); 
-          return Promise.resolve(false);
+          if(result.state === 'afternoon') return true; 
+          return false;
       });
 };
