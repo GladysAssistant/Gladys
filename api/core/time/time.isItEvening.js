@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 /**
  * @public
  * @description This function return true or false, test if it's evening.
@@ -28,4 +27,4 @@ module.exports = function isItEvening(options) {
           if(result.state === 'evening') return true; 
           return false;
       });
-}; 
+};
