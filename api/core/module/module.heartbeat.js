@@ -2,6 +2,7 @@
  * @public
  * @description This function set the lastSeen attribute of the module to now
  * @name gladys.module.heartbeat
+ * @param {module} module The module
  * @param {uuid} module.machine The uuid of the machine
  * @param {String} module.slug The slug of the module
  * @returns {Module} module

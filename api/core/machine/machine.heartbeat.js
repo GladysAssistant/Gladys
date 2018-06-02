@@ -3,6 +3,7 @@
  * @public
  * @description This function set the lastSeen attribute of the machine to now
  * @name gladys.machine.heartbeat
+ * @param {machine} machine The machine
  * @param {uuid} machine.uuid The uuid of the machine
  * @returns {Machine} machine
  * @example
