@@ -47,6 +47,8 @@ function exec(param) {
 
             // if the device is not on this machine
             if(types[0].machine && types[0].machine.length){
+                data.machine_id = types[0].machine;
+                data.module_slug = types[0].service;
                 gladys.emit('devicetype-exec', data);
                 return Promise.resolve(true);
             }

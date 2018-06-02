@@ -71,7 +71,7 @@ function startService(notification, type, user) {
     var notify = null;
 
     if(type.machine && type.machine.length) {
-        gladys.emit('notification-notify', {notification, user, machine_id: type.machine});
+        gladys.emit('notification-notify', {notification, user, machine_id: type.machine, module_slug: type.service});
         return Promise.reject(new Error('ok'));
     } else if(gladys[type.service] && typeof gladys[type.service].notify === "function"){
         notify = gladys[type.service].notify;
