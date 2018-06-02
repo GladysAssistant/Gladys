@@ -5,6 +5,16 @@
         "uuid": "72844455-8634-4131-9875-612b47ad4397",
         "host": "http://192.168.1.100",
         "me": true,
+        "lastSeen": "2018-02-11 12:10:43",
+        "house": 1
+    },
+    {
+        "id": 2,
+        "name": "Raspberry Pi Zero garden",
+        "uuid": "73a84d3b-a438-4807-87cc-04896b11e34b",
+        "host": "http://192.168.1.102",
+        "me": false,
+        "lastSeen": "2018-02-11 12:10:43",
         "house": 1
     }
 ]
