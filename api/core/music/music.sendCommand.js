@@ -9,7 +9,9 @@ module.exports = function sendCommand(functionName, params) {
 
           // if the device is not on this machine
           if(deviceType.machine && deviceType.machine.length){
-             gladys.emit(`music-${functionName}`, params);
+             params.machine_id = params.machine;
+             params.action = functionName;
+             gladys.emit('music', params);
              return Promise.resolve();
           }
 

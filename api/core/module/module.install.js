@@ -11,6 +11,7 @@ module.exports = function (params){
     // if a machine is specified, it means we need to install this module
     // on a remote machine. Emit an event, so a potential module will handle the install
     if(params.machine && params.machine.length){
+        params.machine_id = params.machine;
         gladys.emit('module-install', params);
         return Promise.resolve();
     }

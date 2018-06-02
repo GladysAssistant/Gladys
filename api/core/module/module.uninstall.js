@@ -6,6 +6,7 @@ module.exports = function(module){
 
     // if the module is installed remotely, send the info
     if(module.machine && module.machine.length){
+        params.machine_id = params.machine;
         gladys.emit('module-uninstall', module);
         return Promise.resolve(module);
     }

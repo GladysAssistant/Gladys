@@ -6,6 +6,7 @@ module.exports = function upgrade(params) {
 
     // if module is installed remotely
     if(params.machine && params.machine.length){
+        params.machine_id = params.machine;
         gladys.emit('module-upgrade', params);
         return Promise.resolve();
     }
