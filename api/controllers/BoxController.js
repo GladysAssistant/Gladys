@@ -22,7 +22,15 @@ module.exports = {
      */
     index: function(req, res, next){
        gladys.box.getBoxUser({user: req.session.User})
-        .then((boxs) => res.json(boxs))  
+        .then((boxs) => {
+             
+            // translate box title
+            boxs.forEach((box) => {
+                box.boxType.title = req.__(`box-${box.boxType.title}-title`);
+            });
+            
+            return res.json(boxs);
+        })  
         .catch(next); 
     },
 

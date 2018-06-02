@@ -4,8 +4,57 @@ var queries = require('./device.queries.js');
 var Promise = require('bluebird');
 
 /**
- * Create a Device and its DeviceType.
+ * @public
+ * @description This function create an device and its deviceType (see exemple for more details)
+ * @name gladys.device.create
+ * @param {Object} param
+ * @param {Object} param.device
+ * @param {Array} param.types if the device has deviceType (optional)
+ * @param {Object} device
+ * @param {String} device.name The name of the device
+ * @param {String} device.identifer The identifer of the device, it must be unique
+ * @param {String} device.protocol The protocol of the device
+ * @param {String} device.service The service of the device, the module to which it must be connected
+ * @param {Array} types
+ * @param {String} types.type The type of the deviceType (binary or multilevel)
+ * @param {bolean} types.sensor If the type is an sensor
+ * @param {integer} types.min The min of the deviceType
+ * @param {integer} types.max The max of the deviceType
+ * @returns {Device} device
+ * @example
+ * var param = {
+ *     device: {
+ *         name: 'Light in my room',
+ *         identifier: 'milight-12',
+ *         protocol: 'milight',
+ *         service: 'milight'
+ *     },
+ *     types: [
+ *         {
+ *             type: 'binary',
+ *             sensor: false,
+ *             min: 0,
+ *             max: 1
+ *         },
+ *         {
+ *             type:'multilevel',
+ *             unit: 'color',
+ *             sensor: false,
+ *             min: 0,
+ *             max: 100
+ *         }
+ *     ]   
+ * };
+ * 
+ * gladys.device.create(param)
+ *      .then(function(device){
+ *         // device created ! 
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
  */
+
 function create(param) {
 
     var deviceUpdated = false;

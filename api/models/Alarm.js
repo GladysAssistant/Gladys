@@ -14,6 +14,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+ /**
+ * @public
+ * @name Alarm
+ * @class
+ */
+
 module.exports = {
 
     types: {
@@ -62,6 +68,12 @@ module.exports = {
         active: {
             type: 'boolean',
             defaultsTo: true
+        },
+
+        // determine if this alarm is an alarm for wake up or not
+        isWakeUp: {
+            type: 'boolean',
+            defaultsTo: false
         },
 
         user: {

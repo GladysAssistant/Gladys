@@ -58,7 +58,7 @@ function gitClone(url, path){
  * NPM install a specific directory
  */
 function npmInstall(path){
-    return exec(`npm install --prefix ${path}`);
+    return exec(`npm install --prefix ${path} > /dev/null`);
 }
 
 /**

@@ -5,6 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+    /**
+ * @public
+ * @name DeviceType
+ * @class
+ */
+
 module.exports = {
 
     attributes: {
@@ -62,6 +68,14 @@ module.exports = {
         display: {
           type:'boolean',
           defaultsTo: true  
+        },
+
+        lastValue: {
+            type: 'float'
+        },
+
+        lastValueDatetime: {
+            type: 'datetime'
         },
 
         device: {

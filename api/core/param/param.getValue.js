@@ -2,6 +2,22 @@ var queries = require('./param.queries.js');
 var Promise = require('bluebird');
 var shared = require('./param.shared.js');
 
+/**
+ * @public
+ * @description This function retrun the value an params
+ * @name gladys.param.getValue
+ * @param {String} name The name of the param
+ * @returns {String} param
+ * @example
+ * var name = 'param_1'
+ * 
+ * gladys.param.getValue(name)
+ *     .then(function(param){
+ *        // do something
+ *     })
+ */
+
+
 module.exports = function getValue(name){
     
     if(shared.cache.hasOwnProperty(name)){

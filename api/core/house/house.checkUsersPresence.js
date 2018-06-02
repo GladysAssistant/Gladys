@@ -1,6 +1,14 @@
 const queries = require('./house.queries.js');
 const Promise = require('bluebird');
 
+/**
+ * @public
+ * @description This function check if an user as at home and create an event in timeline
+ * @name gladys.house.checkUserPresence
+ * @example 
+ * gladys.house.checkUserPresence();
+ */
+
 module.exports = function checkUsersPresence(){
     sails.log.info(`House : checkUsersPresence`);
 

@@ -14,6 +14,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+ /**
+ * @public
+ * @name Machine
+ * @class
+ */
+
 module.exports = {
 
     attributes: {

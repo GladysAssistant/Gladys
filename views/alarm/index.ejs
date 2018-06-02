@@ -14,7 +14,7 @@
 
                 <!-- Main content -->
                 <section class="content">
-                    <div class="box skin-box box-primary">
+                    <div class="box skin-box box-primary box-solid">
                          <div class="box-body table-responsive" data-ng-controller="AlarmCtrl as vm">
                                     
                                     <table id="example2" class="table table-bordered table-hover">
@@ -23,7 +23,7 @@
                                                 <th><%= __('Name') %></th>
                                                 <th><%= __('Moment') %></th>
                                                 <th><%= __('alarm-auto-alarm') %></th>
-                                                <th><%= __('Action') %></th>
+                                                <th><%= __('Delete') %></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -59,7 +59,9 @@
                                                 </div>
                                                 <div class="modal-body">
                                                   
-                                                            <!-- DateTime Boostrap Picker -->
+                                                            <p>
+                                                                <%= __('alarm-explanation') %>
+                                                            </p>
 
                                                              <!-- NEW BOX -->
                                                           <div class="box box-solid">
@@ -81,7 +83,15 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                     <div class='col-md-4'>
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarm.isWakeUp" ng-init="vm.newAlarm.isWakeUp = '1'" >
+                                                                                <option  value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class='col-md-2'>
                                                                         <button class="btn btn-flat btn-success  " ng-click="vm.createAlarm()"><%= __('New') %></button>
                                                                       </div>
                                                                 </div>
@@ -107,7 +117,15 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                     <div class='col-md-4'>
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newTimer.isWakeUp" ng-init="vm.newTimer.isWakeUp = '1'">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class='col-md-2'>
                                                                         <button class="btn btn-flat btn-success  " ng-click="vm.createTimer(vm.newTimer)"><%= __('New') %></button>
                                                                       </div>
                                                                 </div>
@@ -129,7 +147,7 @@
                                                                     
                                                                     <div class='col-md-2'>
                                                                         <div class="form-group">
-                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.dayofweek">
+                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.dayofweek" ng-init="vm.newAlarmReccuring.dayofweek = '1'" >
                                                                                 <option  selected value="1" ><%= __('Monday') %></option>
                                                                                 <option value="2"><%= __('Tuesday') %></option>
                                                                                 <option value="3"><%= __('Wednesday') %></option>
@@ -138,6 +156,15 @@
                                                                                 <option value="6"><%= __('Saturday') %></option>
                                                                                 <option value="0"><%= __('Sunday') %></option>
                                                                                 
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarmReccuring.isWakeUp" ng-init="vm.newAlarmReccuring.isWakeUp = '1'">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
                                                                             </select>
                                                                         </div>
                                                                     </div>
@@ -152,7 +179,7 @@
                                                                         </div>
                                                                     </div>
 
-                                                                     <div class='col-md-4'>
+                                                                     <div class='col-md-2'>
                                                                          <button class="btn btn-flat btn-success  " ng-click="vm.createAlarmRecurring()"><%= __('New') %></button>
                                                                       </div>
                                                                    
@@ -179,8 +206,17 @@
                                                                     <div class='col-md-4'>
                                                                         <input type="text" class="form-control" ng-model="vm.newAlarmCron.cronrule" placeholder="* * * * * *" />
                                                                     </div>
+
+                                                                    <div class='col-md-4'>
+                                                                        <div class="form-group">
+                                                                           <select class="form-control" ng-model="vm.newAlarmCron.isWakeUp" ng-init="vm.newAlarmCron.isWakeUp = '1'">
+                                                                                <option  selected value="1" ><%= __('alarm-is-alarm-clock') %></option>
+                                                                                <option  value="0" ><%= __('alarm-is-not-alarm-clock') %></option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
                                                                 
-                                                                     <div class='col-md-4'>
+                                                                     <div class='col-md-2'>
                                                                          <button class="btn btn-flat btn-success  " ng-click="vm.createAlarmCron()"><%= __('New') %></button>
                                                                       </div>
                                                                    
@@ -205,7 +241,7 @@
                                                                     
                                                                     <div class='col-md-2'>
                                                                         <div class="form-group">
-                                                                           <select class="form-control" ng-model="vm.newAlarmAutoWakeUp.dayofweek">
+                                                                           <select class="form-control" ng-model="vm.newAlarmAutoWakeUp.dayofweek" ng-init="vm.newAlarmAutoWakeUp.dayofweek = '1'">
                                                                                 <option  selected value="1" ><%= __('Monday') %></option>
                                                                                 <option value="2"><%= __('Tuesday') %></option>
                                                                                 <option value="3"><%= __('Wednesday') %></option>

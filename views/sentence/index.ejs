@@ -21,7 +21,7 @@
               <li ng-class="vm.status === 'official' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('official')" aria-expanded="true"><%= __('sentence-official') %></a></li>
               <li ng-class="vm.status === 'rejected' && 'active'"><a style="cursor:pointer" ng-click="vm.setStatus('rejected')" aria-expanded="true"><%= __('sentence-rejected') %></a></li>
 
-              <li ng-hide="vm.training" class="pull-right"><a ng-click="vm.trainNew()" style="cursor:pointer"> <%= __('brain-train-new') %> </a></li>
+              <li class="pull-right"><button ng-hide="vm.training" class="btn btn-flat btn-primary"ng-click="vm.trainNew()" style="cursor:pointer"> <%= __('brain-train-new') %> </button></li>
               <li ng-show="vm.training" class="pull-right"><a ><%= __('brain-training') %>...</a></li>
             </ul>
             <div class="tab-content">

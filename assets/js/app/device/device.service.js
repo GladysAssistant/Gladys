@@ -24,6 +24,7 @@
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
             getDeviceTypeByRoom: getDeviceTypeByRoom,
+            getDeviceTypeInRoom: getDeviceTypeInRoom,
             createDeviceType: createDeviceType,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
@@ -86,10 +87,14 @@
         function getDeviceTypeByRoom(){
             return $http({method: 'GET', url: '/devicetype/room'});
         }
+
+        function getDeviceTypeInRoom(id){
+            return $http({method: 'GET', url: '/room/' + id + '/devicetype'});
+        }
         
         // all about deviceStates
-        function getStates(deviceType, skip){
-            return $http({method: 'GET', url: '/devicestate', params: {devicetype: deviceType, skip:skip}});
+        function getStates(deviceType, skip, take){
+            return $http({method: 'GET', url: '/devicestate', params: {devicetype: deviceType, skip:skip, take:take}});
         }
     }
 })();

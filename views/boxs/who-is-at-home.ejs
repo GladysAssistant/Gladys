@@ -1,0 +1,25 @@
+<div class="info-box" data-ng-controller="HousePresenceBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <span class="info-box-icon bg-aqua"><i class="fa fa-home"></i></span>
+    
+    <div class="info-box-content ng-cloak">
+        <div ng-show="vm.enterHouse === true" class="ng-cloak">
+            <p><%= __('box-who-is-at-home-explanation') %></p>
+            <div class="row">
+                <div class="col-md-6">
+                    <select class="form-control" ng-model="vm.newHouseId">
+                        <option ng-repeat="house in vm.houses" value="{{house.id}}">{{house.name}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success btn-flat" ng-click="vm.saveHouse(vm.newHouseId);"><%= __('box-who-is-at-home-validate') %></button>
+                </div>
+            </div>
+        </div>
+        <div ng-show="vm.enterHouse === false">
+          <span class="info-box-number"><%= __('box-who-is-at-home-title') %></span>
+          <div class="" ng-repeat="user in vm.users">{{user.firstname}}</div>
+          <div ng-show="vm.users.length === 0"><%= __('box-who-is-at-home-nobody') %></div>
+        </div>
+    </div>
+    <!-- /.info-box-content -->
+</div>

@@ -1,10 +1,11 @@
 {
   "name": "gladys",
-  "version": "3.7.4",
+  "version": "3.8.1",
   "description": "Your personnal assistant, always here.",
   "scripts": {
     "start": "NODE_ENV=development node app.js",
-    "test": "grunt test"
+    "test": "grunt test",
+    "generate-changelog": "auto-changelog"
   },
   "keywords": [
     "home",
@@ -26,6 +27,7 @@
     "clone": "^2.1.1",
     "dotenv": "^4.0.0",
     "es6-template-strings": "^2.0.1",
+    "express-rate-limit": "^2.11.0",
     "fs-extra": "^4.0.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
@@ -41,7 +43,7 @@
     "grunt-sync": "^0.6.2",
     "include-all": "~4.0.3",
     "jsonwebtoken": "^8.0.0",
-    "limdu": "^0.9.3",
+    "limdu": "0.9.4",
     "moment": "^2.18.1",
     "node-schedule": "^1.2.4",
     "rc": "^1.2.1",
@@ -54,8 +56,10 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
+    "documentation-flat-theme": "^0.2.0",
     "grunt-apidoc": "^0.11.0",
     "grunt-contrib-csslint": "^2.0.0",
+    "grunt-documentation": "^1.2.3",
     "grunt-mocha-istanbul": "^5.0.2",
     "istanbul": "^0.4.5",
     "jshint-stylish": "^2.2.1",

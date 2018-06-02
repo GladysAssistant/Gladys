@@ -7,6 +7,11 @@
  * @author :: Pierre-Gilles Leymarie
  */
 
+/**
+ * @public
+ * @name ParamUser
+ * @class
+ */
 
 module.exports = {
 

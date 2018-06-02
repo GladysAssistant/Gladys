@@ -23,6 +23,27 @@ before_install:
 
 script:
   - "grunt coverage"
-    
+  - "grunt buildProd"
+  - "grunt documentation"
+  - "grunt apidoc"
+  - "mkdir documentation"
+  - "mv docs jsdoc"
+  - "mv ./jsdoc/ ./documentation/"
+  - "mv ./apidoc/ ./documentation/"
+  - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
+  - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
+
 env:
   - CXX=g++-4.8
+
+deploy:
+ provider: pages
+ repo: GladysProject/documentation
+ skip_cleanup: true
+ github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+ local_dir: documentation
+ target-branch: gh-pages
+ fqdn: documentation.gladysproject.com
+ verbose: true
+ on:
+   branch: master

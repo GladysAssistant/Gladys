@@ -30,6 +30,16 @@
     function activate() {
 
         vm.options = {
+            scales: {
+                xAxes: [{
+                    display: true,
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
+                }]
+            },
             legend: {
                 display: true,
                 onClick: null
@@ -83,7 +93,7 @@
                     chartData.data = [chartData.data];
                     vm.chart = chartData;
                 }else{
-                    vm.currentDeviceType.skip -= 5;
+                    vm.currentDeviceType.skip -= 25;
                     if(vm.currentDeviceType.skip < 0){
                         vm.currentDeviceType.skip = 0;
                     }
