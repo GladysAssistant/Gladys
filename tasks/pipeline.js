@@ -20,7 +20,6 @@ var cssFilesToInject = [
   'styles/search.css',
   'styles/store.css',
   'styles/scenario.css',
-  'styles/global.css',
   'styles/angular-chart/angular-chart.min.css',
   'AdminLTE/bower_components/bootstrap-slider/slider.css',
   'styles/device.css',
@@ -30,6 +29,7 @@ var cssFilesToInject = [
   'styles/disable-hyperlinks.css',
   'styles/box.css',
   'styles/nav-tabs-custom.css',
+  'js/angular-bootstrap-calendar/angular-bootstrap-calendar.min.css',
 
   //Inject AdminLTE files
   'AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css',
@@ -45,6 +45,7 @@ var cssFilesToInject = [
 
   //Inject AdminLTE at the end
   'AdminLTE/dist/css/AdminLTE.min.css',
+  'styles/global.css',
 ];
 
 
@@ -93,6 +94,7 @@ var jsFilesToInject = [
   'js/angular-translate/angular-translate.min.js',
   'js/angular-slider/slider.js',
   'js/angular-device-detector/ng-device-detector.min.js',
+  'js/angular-bootstrap-calendar/angular-bootstrap-calendar-tpls.min.js',
   
   // loading first AngularModule definition
   'js/app/app.module.js',

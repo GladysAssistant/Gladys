@@ -51,8 +51,10 @@
                                 <input type="text" class="form-control" ng-model="vm.newMachine.host" placeholder="<%= __('Host') %>" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-host') %>" />
                             </td>
                             <td>
-                                <button class="btn btn-flat btn-success  " ng-show="vm.newMachine.me" ng-click="vm.newMachine.me = false" ><%= __('Yes') %></button>
-                                <button class="btn btn-flat btn-danger  " ng-show="!vm.newMachine.me" ng-click="vm.newMachine.me = true" ><%= __('No') %></button>
+                                <div class="toogle" ng-click="vm.newMachine.me =! vm.newMachine.me">
+                                    <input type="checkbox" ng-model="vm.newMachine.me" class="toogle-checkbox toogle-blue" />
+                                    <label class="toogle-label" for="mytoogle"></label>
+                                </div>
                             </td>
                             <td></td>
                             <td>

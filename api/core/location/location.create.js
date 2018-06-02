@@ -1,7 +1,34 @@
 var Promise = require('bluebird');
 
-module.exports = function create (location){
-    
+/**
+ * @public
+ * @description This function create an location
+ * @name gladys.location.create
+ * @param {Object} location
+ * @param {float} location.latitude The latitude of location
+ * @param {float} location.longitude The longitude of location
+ * @param {float} location.altitude The altitude of location (optional)
+ * @param {float} location.accuracy The accuracy of location (optional)
+ * @returns {Location} location
+ * @example
+ * var location = {
+ *      latitude: 'wakeup',
+ *      longitude: 1,
+ *      altitude: 1,
+ *      accuracy: 2
+ * };
+ *
+ * gladys.location.create(location)
+ *      .then(function(location){
+ *         // location created ! 
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
+ */
+
+module.exports = function create (location) {
+   sails.log.debug(`gladys.location.create : Create location for user ${location.user}`);
    location.datetime = location.datetime || new Date();
   
   // we check if the user did not enter a new area

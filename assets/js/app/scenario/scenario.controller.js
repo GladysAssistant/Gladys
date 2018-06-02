@@ -279,6 +279,9 @@
                         vm.launchers[vm.currentScenario.index] = data.data.trigger;
                         $('#modalUpdateScenario').modal('hide');
                     })
+		    .then(function(){
+                        finishScenario();
+                    })
                     .catch(function () {
                         notificationService.errorNotificationTranslated('SCENARIO.UPDATE_ERROR')
                     });
@@ -290,6 +293,9 @@
                     .then(function(data){
                         vm.launchers.push(data.data.trigger);
                         $('#modalUpdateScenario').modal('hide');
+                    })
+		    .then(function(){
+                        finishScenario();
                     })
                     .catch(function () {
                         notificationService.errorNotificationTranslated('SCENARIO.CREATE_ERROR')

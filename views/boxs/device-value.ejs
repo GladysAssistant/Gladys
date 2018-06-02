@@ -1,0 +1,28 @@
+<div class="info-box bg-red ng-cloak" ng-controller="DeviceValueBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <span class="info-box-icon">
+        <i class="fa {{vm.currentDeviceType.icon}}" ng-show="vm.currentDeviceType"></i>
+        <i class="fa fa-question" ng-show="vm.currentDeviceType == null"></i>
+    </span>
+    <div class="info-box-content">
+        <div class="pull-right btn-group">
+            <button type="button" class="btn btn-danger btn-sm no-border" data-toggle="dropdown">
+                <i class="fa fa-bars"></i>
+            </button> 
+            <ul class="dropdown-menu" role="menu" style="max-height: 200px; overflow: auto">
+                <li ng-repeat="deviceType in vm.deviceTypes">
+                    <a href="" ng-click="vm.currentDeviceType = deviceType; vm.saveCurrentDeviceType()">{{deviceType.name}}</a>
+                </li>
+            </ul>
+        </div>
+        <div ng-show="vm.currentDeviceType === null">
+            <h4 class="text-center" style="padding: 20px">
+                    <%= __('box-chart-empty-state') %>
+            </h4>
+        </div>
+        <div ng-show="vm.currentDeviceType">
+            <div class=""><span class="info-box-number">{{vm.currentDeviceType.roomName}}</span></div>
+            <span class="">{{vm.currentDeviceType.name}}</span>
+            <div class="">{{vm.currentDeviceType.value}} {{vm.currentDeviceType.unit}}</div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="box box-primary" data-ng-controller="ChartBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <div class="box-header with-border">
+        <i class="fa fa-area-chart"></i>
+        <h3 class="box-title"><%= __('box-chart-title') %></h3>
+
+        <div class="box-tools pull-right">
+            <button type="button" id="previousButton" class="btn btn-box-tool" ng-click="vm.previousStates()">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <button type="button" id="nextButton" class="btn btn-box-tool" ng-click="vm.nextStates()">
+                <i class="fa fa-arrow-right"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-bars"></i>
+            </button> 
+            <ul class="dropdown-menu" role="menu" style="max-height: 300px; overflow: auto">
+                <li ng-repeat="deviceType in vm.deviceTypes">
+                    <a href="" ng-click="vm.currentDeviceType = deviceType">{{deviceType.name}}</a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- /.box-header -->
+    <div class="box-body ng-cloak">
+            <div ng-show="vm.currentDeviceType === null">
+                <h4 class="text-center" style="padding: 20px">
+                        <%= __('box-chart-empty-state') %>
+                </h4>
+            </div>
+            <canvas ng-show="vm.currentDeviceType" id="line" 
+                    class="chart chart-line" 
+                    chart-data="vm.chart.data"
+                    chart-labels='vm.chart.labels' 
+                    chart-options="vm.options" 
+                    chart-legend="false" 
+                    chart-series="vm.chart.series"
+                    chart-click="onClick">
+            </canvas> 
+    </div>
+    <!-- /.box-body -->
+</div>

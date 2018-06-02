@@ -15,6 +15,9 @@ describe('DeviceTypeController', function() {
 
             res.body.should.be.instanceOf(Array);
             res.body.forEach(function(room) {
+                room.should.have.property('id');
+                room.should.have.property('name');
+                room.should.have.property('house');
                 validateDeviceType(room.deviceTypes);
             });
             

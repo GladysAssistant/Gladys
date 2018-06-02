@@ -39,5 +39,14 @@
     "device": 3,
     "min": 0,
     "max": 0
+  },
+  {
+    "id": 5,  
+    "name": "On/off",
+    "type": "binary",
+    "sensor": false,
+    "device": 4,
+    "min": 0,
+    "max": 0
   }
 ]
