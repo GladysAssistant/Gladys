@@ -39,9 +39,13 @@ module.exports = {
           defaultsTo: 1,
       },
 
+      lastSeen: {
+        type: 'datetime'
+      },
+
       // The machine where this module is installed
       machine: {
-          model: 'Machine'
+          type: 'uuid'
       }
 
   }
