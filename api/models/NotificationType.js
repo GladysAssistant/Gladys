@@ -30,7 +30,7 @@ module.exports = {
 
         // if this notificationType is not located on this Gladys machine
         machine: {
-            model: 'Machine'
+            type: 'uuid'
         }
 
     }

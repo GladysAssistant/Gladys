@@ -41,7 +41,7 @@ module.exports = {
 
         // The Gladys machine responsible of handling this device
         machine: {
-            model: 'Machine'
+            type: 'uuid'
         },
 
         // if this device is linked to a user (like a phone/laptop/Smart Watch)
