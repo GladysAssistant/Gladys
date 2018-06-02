@@ -86,6 +86,7 @@ function trySendingMessage(newMessage, type, user) {
     if(type.machine && type.machine.length){
         gladys.emit('message-notify', {
             machine_id: type.machine,
+            module_slug: type.service,
             message,
             type,
             user
