@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('machineCtrl', machineCtrl);
 
-    machineCtrl.$inject = ['machineService', 'houseService'];
+    machineCtrl.$inject = ['machineService', 'houseService', 'roomService', '$q'];
 
-    function machineCtrl(machineService, houseService) {
+    function machineCtrl(machineService, houseService, roomService, $q) {
         /* jshint validthis: true */
         var vm = this;
     	vm.createMachine = createMachine;
@@ -24,13 +24,17 @@
 		vm.deleteMachine = deleteMachine;
 
         vm.houses = [];
+        vm.rooms = [];
         vm.saving = false;
 
         activate();
 
         function activate() {
-            getMachines();
-            getHouses();
+            $q.all([getRooms(), getHouses()])
+                .then(function(){
+                    getMachines();
+                });
+            
             return ;
         }
         
@@ -42,9 +46,16 @@
         }
         
         function getHouses() {
-            return houseService.get()
+            return houseService.get({take: 10000})
                 .then(function(data){
                     vm.houses = data.data;
+                });
+        }
+
+        function getRooms() {
+            return roomService.get({take: 10000})
+                .then(function(data){
+                    vm.rooms = data.data;
                 });
         }
 		

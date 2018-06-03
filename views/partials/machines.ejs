@@ -14,7 +14,7 @@
                             <th><%= __('Uuid') %></th>
                             <th><%= __('Name') %></th>
                             <th><%= __('House') %></th>
-                            <th><%= __('Host') %></th>
+                            <th><%= __('Room') %></th>
                             <th><%= __('Me') %></th>
                             <th><%= __('machine-last-seen') %></th>
                             <th><%= __('Delete') %></th>
@@ -27,8 +27,12 @@
                             <td><select  class="form-control" ng-model="machine.house" ng-change="vm.updateMachine(machine);">
                                     <option ng-repeat="house in vm.houses" ng-value="house.id" ng-selected="(house.id == machine.house)" >{{house.name}}</option>
                                 </select>
-                                </td>
-                            <td><input type="text" class="form-control" ng-model="machine.host" ng-model-options='{ debounce: 500 }' ng-change="vm.updateMachine(machine);" /></td>
+                            </td>
+                            <td>
+                                <select class="form-control" ng-model="machine.room" ng-change="vm.updateMachine(machine);">
+                                    <option ng-repeat="room in vm.rooms" ng-value="room.id" ng-selected="(room.id == machine.room)" >{{room.name}}</option>
+                                </select>
+                            </td>
                             <td><div ng-show="machine.me"><%= __('Yes') %></div><div ng-show="!machine.me"><%= __('No') %></div></td>
                             <td>
                                 <span am-time-ago="machine.lastSeen"></span>
@@ -40,15 +44,17 @@
                             <td>
                                 <input type="text" class="form-control" ng-model="vm.newMachine.name" placeholder="<%= __('Name') %>" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-name') %>" />
                             </td>
-                                <td>
-                                    
-                                    <select  class="form-control"
-                                            ng-options="house.name for house in vm.houses track by house.id"
-                                            ng-model="vm.newMachine.house" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-house-choice') %>" >
-                                    </select>
+                            <td> 
+                                <select  class="form-control"
+                                        ng-options="house.name for house in vm.houses track by house.id"
+                                        ng-model="vm.newMachine.house" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-house-choice') %>" >
+                                </select>
                             </td>
-                                <td>
-                                <input type="text" class="form-control" ng-model="vm.newMachine.host" placeholder="<%= __('Host') %>" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-host') %>" />
+                            <td> 
+                                <select  class="form-control"
+                                        ng-options="room.name for room in vm.rooms track by room.id"
+                                        ng-model="vm.newMachine.room" data-toggle="tooltip" data-original-title="<%= __('tooltip-machine-room-choice') %>" >
+                                </select>
                             </td>
                             <td>
                                 <div class="toogle" ng-click="vm.newMachine.me =! vm.newMachine.me">
