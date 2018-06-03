@@ -14,9 +14,9 @@
         .module('gladys')
         .controller('ModuleCtrl', ModuleCtrl);
 
-    ModuleCtrl.$inject = ['moduleService', '$scope', 'notificationService', 'storeService', '$sce'];
+    ModuleCtrl.$inject = ['moduleService', '$scope', 'notificationService', 'storeService', '$sce', 'moment'];
 
-    function ModuleCtrl(moduleService, $scope, notificationService, storeService, $sce) {
+    function ModuleCtrl(moduleService, $scope, notificationService, storeService, $sce, moment) {
         /* jshint validthis: true */
         var vm = this;
         
@@ -45,7 +45,13 @@
        function get(){
            return moduleService.get()
              .then(function(data){
-                vm.modules = data.data; 
+                data.data.forEach(function(module){
+                    if(module.machine) {
+                        module.lastSeenRelative = moment(module.lastSeen).fromNow();
+                        module.active = (new Date().getTime() - new Date(module.lastSeen).getTime()) < 3*60*1000;
+                    }
+                });
+                vm.modules = data.data;
              });
        }
        

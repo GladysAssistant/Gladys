@@ -32,6 +32,7 @@
                   <th><%= __('Name') %></th>
                   <th><%= __('Version') %></th>
                   <th><%= __('Status') %></th>
+                  <th><%= __('module-local') %></th>
                   <th><%= __('Configuration') %></th>
                   <th><%= __('module-upgrade') %></th>
                   <th><%= __('module-uninstall') %></th>
@@ -45,6 +46,13 @@
                       <span ng-show="module.status == 0"><%= __('module-status-0') %></span>
                       <span ng-show="module.status == 1"><%= __('module-status-1') %></span>
                       <span ng-show="module.status == 2"><%= __('module-status-2') %></span>
+                   </td>
+                   <td>
+                        <span ng-show="module.machine == null"><%= __('module-is-local') %></span>
+                        <span ng-show="module.machine != null"><%= __('module-is-remote') %> 
+                            <i class="fa fa-check-circle" ng-show="module.active" data-toggle="tooltip" data-original-title="<%= __('module-last-seen') %> {{module.lastSeenRelative}}"></i>
+                            <i class="fa fa-circle-thin" ng-show="!module.active" data-toggle="tooltip" data-original-title="<%= __('module-last-seen') %> {{module.lastSeenRelative}}" ></i>
+                        </span>
                    </td>
                    <td><button class="btn btn-flat btn-info" ng-click="vm.configModule(module.slug);"><%= __('Configuration') %></button></td>
                   <td><button class="btn btn-flat btn-success" ng-click="vm.upgradeModule($index, module);"><%= __('module-upgrade') %></button></td>
