@@ -1,4 +1,5 @@
 
+module.exports.create = require('./module.create.js');
 module.exports.get = require('./module.get.js');
 module.exports.heartbeat = require('./module.heartbeat.js');
 module.exports.init = require('./module.init.js');
