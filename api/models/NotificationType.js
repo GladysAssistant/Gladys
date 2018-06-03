@@ -26,11 +26,6 @@ module.exports = {
         service: {
             type: 'string',
             required: true
-        },
-
-        // if this notificationType is not located on this Gladys machine
-        machine: {
-            type: 'uuid'
         }
 
     }
