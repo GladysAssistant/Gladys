@@ -7,8 +7,6 @@ module.exports = {
     getById: 'SELECT * FROM eventtype WHERE id = ?;',
     purge: `
         DELETE FROM event
-        WHERE value = ?
-        AND eventtype = ?
-        AND datetime < NOW() - INTERVAL ? DAY;
+        WHERE datetime < NOW() - INTERVAL ? DAY;
     `
 };
