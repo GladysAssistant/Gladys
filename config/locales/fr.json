@@ -534,5 +534,9 @@
   "box-device-room-default-title": "Choisissez une pièce",
   "box-devices-select-room": "Sélectionnez la pièce que vous souhaitez surveiller sur cette box :",
   "box-devices-room-validate": "Valider",
-  "box-device-room-title": "Device par pièce"
+  "box-device-room-title": "Device par pièce",
+  "module-config-view-configuration": "Configuration",
+  "module-config-view-back": "Retour",
+  "module-config-view-main-tab-title": "Configuration",
+  "module-config-view-settings-tab-title": "Paramètres"
 }

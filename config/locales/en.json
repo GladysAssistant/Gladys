@@ -373,5 +373,9 @@
   "box-device-room-default-title": "Choose a room",
   "box-devices-select-room": "Choose the room you want to display in this box:",
   "box-devices-room-validate": "Save",
-  "box-device-room-title": "Device per room"
+  "box-device-room-title": "Device per room",
+  "module-config-view-configuration": "Configuration",
+  "module-config-view-back": "Back",
+  "module-config-view-main-tab-title": "Configuration",
+  "module-config-view-settings-tab-title": "Settings"
 }
