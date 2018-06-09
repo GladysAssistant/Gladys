@@ -40,6 +40,7 @@ module.exports.routes = {
   
   //dashboard
   '/dashboard': 'DashboardController.index' ,
+  '/dashboard/module/:id/configuration': 'DashboardController.moduleConfigView',
   
   //Action
   'post /action': 'ActionController.create',
@@ -204,6 +205,7 @@ module.exports.routes = {
   
   // Param
   'get /param': 'ParamController.index',
+  'get /module/:id/param': 'ParamController.getByModule',
   'get /param/:name': 'ParamController.getByName',
   'post /param': 'ParamController.create',
   'patch /param/:name': 'ParamController.update',
