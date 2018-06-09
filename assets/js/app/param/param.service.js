@@ -20,6 +20,7 @@
         
         var service = {
             get: get,
+            getByModule: getByModule,
             create: create, 
             update: update,
             destroy: destroy
@@ -29,6 +30,10 @@
 
         function get() {
             return $http({method: 'GET', url: '/param'});
+        }
+
+        function getByModule(id) {
+            return $http({method: 'GET', url: '/module/' + id + '/param'});
         }
         
         function create(param) {
