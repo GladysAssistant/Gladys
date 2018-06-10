@@ -35,6 +35,10 @@ module.exports.routes = {
 
   // views
   '/login' : 'WelcomeController.login',
+  'get /forgotpassword' : 'WelcomeController.forgotPassword',
+  'post /forgotpassword' : 'WelcomeController.postForgotPassword',
+  'get /resetpassword' : 'WelcomeController.resetPassword',
+  'post /resetpassword' : 'WelcomeController.postResetPassword',
   '/': 'WelcomeController.index',
   '/installation': 'WelcomeController.installation',
   
