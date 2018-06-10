@@ -24,14 +24,16 @@ module.exports = function(module){
               return [module, null];
           }   
       })
-      .spread(function(module){
+      .spread((module) => {
          
          // we delete the folder
-         var path = './api/hooks/' + module.slug;
-         
-         return [module, removeDir(path)];
+         var modulePath = './api/hooks/' + module.slug;
+         var assetsDestinationProd = './www/hooks/' + module.slug;
+         var assetsDestinationDev = './assets/hooks/' + module.slug; 
+
+         return [module, fse.remove(modulePath), fse.remove(assetsDestinationProd), fse.remove(assetsDestinationDev)];
       })
-      .spread(function(module){
+      .spread((module) => {
          
          // deleting module in DB
          return [module, gladys.utils.sql(queries.delete, [module.id])];
@@ -41,13 +43,3 @@ module.exports = function(module){
           return module;
       });
 };
-
-function removeDir(path){
-    return new Promise(function(resolve, reject){
-          fse.remove(path, function (err) {
-            if (err) return reject(err)
-
-            resolve();
-          });
-    });
-}
