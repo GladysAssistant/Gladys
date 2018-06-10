@@ -1,5 +1,7 @@
 var child_process = require('child_process');
 var fs = require('fs');
+var fse = require('fs-extra');
+var path = require('path');
 var Promise = require('bluebird');
 
 module.exports = function (params){
@@ -34,6 +36,11 @@ module.exports = function (params){
             sails.log.info(`Installing NPM dependencies for module ${params.slug}`);
             return npmInstall(path);
         })
+        // copy assets if they exist in the assets folder of Gladys
+        .then(() => {
+            sails.log.info(`Copying assets...`);
+            return copyAssets(path, params.slug)
+        })
         .then(function(){
            gladys.socket.emit('moduleInstallationProgress', {step: 3, slug: params.slug});
            sails.log.info(`Dependencies installed for module ${params.slug}`);
@@ -44,6 +51,10 @@ module.exports = function (params){
             gladys.socket.emit('moduleInstallationProgress', {step: 4, module: module});
             sails.log.info(`Module ${params.slug} installed with success. Need reboot.`);
             return module;
+        })
+        .catch((err) => {
+            sails.log.error(`Module installation failed! Cleaning folder`);
+            return remove(path).then(() => Promise.reject(err));
         });
 };
 
@@ -60,6 +71,24 @@ function gitClone(url, path){
  */
 function npmInstall(path){
     return exec(`npm install --prefix ${path} > /dev/null`);
+}
+
+function copyAssets(modulePath, slug) {
+    var assetsDestinationProd = './www/hooks/' + slug;
+    var assetsDestinationDev = './assets/hooks/' + slug;
+
+    // we test if the module has an assets folder
+    return fse.pathExists(path.join(modulePath, 'assets'))
+        .then((exists) => {
+            if(exists) {
+
+                // copy all files to the folder accessible for prod start and dev start
+                return Promise.all([
+                    fse.copy(path.join(modulePath, 'assets'), assetsDestinationProd),
+                    fse.copy(path.join(modulePath, 'assets'), assetsDestinationDev)
+                ]);
+            }
+        })
 }
 
 /**
