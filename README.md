@@ -1,9 +1,7 @@
 Gladys Project
 =======================
 
-[![npm version](https://badge.fury.io/js/gladys.svg)](https://www.npmjs.com/package/gladys)
-[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys) [![Code Climate](https://codeclimate.com/github/GladysProject/Gladys/badges/gpa.svg)](https://codeclimate.com/github/GladysProject/Gladys)
-[![Join the chat at https://gitter.im/GladysProject/Gladys](https://badges.gitter.im/GladysProject/Gladys.svg)](https://gitter.im/GladysProject/Gladys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys)
 
 ![Alt](https://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
 
@@ -25,15 +23,21 @@ She wakes you up with a soft progressive warm light thanks to your Philips Hue, 
 
 This is just a simple scenario, possibilities with Gladys are just endless ! Don't hesitate to propose yours :)
 
-Interested in Gladys ? [Try it at home](http://gladysproject.com/en/installation), it's free and Open Source !
+Interested in Gladys ? Try it at home, it's free and Open-Source !
 
 **Website :** [https://gladysproject.com](http://gladysproject.com) <br>
 **Community :** [https://community.gladysproject.com/](https://community.gladysproject.com/)
 
-🎉🎉 Subscribe to our newsletter in [English](http://eepurl.com/bvg-CT) or in [French](http://eepurl.com/bUaySX) 🎉🎉
+Gladys Raspbian image has **more than 32 000 downloads**, and Gladys community has more than **3 000 members** ! 
 
+Who Am I ?
+-------------
 
-Gladys Raspbian image has **more than 26 000 downloads**, and Gladys community has more than **2 000 members** ! 
+My name is [Pierre-Gilles Leymarie](https://twitter.com/pierregillesl), I'm an indie maker, and recently I decided to move part-time on this open-source project Gladys!
+
+As I'm working completely for free for the community, you can support my work on [Patreon](https://www.patreon.com/gladysproject/overview) or [PayPal](https://www.paypal.me/gladysproject/35), to help me pay my food and rent so I'll not die 🤤😄
+
+Thanks a lot for your support 🙏
 
 Specifications
 -------------
