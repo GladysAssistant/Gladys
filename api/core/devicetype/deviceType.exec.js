@@ -22,10 +22,6 @@ function exec(param) {
             if (param.value < types[0].min || param.value > types[0].max) {
                 return Promise.reject(new Error('Incorrect value'));
             }
-
-            if (typeof gladys.modules[types[0].service].exec !== "function") {
-                return Promise.reject(new Error(`${types[0].service} does not exist or does not have an exec function`));
-            }
             
             
             // if we send true or false, it's valid
@@ -40,11 +36,26 @@ function exec(param) {
             // parseFloat value
             param.value = parseFloat(param.value);
 
+            var data = {
+                deviceType: types[0],
+                state: param
+            };
+
+            // if the device is not on this machine
+            if(types[0].machine && types[0].machine.length) {
+                sails.log.debug(`gladys.deviceType.exec : Device is not on this machine. Contacting the remote module on machine ${types[0].machine}`);
+                data.machine_id = types[0].machine;
+                data.module_slug = types[0].service;
+                gladys.emit('devicetype-exec', data);
+                return Promise.resolve(true);
+            }
+
+            if (!gladys.modules[types[0].service] || typeof gladys.modules[types[0].service].exec !== "function") {
+                return Promise.reject(new Error(`${types[0].service} does not exist or does not have an exec function`));
+            }
+
             // calling service method
-            return gladys.modules[types[0].service].exec({
-                    deviceType: types[0],
-                    state: param
-                });
+            return gladys.modules[types[0].service].exec(data);
         })
         .then(function(hasStateFeedback) {
             if(hasStateFeedback === true) return param;

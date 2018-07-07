@@ -253,6 +253,10 @@
   "module-status-0": "Installed",
   "module-status-1": "Installed, waiting for reboot",
   "module-status-2": "Installation failed",
+  "module-local": "Local/Remote",
+  "module-is-local": "Local",
+  "module-is-remote": "Remote",
+  "module-last-seen": "Active",
   "alarm-sleep-now": "Sleep now",
   "alarm-time-sleep": "Sleep time (in hours)",
   "alarm-cron-rule": "Cron rules",
@@ -330,6 +334,7 @@
   "approved": "approved",
   "pending": "pending",
   "rejected": "rejected",
+  "machine-last-seen": "Last seen",
   "box-music-title": "Music",
   "box-music-music-title": "Title",
   "box-music-music-artist": "Artist",
@@ -364,5 +369,13 @@
   "how-edit-area": "How edit an area ?",
   "how-edit-area-text": "To edit an area click on this one then on the edit button, you can then modify. You can also click on the link above.",
   "how-delete-area": "How delete an area ?",
-  "how-delete-area-text": "To delete an area click on it and delete this"
+  "how-delete-area-text": "To delete an area click on it and delete this",
+  "box-device-room-default-title": "Choose a room",
+  "box-devices-select-room": "Choose the room you want to display in this box:",
+  "box-devices-room-validate": "Save",
+  "box-device-room-title": "Device per room",
+  "module-config-view-configuration": "Configuration",
+  "module-config-view-back": "Back",
+  "module-config-view-main-tab-title": "Configuration",
+  "module-config-view-settings-tab-title": "Settings"
 }

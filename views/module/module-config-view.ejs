@@ -1,0 +1,50 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="content-wrapper" >
+    <!-- Content Header (Page header) -->
+    <section class="content-header" >
+        <h1>
+            <%= module.name %>
+            <small><%= __('module-config-view-configuration') %></small>
+        </h1>
+        <small><a href="/dashboard/module"><i class="fa fa-angle-left"></i> <%= __('module-config-view-back') %></a></small>
+        <ol class="breadcrumb">
+            <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
+            <li class="active"><%= __('Module') %></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content" >
+        <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
+            <ul class="nav nav-tabs">
+                <% if (moduleConfigViewExist) { %><li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('module-config-view-main-tab-title') %></a></li><% } %>
+                <li  <% if (!moduleConfigViewExist) { %> class="active" <% } %></li><a href="#tab_2" data-toggle="tab" aria-expanded="true" ng-click="vm.getModulesStore();"><%= __('module-config-view-settings-tab-title') %></a></li>
+                <!-- <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li> -->
+            </ul>
+            <div class="tab-content">
+                
+                <% if (moduleConfigViewExist) { %>
+                <div class="tab-pane active" id="tab_1">
+                    <%- partial (moduleConfigViewPath) %>
+                </div>
+                <% } %>
+                    <div class="tab-pane <% if (!moduleConfigViewExist) { %> active <% } %>" id="tab_2" data-ng-controller="ModuleConfigurationCtrl as vm" ng-init="vm.init(<%= module.id %>);">
+
+                        <div ng-repeat="param in vm.params" class="ng-cloak form-group row">
+                            <div class="col-sm-6">
+                                <label for="exampleInputEmail1">{{param.name}}</label>
+                                <p>{{param.description}}</p>
+                                <input type="text" class="form-control" id="exampleInputEmail1" placeholder="{{param.name}}" ng-model="param.value" ng-model-options='{ debounce: 500 }' ng-change="vm.updateParam(param.name, param);" />
+                                <hr ng-show="$index+1 < vm.params.length" />
+                            </div>                            
+                        </div>
+
+                    </div>
+            </div>
+        </div>
+    </section><!-- /.content -->
+</aside><!-- /.content-wrapper -->
+        
+<script>
+    document.getElementById("moduleLi").className = "active";
+</script>

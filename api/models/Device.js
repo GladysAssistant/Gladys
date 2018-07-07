@@ -39,6 +39,11 @@ module.exports = {
             model: 'Room',
         },
 
+        // The Gladys machine responsible of handling this device
+        machine: {
+            type: 'uuid'
+        },
+
         // if this device is linked to a user (like a phone/laptop/Smart Watch)
         user: {
             model: 'User'

@@ -28,12 +28,23 @@ var Promise = require('bluebird');
  *          // something bad happened ! :/
  *      });
  */
+module.exports = function update(machine) {
+    var promise;
+    if (machine.uuid) {
+        var uuid = machine.uuid;
+        delete machine.uuid;
+        promise = Machine.update({
+            uuid
+        }, machine);
+    } else {
+        var id = machine.id;
+        delete machine.id;
+        promise = Machine.update({
+            id
+        }, machine);
+    }
 
-module.exports = function update(machine){
-   var id = machine.id;
-   delete machine.id; 
-   return Machine.update({id}, machine)
-    .then(function(machines){
+    return promise.then((machines) => {
         if(machines.length === 0){
             return Promise.reject(new Error('NotFound'));
         } else {

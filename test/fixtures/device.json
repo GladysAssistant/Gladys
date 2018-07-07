@@ -20,5 +20,12 @@
     "protocol": "wifi",
     "service": "test",
     "room": 1
+  },
+  {
+    "id": 4,
+    "name": "Music",
+    "protocol": "wifi",
+    "service": "test",
+    "room": 2
   }
 ]

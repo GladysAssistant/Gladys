@@ -37,6 +37,15 @@ module.exports = {
           type: 'integer',
           enum: [0, 1, 2],
           defaultsTo: 1,
+      },
+
+      lastSeen: {
+        type: 'datetime'
+      },
+
+      // The machine where this module is installed
+      machine: {
+          type: 'uuid'
       }
 
   }

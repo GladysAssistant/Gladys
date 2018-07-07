@@ -9,9 +9,11 @@ var queries = require('./deviceState.queries.js');
  * @param {float} state The value of state
  * @returns {State} state
  * @example
- * var identifier = 'milight-12'
- * var service = 'milight'
- * var state = 50
+ * var identifier = 'milight-12';
+ * var service = 'milight';
+ * var state = {
+ *  value: 1
+ * };
  * 
  * gladys.deviceState.createByDeviceTypeIdentifier(identifier, service, state)
  *      .then(function(state){

@@ -82,6 +82,19 @@ module.exports = function answer(result, user) {
  */
 function trySendingMessage(newMessage, type, user) {
 
+    // if the module is not installed locally
+    if(type.machine && type.machine.length) {
+        sails.log.debug(`Module is not located locally, sending notification on machine ${type.machine}`);
+        gladys.emit('message-notify', {
+            machine_id: type.machine,
+            module_slug: type.service,
+            message: newMessage,
+            type,
+            user
+        });
+        return Promise.reject(new Error('ok'));
+    }
+
     var toCall;
 
     if (gladys.modules[type.service] && typeof gladys.modules[type.service].notify == "function") {

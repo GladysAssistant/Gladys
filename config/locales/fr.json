@@ -412,6 +412,10 @@
   "module-status-0": "Installé",
   "module-status-1": "Installé, en attente de reboot de Gladys",
   "module-status-2": "Echec de l'installation",
+  "module-local": "Local/Distant",
+  "module-is-local": "Local",
+  "module-is-remote": "Distant",
+  "module-last-seen": "Actif",
   "alarm-sleep-now": "Dormir maintenant",
   "alarm-time-sleep": "Temps de sommeil (en heures)",
   "alarm-cron-rule": "Règles cron",
@@ -489,6 +493,7 @@
   "approved": "approuvée",
   "pending": "en attente",
   "rejected": "rejetée",
+  "machine-last-seen": "Vu",
   "box-music-title": "Musique",
   "box-music-music-title": "Titre",
   "box-music-music-artist": "Artiste",
@@ -525,5 +530,13 @@
   "how-edit-area": "Comment modifier une zone ?",
   "how-edit-area-text": "Pour modifier une zone cliquez sur celle-ci puis sur le bouton modifier, vous pourrez alors la modifier. Vous pouvez aussi la déplacer en cliquant dessus et en la faisant glisser.",
   "how-delete-area": "Comment supprimer une zone ?",
-  "how-delete-area-text": "Pour supprimer une zone cliquez sur celle-ci puis sur le bouton supprimer."
+  "how-delete-area-text": "Pour supprimer une zone cliquez sur celle-ci puis sur le bouton supprimer.",
+  "box-device-room-default-title": "Choisissez une pièce",
+  "box-devices-select-room": "Sélectionnez la pièce que vous souhaitez surveiller sur cette box :",
+  "box-devices-room-validate": "Valider",
+  "box-device-room-title": "Device par pièce",
+  "module-config-view-configuration": "Configuration",
+  "module-config-view-back": "Retour",
+  "module-config-view-main-tab-title": "Configuration",
+  "module-config-view-settings-tab-title": "Paramètres"
 }

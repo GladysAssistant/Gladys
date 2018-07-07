@@ -1,7 +1,16 @@
 var fse = require('fs-extra');
 var queries = require('./module.queries.js');
+const Promise = require('bluebird');
 
-module.exports = function upgrade(params){
+module.exports = function upgrade(params) {
+
+    // if module is installed remotely
+    if(params.machine && params.machine.length){
+        params.machine_id = params.machine;
+        gladys.emit('module-upgrade', params);
+        return Promise.resolve();
+    }
+
     return gladys.utils.sqlUnique(queries.getById, [params.id])
         .then((module) => {
             

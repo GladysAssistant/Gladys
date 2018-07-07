@@ -38,13 +38,17 @@ module.exports = {
             model: 'House'
         },
 
-        host: {
-            type: 'string'
+        room: {
+            model: 'Room'
         },
 
         me: {
             type: 'boolean',
             defaultsTo: false
+        },
+
+        lastSeen: {
+            type: 'datetime'
         }
 
     }
