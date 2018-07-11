@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:8-alpine
 
 # Create src folder
 RUN mkdir /src
