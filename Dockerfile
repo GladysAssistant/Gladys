@@ -8,9 +8,9 @@ RUN mkdir /src
 
 WORKDIR /src
 ADD . /src
-RUN npm install --unsafe-perm
+RUN npm install
 
-RUN npm install -g grunt-cli  --unsafe-perm
+RUN npm install -g grunt-cli
 RUN grunt buildProd
 
 # Export listening port
