@@ -184,3 +184,8 @@ Gladys it's not just a project, it's a community of people. And we like to meet 
 See more on our Instagram account:
 
 [![Alt](https://gladysproject.com/assets/images/external/screenshot-instagram.png)](https://www.instagram.com/gladysproject/)
+
+Copyright & License
+-------------
+
+Copyright (c) 2013-2018 Gladys Project - Released under the [MIT license](https://github.com/GladysProject/Gladys/blob/master/LICENSE).
