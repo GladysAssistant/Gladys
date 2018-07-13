@@ -169,12 +169,10 @@ Links
 - [Website](https://gladysproject.com)
 - [Community](https://community.gladysproject.com/)
 - [Developer Website](https://developer.gladysproject.com)
+- [Patreon](https://www.patreon.com/gladysproject/overview)
 - [Twitter](https://twitter.com/gladysproject)
 - [Instagram](https://www.instagram.com/gladysproject/)
 - [Facebook](https://www.facebook.com/gladysproject)
-- [English Newsletter](http://eepurl.com/bvg-CT)
-- [French Newsletter](http://eepurl.com/bUaySX)
-
 
 Community
 -------------
