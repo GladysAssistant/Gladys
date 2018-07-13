@@ -1,4 +1,7 @@
-FROM node:carbon
+FROM node:8-alpine
+
+# Add tzdata for timezone settings
+RUN apk add --no-cache tzdata
 
 # Create src folder
 RUN mkdir /src
