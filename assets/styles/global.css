@@ -44,3 +44,7 @@
   overflow: auto !important;
   white-space: normal !important;
 }
+
+.notification-text{
+  margin-top: 5px;
+}
