@@ -554,5 +554,10 @@
   "login-forgot-my-password": "J'ai oublié mon mot de passe",
   "forgot-password-title": "Mot de passe oublié",
   "forgot-password-button": "Confirmer",
-  "forgot-password-done-text": "Si le compte existe, un lien de réinitialisation de votre mot de passe a été affiché dans les logs Gladys."
+  "forgot-password-done-text": "Si le compte existe, un lien de réinitialisation de votre mot de passe a été affiché dans les logs Gladys.",
+  "reset-password-title": "Mot de passe oublié",
+  "reset-password-new-password": "Nouveau mot de passe",
+  "reset-password-button": "Changer mon mot de passe",
+  "reset-password-minimum-size-warning": "(Minimum 8 caractères)",
+  "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer."
 }

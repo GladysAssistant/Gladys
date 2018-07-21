@@ -39,7 +39,8 @@ module.exports = {
 	forgotPassword: function(req, res, next){
 		res.view('welcome/forgotpassword', {
 			layout: null,
-			done: false
+			done: false,
+			resetPasswordFailed: (req.query.error == 'true')
 		});	
 	},
 
@@ -68,7 +69,10 @@ module.exports = {
 			.then(() => {
 				return res.redirect('/login');
 			})
-			.catch(next);
+			.catch((err) => {
+				sails.log.error(err);
+				return res.redirect('/forgotpassword?error=true');
+			});
 	},
     
     installation: function(req, res, next){

@@ -389,5 +389,14 @@
   "module-config-view-main-tab-title": "Configuration",
   "module-config-view-settings-tab-title": "Settings",
   "module-config-view-configuration-button": "Configuration",
-  "module-config-view-configuration-sentence": "This module expose a configuration function. Read carefully the installation instructions, and when you want to configure, click on this button:"
+  "module-config-view-configuration-sentence": "This module expose a configuration function. Read carefully the installation instructions, and when you want to configure, click on this button:",
+  "login-forgot-my-password": "I forgot my password",
+  "forgot-password-title": "Forgot password",
+  "forgot-password-button": "Confirm",
+  "forgot-password-done-text": "If this account exist, a reset password link has been displayed in Gladys logs.",
+  "reset-password-title": "Forgot password",
+  "reset-password-new-password": "New Password",
+  "reset-password-button": "Change my password",
+  "reset-password-minimum-size-warning": "(Minimum 8 characters)",
+  "forgot-password-reset-failed": "Your password was not changed. Maybe the link was not valid anymore (It is valid only 2 hours), or maybe your password length was too low. Please try again."
 }
