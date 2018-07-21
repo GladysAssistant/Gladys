@@ -50,8 +50,9 @@ var translationsEN = {
         UPDATE_DATA_FAIL: 'Failed to updated data : '
     },
     USER: {
-        UPDATED_SUCCESS: 'User updated with success : ',
-        UPDATED_FAILURE: 'Failed to update user : '
+        UPDATED_SUCCESS: 'User updated with success! If you changed your language, please reload this page.',
+        UPDATED_FAILURE: 'Failed to update user : ',
+        PASSWORD_UPDATED_SUCCESS: 'Password updated with success!'
     },
     EVENT: {
         CREATED_SUCCESS_NOTIFICATION: 'Event created with success : ',
@@ -148,8 +149,9 @@ var translationsFR = {
         UPDATE_DATA_FAIL: 'Erreur lors de la mise à jour des données : '
     },
     USER: {
-        UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès : ',
-        UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : '
+        UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès. Si vous avez modifié votre langue, merci de recharger cette page.',
+        UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : ',
+        PASSWORD_UPDATED_SUCCESS: 'Mot de passe mis à jour avec succès !'
     },
     EVENT: {
         CREATED_SUCCESS_NOTIFICATION: 'Event créé avec succès : ',

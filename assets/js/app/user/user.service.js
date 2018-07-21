@@ -16,7 +16,8 @@
             get: get,
             destroy: destroy,
             update: update,
-            whoAmI: whoAmI
+            whoAmI: whoAmI,
+            changePassword: changePassword
         };
         
         var user = null;
@@ -52,6 +53,15 @@
         
         function update(id, user){
              return $http({method: 'PATCH', url: '/user/' + id, data: user });
+        }
+
+        function changePassword(id, oldPassword, newPassword, newPasswordRepeat){
+            var params = {
+                oldPassword: oldPassword,
+                newPassword: newPassword,
+                newPasswordRepeat: newPasswordRepeat
+            };
+            return $http({method: 'PATCH', url: '/user/' + id + '/password', data: params});
         }
         
         function destroy(id){
