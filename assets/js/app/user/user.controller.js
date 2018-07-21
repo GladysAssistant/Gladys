@@ -15,6 +15,12 @@
     vm.createUser = createUser;
     vm.deleteUser = deleteUser;
 
+    
+    vm.changePassword = changePassword;
+    vm.changePasswordErrorPasswordTooLow = false;
+    vm.changePasswordPasswordNotMatching = false;
+    vm.changePasswordOldPasswordInvalid = false;
+
     vm.users = [];
     
     activate();
@@ -63,6 +69,7 @@
     function get(){
         userService.whoAmI()
           .then(function(user){
+              user.preparationTimeAfterWakeUp = user.preparationTimeAfterWakeUp/60;
               vm.user = user;
           });
     }
@@ -75,10 +82,19 @@
     }
 
     function updateUser(id, user){
-        userService.update(id, user)
-          .then(function(data){
+        var newUser = {
+            firstname: user.firstname,
+            lastname: user.lastname, 
+            email: user.email,
+            gender: user.gender,
+            language: user.language,
+            preparationTimeAfterWakeUp: user.preparationTimeAfterWakeUp*60
+        };
+        userService.update(id, newUser)
+          .then(function(data) {
+              data.data.preparationTimeAfterWakeUp = data.data.preparationTimeAfterWakeUp/60;
               vm.user = data.data;
-              notificationService.successNotificationTranslated('USER.UPDATED_SUCCESS', vm.user.firstname);
+              notificationService.successNotificationTranslated('USER.UPDATED_SUCCESS');
           })
           .catch(function(err){
               if(err.data && err.data.details){
@@ -87,6 +103,45 @@
                 notificationService.errorNotificationTranslated('USER.UPDATED_FAILURE', vm.user.firstname);
               }
           });
+    }
+
+    function changePassword(id, oldPassword, newPassword, newPasswordRepeated) {
+
+        // reset errors
+        vm.changePasswordErrorPasswordTooLow = false;
+        vm.changePasswordPasswordNotMatching = false;
+        vm.changePasswordOldPasswordInvalid = false;
+
+        if(!newPassword){
+            vm.changePasswordErrorPasswordTooLow = true;
+            return;
+        }
+        
+        if(newPassword.length < 8) {
+            vm.changePasswordErrorPasswordTooLow = true;
+            return;
+        }
+
+        if(newPassword != newPasswordRepeated){
+            vm.changePasswordPasswordNotMatching = true;
+            return;
+        }
+
+        userService.changePassword(id, oldPassword, newPassword, newPasswordRepeated)
+            .then(function() {
+                vm.oldPassword = '';
+                vm.newPassword = '';
+                vm.newPasswordRepeated = '';
+                vm.changePasswordErrorPasswordTooLow = false;
+                vm.changePasswordPasswordNotMatching = false;
+                notificationService.successNotificationTranslated('USER.PASSWORD_UPDATED_SUCCESS');
+            })
+            .catch(function(err) {
+                if(err.data && err.data.code === 'OLD_PASSWORD_INVALID') {
+                    vm.changePasswordOldPasswordInvalid = true;
+                }
+                console.log(err.data);
+            });
     }
 
     function validUser(){

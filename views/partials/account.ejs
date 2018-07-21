@@ -1,4 +1,5 @@
 <div data-ng-controller="UserCtrl as vm">
+
 <!-- NEW BOX -->
 <div class="box skin-box box-primary" >
     <div class="box-header with-border">
@@ -9,34 +10,101 @@
             <%= __('user-box-description') %>
             </p>
 
-            <table id="example2" class="table table-bordered table-hover ng-cloak">
-                <thead>
-                    <tr>
-                        <th><%= __('user-name') %></th>
-                        <th><%= __('user-infos') %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><%= __('user-id') %></td><td>{{vm.user.id}}</td></tr>
-                    <tr><td><%= __('user-firstname') %></td><td><input type="text" ng-model="vm.user.firstname" class="form-control" /></td></tr>
-                    <tr><td><%= __('user-lastname') %></td><td><input type="text" ng-model="vm.user.lastname" class="form-control" /></td></td></tr>
-                    <tr><td><%= __('user-email') %></td><td><input type="text" ng-model="vm.user.email" class="form-control" /></td></td></tr>
-                    <tr><td><%= __('user-preparation-time') %></td><td><input type="text" ng-model="vm.user.preparationTimeAfterWakeUp" class="form-control" /></td></td></tr>
-                    <tr><td><%= __('user-gender') %></td><td>
+            <div class="row">
+                <div class="col-md-4">
+                        <div class="form-group">
+                            <label><%= __('user-id') %></label>
+                            <input class="form-control" disabled="disabled" value="{{vm.user.id}}"/>
+                        </div>
+            
+                        <div class="form-group">
+                            <label><%= __('user-firstname') %></label>
+                            <input type="text" ng-model="vm.user.firstname" class="form-control" placeholder="<%= __('user-firstname') %>" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-lastname') %></label>
+                            <input type="text" ng-model="vm.user.lastname" class="form-control" placeholder="<%= __('user-lastname') %>" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-email') %></label>
+                            <input type="email" ng-model="vm.user.email" class="form-control" placeholder="<%= __('user-email') %>" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-gender') %></label>
                             <select ng-model="vm.user.gender" class="form-control">
                                 <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
                                 <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
                             </select>
-                        </td></td>
-                    </tr>
-                    <tr><td><button class="btn btn-flat btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button></td></tr>
-                </tbody>
-            </table>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="countrycode"><%= __('installation-language') %></label>
+                            <select class="form-control" id="countrycode"  ng-model="vm.user.language" placeholder="<%= __('installation-language') %>">
+                                <option value="en-US">English</option>
+                                <option value="fr-FR">Français</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-preparation-time') %></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" ng-model="vm.user.preparationTimeAfterWakeUp" placeholder="<%= __('user-preparation-time') %>">
+                                <span class="input-group-addon"> <%= __('user-preparation-time-unit') %></span>
+                            </div>
+                            <span class="help-block"><%= __('user-preparation-time-explanation') %></span>
+                        </div>
+
+
+                        <div class="form-group">
+                                <button class="btn btn-flat btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button>
+                        </div>
+                </div>
+            </div>
+        </div>  
+</div>
+
+<div class="box skin-box box-primary" >
+    <div class="box-header with-border">
+        <h3 class="box-title"><%= __('user-password-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+    </div> 
+        <div class="box-body table-responsive" >
+
+            <div class="row">
+                <div class="col-md-4">
+
+                        <p class="bg-danger" ng-show="vm.changePasswordErrorPasswordTooLow" style="padding:15px;"><%= __('user-change-password-size-too-low') %></p>
+                        <p class="bg-danger" ng-show="vm.changePasswordPasswordNotMatching" style="padding:15px;"><%= __('user-change-password-password-not-matching') %></p>
+                        <p class="bg-danger" ng-show="vm.changePasswordOldPasswordInvalid" style="padding:15px;"><%= __('user-change-password-old-password-invalid') %></p>
+                        
+                        <div class="form-group">
+                            <label><%= __('user-old-password') %></label>
+                            <input type="password" ng-model="vm.oldPassword" class="form-control" placeholder="<%= __('user-old-password') %>" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-new-password') %></label>
+                            <input type="password" ng-model="vm.newPassword" class="form-control" placeholder="<%= __('user-new-password') %>" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%= __('user-new-password-repeat') %></label>
+                            <input type="password" ng-model="vm.newPasswordRepeat" class="form-control" placeholder="<%= __('user-new-password-repeat') %>" />
+                        </div>
+
+
+                        <div class="form-group">
+                                <button class="btn btn-flat btn-success" ng-click="vm.changePassword(vm.user.id, vm.oldPassword, vm.newPassword, vm.newPasswordRepeat);"><%= __('account-update-password') %></button>
+                        </div>
+                </div>
+            </div>
         </div>  
 </div>
 
 <div class="ng-cloak">
+
 <div class="box skin-box box-primary" ng-if="vm.user.role === 'admin'">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
@@ -68,6 +136,7 @@
 
         </div>  
 </div>
+
 </div>
 
    <!-- MODAL -->
@@ -137,10 +206,9 @@
                                             <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
                                                 <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
                                                 <div class="col-sm-8">
-                                                <select class="form-control" id="countrycode"  ng-model="vm.newUser.language">
+                                                <select class="form-control" id="countrycode"  ng-model="vm.newUser.language" placeholder="<%= __('installation-language') %>">
                                                     <option value="en-US">English</option>
                                                     <option value="fr-FR">Français</option>
-                                                    <option value="es">Espagnol</option>
                                                 </select>
                                                 </div>
                                             </div>
