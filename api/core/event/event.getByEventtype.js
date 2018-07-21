@@ -2,22 +2,20 @@ var queries = require('./event.queries.js');
 
 /**
  * @public
- * @description This function return all events
- * @name gladys.event.get
+ * @description This function return all events of one eventtype
+ * @name gladys.event.getByEventtype
  * @param {Object} options
  * @param {integer} options.take The number of events to return (optional)
  * @param {integer} options.skip The number of events to skip (optional)
- * @param {Object} options.user
- * @param {Object} user
- * @param {integer} user.id Th id of user 
+ * @param {Object} options.eventtype The id of eventtype
  * @returns {Array<events>} events
  * @example
  * var options = {
- *      user = {id: 1},
+ *      eventtype: 1,
  *      take: 50,
  *      skip: 0
  * }
- * gladys.event.get(options)
+ * gladys.event.getByEventtype(options)
  *      .then(function(events){
  *          // do something
  *      })
@@ -28,5 +26,5 @@ module.exports = function(options){
     options.skip = parseInt(options.skip) || 0;
     options.take = parseInt(options.take) || 50;
 
-    return gladys.utils.sql(queries.getByUser, [options.user.id, options.take, options.skip]);
+    return gladys.utils.sql(queries.getByEventtype, [options.eventtype, options.take, options.skip]);
 };
