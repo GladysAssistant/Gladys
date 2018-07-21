@@ -28,7 +28,7 @@
                     <%- partial (moduleConfigViewPath) %>
                 </div>
                 <% } %>
-                    <div class="tab-pane <% if (!moduleConfigViewExist) { %> active <% } %>" id="tab_2" data-ng-controller="ModuleConfigurationCtrl as vm" ng-init="vm.init(<%= module.id %>);">
+                    <div class="tab-pane <% if (!moduleConfigViewExist) { %> active <% } %>" id="tab_2" data-ng-controller="ModuleConfigurationCtrl as vm" ng-init="vm.init(<%= module.id %>, '<%= module.slug %>');">
 
                         <div ng-repeat="param in vm.params" class="ng-cloak form-group row">
                             <div class="col-sm-6">
@@ -38,6 +38,21 @@
                                 <hr ng-show="$index+1 < vm.params.length" />
                             </div>                            
                         </div>
+                        
+                        <% if(configurationFunctionExist) { %>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p><%= __('module-config-view-configuration-sentence') %></p>
+                                    <button class="btn btn-flat btn-success" ng-click="vm.startModuleSetup();">
+                                            <%= __('module-config-view-configuration-button') %>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% } %>
 
                     </div>
             </div>

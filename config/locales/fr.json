@@ -538,5 +538,7 @@
   "module-config-view-configuration": "Configuration",
   "module-config-view-back": "Retour",
   "module-config-view-main-tab-title": "Configuration",
-  "module-config-view-settings-tab-title": "Paramètres"
+  "module-config-view-settings-tab-title": "Paramètres",
+  "module-config-view-configuration-button": "Configuration",
+  "module-config-view-configuration-sentence": "Votre module expose une fonction de configuration. Lisez précisement les instructions d'installation du module, et si il mentionne de lancer une configuration, appuyez sur ce bouton :"
 }

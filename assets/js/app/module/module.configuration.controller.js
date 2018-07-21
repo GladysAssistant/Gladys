@@ -14,11 +14,13 @@
         
         vm.init = init;
         vm.updateParam = updateParam;
+        vm.startModuleSetup = startModuleSetup;
         
         vm.moduleId;
 
-        function init(moduleId){
+        function init(moduleId, moduleSlug){
             vm.moduleId = moduleId;
+            vm.moduleSlug = moduleSlug;
             getParam(moduleId);
         }
 
@@ -35,6 +37,16 @@
               .then(function(){
                  vm.saving = false; 
               });
+        }
+
+        function startModuleSetup(){
+            moduleService.config(vm.moduleSlug)
+                .then(function(){
+                    notificationService.successNotificationTranslated('MODULE.CONFIG_SUCCESS_NOTIFICATION');
+                })
+                .catch(function(err) {
+                    notificationService.errorNotificationTranslated('MODULE.CONFIG_FAIL_NOTIFICATION');
+                });
         }
 
         

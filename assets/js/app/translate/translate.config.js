@@ -37,7 +37,7 @@ var translationsEN = {
         TEXT_CANNOT_BE_EMPTY: 'Message text cannot be empty.'
     },
     MODULE: {
-        CONFIG_FAIL_NOTIFICATION: 'Module configuration failed.',
+        CONFIG_FAIL_NOTIFICATION: 'Module configuration failed. Please look at Gladys logs to see what happened.',
         CONFIG_SUCCESS_NOTIFICATION: 'Module configured with success !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installed with success : ',
         INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : ',
@@ -135,7 +135,7 @@ var translationsFR = {
         TEXT_CANNOT_BE_EMPTY: 'Un message ne peut pas être vide.'
     },
     MODULE: {
-        CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module.',
+        CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module. Regardez les logs Gladys pour voir ce qui s\'est mal déroulé.',
         CONFIG_SUCCESS_NOTIFICATION: 'Le module a été configuré avec succès !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installé avec succès : ',
         INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : ',
