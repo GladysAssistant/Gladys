@@ -136,7 +136,10 @@ module.exports = {
     req.body.id = req.params.id;
     gladys.user.changePassword(req.body)
       .then((user) => res.json(user))
-      .catch(next);
+      .catch((err) => {
+        if(err.message) return res.badRequest({code:err.message});
+        else return next(err);
+      });
    },
    
    /**
