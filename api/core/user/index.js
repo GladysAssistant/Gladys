@@ -1,4 +1,5 @@
 
+module.exports.changePassword = require('./user.changePassword.js');
 module.exports.create = require('./user.create.js');
 module.exports.delete = require('./user.delete.js');
 module.exports.login = require('./user.login.js');

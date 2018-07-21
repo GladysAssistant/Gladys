@@ -115,6 +115,29 @@ module.exports = {
          })
          .catch(next);
    },
+
+     /**
+   * @api {patch} /user/:id/password change my password
+   * @apiName updateUserPassword
+   * @apiGroup User
+   * @apiPermission authenticated
+   * 
+   * @apiParam {string} oldPassword The old password of the account
+   * @apiParam {string} newPassword The new password for the account
+   * @apiParam {string} newPasswordRepeat The new password repeated
+   * 
+   * @apiUse UserSuccess
+   */
+   changePassword: function(req, res, next){
+    if(req.params.id != req.session.User.id){
+      return res.forbidden('You cannot modify another user than you.');
+    }
+
+    req.body.id = req.params.id;
+    gladys.user.changePassword(req.body)
+      .then((user) => res.json(user))
+      .catch(next);
+   },
    
    /**
    * @api {delete} /user/:id delete a user

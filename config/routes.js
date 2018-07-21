@@ -279,6 +279,7 @@ module.exports.routes = {
   'post /user': 'UserController.create',
   'post /user/login': 'UserController.login',
   'patch /user/:id': 'UserController.update',
+  'patch /user/:id/password': 'UserController.changePassword',
   'delete /user/:id': 'UserController.delete',
   'get /user/whoami': 'UserController.whoami',
   'post /user/:user_id/house/:house_id/seen': 'UserController.seen',

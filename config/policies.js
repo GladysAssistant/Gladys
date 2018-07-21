@@ -96,7 +96,8 @@ module.exports.policies = {
     delete: ['checkToken', 'isAdmin'],
     update: ['checkToken'],
     whoami: ['checkToken'],
-    seen: ['checkToken']
+    seen: ['checkToken'],
+    changePassword: ['checkToken']
   },
   Welcome : {
     index: [],
