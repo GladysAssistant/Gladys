@@ -55,6 +55,30 @@ module.exports = function(oldVersion) {
             .then(() => gladys.task.dbMigration('3.8.1'));
     }
 
+    if(semver.lt(oldVersion, '3.9.0')) {
+
+        // device
+        return gladys.utils.sql(`ALTER TABLE device ADD COLUMN machine varchar(255) DEFAULT NULL;`).reflect()
+
+            // machine
+            .then(() => gladys.utils.sql(`ALTER TABLE machine DROP COLUMN host;`).reflect())
+            .then(() => gladys.utils.sql(`ALTER TABLE machine ADD COLUMN room integer DEFAULT NULL;`).reflect())
+            .then(() => gladys.utils.sql(`ALTER TABLE machine ADD COLUMN lastSeen datetime DEFAULT NULL;`).reflect())
+
+            // module
+            .then(() => gladys.utils.sql(`ALTER TABLE module ADD COLUMN lastSeen datetime DEFAULT NULL;`).reflect())
+            .then(() => gladys.utils.sql(`ALTER TABLE module ADD COLUMN machine varchar(255) DEFAULT NULL;`).reflect())
+
+            // param 
+            .then(() => gladys.utils.sql(`ALTER TABLE param ADD COLUMN description varchar(255) DEFAULT NULL;`).reflect())
+            .then(() => gladys.utils.sql(`ALTER TABLE param ADD COLUMN type varchar(255) DEFAULT NULL;`).reflect())
+            .then(() => gladys.utils.sql(`ALTER TABLE param ADD COLUMN module integer DEFAULT NULL;`).reflect())
+
+            // finishing migration
+            .then(() => gladys.task.updateDbVersion('3.9.0'))
+            .then(() => gladys.task.dbMigration('3.9.0'));
+    }
+
     // default, we save in DB the current version of Gladys
     return gladys.task.updateDbVersion(gladys.version);
 };
