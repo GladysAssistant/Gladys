@@ -35,6 +35,41 @@ module.exports = {
 			signupActive: sails.config.signup.active
 		});	
 	},
+
+	forgotPassword: function(req, res, next){
+		res.view('welcome/forgotpassword', {
+			layout: null,
+			done: false
+		});	
+	},
+
+	postForgotPassword: function(req, res, next){
+
+		// we catch any errors, we don't want to tell if a user exist or not
+		gladys.user.forgotPassword({email: req.body.email})
+			.catch(() => null)
+			.then(() => {
+				res.view('welcome/forgotpassword', {
+					layout: null,
+					done: true
+				});	
+			});
+	},
+
+	resetPassword: function(req, res, next) {
+		res.view('welcome/resetpassword', {
+			layout: null,
+			token: req.query.token
+		});
+	},
+
+	postResetPassword: function(req, res, next){
+		gladys.user.resetPassword(req.body.password, req.body.token)
+			.then(() => {
+				return res.redirect('/login');
+			})
+			.catch(next);
+	},
     
     installation: function(req, res, next){
         res.view('installation/index', {

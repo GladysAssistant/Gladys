@@ -102,6 +102,10 @@ module.exports.policies = {
   Welcome : {
     index: [],
     login: [],
+    forgotPassword: [],
+    resetPassword: [],
+    postForgotPassword: [],
+    postResetPassword: [],
     installation: ['signupAllowed']
   },
   Weather : ['checkToken'],

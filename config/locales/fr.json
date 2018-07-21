@@ -550,5 +550,9 @@
   "module-config-view-main-tab-title": "Configuration",
   "module-config-view-settings-tab-title": "Paramètres",
   "module-config-view-configuration-button": "Configuration",
-  "module-config-view-configuration-sentence": "Votre module expose une fonction de configuration. Lisez précisement les instructions d'installation du module, et si il mentionne de lancer une configuration, appuyez sur ce bouton :"
+  "module-config-view-configuration-sentence": "Votre module expose une fonction de configuration. Lisez précisement les instructions d'installation du module, et si il mentionne de lancer une configuration, appuyez sur ce bouton :",
+  "login-forgot-my-password": "J'ai oublié mon mot de passe",
+  "forgot-password-title": "Mot de passe oublié",
+  "forgot-password-button": "Confirmer",
+  "forgot-password-done-text": "Si le compte existe, un lien de réinitialisation de votre mot de passe a été affiché dans les logs Gladys."
 }
