@@ -140,7 +140,6 @@
                 if(err.data && err.data.code === 'OLD_PASSWORD_INVALID') {
                     vm.changePasswordOldPasswordInvalid = true;
                 }
-                console.log(err.data);
             });
     }
 
