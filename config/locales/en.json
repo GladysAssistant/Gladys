@@ -377,5 +377,7 @@
   "module-config-view-configuration": "Configuration",
   "module-config-view-back": "Back",
   "module-config-view-main-tab-title": "Configuration",
-  "module-config-view-settings-tab-title": "Settings"
+  "module-config-view-settings-tab-title": "Settings",
+  "module-config-view-configuration-button": "Configuration",
+  "module-config-view-configuration-sentence": "This module expose a configuration function. Read carefully the installation instructions, and when you want to configure, click on this button:"
 }

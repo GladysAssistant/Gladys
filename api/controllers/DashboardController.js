@@ -41,7 +41,8 @@ module.exports = {
         var moduleConfigViewPath = `${BASE_PATH}/api/hooks/${module.slug}/views/configuration.ejs`;
         fs.access(moduleConfigViewPath, fs.constants.F_OK, (err) => {
           var moduleConfigViewExist = !err;
-          res.view('module/module-config-view', { User: req.session.User, pageName: req.__('pagename-module'), module, moduleConfigViewPath, moduleConfigViewExist});
+          var configurationFunctionExist = (gladys.modules[module.slug] && gladys.modules[module.slug].setup && typeof gladys.modules[module.slug].setup === 'function');
+          res.view('module/module-config-view', { User: req.session.User, pageName: req.__('pagename-module'), module, moduleConfigViewPath, moduleConfigViewExist, configurationFunctionExist});
         });        
       })
       .catch(next);
