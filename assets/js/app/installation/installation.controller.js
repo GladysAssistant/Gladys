@@ -175,7 +175,7 @@
         }
         
         // check if password size is good
-        if(vm.newUser.password.length < 5){
+        if(vm.newUser.password.length < 8){
             vm.invalidPassword = true;
             valid = false;  
         }
