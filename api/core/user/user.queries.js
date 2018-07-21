@@ -5,5 +5,6 @@ module.exports = {
   getAdmin: 'SELECT id, firstname, lastname, email, birthdate, gender, language, assistantName, preparationTimeAfterWakeUp, role, createdAt, updatedAt FROM user WHERE role = "admin";',
   getById: 'SELECT id, firstname, lastname, email, birthdate, gender, language, assistantName, preparationTimeAfterWakeUp, role, createdAt, updatedAt FROM user WHERE id = ?;',
   getAllById: 'SELECT * FROM user WHERE id = ?;',
-  delete: 'DELETE FROM user WHERE id = ?;' 
+  delete: 'DELETE FROM user WHERE id = ?;',
+  getParamUserByValue: 'SELECT * FROM paramuser WHERE value = ?;' 
 };
