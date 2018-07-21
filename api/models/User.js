@@ -77,17 +77,22 @@ module.exports = {
     },
 
     beforeUpdate: function(values, next){
+
+        if(values.password) {
         
-        if(values.password.length < 8) {
-            return next('PASSWORD_SIZE_TOO_LOW');
-        }
+            if(values.password.length < 8) {
+                return next('PASSWORD_SIZE_TOO_LOW');
+            }
 
-        bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
-            if (err) return next(err);
-            values.password = encryptedPassword;
+            bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
+                if (err) return next(err);
+                values.password = encryptedPassword;
 
+                next();
+            });
+        } else {
             next();
-        });
+        }
     }
 
 };
