@@ -28,7 +28,6 @@ var Promise = require('bluebird');
  */
 
 module.exports = function create (location) {
-   sails.log.debug(`gladys.location.create : Create location for user ${location.user}`);
    location.datetime = location.datetime || new Date();
   
   // we check if the user did not enter a new area
