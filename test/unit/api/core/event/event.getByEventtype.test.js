@@ -3,7 +3,7 @@ var validateEvent = require('../../validator/eventValidator.js');
 
 describe('Event', function() {
 
-  describe('getByEventtype', function() {
+  describe('getByEventType', function() {
     
     it('should return event by eventtype', function (done) {
 
@@ -13,7 +13,7 @@ describe('Event', function() {
             skip: 0
           };
           
-          gladys.event.getByEventtype(options)
+          gladys.event.getByEventType(options)
             .then(function(result){
                 validateEvent(result);
                 done();
