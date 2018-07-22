@@ -55,8 +55,8 @@
                                                     <p ng-switch-when="rejected"><%= __('rejected') %></p>
                                                 </td>
                                                 <td>
-                                                    <button ng-hide="['approved', 'official'].indexOf(sentence.status) != -1" class="btn btn-flat btn-primary  "  ng-click="vm.approve(sentence.id);" ><%= __('Approve') %></button>
-                                                    <button ng-hide="(sentence.status == 'rejected')" class="btn btn-flat btn-danger  "  ng-click="vm.reject(sentence.id);" ><%= __('Reject') %></button>
+                                                    <button ng-hide="['approved', 'official'].indexOf(sentence.status) != -1" class="btn btn-flat btn-primary  "  ng-click="vm.approve(sentence.id, $index);" ><%= __('Approve') %></button>
+                                                    <button ng-hide="(sentence.status == 'rejected')" class="btn btn-flat btn-danger  "  ng-click="vm.reject(sentence.id, $index);" ><%= __('Reject') %></button>
                                                 </td>
                                             </tr>
                                         </tbody>
