@@ -175,7 +175,7 @@
                                 <div class="form-group">
                                     <label for="selectDeviceType"><%= __('devices-select-device-type') %> : </label>
                                     <select name="selectDeviceType" id="selectDeviceType" class="form-control"
-                                        ng-options="deviceType.name for deviceType in vm.deviceTypes track by deviceType.id"
+                                        ng-options="(deviceType.name || deviceType.deviceName + ' - ' + deviceType.type) for deviceType in vm.deviceTypes track by deviceType.id"
                                         ng-model="vm.currentDeviceType">
                                     </select>
                                 </div>
