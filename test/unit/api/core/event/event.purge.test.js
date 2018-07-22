@@ -5,7 +5,7 @@ describe('Event', function() {
 
     describe('purge', function() {
 
-        it('should return 4 events', function(done) {
+        it('should return 1 events', function(done) {
 
             var event = {
                 params: {
@@ -20,9 +20,7 @@ describe('Event', function() {
                 .then(function(result) {
 
                     var options = {
-                        eventtype: 3,
-                        days: 1,
-                        value: 1
+                        days: 1
                     }
 
                     return gladys.event.purge(options);
@@ -38,7 +36,7 @@ describe('Event', function() {
                 .then(function(result) {
                     validateEvent(result);
                     result.should.be.instanceof(Array);
-                    result.should.have.length(4);
+                    result.should.have.length(1);
                     done();
                 })
                 .catch(done)

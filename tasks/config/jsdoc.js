@@ -74,6 +74,7 @@ module.exports = function(grunt) {
                     'Event',
                     'gladys.event.create',
                     'gladys.event.get',
+                    'gladys.event.getByEventType',
                     'EventType',
                     'gladys.eventType.create',
                     'gladys.eventType.get',
