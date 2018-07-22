@@ -54,7 +54,7 @@ module.exports = function (params){
         })
         .catch((err) => {
             sails.log.error(`Module installation failed! Cleaning folder`);
-            return remove(path).then(() => Promise.reject(err));
+            return fse.remove(path).then(() => Promise.reject(err));
         });
 };
 
