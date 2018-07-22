@@ -15,7 +15,7 @@ var queries = require('./event.queries.js');
  *      take: 50,
  *      skip: 0
  * }
- * gladys.event.getByEventtype(options)
+ * gladys.event.getByEventType(options)
  *      .then(function(events){
  *          // do something
  *      })
