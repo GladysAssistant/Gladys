@@ -7,11 +7,15 @@ RUN apk add --no-cache tzdata
 RUN mkdir /src
 
 WORKDIR /src
-ADD . /src
-RUN npm install
 
-RUN npm install -g grunt-cli
-RUN grunt buildProd
+COPY package.json /src/package.json  
+COPY yarn.lock /src/yarn.lock
+
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python git && \
+    yarn install --production && npm install -g grunt-cli && grunt buildProd && npm uninstall -g grunt-cli \
+    apk del .build-deps
+
+ADD . /src
 
 # Export listening port
 EXPOSE 8080
