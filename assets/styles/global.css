@@ -48,3 +48,7 @@
 .notification-text{
   margin-top: 5px;
 }
+
+.slider .tooltip {
+	pointer-events:none;
+}
