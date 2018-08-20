@@ -298,6 +298,7 @@
   "parameters-box-table-delete": "Supprimer",
   "parameters-box-left": "Gauche",
   "parameters-box-right": "Droite",
+  "scenario-if-condition": "La condition est validée si",
   "scenario-list": "Mes scénarios",
   "scenario-help": "Aide",
   "scenario-table-event": "Déclencheur",
@@ -562,5 +563,8 @@
   "reset-password-new-password": "Nouveau mot de passe",
   "reset-password-button": "Changer mon mot de passe",
   "reset-password-minimum-size-warning": "(Minimum 8 caractères)",
-  "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer."
+  "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer.",
+  "True": "Vraie",
+  "False": "Fausse",
+  "is": "est"
 }

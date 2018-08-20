@@ -17,6 +17,11 @@ module.exports = {
             defaultsTo: true
         },
 
+        trueIf: {
+            type: 'boolean',
+            defaultsTo: true
+        },
+
         launcher: {
             model: 'Launcher',
             required: true
