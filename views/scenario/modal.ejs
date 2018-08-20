@@ -182,7 +182,12 @@
                                 
                                  <form class="form-horizontal">
                                      
-                                    <h4>{{state.name}}</h4>
+                                   <center>
+                                       <h4>
+                                           <%= __('scenario-if-condition') %>&nbsp;&nbsp;<label class="btn btn-primary" style="cursor: default">{{state.name}}</label>&nbsp;<%= __('is') %>&nbsp;<button class="btn" ng-class="state.trueIf ? 'btn-primary' : 'btn-default'" ng-click="state.trueIf = true"><%= __('True') %></button>&nbsp;&nbsp;<button class="btn" ng-class="!state.trueIf ? 'btn-primary' : 'btn-default'" ng-click="state.trueIf = false"><%= __('False') %></button>
+                                       </h4>
+                                   </center>
+                                   <hr/>
                                    
                                    <!-- State Params -->
                                     <div class="form-group" ng-repeat="stateParam in state.params">

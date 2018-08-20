@@ -38,6 +38,7 @@ module.exports = function(params) {
                 return gladys.stateType.getByServiceFunction({service: splitted[0], function: splitted[1]})
                     .then(stateType => gladys.state.create({
                         state: stateType.id,
+                        trueIf: condition.trueIf,
                         condition_template: condition.condition_template,
                         active: condition.active,
                         launcher: launcher.id,

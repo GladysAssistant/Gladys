@@ -143,6 +143,7 @@
             var newState = {
                 launcher: vm.newLauncher.id,
                 state: stateType.id,
+                trueIf: true,
                 name: stateType.name
             };
             
