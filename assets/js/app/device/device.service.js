@@ -1,12 +1,4 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-  
+
 (function () {
     'use strict';
 
@@ -24,6 +16,7 @@
             updateDevice: updateDevice,
             deleteDevice: deleteDevice,
             getDeviceTypeByRoom: getDeviceTypeByRoom,
+            getDeviceTypeInRoom: getDeviceTypeInRoom,
             createDeviceType: createDeviceType,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
@@ -85,6 +78,10 @@
         
         function getDeviceTypeByRoom(){
             return $http({method: 'GET', url: '/devicetype/room'});
+        }
+
+        function getDeviceTypeInRoom(id){
+            return $http({method: 'GET', url: '/room/' + id + '/devicetype'});
         }
         
         // all about deviceStates

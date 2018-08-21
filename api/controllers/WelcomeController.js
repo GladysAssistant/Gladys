@@ -1,18 +1,3 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-  
-/**
- * AccueilController
- *
- * @description :: Server-side logic for managing Accueils
- * @help        :: See http://links.sailsjs.org/docs/controllers
- */
 
 module.exports = {
 
@@ -49,6 +34,45 @@ module.exports = {
 			layout: null,
 			signupActive: sails.config.signup.active
 		});	
+	},
+
+	forgotPassword: function(req, res, next){
+		res.view('welcome/forgotpassword', {
+			layout: null,
+			done: false,
+			resetPasswordFailed: (req.query.error == 'true')
+		});	
+	},
+
+	postForgotPassword: function(req, res, next){
+
+		// we catch any errors, we don't want to tell if a user exist or not
+		gladys.user.forgotPassword({email: req.body.email})
+			.catch(() => null)
+			.then(() => {
+				res.view('welcome/forgotpassword', {
+					layout: null,
+					done: true
+				});	
+			});
+	},
+
+	resetPassword: function(req, res, next) {
+		res.view('welcome/resetpassword', {
+			layout: null,
+			token: req.query.token
+		});
+	},
+
+	postResetPassword: function(req, res, next){
+		gladys.user.resetPassword(req.body.password, req.body.token)
+			.then(() => {
+				return res.redirect('/login');
+			})
+			.catch((err) => {
+				sails.log.error(err);
+				return res.redirect('/forgotpassword?error=true');
+			});
 	},
     
     installation: function(req, res, next){

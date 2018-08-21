@@ -1,43 +1,31 @@
 
 module.exports = {
   getDeviceType: `
-    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.protocol, dt.identifier as deviceTypeIdentifier, room.name as roomName
+    SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.protocol, d.machine, dt.identifier as deviceTypeIdentifier, room.name as roomName
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
     LEFT JOIN room ON d.room = room.id 
     WHERE dt.id = ?;
   `,
+  getByRooms: `
+    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
+    dt.lastValueDatetime as lastChanged, dt.lastValue AS lastValue, room.id as roomId, room.name as roomName, room.house as roomHouse, dt.name as deviceTypeName
+    FROM device d
+    JOIN devicetype dt ON d.id = dt.device
+    JOIN room ON d.room = room.id
+    WHERE ( room.id = ? OR ? IS NULL )
+  `,
    getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
-   ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+   dt.lastValueDatetime as lastChanged, dt.lastValue
    FROM device d
    JOIN devicetype dt ON (d.id = dt.device)
-   LEFT JOIN (
-      SELECT ds.devicetype, MAX(id) as id
-      FROM devicestate ds 
-      INNER JOIN (
-        SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
-      ) as dsJoin
-      WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
-      GROUP by ds.devicetype
-  ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
-   LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
    WHERE d.room = ?;
   `,
   getByDevice: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId
+    SELECT dt.*, dt.lastValueDatetime as lastChanged
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
-    LEFT JOIN (
-      SELECT ds.devicetype, MAX(id) as id
-      FROM devicestate ds 
-      INNER JOIN (
-        SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
-      ) as dsJoin
-      WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
-      GROUP by ds.devicetype
-  ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
-    LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
     WHERE dt.device = ?;
   `,
   getByIdentifier: `
@@ -49,52 +37,33 @@ module.exports = {
     AND dt.identifier = ?;
   `,
   getAll: `
-    SELECT CONCAT(d.name, " - ", dt.type) AS name, d.service, d.protocol, dt.id, dt.type, dt.tag,  dt.unit, dt.min, dt.max, dt.device, r.name AS roomName, r.id as roomId 
+    SELECT dt.name, d.service, d.protocol, dt.id, dt.type, dt.tag,  dt.unit, dt.min, dt.max, dt.device, r.name AS roomName, r.id as roomId, d.name as deviceName
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
     JOIN room r ON (d.room = r.id);
   `,
-  getByDeviceAndIdentifier: 'SELECT id FROM devicetype WHERE device = ? AND identifier = ?;',
+  getByDeviceAndIdentifier: 'SELECT * FROM devicetype WHERE device = ? AND identifier = ?;',
   delete : 'DELETE FROM devicetype WHERE id = ?;',
   deleteDeviceStates: 'DELETE FROM devicestate WHERE devicetype = ?;',
   getById: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId, room.name as roomName
-      FROM device d
-      JOIN devicetype dt ON (d.id = dt.device)
-      LEFT JOIN (
-        SELECT ds.devicetype, MAX(id) as id
-        FROM devicestate ds 
-        INNER JOIN (
-          SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
-        ) as dsJoin
-        WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
-        GROUP by ds.devicetype
-    ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
-      LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
-      LEFT JOIN room ON d.room = room.id 
-      WHERE dt.id = ?;
+    SELECT dt.*, dt.lastValueDatetime as lastChanged, room.name as roomName
+    FROM device d
+    JOIN devicetype dt ON (d.id = dt.device)
+    LEFT JOIN room ON d.room = room.id 
+    WHERE dt.id = ?;
   `, 
   getByType: `
-    SELECT dt.*, ds3.datetime as lastChanged, ds3.value AS lastValue, ds3.id AS lastValueId, room.name as roomName
-      FROM device d
-      JOIN devicetype dt ON (d.id = dt.device)
-      LEFT JOIN (
-        SELECT ds.devicetype, MAX(id) as id
-        FROM devicestate ds 
-        INNER JOIN (
-          SELECT devicetype, MAX(datetime) as datetime FROM devicestate GROUP BY devicetype
-        ) as dsJoin
-        WHERE dsJoin.devicetype = ds.devicetype AND dsJoin.datetime = ds.datetime
-        GROUP by ds.devicetype
-    ) as deviceStateJoin ON (deviceStateJoin.devicetype = dt.id)
-      LEFT JOIN devicestate ds3 ON deviceStateJoin.id = ds3.id
-      LEFT JOIN room ON d.room = room.id 
-      WHERE dt.type = ?;
+    SELECT dt.*, dt.lastValueDatetime as lastChanged, room.name as roomName
+    FROM device d
+    JOIN devicetype dt ON (d.id = dt.device)
+    LEFT JOIN room ON d.room = room.id 
+    WHERE dt.type = ?;
   `, 
 
   getDeviceTypeByCategory:
   `
-    SELECT devicetype.* FROM devicetype 
+    SELECT devicetype.* 
+    FROM devicetype 
     JOIN device ON devicetype.device = device.id 
     WHERE category = ?
     AND (room = ? OR ? IS NULL)

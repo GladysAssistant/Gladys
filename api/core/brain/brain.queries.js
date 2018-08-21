@@ -1,8 +1,10 @@
 module.exports = {
 
      getNotificationTypes: `
-        SELECT * FROM notificationtype nt
+        SELECT nt.*, module.machine 
+        FROM notificationtype nt
         JOIN notificationuser nu ON (nt.id = nu.notificationtype)
+        LEFT JOIN module ON nt.service = module.slug
         WHERE nu.user = ?
         ORDER BY nu.priority; 
     `,

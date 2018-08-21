@@ -13,7 +13,7 @@
             <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-bars"></i>
             </button> 
-            <ul class="dropdown-menu" role="menu">
+            <ul class="dropdown-menu" role="menu" style="max-height: 300px; overflow: auto">
                 <li ng-repeat="deviceType in vm.deviceTypes">
                     <a href="" ng-click="vm.currentDeviceType = deviceType">{{deviceType.name}}</a>
                 </li>

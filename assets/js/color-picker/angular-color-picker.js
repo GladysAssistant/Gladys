@@ -3,7 +3,7 @@
         return {
             restrict: 'E',
             replace: true,
-            template: '<div class="colorpicker-input" style="width:100%; height:1.5em"></div>',
+            template: '<div class="colorpicker-input" style="width:100%; height:1.5em; border: #DDDDDD; border-width: 1px; border-style: solid;"></div>',
             require: 'ngModel',
             scope: {
                 ngModel: '='

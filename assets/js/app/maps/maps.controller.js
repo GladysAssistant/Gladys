@@ -1,11 +1,3 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
   
 (function () {
     'use strict';
@@ -14,18 +6,31 @@
         .module('gladys')
         .controller('MapsCtrl', MapsCtrl);
 
-    MapsCtrl.$inject = ['geoLocationService'];
+    MapsCtrl.$inject = ['geoLocationService', 'areaService', '$translate', '$scope', 'notificationService'];
 
-    function MapsCtrl(geoLocationService) {
+    function MapsCtrl(geoLocationService, areaService, $translate, $scope, notificationService) {
         /* jshint validthis: true */
         var vm = this;
         
         var leafletMap;
         var markerUser = {};
+        var areaUser = {};
 
         var lastDrawnId = null;
         var lastDrawnPolyLine = null;
-    
+
+        vm.area = {};
+        vm.createArea = createArea;
+        vm.deleteArea = deleteArea;
+        vm.updateArea = updateArea;
+        vm.newArea = false;
+
+        var areaText;
+        var newButtonText;
+        var editButtonText;
+        var deleteButtonText;
+        var popup = L.popup();
+
         getPoints();
 
         var icon = L.icon({
@@ -64,17 +69,40 @@
         }
 
         function initMap(latitude, longitude, zoomLevel){
+            translateText()
             leafletMap = L.map('map').setView([latitude, longitude], zoomLevel);
 
-            var CartoDB_Positron = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(leafletMap);
+            
+            leafletMap.on('contextmenu', function(e){
+                vm.newArea = true;
+                vm.area = {}
+                vm.area.latitude = e.latlng.lat
+                vm.area.longitude = e.latlng.lng
+                $scope.$apply()
+                popup
+                    .setLatLng(e.latlng)
+                    .setContent('<b>' + areaText + '</b><br><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".area-modal" style="margin-top:10px">' + newButtonText + '</button>')
+                    .openOn(leafletMap)
+            })
+
+            getAreas();
+        }
+
+        function getAreas(){
+            areaService.get()
+                .then(function(data){
+                    data.data.forEach(function(area){
+                        newMapArea(area)
+                    });
+                });
         }
 
         function waitForNewValue(){
-        
             io.socket.on('newLocation', function (location) {
                 updateValue(location);
             });
@@ -109,5 +137,106 @@
                 });
         }
 
+        function createArea(area){
+            leafletMap.closePopup()
+            return areaService.create(area)
+                .then(function(data){
+                    newMapArea(data.data)
+                    vm.area = {};
+                })
+                .catch(function(err) {
+                    vm.area = {};
+                    if(err.data && err.data.code && err.data.code == 'E_VALIDATION') {
+                        for(var key in err.data.invalidAttributes) {
+                            if(err.data.invalidAttributes.hasOwnProperty(key)){
+                                notificationService.errorNotificationTranslated('AREA.INVALID_' + key.toUpperCase());
+                            }
+                        }
+                    } else {
+                        notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                    }
+                });
+        }
+
+        function updateArea(id, area){
+            return areaService.update(id, area)
+                .then(function(data){
+                    areaUser[area.id].remove()
+                    newMapArea(area)
+                });
+        }
+
+        function deleteArea(id){
+            return areaService.destroy(id)
+              .then(function(){
+                areaUser[id].remove()
+              });
+        }
+
+        function newMapArea(area){
+            areaUser[area.id] = L.circle([area.latitude, area.longitude], 
+                {id: area.id,
+                    name: area.name, 
+                    longitude: 
+                    area.longitude, 
+                    latitude: area.latitude, 
+                    radius: area.radius
+                }).addTo(leafletMap);
+
+            areaUser[area.id].on('mouseover', function(){
+                areaUser[area.id].bindTooltip(area.name).openTooltip();
+            })
+
+            areaUser[area.id].on('click', function(){
+                vm.newArea = false;
+                vm.area = {}
+                vm.area = areaUser[area.id].options;
+                $scope.$apply()
+                areaUser[area.id].bindPopup('<b>' + area.name + '</b><br><button class="btn btn-flat btn-primary" data-toggle="modal" data-target=".area-modal" style="margin-bottom:5px; margin-top:10px">' + editButtonText + '</button><br><button class="btn btn-flat btn-danger" id="deleteAreaButton">' + deleteButtonText + '</button>').openPopup();
+
+                $('#deleteAreaButton').click(function(){
+                    deleteArea(vm.area.id)
+                })
+            })
+
+            areaUser[area.id].on({'mousedown': function () {
+                    leafletMap.on('mousemove', function (e) {
+                        leafletMap.dragging.disable();
+                        areaUser[area.id].setLatLng(e.latlng);
+                        vm.area = {}
+                        vm.area = areaUser[area.id].options
+                        vm.area.latitude = e.latlng.lat
+                        vm.area.longitude = e.latlng.lng
+                        updateArea(vm.area.id, vm.area)
+                    });
+                }
+            });
+
+            leafletMap.on('mouseup',function(e){
+                leafletMap.dragging.enable();
+                leafletMap.removeEventListener('mousemove');
+            })
+
+        }
+
+        function translateText(){
+            $translate('MAPS.AREA')
+                .then(function(text) {
+                    areaText = text
+                });
+            $translate('MAPS.NEW')
+                .then(function(text) {
+                    newButtonText = text
+                });
+            $translate('MAPS.EDIT')
+                .then(function(text) {
+                    editButtonText = text
+                });
+            $translate('MAPS.DELETE')
+                .then(function(text) {
+                    deleteButtonText = text 
+                });
+            return;
+        }
     }
 })();

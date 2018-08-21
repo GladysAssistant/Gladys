@@ -1,0 +1,61 @@
+<div class="box box-success ng-cloak" data-ng-controller="DeviceRoomBoxController as vm" ng-init="vm.init(<%= boxId %>);">
+    <div class="box-header with-border">
+        <i class="fa fa-home"></i>
+        <h3 class="box-title">
+            <span ng-show="vm.selectRoom"><%= __('box-device-room-default-title') %></span>
+            <span ng-show="!vm.selectRoom">{{vm.room.name}}</span>
+        </h3>
+    </div>
+    <div class="box-body ng-cloak">
+            
+        <div ng-show="vm.selectRoom" class="ng-cloak">
+            <p><%= __('box-devices-select-room') %></p>
+            <div class="row">
+                <div class="col-xs-offset-2 col-xs-6">
+                    <select ng-model="vm.selectedRoomId" class="form-control">
+                        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+                    </select>
+                </div>
+                <div class="col-xs-2"> <button class="btn btn-success btn-flat" ng-click="vm.selectRoomId(vm.selectedRoomId);"><%= __('box-devices-room-validate') %></button>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="!vm.selectRoom">            
+            <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr ng-show="type.display" ng-repeat="type in vm.room.deviceTypes" class="ng-cloak">
+                                    <td>
+                                        <span ng-show="{{type.deviceTypeName != null}}">{{type.deviceTypeName}}</span>
+                                        <span ng-show="{{type.deviceTypeName == null}}">{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}"> - {{type.type}}</span></span>
+                                    </td>
+                                    <td>
+                                        <!-- If the deviceType is a sensor, display last data -->
+                                        <div ng-show="type.sensor == 1 && type.type != 'binary'">{{type.lastValue }} {{type.unit}}</div>
+                                        <div ng-show="type.sensor == 1 && type.type == 'binary'">
+                                            <i ng-show="type.lastValue == 1" class="fa fa-circle" aria-hidden="true"></i>
+                                            <i ng-show="type.lastValue == 0" class="fa fa-circle-o" aria-hidden="true"></i>
+                                        </div>
+                                        
+                                        
+                                        <!-- If the deviceType is not a sensor and is not a binary, display input field -->
+                                        <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+
+                                            <slider id="blue" ng-model="type.lastValue" min="type.min" step="1" max="type.max" value="type.lastValue" ng-model-options='{ debounce: 100 }' ng-change="vm.changeValue(type, type.lastValue);" ></slider>
+                                                
+                                        </form>    
+                                        <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
+                                        <div class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
+                                                <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle" ng-show="!type.sensor && type.type == 'binary'"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+            </div>
+        </div> 
+    </div>
+</div>

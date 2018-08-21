@@ -3,6 +3,37 @@ module.exports = create;
 var Promise = require('bluebird');
 var queries = require('./notification.queries.js');
 
+/**
+ * @public
+ * @description This function create an notification
+ * @name gladys.notification.create
+ * @param {Object} options
+ * @param {String} options.title The title of the notification
+ * @param {String} options.text The text of the notification
+ * @param {String} options.link The link of view
+ * @param {String} options.icon The icon of the notification
+ * @param {String} options.iconColor The icon color of the notification icon
+ * @param {User} options.user The id of the user of the notification
+ * @returns {Notification} notification
+ * @example
+ * var options = {
+ *      title: "Update available !",
+ *      text: "Gladys Update 3.8.0 is available",
+ *      link: "/dashboard"
+ *      icon: "fa fa-refresh",
+ *      iconColor: "bg-light-blue",
+ *      user: 1
+ * }
+ * 
+ * gladys.notification.create(options)
+ *      .then(function(notification){
+ *          // notification created
+ *      })
+ *      .catch(function(err){
+ *          // something bad happened ! :/
+ *      });
+ */
+
 function create(options) {
 
     // handle scenarios
@@ -38,7 +69,12 @@ function create(options) {
 function startService(notification, type, user) {
 
     var notify = null;
-    if(gladys[type.service] && typeof gladys[type.service].notify === "function"){
+
+    if(type.machine && type.machine.length) {
+        sails.log.debug(`Notification module is not located on this machine, sending message on machine ${type.machine}`);
+        gladys.emit('notification-notify', {notification, user, machine_id: type.machine, module_slug: type.service});
+        return Promise.reject(new Error('ok'));
+    } else if(gladys[type.service] && typeof gladys[type.service].notify === "function"){
         notify = gladys[type.service].notify;
     } else if (gladys.modules[type.service] || typeof gladys.modules[type.service].notify === "function") {
         notify = gladys.modules[type.service].notify;

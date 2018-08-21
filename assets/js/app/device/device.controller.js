@@ -1,12 +1,3 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-  
   
 (function () {
   'use strict';
@@ -35,7 +26,8 @@
     vm.nbElementToGet = 50;
     vm.remoteIsBusy = false;
     vm.noMoreElements = false;
-
+    vm.getDeviceTypesByRoom = getDeviceTypesByRoom;
+    
     vm.saving = false;
     vm.ready = false;
     vm.devices = [];
@@ -85,7 +77,16 @@
     function getDeviceTypesByRoom(){
        return deviceService.getDeviceTypeByRoom()
          .then(function(data){
-            vm.roomDeviceTypes = data.data; 
+            vm.roomDeviceTypes = [];
+
+            // only display rooms that have devices inside
+            data.data.forEach(function (room) {
+                var numberOfDevices = 0;
+                room.deviceTypes.forEach(function (deviceType) {
+                    if(deviceType.display) numberOfDevices++;
+                });
+                if(numberOfDevices > 0) vm.roomDeviceTypes.push(room);
+            });
          });
     }
     
@@ -224,12 +225,27 @@
         
         io.socket.on('newDeviceState', function (deviceState) {
             updateValueType(deviceState);
+            updateRoomView(deviceState);
         });
 
         io.socket.on('newDevice', function (result) {
             vm.devices.push(result.device);
             $scope.$apply();
         });
+    }
+
+    function updateRoomView(newDeviceState) {
+        if(vm.roomDeviceTypes instanceof Array) {
+            vm.roomDeviceTypes.forEach(function(room) {
+                room.deviceTypes.forEach(function(type){
+                    if(type.id === newDeviceState.devicetype){
+                        type.lastValue = newDeviceState.value;
+                        type.lastChanged = newDeviceState.datetime;
+                        $scope.$apply();
+                    }
+                });
+            });
+        }
     }
     
     

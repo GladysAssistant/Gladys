@@ -19,12 +19,11 @@
             <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('parameters-general') %></a></li>
             <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('parameters-house') %></a></li>
-            <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('parameters-areas') %></a></li>
-            <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><%= __('parameters-account') %></a></li>
-            <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><%= __('parameters-boxs') %></a></li>
-            <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><%= __('parameters-security') %></a></li>
-            <li class=""><a href="#tab_7" data-toggle="tab" aria-expanded="false"><%= __('parameters-param') %></a></li>
-            <li class=""><a href="#tab_8" data-toggle="tab" aria-expanded="false"><%= __('parameters-notification') %></a></li>
+            <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('parameters-account') %></a></li>
+            <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><%= __('parameters-boxs') %></a></li>
+            <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><%= __('parameters-security') %></a></li>
+            <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><%= __('parameters-param') %></a></li>
+            <li class=""><a href="#tab_7" data-toggle="tab" aria-expanded="false"><%= __('parameters-notification') %></a></li>
             <!-- <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li> -->
             </ul>
             <div class="tab-content">
@@ -36,26 +35,22 @@
             </div> 
             <!-- END OF TAB -->
             <div class="tab-pane" id="tab_3">
-                <%- partial ('../partials/areas.ejs') %>
-            </div> 
-            <!-- END OF TAB -->
-            <div class="tab-pane" id="tab_4">
                 <%- partial ('../partials/account.ejs') %>
             </div> 
             <!-- END OF TAB -->
-            <div class="tab-pane" id="tab_5">
+            <div class="tab-pane" id="tab_4">
                 <%- partial ('../partials/boxconfig.ejs') %>
             </div> 
             <!-- END OF TAB -->
-            <div class="tab-pane" id="tab_6">
+            <div class="tab-pane" id="tab_5">
                 <%- partial ('../partials/token.ejs') %>
             </div> 
             <!-- END OF TAB -->
-            <div class="tab-pane" id="tab_7">
+            <div class="tab-pane" id="tab_6">
                 <%- partial ('../partials/param.ejs') %>
             </div> 
             <!-- END OF TAB -->
-            <div class="tab-pane" id="tab_8">
+            <div class="tab-pane" id="tab_7">
                 <%- partial ('../partials/notifications.ejs') %>
             </div>
             <!-- END OF TAB -->

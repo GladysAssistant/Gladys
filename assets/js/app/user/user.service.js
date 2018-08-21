@@ -1,12 +1,4 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-  
+
 (function () {
     'use strict';
 
@@ -24,7 +16,8 @@
             get: get,
             destroy: destroy,
             update: update,
-            whoAmI: whoAmI
+            whoAmI: whoAmI,
+            changePassword: changePassword
         };
         
         var user = null;
@@ -60,6 +53,15 @@
         
         function update(id, user){
              return $http({method: 'PATCH', url: '/user/' + id, data: user });
+        }
+
+        function changePassword(id, oldPassword, newPassword, newPasswordRepeat){
+            var params = {
+                oldPassword: oldPassword,
+                newPassword: newPassword,
+                newPasswordRepeat: newPasswordRepeat
+            };
+            return $http({method: 'PATCH', url: '/user/' + id + '/password', data: params});
         }
         
         function destroy(id){

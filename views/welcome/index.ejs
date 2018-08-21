@@ -30,21 +30,12 @@
                         <input type="password" name="password" class="form-control" placeholder="<%= __('Password') %>"/>
                     </div> 
                     
-                    <div class="footer">                                                               
+                    <div class="footer">   
+                        <p>                                                      
                         <button type="submit" class="btn btn-flat btn-success btn-block"><%= __('Sign me in') %></button>  
-                        
-                        <!--<p><a href="#"><%= __('I forgot my password') %></a></p>
-                        <% if(signupActive) { %>
-                            <a href="/register" class="text-center"><%= __('Register a new membership') %></a>
-                        <% } %>-->
+                        </p>
+                        <p><a href="/forgotpassword"><%= __('login-forgot-my-password') %></a></p>
                     </div>
-                </div>
-                <div class="footer"> 
-                    
-                    <!--<p><a href="#"><%= __('I forgot my password') %></a></p>
-                    <% if(signupActive) { %>
-                        <a href="/register" class="text-center"><%= __('Register a new membership') %></a>
-                    <% } %>-->
                 </div>
             </form>
 

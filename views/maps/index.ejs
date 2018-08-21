@@ -1,24 +1,123 @@
 <script src="/js/dependencies/leaflet.js"></script>
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="content-wrapper">
-                <!-- Content Header (Page header) -->
-                <section class="content-header">
-                    <h1>
-                        <%= __('Maps') %>
-                        <small><%= __('Control Panel') %></small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
-                        <li class="active"><%= __('Maps') %></li>
-                    </ol>
-                </section>
+    <aside class="content-wrapper" ng-controller="MapsCtrl as vm">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                <%= __('pagename-maps') %>
+                <small><%= __('Control Panel') %></small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
+                <li class="active"><%= __('pagename-maps') %></li>
+            </ol>
+        </section>
 
-                <!-- Main content -->
-                <section class="content" ng-controller="MapsCtrl" data-ng-init="init()" >
-                             <div id="map" style="width : 100%; height : 500px;"></div>
-                </section><!-- /.content -->
-            </aside><!-- /.content-wrapper -->
+        <!-- Main content -->
+        <section class="content">
+            <div id="map" style="width : 100%; height : 500px;">
+                <div class="leaflet-top leaflet-right">
+                    <div class="leaflet-bar leaflet-control">
+                        <a class="leaflet-button active" title="<%= __('manage-area') %>" href="#" data-toggle="modal" data-target=".area-info-modal" role="button"><i class="fa fa-info"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section><!-- /.content -->
+
+    <div class="modal fade area-modal ng-cloak" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title"><%= __('area-box-title') %></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">   
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">   
+                                <form class="form-horizontal ng-cloak" >        
+
+                                    <div class="form-group">
+                                        <label for="name" class="col-sm-5 control-label"><%= __('area-name') %></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="vm.area.name" class="form-control" id="name">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="longitude" class="col-sm-5 control-label"><%= __('area-longitude') %></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="vm.area.longitude" class="form-control" id="longitude">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="latitude" class="col-sm-5 control-label" ><%= __('area-latitude') %></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="vm.area.latitude" class="form-control" id="latitude">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="radius" class="col-sm-5 control-label" ><%= __('area-radius') %></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="vm.area.radius" class="form-control" id="radius">
+                                        </div>
+                                    </div>
+
+                                </form>       
+                            </div>           
+                        </div> 
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button ng-show="!vm.newArea" type="button" ng-click="vm.updateArea(vm.area.id, vm.area)" class="btn btn-primary btn-flat" data-dismiss="modal">Ok</button>
+                    <button ng-show="vm.newArea" type="button" ng-click="vm.createArea(vm.area)" class="btn btn-primary btn-flat" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </div>
+
+    <div class="modal fade area-info-modal ng-cloak" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title"><%= __('manage-area') %></h4>
+                </div>
+                <div class="modal-body">
+                    <p><%= __('area-box-description') %></p>
+                    <hr>
+                    <h4><%= __('how-create-area') %></h4>
+                    <p><%= __('how-create-area-text') %></p>
+                    <hr>
+                    <h4><%= __('how-edit-area') %></h4>
+                    <p><%= __('how-edit-area-text') %></p>
+                    <hr>
+                    <h4><%= __('how-delete-area') %></h4>
+                    <p><%= __('how-delete-area-text') %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside><!-- /.content-wrapper -->
 
 <script>
     document.getElementById("mapsLi").className = "active";
 </script>
+
+<style type="text/css">
+    .leaflet-button {
+        font-size: 15px;
+    }
+
+    .leaflet-button.active{
+        color: black
+    }
+</style>

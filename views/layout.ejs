@@ -17,6 +17,12 @@
         display: none;
     }
     </style>
+
+    <!-- Your scripts here? -->
+    
+    <!--SCRIPTS-->
+    <script src="/min/production.min.js"></script>
+    <!--SCRIPTS END-->
     
   </head>
 
@@ -53,8 +59,9 @@
                                                 <!-- inner menu: contains the actual data -->
                                                 <ul class="menu">
                                                     <li ng-repeat="notification in vm.notifications" >
-                                                        <a href="#">
+                                                        <a href="#" class="notification-item-a">
                                                             <i class="{{notification.icon}} {{notification.iconColor}}"></i> {{notification.title}}
+                                                            <div class="notification-text">{{notification.text}}</div>
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -135,7 +142,7 @@
                         </li>
                         <li id="mapsLi" class="treeview">
                             <a href="/dashboard/maps">
-                                <i class="fa fa-map-marker"></i> <span><%= __('Maps') %></span>
+                                <i class="fa fa-map-marker"></i> <span><%= __('pagename-maps') %></span>
                             </a>
                         </li>
                         <li id="brainLi" class="treeview">
@@ -211,12 +218,6 @@
     <!--<script type="text/javascript" src="/js/app.js"></script>-->
 
 
-
-    <!-- Your scripts here? -->
-    
-    <!--SCRIPTS-->
-    <script src="/min/production.min.js"></script>
-    <!--SCRIPTS END-->
     
 
     <!--

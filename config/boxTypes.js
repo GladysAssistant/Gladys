@@ -52,5 +52,17 @@ module.exports.boxTypes = [
         "title": "who-is-at-home",
         "path": "views/boxs/who-is-at-home.ejs",
         "view": "dashboard"
+    },
+    {
+        "uuid": "081d6b76-7b07-4cf8-a4fc-75fc3d3a1787",
+        "title": "device-value",
+        "path": "views/boxs/device-value.ejs",
+        "view": "dashboard"
+    },
+    {
+        "uuid": "e477b1ad-5393-4da3-b10f-484626458530",
+        "title": "device-room",
+        "path": "views/boxs/device-room.ejs",
+        "view": "dashboard"
     }
 ];

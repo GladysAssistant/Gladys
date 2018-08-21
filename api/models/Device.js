@@ -5,6 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+  /**
+ * @public
+ * @name Device
+ * @class
+ */
+
 module.exports = {
 
     attributes: {
@@ -31,6 +37,11 @@ module.exports = {
 
         room: {
             model: 'Room',
+        },
+
+        // The Gladys machine responsible of handling this device
+        machine: {
+            type: 'uuid'
         },
 
         // if this device is linked to a user (like a phone/laptop/Smart Watch)

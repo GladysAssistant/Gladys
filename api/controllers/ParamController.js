@@ -10,6 +10,18 @@ module.exports = {
         })
         .catch(next);
   },
+
+  getByModule: function(req, res, next){
+    gladys.param.getByModule({id: req.params.id})
+      .then((params) => res.json(params))
+      .catch(next);
+  },
+
+  getByName: function(req, res, next){
+    gladys.param.getValue(req.params.name)
+        .then((value) => res.json({value}))
+        .catch(next);
+  },
   
   create: function(req, res, next){
       gladys.param.setValue(req.body)

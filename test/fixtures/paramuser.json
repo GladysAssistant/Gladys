@@ -4,5 +4,11 @@
         "name": "test",
         "value": "test",
         "user": 1
+    },
+    {
+        "id": 2,
+        "name": "RESET_PASSWORD_TOKEN",
+        "value": "4c7d0b0deadc7ade9c2cecbc9eb8fb74720c2363",
+        "user": 1
     }
 ]

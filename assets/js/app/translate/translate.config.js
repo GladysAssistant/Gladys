@@ -37,7 +37,7 @@ var translationsEN = {
         TEXT_CANNOT_BE_EMPTY: 'Message text cannot be empty.'
     },
     MODULE: {
-        CONFIG_FAIL_NOTIFICATION: 'Module configuration failed.',
+        CONFIG_FAIL_NOTIFICATION: 'Module configuration failed. Please look at Gladys logs to see what happened.',
         CONFIG_SUCCESS_NOTIFICATION: 'Module configured with success !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installed with success : ',
         INSTALLED_FAIL_NOTIFICATION: 'Module failed to install : ',
@@ -50,8 +50,9 @@ var translationsEN = {
         UPDATE_DATA_FAIL: 'Failed to updated data : '
     },
     USER: {
-        UPDATED_SUCCESS: 'User updated with success : ',
-        UPDATED_FAILURE: 'Failed to update user : '
+        UPDATED_SUCCESS: 'User updated with success! If you changed your language, please reload this page.',
+        UPDATED_FAILURE: 'Failed to update user : ',
+        PASSWORD_UPDATED_SUCCESS: 'Password updated with success!'
     },
     EVENT: {
         CREATED_SUCCESS_NOTIFICATION: 'Event created with success : ',
@@ -88,6 +89,12 @@ var translationsEN = {
         CREATED_FAIL_NOTIFICATION: 'Failed to change mode. ',
         CREATED_SUCCESS_NOTIFICATION: 'Mode changed successfully. '
     },
+    MAPS: {
+        AREA: 'Area',
+        NEW: 'New area',
+        EDIT: 'Modifier',
+        DELETE: 'Suprimer'
+    }
 };
 
 var translationsFR = {
@@ -129,7 +136,7 @@ var translationsFR = {
         TEXT_CANNOT_BE_EMPTY: 'Un message ne peut pas être vide.'
     },
     MODULE: {
-        CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module.',
+        CONFIG_FAIL_NOTIFICATION: 'Erreur lors de la configuration du module. Regardez les logs Gladys pour voir ce qui s\'est mal déroulé.',
         CONFIG_SUCCESS_NOTIFICATION: 'Le module a été configuré avec succès !',
         INSTALLED_SUCCESS_NOTIFICATION: 'Module installé avec succès : ',
         INSTALLED_FAIL_NOTIFICATION: 'Erreur lors de l\'installation du module : ',
@@ -142,8 +149,9 @@ var translationsFR = {
         UPDATE_DATA_FAIL: 'Erreur lors de la mise à jour des données : '
     },
     USER: {
-        UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès : ',
-        UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : '
+        UPDATED_SUCCESS: 'Utilisateur mis à jour avec succès. Si vous avez modifié votre langue, merci de recharger cette page.',
+        UPDATED_FAILURE: 'Erreur lors de la mise à jour d\'un utilisateur : ',
+        PASSWORD_UPDATED_SUCCESS: 'Mot de passe mis à jour avec succès !'
     },
     EVENT: {
         CREATED_SUCCESS_NOTIFICATION: 'Event créé avec succès : ',
@@ -179,6 +187,12 @@ var translationsFR = {
     MODE: {
         CREATED_FAIL_NOTIFICATION: 'Impossible de changer de mode. ',
         CREATED_SUCCESS_NOTIFICATION: 'Mode changé avec succès. '
+    },
+    MAPS: {
+        AREA: 'Zone',
+        NEW: 'Nouvelle zone',
+        EDIT: 'Modifier',
+        DELETE: 'Suprimer'
     }
 };
 

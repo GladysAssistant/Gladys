@@ -35,11 +35,16 @@ module.exports.routes = {
 
   // views
   '/login' : 'WelcomeController.login',
+  'get /forgotpassword' : 'WelcomeController.forgotPassword',
+  'post /forgotpassword' : 'WelcomeController.postForgotPassword',
+  'get /resetpassword' : 'WelcomeController.resetPassword',
+  'post /resetpassword' : 'WelcomeController.postResetPassword',
   '/': 'WelcomeController.index',
   '/installation': 'WelcomeController.installation',
   
   //dashboard
   '/dashboard': 'DashboardController.index' ,
+  '/dashboard/module/:id/configuration': 'DashboardController.moduleConfigView',
   
   //Action
   'post /action': 'ActionController.create',
@@ -107,6 +112,7 @@ module.exports.routes = {
   'post /devicetype': 'DeviceTypeController.create',
   'delete /devicetype/:id': 'DeviceTypeController.delete',
   'get /devicetype/room': 'DeviceTypeController.getByRoom',
+  'get /room/:id/devicetype': 'DeviceTypeController.getInRoom',
   'patch /devicetype/:id': 'DeviceTypeController.update',
   'post /devicetype/:id/exec': 'DeviceTypeController.exec',
   'get /devicetype/:id/exec': 'DeviceTypeController.execGet',
@@ -203,6 +209,8 @@ module.exports.routes = {
   
   // Param
   'get /param': 'ParamController.index',
+  'get /module/:id/param': 'ParamController.getByModule',
+  'get /param/:name': 'ParamController.getByName',
   'post /param': 'ParamController.create',
   'patch /param/:name': 'ParamController.update',
   'delete /param/:name': 'ParamController.delete',
@@ -275,6 +283,7 @@ module.exports.routes = {
   'post /user': 'UserController.create',
   'post /user/login': 'UserController.login',
   'patch /user/:id': 'UserController.update',
+  'patch /user/:id/password': 'UserController.changePassword',
   'delete /user/:id': 'UserController.delete',
   'get /user/whoami': 'UserController.whoami',
   'post /user/:user_id/house/:house_id/seen': 'UserController.seen',

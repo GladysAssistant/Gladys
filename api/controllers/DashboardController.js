@@ -1,19 +1,5 @@
-/** 
-  * Gladys Project
-  * http://gladysproject.com
-  * Software under licence Creative Commons 3.0 France 
-  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-  * You may not use this software for commercial purposes.
-  * @author :: Pierre-Gilles Leymarie
-  */
-/**
- * DashboardController
- *
- * @description :: Server-side logic for managing the dashboard
- * @help        :: See http://links.sailsjs.org/docs/controllers
- */
-
 const path = require('path');
+const fs = require('fs');
 const BASE_PATH = path.join(__dirname, '../../');
 
 module.exports = {
@@ -47,6 +33,19 @@ module.exports = {
   
   module: function(req, res, next){
       res.view('module/index', { User: req.session.User, pageName: req.__('pagename-module') });
+  },
+
+  moduleConfigView: function(req, res, next){
+    gladys.module.getById({id: req.params.id})
+      .then((module) => {
+        var moduleConfigViewPath = `${BASE_PATH}/api/hooks/${module.slug}/views/configuration.ejs`;
+        fs.access(moduleConfigViewPath, fs.constants.F_OK, (err) => {
+          var moduleConfigViewExist = !err;
+          var configurationFunctionExist = (gladys.modules[module.slug] && gladys.modules[module.slug].setup && typeof gladys.modules[module.slug].setup === 'function');
+          res.view('module/module-config-view', { User: req.session.User, pageName: req.__('pagename-module'), module, moduleConfigViewPath, moduleConfigViewExist, configurationFunctionExist});
+        });        
+      })
+      .catch(next);
   },
 
   alarm:function(req,res,next){

@@ -1,18 +1,3 @@
-/** 
- * Gladys Project
- * http://gladysproject.com
- * Software under licence Creative Commons 3.0 France 
- * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
- * You may not use this software for commercial purposes.
- * @author :: Pierre-Gilles Leymarie
- */
-
-/**
- * User.js
- *
- * @description :: TODO: You might write a short summary of how this model works and what it represents here.
- * @docs        :: http://sailsjs.org/#!documentation/models
- */
 
 var bcrypt = require('bcrypt');
 
@@ -79,8 +64,8 @@ module.exports = {
 
     beforeCreate: function(values, next) {
         
-        if(values.password.length < 5){
-            return next('Password is too short');
+        if(values.password.length < 8){
+            return next('PASSWORD_SIZE_TOO_LOW');
         }
 
         bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
@@ -89,6 +74,25 @@ module.exports = {
 
             next();
         });
+    },
+
+    beforeUpdate: function(values, next){
+
+        if(values.password) {
+        
+            if(values.password.length < 8) {
+                return next('PASSWORD_SIZE_TOO_LOW');
+            }
+
+            bcrypt.hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
+                if (err) return next(err);
+                values.password = encryptedPassword;
+
+                next();
+            });
+        } else {
+            next();
+        }
     }
 
 };
