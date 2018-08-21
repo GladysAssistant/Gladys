@@ -13,3 +13,4 @@ module.exports.isNotEmpty = require('./house.isNotEmpty.js');
 module.exports.update = require('./house.update.js');
 module.exports.userSeen = require('./house.userSeen.js');
 module.exports.isUserAsleep = require('./house.isUserAsleep.js');
+module.exports.isMode = require('./house.isMode.js');
