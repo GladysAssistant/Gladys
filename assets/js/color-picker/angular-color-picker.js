@@ -11,7 +11,9 @@
             link: function ($scope, element, attrs, ngModelCtrl, $compile) {
                 var picker = new CP(element[0]);
 		var modelValue = $scope.ngModel;
-                element.css('background-color', '#' + (modelValue).toString(16));
+		if (modelValue) {
+                    element.css('background-color', '#' + (modelValue).toString(16));
+		}
 
                 picker.on('stop', function (newValue) {
                     var intValue = parseInt(newValue, 16);
