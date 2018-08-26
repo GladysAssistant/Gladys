@@ -1,271 +1,382 @@
 <div data-ng-controller="UserCtrl as vm">
 
-<!-- NEW BOX -->
-<div class="box skin-box box-primary" >
-    <div class="box-header with-border">
-        <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
-    </div> 
-        <div class="box-body table-responsive" >
-            <p>
-            <%= __('user-box-description') %>
-            </p>
+    <div class="row">
+        <div class="col-lg-4">
 
-            <div class="row">
-                <div class="col-md-4">
-                        <div class="form-group">
-                            <label><%= __('user-id') %></label>
-                            <input class="form-control" disabled="disabled" value="{{vm.user.id}}"/>
-                        </div>
-            
-                        <div class="form-group">
-                            <label><%= __('user-firstname') %></label>
-                            <input type="text" ng-model="vm.user.firstname" class="form-control" placeholder="<%= __('user-firstname') %>" />
-                        </div>
+            <div class="box skin-box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+                    <i class="pull-right fa fa-question-circle close" data-toggle="tooltip" data-placement="left" data-original-title="<%= __('user-box-description') %>"></i>
+                </div>
+                
+                <form class="form-horizontal">
+                    <div class="box-body">
 
                         <div class="form-group">
-                            <label><%= __('user-lastname') %></label>
-                            <input type="text" ng-model="vm.user.lastname" class="form-control" placeholder="<%= __('user-lastname') %>" />
-                        </div>
-
-                        <div class="form-group">
-                            <label><%= __('user-email') %></label>
-                            <input type="email" ng-model="vm.user.email" class="form-control" placeholder="<%= __('user-email') %>" />
-                        </div>
-
-                        <div class="form-group">
-                            <label><%= __('user-gender') %></label>
-                            <select ng-model="vm.user.gender" class="form-control">
-                                <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
-                                <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="countrycode"><%= __('installation-language') %></label>
-                            <select class="form-control" id="countrycode"  ng-model="vm.user.language" placeholder="<%= __('installation-language') %>">
-                                <option value="en-US">English</option>
-                                <option value="fr-FR">Français</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label><%= __('user-preparation-time') %></label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" ng-model="vm.user.preparationTimeAfterWakeUp" placeholder="<%= __('user-preparation-time') %>">
-                                <span class="input-group-addon"> <%= __('user-preparation-time-unit') %></span>
+                            <label for="inputId" class="col-sm-3 control-label"><%= __('user-id') %></label>
+                            <div class="col-sm-9">
+                                <input id="inputId" class="form-control" disabled="disabled" value="{{vm.user.id}}"/>
                             </div>
-                            <span class="help-block"><%= __('user-preparation-time-explanation') %></span>
                         </div>
-
 
                         <div class="form-group">
-                                <button class="btn btn-flat btn-success" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button>
+                            <label for="inputFirstname" class="col-sm-3 control-label"><%= __('user-firstname') %></label>
+                            <div class="col-sm-9">
+                                <input id="inputFirstname" type="text" ng-model="vm.user.firstname" class="form-control" placeholder="<%= __('user-firstname') %>" />
+                            </div>
                         </div>
+
+                        <div class="form-group">
+                            <label for="inputlastname" class="col-sm-3 control-label"><%= __('user-lastname') %></label>
+                            <div class="col-sm-9">
+                                <input id="inputlastname" type="text" ng-model="vm.user.lastname" class="form-control" placeholder="<%= __('user-lastname') %>" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmail" class="col-sm-3 control-label"><%= __('user-email') %></label>
+                            <div class="col-sm-9">
+                                <input id="inputEmail" type="email" ng-model="vm.user.email" class="form-control" placeholder="<%= __('user-email') %>" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selectGender" class="col-sm-3 control-label"><%= __('user-gender') %></label>
+                            <div class="col-sm-9">
+                                <select id="selectGender" ng-model="vm.user.gender" class="form-control">
+                                    <option value="0" ng-selected="vm.user.gender === 0"><%= __('installation-male') %></option>
+                                    <option value="1" ng-selected="vm.user.gender === 1"><%= __('installation-female') %></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selectCountrycode" class="col-sm-3 control-label"><%= __('installation-language') %></label>
+                            <div class="col-sm-9">
+                                <select class="form-control" id="selectCountrycode"  ng-model="vm.user.language" placeholder="<%= __('installation-language') %>">
+                                    <option value="en-US">English</option>
+                                    <option value="fr-FR">Français</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPreparationTimeAfterWakeUp" class="col-sm-3 control-label"><%= __('preparation') %></label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+
+                                    <input id="inputPreparationTimeAfterWakeUp" 
+                                            type="number" 
+                                            class="form-control" 
+                                            ng-model="vm.user.preparationTimeAfterWakeUp" 
+                                            placeholder="<%= __('user-preparation-time') %>"
+                                            data-toggle="tooltip" 
+                                            data-original-title="<%= __('user-preparation-time-explanation') %>">
+
+                                    <span class="input-group-addon"> <%= __('user-preparation-time-unit') %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="box-footer">
+                    <button class="btn btn-primary btn-flat pull-right" ng-click="vm.updateUser(vm.user.id, vm.user);"><%= __('account-update-button') %></button>
                 </div>
             </div>
-        </div>  
-</div>
+            
+            <!-- if user is not admin, not display this box in this column but in second -->
+            <div class="box skin-box box-primary" ng-if="vm.user.role === 'admin'">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('user-password-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+                </div>
+                
+                <form class="form-horizontal">
+                    <div class="box-body">
 
-<div class="box skin-box box-primary" >
-    <div class="box-header with-border">
-        <h3 class="box-title"><%= __('user-password-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
-    </div> 
-        <div class="box-body table-responsive" >
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordErrorPasswordTooLow">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-size-too-low') %>
+                        </div>
 
-            <div class="row">
-                <div class="col-md-4">
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordPasswordNotMatching">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-password-not-matching') %>
+                        </div>
 
-                        <p class="bg-danger" ng-show="vm.changePasswordErrorPasswordTooLow" style="padding:15px;"><%= __('user-change-password-size-too-low') %></p>
-                        <p class="bg-danger" ng-show="vm.changePasswordPasswordNotMatching" style="padding:15px;"><%= __('user-change-password-password-not-matching') %></p>
-                        <p class="bg-danger" ng-show="vm.changePasswordOldPasswordInvalid" style="padding:15px;"><%= __('user-change-password-old-password-invalid') %></p>
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordOldPasswordInvalid">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-old-password-invalid') %>
+                        </div>
                         
                         <div class="form-group">
-                            <label><%= __('user-old-password') %></label>
-                            <input type="password" ng-model="vm.oldPassword" class="form-control" placeholder="<%= __('user-old-password') %>" />
+                            <label for="inputOldPassword" class="col-sm-5 control-label"><%= __('user-old-password') %></label>
+                            <div class="col-md-7">
+                                <input id="inputOldPassword" type="password" ng-model="vm.oldPassword" class="form-control" placeholder="<%= __('user-old-password') %>" />
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label><%= __('user-new-password') %></label>
-                            <input type="password" ng-model="vm.newPassword" class="form-control" placeholder="<%= __('user-new-password') %>" />
+                            <label for="inputNewPassword" class="col-sm-5 control-label"><%= __('user-new-password') %></label>
+                            <div class="col-md-7">
+                                <input id="inputNewPassword" type="password" ng-model="vm.newPassword" class="form-control" placeholder="<%= __('user-new-password') %>" />
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label><%= __('user-new-password-repeat') %></label>
-                            <input type="password" ng-model="vm.newPasswordRepeat" class="form-control" placeholder="<%= __('user-new-password-repeat') %>" />
+                            <label for="inputNewPasswordRepeat" class="col-sm-5 control-label"><%= __('user-new-password-repeat') %></label>
+                            <div class="col-md-7">
+                                <input id="inputNewPasswordRepeat" type="password" ng-model="vm.newPasswordRepeat" class="form-control" placeholder="<%= __('user-new-password-repeat') %>" />
+                            </div>
                         </div>
-
-
-                        <div class="form-group">
-                                <button class="btn btn-flat btn-success" ng-click="vm.changePassword(vm.user.id, vm.oldPassword, vm.newPassword, vm.newPasswordRepeat);"><%= __('account-update-password') %></button>
-                        </div>
+                    </div>
+                </form>
+                <div class="box-footer">
+                    <button class="btn btn-flat btn-primary pull-right" ng-click="vm.changePassword(vm.user.id, vm.oldPassword, vm.newPassword, vm.newPasswordRepeat);"><%= __('account-update-password') %></button>
                 </div>
             </div>
-        </div>  
-</div>
+        </div>
 
-<div class="ng-cloak">
+        <!-- if user is not admin, display three column for more responsive and beautiful view with change password box in second -->
+        <div class="col-lg-4" ng-if="vm.user.role != 'admin'">
+            <div class="box skin-box box-primary" ng-if="vm.user.role != 'admin'">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('user-password-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+                </div>
+                
+                <form class="form-horizontal">
+                    <div class="box-body">
 
-<div class="box skin-box box-primary" ng-if="vm.user.role === 'admin'">
-    <div class="box-header with-border">
-        <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
-    </div> 
-        <div class="box-body table-responsive" >
-            <p>
-                <%= __('all-user-box-description') %>
-            </p>
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordErrorPasswordTooLow">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-size-too-low') %>
+                        </div>
 
-            <table class="table table-bordered table-hover ng-cloak">
-                <thead>
-                    <tr>
-                        <th><%= __('all-user-id') %></th>
-                        <th><%= __('all-user-name') %></th>
-                        <th><%= __('all-user-delete') %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="aUser in vm.users">
-                        <td>{{aUser.id}}</td>
-                        <td>{{aUser.firstname}} {{aUser.lastname}}</td>
-                        <td><button class="btn btn-flat btn-danger" ng-click="vm.deleteUser($index, aUser.id);"><%= __('all-user-delete-button') %></button></td>
-                    </tr>
-                     <tr>
-                         <td><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button></td>
-                     </tr>
-                </tbody>
-            </table>
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordPasswordNotMatching">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-password-not-matching') %>
+                        </div>
 
-        </div>  
-</div>
+                        <div class="alert alert-danger alert-dismissible" ng-show="vm.changePasswordOldPasswordInvalid">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <%= __('user-change-password-old-password-invalid') %>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="inputOldPassword" class="col-sm-5 control-label"><%= __('user-old-password') %></label>
+                            <div class="col-md-7">
+                                <input id="inputOldPassword" type="password" ng-model="vm.oldPassword" class="form-control" placeholder="<%= __('user-old-password') %>" />
+                            </div>
+                        </div>
 
-</div>
+                        <div class="form-group">
+                            <label for="inputNewPassword" class="col-sm-5 control-label"><%= __('user-new-password') %></label>
+                            <div class="col-md-7">
+                                <input id="inputNewPassword" type="password" ng-model="vm.newPassword" class="form-control" placeholder="<%= __('user-new-password') %>" />
+                            </div>
+                        </div>
 
-   <!-- MODAL -->
-        <!-- Large modal -->
+                        <div class="form-group">
+                            <label for="inputNewPasswordRepeat" class="col-sm-5 control-label"><%= __('user-new-password-repeat') %></label>
+                            <div class="col-md-7">
+                                <input id="inputNewPasswordRepeat" type="password" ng-model="vm.newPasswordRepeat" class="form-control" placeholder="<%= __('user-new-password-repeat') %>" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="box-footer">
+                    <button class="btn btn-flat btn-primary pull-right" ng-click="vm.changePassword(vm.user.id, vm.oldPassword, vm.newPassword, vm.newPasswordRepeat);"><%= __('account-update-password') %></button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4" ng-if="vm.user.role != 'admin'"></div>
+
+        <!-- If user is admin, display just two column with users management box in second -->
+        <div class="col-lg-8"  ng-if="vm.user.role === 'admin'">
+            <div class="box skin-box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><%= __('all-user-box-title') %> <small class="ng-cloak" ng-show="vm.saving"><%= __('user-box-saving') %></small></h3>
+                    <i class="fa fa-question-circle close" data-toggle="tooltip" data-placement="left" data-original-title="<%= __('all-user-box-description') %>"></i>
+                </div>
+
+                <div class="box-body">
+                    <div class="grid">
+                        <div class="box box-widget widget-user-2 card grid-item" ng-repeat="aUser in vm.users">
+                            <div class="widget-user-header">
+                                <div class="widget-user-image">
+                                    <img class="img-circle" src="/img/user-circle.png" alt="User Avatar">
+                                
+                                    <h4 class="widget-user-username">
+                                        <div>
+                                            {{aUser.name}}
+                                        </div>
+                                    </h4>
+                                    <button type="button" class="close" style="float: right" ng-click="vm.deleteUser($index, aUser.id);" data-toggle="tooltip" data-placement="left" data-original-title="<%= __('all-user-delete-button') %>">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <h5 class="widget-user-desc">{{aUser.email}}</h5>
+                                </div>
+                            </div>
+
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-stacked">
+                                <li><a href="#"><%= __('all-user-id') %> <span class="pull-right">{{aUser.id}}</span></a></li>
+                                <li>
+                                    <a href="#" ng-switch="aUser.role"><%= __('installation-role') %> 
+                                        <span class="pull-right" ng-switch-when="admin"><%= __('installation-role-admin') %></span>
+                                        <span class="pull-right" ng-switch-when="habitant"><%= __('installation-role-habitant') %></span>
+                                        <span class="pull-right" ng-switch-when="guest"><%= __('installation-role-guest') %></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" ng-switch="aUser.gender"><%= __('installation-gender') %> 
+                                        <span class="pull-right" ng-switch-when="0"><%= __('installation-male') %></span>
+                                        <span class="pull-right" ng-switch-when="1"><%= __('installation-female') %></span>
+                                    </a>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="box box-widget widget-user-2 card grid-item" data-toggle="modal" data-target=".bs-example-modal-lg" style="min-height: 225px; position: relative; cursor: pointer">
+                            <h1><i class="fa fa-plus" data-toggle="tooltip" data-placement="left" data-original-title="<%= __('New') %>" style="position: absolute; left: 48%; top: 42%;"></i></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <!-- Large modal -->
     <div id="modalNewUser" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-content">
+                <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="<%= __('Close') %>"><span aria-hidden="true">×</span></button>
                     <h4 class="modal-title" id="myLargeModalLabel"><%= __('create-user-modal-title') %></h4>
-            </div>
+                </div>
                 <div class="modal-body">
-                   
                     <!-- FORM -->
                     <form class="form-horizontal">   
-                               <div class="row">
-                                   <div class="col-md-3"></div>
-                                   <div class="col-md-6">   
-                                       <form class="form-horizontal ng-cloak" >
-                                           
-                                           <p class="bg-danger" ng-show="vm.createAccountError" style="padding:15px;"></p>
-                                           <p class="bg-danger" ng-show="vm.invalidEmail" style="padding:15px;"><%= __('installation-invalid-email') %></p>
-                                           <p class="bg-danger" ng-show="vm.invalidPassword" style="padding:15px;"><%= __('installation-invalid-password') %></p>
-                                           <p class="bg-danger" ng-show="vm.invalidBirthdate" style="padding:15px;"><%= __('installation-invalid-birthdate') %></p>
-                                            
-                                            <!-- FirstName -->
-                                            <div class="form-group">
-                                                <label for="firstname" class="col-sm-4 control-label"><%= __('installation-firstname') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.firstname" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- LastName -->
-                                            <div class="form-group">
-                                                <label for="lastname" class="col-sm-4 control-label"><%= __('installation-lastname') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.lastname" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Email -->
-                                            <div ng-class="{'form-group': !vm.invalidEmail , 'form-group has-error': vm.invalidEmail }">
-                                                <label for="email" class="col-sm-4 control-label"   ><%= __('installation-email') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="email" ng-model="vm.newUser.email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Password -->
-                                            <div ng-class="{'form-group': !vm.invalidPassword , 'form-group has-error': vm.invalidPassword }">
-                                                <label for="password"  class="col-sm-4 control-label" ><%= __('installation-password') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="password" ng-model="vm.newUser.password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
-                                                </div>
-                                            </div>
-                                            
-                                             <!-- Birthdate -->
-                                            <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
-                                                <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Country code -->
-                                            <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
-                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
-                                                <div class="col-sm-8">
-                                                <select class="form-control" id="countrycode"  ng-model="vm.newUser.language" placeholder="<%= __('installation-language') %>">
-                                                    <option value="en-US">English</option>
-                                                    <option value="fr-FR">Français</option>
-                                                </select>
-                                                </div>
-                                            </div>
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">   
+                                <form class="form-horizontal ng-cloak" >
 
-                                            <!-- Role -->
-                                            <div ng-class="{'form-group': !vm.invalidRole , 'form-group has-error': vm.invalidRole }">
-                                                <label for="role" class="col-sm-4 control-label"><%= __('installation-role') %></label>
-                                                <div class="col-sm-8">
-                                                <select class="form-control" id="role"  ng-model="vm.newUser.role">
-                                                    <option value="admin"><%= __('installation-role-admin') %></option>
-                                                    <option value="habitant"><%= __('installation-role-habitant') %></option>
-                                                    <option value="guest"><%= __('installation-role-guest') %></option>
-                                                </select>   
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Preparation time -->
-                                            <!--<div class="form-group">
-                                                <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-preparation-time') %></label>
-                                                <div class="col-sm-8">
-                                                <input type="text" ng-model="vm.newUser.preparationTime" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
-                                                </div>
-                                            </div>-->
-                                            
-                                            
-                                            <!-- Gender -->
-                                             <div class="form-group">
-                                                <label for="gender" class="col-sm-4 control-label">
-                                                     <%= __('installation-gender') %>
-                                                </label>
-                                                <div class="col-sm-8">
-                                                    <select ng-model="vm.newUser.gender" class="form-control" id="gender">
-                                                        <option value="0"><%= __('installation-male') %></option>
-                                                        <option value="1"><%= __('installation-female') %></option>
-                                                    </select>
-                                                </div>
-                                             </div>
+                                    <div class="alert alert-danger alert-dismissible" ng-show="vm.createAccountError">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        Error
+                                    </div>
 
-                                             <div class="form-group">
-                                                 <button class="btn btn-flat btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
-                                             </div>
-                                             
-                                         </form>      
-                                        
-                                </div>           
-                             </div>
-                             
-                             </form>
-                     <!-- END OF FORM -->
+                                    <div class="alert alert-danger alert-dismissible" ng-show="vm.invalidEmail">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <%= __('installation-invalid-email') %>
+                                    </div>
 
-                     
+                                    <div class="alert alert-danger alert-dismissible" ng-show="vm.invalidPassword">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <%= __('installation-invalid-password') %>
+                                    </div>
+
+                                    <div class="alert alert-danger alert-dismissible" ng-show="vm.invalidBirthdate">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <%= __('installation-invalid-birthdate') %>
+                                    </div>
+                                    
+                                    <!-- FirstName -->
+                                    <div class="form-group">
+                                        <label for="firstname" class="col-sm-4 control-label"><%= __('installation-firstname') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" ng-model="vm.newUser.firstname" class="form-control" id="firstname" placeholder="<%= __('installation-firstname') %>">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- LastName -->
+                                    <div class="form-group">
+                                        <label for="lastname" class="col-sm-4 control-label"><%= __('installation-lastname') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" ng-model="vm.newUser.lastname" class="form-control" id="lastname" placeholder="<%= __('installation-lastname') %>">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Email -->
+                                    <div ng-class="{'form-group': !vm.invalidEmail , 'form-group has-error': vm.invalidEmail }">
+                                        <label for="email" class="col-sm-4 control-label"   ><%= __('installation-email') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="email" ng-model="vm.newUser.email" class="form-control" id="email" placeholder="<%= __('installation-email') %>">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Password -->
+                                    <div ng-class="{'form-group': !vm.invalidPassword , 'form-group has-error': vm.invalidPassword }">
+                                        <label for="password"  class="col-sm-4 control-label" ><%= __('installation-password') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="password" ng-model="vm.newUser.password" class="form-control" id="password" placeholder="<%= __('installation-password') %>">
+                                        </div>
+                                    </div>
+                                    
+                                        <!-- Birthdate -->
+                                    <div ng-class="{'form-group': !vm.invalidBirthdate , 'form-group has-error': vm.invalidBirthdate }">
+                                        <label for="birthdate" class="col-sm-4 control-label" ><%= __('installation-birthdate') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" ng-model="vm.newUser.birthdate" class="form-control" id="birthdatepicker" placeholder="<%= __('installation-birthdate-placeholder') %>">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Country code -->
+                                    <div ng-class="{'form-group': !vm.invalidCountryCode , 'form-group has-error': vm.invalidCountryCode }">
+                                        <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-language') %></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="countrycode"  ng-model="vm.newUser.language" placeholder="<%= __('installation-language') %>">
+                                                <option value="en-US">English</option>
+                                                <option value="fr-FR">Français</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Role -->
+                                    <div ng-class="{'form-group': !vm.invalidRole , 'form-group has-error': vm.invalidRole }">
+                                        <label for="role" class="col-sm-4 control-label"><%= __('installation-role') %></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="role"  ng-model="vm.newUser.role">
+                                                <option value="admin"><%= __('installation-role-admin') %></option>
+                                                <option value="habitant"><%= __('installation-role-habitant') %></option>
+                                                <option value="guest"><%= __('installation-role-guest') %></option>
+                                            </select>   
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Preparation time -->
+                                    <!--<div class="form-group">
+                                        <label for="countrycode" class="col-sm-4 control-label"><%= __('installation-preparation-time') %></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" ng-model="vm.newUser.preparationTime" class="form-control" id="countrycode" placeholder="<%= __('installation-countrycode') %>">
+                                        </div>
+                                    </div>-->
+
+                                    <!-- Gender -->
+                                    <div class="form-group">
+                                        <label for="gender" class="col-sm-4 control-label">
+                                                <%= __('installation-gender') %>
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <select ng-model="vm.newUser.gender" class="form-control" id="gender">
+                                                <option value="0"><%= __('installation-male') %></option>
+                                                <option value="1"><%= __('installation-female') %></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-flat btn-success pull-right" ng-click="vm.createUser(vm.newUser);"><%= __('create-user-button-create') %></button>
+                                    </div>
+                                </form>      
+                            </div>           
+                        </div>       
+                    </form>
+                    <!-- END OF FORM -->
                 </div>
             </div>
         </div>
     </div>
     <!-- END OF MODAL -->
-
-
 </div>
-
