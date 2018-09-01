@@ -81,7 +81,11 @@ module.exports = {
         device: {
             model: 'Device',
             required: true
-        }
+        },
 
+        idDeviceTypeOrder: {
+            type: 'integer',
+            defaultsTo: 0
+        }
     }
 };

@@ -1,367 +1,519 @@
 <!-- Right side column. Contains the navbar and content of the page -->
-            <aside class="content-wrapper" >
-                <!-- Content Header (Page header) -->
-                <section class="content-header" >
-                    <h1>
-                        <%= __('Device') %>
-                        <small><%= __('Control Panel') %></small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
-                        <li class="active"><%= __('Device') %></li>
-                    </ol>
-                </section>
+<aside class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= __('Device') %>
+                <small><%= __('Control Panel') %></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <p><i class="fa fa-dashboard"></i> <%= __('Home') %>
+                </p>
+            </li>
+            <li class="active">
+                <%= __('Device') %>
+            </li>
+        </ol>
+    </section>
 
-                <!-- Main content -->
-                <section class="content"  data-ng-controller="DeviceCtrl as vm">
-                    
-                     <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
+    <!-- Main content -->
+    <section class="content" data-ng-controller="DeviceCtrl as vm">
+
+        <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true" ng-click="vm.getDeviceTypesByRoom()"><%= __('devices-control') %></a></li>
-              <li><a href="#tab_2" data-toggle="tab" aria-expanded="true"><%= __('devices-list') %></a></li>
-              <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('devices-data') %></a></li>
+                <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true" ng-click="vm.getDeviceTypesByRoom()"><%= __('devices-control') %></a></li>
+                <li><a href="#tab_2" data-toggle="tab" aria-expanded="true"><%= __('devices-list') %></a></li>
+                <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><%= __('devices-data') %></a></li>
 
-              <li class="pull-right"><a href="#" class="ng-cloak" ng-show="vm.saving"><%= __('devices-saving') %>...</a></li>
+                <li class="pull-right"><a href="#" class="ng-cloak" ng-show="vm.saving"><%= __('devices-saving') %>...</a></li>
             </ul>
             <div class="tab-content">
-                
-              <div class="tab-pane active" id="tab_1">
 
-                  <div class="row" ng-show="!vm.ready">
-                      <div class="col-centered col-md-4 col-md-offset-4">
-                          <div class="spinner-box">
-                            <div class="spinner">
+                <div class="tab-pane active" id="tab_1">
+
+                    <div class="row" ng-show="!vm.ready">
+                        <div class="col-centered col-md-4 col-md-offset-4">
+                            <div class="spinner-box">
+                                <div class="spinner">
                                     <div class="double-bounce1"></div>
                                     <div class="double-bounce2"></div>
+                                </div>
                             </div>
-                          </div>
-                      </div>
-                  </div>
-                  
-                  <div class="row" ng-show="vm.ready" ng-cloak>
-                    
-                    <div class="col-centered col-md-4" ng-repeat="room in vm.roomDeviceTypes">
-                    
-                    <div class="box skin-box box-primary" >
-                        
-                        <div class="box-header with-border">
-                            <h3 class="box-title">{{room.name}}</h3>
                         </div>
-                        
-                        <div class="box-body table-responsive">
+                    </div>
 
-                                    <table id="example2" class="table table-bordered table-hover">
+                    <div class="row" ng-show="vm.ready" ng-cloak>
+
+                        <div class="col-centered col-md-4" ng-repeat="room in vm.roomDeviceTypes">
+
+                            <div class="box skin-box box-primary">
+
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">{{room.name}}</h3>
+                                    <i class="close fa fa-gear" data-toggle="modal" data-target="#modalSelectedRoom" ng-click="vm.selectedRoom = room"></i>
+                                </div>
+
+                                <div class="box-body table-responsive">
+
+                                    <table id="example1" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th><%= __('device-name') %></th>
-                                                <th><%= __('device-action') %></th>
+                                                <th>
+                                                    <%= __('device-name') %>
+                                                </th>
+                                                <th>
+                                                    <%= __('device-action') %>
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-show="type.display" ng-repeat="type in room.deviceTypes" class="ng-cloak">
-                                                <td><span ng-show="type.deviceTypeName">{{type.deviceTypeName}}</span><span ng-show="!type.deviceTypeName">{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}"> - {{type.type}}</span></span></td>
+                                            <tr ng-show="type.display" ng-repeat="type in room.deviceTypes | orderBy:'idDeviceTypeOrder'" class="ng-cloak">
+                                                <td><span ng-show="type.deviceTypeName">{{type.deviceTypeName}}</span><span
+                                                        ng-show="!type.deviceTypeName">{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}">
+                                                            - {{type.type}}</span></span></td>
                                                 <td>
                                                     <!-- If the deviceType is a sensor, display last data -->
                                                     <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
-                                                    
+
                                                     <!-- If the deviceType is not a sensor and is not a binary, display input field -->
-                                                    <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                    <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'">
 
-                                                        <slider id="blue" ng-model="type.lastValue" min="type.min" step="1" max="type.max" value="type.lastValue" ng-model-options='{ debounce: 100 }' ng-change="vm.changeValue(type, type.lastValue);" ></slider>
-                                                             
-                                                     </form>    
+                                                        <slider id="blue" ng-model="type.lastValue" min="type.min" step="1" max="type.max" value="type.lastValue" ng-model-options='{ debounce: 100 }'
+                                                            ng-change="vm.changeValue(type, type.lastValue);"></slider>
+
+                                                    </form>
                                                     <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
-                                                     <div class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
-                                                            <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
-                                                            <label class="toogle-label" for="mytoogle" ng-show="!type.sensor && type.type == 'binary'"></label>
-                                                     </div>
+                                                    <div class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
+                                                        <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0"
+                                                            class="toogle-checkbox toogle-blue" />
+                                                        <label class="toogle-label" for="mytoogle" ng-show="!type.sensor && type.type == 'binary'"></label>
+                                                    </div>
                                                 </td>
-                                               </tr>
+                                            </tr>
                                         </tbody>
                                     </table>
 
-                        </div>     
-                        
-                        
-                        
-                        
+                                </div>
+
+
+
+
+                            </div>
+                            <!-- box-->
+
+                        </div>
                     </div>
-                    <!-- box-->
-                   
-                    </div>
-                   </div>
-                   <!-- row -->
-              </div>
-              
-              
-              <div class="tab-pane" id="tab_2">
+                    <!-- row -->
+                </div>
+
+
+                <div class="tab-pane" id="tab_2">
                     <!-- BEGINNING OF TAB 2 -->
-                        <div class="box-body table-responsive">
+                    <div class="box-body table-responsive">
 
-                                    <table id="example2" class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th><%= __('ID') %></th>
-                                                <th><%= __('Name') %></th>
-                                                <th><%= __('Identifier') %></th>
-                                                <th><%= __('Protocol') %></th>
-                                                <th><%= __('Service') %></th>
-                                                <th><%= __('Room') %></th>
-                                                <th><%= __('User') %></th>
-                                                <th><%= __('devices-see-more') %></th>
-                                                <th><%= __('Action') %></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr infinite-scroll="vm.loadMore()" ng-repeat="device in vm.devices" class="ng-cloak">
-                                                <td>{{device.id}}</td>
-                                                <td><input type="text" placeholder="<%= __('device-create-name') %>" class="form-control" ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" placeholder="<%= __('device-create-identifier') %>" class="form-control" ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" placeholder="<%= __('device-create-protocol') %>" class="form-control" ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><input type="text" placeholder="<%= __('device-create-service') %>" class="form-control" ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
-                                                    <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
-                                                    </select>-->
-                                                    
-                                                    <select name="selectRoom" id="selectRoom" class="form-control"
-                                                            ng-options="room.name for room in vm.rooms track by room.id"
-                                                            ng-model="device.room" ng-change="vm.updateDevice(device);">
-                                                   </select>
-                                                </td>
-                                                <td>
-                                                    <select name="selectUser" class="form-control"
-                                                            ng-options="user.id as user.name for user in vm.users"
-                                                            ng-model="device.user" ng-change="vm.updateDevice(device);">
-                                                   </select>
-                                                </td>
-                                                <td><button class="btn btn-flat btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg" ng-click="vm.selectDevice(device);" ><%= __('devices-see-more') %></button></td>
-                                                <td><button class="btn btn-flat btn-danger"  ng-click="vm.deleteDevice($index, device.id);" ><%= __('Delete') %></button></td>
-                                            </tr>
-                                            <tr>
-                                                 <td></td>
-                                                 <td><div class="form-group"><input type="text" class="form-control" ng-model="vm.newDevice.name" placeholder="<%= __('device-create-name') %>" /></div></td>
-                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.identifier" placeholder="<%= __('device-create-identifier') %>" /></td>
-                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.protocol" placeholder="<%= __('device-create-protocol') %>" /></td>
-                                                 <td><input type="text" class="form-control" ng-model="vm.newDevice.service"  placeholder="<%= __('device-create-service') %>"/></td>
-                                                 <td>
-                                                    <select name="selectRoom" id="selectRoom" class="form-control"
-                                                            ng-options="room.name for room in vm.rooms track by room.id"
-                                                            ng-model="vm.newDevice.room" >
-                                                   </select>
-                                                </td>
-                                                <td>
-                                                    <select name="selectUser" class="form-control"
-                                                            ng-options="user.name for user in vm.users track by user.id"
-                                                            ng-model="vm.newDevice.user">
-                                                   </select>
-                                                </td>
-                                                <td></td>
-                                                 <td><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".create-device-modal" ng-click="vm.createDevice(vm.newDevice);" ><%= __('device-create-button') %></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="active">
+                                        <%= __('ID') %>
+                                    </th>
 
-                        </div>          
-                    
+                                    <th><a href="#" ng-click="vm.sortDevice = 'name';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('Name') %>
+                                                <span ng-show="vm.sortDevice == 'name' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'name' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th><a href="#" ng-click="vm.sortDevice = 'identifier';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('Identifier') %>
+                                                <span ng-show="vm.sortDevice == 'identifier' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'identifier' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th><a href="#" ng-click="vm.sortDevice = 'protocol';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('Protocol') %>
+                                                <span ng-show="vm.sortDevice == 'protocol' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'protocol' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th><a href="#" ng-click="vm.sortDevice = 'service';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('Service') %>
+                                                <span ng-show="vm.sortDevice == 'service' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'service' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th><a href="#" ng-click="vm.sortDevice = 'room.name';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('Room') %>
+                                                <span ng-show="vm.sortDevice == 'room.name' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'room.name' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th><a href="#" ng-click="vm.sortDevice = 'user';vm.sortDeviceReverse = !vm.sortDeviceReverse"><%= __('User') %>
+                                                <span ng-show="vm.sortDevice == 'user' && !vm.sortDeviceReverse" class="fa fa-angle-up"></span>
+                                                <span ng-show="vm.sortDevice == 'user' && vm.sortDeviceReverse" class="fa fa-angle-down"></span></a></th>
+                                    <th>
+                                        <%= __('devices-see-more') %>
+                                    </th>
+                                    <th>
+                                        <%= __('Action') %>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr infinite-scroll="vm.loadMore()" ng-repeat="device in vm.devices | orderBy:vm.sortDevice:vm.sortDeviceReverse" class="ng-cloak">
+                                    <td class="active">{{device.id}}</td>
+                                    <td><input type="text" placeholder="<%= __('device-create-name') %>" class="form-control"
+                                            ng-model="device.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);"
+                                        /></td>
+                                    <td><input type="text" placeholder="<%= __('device-create-identifier') %>" class="form-control"
+                                            ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);"
+                                        /></td>
+                                    <td><input type="text" placeholder="<%= __('device-create-protocol') %>" class="form-control"
+                                            ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);"
+                                        /></td>
+                                    <td><input type="text" placeholder="<%= __('device-create-service') %>" class="form-control"
+                                            ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);"
+                                        /></td>
+                                    <td>
+                                        <!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
+                                        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+                                        </select>-->
+
+                                        <select name="selectRoom" id="selectRoom" class="form-control" ng-options="room.name for room in vm.rooms track by room.id"
+                                            ng-model="device.room" ng-change="vm.updateDevice(device);">
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="selectUser" class="form-control" ng-options="user.id as user.name for user in vm.users" ng-model="device.user"
+                                            ng-change="vm.updateDevice(device);">
+                                        </select>
+                                    </td>
+                                    <td><button class="btn btn-flat btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg"
+                                            ng-click="vm.selectDevice(device);"><%= __('devices-see-more') %></button></td>
+                                    <td><button class="btn btn-flat btn-danger" ng-click="vm.deleteDevice($index, device.id);"><%= __('Delete') %></button></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div class="form-group"><input type="text" class="form-control" ng-model="vm.newDevice.name"
+                                                placeholder="<%= __('device-create-name') %>" /></div>
+                                    </td>
+                                    <td><input type="text" class="form-control" ng-model="vm.newDevice.identifier" placeholder="<%= __('device-create-identifier') %>"
+                                        /></td>
+                                    <td><input type="text" class="form-control" ng-model="vm.newDevice.protocol" placeholder="<%= __('device-create-protocol') %>"
+                                        /></td>
+                                    <td><input type="text" class="form-control" ng-model="vm.newDevice.service" placeholder="<%= __('device-create-service') %>"
+                                        /></td>
+                                    <td>
+                                        <select name="selectRoom" id="selectRoom" class="form-control" ng-options="room.name for room in vm.rooms track by room.id"
+                                            ng-model="vm.newDevice.room">
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="selectUser" class="form-control" ng-options="user.name for user in vm.users track by user.id" ng-model="vm.newDevice.user">
+                                        </select>
+                                    </td>
+                                    <td></td>
+                                    <td><button class="btn btn-flat btn-success" data-toggle="modal" data-target=".create-device-modal"
+                                            ng-click="vm.createDevice(vm.newDevice);"><%= __('device-create-button') %></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
                     <!-- END OF TAB 2 -->
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_3" data-ng-controller="DeviceStateCtrl as vm">
-                  
-                  <!-- BEGINNING OF TAB 3 -->
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_3" data-ng-controller="DeviceStateCtrl as vm">
+
+                    <!-- BEGINNING OF TAB 3 -->
                     <div class="row">
                         <div class="col-md-8 pull-right">
                             <form class="form-inline">
                                 <div class="form-group">
                                     <label for="selectDeviceType"><%= __('devices-select-device-type') %> : </label>
-                                    <select name="selectDeviceType" id="selectDeviceType" class="form-control"
-                                        ng-options="(deviceType.name || deviceType.deviceName + ' - ' + deviceType.type) for deviceType in vm.deviceTypes track by deviceType.id"
+                                    <select name="selectDeviceType" id="selectDeviceType" class="form-control" ng-options="(deviceType.name || deviceType.deviceName + ' - ' + deviceType.type) for deviceType in vm.deviceTypes track by deviceType.id"
                                         ng-model="vm.currentDeviceType">
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                     <button class="btn btn-flat btn-info" ng-click="vm.previousStates();" ><%= __('devices-skip-previous') %></button>
-                                     <button class="btn btn-flat btn-info" ng-click="vm.nextStates();" ><%= __('devices-skip-next') %></button>
+                                    <button class="btn btn-flat btn-info" ng-click="vm.previousStates();"><%= __('devices-skip-previous') %></button>
+                                    <button class="btn btn-flat btn-info" ng-click="vm.nextStates();"><%= __('devices-skip-next') %></button>
                                 </div>
-                                </form>
-                            
-                           
-                            
+                            </form>
+
+
+
                         </div>
                         <!-- col-md-4 -->
-                        
-                       
+
+
                         <!-- col-md-6 -->
                     </div>
-                     <!-- /.row --> 
-                     
-                      
-                            
-                    <div>
-                        <canvas id="line" class="chart chart-line" chart-data="vm.chart.data"
-                         chart-labels='vm.chart.labels' chart-options="vm.options" chart-series="vm.chart.series">
-                        </canvas> 
-                    </div>
-                     
-                  <!-- END OF TAB 3 -->
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_3">
+                    <!-- /.row -->
 
-              </div>
-              <!-- /.tab-pane -->
+
+
+                    <div>
+                        <canvas id="line" class="chart chart-line" chart-data="vm.chart.data" chart-labels='vm.chart.labels' chart-options="vm.options"
+                            chart-series="vm.chart.series">
+                        </canvas>
+                    </div>
+
+                    <!-- END OF TAB 3 -->
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_3">
+
+                </div>
+                <!-- /.tab-pane -->
             </div>
             <!-- /.tab-content -->
-          </div>
+        </div>
 
-                    
-                    
-  
-                <!-- Large modal -->
-                <div id="modalNewSensor" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-lg" id="modal-devices">
-                    <div class="modal-content">
-                       <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                              <h4 class="modal-title" id="myLargeModalLabel"><%= __('devices-devicetype-modal-title') %></h4>
-                            </div>
-                            <div class="modal-body">
-                                 <div class="box-body table-responsive">
-                                            <table id="example2" class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th><%= __('devices-types-ID') %></th>
-                                                <th><%= __('devices-types-name') %></th>
-                                                <th><%= __('devices-types-identifier') %></th>
-                                                <th><%= __('devices-types-type') %></th>
-                                                <th><%= __('devices-types-category') %></th>
-                                                <th><%= __('devices-types-tag') %></th>
-                                                <th><%= __('devices-types-unit') %></th>
-                                                <th><%= __('devices-types-min') %></th>
-                                                <th><%= __('devices-types-max') %></th>
-                                                <th><%= __('devices-types-isensor') %></th>
-                                                <th><%= __('devices-types-display') %></th>
-                                                <th><%= __('devices-types-lastvalue') %></th>
-                                                <th><%= __('Delete') %></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="type in vm.selectedDevice.types" class="ng-cloak">
-                                                <td>{{type.id}}</td>
-                                                <td><input type="text" class="form-control" ng-model="type.name"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="type.identifier"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="type.type"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td>
-                                                    <select class="form-control" ng-model="type.category" ng-change="vm.updateDeviceType(type);" >
-                                                        <option value="light"><%= __('devices-types-category-light') %></option>
-                                                        <option value="outlet"><%= __('devices-types-category-outlet') %></option>
-                                                        <option value="music"><%= __('devices-types-category-music') %></option>
-                                                        <option value="tv"><%= __('devices-types-category-tv') %></option>
-                                                        <option value="phone"><%= __('devices-types-category-phone') %></option>
-                                                        <option value="computer"><%= __('devices-types-category-computer') %></option>
-                                                    </select>
-                                                </td>
-                                                <td><input type="text" class="form-control" ng-model="type.tag"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="type.unit"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="type.min"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
-                                                <td><input type="text" class="form-control" ng-model="type.max"  ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType(type);" /></td>
 
-                                                <td>
-                                                    <div class="toogle" ng-click="vm.changeTypeSensor(type);">
-                                                        <input type="checkbox" ng-model="type.sensor" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
-                                                        <label class="toogle-label" for="mytoogle"></label>
-                                                    </div>                                                                                                    
-                                                </td>
-                                                
-                                                <td>
-                                                    <div class="toogle" ng-click="vm.changeTypeDisplay(type);">
-                                                        <input type="checkbox" ng-model="type.display" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
-                                                        <label class="toogle-label" for="mytoogle"></label>
+
+
+        <!-- Large modal -->
+        <div id="modalNewSensor" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" id="modal-devices">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myLargeModalLabel">
+                            <%= __('devices-devicetype-modal-title') %>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box-body table-responsive">
+                            <table id="example3" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="active">
+                                            <%= __('devices-types-ID') %>
+                                        </th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'name';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-name') %>
+                                                    <span ng-show="vm.sortDeviceType == 'name' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'name' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'identifier';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-identifier') %>
+                                                    <span ng-show="vm.sortDeviceType == 'identifier' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'identifier' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'type';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-type') %>
+                                                    <span ng-show="vm.sortDeviceType == 'type' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'type' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'category';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-category') %>
+                                                    <span ng-show="vm.sortDeviceType == 'category' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'category' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'tag';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-tag') %>
+                                                    <span ng-show="vm.sortDeviceType == 'tag' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'tag' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'unit';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-unit') %>
+                                                    <span ng-show="vm.sortDeviceType == 'unit' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'unit' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'min';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-min') %>
+                                                    <span ng-show="vm.sortDeviceType == 'min' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'min' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'max';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-max') %>
+                                                    <span ng-show="vm.sortDeviceType == 'max' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'max' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'sensor';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-isensor') %>
+                                                    <span ng-show="vm.sortDeviceType == 'sensor' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'sensor' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th><a href="#" ng-click="vm.sortDeviceType = 'display';vm.sortDeviceTypeReverse = !vm.sortDeviceTypeReverse"><%= __('devices-types-display') %>
+                                                    <span ng-show="vm.sortDeviceType == 'display' && !vm.sortDeviceTypeReverse" class="fa fa-angle-up"></span>
+                                                    <span ng-show="vm.sortDeviceType == 'display' && vm.sortDeviceTypeReverse" class="fa fa-angle-down"></span></a></th>
+                                        <th>
+                                            <%= __('devices-types-lastvalue') %>
+                                        </th>
+                                        <th>
+                                            <%= __('Delete') %>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="type in vm.selectedDevice.types | orderBy:vm.sortDeviceType:vm.sortDeviceTypeReverse" class="ng-cloak">
+                                        <td class="active">{{type.id}}</td>
+                                        <td><input type="text" class="form-control" ng-model="type.name" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td><input type="text" class="form-control" ng-model="type.identifier" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td><input type="text" class="form-control" ng-model="type.type" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td>
+                                            <select class="form-control" ng-model="type.category" ng-change="vm.updateDeviceType(type);">
+                                                <option value="light">
+                                                    <%= __('devices-types-category-light') %>
+                                                </option>
+                                                <option value="outlet">
+                                                    <%= __('devices-types-category-outlet') %>
+                                                </option>
+                                                <option value="music">
+                                                    <%= __('devices-types-category-music') %>
+                                                </option>
+                                                <option value="tv">
+                                                    <%= __('devices-types-category-tv') %>
+                                                </option>
+                                                <option value="phone">
+                                                    <%= __('devices-types-category-phone') %>
+                                                </option>
+                                                <option value="computer">
+                                                    <%= __('devices-types-category-computer') %>
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" ng-model="type.tag" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td><input type="text" class="form-control" ng-model="type.unit" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td><input type="text" class="form-control" ng-model="type.min" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td><input type="text" class="form-control" ng-model="type.max" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+
+                                        <td>
+                                            <div class="toogle" ng-click="vm.changeTypeSensor(type);">
+                                                <input type="checkbox" ng-model="type.sensor" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle"></label>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="toogle" ng-click="vm.changeTypeDisplay(type);">
+                                                <input type="checkbox" ng-model="type.display" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!-- If the deviceType is a sensor, display last data -->
+                                            <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
+
+                                            <!-- If the deviceType is not a sensor and is not a binary, display input field -->
+                                            <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control input-sm" ng-model="type.lastValue" />
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-flat btn-success" ng-click="vm.changeValue(type, type.lastValue);"><%= __('devices-types-changevalue') %></button>
+                                                        </span>
                                                     </div>
-                                                </td>
-                                                <td>
-                                                    <!-- If the deviceType is a sensor, display last data -->
-                                                    <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
-                                                    
-                                                    <!-- If the deviceType is not a sensor and is not a binary, display input field -->
-                                                     <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
-                                                        <div class="form-group">
-                                                            <div class="input-group">
-                                                            <input 
-                                                                type="number" class="form-control input-sm" 
-                                                                ng-model="type.lastValue" 
-                                                            />
-                                                            <span class="input-group-btn">
-                                                            <button class="btn btn-flat btn-success" ng-click="vm.changeValue(type, type.lastValue);" ><%= __('devices-types-changevalue') %></button> 
-                                                            </span>
-                                                            </div>
-                                                        </div>
-                                                     </form>    
-                                                    <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
-                                                    <div class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
-                                                        <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
-                                                        <label class="toogle-label" for="mytoogle" ng-show="!type.sensor && type.type == 'binary'"></label>
-                                                    </div>
-                                                </td>
-                                                <td><button class="btn btn-flat btn-danger" ng-click="vm.deleteDeviceType($index, type.id);"><%= __('Delete') %></button></td>
-                                            </tr>
-                                            <tr>
-                                                <td></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.name" placeholder="<%= __('devices-types-name') %>" /></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.identifier" placeholder="<%= __('devices-types-identifier') %>" /></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.type" placeholder="<%= __('devices-types-type') %>" /></td>
-                                                <td>
-                                                    <select class="form-control" ng-model="vm.newType.category"  >
-                                                        <option value="light"><%= __('devices-types-category-light') %></option>
-                                                        <option value="outlet"><%= __('devices-types-category-outlet') %></option>
-                                                        <option value="music"><%= __('devices-types-category-music') %></option>
-                                                        <option value="tv"><%= __('devices-types-category-tv') %></option>
-                                                        <option value="phone"><%= __('devices-types-category-phone') %></option>
-                                                        <option value="computer"><%= __('devices-types-category-computer') %></option>
-                                                    </select>    
-                                                </td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.tag" placeholder="<%= __('devices-types-tag') %>" /></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.unit" placeholder="<%= __('devices-types-unit') %>" /></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.min" placeholder="<%= __('devices-types-min') %>" /></td>
-                                                <td><input type="text" class="form-control" ng-model="vm.newType.max" placeholder="<%= __('devices-types-max') %>" /></td>
-                                                
-                                                <td>
-                                                    <div class="toogle" ng-click="vm.newType.sensor =! vm.newType.sensor">
-                                                        <input type="checkbox" ng-model="vm.newType.sensor" class="toogle-checkbox toogle-blue" />
-                                                        <label class="toogle-label" for="mytoogle"></label>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="toogle" ng-click="vm.newType.display =! vm.newType.display">
-                                                        <input type="checkbox" ng-model="vm.newType.display" class="toogle-checkbox toogle-blue" />
-                                                        <label class="toogle-label" for="mytoogle"></label>
-                                                    </div>
-                                                </td>
-                                                <td></td>
-                                                <td><button class="btn btn-flat btn-success" ng-click="vm.createDeviceType(vm.newType);"><%= __('Create') %></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                  
-                                  
-                                  </div>
-  
-                                <!-- END OF BODY -->
-                            </div>
-                  </div>
+                                                </div>
+                                            </form>
+                                            <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
+                                            <div class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
+                                                <input type="checkbox" ng-show="!type.sensor && type.type == 'binary'" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0"
+                                                    class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle" ng-show="!type.sensor && type.type == 'binary'"></label>
+                                            </div>
+                                        </td>
+                                        <td><button class="btn btn-flat btn-danger" ng-click="vm.deleteDeviceType($index, type.id);"><%= __('Delete') %></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.name" placeholder="<%= __('devices-types-name') %>"
+                                            /></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.identifier" placeholder="<%= __('devices-types-identifier') %>"
+                                            /></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.type" placeholder="<%= __('devices-types-type') %>"
+                                            /></td>
+                                        <td>
+                                            <select class="form-control" ng-model="vm.newType.category">
+                                                <option value="light">
+                                                    <%= __('devices-types-category-light') %>
+                                                </option>
+                                                <option value="outlet">
+                                                    <%= __('devices-types-category-outlet') %>
+                                                </option>
+                                                <option value="music">
+                                                    <%= __('devices-types-category-music') %>
+                                                </option>
+                                                <option value="tv">
+                                                    <%= __('devices-types-category-tv') %>
+                                                </option>
+                                                <option value="phone">
+                                                    <%= __('devices-types-category-phone') %>
+                                                </option>
+                                                <option value="computer">
+                                                    <%= __('devices-types-category-computer') %>
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.tag" placeholder="<%= __('devices-types-tag') %>"
+                                            /></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.unit" placeholder="<%= __('devices-types-unit') %>"
+                                            /></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.min" placeholder="<%= __('devices-types-min') %>"
+                                            /></td>
+                                        <td><input type="text" class="form-control" ng-model="vm.newType.max" placeholder="<%= __('devices-types-max') %>"
+                                            /></td>
+
+                                        <td>
+                                            <div class="toogle" ng-click="vm.newType.sensor =! vm.newType.sensor">
+                                                <input type="checkbox" ng-model="vm.newType.sensor" class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="toogle" ng-click="vm.newType.display =! vm.newType.display">
+                                                <input type="checkbox" ng-model="vm.newType.display" class="toogle-checkbox toogle-blue" />
+                                                <label class="toogle-label" for="mytoogle"></label>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td><button class="btn btn-flat btn-success" ng-click="vm.createDeviceType(vm.newType);"><%= __('Create') %></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+                        <!-- END OF BODY -->
+                    </div>
                 </div>
+            </div>
+        </div>
+        <!-- end of modal -->
+
+
+
+        <!-- Large modal -->
+        <div id="modalSelectedRoom" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog" id="modal-devices-room">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myLargeModalLabel">
+                            {{vm.selectedRoom.name}}
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box-body table-responsive">
+                            <table id="example3" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>
+                                            <%= __('box-device-value-title') %>
+                                        </th>
+                                        <th>
+                                            <%= __('devices-types-name') %>
+                                        </th>
+                                        <th>
+                                            <%= __('devices-types-type') %>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="type in vm.selectedRoom.deviceTypes | orderBy:'idDeviceTypeOrder'" class="ng-cloak">
+                                        <td><input type="number" class="form-control" ng-model="type.idDeviceTypeOrder" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td>{{type.name}}</td>
+                                        <td><input type="text" class="form-control" ng-model="type.deviceTypeName" ng-model-options='{ debounce: 500 }'
+                                                ng-change="vm.updateDeviceType(type);" /></td>
+                                        <td>{{type.type}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <!-- end of modal -->
-                
-                
-                </section><!-- /.content -->
-            </aside><!-- /.content-wrapper -->
-            
-            <script>
-                document.getElementById("sensorLi").className = "active";
-            </script>
+            </div>
+        </div>
+        <!-- end of modal -->
 
 
 
+    </section><!-- /.content -->
+</aside><!-- /.content-wrapper -->
 
-            
+<script>
+    document.getElementById("sensorLi").className = "active";
+</script>
