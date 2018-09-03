@@ -1,3 +1,4 @@
+// https://github.com/bladepop/colorpicker
 angular.module('tb-color-picker', [])
     .run(['$templateCache', function ($templateCache) {
         $templateCache.put('color-picker.tp1.html', '<div class="color-picker">' +
