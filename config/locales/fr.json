@@ -214,7 +214,7 @@
   "devices-skip-next": "Suivant",
   "devices-types-ID": "ID",
   "devices-types-name": "Nom",
-  "devices-types-identifier": "Identifier",
+  "devices-types-identifier": "Identifiant",
   "devices-types-type": "type",
   "devices-types-category": "Catégorie",
   "devices-types-tag": "tag",
@@ -241,8 +241,8 @@
   "devices-types-category-music": "Musique",
   "devices-types-category-tv": "TV",
   "device-create-name": "Nom",
-  "device-create-identifier": "Identifier",
-  "device-create-protocol": "Protocol",
+  "device-create-identifier": "Identifiant",
+  "device-create-protocol": "Protocole",
   "device-create-service": "Service",
   "device-create-button": "Créer",
   "notification-update-available-title": "Mise à jour disponible !",
@@ -562,5 +562,9 @@
   "reset-password-new-password": "Nouveau mot de passe",
   "reset-password-button": "Changer mon mot de passe",
   "reset-password-minimum-size-warning": "(Minimum 8 caractères)",
-  "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer."
+  "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer.",
+  "order": "Ordre",
+  "color": "couleur",
+  "function": "fonction",
+  "functions": "fonctions"
 }
