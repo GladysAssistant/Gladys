@@ -206,8 +206,8 @@ module.exports = {
    * 
    * @apiUse DeviceTypeSuccess
    */
-  update: function(req, res, next) {
-      gladys.deviceType.update(req.params.id, req.body)
+  update: function(req, res, next) { 
+    gladys.deviceType.update(req.params.id, req.body)
         .then((deviceType) => res.json(deviceType))
         .catch(next);
   }

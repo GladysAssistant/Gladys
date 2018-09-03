@@ -1,7 +1,7 @@
   
 (function() {
     'use strict';
-
+//, 'tb-color-picker'
     angular
-        .module('gladys', ['ng.deviceDetector', 'infinite-scroll', 'angularMoment', 'ui-notification', 'smoothScroll', 'chart.js', 'pascalprecht.translate', 'ui.bootstrap-slider', 'ng.deviceDetector', 'mwl.calendar']);
+        .module('gladys', ['ng.deviceDetector', 'infinite-scroll', 'angularMoment', 'ui-notification', 'smoothScroll', 'chart.js', 'pascalprecht.translate', 'ui.bootstrap-slider', 'ng.deviceDetector', 'mwl.calendar', 'tb-color-picker']);
 })();

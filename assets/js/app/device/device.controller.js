@@ -27,7 +27,7 @@
     vm.remoteIsBusy = false;
     vm.noMoreElements = false;
     vm.getDeviceTypesByRoom = getDeviceTypesByRoom;
-    
+
     vm.saving = false;
     vm.ready = false;
     vm.devices = [];
@@ -38,6 +38,15 @@
     };
     
     vm.updateDevice = updateDevice;
+
+    vm.updateDeviceTypeOrder = updateDeviceTypeOrder;
+    vm.updateDeviceTypeColor = updateDeviceTypeColor;
+    vm.selectedRoom = [];
+    vm.sortDevice = 'id';
+    vm.sortDeviceReverse = false;
+    vm.sortDeviceType = 'order';
+    vm.sortDeviceTypeReverse = false;
+    vm.options = ['#ffffff','#f5f5f5', '#dff0d8', '#d9edf7', '#fcf8e3', '#f2dede'];
 
     activate();
 
@@ -171,6 +180,7 @@
     }
     
     function updateDeviceType(deviceType){
+        console.log(deviceType);
         return deviceService.updateDeviceType(deviceType)
             .then(function(){
                 
@@ -220,6 +230,23 @@
         return updateDeviceType(type);
     }
    
+        function updateDeviceTypeOrder(id, order) {
+            var newType = {
+                id: id,
+                order: order
+            };
+            return updateDeviceType(newType);
+        }
+   
+        function updateDeviceTypeColor(id, color) {
+            var tmpColor=color.substring(1);
+            var newType = {
+                id: id,
+                color: tmpColor
+            };
+            return updateDeviceType(newType);
+        }
+
      // waiting for websocket message
     function waitForNewValue(){
         
