@@ -122,3 +122,5 @@ typings
 jsconfig.json
 .env
 .vscode
+views/installation/index.ejs
+views/layout.ejs

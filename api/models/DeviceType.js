@@ -89,8 +89,8 @@ module.exports = {
         },
 
         color: {
-            type: 'varchar',
-            defaultsTo: '#ffffff'
+            type: 'string',
+            defaultsTo: '#FFFFFF'
         }
 
     }

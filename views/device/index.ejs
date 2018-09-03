@@ -417,9 +417,9 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="type in vm.selectedRoom.deviceTypes | orderBy:'order':false" class="ng-cloak">
-                                        <td><color-picker color="type.color" options="vm.options" on-color-changed="vm.updateDeviceTypeColor(type.id,newColor);"></color-picker></td>
+                                        <td><color-picker color="type.color" options="vm.options" on-color-changed="vm.updateDeviceType({id: type.id, color: newColor});"></color-picker></td>
                                         <td><input type="number" class="form-control" ng-model="type.order" ng-model-options='{ debounce: 500 }'
-                                                ng-change="vm.updateDeviceTypeOrder(type.id,type.order);" /></td>
+                                                ng-change="vm.updateDeviceType({id: type.id, order: type.order});"/></td>
                                         <td>{{type.name}}</td>
                                         <td>{{type.deviceTypeName}}</td>                                                
                                         <td>{{type.type}}</td>
