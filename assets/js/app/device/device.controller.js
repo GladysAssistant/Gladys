@@ -178,7 +178,6 @@
     }
     
     function updateDeviceType(deviceType){
-        console.log(deviceType);
         return deviceService.updateDeviceType(deviceType)
             .then(function(){
                 
