@@ -86,6 +86,7 @@ module.exports.policies = {
     update: ['checkToken', 'isAdmin'],
     healthCheck: true
   },
+  Television : ['checkToken'],
   Timer: ['checkToken'],
   Token : ['checkToken'],
   Update: ['checkToken'],

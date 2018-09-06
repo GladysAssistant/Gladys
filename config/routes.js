@@ -260,6 +260,21 @@ module.exports.routes = {
   'post /system/update': 'SystemController.update',
   'get /system/health': 'SystemController.healthCheck',
 
+  // Television
+  'post /television/switchState': 'TelevisionController.switchState',
+  'get /television/getState': 'TelevisionController.getState',
+  'post /television/setChannel': 'TelevisionController.setChannel',
+  'get /television/getChannel': 'TelevisionController.getChannel',
+  'get /television/getMuted': 'TelevisionController.getMuted',
+  'get /television/getVolume': 'TelevisionController.getVolume',
+  'post /television/fastForward': 'TelevisionController.fastForward',
+  'post /television/rewind': 'TelevisionController.rewind',
+  'post /television/pause': 'TelevisionController.pause',
+  'post /television/play': 'TelevisionController.play',
+  'post /television/setMuted': 'TelevisionController.setMuted',
+  'post /television/setVolume': 'TelevisionController.setVolume',
+  'post /television/stop': 'TelevisionController.stop',
+
   // Token
   'get /token': 'TokenController.index',
   'post /token': 'TokenController.create',

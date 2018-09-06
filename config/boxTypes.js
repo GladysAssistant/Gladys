@@ -6,6 +6,12 @@ module.exports.boxTypes = [
         "view": "dashboard"
     },
     {
+        "uuid": "5616b85f-1fcb-46f6-a1ff-a6403c76e3b7",
+        "title": "television",
+        "path": "views/boxs/television.ejs",
+        "view": "dashboard"
+    },
+    {
         "uuid": "887eec64-b54d-40d2-a35c-dc99e3d5a2ee",
         "title": "music",
         "path": "views/boxs/music.ejs",
