@@ -12,6 +12,7 @@
     visibility: hidden;
     width: 136px;
     z-index: 4011;
+    white-space: normal;
 }
 
 .color-picker:hover .color-palette {
