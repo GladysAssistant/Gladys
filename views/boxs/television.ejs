@@ -1,129 +1,16 @@
 <style type="text/css">
-    * {
-        margin: 0;
-        padding: 0;
-    }
-
     li {
         list-style: none;
     }
 
     ul {
-        margin-top: 10px;
-        margin-bottom: 0px;
-    }
-
-    .btn-circle {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
-        padding: 10px 16px;
-        font-size: 24px;
-        line-height: 1.33;
-        border-top-left-radius: 25px;
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-bottom-left-radius: 25px;
-    }
-
-    .btn-circle.danger {
-        border-color: #d73925;
-        background-color: #dd4b39;
-        color: white;
-        padding: 13px 0px 0px 0px;
-    }
-
-    .btn-circle.danger:hover {
-        background-color: #ac2925;
-        border-color: #761c19;
-    }
-
-    .btn-circle.danger:focus {
-        background-color: #c9302c;
-        border-color: #761c19;
-    }
-
-    .btn-circle.danger:active {
-        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-        background-color: #d73925;
-    }
-
-    .btn-circle.btn-left-vol {
-        padding: 11px 0px 0px 16px;
-        line-height: 1.33;
-        border-top-left-radius: 25px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 25px;
-        border-right-width: 0px;
-        margin-right: -5px;
-        margin-left: -5px
-    }
-
-    .btn-circle.btn-right-vol {
-        padding: 11px 16px 0px 10px;
-        line-height: 1.33;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-bottom-left-radius: 0px;
-        border-left-width: 1px;
-        margin-left: 0px;
-    }
-
-    .btn-circle-centre-vol {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
-        font-size: 18px;
-        line-height: 1.33;
-        border-left-width: 1px;
-        border-right-width: 0px;
-        margin-left: 0px;
-        margin-right: -10px;
-        padding: 11px 0px 0px 0px;
-    }
-
-    .btn-circle.btn-left-prog {
-        padding: 5px 0px 0px 5px;
-        line-height: 1.33;
-        border-top-left-radius: 25px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 25px;
-        border-right-width: 0px;
-        margin-right: -5px;
-        margin-left: -5px
-    }
-
-    .btn-circle.btn-right-prog {
-        padding: 6px 10px 0px 10px;
-        line-height: 1.33;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-bottom-left-radius: 0px;
-        border-left-width: 1px;
-        margin-left: 0px;
-    }
-
-    .btn-circle-centre-prog {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
-        font-size: 18px;
-        line-height: 1.33;
-        border-left-width: 1px;
-        border-right-width: 0px;
-        margin-left: 0px;
-        margin-right: -10px;
-        padding: 14px 0px 0px 0px;
+        padding: 0;
     }
 
     .circle {
         position: relative;
         margin: auto;
-        margin-top: 40px;
+        margin-top: 10px;
         width: 160px;
         height: 160px;
         padding: 0px;
@@ -179,83 +66,97 @@
         border-bottom-left-radius: 40px;
     }
 
-    .btn-pad {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
-        font-size: 18px;
-        line-height: 1.33;
-        margin: 0px 10px 10px 0px;
+    .btn-margin {
+        margin: 7px
     }
 
-    .btn-cde {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
-        font-size: 18px;
-        line-height: 1.33;
-        margin: 5px 0px 5px 5px;
+    .btn-left-rounded {
+        border-top-left-radius: 50%;
+        border-bottom-left-radius: 50%;
     }
 
-    .btn-cde-glyphicon {
-        top: 0px;
+    .btn-right-rounded {
+        border-top-right-radius: 50%;
+        border-bottom-right-radius: 50%;
     }
 
-    .btn-cde.btn-rec {
-        color: #dd4b39;
-        margin: 0px 0px 0px 15px;
+    .btn-circle2 {
+        width: 40px;
+        height: 40px;
+        border-radius: 40px;
+        text-align: center;
+        color: white;
     }
 
-    .btn-rec:hover {
-        color: #ac2925;
+    .box-footer {
+        background-color: #3d8dbc57;
     }
 
-    .btn-rec:active {
-        color: #d73925;
-    }
+    @media (max-width: 800px) {
 
-    .box-footer-tv {
-        background-color: #c0c0c085;
+        .btn-flat,
+        .btn-primary,
+        .btn-group {
+            margin: 5px;
+        }
     }
 </style>
 
-<div class="box box-info" data-ng-controller="TelevisionCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+<div class="box box-primary" data-ng-controller="TelevisionCtrl as vm" ng-init="vm.init(1);">
     <div class="box-header with-border">
         <i class="fa fa-television"></i>
         <h3 class="box-title">
-            <%= __('box-television-title') %>
+            <%= __('box-television-title') %> ( <span ng-repeat="room in vm.rooms | filter:{id:vm.roomId}">{{room.name}}</span> )
+             : <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}">{{vm.currentSource}}</span>
+             
         </h3>
+
+        
+
+        <div ng-show="vm.roomId" class="box-tools">
+
+            <div class="pull-right box-tools">
+                <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bars"></i></button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li ng-repeat="room in vm.rooms"><a href="#" ng-click="vm.selectRoomId(room.id);">{{room.name}}</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 
-    <!-- /.box-header -->
     <div class="box-body">
         <div ng-show="vm.roomId" class="ng-cloak">
-
-            <!-- on/off -->
             <div class="row">
                 <div class="col-sm-2 text-left">
-                    <a ng-click="vm.switchState()" class="btn btn-app btn-circle danger"><i class="fa fa-power-off"></i></a>
+                    <!--on/off-->
+                    <button type="button" ng-click="vm.switchState()" class="btn btn-default btn-danger btn-circle2"><i class="fa fa-power-off"></i></button>
                 </div>
-                <!-- Volume + et - -->
                 <div class="col-sm-5 text-center">
-                    <a ng-click="vm.volumeDown()" class="btn btn-app btn-circle btn-left-vol"><i class="glyphicon glyphicon-volume-down"></i></a>
-                    <a ng-click="vm.setMuted()" class="btn btn-app btn-circle-centre-vol"><i class="glyphicon glyphicon-volume-off"></i></a>
-                    <a ng-click="vm.volumeUp()" class="btn btn-app btn-circle btn-right-vol"><i class="glyphicon glyphicon-volume-up"></i></a>
+                    <!--Son-->
+                    <div class="btn-group">
+                        <button type="button" ng-click="vm.volumeDown()" class="btn btn-default btn-left-rounded"><i class="glyphicon glyphicon-volume-down"></i></button>
+                        <button type="button" ng-click="vm.setMuted()" class="btn btn-default"><i class="glyphicon glyphicon-volume-off"></i></button>
+                        <button type="button" ng-click="vm.volumeUp()" class="btn btn-default btn-right-rounded"><i class="glyphicon glyphicon-volume-up"></i></button>
+                    </div>
                 </div>
-                <!-- prog + et - -->
                 <div class="col-sm-5 text-center">
-                    <a ng-click="vm.programMinus()" class="btn btn-app btn-circle btn-left-prog">-</a>
-                    <a class="btn btn-app btn-circle-centre-prog"><i class="fa fa-tv"></i></a>
-                    <a ng-click="vm.programPlus()" class="btn btn-app btn-circle btn-right-prog">+</i></a>
+                    <!--Programme-->
+                    <div class="btn-group">
+                        <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</i></button>
+                        <button type="button" class="btn btn-default"><i class="fa fa-tv"></i></button>
+                        <button type="button" ng-click="vm.programPlus()" class="btn btn-default btn-right-rounded">+</i></button>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
+                <div class="col-sm-2"></div>
                 <!--Joystick-->
-                <div class="col-sm-7 text-center">
+                <div class="col-sm-5 text-center">
                     <div class="circle">
                         <ul>
-                            <li ng-click="vm.pressKey('up')" ><i class="fa fa-3x fa-caret-up"></i></li>
+                            <li ng-click="vm.pressKey('up')"><i class="fa fa-3x fa-caret-up"></i></li>
                             <li ng-click="vm.pressKey('right')"><i class="fa fa-3x fa-caret-right"></i></li>
                             <li ng-click="vm.pressKey('down')"><i class="fa fa-3x fa-caret-down"></i></li>
                             <li ng-click="vm.pressKey('left')"><i class="fa fa-3x fa-caret-left"></i></li>
@@ -263,26 +164,26 @@
                         <a ng-click="vm.pressKey('ok')" class="btn btn-app btn-circle btn-ok">OK</a>
                     </div>
                 </div>
-                <!--Pavé numérique-->
                 <div class="col-sm-5 text-center">
+                    <!-- Pad-->
                     <ul>
                         <li>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(1)">1</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(2)">2</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(3)">3</a>
+                            <button type="button" ng-click="vm.setChannel(1)" class="btn btn-default btn-margin">1</i></button>
+                            <button type="button" ng-click="vm.setChannel(2)" class="btn btn-default btn-margin">2</i></button>
+                            <button type="button" ng-click="vm.setChannel(3)" class="btn btn-default btn-margin">3</i></button>
                         </li>
                         <li>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(4)">4</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(4)">5</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(5)">6</a>
+                            <button type="button" ng-click="vm.setChannel(4)" class="btn btn-default btn-margin">4</i></button>
+                            <button type="button" ng-click="vm.setChannel(5)" class="btn btn-default btn-margin">5</i></button>
+                            <button type="button" ng-click="vm.setChannel(6)" class="btn btn-default btn-margin">6</i></button>
                         </li>
                         <li>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(7)">7</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(8)">8</a>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(9)">9</a>
+                            <button type="button" ng-click="vm.setChannel(7)" class="btn btn-default btn-margin">7</i></button>
+                            <button type="button" ng-click="vm.setChannel(8)" class="btn btn-default btn-margin">8</i></button>
+                            <button type="button" ng-click="vm.setChannel(9)" class="btn btn-default btn-margin">9</i></button>
                         </li>
                         <li>
-                            <a class="btn btn-app btn-pad" ng-click="vm.setChannel(0)">0</a>
+                            <button type="button" ng-click="vm.setChannel(0)" class="btn btn-default btn-margin">0</i></button>
                         </li>
                     </ul>
                 </div>
@@ -298,26 +199,29 @@
                         <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
                     </select>
                 </div>
-                <div class="col-xs-2"> <button class="btn btn-success btn-flat" ng-click="vm.selectRoomId(vm.selectedRoomId);"><%= __('box-television-television-validate') %></button>
+                <div class="col-xs-2"> <button class="btn btn-success btn-flat" ng-click="vm.selectRoomId(vm.selectedRoomId);">
+                        <%= __('box-television-television-validate') %></button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- /.box-body -->
-    <div class="box-footer box-footer-tv">
-        <div ng-show="vm.roomId" class="ng-cloak">
+    <div ng-show="vm.roomId" class="box-footer">
+        <div class="ng-cloak">
             <div class="row">
                 <div class="col-sm-3 text-center">
-                    <a class="btn btn-app btn-cde" ng-click=""><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></a>
-                    <a class="btn btn-app btn-cde" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></a>
+                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
+                    <ul class="dropdown-menu pull-left" role="menu">
+                            <li ng-repeat="source in vm.allSources"><a href="#" ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
+                        </ul>
+                    <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
                 </div>
                 <div class="col-sm-9 text-center">
-                    <a class="btn btn-app btn-cde" ng-click="vm.rewind()"><i class="fa fa-backward"></i></a>
-                    <a class="btn btn-app btn-cde" ng-click="vm.play()"><i class="fa fa-play"></i></a>
-                    <a class="btn btn-app btn-cde" ng-click="vm.pause()"><i class="fa fa-pause"></i></a>
-                    <a class="btn btn-app btn-cde" ng-click="vm.stop()"><i class="fa fa-stop"></i></a>
-                    <a class="btn btn-app btn-cde" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></a>
-                    <a class="btn btn-app btn-cde btn-rec" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></i></a>
+                    <button class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.stop()"><i class="fa fa-stop"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></button>
+                    <button class="btn btn-danger" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
                 </div>
             </div>
         </div>

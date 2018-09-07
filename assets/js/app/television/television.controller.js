@@ -27,7 +27,8 @@
         vm.currentSoundState = '';
         vm.currentChannel = '';
         vm.currentMuteState = '';
-        vm.allSources = [];
+        vm.allSources = [{label:'TV'}];
+        vm.currentSource = 'TV';
 
         vm.selectRoomId = selectRoomId;
 
@@ -56,7 +57,8 @@
         
         function activate(){
             getRoomId();
-            if(vm.displayAskRoomForm) getRooms();
+            //if(vm.displayAskRoomForm) getRooms();
+            getRooms();
         }
 
         function init(boxId){
@@ -122,16 +124,14 @@
             .then(function(data){
                 if (data.data !== undefined || data.data != 0) {
                     vm.allSources=data.data;
-                } else {
-                    vm.allSources.push({label:'TV'})
-                }
+                } 
             })
         }
 
         function openSources(source){
             return televisionService.openSources({room: vm.roomId, id:source})
             .then(function(data){
-
+                vm.currentSource=source;
             })
         }
 
