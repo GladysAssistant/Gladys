@@ -88,7 +88,7 @@
         color: white;
     }
 
-    .box-footer {
+    .box-footer-color {
         background-color: #3d8dbc57;
     }
 
@@ -107,7 +107,7 @@
         <i class="fa fa-television"></i>
         <h3 class="box-title">
             <%= __('box-television-title') %> ( <span ng-repeat="room in vm.rooms | filter:{id:vm.roomId}">{{room.name}}</span> )
-             : <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}">{{vm.currentSource}}</span>
+            <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}"> : {{vm.currentSource}}</span>
              
         </h3>
 
@@ -205,7 +205,7 @@
             </div>
         </div>
     </div>
-    <div ng-show="vm.roomId" class="box-footer">
+    <div ng-show="vm.roomId" class="box-footer box-footer-color">
         <div class="ng-cloak">
             <div class="row">
                 <div class="col-sm-3 text-center">
