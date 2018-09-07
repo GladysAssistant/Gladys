@@ -44,7 +44,7 @@
     vm.sortDeviceReverse = false;
     vm.sortDeviceType = 'order';
     vm.sortDeviceTypeReverse = false;
-    vm.options = ['#ffffff','#f5f5f5', '#dff0d8', '#d9edf7', '#fcf8e3', '#f2dede', '#55efc4', '#81ecec', '#74b9ff', '#a29bfe', '#f3a683', '#f7d794', '#778beb', '#e77f67', '#cf6a87'];
+    vm.options = ['#FFCCBC','#FFAC9C', '#FF8C7C', '#FF7C6C', '#FFBCD8', '#FF8CC8', '#FF7CB8', '#FF6CA8', '#DCC6E0', '#CEA0E4', '#BE90D4', '#AB69C6', '#39D5FF', '#29C5FF', '#19B5FE', '#22A7F0', '#5EFAF7', '#51F5EA', '#47EBE0', '#37DBD0', '#8EFFC1', '#5EFCA1', '#4EEC91', '#3EDC81', '#FDE3A7', '#FFCF4B', '#F9BF3B', '#F9B32F', '#F6C4A3', '#EAB897', '#DFAD8C', '#D4A281', '#fffff', '#C5D3E2', '#BCCAD9', '#ACBAC9'];
 
     activate();
 

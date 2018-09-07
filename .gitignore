@@ -122,5 +122,7 @@ typings
 jsconfig.json
 .env
 .vscode
-views/installation/index.ejs
 views/layout.ejs
+package-lock.json
+views/layout.ejs
+views/installation/index.ejs
