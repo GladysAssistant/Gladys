@@ -30,6 +30,7 @@ var cssFilesToInject = [
   'styles/box.css',
   'styles/nav-tabs-custom.css',
   'js/angular-bootstrap-calendar/angular-bootstrap-calendar.min.css',
+  'style/television.css',
 
   //Inject AdminLTE files
   'AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css',
