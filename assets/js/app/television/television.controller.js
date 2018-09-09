@@ -21,7 +21,6 @@
         var vm = this;
         vm.roomId = null;
         vm.displayAskRoomForm = false;
-        vm.hideBan = 'hidden'
         vm.DefaultValue = true;
         vm.currentPowerState = '';
         vm.currentSoundState = '';
@@ -96,16 +95,20 @@
                     if(devicesTypes[i].category === "tv") {
                         if(devicesTypes[i].deviceTypeIdentifier === 'Power') {
                             vm.currentPowerState = devicesTypes[i].lastValue
+                            vm.devicePowerId = devicesTypes[i].id
                         }
                         if(devicesTypes[i].deviceTypeIdentifier === 'Sound') {
                             vm.currentSoundState = devicesTypes[i].lastValue
+                            vm.deviceSoundId = devicesTypes[i].id
                         }
                         if(devicesTypes[i].deviceTypeIdentifier === 'Channel') {
                             vm.currentChannel = devicesTypes[i].lastValue
                             vm.thisChannel = devicesTypes[i].lastValue
+                            vm.deviceChannelId = devicesTypes[i].id
                         }
                         if(devicesTypes[i].deviceTypeIdentifier === 'Mute') {
                             vm.currentMuteState = devicesTypes[i].lastValue
+                            vm.deviceMuteId = devicesTypes[i].id
                         }
                     }
                 }
@@ -185,16 +188,11 @@
         }
 
         function switchState(){
-            return televisionService.switchState({room: vm.roomId, state: !vm.currentPowerState})
+            return televisionService.switchState({room: vm.roomId, state: !vm.currentPowerState, deviceTypeId: vm.devicePowerId})
                 .then(function(data){
-                    if(data.status === 200){
-                        updateDeviceType('Power', vm.currentPowerState, vm.roomId)
-                        .then(function(data){
-                            if(data.status === 201){
-                                vm.currentPowerState=!vm.currentPowerState
-                            }
-                        })
-                    }
+                   if(data.status === 200) {
+                       vm.currentPowerState = !vm.currentPowerState
+                   }
                 });
         }
 
@@ -210,7 +208,7 @@
                 vm.currentChannel=0;
             }
             vm.thisChannel=parseInt(vm.currentChannel)+parseInt(1)
-            setChannel()
+            setChannel(vm.thisChannel)
         }
 
         function programMinus() {
@@ -219,60 +217,44 @@
             }
             if(vm.thisChannel > 0) {
                 vm.thisChannel=parseInt(vm.currentChannel)-parseInt(1)
-                setChannel()
+                setChannel(vm.thisChannel)
             }
         }
 
         function setChannel(channel) {
-            return televisionService.setChannel({room: vm.roomId, channel: channel})
+            return televisionService.setChannel({room: vm.roomId, channel: channel, deviceTypeId: vm.deviceChannelId})
                 .then(function(data){
-                    console.log(data)
+                    if(data.status === 200){
+                        vm.currentChannel=channel
+                    }
                 });
         }
 
         function volumeDown() {
-            return televisionService.volumeDown({room: vm.roomId})
+            return televisionService.volumeDown({room: vm.roomId, deviceTypeId: vm.deviceSoundId})
                 .then(function(data){
-
+                    if(data.status === 200) {
+                        vm.currentSoundState=parseInt(vm.currentSoundState)-parseInt(1)
+                    }
                 });
         }
 
         function volumeUp() {
-            return televisionService.volumeUp({room: vm.roomId})
+            return televisionService.volumeUp({room: vm.roomId, deviceTypeId: vm.deviceSoundId})
                 .then(function(data){
-
+                    if(data.status === 200) {
+                        vm.currentSoundState=parseInt(vm.currentSoundState)+parseInt(1)
+                    } 
                 });
         }
 
         function setMuted() {
-            return televisionService.setMuted({room: vm.roomId, state: !vm.currentMuteState})
+            return televisionService.setMuted({room: vm.roomId, state: !vm.currentMuteState, deviceTypeId: vm.deviceMuteId})
                 .then(function(data){
                     if(data.status === 200){
-                        if(vm.currentMuteState) {
-                            vm.hideBan = ''
-                        } else {
-                            vm.hideBan = 'hidden'
-                        }
-                        updateDeviceType('Mute', vm.currentMuteState, vm.roomId)
-                        .then(function(data){
-                            if(data.status === 201){
-                                vm.currentMuteState=!vm.currentMuteState
-                            }
-                        })
+                        vm.currentMuteState=!vm.currentMuteState
                     }
                 });
-        }
-
-        function updateDeviceType(deviceType,state, roomId) {
-            return deviceService.getDeviceTypeInRoom(roomId)
-            .then(function(devicesTypes) {
-                devicesTypes = devicesTypes.data.deviceTypes;
-                for(var i = 0; i < devicesTypes.length; i++) {
-                    if(devicesTypes[i].category === "tv" && devicesTypes[i].tag === deviceType) {
-                        return televisionService.updateDeviceType({value:state,devicetype:devicesTypes[i].id})
-                    }
-                }
-            })
         }
     }
 })();
