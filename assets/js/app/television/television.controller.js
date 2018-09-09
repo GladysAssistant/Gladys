@@ -94,17 +94,17 @@
                 devicesTypes = devicesTypes.data.deviceTypes;
                 for(var i = 0; i < devicesTypes.length; i++) {
                     if(devicesTypes[i].category === "tv") {
-                        if(devicesTypes[i].tag === 'Power') {
+                        if(devicesTypes[i].deviceTypeIdentifier === 'Power') {
                             vm.currentPowerState = devicesTypes[i].lastValue
                         }
-                        if(devicesTypes[i].tag === 'Sound') {
+                        if(devicesTypes[i].deviceTypeIdentifier === 'Sound') {
                             vm.currentSoundState = devicesTypes[i].lastValue
                         }
-                        if(devicesTypes[i].tag === 'Channel') {
+                        if(devicesTypes[i].deviceTypeIdentifier === 'Channel') {
                             vm.currentChannel = devicesTypes[i].lastValue
                             vm.thisChannel = devicesTypes[i].lastValue
                         }
-                        if(devicesTypes[i].tag === 'Mute') {
+                        if(devicesTypes[i].deviceTypeIdentifier === 'Mute') {
                             vm.currentMuteState = devicesTypes[i].lastValue
                         }
                     }
