@@ -76,5 +76,13 @@ module.exports = {
     FROM devicetype 
     JOIN device ON devicetype.device = device.id 
     WHERE devicetype.tag = ?;
+  `,
+
+  getDeviceTypeByTags:
+    `
+    SELECT devicetype.* 
+    FROM devicetype 
+    JOIN device ON devicetype.device = device.id 
+    WHERE devicetype.tag IN ( ? );
   `
 };
