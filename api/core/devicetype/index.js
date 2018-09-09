@@ -12,3 +12,4 @@ module.exports.getByIdentifier = require('./deviceType.getByIdentifier.js');
 module.exports.getByType = require('./deviceType.getByType.js');
 module.exports.getById = require('./deviceType.getById.js');
 module.exports.update = require('./deviceType.update.js');
+module.exports.getByTag = require('./deviceType.getByTag.js');

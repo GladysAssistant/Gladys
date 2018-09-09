@@ -15,7 +15,7 @@ module.exports = {
     JOIN room ON d.room = room.id
     WHERE ( room.id = ? OR ? IS NULL )
   `,
-   getByRoom: `
+  getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
    dt.lastValueDatetime as lastChanged, dt.lastValue
    FROM device d
@@ -51,24 +51,30 @@ module.exports = {
     JOIN devicetype dt ON (d.id = dt.device)
     LEFT JOIN room ON d.room = room.id 
     WHERE dt.id = ?;
-  `, 
+  `,
   getByType: `
     SELECT dt.*, dt.lastValueDatetime as lastChanged, room.name as roomName
     FROM device d
     JOIN devicetype dt ON (d.id = dt.device)
     LEFT JOIN room ON d.room = room.id 
     WHERE dt.type = ?;
-  `, 
+  `,
 
   getDeviceTypeByCategory:
-  `
+    `
     SELECT devicetype.* 
     FROM devicetype 
     JOIN device ON devicetype.device = device.id 
     WHERE category = ?
     AND (room = ? OR ? IS NULL)
     AND (type = ? OR ? IS NULL);
-  `
+  `,
 
-  
+  getDeviceTypeByTag:
+    `
+    SELECT devicetype.* 
+    FROM devicetype 
+    JOIN device ON devicetype.device = device.id 
+    WHERE devicetype.tag = ?;
+  `
 };
