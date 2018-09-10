@@ -14,6 +14,7 @@
         position: relative;
         margin: auto;
         margin-top: 10px;
+        margin-bottom: 20px;
         width: 160px;
         height: 160px;
         padding: 0px;
@@ -27,7 +28,7 @@
     }
 
     .circle li:active {
-        color: #00c0ef;
+        color: #80b5d3;
     }
 
     .circle li:nth-child(1) {

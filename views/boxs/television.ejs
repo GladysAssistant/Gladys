@@ -1,17 +1,13 @@
-
 <div class="box box-primary" data-ng-controller="TelevisionCtrl as vm" ng-init="vm.init(1);">
     <div class="box-header with-border">
         <i class="fa fa-television"></i>
         <h3 class="box-title">
-            <%= __('box-television-title') %> ( <span ng-repeat="room in vm.rooms | filter:{id:vm.roomId}">{{room.name}}</span> )
-            <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}"> : {{vm.currentSource}}</span>
-             
+            <%= __('box-television-title') %>
         </h3>
-
-        
-
-        <div ng-show="vm.roomId" class="box-tools">
-
+        <span ng-show="vm.roomId" class="ng-cloak"><h3 class="box-title"> ( <span ng-repeat="room in vm.rooms | filter:{id:vm.roomId}">{{room.name}}</span> )
+            <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}"> : {{vm.currentSource}}</span></h3>
+        </span>
+        <div ng-show="vm.roomId" class="box-tools ng-cloak">
             <div class="pull-right box-tools">
                 <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
                     <i class="fa fa-bars"></i></button>
@@ -27,22 +23,25 @@
             <div class="row">
                 <div class="col-sm-2 text-left">
                     <!--on/off-->
-                    <button type="button" ng-click="vm.switchState()" class="btn btn-default btn-danger btn-circle2"><i class="fa fa-power-off"></i></button>
+                    <button type="button" ng-click="vm.switchState()" class="btn btn-default btn-danger btn-circle2"><i
+                            class="fa fa-power-off"></i></button>
                 </div>
                 <div class="col-sm-5 text-center">
                     <!--Son-->
                     <div class="btn-group">
-                        <button type="button" ng-click="vm.volumeDown()" class="btn btn-default btn-left-rounded"><i class="glyphicon glyphicon-volume-down"></i></button>
+                        <button type="button" ng-click="vm.volumeDown()" class="btn btn-default btn-left-rounded"><i
+                                class="glyphicon glyphicon-volume-down"></i></button>
                         <button type="button" ng-click="vm.setMuted()" class="btn btn-default"><i class="glyphicon glyphicon-volume-off"></i></button>
-                        <button type="button" ng-click="vm.volumeUp()" class="btn btn-default btn-right-rounded"><i class="glyphicon glyphicon-volume-up"></i></button>
+                        <button type="button" ng-click="vm.volumeUp()" class="btn btn-default btn-right-rounded"><i
+                                class="glyphicon glyphicon-volume-up"></i></button>
                     </div>
                 </div>
                 <div class="col-sm-5 text-center">
                     <!--Programme-->
                     <div class="btn-group">
-                        <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</i></button>
+                        <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</button>
                         <button type="button" class="btn btn-default"><i class="fa fa-tv"></i></button>
-                        <button type="button" ng-click="vm.programPlus()" class="btn btn-default btn-right-rounded">+</i></button>
+                        <button type="button" ng-click="vm.programPlus()" class="btn btn-default btn-right-rounded">+</button>
                     </div>
                 </div>
             </div>
@@ -105,14 +104,15 @@
     <div ng-show="vm.roomId" class="box-footer box-footer-color">
         <div class="ng-cloak">
             <div class="row">
-                <div class="col-sm-3 text-center">
+                <div class="col-sm-4 text-center">
                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
                     <ul class="dropdown-menu pull-left" role="menu">
-                            <li ng-repeat="source in vm.allSources"><a href="#" ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
-                        </ul>
+                        <li ng-repeat="source in vm.allSources"><a href="#" ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
+                    </ul>
                     <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
+                    <button type="button" ng-click="vm.pressKey('back')" class="btn btn-default"><i class="fa fa-undo"></i></button>
                 </div>
-                <div class="col-sm-9 text-center">
+                <div class="col-sm-8 text-center">
                     <button class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
                     <button class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
                     <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
