@@ -41,7 +41,7 @@ module.exports.parse = function parse(text) {
         })
         .then((result) => {
             
-            channel = result.television
+            channel = result.channel
 
             replacedText = result.text;
 
