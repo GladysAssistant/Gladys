@@ -45,6 +45,6 @@ module.exports.parse = function parse(text) {
 
             replacedText = result.text;
 
-            return Promise.resolve({deviceTypes, rooms, houses, television, times, replacedText, allHouses});
+            return Promise.resolve({deviceTypes, rooms, houses, channel, times, replacedText, allHouses});
         });
 };
