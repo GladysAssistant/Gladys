@@ -59,7 +59,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-show="type.display" ng-repeat="type in room.deviceTypes | orderBy:'order':false" class="ng-cloak"  style="background-color:{{type.color}}">
+                                            <tr ng-show="type.display" ng-repeat="type in room.deviceTypes | orderBy:'order':false" class="ng-cloak"  style="background-color:{{type.color}} !important">
                                                 <td><span ng-show="type.deviceTypeName">{{type.deviceTypeName}}</span><span ng-show="!type.deviceTypeName">{{type.name}} <span ng-show="{{type.type != 'binary' && type.type.length}}"> - {{type.type}}</span></span></td>
                                                 <td>
                                                     <!-- If the deviceType is a sensor, display last data -->
