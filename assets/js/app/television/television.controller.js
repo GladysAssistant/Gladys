@@ -21,7 +21,6 @@
         var vm = this;
         vm.roomId = null;
         vm.displayAskRoomForm = false;
-        vm.DefaultValue = true;
         vm.currentPowerState = '';
         vm.currentSoundState = '';
         vm.currentChannel = '';
