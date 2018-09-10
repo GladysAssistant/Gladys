@@ -13,19 +13,7 @@ module.exports = function command(scope) {
     };
 
     switch(scope.label) {
-        case 'get-state':
-            response.label = 'television-get-state';
-            calledFunc = gladys.television.getState()
-                .then(() => response)
-        break;
-
-        case 'get-current-channel':
-            response.label = 'television-get-current-channel';
-            calledFunc = gladys.television.getCurrentChannel()
-                .then(() => response)
-        break;
-
-        case 'set-channel':
+        case 'television-set-channel':
             response.label = 'tell-television-set-channel';
             calledFunc = gladys.television.getCurrentChannel()
                 .then((result) => {
@@ -35,7 +23,7 @@ module.exports = function command(scope) {
                 })
         break;
 
-        case 'switch-state':
+        case 'television-switch-state':
             response.label = 'television-switch-state';
             calledFunc = gladys.television.getState()
                 .then((result) => {
@@ -45,55 +33,75 @@ module.exports = function command(scope) {
                 })
         break;
 
-        case 'pause':
+        case 'television-pause':
             response.label = 'television-paused';
             calledFunc = gladys.television.pause(params)
                 .then(() => response);
         break;
 
-        case 'play':
+        case 'television-play':
             response.label = 'television-played';
             calledFunc = gladys.television.play(params)
                 .then(() => response);
         break;
 
-        case 'previous':
-            response.label = 'television-previous';
-            calledFunc = gladys.television.previous(params)
+        case 'television-rewind':
+            response.label = 'television-rewind';
+            calledFunc = gladys.television.rewind(params)
                 .then(() => response);
         break;
 
-        case 'volume-up':
-            response.label = 'television-volume-set-up';
-            calledFunc = gladys.television.getVolume(params)
+        case 'television-fast-forward':
+            response.label = 'television-fast-forward';
+            calledFunc = gladys.television.fastForward(params)
+                .then(() => response);
+        break;
+
+        case 'television-program-plus':
+            response.label = 'television-change-chaine';
+            calledFunc = gladys.television.getCurrentChannel()
                 .then((result) => {
-                    
-                    // increase the volume from 15%
-                    var newVolume = Math.floor(result.volume * 1.15);
-                    params.volume = newVolume;
-                    return gladys.television.setVolume(params);
+                    if(result !== params.channel) {
+                        return gladys.television.setChannel(parseInt(params.channel)+parseInt(1))
+                    }
                 })
                 .then(() => response);
         break;
 
-        case 'volume-down':
-            response.label = 'television-volume-set-down';
-            calledFunc = gladys.television.getVolume(params)
+        case 'television-program-minus':
+            response.label = 'television-change-chaine';
+            calledFunc = gladys.television.getCurrentChannel()
                 .then((result) => {
-                    
-                    // decrease the volume from 15%
-                    var newVolume = Math.floor(result.volume * 0.75);
-                    params.volume = newVolume;
-                    return gladys.television.setVolume(params);
+                    if(result !== params.channel) {
+                        return gladys.television.setChannel(parseInt(params.channel)-parseInt(1))
+                    }
                 })
                 .then(() => response);
         break;
 
-        case 'stop':
+        case 'television-volume-up':
+            response.label = 'television-change-volume';
+            calledFunc = gladys.television.volumeUp(params)
+                .then(() => response);
+        break;
+
+        case 'television-volume-down':
+            response.label = 'television-change-volume';
+            calledFunc = gladys.television.volumeDown(params)
+                .then(() => response);
+        break;
+
+        case 'television-stop':
             response.label = 'television-stopped';
             calledFunc = gladys.television.stop(params)
                 .then(() => response);
-        break;  
+        break; 
+        
+        case 'television-mute':
+            response.label = 'television-mute';
+            calledFunc = gladys.television.setMuted(params)
+                .then(() => response);
+        break; 
 
         default:
             calledFunc = Promise.reject(new Error('UNKNOWN_COMMAND'));
