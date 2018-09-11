@@ -80,6 +80,7 @@
         }
 
         function selectRoom(room) {
+            room = JSON.parse(room)
             boxService.update(vm.boxId, { params: { roomId: room.id } });
             vm.displayAskRoomForm = false;
             vm.roomId = room.id;
