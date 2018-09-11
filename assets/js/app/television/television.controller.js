@@ -7,7 +7,7 @@
   * @author :: Pierre-Gilles Leymarie
   */
 
-(function () {
+ (function () {
     'use strict';
 
     angular
@@ -60,9 +60,10 @@
             boxService.getById(id)
                 .then(function (data) {
                     vm.box = data.data;
-                    if (vm.box.params && vm.box.params.room) {
+                    if (vm.box.params && vm.box.params.roomId) {
                         vm.displayAskRoomForm = false;
                         vm.roomId = vm.box.params.roomId;
+                        vm.currentRoomName =vm.box.params.name;
                         return getData(vm.roomId);
                     } else {
                         vm.displayAskRoomForm = true;
@@ -80,8 +81,10 @@
         }
 
         function selectRoom(room) {
-            room = JSON.parse(room)
-            boxService.update(vm.boxId, { params: { roomId: room.id } });
+            if(typeof(room)==="string") {
+                room = JSON.parse(room);
+            }
+            boxService.update(vm.boxId, { params: { roomId: room.id, name: room.name } });
             vm.displayAskRoomForm = false;
             vm.roomId = room.id;
             vm.currentRoomName = room.name;

@@ -4,8 +4,7 @@
         <h3 class="box-title">
             <%= __('box-television-title') %>
         </h3>
-        <span ng-show="vm.roomId" class="ng-cloak"><h3 class="box-title"> ( <span ng-repeat="room in vm.rooms | filter:{id:vm.roomId}">{{room.name}}</span> )
-            <span ng-repeat="source in vm.allSources | filter:{label:vm.currentSource}"> : {{vm.currentSource}}</span></h3>
+        <span ng-show="vm.roomId" class="ng-cloak"><h3 class="box-title"> ( {{vm.currentRoomName}} ) : {{vm.currentSource}}</h3>
         </span>
         <div ng-show="vm.roomId" class="box-tools ng-cloak">
             <div class="pull-right box-tools">
