@@ -37,11 +37,7 @@
             openMenu: openMenu,
             rec: rec,
             updateDeviceType: updateDeviceType,
-            getSavedRoomBox: getSavedRoomBox,
-            saveRoomBox: saveRoomBox
         };
-
-        var EXPIRATION = 10*365*24*3600*1000;
 
         return service;
 
@@ -116,15 +112,5 @@
         function updateDeviceType(params) {
             return $http({method: 'POST', url: '/devicestate', data: params})
         } 
-
-        // get RoomId from localStorage
-        function getSavedRoomBox(boxId){
-            return cacheService.get('TELEVISION_BOX_ID_' + boxId);
-        }
-
-        // saveRoomId of this box to localStorage
-        function saveRoomBox(boxId, roomId){
-            return cacheService.set('TELEVISION_BOX_ID_' + boxId, roomId, EXPIRATION);
-        }
     }
 })();
