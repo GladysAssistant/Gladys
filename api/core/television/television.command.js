@@ -60,10 +60,8 @@ module.exports = function command(scope) {
         case 'television-program-plus':
             response.label = 'television-change-chaine';
             calledFunc = gladys.television.getCurrentChannel()
-                .then((result) => {
-                    if(result !== params.channel) {
-                        return gladys.television.setChannel(parseInt(params.channel)+parseInt(1))
-                    }
+                .then((currentChannel) => {
+                    return gladys.television.setChannel(parseInt(currentChannel)+parseInt(1))
                 })
                 .then(() => response);
         break;
@@ -71,10 +69,8 @@ module.exports = function command(scope) {
         case 'television-program-minus':
             response.label = 'television-change-chaine';
             calledFunc = gladys.television.getCurrentChannel()
-                .then((result) => {
-                    if(result !== params.channel) {
-                        return gladys.television.setChannel(parseInt(params.channel)-parseInt(1))
-                    }
+                .then((currentChannel) => {
+                    return gladys.television.setChannel(parseInt(currentChannel)-parseInt(1))
                 })
                 .then(() => response);
         break;
