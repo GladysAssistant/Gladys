@@ -25,8 +25,9 @@
         vm.currentSoundState = '';
         vm.currentChannel = '';
         vm.currentMuteState = '';
-        vm.allSources = [{ label: 'TV' }];
-        vm.currentSource = 'TV';
+        vm.defaultSource = [{ label: 'TV' }];
+        vm.allSources = vm.defaultSource;
+        vm.currentSource = vm.defaultSource[0].label;
         vm.currentRoomName = '';
 
         vm.selectRoom = selectRoom;
@@ -130,9 +131,16 @@
         function getSources() {
             return televisionService.getSources({ room: vm.roomId })
                 .then(function (data) {
-                    if (data.data !== undefined || data.data != 0) {
-                        vm.allSources = data.data;
+                    if(data.status === 200){
+                        if (data.data !== undefined || data.data != 0) {
+                            vm.allSources = data.data;
+                        }
+                    } else {
+                        vm.allSources = vm.defaultSource;
                     }
+                })
+                .catch((data) => {
+                    vm.allSources = vm.defaultSource;
                 })
         }
 
