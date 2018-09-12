@@ -62,16 +62,20 @@
                 .then(function (data) {
                     vm.box = data.data;
                     if (vm.box.params && vm.box.params.roomId) {
-                        vm.displayAskRoomForm = false;
-                        vm.roomId = vm.box.params.roomId;
-                        vm.currentRoomName =vm.box.params.name;
-                        getData(vm.roomId);
                         getRooms();
-                        getSources();
+                        setBoxInformation(vm.box.params.roomId, vm.box.params.name)
                     } else {
                         vm.displayAskRoomForm = true;
                     }
                 });
+        }
+
+        function setBoxInformation(roomId, roomName){
+            vm.displayAskRoomForm = false;
+            vm.roomId = roomId;
+            vm.currentRoomName = roomName;
+            getData(roomId);
+            getSources();
         }
 
         function getRooms() {
@@ -86,11 +90,7 @@
                 room = JSON.parse(room);
             }
             boxService.update(vm.boxId, { params: { roomId: room.id, name: room.name } });
-            vm.displayAskRoomForm = false;
-            vm.roomId = room.id;
-            vm.currentRoomName = room.name;
-            getData(vm.roomId);
-            getSources();
+            setBoxInformation(room.id, room.name)
         }
 
         function getData(roomId) {
@@ -99,25 +99,34 @@
                     devicesTypes = devicesTypes.data.deviceTypes;
                     for (var i = 0; i < devicesTypes.length; i++) {
                         if (devicesTypes[i].category === "tv") {
-                            if (devicesTypes[i].deviceTypeIdentifier === 'Power') {
-                                vm.currentPowerState = devicesTypes[i].lastValue
-                                vm.devicePowerId = devicesTypes[i].id
-                            }
-                            if (devicesTypes[i].deviceTypeIdentifier === 'Sound') {
-                                vm.currentSoundState = devicesTypes[i].lastValue
-                                vm.deviceSoundId = devicesTypes[i].id
-                            }
-                            if (devicesTypes[i].deviceTypeIdentifier === 'Channel') {
-                                vm.currentChannel = devicesTypes[i].lastValue
-                                vm.thisChannel = devicesTypes[i].lastValue
-                                vm.deviceChannelId = devicesTypes[i].id
-                            }
-                            if (devicesTypes[i].deviceTypeIdentifier === 'Mute') {
-                                vm.currentMuteState = devicesTypes[i].lastValue
-                                vm.deviceMuteId = devicesTypes[i].id
+                            switch(devicesTypes[i].deviceTypeIdentifier){
+                                case 'Power':
+                                    vm.currentPowerState = devicesTypes[i].lastValue
+                                    vm.devicePowerId = devicesTypes[i].id
+                                    break;
+                                case 'Sound':
+                                    vm.currentSoundState = devicesTypes[i].lastValue
+                                    vm.deviceSoundId = devicesTypes[i].id
+                                    break;
+                                case 'Channel':
+                                    vm.currentChannel = devicesTypes[i].lastValue
+                                    vm.thisChannel = devicesTypes[i].lastValue
+                                    vm.deviceChannelId = devicesTypes[i].id
+                                    break;
+                                case 'Mute':
+                                    vm.currentMuteState = devicesTypes[i].lastValue
+                                    vm.deviceMuteId = devicesTypes[i].id
+                                    break;
                             }
                         }
                     }
+                })
+                .catch(() => {
+                    console.log('No deviceType found on this room with type Power, Sound, Channel and Mute !')
+                    vm.deviceMuteId = null;
+                    vm.deviceChannelId = null;
+                    vm.deviceSoundId = null;
+                    vm.devicePowerId = null;
                 })
         }
 
