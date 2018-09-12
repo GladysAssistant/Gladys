@@ -96,6 +96,10 @@
         background-color: #3d8dbc57;
     }
 
+    .dropdown-menu.pull-right:hover {
+        cursor: pointer;
+    }
+
     @media (max-width: 800px) {
 
         .btn-flat,
