@@ -89,6 +89,7 @@
             vm.roomId = room.id;
             vm.currentRoomName = room.name;
             getData(vm.roomId);
+            getSources();
         }
 
         function getData(roomId) {
