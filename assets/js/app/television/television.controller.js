@@ -65,13 +65,13 @@
                         vm.displayAskRoomForm = false;
                         vm.roomId = vm.box.params.roomId;
                         vm.currentRoomName =vm.box.params.name;
-                        return getData(vm.roomId);
+                        getData(vm.roomId);
+                        getRooms();
+                        getSources();
                     } else {
                         vm.displayAskRoomForm = true;
                     }
                 });
-            getRooms();
-            getSources();
         }
 
         function getRooms() {
