@@ -85,6 +85,16 @@ ul {
     color: white;
 }
 
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus
+
+.btn-circle2:active, .btn-circle2:active.focus, .btn-circle2:focus, .btn-circle2:active:focus, .btn-circle2.active.focus {
+    outline: none;
+}
 .box-footer-color {
     background-color: #3d8dbc57;
 }
