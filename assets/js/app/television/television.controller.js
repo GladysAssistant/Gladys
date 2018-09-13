@@ -19,6 +19,8 @@
     function TelevisionCtrl(televisionService, deviceService, boxService) {
         /* jshint validthis: true */
         var vm = this;
+        vm.devices = [];
+        vm.devicetypes = [];
         vm.deviceId = null;
         vm.displayAskDeviceForm = false;
         vm.currentPowerState = '';
@@ -56,10 +58,11 @@
 
         vm.init = init;
 
+        getDevices();
 
         function init(id) {
             vm.boxId = id;
-            getDevices();
+            
             boxService.getById(id)
                 .then(function (data) {
                     vm.box = data.data;
@@ -80,9 +83,20 @@
         }
 
         function getDevices() {
-            deviceService.get()
-                .then(function(data) {
-                    vm.devices = data.data;
+            deviceService.getDeviceTypeByCategory({category:'TV'})
+                .then((res)=> {
+                    var tempDevices = [];
+                    res.data.forEach(function(deviceType) {
+                        if(!tempDevices.includes(deviceType.deviceName+':'+deviceType.device)) {
+                            tempDevices.push(deviceType.deviceName+':'+deviceType.device)
+                            vm.devicetypes[deviceType.device]=new Array()
+                        }
+                        vm.devicetypes[deviceType.device].push(deviceType);
+                    })
+                    tempDevices.forEach(function(tempDevice) {
+                        var deviceId = tempDevice.split(":");
+                        vm.devices.push({id:deviceId[1],name:deviceId[0]})
+                    })
                 })
         }
 
@@ -94,41 +108,28 @@
             setBoxInformation(device.id, device.name)
         }
 
-        function getData() {
-            deviceService.getDeviceTypesDevice(vm.deviceId)
-                .then(function (devicesTypes) {
-                    devicesTypes = devicesTypes.data;
-                    devicesTypes.forEach(function(deviceType) {
-                        if(deviceType.device === vm.deviceId && deviceType.category === "tv") {
-                            switch(deviceType.identifier){
-                                case 'Power':
-                                    vm.currentPowerState = deviceType.lastValue
-                                    vm.devicePowerId = deviceType.id
-                                    break;
-                                case 'Sound':
-                                    vm.currentSoundState = deviceType.lastValue
-                                    vm.deviceSoundId = deviceType.id
-                                    break;
-                                case 'Channel':
-                                    vm.currentChannel = deviceType.lastValue
-                                    vm.thisChannel = deviceType.lastValue
-                                    vm.deviceChannelId = deviceType.id
-                                    break;
-                                case 'Mute':
-                                    vm.currentMuteState = deviceType.lastValue
-                                    vm.deviceMuteId = deviceType.id
-                                    break;
-                            }
-                        }                        
-                    });
-                })
-                .catch(() => {
-                    console.log('No deviceType found on this room with type Power, Sound, Channel and Mute !')
-                    vm.deviceMuteId = null;
-                    vm.deviceChannelId = null;
-                    vm.deviceSoundId = null;
-                    vm.devicePowerId = null;
-                })
+        function getData(deviceId) {
+            vm.devicetypes[deviceId].forEach(function(devicetype) {
+                switch(devicetype.identifier){
+                    case 'Power':
+                        vm.currentPowerState = devicetype.lastValue
+                        vm.devicePowerId = devicetype.id
+                        break;
+                    case 'Sound':
+                        vm.currentSoundState = devicetype.lastValue
+                        vm.deviceSoundId = devicetype.id
+                        break;
+                    case 'Channel':
+                        vm.currentChannel = devicetype.lastValue
+                        vm.thisChannel = devicetype.lastValue
+                        vm.deviceChannelId = devicetype.id
+                        break;
+                    case 'Mute':
+                        vm.currentMuteState = devicetype.lastValue
+                        vm.deviceMuteId = devicetype.id
+                        break;
+                }
+            })
         }
 
         function pressKey(key) {
