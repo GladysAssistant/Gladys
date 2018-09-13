@@ -37,7 +37,6 @@
             openMenu: openMenu,
             rec: rec,
             customCommand: customCommand,
-            updateDeviceType: updateDeviceType,
         };
 
         return service;
@@ -113,9 +112,5 @@
         function customCommand(params) {
             return $http({method: 'POST', url: '/television/customCommand', data: params});
         }
-
-        function updateDeviceType(params) {
-            return $http({method: 'POST', url: '/devicestate', data: params})
-        } 
     }
 })();
