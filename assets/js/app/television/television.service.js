@@ -36,6 +36,7 @@
             openSources: openSources,
             openMenu: openMenu,
             rec: rec,
+            customCommand: customCommand,
             updateDeviceType: updateDeviceType,
         };
 
@@ -107,6 +108,10 @@
 
         function getMuted(params) {
             return $http({method: 'GET', url: '/television/getMuted', params: params})
+        }
+
+        function customCommand(params) {
+            return $http({method: 'POST', url: '/television/customCommand', data: params});
         }
 
         function updateDeviceType(params) {

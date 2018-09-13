@@ -309,6 +309,20 @@ module.exports = {
         gladys.television.rec(req.body)
             .then((result) => res.json(result))
             .catch(next);
-    },    
+    },
+
+    /**
+     * @api {post} /television/customCommand Custom Command
+     * @apiName televisionCustomCommand
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    customCommand: function(req, res, next){
+        gladys.television.customCommand(req.body)
+            .then((result) => res.json(result))
+            .catch(next)
+    }
 };
 

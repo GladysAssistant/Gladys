@@ -50,6 +50,7 @@
         vm.openSources = openSources;
         vm.openMenu = openMenu;
         vm.rec = rec;
+        vm.customCommand = customCommand;
 
         vm.thisChannel = null;
 
@@ -277,6 +278,13 @@
                         vm.currentMuteState = !vm.currentMuteState
                     }
                 });
+        }
+
+        function customCommand(color) {
+            return televisionService.customCommand({ device: vm.deviceId, color: color})
+                .then(function() {
+
+                })
         }
     }
 })();

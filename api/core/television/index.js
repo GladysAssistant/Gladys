@@ -25,3 +25,4 @@ module.exports.getSources = require('./television.getSources.js');
 module.exports.openSources = require('./television.openSources.js');
 module.exports.openMenu = require('./television.openMenu.js');
 module.exports.rec = require('./television.rec.js');
+module.exports.customCommand = require('./television.customCommand.js');
