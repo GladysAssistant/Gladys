@@ -1,10 +1,10 @@
 <div class="box box-primary" data-ng-controller="TelevisionCtrl as vm" ng-init="vm.init(<%= boxId %>);">
     <div class="box-header with-border">
         <i class="fa fa-television"></i>
-        <h3 class="box-title">
+        <h3 ng-show="vm.displayAskDeviceForm" class="box-title">
             <%= __('box-television-title') %>
         </h3>
-        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title"> ( {{vm.currentDeviceName}} ) : {{vm.currentSource}}</h3>
+        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} ({{vm.currentSource}})</h3>
         </span>
         <div ng-show="vm.deviceId" class="box-tools ng-cloak">
             <div class="pull-right box-tools">
@@ -17,15 +17,15 @@
         </div>
     </div>
 
-    <div class="box-body">
+    <div class="box-body" ng-class="{'body-tv':!vm.displayAskDeviceForm}">
         <div ng-show="vm.deviceId" class="ng-cloak">
-            <div class="row">
-                <div class="col-sm-2 text-left">
+            <div class="row no-gutter">
+                <div class="col-xs-2 text-center">
                     <!--on/off-->
                     <button type="button" ng-click="vm.switchState()" class="btn btn-default btn-danger btn-circle2"><i
                             class="fa fa-power-off"></i></button>
                 </div>
-                <div class="col-sm-5 text-center">
+                <div class="col-xs-5 text-center">
                     <!--Son-->
                     <div class="btn-group">
                         <button type="button" ng-click="vm.volumeDown()" class="btn btn-default btn-left-rounded"><i
@@ -34,8 +34,9 @@
                         <button type="button" ng-click="vm.volumeUp()" class="btn btn-default btn-right-rounded"><i
                                 class="glyphicon glyphicon-volume-up"></i></button>
                     </div>
+
                 </div>
-                <div class="col-sm-5 text-center">
+                <div class="col-xs-5 text-center">
                     <!--Programme-->
                     <div class="btn-group">
                         <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</button>
@@ -45,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row no-gutter">
                 <div class="col-sm-2"></div>
                 <!--Joystick-->
                 <div class="col-sm-5 text-center">
@@ -80,6 +81,13 @@
                         <li>
                             <button type="button" ng-click="vm.setChannel(0)" class="btn btn-default btn-margin">0</i></button>
                         </li>
+                        <li></li>
+                        <li>
+                            <button type="button" ng-click="vm.customCommand(red)" class="btn btn-default btn-margin bg-red-active color-palette"></i></button>
+                            <button type="button" ng-click="vm.customCommand(green)" class="btn btn-default btn-margin bg-green-active color-palette"></i></button>
+                            <button type="button" ng-click="vm.customCommand(yellow)" class="btn btn-default btn-margin bg-yellow-active color-palette"></i></button>
+                            <button type="button" ng-click="vm.customCommand(blue)" class="btn btn-default btn-margin bg-aqua-active color-palette"></i></button>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -102,16 +110,17 @@
     </div>
     <div ng-show="vm.deviceId" class="box-footer box-footer-color">
         <div class="ng-cloak">
-            <div class="row">
-                <div class="col-sm-4 text-center">
+            <div class="row no-gutter">
+                <div class="col-sm-6 text-center">
                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
                     <ul class="dropdown-menu pull-left" role="menu">
-                        <li ng-repeat="source in vm.allSources"><a href="#" ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
+                        <li ng-repeat="source in vm.allSources"><a ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
                     </ul>
                     <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
                     <button type="button" ng-click="vm.pressKey('back')" class="btn btn-primary"><i class="fa fa-undo"></i></button>
+                    <button type="button" ng-click="vm.openInfo()" class="btn btn-primary"><i class="fa fa-info"></i></button>
                 </div>
-                <div class="col-sm-8 text-center">
+                <div class="col-sm-6 text-center">
                     <button class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
                     <button class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
                     <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
