@@ -1,0 +1,314 @@
+/** 
+  * Gladys Project
+  * http://gladysproject.com
+  * Software under licence Creative Commons 3.0 France 
+  * http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+  * You may not use this software for commercial purposes.
+  * @author :: Pierre-Gilles Leymarie
+  */
+
+/**
+ * @apiDefine televisionParam
+ * @apiParam {Integer} [devicetype] DeviceType ID
+ * @apiParam {Integer} [room] Room ID 
+ * @apiDescription You can put the devicetype attribute OR the room attribute to determine in which room you want to control the television/which precise deviceType is playing.
+ */
+
+module.exports = {
+   
+
+   /**
+     * @api {post} /television/switchState switch state
+     * @apiName televisionSwitchState
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    switchState: function(req, res, next){
+        gladys.television.switchState(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {get} /television/state Get Current State
+     * @apiName televisionGetCurrentState
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * 
+     * @apiSuccess {Boolean} state State of the television
+     */
+    getState: function(req, res, next){
+        gladys.television.getState(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/channel Set channel
+     * @apiName televisionSetChannel
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * 
+     */
+    setChannel: function(req, res, next){
+        gladys.television.setChannel(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {get} /television/getChannel Get channel
+     * @apiName televisionGetChannel
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     *
+     * @apiSuccess {Integer} channel Current channel of the television
+     * 
+     */
+    getChannel: function(req, res, next){
+        gladys.television.getChannel(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {get} /television/muted Get Muted
+     * @apiName televisionGetMuted
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * 
+     * @apiSuccess {boolean} muted Returns true if the television is muted
+     */
+    getMuted: function(req, res, next){
+        gladys.television.getMuted(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {get} /television/volume Get Volume
+     * @apiName televisionGetVolume
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * 
+     * @apiSuccess {integer} volume Volume of the television
+     */
+    getVolume: function(req, res, next){
+        gladys.television.getVolume(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/fastForward Fast Forward 
+     * @apiName televisionFastForward
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    fastForward: function(req, res, next){
+        gladys.television.fastForward(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/rewind Rewind 
+     * @apiName televisionRewind
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    rewind: function(req, res, next){
+        gladys.television.rewind(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/pause Pause 
+     * @apiName televisionPause
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    pause: function(req, res, next){
+        gladys.television.pause(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/play Play 
+     * @apiName televisionPlay
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    play: function(req, res, next){
+        gladys.television.play(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/muted Set muted 
+     * @apiName televisionSetMuted
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * @apiParam {boolean} muted true if sound is muted
+     */
+    setMuted: function(req, res, next){
+        gladys.television.setMuted(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+     /**
+     * @api {post} /television/volume Set Volume 
+     * @apiName televisionSetVolume
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * @apiParam {integer} volume Volume level
+     */
+    setVolume: function(req, res, next){
+        gladys.television.setVolume(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/stop Stop 
+     * @apiName televisionStop
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    stop: function(req, res, next){
+        gladys.television.stop(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/volumeUp Volume Up 
+     * @apiName televisionVolumeUp
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    volumeUp: function(req, res, next){
+        gladys.television.volumeUp(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/volumeDown Volume Down 
+     * @apiName televisionVolumeDown
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    volumeDown: function(req, res, next){
+        gladys.television.volumeDown(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/pressKey Press Key 
+     * @apiName televisionPressKey
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    pressKey: function(req, res, next){
+        gladys.television.pressKey(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {get} /television/getSources Get Sources
+     * @apiName televisionGetSources
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     * 
+     * @apiSuccess {array} All television source
+     */
+    getSources: function(req, res, next){
+        gladys.television.getSources(req.query)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/openSources Open Sources
+     * @apiName televisionOpenSources
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    openSources: function(req, res, next){
+        gladys.television.openSources(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/openMenu Open Menu
+     * @apiName televisionOpenMenu
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    openMenu: function(req, res, next){
+        gladys.television.openMenu(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },
+
+    /**
+     * @api {post} /television/rec Rec
+     * @apiName televisionRec
+     * @apiGroup television
+     * @apiPermission authenticated
+     *
+     * @apiUse televisionParam
+     */
+    rec: function(req, res, next){
+        gladys.television.rec(req.body)
+            .then((result) => res.json(result))
+            .catch(next);
+    },    
+};
+

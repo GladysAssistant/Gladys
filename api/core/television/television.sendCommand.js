@@ -21,10 +21,10 @@ module.exports = function sendCommand(functionName, params) {
 };
 
 function getDeviceType(params){
-    if(params.devicetype) return gladys.utils.sqlUnique(queries.getDeviceTypeById, [params.devicetype]);
+    if(params.device) return gladys.utils.sqlUnique(queries.getDeviceTypeByDeviceIdOrByDeviceTypeId, [params.device, null]);
     else if(params.room) return gladys.utils.sqlUnique(queries.getTelevisionDeviceTypeByRoom, [params.room]);
-
-    // if user does not specify a room, or a devicetype, we suppose there is only one 
+    else if(param.deviceType) return gladys.utils.sqlUnique(queries.getDeviceTypeByDeviceIdOrByDeviceTypeId, [null, params.deviceType]);
+    // if user does not specify a room, or a device, or a devicetype, we suppose there is only one 
     // and return this one
     else return gladys.utils.sqlUnique(queries.getDefaultDeviceType, []);
 }
