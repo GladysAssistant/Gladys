@@ -78,6 +78,10 @@
             vm.displayAskDeviceForm = false;
             vm.deviceId = deviceId;
             vm.currentDeviceName = deviceName;
+            vm.currentPowerState = null;
+            vm.currentSoundState = null;
+            vm.currentChannel = null;
+            vm.currentMuteState = null;
             getData(deviceId);
             getSources();
         }
