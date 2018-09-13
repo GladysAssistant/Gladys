@@ -20,6 +20,7 @@
             createDeviceType: createDeviceType,
             getDeviceTypesDevice: getDeviceTypesDevice,
             getTypes: getTypes,
+            getDeviceTypeByCategory: getDeviceTypeByCategory,
             updateDeviceType: updateDeviceType,
             deleteDeviceType: deleteDeviceType,
             exec: exec,
@@ -78,6 +79,10 @@
         
         function getDeviceTypeByRoom(){
             return $http({method: 'GET', url: '/devicetype/room'});
+        }
+
+        function getDeviceTypeByCategory(options){
+            return $http({method: 'GET', url: '/devicetype/category', params: options});
         }
 
         function getDeviceTypeInRoom(id){
