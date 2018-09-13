@@ -62,7 +62,7 @@ module.exports = {
 
   getDeviceTypeByCategory:
   `
-    SELECT devicetype.* 
+    SELECT devicetype.*, device.name as deviceName
     FROM devicetype 
     JOIN device ON devicetype.device = device.id 
     WHERE category = ?
