@@ -88,7 +88,7 @@
 
         function getDevices() {
             deviceService.getDeviceTypeByCategory({category:'TV'})
-                .then((res)=> {
+                .then(function(res) {
                     var tempDevices = [];
                     res.data.forEach(function(deviceType) {
                         if(!tempDevices.includes(deviceType.deviceName+':'+deviceType.device)) {
@@ -154,7 +154,7 @@
                         vm.allSources = vm.defaultSource;
                     }
                 })
-                .catch((data) => {
+                .catch(function(data) {
                     vm.allSources = vm.defaultSource;
                 })
         }
