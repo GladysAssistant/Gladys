@@ -1,3 +1,9 @@
+/**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Event
+ * @class
+ */
 
 module.exports.create = require('./event.create.js');
 module.exports.command = require('./event.command.js');
