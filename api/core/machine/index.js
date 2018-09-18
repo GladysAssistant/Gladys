@@ -1,4 +1,11 @@
 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Machine
+ * @class
+ */
+
 module.exports.create = require('./machine.create.js');
 module.exports.delete = require('./machine.delete.js');
 module.exports.get = require('./machine.get.js');

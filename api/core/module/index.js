@@ -1,4 +1,11 @@
 
+/**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Module
+ * @class
+ */
+
 module.exports.create = require('./module.create.js');
 module.exports.get = require('./module.get.js');
 module.exports.heartbeat = require('./module.heartbeat.js');
