@@ -7,7 +7,10 @@ jobs:
     - stage: test
       env:
       - CXX=g++-4.8
-      node_js: '6','8','10'
+      node_js:
+       - '6'
+       - '8'
+       - '10'
       services:
       - mysql
       addons:
