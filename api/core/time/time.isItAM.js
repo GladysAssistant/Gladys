@@ -8,7 +8,7 @@
  * 
  * @example
  * var house = {
- *	house: '1'
+ *	    house: '1'
  * };
  * 
  * gladys.time.isItAM(house)

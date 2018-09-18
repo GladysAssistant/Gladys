@@ -13,8 +13,8 @@ const Promise = require('bluebird');
  * @example
  * 
  * var option = {
- *	start: '10:00:00',
- *	end: '15:00:00'
+ *	    start: '10:00:00',
+ *	    end: '15:00:00'
  * };
  * 
  * gladys.time.isInTimeRange(option)

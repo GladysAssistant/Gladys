@@ -1,4 +1,11 @@
 
+/**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Time
+ * @class
+ */
+
 module.exports.get = require('./time.get.js');
 module.exports.command = require('./time.command.js');
 module.exports.getMomentOfTheDay = require('./time.getMomentOfTheDay.js');
