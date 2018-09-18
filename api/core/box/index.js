@@ -1,4 +1,11 @@
 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Box
+ * @class
+ */
+
 module.exports.create = require('./box.create.js');
 module.exports.delete = require('./box.delete.js');
 module.exports.get = require('./box.get.js');

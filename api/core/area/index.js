@@ -1,4 +1,11 @@
 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Area
+ * @class
+ */
+
 module.exports.inArea = require('./area.inArea.js');
 module.exports.changeArea = require('./area.changeArea.js');
 module.exports.create = require('./area.create.js');
