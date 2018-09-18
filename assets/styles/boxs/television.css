@@ -58,9 +58,9 @@ ul {
     left: 40px;
     margin: 0px;
     padding: 27px 0px 0px 0px;
-    font-size: 18px;
-    line-height: 1.33;
-    border-radius: 40px;
+    font-size: 18px !important;
+    line-height: 1.33 !important;
+    border-radius: 40px !important;
 }
 
 .btn-margin {
@@ -68,55 +68,28 @@ ul {
 }
 
 .btn-left-rounded {
-    border-top-left-radius: 50%;
-    border-bottom-left-radius: 50%;
+    border-top-left-radius: 50% !important;
+    border-bottom-left-radius: 50% !important;
 }
 
 .btn-right-rounded {
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
+    border-top-right-radius: 50% !important;
+    border-bottom-right-radius: 50% !important;
 }
 
-.btn-circle2 {
+.btn-circle {
     width: 40px;
     height: 40px;
-    border-radius: 40px;
-    text-align: center;
-    color: white;
+    border-radius: 40px !important;
 }
 
-.btn:focus,
-.btn:active:focus,
-.btn.active:focus,
-.btn.focus,
-.btn:active.focus,
-.btn.active.focus
-
-.btn-circle2:active, .btn-circle2:active.focus, .btn-circle2:focus, .btn-circle2:active:focus, .btn-circle2.active.focus {
-    outline: none;
-}
 .box-footer-color {
     background-color: #3d8dbc57;
 }
 
-.dropdown-menu:hover {
-    cursor: pointer;
-}
-
-.no-gutter {
-    margin-right: 0;
-    margin-left: 0;
-  }
-  
-  .no-gutter > [class*="col-"] {
-    padding-right: 0;
-    padding-left: 0;
-  }
-
-
 @media (max-width: 800px) {
 
-    .btn-primary, .btn-danger {
+    .btn-primary {
         margin: 1px;
         height: 34px;
         width: 38px;

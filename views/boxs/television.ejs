@@ -19,10 +19,10 @@
 
     <div class="box-body" ng-class="{'body-tv':!vm.displayAskDeviceForm}">
         <div ng-show="vm.deviceId" class="ng-cloak">
-            <div class="row no-gutter">
+            <div class="row">
                 <div class="col-xs-2 text-center">
                     <!--on/off-->
-                    <button type="button" ng-click="vm.switchState()" class="btn btn-default btn-margin bg-red-active color-palette btn-circle2"><i
+                    <button type="button" ng-click="vm.switchState()" class="btn btn-danger btn-margin btn-circle"><i
                             class="fa fa-power-off"></i></button>
                 </div>
                 <div class="col-xs-5 text-center">
@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="row no-gutter">
+            <div class="row">
                 <div class="col-sm-2"></div>
                 <!--Joystick-->
                 <div class="col-sm-5 text-center">
@@ -57,7 +57,7 @@
                             <li ng-click="vm.pressKey('down')"><i class="fa fa-3x fa-caret-down"></i></li>
                             <li ng-click="vm.pressKey('left')"><i class="fa fa-3x fa-caret-left"></i></li>
                         </ul>
-                        <a ng-click="vm.pressKey('ok')" class="btn btn-app btn-circle btn-ok">OK</a>
+                        <button type="button" ng-click="vm.pressKey('ok')" class="btn btn-default btn-ok">OK</button>
                     </div>
                 </div>
                 <div class="col-sm-5 text-center">
@@ -83,10 +83,10 @@
                         </li>
                         <li></li>
                         <li>
-                            <button type="button" ng-click="vm.customCommand('red')" class="btn btn-default btn-margin bg-red-active color-palette"></i></button>
-                            <button type="button" ng-click="vm.customCommand('green')" class="btn btn-default btn-margin bg-green-active color-palette"></i></button>
-                            <button type="button" ng-click="vm.customCommand('yellow')" class="btn btn-default btn-margin bg-yellow-active color-palette"></i></button>
-                            <button type="button" ng-click="vm.customCommand('blue')" class="btn btn-default btn-margin bg-aqua-active color-palette"></i></button>
+                            <button type="button" ng-click="vm.customCommand('red')" class="btn btn-danger btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('green')" class="btn btn-success btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('yellow')" class="btn btn-warning btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('blue')" class="btn btn-info btn-margin"></i></button>
                         </li>
                     </ul>
                 </div>
@@ -126,7 +126,7 @@
                     <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
                     <button class="btn btn-primary" ng-click="vm.stop()"><i class="fa fa-stop"></i></button>
                     <button class="btn btn-primary" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></button>
-                    <button class="btn btn-default btn-margin bg-red-active color-palette" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
+                    <button class="btn btn-danger" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
                 </div>
             </div>
         </div>

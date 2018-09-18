@@ -44,9 +44,6 @@ var cssFilesToInject = [
 
   // Inject AdminLTE at the end
   'styles/dependencies/adminLTE/AdminLTE.min.css',
-  
-  //Box television
-  'styles/television.css',
 ];
 
 
