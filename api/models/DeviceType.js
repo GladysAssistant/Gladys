@@ -75,6 +75,16 @@ module.exports = {
         device: {
             model: 'Device',
             required: true
+        },
+
+        order: {
+            type: 'integer',
+            defaultsTo: 0
+        },
+
+        color: {
+            type: 'string',
+            defaultsTo: '#FFFFFF'
         }
 
     }

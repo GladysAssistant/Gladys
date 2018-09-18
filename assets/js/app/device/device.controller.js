@@ -27,7 +27,7 @@
     vm.remoteIsBusy = false;
     vm.noMoreElements = false;
     vm.getDeviceTypesByRoom = getDeviceTypesByRoom;
-    
+
     vm.saving = false;
     vm.ready = false;
     vm.devices = [];
@@ -38,6 +38,20 @@
     };
     
     vm.updateDevice = updateDevice;
+
+    vm.selectedRoom = [];
+    vm.sortDevice = 'id';
+    vm.sortDeviceReverse = false;
+    vm.sortDeviceType = 'order';
+    vm.sortDeviceTypeReverse = false;
+    vm.options =['#c5ddeb','#80b5d3', '#3c8dbc', '#357ca5',
+     '#b3edfb', '#59d6f4', '#00c0ef', '#00a7d0',
+     '#b3e5ce', '#59c593', '#00a65a', '#008d4c',
+     '#fce2b8', '#f7be65', '#f39c12', '#db8b0b', 
+     '#f5c9c4', '#e98a7e', '#dd4b39', '#d33724', 
+     '#d0cfe5', '#9795c6', '#605ca8', '#555299', 
+     '#f4bbd0', '#e56a97', '#d81b60', '#ca195a', 
+     '#ffffff', '#e1e4e9', '#d2d6de', '#b5bbc8'];
 
     activate();
 

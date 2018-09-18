@@ -398,5 +398,9 @@
   "reset-password-new-password": "New Password",
   "reset-password-button": "Change my password",
   "reset-password-minimum-size-warning": "(Minimum 8 characters)",
-  "forgot-password-reset-failed": "Your password was not changed. Maybe the link was not valid anymore (It is valid only 2 hours), or maybe your password length was too low. Please try again."
+  "forgot-password-reset-failed": "Your password was not changed. Maybe the link was not valid anymore (It is valid only 2 hours), or maybe your password length was too low. Please try again.",
+  "Order": "Order",
+  "color": "color",
+  "function": "function",
+  "functions": "functions"
 }
