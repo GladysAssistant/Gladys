@@ -23,7 +23,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/state Get Current State
+     * @api {get} /television/:id/state Get Current State
      * @apiName televisionGetCurrentState
      * @apiGroup television
      * @apiPermission authenticated
@@ -54,7 +54,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/channel Get channel
+     * @api {get} /television/:id/channel Get channel
      * @apiName televisionGetChannel
      * @apiGroup television
      * @apiPermission authenticated
@@ -71,7 +71,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/muted Get Muted
+     * @api {get} /television/:id/mute Get Muted
      * @apiName televisionGetMuted
      * @apiGroup television
      * @apiPermission authenticated
@@ -159,7 +159,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/muted Set muted 
+     * @api {post} /television/mute Set muted 
      * @apiName televisionSetMuted
      * @apiGroup television
      * @apiPermission authenticated
@@ -261,7 +261,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/openSources Open Sources
+     * @api {post} /television/opensources Open Sources
      * @apiName televisionOpenSources
      * @apiGroup television
      * @apiPermission authenticated

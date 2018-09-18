@@ -58,7 +58,7 @@
         }
 
         function getState(params) {
-            return $http({method: 'GET', url: '/television/getState', params: params});
+            return $http({method: 'GET', url: '/television/'+params.device+'/state', params: params});
         }
 
         function setChannel(params) {
@@ -66,11 +66,11 @@
         }
 
         function getChannel(params) {
-            return $http({method: 'GET', url: '/television/channel', params: params});
+            return $http({method: 'GET', url: '/television/'+params.device+'/channel', params: params});
         }
 
         function setMuted(params) {
-            return $http({method: 'POST', url: '/television/setMuted', data: params})
+            return $http({method: 'POST', url: '/television/mute', data: params})
         }
 
         function volumeUp(params) {
@@ -90,7 +90,7 @@
         }
 
         function openSources(params) {
-            return $http({method: 'POST', url: '/television/openSources', data: params});
+            return $http({method: 'POST', url: '/television/opensources', data: params});
         }
 
         function openMenu(params) {
@@ -102,7 +102,7 @@
         }
 
         function getMuted(params) {
-            return $http({method: 'GET', url: '/television/getMuted', params: params})
+            return $http({method: 'GET', url: '/television/'+params.device+'/mute', params: params})
         }
 
         function customCommand(params) {
