@@ -1,12 +1,14 @@
-var queries = require('./area.queries.js');
+const queries = require('./area.queries.js');
+const Promise = require('bluebird');
 
-module.exports = function enterArea(location){
-   return gladys.area.inArea(location)
-     .then(function(areas){
-         return [getLastAreas(location.user), areas];
-     })
-     .spread(function(lastAreasUser, areas){
-       
+module.exports = function enterArea(location) {
+
+   return Promise.all([
+       gladys.area.inArea(location),
+       gladys.area.userIn({id: location.user})
+   ])
+    .spread((areas, lastAreasUser) => {
+
         areas.forEach(function(area){
             sails.log.info(`User ${location.user} detected in area ${area.name}`); 
         });
@@ -14,26 +16,11 @@ module.exports = function enterArea(location){
         // we remove the areas where the user was already in
         var newAreas = removeDuplicateArea(lastAreasUser, areas);
         var leftAreas = findLeftAreas(lastAreasUser, areas);
+        
         return {newAreas, leftAreas};
-     });
+    });
 };
 
-
-/** 
- * Return the last area where the user was located before
- */
-function getLastAreas(userId){
-    return gladys.utils.sql(queries.lastLocationUser, [userId])
-      .then(function(locations){
-         
-         // if the user was never located before
-         if(locations.length === 0) {
-             return [];
-         } else {
-             return gladys.area.inArea(locations[0]);
-         }
-      });
-}
 
 function findLeftAreas(lastAreasUser, areas){
     

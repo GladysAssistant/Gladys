@@ -3,7 +3,8 @@
         "id": 1,
 		"code": "test", 
 		"name": "test", 
-        "service": "test",
+		"service": "test",
+		"category": "test",
 		"faIcon": "fa fa-desktop", 
 		"iconColor": "bg-black"
 	},
@@ -11,7 +12,8 @@
         "id": 2,
 		"code": "wakeup", 
 		"name": "Gladys updated", 
-        "service": "test",
+		"service": "test",
+		"category": "test",
 		"faIcon": "fa fa-wrench", 
 		"iconColor": "bg-black"
 	},
@@ -20,6 +22,7 @@
 		"code": "devicetype-new-value",
 		"name": "DeviceType new Value",
 		"service": "DeviceType",
+		"category": "device",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -28,6 +31,7 @@
 		"code": "house-mode-changed",
 		"name": "House Mode changed",
 		"service": "mode",
+		"category": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -35,7 +39,8 @@
 		"id": 5,
 		"code": "enter-area",
 		"name": "House Mode changed",
-		"service": "mode",
+		"service": "area",
+		"category": "area",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -43,7 +48,8 @@
 		"id": 6,
 		"code": "left-area",
 		"name": "House Mode changed",
-		"service": "mode",
+		"service": "area",
+		"category": "area",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -52,6 +58,7 @@
 		"code": "back-at-home",
 		"name": "User is back at home !",
 		"service": "house",
+		"category": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -60,6 +67,7 @@
 		"code": "user-seen-at-home",
 		"name": "User has been seen at home !",
 		"service": "house",
+		"category": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -68,6 +76,7 @@
 		"code": "left-home",
 		"name": "User has left home !",
 		"service": "house",
+		"category": "house",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	},
@@ -76,6 +85,7 @@
 		"code": "going-to-sleep",
 		"name": "User is going to sleep",
 		"service": "house",
+		"category": "user",
 		"faIcon": "fa fa-desktop",
 		"iconColor": "bg-black"
 	}

@@ -64,7 +64,7 @@
     "istanbul": "^0.4.5",
     "jshint-stylish": "^2.2.1",
     "mocha": "^3.5.0",
-    "should": "^13.0.1",
+    "should": "13.2.3",
     "supertest": "^3.0.0"
   },
   "main": "app.js",
