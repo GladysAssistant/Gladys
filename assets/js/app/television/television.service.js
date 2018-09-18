@@ -54,23 +54,23 @@
         }
 
         function switchState(params) {
-            return $http({method: 'POST', url: '/television/state', data: params});
+            return $http({method: 'POST', url: '/television/'+params.device+'/state', data: params});
         }
 
         function getState(params) {
-            return $http({method: 'GET', url: '/television/'+params.device+'/state', params: params});
+            return $http({method: 'GET', url: '/television/state', params: params});
         }
 
         function setChannel(params) {
-            return $http({method: 'POST', url: '/television/channel', data: params});
+            return $http({method: 'POST', url: '/television/'+params.device+'/channel', data: params});
         }
 
         function getChannel(params) {
-            return $http({method: 'GET', url: '/television/'+params.device+'/channel', params: params});
+            return $http({method: 'GET', url: '/television/channel', params: params});
         }
 
         function setMuted(params) {
-            return $http({method: 'POST', url: '/television/mute', data: params})
+            return $http({method: 'POST', url: '/television/'+params.device+'/mute', data: params})
         }
 
         function volumeUp(params) {
@@ -102,7 +102,7 @@
         }
 
         function getMuted(params) {
-            return $http({method: 'GET', url: '/television/'+params.device+'/mute', params: params})
+            return $http({method: 'GET', url: '/television/mute', params: params})
         }
 
         function customCommand(params) {

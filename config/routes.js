@@ -262,15 +262,15 @@ module.exports.routes = {
   'get /system/health': 'SystemController.healthCheck',
 
   // Television
-  'post /television/state': 'TelevisionController.switchState',
-  'get /television/:id/state': 'TelevisionController.getState',
-  'post /television/channel': 'TelevisionController.setChannel',
-  'get /television/:id/mute': 'TelevisionController.getMuted',
+  'post /television/:id/state': 'TelevisionController.switchState',
+  'get /television/state': 'TelevisionController.getState',
+  'post /television/:id/channel': 'TelevisionController.setChannel',
+  'get /television/mute': 'TelevisionController.getMuted',
   'post /television/fastforward': 'TelevisionController.fastForward',
   'post /television/rewind': 'TelevisionController.rewind',
   'post /television/pause': 'TelevisionController.pause',
   'post /television/play': 'TelevisionController.play',
-  'post /television/mute': 'TelevisionController.setMuted',
+  'post /television/:id/mute': 'TelevisionController.setMuted',
   'post /television/stop': 'TelevisionController.stop',
   'post /television/presskey': 'TelevisionController.pressKey',
   'post /television/volume/down': 'TelevisionController.volumeDown',
@@ -280,7 +280,7 @@ module.exports.routes = {
   'post /television/openmenu': 'TelevisionController.openMenu',
   'post /television/rec': 'TelevisionController.rec',
   'post /television/customcommand': 'TelevisionController.customCommand',
-  'get /television/:id/channel': 'TelevisionController.getChannel',
+  'get /television/channel': 'TelevisionController.getChannel',
 
   // Token
   'get /token': 'TokenController.index',

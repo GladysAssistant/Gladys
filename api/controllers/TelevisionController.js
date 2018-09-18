@@ -9,7 +9,7 @@ module.exports = {
    
 
    /**
-     * @api {post} /television/state switch state
+     * @api {post} /television/:id/state switch state
      * @apiName televisionSwitchState
      * @apiGroup television
      * @apiPermission authenticated
@@ -23,7 +23,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/:id/state Get Current State
+     * @api {get} /television/state Get Current State
      * @apiName televisionGetCurrentState
      * @apiGroup television
      * @apiPermission authenticated
@@ -39,7 +39,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/channel Set channel
+     * @api {post} /television/:id/channel Set channel
      * @apiName televisionSetChannel
      * @apiGroup television
      * @apiPermission authenticated
@@ -54,7 +54,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/:id/channel Get channel
+     * @api {get} /television/channel Get channel
      * @apiName televisionGetChannel
      * @apiGroup television
      * @apiPermission authenticated
@@ -71,7 +71,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/:id/mute Get Muted
+     * @api {get} /television/mute Get Muted
      * @apiName televisionGetMuted
      * @apiGroup television
      * @apiPermission authenticated
@@ -159,7 +159,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/mute Set muted 
+     * @api {post} /television/:id/mute Set muted 
      * @apiName televisionSetMuted
      * @apiGroup television
      * @apiPermission authenticated
