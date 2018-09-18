@@ -34,9 +34,9 @@
         getPoints();
 
         var icon = L.icon({
-            iconUrl: '/styles/leaflet/images/marker-icon.png',
-            iconRetinaUrl: '/styles/leaflet/images/marker-icon-2x.png',
-            shadowUrl: '/styles/leaflet/images/marker-shadow.png',
+            iconUrl: '/img/leaflet/marker-icon.png',
+            iconRetinaUrl: '/img/leaflet/marker-icon-2x.png',
+            shadowUrl: '/img/leaflet/marker-shadow.png',
             iconSize:[25,41],
             iconAnchor:[12,41],
             popupAnchor:[1,-34],

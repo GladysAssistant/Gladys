@@ -7,7 +7,7 @@ module.exports = function(grunt){
             options: {
             import: 2
             },
-            src: ['./assets/styles/AdminLTE.css']
+            src: ['./assets/styles/dependencies/adminLTE/AdminLTE.css']
         },
         }
 	);
