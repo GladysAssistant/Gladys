@@ -4,7 +4,6 @@
     <h3 class="box-title"><%= __('Gladys API tokens') %></h3>
 </div>
         <div class="box-body table-responsive" data-ng-controller="tokenCtrl as vm">
-            
                     <p><%= __('token-description') %></p>
                 
                     <table id="example2" class="table table-bordered table-hover">
@@ -23,7 +22,7 @@
                                 <td>{{token.value}}</td>
                                 <td>
                                     <div class="toogle" ng-click="vm.switchStatus($index, token.id)">
-                                        <input type="checkbox" ng-model="token.active == 1" class="toogle-checkbox toogle-blue" />
+                            <input type="checkbox" ng-model="token.active" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue"/>
                                         <label class="toogle-label" for="mytoogle"></label>
                                     </div>
                                 </td>
@@ -31,11 +30,9 @@
                             </tr>
                             <tr>
                                 <td><input type="text" ng-model="vm.newToken.name" class="form-control" placeholder="<%= __('Name') %>"/></td>
-                                <td><button class="btn btn-flat btn-success  " ng-click="vm.createToken();"><%= __('New') %></button></td>
+                    <td><button class="btn btn-flat btn-success" ng-click="vm.createToken();"><%= __('New') %></button></td>
                             </tr>
                         </tbody>
                     </table>
-
         </div>
     </div>
-    <!-- END OF BOX -->

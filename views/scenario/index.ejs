@@ -1,50 +1,58 @@
 <script src="/js/dependencies/ace/ace.js"></script>
-<!-- Right side column. Contains the navbar and content of the page -->
-<aside class="content-wrapper">
-<!-- Content Header (Page header) -->
-<section class="content-header">
-    <h1>
-        <%= __('Manage your scenarios') %>
-        <small><%= __('Control Panel') %></small>
-    </h1>
-    <ol class="breadcrumb">
-        <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
-        <li class="active"><%= __('Scenario') %></li>
-    </ol>
-</section>
 
-<!-- Main content -->
-<section class="content" data-ng-controller="scenarioCtrl as vm" >
-    <div class="box-body" >
-         <div id="tab-color" class="nav-tabs-custom nav-tabs-custom-primary">
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><%= __('scenario-list') %></a></li>
-              <!-- <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><%= __('scenario-help') %></a></li> -->
-              <!-- <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li> -->
-            </ul>
-            <div class="tab-content">
-              <div class="tab-pane active" id="tab_1">
-                    <!-- BEGINNING OF TAB 1 -->
-                    <%- partial ('./maintable.ejs') %>
-               </div>
-               <!-- end of tab -->
-               
-               <div class="tab-pane active" id="tab_2">
-                    
-                   
-               </div>
-               <!-- end of tab -->
-               
+<aside class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= __('Manage your scenarios') %>
+            <small><%= __('Control Panel') %></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><p><i class="fa fa-dashboard"></i> <%= __('Home') %></p></li>
+            <li class="active"><%= __('Scenario') %></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content" data-ng-controller="scenarioCtrl as vm" >
+        <div class="box skin-box box-primary box-solid">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th><%= __('scenario-table-title') %></th>
+                            <th><%= __('scenario-table-event') %></th>
+                            <th><%= __('scenario-table-template') %></th>
+                            <th><%= __('Edit') %></th>
+                            <th><%= __('Delete') %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="launcher in vm.launchers" class="ng-cloak" >
+                            <td>
+                                {{launcher.title}}                 
+                            </td>
+                            <td>
+                                {{launcher.name}}                 
+                            </td>
+                            <td>{{launcher.condition_template}}</td>
+                            <td><button ng-click="vm.editScenario($index, launcher.id)" class= "btn btn-flat btn-info  "><%= __('Edit') %></button></td>
+                            <td><button ng-click="vm.deleteLauncher($index, launcher.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button class="btn btn-flat btn-success  " data-toggle="modal" data-target=".bs-example-modal-lg" ><%= __('New') %></button>
+                                <button class="btn btn-flat btn-success  " ng-click="vm.startCreateScenarioTextModal()" ><%= __('scenario-new-text-editor') %></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <!-- end of tab-content -->
-         </div>
-         <!-- end of nav-tabs-custom {{vm.skins.tab}} -->
-    </div>
-         <%- partial ('./modal.ejs') %>
-         <%- partial ('./edit-scenario.ejs') %>
+        </div>
+        <%- partial ('./modal.ejs') %>
+        <%- partial ('./edit-scenario.ejs') %>
     </section><!-- /.content -->
 </aside><!-- /.content-wrapper -->
-
 
 <script>
     document.getElementById("scenarioLi").className = "active";
