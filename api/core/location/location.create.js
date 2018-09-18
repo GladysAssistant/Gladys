@@ -39,7 +39,7 @@ module.exports = function create (location) {
             return gladys.event.create({
                 code: 'enter-area',
                 user: location.user,
-                value: area.name,
+                value: area.id,
                 scope: area
             });
         });
@@ -49,7 +49,7 @@ module.exports = function create (location) {
             return gladys.event.create({
                 code: 'left-area',
                 user: location.user,
-                value: area.name,
+                value: area.id,
                 scope: area
             });
         });

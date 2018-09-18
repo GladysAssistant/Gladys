@@ -1,4 +1,11 @@
 
+/**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name DeviceState
+ * @class
+ */
+
 module.exports.create = require('./deviceState.create.js');
 module.exports.createByIdentifier = require('./deviceState.createByIdentifier.js');
 module.exports.createByDeviceTypeIdentifier = require('./deviceState.createByDeviceTypeIdentifier.js');
