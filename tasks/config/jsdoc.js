@@ -129,6 +129,13 @@ module.exports = function(grunt) {
                     'gladys.room.create',
                     'gladys.room.update',
                     'gladys.room.delete',
+                    'Television',
+                    'gladys.television.pressKey',
+                    'gladys.television.setChannel',
+                    'gladys.television.setMuted',
+                    'gladys.television.switchState',
+                    'gladys.television.volumeDown',
+                    'gladys.television.volumeUp',
                     'gladys.room.get',
                     'Weather',
                     'gladys.weather.get'
