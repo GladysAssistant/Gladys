@@ -9,7 +9,7 @@ module.exports = {
    
 
    /**
-     * @api {post} /television/switchState switch state
+     * @api {post} /television/state switch state
      * @apiName televisionSwitchState
      * @apiGroup television
      * @apiPermission authenticated
@@ -54,7 +54,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/getChannel Get channel
+     * @api {get} /television/channel Get channel
      * @apiName televisionGetChannel
      * @apiGroup television
      * @apiPermission authenticated
@@ -103,7 +103,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/fastForward Fast Forward 
+     * @api {post} /television/fastforward Fast Forward 
      * @apiName televisionFastForward
      * @apiGroup television
      * @apiPermission authenticated
@@ -203,7 +203,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/volumeUp Volume Up 
+     * @api {post} /television/volume/up Volume Up 
      * @apiName televisionVolumeUp
      * @apiGroup television
      * @apiPermission authenticated
@@ -217,7 +217,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/volumeDown Volume Down 
+     * @api {post} /television/volume/down Volume Down 
      * @apiName televisionVolumeDown
      * @apiGroup television
      * @apiPermission authenticated
@@ -231,7 +231,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/pressKey Press Key 
+     * @api {post} /television/presskey Press Key 
      * @apiName televisionPressKey
      * @apiGroup television
      * @apiPermission authenticated
@@ -245,7 +245,7 @@ module.exports = {
     },
 
     /**
-     * @api {get} /television/getSources Get Sources
+     * @api {get} /television/source Get Sources
      * @apiName televisionGetSources
      * @apiGroup television
      * @apiPermission authenticated
@@ -275,7 +275,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/openMenu Open Menu
+     * @api {post} /television/openmenu Open Menu
      * @apiName televisionOpenMenu
      * @apiGroup television
      * @apiPermission authenticated
@@ -303,7 +303,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/customCommand Custom Command
+     * @api {post} /television/customcommand Custom Command
      * @apiName televisionCustomCommand
      * @apiGroup television
      * @apiPermission authenticated

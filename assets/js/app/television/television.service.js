@@ -18,6 +18,7 @@
             switchState: switchState,
             getState: getState,
             setChannel: setChannel,
+            getChannel: getChannel,
             setMuted: setMuted,
             getMuted: getMuted,
             volumeUp: volumeUp,
@@ -49,11 +50,11 @@
         }
 
         function fastForward(params) {
-            return $http({method: 'POST', url: '/television/fastForward', data: params});
+            return $http({method: 'POST', url: '/television/fastforward', data: params});
         }
 
         function switchState(params) {
-            return $http({method: 'POST', url: '/television/switchState', data: params});
+            return $http({method: 'POST', url: '/television/state', data: params});
         }
 
         function getState(params) {
@@ -61,7 +62,11 @@
         }
 
         function setChannel(params) {
-            return $http({method: 'POST', url: '/television/setChannel', data: params});
+            return $http({method: 'POST', url: '/television/channel', data: params});
+        }
+
+        function getChannel(params) {
+            return $http({method: 'GET', url: '/television/channel', params: params});
         }
 
         function setMuted(params) {
@@ -69,19 +74,19 @@
         }
 
         function volumeUp(params) {
-            return $http({method: 'POST', url: '/television/volumeUp', data: params})
+            return $http({method: 'POST', url: '/television/volume/up', data: params})
         }
 
         function volumeDown(params) {
-            return $http({method: 'POST', url: '/television/volumeDown', data: params})
+            return $http({method: 'POST', url: '/television/volume/down', data: params})
         }
 
         function pressKey(params) {
-            return $http({method: 'POST', url: '/television/pressKey', data: params})
+            return $http({method: 'POST', url: '/television/presskey', data: params})
         }
 
         function getSources(params) {
-            return $http({method: 'GET', url: '/television/getSources', params: params});
+            return $http({method: 'GET', url: '/television/source', params: params});
         }
 
         function openSources(params) {
@@ -89,7 +94,7 @@
         }
 
         function openMenu(params) {
-            return $http({method: 'POST', url: '/television/openMenu', data: params});
+            return $http({method: 'POST', url: '/television/openmenu', data: params});
         }
 
         function rec(params) {
@@ -101,7 +106,7 @@
         }
 
         function customCommand(params) {
-            return $http({method: 'POST', url: '/television/customCommand', data: params});
+            return $http({method: 'POST', url: '/television/customcommand', data: params});
         }
     }
 })();
