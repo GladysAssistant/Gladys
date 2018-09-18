@@ -70,14 +70,6 @@ module.exports = {
     AND (type = ? OR ? IS NULL);
   `,
 
-  getDeviceTypeByTag:
-    `
-    SELECT devicetype.* 
-    FROM devicetype 
-    JOIN device ON devicetype.device = device.id 
-    WHERE devicetype.tag = ?;
-  `,
-
   getDeviceTypeByTags:
     `
     SELECT devicetype.* 
