@@ -33,8 +33,6 @@ module.exports = function create (location) {
   // we check if the user did not enter a new area
   return gladys.area.changeArea(location)
     .then(function(result){  
-
-        console.log(result);
         
        // foreach area the user entered in, we emit a new event
        var insertNewAreaEvents = Promise.map(result.newAreas, function(area){
