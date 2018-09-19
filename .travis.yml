@@ -66,19 +66,20 @@ jobs:
           branch: master
 
     - stage: build docker image
+	  language: minimal
       services:
       - docker
-      language: minimal
       env:
       - DOCKER_REPO_SLUG=vonox/gladys
+	  before_install:
+      - sudo apt-get update
+      - sudo apt-get install -o Dpkg::Options::="--force-confold" -y docker-engine
+      - pip install docker-ci-deploy
       script:
-      - docker build -t $DOCKER_REPO_SLUG:latest .
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$TRAVIS_BRANCH .; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$(echo $TRAVIS_TAG | cut -d'.' -f 1); else true ; fi
-      after_success:
-      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - echo $(echo $TRAVIS_TAG | cut -d'.' -f 1)
-      - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$(echo $TRAVIS_TAG | cut -d'.' -f 1); else true ; fi
-   
+      - docker build -t $DOCKER_REPO_SLUG .
+	  before_deploy:
+	  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      deploy:
+        provider: script
+        script: docker-ci-deploy --tag $TRAVIS_BRANCH --tag latest $DOCKER_REPO_SLUG
+ 
