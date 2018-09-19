@@ -56,16 +56,16 @@ jobs:
       node_js: '8'
       env:
       - DOCKER_REPO_SLUG=gladysproject/gladys
-      - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
       script:
       - docker build -t $DOCKER_REPO_SLUG:latest .
       - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$TRAVIS_BRANCH .; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$(echo $TRAVIS_TAG | cut -d'.' -f 1); else true ; fi
       after_success:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - echo $(echo $TRAVIS_TAG | cut -d'.' -f 1)
       - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
       - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$(echo $TRAVIS_TAG | cut -d'.' -f 1); else true ; fi
     
     - stage: deploy documentation
       node_js: '8'
