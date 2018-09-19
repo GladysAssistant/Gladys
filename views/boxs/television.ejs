@@ -17,9 +17,9 @@
         </div>
     </div>
 
-    <div class="box-body" ng-class="{'body-tv':!vm.displayAskDeviceForm}">
+    <div class="box-body body-tv" ng-class="{'body-tv':!vm.displayAskDeviceForm}">
         <div ng-show="vm.deviceId" class="ng-cloak">
-            <div class="row">
+            <div class="row" id="firstRow">
                 <div class="col-xs-2 text-center">
                     <!--on/off-->
                     <button type="button" ng-click="vm.switchState()" class="btn btn-danger btn-margin btn-circle"><i
@@ -94,7 +94,7 @@
         </div>
         <div ng-show="vm.displayAskDeviceForm" class="ng-cloak">
             <p>
-                <%= __('box-television-television-select-room') %>
+                <%= __('box-television-television-select') %>
             </p>
             <div class="row">
                 <div class="col-xs-offset-2 col-xs-6">

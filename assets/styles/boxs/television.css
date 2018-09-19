@@ -13,7 +13,7 @@ ul {
 .circle {
     position: relative;
     margin: auto;
-    margin-top: 30px;
+    margin-top: 10px;
     width: 160px;
     height: 160px;
     padding: 0px;
@@ -67,38 +67,69 @@ ul {
     margin: 7px
 }
 
+/* Disables the square outline for rounded buttons */
+.btn-left-rounded:active:focus,
+.btn-right-rounded:active:focus,
+.btn-circle:active:focus
+{
+    outline: none !important;
+}
+
+/* necessary to have a "pointer" cursor on the dropdown menus */
+.dropdown-menu:hover { 
+    cursor: pointer;
+}
+
 .btn-left-rounded {
     border-top-left-radius: 50% !important;
     border-bottom-left-radius: 50% !important;
+    width: 40px;
+    height: 34px;
 }
 
 .btn-right-rounded {
     border-top-right-radius: 50% !important;
     border-bottom-right-radius: 50% !important;
+    width: 40px;
+    height: 34px;
 }
 
 .btn-circle {
     width: 40px;
     height: 40px;
     border-radius: 40px !important;
+    margin-top: -2px;   /* Aligning the On/Off button with the others on the same line */
 }
 
 .box-footer-color {
-    background-color: #3d8dbc57;
+    background-color: #3d8dbc57 !important;
 }
 
 @media (max-width: 800px) {
 
-    .btn-primary {
-        margin: 1px;
+    .btn-primary, .box-footer .btn-danger {
+        margin: 2px 1px;
         height: 34px;
         width: 38px;
     }
     .circle {
-        margin-top: 10px;
         margin-bottom: 10px;
     }
     .body-tv {
-        padding:10px 0 0 0;
-    }    
+        padding:10px 0 0 0  !important;
+    }
+    
+    /* to have the first row on a single line */
+    .btn-right-rounded, .btn-left-rounded {
+        width: 34px;
+        height: 34px;
+    }
+    #firstRow {        
+        margin-right: 0;
+        margin-left: 0;
+    }
+    #firstRow > [class*="col-"] {
+        padding-right: 0;
+        padding-left: 0;
+    }
 }
