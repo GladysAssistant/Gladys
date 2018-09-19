@@ -14,5 +14,13 @@
         "longitude": -72,
         "radius": 100,
         "user": 1
+    },
+    {
+        "id": 3,
+        "name": "Pepper Pots work",
+        "latitude": 44,
+        "longitude": -72,
+        "radius": 100,
+        "user": 2
     }
 ]

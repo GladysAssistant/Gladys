@@ -1,3 +1,10 @@
+ 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name House
+ * @class
+ */
 
 module.exports.checkUsersPresence = require('./house.checkUsersPresence.js');
 module.exports.create = require('./house.create.js');

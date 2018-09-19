@@ -1,4 +1,18 @@
 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Calendar
+ * @class
+ */
+
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name CalendarEvent
+ * @class
+ */
+
 module.exports.hasRightCalendar = require('./calendar.hasRightCalendar.js');
 module.exports.hasRightCalendarEvent = require('./calendar.hasRightCalendarEvent.js');
 
