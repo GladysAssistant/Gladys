@@ -66,19 +66,19 @@ jobs:
           branch: master
 
     - stage: build docker image
-	  language: minimal
+      language: minimal
       services:
       - docker
       env:
       - DOCKER_REPO_SLUG=vonox/gladys
-	  before_install:
+      before_install:
       - sudo apt-get update
       - sudo apt-get install -o Dpkg::Options::="--force-confold" -y docker-engine
       - pip install docker-ci-deploy
       script:
       - docker build -t $DOCKER_REPO_SLUG .
-	  before_deploy:
-	  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      before_deploy:
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       deploy:
         provider: script
         script: docker-ci-deploy --tag $TRAVIS_BRANCH --tag latest $DOCKER_REPO_SLUG
