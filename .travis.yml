@@ -69,7 +69,7 @@ jobs:
       services:
       - docker
       env:
-      - DOCKER_REPO_SLUG=gladysproject/gladys
+      - DOCKER_REPO_SLUG=vonox/gladys
       script:
       - docker build -t $DOCKER_REPO_SLUG:latest .
       - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$TRAVIS_BRANCH .; else true ; fi
