@@ -53,7 +53,6 @@ jobs:
     - stage: build docker image
       services:
       - docker
-      node_js: '8'
       env:
       - DOCKER_REPO_SLUG=gladysproject/gladys
       script:
