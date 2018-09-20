@@ -38,6 +38,7 @@ var cssFilesToInject = [
   'styles/dependencies/font-awesome.min.css',
   'styles/dependencies/adminLTE/_all-skins.min.css',
   'styles/dependencies/bootstrap-datetimepicker.min.css',
+  'styles/dependencies/color-picker/color-picker.min.css',
   
   // Inject hooks styles
   'hooks/**/*.css',
@@ -83,6 +84,8 @@ var jsFilesToInject = [
   'js/dependencies/ng-device-detector.min.js',
   'js/dependencies/angular-bootstrap-calendar-tpls.min.js',
   'js/dependencies/angular-chart.min.js',
+  'js/dependencies/color-picker/color-picker.min.js',
+  'js/dependencies/color-picker/angular-color-picker.js',
   
   // Load first AngularModule definition
   'js/app/app.module.js',
