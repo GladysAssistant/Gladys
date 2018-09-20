@@ -67,6 +67,7 @@ module.exports = function(grunt) {
                     'gladys.deviceType.create',
                     'gladys.deviceType.delete',
                     'gladys.deviceType.getAll',
+                    'gladys.deviceType.getByCategory',
                     'gladys.deviceType.getById',
                     'gladys.deviceType.getByIdentifier',
                     'gladys.deviceType.getByType',
