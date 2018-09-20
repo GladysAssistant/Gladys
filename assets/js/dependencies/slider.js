@@ -13,7 +13,7 @@ angular.module('ui.bootstrap-slider', [])
         return {
             restrict: 'AE',
             replace: true,
-            template: '<div><input class="slider-input" type="text" style="width:100%" /></div>',
+            template: '<div><input class="slider-input" type="text" style="width:calc(100% - 10px)" /></div>',
             require: 'ngModel',
             scope: {
                 max: "=",
