@@ -26,6 +26,7 @@ module.exports = function(grunt) {
                     'gladys.area.update',
                     'gladys.area.delete',
                     'gladys.area.get',
+		    'gladys.area.userIn',
                     'Box',
                     'gladys.box.create',
                     'gladys.box.update',
