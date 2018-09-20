@@ -261,7 +261,7 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/opensources Open Sources
+     * @api {post} /television/opensource Open Sources
      * @apiName televisionOpenSources
      * @apiGroup television
      * @apiPermission authenticated

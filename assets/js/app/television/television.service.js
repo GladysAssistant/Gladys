@@ -90,7 +90,7 @@
         }
 
         function openSources(params) {
-            return $http({method: 'POST', url: '/television/opensources', data: params});
+            return $http({method: 'POST', url: '/television/opensource', data: params});
         }
 
         function openMenu(params) {
