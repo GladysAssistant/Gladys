@@ -38,6 +38,7 @@ var cssFilesToInject = [
   'styles/dependencies/adminLTE/_all-skins.min.css',
   'styles/dependencies/bootstrap-datetimepicker.min.css',
   'styles/dependencies/color-picker/color-picker.min.css',
+  'styles/dependencies/googleColorPickerStyle.css',
   
   // Inject hooks styles
   'hooks/**/*.css',
@@ -85,6 +86,7 @@ var jsFilesToInject = [
   'js/dependencies/angular-chart.min.js',
   'js/dependencies/color-picker/color-picker.min.js',
   'js/dependencies/color-picker/angular-color-picker.js',
+  'js/dependencies/googleColorPicker.js',
   
   // Load first AngularModule definition
   'js/app/app.module.js',
