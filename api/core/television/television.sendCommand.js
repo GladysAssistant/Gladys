@@ -9,7 +9,7 @@ module.exports = function sendCommand(functionName, params) {
                 return Promise.reject(new Error(`television : Module ${deviceType.service} does not exist or does not handle television.`));
          
           if(typeof gladys.modules[deviceType.service].television[functionName] != 'function') {
-            console.log(`television : Module ${deviceType.service} does not have function ${functionName}`)
+            sails.log.error(`television : Module ${deviceType.service} does not have function ${functionName}`)
             return Promise.reject();
           } 
 
