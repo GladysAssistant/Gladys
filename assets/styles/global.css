@@ -82,3 +82,63 @@ a.disabled {
 .slider .tooltip {
   pointer-events:none;
 }
+.widget-user-username{
+  width: 70%; 
+  margin-left: 2% !important;
+  white-space: nowrap; 
+  display: inline-flex;
+}
+
+.widget-user-username div{
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
+
+.user-panel p{
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 155px;
+}
+
+.user-menu a {
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 155px;
+}
+
+.select-user {
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+
+/* Card */
+.card {
+  box-shadow: 0 1px 8px 1px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  border-radius: 5px;
+}
+
+.card:hover {
+  box-shadow: 0 2px 16px 2px rgba(0,0,0,0.2);
+}
+
+/* Grid */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 1000px) { 
+  .grid-item {
+    width: 49%;
+  }
+}
+
+.grid-item {
+  margin: 0.5%;
+}

@@ -50,7 +50,7 @@
                         
                         <div class="box-body table-responsive">
 
-                                    <table id="example2" class="table table-bordered table-hover">
+                                    <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
                                                 <th><%= __('device-name') %></th>
@@ -119,17 +119,14 @@
                                                 <td><input type="text" placeholder="<%= __('device-create-identifier') %>" class="form-control" ng-model="device.identifier" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td><input type="text" placeholder="<%= __('device-create-protocol') %>" class="form-control" ng-model="device.protocol" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
                                                 <td><input type="text" placeholder="<%= __('device-create-service') %>" class="form-control" ng-model="device.service" ng-model-options='{ debounce: 500 }' ng-change="vm.updateDevice(device);" /></td>
-                                                <td><!--<select name="selectRoom" id="selectRoom" class="form-control" ng-model="device.room">
-                                                    <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
-                                                    </select>-->
-                                                    
+                                                <td>                                                    
                                                     <select name="selectRoom" id="selectRoom" class="form-control"
                                                             ng-options="room.name for room in vm.rooms track by room.id"
                                                             ng-model="device.room" ng-change="vm.updateDevice(device);">
                                                    </select>
                                                 </td>
                                                 <td>
-                                                    <select name="selectUser" class="form-control"
+                                                    <select name="selectUser" class="form-control select-user"
                                                             ng-options="user.id as user.name for user in vm.users"
                                                             ng-model="device.user" ng-change="vm.updateDevice(device);">
                                                    </select>
@@ -150,7 +147,7 @@
                                                    </select>
                                                 </td>
                                                 <td>
-                                                    <select name="selectUser" class="form-control"
+                                                    <select name="selectUser" class="form-control select-user"
                                                             ng-options="user.name for user in vm.users track by user.id"
                                                             ng-model="vm.newDevice.user">
                                                    </select>
