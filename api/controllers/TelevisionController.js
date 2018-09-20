@@ -261,15 +261,15 @@ module.exports = {
     },
 
     /**
-     * @api {post} /television/opensource Open Sources
-     * @apiName televisionOpenSources
+     * @api {post} /television/opensource Open Source
+     * @apiName televisionOpenSource
      * @apiGroup television
      * @apiPermission authenticated
      *
      * @apiUse televisionParam
      */
-    openSources: function(req, res, next){
-        gladys.television.openSources(req.body)
+    openSource: function(req, res, next){
+        gladys.television.openSource(req.body)
             .then((result) => res.json(result))
             .catch(next);
     },

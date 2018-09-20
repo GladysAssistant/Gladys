@@ -277,7 +277,7 @@ module.exports.routes = {
   'post /television/volume/down': 'TelevisionController.volumeDown',
   'post /television/volume/up': 'TelevisionController.volumeUp',
   'get /television/source': 'TelevisionController.getSources',
-  'post /television/opensource': 'TelevisionController.openSources',
+  'post /television/opensource': 'TelevisionController.openSource',
   'post /television/openmenu': 'TelevisionController.openMenu',
   'post /television/rec': 'TelevisionController.rec',
   'post /television/customcommand': 'TelevisionController.customCommand',

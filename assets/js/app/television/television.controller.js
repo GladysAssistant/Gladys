@@ -40,7 +40,7 @@
         vm.volumeDown = volumeDown;
         vm.pressKey = pressKey;
         vm.getSources = getSources;
-        vm.openSources = openSources;
+        vm.openSource = openSource;
         vm.openMenu = openMenu;
         vm.rec = rec;
         vm.customCommand = customCommand;
@@ -128,14 +128,14 @@
         }
 
         function pressKey(key) {
-            return televisionService.pressKey({ device: vm.deviceId, key: key })
+            return televisionService.pressKey({ device: {id: vm.deviceId}, key: key })
                 .then(function () {
 
                 });
         }
 
         function getSources() {
-            return televisionService.getSources({ device: vm.deviceId })
+            return televisionService.getSources({ device: {id: vm.deviceId} })
                 .then(function (data) {
                     if(data.status === 200){
                         if (data.data !== undefined || data.data != 0) {
@@ -150,64 +150,64 @@
                 })
         }
 
-        function openSources(source) {
-            return televisionService.openSources({ device: vm.deviceId, id: source })
+        function openSource(source) {
+            return televisionService.openSource({ device: {id: vm.deviceId}, id: source })
                 .then(function (data) {
                     vm.currentSource = source;
                 })
         }
 
         function openMenu() {
-            return televisionService.openMenu({ device: vm.deviceId })
+            return televisionService.openMenu({ device: {id: vm.deviceId} })
                 .then(function (data) {
 
                 })
         }
 
         function rec() {
-            return televisionService.rec({ device: vm.deviceId })
+            return televisionService.rec({ device: {id: vm.deviceId} })
                 .then(function (data) {
 
                 })
         }
 
         function play() {
-            return televisionService.play({ device: vm.deviceId, controlType: 'play' })
+            return televisionService.play({ device: {id: vm.deviceId}, controlType: 'play' })
                 .then(function () {
 
                 });
         }
 
         function pause() {
-            return televisionService.pause({ device: vm.deviceId, controlType: 'pause' })
+            return televisionService.pause({ device: {id: vm.deviceId}, controlType: 'pause' })
                 .then(function () {
 
                 });
         }
 
         function stop() {
-            return televisionService.stop({ device: vm.deviceId, controlType: 'stop' })
+            return televisionService.stop({ device: {id: vm.deviceId}, controlType: 'stop' })
                 .then(function () {
 
                 });
         }
 
         function rewind() {
-            return televisionService.rewind({ device: vm.deviceId, controlType: 'rewind' })
+            return televisionService.rewind({ device: {id: vm.deviceId}, controlType: 'rewind' })
                 .then(function () {
 
                 });
         }
 
         function fastForward() {
-            return televisionService.fastForward({ device: vm.deviceId, controlType: 'fastForward' })
+            return televisionService.fastForward({ device: {id: vm.deviceId}, controlType: 'fastForward' })
                 .then(function () {
 
                 });
         }
 
         function switchState() {
-            return televisionService.switchState({ device: vm.deviceId, state: !vm.currentPowerState, deviceTypeId: vm.devicePowerId })
+            return televisionService.switchState({ device: {id: vm.deviceId}, state: !vm.currentPowerState, deviceTypeId: vm.devicePowerId })
                 .then(function (data) {
                     if (data.status === 200) {
                         vm.currentPowerState = !vm.currentPowerState
@@ -216,7 +216,7 @@
         }
 
         function getState() {
-            return televisionService.getState({ device: vm.deviceId })
+            return televisionService.getState({ device: {id: vm.deviceId} })
                 .then(function (data) {
 
                 });
@@ -241,7 +241,7 @@
         }
 
         function setChannel(channel) {
-            return televisionService.setChannel({ device: vm.deviceId, channel: channel, deviceTypeId: vm.deviceChannelId })
+            return televisionService.setChannel({ device: {id: vm.deviceId}, channel: channel, deviceTypeId: vm.deviceChannelId })
                 .then(function (data) {
                     if (data.status === 200) {
                         vm.currentChannel = channel
@@ -250,7 +250,7 @@
         }
 
         function volumeDown() {
-            return televisionService.volumeDown({ device: vm.deviceId, deviceTypeId: vm.deviceSoundId })
+            return televisionService.volumeDown({ device: {id: vm.deviceId}, deviceTypeId: vm.deviceSoundId })
                 .then(function (data) {
                     if (data.status === 200) {
                         vm.currentSoundState = parseInt(vm.currentSoundState) - parseInt(1)
@@ -259,7 +259,7 @@
         }
 
         function volumeUp() {
-            return televisionService.volumeUp({ device: vm.deviceId, deviceTypeId: vm.deviceSoundId })
+            return televisionService.volumeUp({ device:{id: vm.deviceId}, deviceTypeId: vm.deviceSoundId })
                 .then(function (data) {
                     if (data.status === 200) {
                         vm.currentSoundState = parseInt(vm.currentSoundState) + parseInt(1)
@@ -268,7 +268,7 @@
         }
 
         function setMuted() {
-            return televisionService.setMuted({ device: vm.deviceId, state: !vm.currentMuteState, deviceTypeId: vm.deviceMuteId })
+            return televisionService.setMuted({ device:{id: vm.deviceId}, state: !vm.currentMuteState, deviceTypeId: vm.deviceMuteId })
                 .then(function (data) {
                     if (data.status === 200) {
                         vm.currentMuteState = !vm.currentMuteState
@@ -277,7 +277,7 @@
         }
 
         function customCommand(color) {
-            return televisionService.customCommand({ device: vm.deviceId, color: color})
+            return televisionService.customCommand({ device:{id: vm.deviceId}, color: color})
                 .then(function() {
 
                 })

@@ -25,7 +25,7 @@
             volumeDown: volumeDown,
             pressKey: pressKey,
             getSources: getSources,
-            openSources: openSources,
+            openSource: openSource,
             openMenu: openMenu,
             rec: rec,
             customCommand: customCommand,
@@ -89,7 +89,7 @@
             return $http({method: 'GET', url: '/television/source', params: params});
         }
 
-        function openSources(params) {
+        function openSource(params) {
             return $http({method: 'POST', url: '/television/opensource', data: params});
         }
 
