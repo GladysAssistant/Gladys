@@ -1,20 +1,22 @@
-@keyframes clickPush {
+@keyframes mouse-down {
     0% {
         transform: scale(1);
         opacity: 1;
     }
   
   
-    50% {
+    100% {
         transform: scale(0);
         opacity: 0;
     }
-  
-    51% {
+}
+
+
+@keyframes mouse-up {
+    0% {
         transform: scale(1.5);
         opacity: 0;
     }
-  
   
     100% {
         transform: scale(1);
@@ -48,9 +50,17 @@
     background-color:#3c8dbc !important;
 }
 
-.btn-outer:active > .btn-inner {
-    animation: clickPush 0.5s ease-in-out;
+.btn-inner-mouse-down {
+    animation: mouse-down 0.25s forwards ease-in-out;
 }
+
+.btn-inner-mouse-up {
+    animation: mouse-up 0.25s forwards ease-in-out;
+}
+
+/*.btn-outer:active > .btn-inner {
+    animation: clickPush 0.5s ease-in-out;
+}*/
 
 .btn-outer:hover > .btn-inner {
     box-shadow:0px 0px 2px #ffffff, inset 0px 0px 2px #ffffff;
