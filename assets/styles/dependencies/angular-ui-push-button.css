@@ -1,0 +1,57 @@
+@keyframes clickPush {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+  
+  
+    50% {
+        transform: scale(0);
+        opacity: 0;
+    }
+  
+    51% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+  
+  
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+  
+.circle {
+    border-radius: 50% !important;
+    padding: 0px !important;
+    margin:0px !important;
+}
+
+.btn-outer {
+    position: relative;
+    width: 25px;
+    height: 25px;
+}
+
+.btn-inner {
+    position: relative;
+    top:15%;
+    left:15%;
+    width: 70%;
+    height: 70%;
+    border:2px solid white !important;
+}
+
+.btn-outer:active, .btn-outer:hover,
+.btn-inner:active, .btn-inner:hover {
+    background-color:#3c8dbc !important;
+}
+
+.btn-outer:active > .btn-inner {
+    animation: clickPush 0.5s ease-in-out;
+}
+
+.btn-outer:hover > .btn-inner {
+    box-shadow:0px 0px 2px #ffffff, inset 0px 0px 2px #ffffff;
+}
