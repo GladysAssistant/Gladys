@@ -72,8 +72,6 @@ jobs:
       env:
       - DOCKER_REPO_SLUG=vonox/gladys
       before_install:
-      - sudo apt-get update
-      - sudo apt-get install -o Dpkg::Options::="--force-confold" -y docker-engine
       - pip install docker-ci-deploy
       script:
       - docker build -t $DOCKER_REPO_SLUG .
