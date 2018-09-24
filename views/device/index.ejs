@@ -72,16 +72,10 @@
                                                                 <input type="checkbox" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
                                                                 <label class="toogle-label" for="mytoogle"></label>
                                                             </div>
-
-
-
+                                                            <!-- pushButton for push type -->
                                                             <div ng-switch-when="push">
                                                                 <push-button type="text" ng-model="type.lastValue" ng-click="vm.changeValue(type, type.lastValue)"></push-button>
                                                             </div>
-
-
-
-
                                                             <!-- ColorPicker for color type -->
                                                             <div ng-switch-when="color">
                                                                 <color-picker type="text" ng-model="type.lastValue" ng-change="vm.changeValue(type, type.lastValue)"></color-picker>

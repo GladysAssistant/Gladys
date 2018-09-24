@@ -1,25 +1,51 @@
-@keyframes mouse-down {
+@-webkit-keyframes mouse-down {
     0% {
-        transform: scale(1);
-        opacity: 1;
+        -webkit-transform: scale(1);
+                transform: scale(1);
     }
   
-  
     100% {
-        transform: scale(0);
-        opacity: 0;
+        -webkit-transform: scale(0);
+                transform: scale(0);
     }
 }
 
-
-@keyframes mouse-up {
+@keyframes mouse-down {
     0% {
-        transform: scale(1.5);
+        -webkit-transform: scale(1);
+                transform: scale(1);
+    }
+  
+    100% {
+        -webkit-transform: scale(0);
+                transform: scale(0);
+    }
+}
+
+@-webkit-keyframes mouse-up {
+    0% {
+        -webkit-transform: scale(1.5);
+                transform: scale(1.5);
         opacity: 0;
     }
   
     100% {
-        transform: scale(1);
+        -webkit-transform: scale(1);
+                transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes mouse-up {
+    0% {
+        -webkit-transform: scale(1.5);
+                transform: scale(1.5);
+        opacity: 0;
+    }
+  
+    100% {
+        -webkit-transform: scale(1);
+                transform: scale(1);
         opacity: 1;
     }
 }
@@ -43,25 +69,15 @@
     width: 70%;
     height: 70%;
     border:2px solid white !important;
-}
-
-.btn-outer:active, .btn-outer:hover,
-.btn-inner:active, .btn-inner:hover {
-    background-color:#3c8dbc !important;
+    background-color: transparent !important;
 }
 
 .btn-inner-mouse-down {
-    animation: mouse-down 0.25s forwards ease-in-out;
+    -webkit-animation: mouse-down 0.15s forwards ease-in-out;
+            animation: mouse-down 0.15s forwards ease-in-out;
 }
 
 .btn-inner-mouse-up {
-    animation: mouse-up 0.25s forwards ease-in-out;
-}
-
-/*.btn-outer:active > .btn-inner {
-    animation: clickPush 0.5s ease-in-out;
-}*/
-
-.btn-outer:hover > .btn-inner {
-    box-shadow:0px 0px 2px #ffffff, inset 0px 0px 2px #ffffff;
+    -webkit-animation: mouse-up 0.15s forwards ease-in-out;
+            animation: mouse-up 0.15s forwards ease-in-out;
 }
