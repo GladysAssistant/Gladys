@@ -4,13 +4,14 @@ language: node_js
 
 jobs:
   include:
-    - stage: test
+    - stage: Test
       env:
       - CXX=g++-4.8
       node_js:
        - '6'
        - '8'
        - '10'
+      cache: yarn
       services:
       - mysql
       addons:
@@ -20,14 +21,14 @@ jobs:
           packages:
           - g++-4.8
       before_install:
-        - npm install -g grunt-cli
+        - yarn global add grunt-cli
         - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
         - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
       script:
         - "grunt coverage"
         - "grunt buildProd"
       
-    - stage: build documentation
+    - stage: Build & Deploy documentation
       env:
       - CXX=g++-4.8
       node_js: '8'
@@ -38,7 +39,7 @@ jobs:
           packages:
           - g++-4.8
       before_install:
-        - npm install -g grunt-cli
+        - yarn global add grunt-cli
       script:
         - "grunt documentation"
         - "grunt apidoc"
@@ -49,15 +50,11 @@ jobs:
         - "mv ./apidoc/ ./documentation/"
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
-
-    - stage: deploy documentation
-      node_js: '8'
-      script: echo "Deploying documentation to Github"
       deploy:
         provider: pages
         repo: GladysProject/documentation
         skip_cleanup: true
-        github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+        github_token: $GITHUB_TOKEN
         local_dir: documentation
         target-branch: gh-pages
         fqdn: documentation.gladysproject.com
@@ -65,19 +62,17 @@ jobs:
         on:
           branch: master
 
-    - stage: build docker image
+    - stage: Build & Push Docker image
       language: minimal
-      services:
-      - docker
+      services: docker
       env:
-      - DOCKER_REPO_SLUG=vonox/gladys
-      before_install:
-      - pip install docker-ci-deploy
+      - DOCKER_REPO_SLUG=gladysproject/gladys
+      - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
       script:
-      - docker build -t $DOCKER_REPO_SLUG .
-      before_deploy:
+      - docker build -t $DOCKER_REPO_SLUG:latest .
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$MAJOR_VERSION .; else true ; fi
+      after_success:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      deploy:
-        provider: script
-        script: docker-ci-deploy --tag $TRAVIS_BRANCH --tag latest $DOCKER_REPO_SLUG
+      - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
  
