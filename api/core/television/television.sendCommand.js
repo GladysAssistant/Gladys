@@ -20,7 +20,7 @@ module.exports = function sendCommand(functionName, params) {
 };
 
 function getDeviceType(params){
-    if(params.device.id) return gladys.utils.sqlUnique(queries.getDeviceTypeByDeviceId, [params.device.id]);
+    if(params.device) return gladys.utils.sqlUnique(queries.getDeviceTypeByDeviceId, [params.device]);
     else if(params.room) return gladys.utils.sqlUnique(queries.getTelevisionDeviceTypeByRoom, [params.room]);
     // if user does not specify a room, or a device, we suppose there is only one 
     // and return this one
