@@ -1,3 +1,9 @@
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name Room
+ * @class
+ */
 
 module.exports.getAll = require('./room.getAll.js');
 module.exports.get = require('./room.get.js');

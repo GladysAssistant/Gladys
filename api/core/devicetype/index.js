@@ -1,4 +1,11 @@
 
+ /**
+ * Don't remove, it is useful for generating documentation :)
+ * @public
+ * @name DeviceType
+ * @class
+ */
+
 module.exports.create = require('./deviceType.create.js');
 module.exports.command = require('./deviceType.command.js');
 module.exports.delete = require('./deviceType.delete.js');

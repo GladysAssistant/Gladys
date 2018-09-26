@@ -15,37 +15,35 @@
 // (if you're using LESS with the built-in default config, you'll want
 //  to change `assets/styles/importer.less` instead.)
 var cssFilesToInject = [
-  // styles
-  'styles/angular-ui-notification/angular-ui-notification.min.css',
+
+  // Inject styles
   'styles/search.css',
   'styles/store.css',
   'styles/scenario.css',
-  'styles/angular-chart/angular-chart.min.css',
-  'AdminLTE/bower_components/bootstrap-slider/slider.css',
   'styles/device.css',
-  'styles/weather.css',
-  'styles/leaflet/leaflet.css',
   'styles/toogle.css',
-  'styles/disable-hyperlinks.css',
-  'styles/box.css',
-  'styles/nav-tabs-custom.css',
-  'js/angular-bootstrap-calendar/angular-bootstrap-calendar.min.css',
+  'styles/global.css',
 
-  //Inject AdminLTE files
-  'AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css',
-  'AdminLTE/bower_components/font-awesome/css/font-awesome.min.css',
-  'AdminLTE/dist/css/skins/_all-skins.min.css',
-  'AdminLTE/bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
+  // Inject boxs styles
+  'styles/boxs/*.css',
+
+  // Inject dependencies styles
+  'styles/dependencies/angular-ui-notification.min.css',
+  'styles/dependencies/angular-chart.min.css',
+  'styles/dependencies/slider.css',
+  'styles/dependencies/leaflet.css',
+  'styles/dependencies/angular-bootstrap-calendar.min.css',
+  'styles/dependencies/bootstrap.min.css',
+  'styles/dependencies/font-awesome.min.css',
+  'styles/dependencies/adminLTE/_all-skins.min.css',
+  'styles/dependencies/bootstrap-datetimepicker.min.css',
+  'styles/dependencies/color-picker/color-picker.min.css',
   
-  // all styles, disabled by default
-  //'styles/**/*.css',
-  
-  // injecting hooks styles
+  // Inject hooks styles
   'hooks/**/*.css',
 
-  //Inject AdminLTE at the end
-  'AdminLTE/dist/css/AdminLTE.min.css',
-  'styles/global.css',
+  // Inject AdminLTE at the end
+  'styles/dependencies/adminLTE/AdminLTE.min.css',
 ];
 
 
@@ -53,67 +51,52 @@ var cssFilesToInject = [
 // (uses Grunt-style wildcard/glob/splat expressions)
 var jsFilesToInject = [
   
-  // Load sails.io before everything else
+  // Load sails.io, moments and jquery before everything else
   'js/dependencies/sails.io.js',
-  // loading angularJS
+  'js/dependencies/jquery.min.js',
+  //'js/dependencies/moment-with-locales.min.js',
+  'js/dependencies/moment/moment.min.js',
+  'js/dependencies/moment/locale/*.js',
+
+  // Load Bootstrap components
+  'js/dependencies/bootstrap.min.js',
+  'js/dependencies/bootstrap-datetimepicker.min.js',
+  'js/dependencies/bootstrap-slider.js',
+
+  // Load angular components
   'js/dependencies/angular.min.js',
-  // loading angularJS route
   'js/dependencies/angular-route.min.js',
-  // loading JQuery
-  'AdminLTE/bower_components/jquery/dist/jquery.min.js',
-
-  'js/dependencies/popper.min.js',
-
-  // loading Bootstrap
-  'AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js',
   
-  // loading Moment with locales
-  'AdminLTE/bower_components/moment/min/moment-with-locales.min.js',
-  
-  // loading Chart JS
-  'AdminLTE/bower_components/chart.js/dist/Chart.min.js',
-
-  // loading bootstrap datetimepicker
-  'AdminLTE/bower_components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
-  
-  'AdminLTE/bower_components/bootstrap-slider/bootstrap-slider.js',
-
+  // Load other modules
+  'js/dependencies/popper.min.js', 
+  'js/dependencies/Chart.min.js',
   'js/dependencies/js-yaml.min.js',
 
-  // Other dependecies
-  //'js/dependencies/**/*.js',
+  // Load other angular components
+  'js/dependencies/ng-device-detector.min.js',
+  'js/dependencies/ng-infinite-scroll.js',
+  'js/dependencies/angular-moment.min.js',
+  'js/dependencies/angular-ui-notification.min.js',
+  'js/dependencies/angular-smooth-scroll.min.js',
+  'js/dependencies/angular-translate.min.js',
+  'js/dependencies/slider.js',
+  'js/dependencies/ng-device-detector.min.js',
+  'js/dependencies/angular-bootstrap-calendar-tpls.min.js',
+  'js/dependencies/angular-chart.min.js',
+  'js/dependencies/color-picker/color-picker.min.js',
+  'js/dependencies/color-picker/angular-color-picker.js',
   
-  
-  //loading other modules 
-  'js/ng-device-detector/ng-device-detector.min.js',
-  'js/ng-infinite-scroll/ng-infinite-scroll.js',
-  'js/angular-moment/angular-moment.min.js',
-  'js/angular-ui-notification/angular-ui-notification.min.js',
-  'js/smooth-scroll/angular-smooth-scroll.min.js',
-  'js/angular-chart/dist/angular-chart.min.js',
-  'js/angular-translate/angular-translate.min.js',
-  'js/angular-slider/slider.js',
-  'js/angular-device-detector/ng-device-detector.min.js',
-  'js/angular-bootstrap-calendar/angular-bootstrap-calendar-tpls.min.js',
-  
-  // loading first AngularModule definition
+  // Load first AngularModule definition
   'js/app/app.module.js',
-  
   'js/app/app.run.js',
-  // all the rest of the angular application
   'js/app/**/*.js',
   
-  // loading hooks JS scripts
+  // Load hooks JS scripts
   'hooks/**/*.js',
   
-  // loading AdminLTE app
-
-  'AdminLTE/dist/js/adminlte.min.js',
-  // All of the rest of your client-side js files
-  // will be injected here in no particular order.
-  //'js/**/*.js'
+  // Load AdminLTE app
+  'js/dependencies/adminlte.min.js',
 ];
-
 
 // Client-side HTML templates are injected using the sources below
 // The ordering of these templates shouldn't matter.
@@ -127,8 +110,6 @@ var jsFilesToInject = [
 var templateFilesToInject = [
   'templates/**/*.html'
 ];
-
-
 
 // Prefix relative paths to source files so they point to the proper locations
 // (i.e. where the other Grunt tasks spit them out, or in some cases, where

@@ -9,7 +9,7 @@
  * @example
  * 
  * var machine = {
- *  uuid: '46929309-0fa0-4f29-8c51-4d8e6ff6b078'
+ *      uuid: '46929309-0fa0-4f29-8c51-4d8e6ff6b078'
  * };
  * 
  * gladys.machine.heartbeat(machine)

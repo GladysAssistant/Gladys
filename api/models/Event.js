@@ -5,12 +5,6 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-/**
- * @public
- * @name Event
- * @class
- */
-
 module.exports = {
 
   attributes: {
