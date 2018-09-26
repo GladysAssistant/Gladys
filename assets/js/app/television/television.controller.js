@@ -78,7 +78,7 @@
         }
 
         function getDevices() {
-            deviceService.getDeviceTypeByCategory({category:'TV'})
+            deviceService.getDeviceTypeByCategory({category:'Television'})
                 .then(function(res) {
                     var tempDevices = [];
                     res.data.forEach(function(deviceType) {
