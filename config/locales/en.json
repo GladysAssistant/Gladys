@@ -80,6 +80,7 @@
   "device-create-button": "Create",
   "notification-update-available-title": "Update available !",
   "notification-update-available-text": "New version of Gladys :",
+  "notification-update-module-available-text": "can be updated on version",
   "installation-step": "Step",
   "installation-create-account": "Create account",
   "installation-configuration": "Configuration",
