@@ -114,7 +114,7 @@
                 <div class="col-sm-6 text-center">
                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
                     <ul class="dropdown-menu pull-left" role="menu">
-                        <li ng-repeat="source in vm.allSources"><a ng-click="vm.openSources(source.label)">{{source.label}}</a></li>
+                        <li ng-repeat="source in vm.allSources"><a ng-click="vm.openSource(source.label)">{{source.label}}</a></li>
                     </ul>
                     <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
                     <button type="button" ng-click="vm.pressKey('back')" class="btn btn-primary"><i class="fa fa-undo"></i></button>

@@ -1,5 +1,5 @@
 var sendCommand = require('./television.sendCommand.js');
 
-module.exports = function openSources(params) {
-    return sendCommand('openSources', params);
+module.exports = function openSource(params) {
+    return sendCommand('openSource', params);
 };
