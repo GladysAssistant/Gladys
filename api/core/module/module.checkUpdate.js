@@ -21,7 +21,7 @@ module.exports = function(){
                                     var notification = {
                                         title: sails.__({ phrase: 'notification-update-available-title', locale: admin.language.substr(0,2)}) + ` ${moduleOnStore.version}`,
                                         text: `${moduleOnStore.name} ` + sails.__({ phrase: 'notification-update-module-available-text', locale: admin.language.substr(0,2)}) + ` ${moduleOnStore.version}`,
-                                        icon: 'fa fa-puzzle-piece',
+                                        icon: 'fa fa-cloud-download',
                                         iconColor: '',
                                         link: '/dashboard/module',
                                         priority: 0,
