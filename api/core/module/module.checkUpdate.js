@@ -20,10 +20,10 @@ module.exports = function(){
                                     // we create a new notification
                                     var notification = {
                                         title: sails.__({ phrase: 'notification-update-available-title', locale: admin.language.substr(0,2)}) + ` ${moduleOnStore.version}`,
-                                        text: ` ${moduleOnStore.name} ` + sails.__({ phrase: 'notification-update-module-available-text', locale: admin.language.substr(0,2)}) + ` ${moduleOnStore.version}`,
-                                        icon: sails.config.update.icon,
-                                        iconColor: sails.config.update.iconColor,
-                                        link: sails.config.update.link,
+                                        text: `${moduleOnStore.name} ` + sails.__({ phrase: 'notification-update-module-available-text', locale: admin.language.substr(0,2)}) + ` ${moduleOnStore.version}`,
+                                        icon: 'fa fa-puzzle-piece',
+                                        iconColor: '',
+                                        link: '/dashboard/module',
                                         priority: 0,
                                         user: admin.id,
                                     };

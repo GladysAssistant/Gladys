@@ -65,8 +65,8 @@ module.exports = function(cb){
   gladys.module.init();
 
   // checking for update on module now
-  gladys.module.checkUpdate()
-  
+  gladys.module.checkUpdate();
+
   // Check for update interval
   setInterval(function(){
     gladys.update.checkUpdate();
