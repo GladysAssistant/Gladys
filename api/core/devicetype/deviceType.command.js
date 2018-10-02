@@ -9,10 +9,10 @@ module.exports = function command(options){
         return Promise.map(options.deviceTypes, function(deviceType){
             switch(options.label){
                 case 'set-device-on':
-                    value = (deviceType.max === null ? 1 : deviceType.max);
+                    value = deviceType.max;
                 break;
                 case 'set-device-off': 
-                    value = (deviceType.min === null ? 0 : deviceType.min);
+                    value = deviceType.min;
                 break;
             }
             return gladys.deviceType.exec({devicetype: deviceType.id, value: value});
@@ -32,10 +32,10 @@ module.exports = function command(options){
                   return Promise.map(deviceTypes, function(deviceType) {
                     switch(options.label){
                         case 'set-device-on':
-                            value = (deviceType.max === null ? 1 : deviceType.max);
+                            value = deviceType.max;
                         break;
                         case 'set-device-off': 
-                            value = (deviceType.min === null ? 0 : deviceType.min);
+                            value = deviceType.min;
                         break;
                     }
                       return gladys.deviceType.exec({devicetype: deviceType.id, value: value});

@@ -29,8 +29,8 @@ module.exports = function(originalText,rooms){
 /**
  * Return true if the deviceName is present in the sentence
  */
-function present(text, type){
-    return (text.toLowerCase().indexOf(type ? type.toLowerCase() : type) > -1);
+function present(text, tag){
+    return ((text.toLowerCase().indexOf(tag ? tag.toLowerCase() : tag) > -1) && (tag!==null));
 }
 
 function inroom (rooms, type) {
