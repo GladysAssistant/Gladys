@@ -1,13 +1,13 @@
-module.exports = function(originalText){
+module.exports = function(originalText,rooms){
     return gladys.deviceType.getAll()
        .then(function(deviceTypes){
-           
+ 
            var result = [];
            var replaceRegex = '';
            
-           // foreach deviceType, we verify if the device is present in the 
+           // foreach deviceType, we verify if the device is present in the sentence
            deviceTypes.forEach(function(type){
-               if(present(originalText, type.tag)){
+               if(present(originalText, type.tag) && inroom(rooms, type)) {
                    result.push(type);
                    if(replaceRegex.length > 0) replaceRegex += '|';
                    replaceRegex += type.tag;
@@ -31,4 +31,13 @@ module.exports = function(originalText){
  */
 function present(text, type){
     return (text.toLowerCase().indexOf(type ? type.toLowerCase() : type) > -1);
+}
+
+function inroom (rooms, type) {
+    if (rooms.length) {
+        return(rooms.find(room => room.id===type.roomId));
+    } else {
+        return true;
+    }
+
 }

@@ -18,7 +18,7 @@ module.exports = function(originalText){
         var text = originalText;
         
         if(replaceRegex.length > 0) {
-            text = originalText.replace(new RegExp(replaceRegex, 'g'), '%ROOM%');
+            text = originalText.replace(new RegExp(replaceRegex, 'gi'), '%ROOM%');
         }
 
         return {

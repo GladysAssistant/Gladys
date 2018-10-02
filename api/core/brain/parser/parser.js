@@ -17,7 +17,7 @@ module.exports.parse = function parse(text) {
 
             rooms = result.rooms;
             
-            return parseDeviceType(result.text);
+            return parseDeviceType(result.text, rooms);
         })
         .then((result) => {
 
