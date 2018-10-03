@@ -74,7 +74,7 @@
                                                             </div>
                                                             <!-- pushButton for push type -->
                                                             <div ng-switch-when="push">
-                                                                <push-button type="text" ng-model="type.lastValue" ng-click="vm.changeValue(type, type.lastValue)"></push-button>
+                                                                <push-button type="text" ng-model="type.max" ng-click="vm.changeValue(type, type.max)"></push-button>
                                                             </div>
                                                             <!-- ColorPicker for color type -->
                                                             <div ng-switch-when="color">
@@ -293,7 +293,7 @@
                                                     <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
                                                     
                                                     <!-- If the deviceType is not a sensor and is not a binary, display input field -->
-                                                     <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                     <form class="form-inline" ng-show="type.type != 'push' && !type.sensor && type.type != 'binary'"  >
                                                         <div class="form-group">
                                                             <div class="input-group">
                                                             <input 

@@ -9,10 +9,10 @@
                 scope: {
                     ngModel: '='
                 },
-                link: function (scope, element, attrs, ngModelCtrl) {
+                link: function ($scope, element, attrs, ngModelCtrl) {
 
                     element.bind('click', function () {
-                        ngModelCtrl.$setViewValue(1);
+                        ngModelCtrl.$setViewValue($scope.ngModel);
 
                         var e = element.children();
                         var animationEvent = whichAnimationEvent();
