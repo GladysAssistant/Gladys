@@ -74,7 +74,7 @@ function npmInstall(path){
 }
 
 function copyAssets(modulePath, slug) {
-    var assetsDestinationProd = './www/hooks/' + slug;
+    var assetsDestinationProd = '.tmp/public/hooks/' + slug;
     var assetsDestinationDev = './assets/hooks/' + slug;
 
     // we test if the module has an assets folder
