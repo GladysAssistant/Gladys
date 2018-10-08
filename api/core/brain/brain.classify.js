@@ -24,7 +24,6 @@ module.exports = function classify(user, message){
             if(scope.user.password) delete scope.user.password;
 
             var classifier = shared.getClassifier();
-            console.log('scope.replacedText', scope.replacedText);
 
             var classifications = classifier.classify(scope.replacedText);
 
