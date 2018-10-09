@@ -572,5 +572,14 @@
   "preparation":"Préparation",
   "scenario-if-condition-true": "Vraie",
   "scenario-if-condition-false": "Fausse",
-  "scenario-if-condition-is": "est"
+  "scenario-if-condition-is": "est",
+  "parameters-gateway": "Gladys Gateway",
+  "gateway-left-explanation": "Le Gladys Gateway est la meilleure façon de se connecter à Gladys depuis l'extérieur de votre réseau",
+  "gateway-left-explanation-know-more": "En savoir plus",
+  "gladys-gateway-login-error": "Votre email ou votre mot de passe est invalide.",
+  "gladys-gateway-2fa-error": "L'authentification à deux facteurs n'est pas activés sur votre compte. Merci de l'activer avant de vous connecter ici.",
+  "gateway-connected-sentence": "Votre instance Gladys est connecté au Gladys Gateway et recevra les commandes que vous enverrez depuis le Gateway. Si vous voulez vous reconnecter, cliquez",
+  "gateway-connected-click-here": "ici",
+  "gateway-login-title": "Connectez vous à votre compte Gladys Gateway",
+  "gateway-two-factor-code": "Code d'authentification à deux-facteurs"
 }
