@@ -131,6 +131,7 @@ module.exports.routes = {
   
   // Gateway
   'post /gateway/login': 'GatewayController.login',
+  'get /gateway/status': 'GatewayController.isConnected',
 
   // House
   'get /house': 'HouseController.index',

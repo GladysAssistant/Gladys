@@ -31,8 +31,10 @@ module.exports = function(email, password, twoFactorCode) {
         gladys.param.setValue({ name: 'GLADYS_GATEWAY_ECDSA_PRIVATE_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.ecdsaPrivateKeyJwk) })
       ]);
     })
-    .catch((err) => {
-      console.log(err);
-      return Promise.reject(err);
+    .then(() => gladys.gateway.init())
+    .then(() => {
+      return {
+        connected: true
+      };
     });
 };
