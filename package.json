@@ -20,6 +20,7 @@
     "gladys": "./app.js"
   },
   "dependencies": {
+    "@gladysproject/gladys-gateway-js": "^0.1.2",
     "barrels": "^1.6.5",
     "bcrypt": "3.0.1",
     "bluebird": "^3.5.0",
@@ -46,6 +47,7 @@
     "limdu": "0.9.4",
     "moment": "^2.18.1",
     "node-schedule": "^1.2.4",
+    "node-webcrypto-ossl": "^1.0.38",
     "rc": "^1.2.1",
     "request": "^2.81.0",
     "sails": "^0.12.13",
