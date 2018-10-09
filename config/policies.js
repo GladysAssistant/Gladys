@@ -45,6 +45,7 @@ module.exports.policies = {
   DeviceState: ['checkToken'],
   DeviceType: ['checkToken'],
   GoogleApi : ['checkToken'],
+  Gateway : ['checkToken'],
   House : ['checkToken'],
   Launcher :['checkToken'],
   LauncherType : ['checkToken'],

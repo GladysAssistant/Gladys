@@ -24,7 +24,7 @@ module.exports = {
         },
         
         value: {
-            type:'string',
+            type: 'text',
             required: true
         }
 
