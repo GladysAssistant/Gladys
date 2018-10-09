@@ -128,6 +128,9 @@ module.exports.routes = {
   //EventType
   'get /eventtype': 'EventTypeController.index',
   'get /eventtype/:id/launcherparam': 'EventTypeController.getLauncherParams',
+  
+  // Gateway
+  'post /gateway/login': 'GatewayController.login',
 
   // House
   'get /house': 'HouseController.index',

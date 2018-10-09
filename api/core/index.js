@@ -5,6 +5,7 @@ var gladys = {};
 gladys = new events.EventEmitter();
 
 gladys.load = function load(cb) {
+  
   // require all Gladys dependencies
   gladys.action = require('./action/index.js');
   gladys.actionType = require('./actiontype/index.js');
@@ -23,6 +24,7 @@ gladys.load = function load(cb) {
   gladys.direction = require('./direction/index.js');
   gladys.event = require('./event/index.js');
   gladys.eventType = require('./eventtype/index.js');
+  gladys.gateway = require('./gateway/index.js');
   gladys.house = require('./house/index.js');
   gladys.launcher = require('./launcher/index.js');
   gladys.launcherParam = require('./launcherparam/index.js');
