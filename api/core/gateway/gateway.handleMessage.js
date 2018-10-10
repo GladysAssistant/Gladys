@@ -3,16 +3,28 @@ const importControllers = require('./utils').importControllers;
 const DeviceTypeController = require('../../controllers/DeviceTypeController.js');
 
 var controllers = importControllers();
+var idRouteRegex =  /\/\d+\//g;
 
 module.exports = function(data, cb) {
   switch(data.type) {
     case 'gladys-api-call':
       var route = (data.options.method + ' ' + data.options.url).toLowerCase();
+      
+      var id = route.match(idRouteRegex);
+      route = route.replace(idRouteRegex, '/:id/');
+
+      var params = {};
+      
+      if(id && id.length > 0) {
+        params.id = id[0].replace(/\//g, '');
+      }
+
       var controller = controllers[route];
       if(!controller) {
-        return cb(new Error('ROUTE_NOT_FOUND'));
+        return cb({error_code: 'ROUTE_NOT_FOUND', error_message: `Route: ${route} not found`});
       }
-      callApi(data.sender_id, controller, cb);
+
+      callApi(data.sender_id, controller, params, data.options.query, data.options.data, cb);
     break;
 
     default: 
