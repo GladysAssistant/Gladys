@@ -1,12 +1,15 @@
 var fs = require('fs');
 var path = require('path');
 
-module.exports.callApi = function(userId, controllerFunc, callback) {
+module.exports.callApi = function(userId, controllerFunc, params, query, data, callback) {
   
   var req = {
     user: {
       id: userId
-    }
+    },
+    params, 
+    query,
+    body: data
   };
   
   var res = {
@@ -14,7 +17,16 @@ module.exports.callApi = function(userId, controllerFunc, callback) {
   };
 
   var next = function(err) {
-    callback(err)
+    sails.log.warn('Gladys Gateway: Error in API call');
+    sails.log.warn(err);
+    if(err instanceof Error && err.message) {
+      err = {
+        status: 500,
+        error_code: 'ERROR',
+        error_message: err.message
+      };
+    }
+    callback(err);
   };
 
   controllerFunc(req, res, next);
