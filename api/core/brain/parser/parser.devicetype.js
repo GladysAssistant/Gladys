@@ -1,4 +1,4 @@
-module.exports = function(originalText,rooms){
+module.exports = function(originalText){
     return gladys.deviceType.getAll()
        .then(function(deviceTypes){
  
@@ -7,7 +7,7 @@ module.exports = function(originalText,rooms){
            
            // foreach deviceType, we verify if the device is present in the sentence
            deviceTypes.forEach(function(type){
-               if(present(originalText, type.tag) && inroom(rooms, type)) {
+               if(present(originalText, type.tag)) {
                    result.push(type);
                    if(replaceRegex.length > 0) replaceRegex += '|';
                    replaceRegex += type.tag;
@@ -35,18 +35,6 @@ function present(text, tag){
     } else {
         return false;
     }
-}
-
-/**
- * Returns true if a room is specified and the devicetype is attached to it
- */
-function inroom (rooms, type) {
-    if (rooms.length) {
-        return(rooms.find(room => room.id===type.roomId));
-    } else {
-        return true;
-    }
-
 }
 
 function no_accent(my_string)
