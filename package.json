@@ -53,7 +53,8 @@
     "sails-util-mvcsloader": "^0.4.0",
     "serialization": "^0.2.0",
     "suncalc": "^1.8.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "semver": "^5.6.0"
   },
   "devDependencies": {
     "documentation-flat-theme": "^0.2.1",
