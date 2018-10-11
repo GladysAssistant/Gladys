@@ -5,14 +5,23 @@ module.exports = function sendCommand(functionName, params) {
     return getDeviceType(params)
       .then((deviceType) => {
 
+          params.deviceType = deviceType;
+
+          // if the device is not on this machine
+          if(deviceType.machine && deviceType.machine.length){
+              params.machine_id = params.machine;
+              params.module_slug = deviceType.service;
+              params.action = functionName;
+              gladys.emit('television', params);
+              return Promise.resolve();
+          }
+
           if(!gladys.modules[deviceType.service] || !gladys.modules[deviceType.service].television)
                 return Promise.reject(new Error(`television : Module ${deviceType.service} does not exist or does not handle television.`));
          
           if(typeof gladys.modules[deviceType.service].television[functionName] != 'function') {
             return Promise.reject(new Error(`television : Module ${deviceType.service} does not have function ${functionName}`));
-          } 
-
-          params.deviceType = deviceType;
+          }
         
           // calling television module
           return gladys.modules[deviceType.service].television[functionName](params);

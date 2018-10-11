@@ -4,15 +4,14 @@ describe('TelevisionController', function() {
 
   describe('sendComand', function() {
    
-    it('POST /television/5/state', function (done) {
+    it('POST /television/state', function (done) {
         
         var params = {
-            state: true,
             device: 5
         };
         
      	request(sails.hooks.http.app)
-        .post('/television/5/state?token=test')
+        .post('/television/state?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -23,23 +22,22 @@ describe('TelevisionController', function() {
 
     });
 
-    it('GET /television/state', function (done) {
+    it('GET /television/5/state', function (done) {
         
      	request(sails.hooks.http.app)
-        .get('/television/state?token=test&device=5')
+        .get('/television/5/state?token=test')
         .expect(200)
         .end(function(err, res) {
             if(err) return done(err);
 
-            res.body.should.be.instanceOf(Array);
-            res.body[0].should.have.property('state');
+            res.body.should.have.property('state');
             
             done();
         });
 
     });
 
-    it('POST /television/5/channel', function (done) {
+    it('POST /television/channel', function (done) {
 
         var params = {
             channel: 1,
@@ -47,7 +45,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/5/channel?token=test')
+        .post('/television/channel?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -58,10 +56,10 @@ describe('TelevisionController', function() {
 
     });
 
-    it('GET /television/channel ', function (done) {
+    it('GET /television/5/channel ', function (done) {
         
      	request(sails.hooks.http.app)
-        .get('/television/channel?token=test&device=5')
+        .get('/television/5/channel?token=test')
         .expect(200)
         .end(function(err, res) {
             if(err) return done(err);
@@ -74,10 +72,10 @@ describe('TelevisionController', function() {
 
     });
 
-     it('GET /television/mute ', function (done) {
+    it('GET /television/5/mute ', function (done) {
         
      	request(sails.hooks.http.app)
-        .get('/television/mute?token=test&device=5')
+        .get('/television/5/mute?token=test')
         .expect(200)
         .end(function(err, res) {
             if(err) return done(err);
@@ -90,23 +88,23 @@ describe('TelevisionController', function() {
 
     });
 
-    it('GET /television/source ', function (done) {
+    it('GET /television/5/source ', function (done) {
         
         request(sails.hooks.http.app)
-       .get('/television/source?token=test&device=5')
+       .get('/television/5/source?token=test')
        .expect(200)
        .end(function(err, res) {
            if(err) return done(err);
 
            res.body.should.be.instanceOf(Array);
-           res.body[0][0].should.have.property('label');
+           res.body[0].should.have.property('label');
 
            done();
        });
 
    });
 
-    it('POST /television/5/mute ', function (done) {
+    it('POST /television/mute ', function (done) {
 
         var params = {
             mute: false,
@@ -114,7 +112,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/5/mute?token=test')
+        .post('/television/mute?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -133,7 +131,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/fastforward?token=test')
+        .post('/television/fastforward?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -152,7 +150,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/pause?token=test')
+        .post('/television/pause?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -171,7 +169,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/play?token=test')
+        .post('/television/play?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -190,7 +188,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/rewind?token=test')
+        .post('/television/rewind?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -209,7 +207,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/stop?token=test')
+        .post('/television/stop?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -228,7 +226,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/presskey?token=test')
+        .post('/television/presskey?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -246,7 +244,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/volume/down?token=test')
+        .post('/television/volume/down?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -264,7 +262,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/volume/up?token=test')
+        .post('/television/volume/up?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -283,7 +281,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/opensource?token=test')
+        .post('/television/opensource?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -301,7 +299,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/openmenu?token=test')
+        .post('/television/openmenu?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -319,7 +317,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/rec?token=test')
+        .post('/television/rec?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -338,7 +336,7 @@ describe('TelevisionController', function() {
         };
         
      	request(sails.hooks.http.app)
-        .get('/television/rec?token=test')
+        .post('/television/rec?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {
@@ -349,8 +347,6 @@ describe('TelevisionController', function() {
 
     });
 
-    
   });
-
 
 });

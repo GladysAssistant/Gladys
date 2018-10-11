@@ -15,22 +15,24 @@ module.exports = function command(scope) {
     switch(scope.label) {
         case 'television-set-channel':
             response.label = 'tell-television-set-channel';
-            calledFunc = gladys.television.getCurrentChannel()
+            calledFunc = gladys.television.getCurrentChannel(params)
                 .then((result) => {
                     if(result !== params.channel) {
-                        return gladys.television.setChannel(params.channel)
+                        return gladys.television.setChannel(params)
                     }
                 })
+                .then(() => response);
         break;
 
         case 'television-switch-state':
             response.label = 'television-switch-state';
-            calledFunc = gladys.television.getState()
+            calledFunc = gladys.television.getState(params)
                 .then((result) => {
                     if(result !== params.state) {
-                        return gladys.television.switchState(params.state)
+                        return gladys.television.switchState(params)
                     }
                 })
+                .then(() => response);
         break;
 
         case 'television-pause':
@@ -59,7 +61,7 @@ module.exports = function command(scope) {
 
         case 'television-program-plus':
             response.label = 'television-change-chaine';
-            calledFunc = gladys.television.getCurrentChannel()
+            calledFunc = gladys.television.getCurrentChannel(params)
                 .then((currentChannel) => {
                     return gladys.television.setChannel(parseInt(currentChannel)+parseInt(1))
                 })
@@ -68,7 +70,7 @@ module.exports = function command(scope) {
 
         case 'television-program-minus':
             response.label = 'television-change-chaine';
-            calledFunc = gladys.television.getCurrentChannel()
+            calledFunc = gladys.television.getCurrentChannel(params)
                 .then((currentChannel) => {
                     return gladys.television.setChannel(parseInt(currentChannel)-parseInt(1))
                 })

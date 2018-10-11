@@ -32,7 +32,7 @@
     "id":5,
     "name": "Television",
     "protocol": "television",
-    "service": "television",
+    "service": "test",
     "room":1
   }
 ]

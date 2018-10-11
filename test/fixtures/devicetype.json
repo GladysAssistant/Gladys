@@ -84,7 +84,7 @@
     "max": 1
   },
   {
-    "id": 6,  
+    "id": 9,
     "name": "Chaine",
     "identifier": "Channel",
     "type": "dimmer",

@@ -30,6 +30,7 @@ describe('Television', function() {
         'getState',
         'setChannel',
         'getChannel',
+        'getCurrentChannel',
         'pause',
         'play',
         'stop',

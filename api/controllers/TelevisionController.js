@@ -33,7 +33,7 @@ module.exports = {
      * @apiSuccess {Boolean} state State of the television
      */
     getState: function(req, res, next){
-        gladys.television.getState(req.query)
+        gladys.television.getState({device: req.params.id})
             .then((result) => res.json(result))
             .catch(next);
     },
@@ -65,7 +65,7 @@ module.exports = {
      * 
      */
     getChannel: function(req, res, next){
-        gladys.television.getChannel(req.query)
+        gladys.television.getChannel({device: req.params.id})
             .then((result) => res.json(result))
             .catch(next);
     },
@@ -81,7 +81,7 @@ module.exports = {
      * @apiSuccess {boolean} muted Returns true if the television is muted
      */
     getMuted: function(req, res, next){
-        gladys.television.getMuted(req.query)
+        gladys.television.getMuted({device: req.params.id})
             .then((result) => res.json(result))
             .catch(next);
     },
@@ -97,7 +97,7 @@ module.exports = {
      * @apiSuccess {integer} volume Volume of the television
      */
     getVolume: function(req, res, next){
-        gladys.television.getVolume(req.query)
+        gladys.television.getVolume({device: req.params.id})
             .then((result) => res.json(result))
             .catch(next);
     },
