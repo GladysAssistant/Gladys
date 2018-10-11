@@ -1,5 +1,7 @@
 var os = require('os');
+var osUtils 	= require('os-utils');
 var Promise = require('bluebird');
+const queries = require('./system.queries.js');
 
 module.exports = function(){
    
@@ -13,13 +15,33 @@ module.exports = function(){
      loadavg: os.loadavg(),
      totalmem: os.totalmem(),
      freemem: os.freemem(),
+     freememPercentage: osUtils.freememPercentage(),
      cpus: os.cpus(),
-     networkInterfaces: os.networkInterfaces()  
+     networkInterfaces: os.networkInterfaces(), 
+     gladysVersion: gladys.version
    };
    
-   var usedMemory = infos.totalmem - infos.freemem;
-   var percentMemoryUsed = 100*usedMemory/infos.totalmem;
-   infos.percentMemoryUsed = percentMemoryUsed;
-   
-   return Promise.resolve(infos);
+   infos.percentMemoryUsed = 100 - infos.freememPercentage;
+
+   return Promise.all([
+     gladys.utils.sqlUnique(queries.getNumberOfDeviceTypes, []),
+     gladys.utils.sqlUnique(queries.getNumberOfDeviceStates, []),
+     getCpuUsage()
+   ])
+   .spread((deviceTypeCount, deviceStateCount, cpuUsage) => {
+
+    infos.deviceTypeCount = deviceTypeCount.count;
+    infos.deviceStateCount = deviceStateCount.count;
+    infos.cpuUsage = cpuUsage;
+
+    return infos;
+   });
 };
+
+function getCpuUsage() {
+  return new Promise(function(resolve, reject){
+    osUtils.cpuUsage((v) => {
+      resolve(v);
+    });
+  });
+}
