@@ -47,7 +47,7 @@ Gladys is 100% written in Node.js.
 Prerequisites
 -------------
 
-- [Node.js](http://nodejs.org) ( >= v4.x.x  and < 10.x.x)
+- [Node.js](http://nodejs.org) ( >= v8.x.x )
 - [MySQL](http://www.mysql.com/)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
@@ -155,24 +155,20 @@ To be sure that you're doing that good, check [node-gyp installation guide](http
 Contributing
 -------------
 
-Pull request are welcome, but code must follow some guidelines.
+Pull requests are welcomed!
 
-* Use [JSHint](https://github.com/jshint/jshint).
-* For the AngularJS client code, follow [John Papa's Angular Style Guide](https://github.com/johnpapa/angular-styleguide).
-* Please Unit test your code. We use Mocha and Istanbul for code coverage. No pull requests will be accepted without good unit tests.
- 
-If you want to develop a new functionality, develop a Gladys Module instead of modifying the core! More about modules on the [website](https://gladysproject.com).
+See [Contributing.md](https://github.com/GladysProject/Gladys/blob/master/.github/CONTRIBUTING.md).
 
 Links
 -------------
 
 - [Website](https://gladysproject.com)
 - [Community](https://community.gladysproject.com/)
-- [Developer Website](https://developer.gladysproject.com)
 - [Patreon](https://www.patreon.com/gladysproject/overview)
 - [Twitter](https://twitter.com/gladysproject)
 - [Instagram](https://www.instagram.com/gladysproject/)
 - [Facebook](https://www.facebook.com/gladysproject)
+- [Developer Website](https://developer.gladysproject.com)
 
 Community
 -------------
