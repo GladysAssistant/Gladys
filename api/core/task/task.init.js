@@ -64,9 +64,13 @@ module.exports = function(cb){
   // fully installed
   gladys.module.init();
 
+  // checking for update on module now
+  gladys.module.checkUpdate();
+
   // Check for update interval
   setInterval(function(){
     gladys.update.checkUpdate();
+    gladys.module.checkUpdate();
   }, sails.config.update.checkUpdateInterval);  
  
 };
