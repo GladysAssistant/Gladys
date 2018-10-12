@@ -22,6 +22,7 @@ var cssFilesToInject = [
   'styles/scenario.css',
   'styles/device.css',
   'styles/toogle.css',
+
   'styles/global.css',
 
   // Inject boxs styles

@@ -1,0 +1,134 @@
+<div class="box box-primary" data-ng-controller="TelevisionCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <div class="box-header with-border">
+        <i class="fa fa-television"></i>
+        <h3 ng-show="vm.displayAskDeviceForm" class="box-title">
+            <%= __('box-television-title') %>
+        </h3>
+        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} ({{vm.currentSource}})</h3>
+        </span>
+        <div ng-show="vm.deviceId" class="box-tools ng-cloak">
+            <div class="pull-right box-tools">
+                <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bars"></i></button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li ng-repeat="device in vm.devices" class="ng-cloak"><a ng-click="vm.selectDevice(device);">{{device.name}}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="box-body body-tv" ng-class="{'body-tv':!vm.displayAskDeviceForm}">
+        <div ng-show="vm.deviceId" class="ng-cloak">
+            <div class="row" id="firstRow">
+                <div class="col-xs-2 text-center">
+                    <!--on/off-->
+                    <button type="button" ng-click="vm.switchState()" class="btn btn-danger btn-margin btn-circle"><i
+                            class="fa fa-power-off"></i></button>
+                </div>
+                <div class="col-xs-5 text-center">
+                    <!--Son-->
+                    <div class="btn-group">
+                        <button type="button" ng-click="vm.volumeDown()" class="btn btn-default btn-left-rounded"><i
+                                class="glyphicon glyphicon-volume-down"></i></button>
+                        <button type="button" ng-click="vm.setMuted()" class="btn btn-default"><i class="glyphicon glyphicon-volume-off"></i></button>
+                        <button type="button" ng-click="vm.volumeUp()" class="btn btn-default btn-right-rounded"><i
+                                class="glyphicon glyphicon-volume-up"></i></button>
+                    </div>
+
+                </div>
+                <div class="col-xs-5 text-center">
+                    <!--Programme-->
+                    <div class="btn-group">
+                        <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</button>
+                        <button type="button" class="btn btn-default"><i class="fa fa-tv"></i></button>
+                        <button type="button" ng-click="vm.programPlus()" class="btn btn-default btn-right-rounded">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <!--Joystick-->
+                <div class="col-sm-5 text-center">
+                    <div class="circle">
+                        <ul>
+                            <li ng-click="vm.pressKey('up')"><i class="fa fa-3x fa-caret-up"></i></li>
+                            <li ng-click="vm.pressKey('right')"><i class="fa fa-3x fa-caret-right"></i></li>
+                            <li ng-click="vm.pressKey('down')"><i class="fa fa-3x fa-caret-down"></i></li>
+                            <li ng-click="vm.pressKey('left')"><i class="fa fa-3x fa-caret-left"></i></li>
+                        </ul>
+                        <button type="button" ng-click="vm.pressKey('ok')" class="btn btn-default btn-ok">OK</button>
+                    </div>
+                </div>
+                <div class="col-sm-5 text-center">
+                    <!-- Pad-->
+                    <ul>
+                        <li>
+                            <button type="button" ng-click="vm.setChannel(1)" class="btn btn-default btn-margin">1</i></button>
+                            <button type="button" ng-click="vm.setChannel(2)" class="btn btn-default btn-margin">2</i></button>
+                            <button type="button" ng-click="vm.setChannel(3)" class="btn btn-default btn-margin">3</i></button>
+                        </li>
+                        <li>
+                            <button type="button" ng-click="vm.setChannel(4)" class="btn btn-default btn-margin">4</i></button>
+                            <button type="button" ng-click="vm.setChannel(5)" class="btn btn-default btn-margin">5</i></button>
+                            <button type="button" ng-click="vm.setChannel(6)" class="btn btn-default btn-margin">6</i></button>
+                        </li>
+                        <li>
+                            <button type="button" ng-click="vm.setChannel(7)" class="btn btn-default btn-margin">7</i></button>
+                            <button type="button" ng-click="vm.setChannel(8)" class="btn btn-default btn-margin">8</i></button>
+                            <button type="button" ng-click="vm.setChannel(9)" class="btn btn-default btn-margin">9</i></button>
+                        </li>
+                        <li>
+                            <button type="button" ng-click="vm.setChannel(0)" class="btn btn-default btn-margin">0</i></button>
+                        </li>
+                        <li></li>
+                        <li>
+                            <button type="button" ng-click="vm.customCommand('red')" class="btn btn-danger btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('green')" class="btn btn-success btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('yellow')" class="btn btn-warning btn-margin"></i></button>
+                            <button type="button" ng-click="vm.customCommand('blue')" class="btn btn-info btn-margin"></i></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div ng-show="vm.displayAskDeviceForm" class="ng-cloak">
+            <p>
+                <%= __('box-television-television-select') %>
+            </p>
+            <div class="row">
+                <div class="col-xs-offset-2 col-xs-6">
+                    <select ng-model="vm.selectedDevice" class="form-control">
+                        <option ng-repeat="device in vm.devices" value="{{device}}">{{device.name}}</option>
+                    </select>
+                </div>
+                <div class="col-xs-2"> <button class="btn btn-success btn-flat" ng-click="vm.selectDevice(vm.selectedDevice);">
+                        <%= __('box-television-television-validate') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-show="vm.deviceId" class="box-footer box-footer-color">
+        <div class="ng-cloak">
+            <div class="row no-gutter">
+                <div class="col-sm-6 text-center">
+                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
+                    <ul class="dropdown-menu pull-left" role="menu">
+                        <li ng-repeat="source in vm.allSources"><a ng-click="vm.openSource(source.label)">{{source.label}}</a></li>
+                    </ul>
+                    <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
+                    <button type="button" ng-click="vm.pressKey('back')" class="btn btn-primary"><i class="fa fa-undo"></i></button>
+                    <button type="button" ng-click="vm.openInfo()" class="btn btn-primary"><i class="fa fa-info"></i></button>
+                </div>
+                <div class="col-sm-6 text-center">
+                    <button class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.stop()"><i class="fa fa-stop"></i></button>
+                    <button class="btn btn-primary" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></button>
+                    <button class="btn btn-danger" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
