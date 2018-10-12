@@ -4,18 +4,17 @@ module.exports = function command(options){
   console.log(options); 
   
   var value;
-  
-  switch(options.label){
-      case 'set-device-on':
-        value = 1;
-      break;
-      case 'set-device-off': 
-        value = 0;
-      break;
-  }
-  
+    
    if(options.deviceTypes && options.deviceTypes.length){
         return Promise.map(options.deviceTypes, function(deviceType){
+            switch(options.label){
+                case 'set-device-on':
+                    value = deviceType.max;
+                break;
+                case 'set-device-off': 
+                    value = deviceType.min;
+                break;
+            }
             return gladys.deviceType.exec({devicetype: deviceType.id, value: value});
         });
    } else if(options.rooms && options.rooms.length) {
@@ -31,6 +30,14 @@ module.exports = function command(options){
                   
                   // then, foreach deviceTypes found, turn it on/off
                   return Promise.map(deviceTypes, function(deviceType) {
+                    switch(options.label){
+                        case 'set-device-on':
+                            value = deviceType.max;
+                        break;
+                        case 'set-device-off': 
+                            value = deviceType.min;
+                        break;
+                    }
                       return gladys.deviceType.exec({devicetype: deviceType.id, value: value});
                   });
               })
