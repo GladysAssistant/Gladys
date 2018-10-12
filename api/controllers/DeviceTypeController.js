@@ -169,6 +169,21 @@ module.exports = {
 },
 
   /**
+   * @api {get} /devicetype/category get by category
+   * @apiName getDeviceTypeByCategory
+   * @apiGroup DeviceType
+   * @apiPermission authenticated
+   *
+   * 
+   * @apiUse DeviceTypeSuccess
+   */
+  getDeviceTypeByCategory: function(req, res, next) {
+    gladys.deviceType.getByCategory({category: req.query.category, room: req.query.room, type: req.query.type})
+        .then((deviceType) => res.json(deviceType))
+        .catch(next);
+  },
+
+  /**
    * @api {get} /devicetype/:id get by id
    * @apiName getDeviceTypeById
    * @apiGroup DeviceType

@@ -27,5 +27,12 @@
     "protocol": "wifi",
     "service": "test",
     "room": 2
+  },
+  {
+    "id":5,
+    "name": "Television",
+    "protocol": "television",
+    "service": "test",
+    "room":1
   }
 ]

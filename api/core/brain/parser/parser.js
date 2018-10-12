@@ -3,6 +3,7 @@ var parseDeviceType = require('./parser.devicetype.js');
 var parseRoom = require('./parser.room.js');
 var parseHouse = require('./parser.house.js');
 var parseTime = require('./parser.time.js');
+var parseChannel = require('./parser.channel.js');
 
 module.exports.parse = function parse(text) {
 
@@ -22,21 +23,28 @@ module.exports.parse = function parse(text) {
         .then((result) => {
 
             deviceTypes = result.deviceTypes;
-            
+
             return parseTime(result.text);
-        })
+        }) 
         .then((result) => {
 
             times = result.times;
 
             return parseHouse(result.text);
-        }) 
+        })
         .then((result) => {
-
+            
             houses = result.houses;
             allHouses = result.allHouses;
+
+            return parseChannel(result.text);
+        })
+        .then((result) => {
+            
+            channel = result.channel
+
             replacedText = result.text;
 
-            return Promise.resolve({deviceTypes, rooms, houses, times, replacedText, allHouses});
+            return Promise.resolve({deviceTypes, rooms, houses, channel, times, replacedText, allHouses});
         });
 };
