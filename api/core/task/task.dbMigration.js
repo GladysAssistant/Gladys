@@ -79,6 +79,17 @@ module.exports = function(oldVersion) {
       .then(() => gladys.task.dbMigration('3.9.0'));
   }
 
+  if(semver.lt(oldVersion, '3.10.0')) {
+
+    // add trueIf collumn
+    return gladys.utils.sql(`ALTER TABLE state ADD COLUMN trueIf tinyint(1) DEFAULT NULL;`).reflect()
+
+      // finishing migration
+      .then(() => gladys.task.updateDbVersion('3.10.0'))
+      .then(() => gladys.task.dbMigration('3.10.0'));
+
+  }
+
   // default, we save in DB the current version of Gladys
   return gladys.task.updateDbVersion(gladys.version);
 };
