@@ -82,6 +82,11 @@ module.exports = function create(event){
         })
         .then(function(eventSaved){
             gladys.scenario.trigger(event);
+      
+            // Insert name and code in object retunred
+            eventSaved.name = eventType.name
+            eventSaved.code = eventType.code
+      
             return eventSaved;
         })
         .then((eventSaved) => {
