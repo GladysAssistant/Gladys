@@ -29,6 +29,7 @@ function normalize(data) {
         } else {
             dictionnary[elem.id] = {
                 code: elem.code,
+                trueIf: elem.trueIf,
                 params: {
                     [elem.variablename]: elem.value
                 }

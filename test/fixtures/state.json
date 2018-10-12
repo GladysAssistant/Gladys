@@ -3,12 +3,28 @@
         "id": 1,
         "launcher": 1,
         "state": 1,
-        "condition_template": "true"
+        "condition_template": "true",
+        "trueIf": 1
     },
     {
         "id": 2,
         "launcher": 3,
         "state": 2,
-        "condition_template": "true"
+        "condition_template": "true",
+        "trueIf": 1
+    },
+    {
+      "id": 3,
+      "launcher": 4,
+      "state": 3,
+      "condition_template": "true",
+      "trueIf": 1
+    },
+    {
+      "id": 4,
+      "launcher": 4,
+      "state": 4,
+      "condition_template": "true",
+      "trueIf": 1
     }
 ]
