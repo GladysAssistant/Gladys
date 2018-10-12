@@ -1,9 +1,12 @@
 var Promise = require('bluebird');
+const semver = require('semver');
 
 module.exports = function(){
   return gladys.update.getLastVersion()
-    .then(function(version){
-      if(version.name > gladys.version){
+    .then((version) => {
+      
+      // we compare the semver version
+      if(semver.gt(version.name, gladys.version)) {
         sails.log.info(`New version of Gladys available : ${version.name}`);
         return notificationAdmin(version.name);
       } else {
@@ -12,7 +15,6 @@ module.exports = function(){
       }
     });  
 };
-
 
 function notificationAdmin(version){
     
