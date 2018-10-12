@@ -12,7 +12,7 @@ module.exports = {
         WHERE devicetype = ?
         ORDER BY datetime DESC
         LIMIT ?
-        OFFSET ?;` ,
+        OFFSET ?;`,
   getDeviceTypeByIdentifierAndType:  `
     SELECT devicetype.id
     FROM device 

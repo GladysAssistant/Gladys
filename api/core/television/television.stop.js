@@ -16,5 +16,5 @@ var sendCommand = require('./television.sendCommand.js');
  */
 
 module.exports = function stop(params) {
-    return sendCommand('stop', params);
+  return sendCommand('stop', params);
 };

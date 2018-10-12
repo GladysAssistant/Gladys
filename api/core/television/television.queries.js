@@ -1,6 +1,6 @@
 
 module.exports = {
-    getDeviceTypeByDeviceId: 
+  getDeviceTypeByDeviceId: 
     `
         SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.machine, dt.identifier as deviceTypeIdentifier
         FROM devicetype dt 
@@ -8,7 +8,7 @@ module.exports = {
         WHERE dt.category = 'television' 
         AND dt.device = ?;
     `,
-    getTelevisionDeviceTypeByRoom:
+  getTelevisionDeviceTypeByRoom:
         `
             SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.machine, dt.identifier as deviceTypeIdentifier
             FROM devicetype dt 
@@ -16,7 +16,7 @@ module.exports = {
             WHERE d.room = ? AND dt.category = 'television';
         `,
 
-    getDefaultDeviceType: 
+  getDefaultDeviceType: 
     `
             SELECT dt.id, dt.type, dt.unit, dt.min, dt.max, d.identifier, dt.device, d.service, d.machine, dt.identifier as deviceTypeIdentifier
             FROM devicetype dt 

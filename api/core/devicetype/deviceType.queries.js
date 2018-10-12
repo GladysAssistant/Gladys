@@ -15,7 +15,7 @@ module.exports = {
     JOIN room ON d.room = room.id
     WHERE ( room.id = ? OR ? IS NULL )
   `,
-   getByRoom: `
+  getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
    dt.lastValueDatetime as lastChanged, dt.lastValue
    FROM device d

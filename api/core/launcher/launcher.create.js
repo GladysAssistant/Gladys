@@ -1,4 +1,4 @@
 
 module.exports = function(launcher){
-    return Launcher.create(launcher);
+  return Launcher.create(launcher);
 };

@@ -6,76 +6,73 @@
  */
 
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string'
+    },
 
-    attributes: {
+    // binary, multilevel. Useful for display in views
+    type: {
+      type: 'string',
+      required: true
+    },
 
-        name: {
-          type: 'string'  
-        },
+    // ex: "light", "tv"
+    // useful for gladys if you ask "turn on the lights in the living room"
+    // that she need to select all "binary" that are not sensors, that are categorized
+    // as "light" and that are in the living room.
+    category: {
+      type: 'string'
+    },
 
-        // binary, multilevel. Useful for display in views
-        type: {
-            type: 'string',
-            required: true
-        },
+    // can be useful to identify a devicetype (ex: unique ID of a part of a device)
+    identifier: {
+      type: 'string'
+    },
 
-        // ex: "light", "tv"
-        // useful for gladys if you ask "turn on the lights in the living room"
-        // that she need to select all "binary" that are not sensors, that are categorized 
-        // as "light" and that are in the living room.
-        category: {
-            type: 'string'
-        },
+    // the name of the deviceType for
+    // text recognition
+    tag: {
+      type: 'string'
+    },
 
-        // can be useful to identify a devicetype (ex: unique ID of a part of a device)
-        identifier: {
-          type: 'string'  
-        },
-        
-        // the name of the deviceType for 
-        // text recognition
-        tag: {
-          type: 'string'
-        },
-        
-        // true if the devicetype is a sensor
-        sensor: {
-            type: 'boolean',
-            required: true
-        },
+    // true if the devicetype is a sensor
+    sensor: {
+      type: 'boolean',
+      required: true
+    },
 
-        unit: {
-            type: 'string'
-        },
+    unit: {
+      type: 'string'
+    },
 
-        min: {
-            type: 'integer',
-            required: true
-        },
+    min: {
+      type: 'integer',
+      required: true
+    },
 
-        max: {
-            type: 'integer',
-            required: true
-        },
-        
-        // if the deviceType should be displayed in view
-        display: {
-          type:'boolean',
-          defaultsTo: true  
-        },
+    max: {
+      type: 'integer',
+      required: true
+    },
 
-        lastValue: {
-            type: 'float'
-        },
+    // if the deviceType should be displayed in view
+    display: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        lastValueDatetime: {
-            type: 'datetime'
-        },
+    lastValue: {
+      type: 'float'
+    },
 
-        device: {
-            model: 'Device',
-            required: true
-        }
+    lastValueDatetime: {
+      type: 'datetime'
+    },
 
+    device: {
+      model: 'Device',
+      required: true
     }
+  }
 };

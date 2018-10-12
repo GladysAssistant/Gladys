@@ -1,30 +1,26 @@
-
 module.exports = {
+  attributes: {
+    title: {
+      type: 'string'
+    },
 
-    attributes: {
+    condition_template: {
+      type: 'string'
+    },
 
-        title: {
-            type: 'string'
-        },
+    active: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        condition_template: {
-            type: 'string'
-        },
+    eventtype: {
+      model: 'EventType',
+      required: true
+    },
 
-        active: {
-            type: 'boolean',
-            defaultsTo: true
-        },
-        
-        eventtype: {
-            model: 'EventType',
-            required: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        },
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

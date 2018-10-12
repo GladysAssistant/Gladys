@@ -1,5 +1,5 @@
 
 module.exports = {
-    getByUuid: `SELECT * FROM answer WHERE uuid = ?;`,
-    cleanAnswers: 'DELETE FROM answer;'
+  getByUuid: `SELECT * FROM answer WHERE uuid = ?;`,
+  cleanAnswers: 'DELETE FROM answer;'
 };

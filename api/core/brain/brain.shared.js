@@ -4,11 +4,11 @@ var intentClassifier = createClassifier();
 
 module.exports = {
     
-    getClassifier: function(){
-        return intentClassifier;
-    },
+  getClassifier: function(){
+    return intentClassifier;
+  },
     
-    setClassifier: function(classifier){
-        intentClassifier = classifier;
-    }
+  setClassifier: function(classifier){
+    intentClassifier = classifier;
+  }
 };

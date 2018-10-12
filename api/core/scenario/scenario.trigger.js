@@ -5,67 +5,77 @@ var Promise = require('bluebird');
 
 module.exports = function(params) {
     
-    // clone params so that original object is not affected
-    params = clone(params);
+  // clone params so that original object is not affected
+  params = clone(params);
 
-    sails.log.info(`Scenario : Trigger : New event : ${params.code}`);
+  sails.log.info(`Scenario : Trigger : New event : ${params.code}`);
 
-    // we get all launchers with this code
-    return gladys.utils.sql(queries.getLaunchersWithCode, [params.code])
-        .then(function(launchers) {
+  // we get all launchers with this code
+  return gladys.utils.sql(queries.getLaunchersWithCode, [params.code])
+    .then(function(launchers) {
             
-            sails.log.info(`Scenario : Trigger : Found ${launchers.length} launchers with code ${params.code}.`);
+      sails.log.info(`Scenario : Trigger : Found ${launchers.length} launchers with code ${params.code}.`);
 
-            // initialize scope
-            params.scope = params.scope || {};
-            if(params.house && !params.scope.hasOwnProperty('house')) params.scope.house = params.house;
-            if(params.user && !params.scope.hasOwnProperty('user')) params.scope.user = params.user;
-            if(params.room && !params.scope.hasOwnProperty('room')) params.scope.room = params.room;
-            if(params.value && !params.scope.hasOwnProperty('value')) params.scope.value = params.value;
-            if(params.datetime && !params.scope.hasOwnProperty('datetime')) params.scope.datetime = params.datetime;
+      // initialize scope
+      params.scope = params.scope || {};
+      if(params.house && !params.scope.hasOwnProperty('house')) {
+        params.scope.house = params.house; 
+      }
+      if(params.user && !params.scope.hasOwnProperty('user')) {
+        params.scope.user = params.user; 
+      }
+      if(params.room && !params.scope.hasOwnProperty('room')) {
+        params.scope.room = params.room; 
+      }
+      if(params.value && !params.scope.hasOwnProperty('value')) {
+        params.scope.value = params.value; 
+      }
+      if(params.datetime && !params.scope.hasOwnProperty('datetime')) {
+        params.scope.datetime = params.datetime; 
+      }
 
-            // foreach launcher, we verify if the condition is satisfied
-            // and if yes, start all the actions
-            return Promise.map(launchers, function(launcher) {
-                return verifyAndStart(launcher, params.scope);
-            });
-        });
+      // foreach launcher, we verify if the condition is satisfied
+      // and if yes, start all the actions
+      return Promise.map(launchers, function(launcher) {
+        return verifyAndStart(launcher, params.scope);
+      });
+    });
 
 };
 
 
 function verifyAndStart(launcher, scope) {
 
-    // first, we verify the launcher condition
-    return verifyLauncherCondition(launcher, scope)
-        .then(function() {
+  // first, we verify the launcher condition
+  return verifyLauncherCondition(launcher, scope)
+    .then(function() {
 
-            // then, we verify the states conditions 
-            return gladys.scenario.verifyConditions({
-                launcher: launcher
-            });
-        })
-        .then(function(conditions) {
+      // then, we verify the states conditions 
+      return gladys.scenario.verifyConditions({
+        launcher: launcher
+      });
+    })
+    .then(function(conditions) {
             
-            sails.log.info(`Scenario : Trigger : Conditions verified, starting all actions.`);
+      sails.log.info(`Scenario : Trigger : Conditions verified, starting all actions.`);
             
-            // it's ok, so we start all the actions
-            var obj = {
-                launcher: launcher,
-                scope: gladys.utils.concatArray(conditions, scope)
-            };
-            return gladys.scenario.exec(obj);
-        })
-        .catch(function(err) {
+      // it's ok, so we start all the actions
+      var obj = {
+        launcher: launcher,
+        scope: gladys.utils.concatArray(conditions, scope)
+      };
+      return gladys.scenario.exec(obj);
+    })
+    .catch(function(err) {
             
-            // if the error is not a conditions_not_verified error, 
-            // we propagate the error
-            if (err.message !== 'conditions_not_verified') {
-                sails.log.error(err);
-            } else {
-                sails.log.info(`Scenario : Trigger : Condition not verified.`);
-            }
-        });
+      // if the error is not a conditions_not_verified error, 
+      // we propagate the error
+      if (err.message !== 'conditions_not_verified') {
+        sails.log.error(err);
+      } else {
+        sails.log.info(`Scenario : Trigger : Condition not verified.`);
+      }
+    });
 }
 
 
@@ -73,21 +83,21 @@ function verifyAndStart(launcher, scope) {
 // the template
 function verifyLauncherCondition(launcher, scope) {
     
-    // if the condition_template is empty, it's ok
-    if(launcher.condition_template === null || launcher.condition_template == '') {
-        return Promise.resolve(true);
-    }
+  // if the condition_template is empty, it's ok
+  if(launcher.condition_template === null || launcher.condition_template == '') {
+    return Promise.resolve(true);
+  }
     
-    try {
-        var result = template('${' + launcher.condition_template + '}', scope);
-        if (result == 'true') {
+  try {
+    var result = template('${' + launcher.condition_template + '}', scope);
+    if (result == 'true') {
             
-            sails.log.info(`Scenario : Trigger : Launcher condition verified.`);  
-            return Promise.resolve(true);
-        } else  {
-            return Promise.reject(new Error('conditions_not_verified'));
-        }
-    } catch (e) {
-        return Promise.reject(new Error(e));
+      sails.log.info(`Scenario : Trigger : Launcher condition verified.`);  
+      return Promise.resolve(true);
+    } else  {
+      return Promise.reject(new Error('conditions_not_verified'));
     }
+  } catch (e) {
+    return Promise.reject(new Error(e));
+  }
 }

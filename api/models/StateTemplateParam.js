@@ -1,33 +1,29 @@
 /**
-* StateTemplateParam.js
-*
-* @description :: TODO: You might write a short summary of how this model works and what it represents here.
-* @docs        :: http://sailsjs.org/#!documentation/models
-*/
+ * StateTemplateParam.js
+ *
+ * @description :: TODO: You might write a short summary of how this model works and what it represents here.
+ * @docs        :: http://sailsjs.org/#!documentation/models
+ */
 
 module.exports = {
-
   attributes: {
-      
-      name: {
-          type: 'string',
-          required: true
-      },
-        
-      variablename: {
-          type:'string',
-          required: true  
-      },
+    name: {
+      type: 'string',
+      required: true
+    },
 
-      path: {
-          type: 'string'
-      },
+    variablename: {
+      type: 'string',
+      required: true
+    },
 
-      statetype: {
-          model: 'StateType',
-          required: true
-      }
+    path: {
+      type: 'string'
+    },
 
+    statetype: {
+      model: 'StateType',
+      required: true
+    }
   }
 };
-

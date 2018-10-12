@@ -1,6 +1,6 @@
 
 module.exports = {
-    // Haversine formula is used here to calculate distance in SQL
+  // Haversine formula is used here to calculate distance in SQL
   // see here for explanations: http://vinsol.com/blog/2011/08/30/geoproximity-search-with-mysql/
   inArea: `
     SELECT area.*,

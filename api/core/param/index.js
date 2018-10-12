@@ -1,13 +1,13 @@
 
 
- /**
+/**
  * Don't remove, it is useful for generating documentation :)
  * @public
  * @name Param
  * @class
  */
 
- module.exports.clearCache = require('./param.clearCache.js');
+module.exports.clearCache = require('./param.clearCache.js');
 module.exports.get = require('./param.get.js');
 module.exports.getByModule = require('./param.getByModule.js');
 module.exports.delete = require('./param.delete.js');

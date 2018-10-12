@@ -7,18 +7,18 @@ module.exports = function(options){
   return gladys.utils.sql(queries.getActions, [options.id])
     .then(function(actions){
         
-        // foreach action, we get all it params
-        return Promise.map(actions, function(action){
-           return getParams(action); 
-        });
+      // foreach action, we get all it params
+      return Promise.map(actions, function(action){
+        return getParams(action); 
+      });
     });  
 };
 
 
 function getParams(action){
-    return gladys.utils.sql(queries.getActionParams, [action.id])
-      .then(function(params){
-         action.params = params;
-         return action; 
-      });
+  return gladys.utils.sql(queries.getActionParams, [action.id])
+    .then(function(params){
+      action.params = params;
+      return action; 
+    });
 }

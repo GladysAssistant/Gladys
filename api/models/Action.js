@@ -1,17 +1,13 @@
-
 module.exports = {
+  attributes: {
+    action: {
+      model: 'ActionType',
+      required: true
+    },
 
-    attributes: {
-
-        action: {
-            model: 'ActionType',
-            required: true
-        },
-
-        launcher: {
-            model: 'Launcher',
-            required: true
-        }
-
+    launcher: {
+      model: 'Launcher',
+      required: true
     }
+  }
 };

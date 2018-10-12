@@ -1,36 +1,32 @@
-
-
 module.exports = {
+  attributes: {
+    datetime: {
+      type: 'datetime'
+    },
 
-    attributes: {
+    sender: {
+      model: 'user'
+    },
 
-        datetime: {
-            type: 'datetime'
-        },
+    receiver: {
+      model: 'user'
+    },
 
-        sender: {
-            model: 'user'
-        },
+    text: {
+      type: 'text'
+    },
 
-        receiver: {
-            model: 'user'
-        },
+    conversation: {
+      type: 'uuid'
+    },
 
-        text: {
-            type: 'text'
-        },
+    service: {
+      type: 'string'
+    },
 
-        conversation: {
-            type: 'uuid'
-        },
-
-        service: {
-            type: 'string'
-        },
-
-        isRead: {
-            type: 'boolean',
-            defaultsTo: false
-        }
+    isRead: {
+      type: 'boolean',
+      defaultsTo: false
     }
+  }
 };

@@ -8,10 +8,18 @@ module.exports = function(options){
   
   var query = queries.get;
   
-  if(options.status === 'official') query = queries.getOffical;
-  if(options.status === 'approved') query = queries.getApproved;
-  if(options.status === 'rejected') query = queries.getRejected;
-  if(options.status === 'pending') query = queries.getPending;
+  if(options.status === 'official') {
+    query = queries.getOffical; 
+  }
+  if(options.status === 'approved') {
+    query = queries.getApproved; 
+  }
+  if(options.status === 'rejected') {
+    query = queries.getRejected; 
+  }
+  if(options.status === 'pending') {
+    query = queries.getPending; 
+  }
 
   return gladys.utils.sql(query, [options.take, options.skip]);
 };

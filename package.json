@@ -6,7 +6,8 @@
     "start": "NODE_ENV=development node app.js",
     "test": "grunt test",
     "generate-changelog": "auto-changelog",
-    "eslint": "eslint api test config"
+    "eslint": "eslint api test config",
+    "prettier": "prettier --single-quote --write api/**/*.js config/*.js test/**/*.js"
   },
   "keywords": [
     "home",

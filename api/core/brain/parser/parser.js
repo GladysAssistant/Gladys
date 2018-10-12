@@ -7,44 +7,44 @@ var parseChannel = require('./parser.channel.js');
 
 module.exports.parse = function parse(text) {
 
-    var deviceTypes = [];
-    var rooms = [];
-    var houses = [];
-    var times = [];
-    var replacedText = '';
+  var deviceTypes = [];
+  var rooms = [];
+  var houses = [];
+  var times = [];
+  var replacedText = '';
 
-    return parseRoom(text)
-        .then((result) => {
+  return parseRoom(text)
+    .then((result) => {
 
-            rooms = result.rooms;
+      rooms = result.rooms;
             
-            return parseDeviceType(result.text);
-        })
-        .then((result) => {
+      return parseDeviceType(result.text);
+    })
+    .then((result) => {
 
-            deviceTypes = result.deviceTypes;
+      deviceTypes = result.deviceTypes;
 
-            return parseTime(result.text);
-        }) 
-        .then((result) => {
+      return parseTime(result.text);
+    }) 
+    .then((result) => {
 
-            times = result.times;
+      times = result.times;
 
-            return parseHouse(result.text);
-        })
-        .then((result) => {
+      return parseHouse(result.text);
+    })
+    .then((result) => {
             
-            houses = result.houses;
-            allHouses = result.allHouses;
+      houses = result.houses;
+      allHouses = result.allHouses;
 
-            return parseChannel(result.text);
-        })
-        .then((result) => {
+      return parseChannel(result.text);
+    })
+    .then((result) => {
             
-            channel = result.channel
+      channel = result.channel;
 
-            replacedText = result.text;
+      replacedText = result.text;
 
-            return Promise.resolve({deviceTypes, rooms, houses, channel, times, replacedText, allHouses});
-        });
+      return Promise.resolve({deviceTypes, rooms, houses, channel, times, replacedText, allHouses});
+    });
 };

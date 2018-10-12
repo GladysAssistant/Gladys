@@ -1,4 +1,4 @@
 
 module.exports = function (user){
-    return Notification.update({user: user.id}, {isRead: true});
+  return Notification.update({user: user.id}, {isRead: true});
 };

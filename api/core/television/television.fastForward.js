@@ -16,5 +16,5 @@ var sendCommand = require('./television.sendCommand.js');
  */
 
 module.exports = function fastForward(params) {
-    return sendCommand('fastForward', params);
+  return sendCommand('fastForward', params);
 };

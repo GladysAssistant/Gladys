@@ -1,4 +1,3 @@
-const moment = require('moment');
 const Promise = require('bluebird');
 
 /**
@@ -29,24 +28,26 @@ const Promise = require('bluebird');
 
 module.exports = function isInTimeRange(options){
 
-    var now = new Date();
+  var now = new Date();
 
-    var arrayOfSart = options.start.split(":");
-    var arrayOfEnd = options.end.split(":");
+  var arrayOfSart = options.start.split(':');
+  var arrayOfEnd = options.end.split(':');
 
-    // default start time 00:00:00
-    var startDate = new Date();
-    startDate.setHours(arrayOfSart[0] || 0);
-    startDate.setMinutes(arrayOfSart[1] || 0);
-    startDate.setSeconds(arrayOfSart[2] || 0);
+  // default start time 00:00:00
+  var startDate = new Date();
+  startDate.setHours(arrayOfSart[0] || 0);
+  startDate.setMinutes(arrayOfSart[1] || 0);
+  startDate.setSeconds(arrayOfSart[2] || 0);
 
     
-    // end time default is the end of the day
-    var endDate = new Date();
-    endDate.setHours(arrayOfEnd[0] || 23);
-    endDate.setMinutes(arrayOfEnd[1] || 59);
-    endDate.setSeconds(arrayOfEnd[2] || 59);
+  // end time default is the end of the day
+  var endDate = new Date();
+  endDate.setHours(arrayOfEnd[0] || 23);
+  endDate.setMinutes(arrayOfEnd[1] || 59);
+  endDate.setSeconds(arrayOfEnd[2] || 59);
 
-    if(now >= startDate && now <= endDate) return Promise.resolve(true);
-	return Promise.resolve(false);
+  if(now >= startDate && now <= endDate) {
+    return Promise.resolve(true); 
+  }
+  return Promise.resolve(false);
 };

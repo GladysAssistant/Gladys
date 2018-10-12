@@ -23,12 +23,12 @@
  */
 
 module.exports = function(module) {
-    return Module.update({machine: module.machine, slug: module.slug}, {lastSeen: new Date()})
-        .then((modules) => {
-            if(modules.length === 0){
-                return Promise.reject(new Error('NotFound'));
-            } else {
-                return Promise.resolve(modules[0]);
-            }
-        })
+  return Module.update({machine: module.machine, slug: module.slug}, {lastSeen: new Date()})
+    .then((modules) => {
+      if(modules.length === 0){
+        return Promise.reject(new Error('NotFound'));
+      } else {
+        return Promise.resolve(modules[0]);
+      }
+    });
 };

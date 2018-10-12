@@ -43,31 +43,40 @@ const SunCalc = require('suncalc');
 
 module.exports = function get(options){
 
-    if(!options || !options.latitude || !options.longitude) return Promise.reject(new Error('Weather : Latitude and longitude are required.'));
-    if(!options.hasOwnProperty('offset')) options.offset = 0;
+  if(!options || !options.latitude || !options.longitude) {
+    return Promise.reject(new Error('Weather : Latitude and longitude are required.')); 
+  }
+  if(!options.hasOwnProperty('offset')) {
+    options.offset = 0; 
+  }
 
-    return getWeatherProvider(0, options)
-        .then((result) => {
+  return getWeatherProvider(0, options)
+    .then((result) => {
 
-            var now = new Date();
-            // add day or night info to result
-            var times = SunCalc.getTimes(now, options.latitude , options.longitude);
+      var now = new Date();
+      // add day or night info to result
+      var times = SunCalc.getTimes(now, options.latitude, options.longitude);
 
-            if(now > times.sunset || now < times.sunrise) result.sun = 'night';
-            else result.sun = 'day';
+      if(now > times.sunset || now < times.sunrise) {
+        result.sun = 'night'; 
+      } else {
+        result.sun = 'day'; 
+      }
 
-            return result;
-        });  
+      return result;
+    });  
 };
 
 function getWeatherProvider(index, options){
-    if(!shared.providers[index]) return Promise.reject(new Error('No weather provider available')); 
+  if(!shared.providers[index]) {
+    return Promise.reject(new Error('No weather provider available')); 
+  } 
     
-    // call the provider
-    return gladys.modules[shared.providers[index]].weather.get(options)
-        .catch(() => {
+  // call the provider
+  return gladys.modules[shared.providers[index]].weather.get(options)
+    .catch(() => {
 
-            // if the provider is not available, call the next one
-            return getWeatherProvider(index + 1, options);
-        });
+      // if the provider is not available, call the next one
+      return getWeatherProvider(index + 1, options);
+    });
 }

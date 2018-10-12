@@ -1,25 +1,23 @@
-var should = require('should');
+
 
 describe('Music', function() {
-
   describe('sendCommand', function() {
-    
-    it('should call play function to test module by devicetype ID', function (done) {
-     	  
-          gladys.music.play({devicetype: 4})
-                .then(function(){
-                    
-                    done();
-                }).catch(done);
+    it('should call play function to test module by devicetype ID', function(done) {
+      gladys.music
+        .play({ devicetype: 4 })
+        .then(function() {
+          done();
+        })
+        .catch(done);
     });
 
-    it('should call play function to test module by room ID', function (done) {
-     	  
-          gladys.music.play({room: 1})
-                .then(function(){
-                    
-                    done();
-                }).catch(done);
+    it('should call play function to test module by room ID', function(done) {
+      gladys.music
+        .play({ room: 1 })
+        .then(function() {
+          done();
+        })
+        .catch(done);
     });
 
     /**
@@ -27,36 +25,32 @@ describe('Music', function() {
      */
 
     var functionsAvailable = [
-       'flushQueue',
-       'getCurrentTrack',
-       'getQueue',
-       'getMuted',
-       'getPlaying',
-       'getPlaylists',
-       'getVolume',
-       'next',
-       'pause',
-       'play',
-       'playPlaylist',
-       'previous',
-       'queue',
-       'setMuted',
-       'setVolume',
-       'stop'
+      'flushQueue',
+      'getCurrentTrack',
+      'getQueue',
+      'getMuted',
+      'getPlaying',
+      'getPlaylists',
+      'getVolume',
+      'next',
+      'pause',
+      'play',
+      'playPlaylist',
+      'previous',
+      'queue',
+      'setMuted',
+      'setVolume',
+      'stop'
     ];
 
-    functionsAvailable.forEach(function(func){
-        
-        it(`should call ${func} function`, function (done) {
-            
-              gladys.music[func]({devicetype: 4})
-                    .then(function(){
-                        
-                        done();
-                    }).catch(done);
-        });
-    }); 
-    
+    functionsAvailable.forEach(function(func) {
+      it(`should call ${func} function`, function(done) {
+        gladys.music[func]({ devicetype: 4 })
+          .then(function() {
+            done();
+          })
+          .catch(done);
+      });
+    });
   });
-
 });

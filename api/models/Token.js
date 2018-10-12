@@ -1,27 +1,23 @@
-
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string'
+    },
 
-    attributes: {
+    value: {
+      type: 'string',
+      required: true,
+      unique: true
+    },
 
-        name: {
-            type: 'string'
-        },
+    active: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        value: {
-            type: 'string',
-            required: true,
-            unique: true
-        },
-
-        active: {
-            type: 'boolean',
-            defaultsTo: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

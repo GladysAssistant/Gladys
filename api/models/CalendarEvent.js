@@ -1,39 +1,35 @@
-
 module.exports = {
+  attributes: {
+    externalid: {
+      type: 'string',
+      required: true,
+      unique: true
+    },
 
-    attributes: {
+    name: {
+      type: 'string'
+    },
 
-        externalid: {
-            type: 'string',
-            required: true,
-            unique: true
-        },
+    location: {
+      type: 'string'
+    },
 
-        name: {
-            type: 'string'
-        },
+    start: {
+      type: 'datetime'
+    },
 
-        location: {
-            type: 'string'
-        },
+    end: {
+      type: 'datetime'
+    },
 
-        start: {
-            type: 'datetime'
-        },
+    fullday: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
-        end: {
-            type: 'datetime'
-        },
-
-        fullday: {
-            type: 'boolean',
-            defaultsTo: false
-        },
-
-        calendar: {
-            model: 'Calendar',
-            required: true
-        }
-
+    calendar: {
+      model: 'Calendar',
+      required: true
     }
+  }
 };
