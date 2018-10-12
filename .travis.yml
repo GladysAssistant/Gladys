@@ -21,7 +21,7 @@ jobs:
           packages:
           - g++-4.8
       before_install:
-        - yarn global add grunt-cli
+        - yarn global add grunt-cli eslint
         - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
         - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
       script:
