@@ -14,6 +14,12 @@ We want to make contributing to this project as easy and transparent as possible
 
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
+## Before making a Pull Request
+
+Make sure you discussed with the team on [Gladys Community](https://community.gladysproject.com/) to ensure your pull request goes in the same direction as current developements 🙂
+
+Then, please create a card on our public [Trello](https://trello.com/b/41GdzyPx/gladys-developement) to indicate that you are currently working on this feature. It's always great to know what others are doing!
+
 ## All Code Changes Happen Through Pull Requests
 
 Pull requests are the best way to propose changes to the codebase. 
