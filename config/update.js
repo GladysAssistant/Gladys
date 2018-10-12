@@ -8,6 +8,7 @@ module.exports.update = {
     categoryBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/categories/',
     stateBaseUrl: 'https://raw.githubusercontent.com/GladysProject/gladys-data/master/states/',
     getLastVersionUrl: 'https://developer.gladysproject.com/api/gladys/version',
+    getModuleBySlugUrl: 'https://developer.gladysproject.com/api/v1/modules/',
     icon: 'fa fa-refresh',
     iconColor: 'bg-light-blue',
     link: '/dashboard/parameters',

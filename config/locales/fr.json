@@ -247,6 +247,7 @@
   "device-create-button": "Créer",
   "notification-update-available-title": "Mise à jour disponible !",
   "notification-update-available-text": "Nouvelle version de Gladys :",
+  "notification-update-module-available-text": "peut être mis à jour en version",
   "installation-step": "Etape",
   "installation-create-account": "Création de votre compte",
   "installation-configuration": "Configuration",
