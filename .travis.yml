@@ -1,49 +1,78 @@
+sudo: required
+
 language: node_js
 
-node_js:
-  - '6'
-  - '8'
-  - '10'
-  
-services:
-  - mysql
+jobs:
+  include:
+    - stage: Test
+      env:
+      - CXX=g++-4.8
+      node_js:
+       - '6'
+       - '8'
+       - '10'
+      cache: yarn
+      services:
+      - mysql
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - g++-4.8
+      before_install:
+        - yarn global add grunt-cli
+        - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
+        - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
+      script:
+        - "grunt coverage"
+        - "grunt buildProd"
+      
+    - stage: Build & Deploy documentation
+      env:
+      - CXX=g++-4.8
+      node_js: '8'
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - g++-4.8
+      before_install:
+        - yarn global add grunt-cli
+      script:
+        - "grunt documentation"
+        - "grunt apidoc"
+      after_success:
+        - "mkdir documentation"
+        - "mv docs jsdoc"
+        - "mv ./jsdoc/ ./documentation/"
+        - "mv ./apidoc/ ./documentation/"
+        - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
+        - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
+      deploy:
+        provider: pages
+        repo: GladysProject/documentation
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        local_dir: documentation
+        target-branch: gh-pages
+        fqdn: documentation.gladysproject.com
+        verbose: true
+        on:
+          branch: master
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
-    
-
-before_install:
-  - npm install -g grunt-cli
-  - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
-
-script:
-  - "grunt coverage"
-  - "grunt buildProd"
-  - "grunt documentation"
-  - "grunt apidoc"
-  - "mkdir documentation"
-  - "mv docs jsdoc"
-  - "mv ./jsdoc/ ./documentation/"
-  - "mv ./apidoc/ ./documentation/"
-  - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
-  - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
-
-env:
-  - CXX=g++-4.8
-
-deploy:
- provider: pages
- repo: GladysProject/documentation
- skip_cleanup: true
- github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
- local_dir: documentation
- target-branch: gh-pages
- fqdn: documentation.gladysproject.com
- verbose: true
- on:
-   branch: master
+    - stage: Build & Push Docker image
+      language: minimal
+      services: docker
+      env:
+      - DOCKER_REPO_SLUG=gladysproject/gladys
+      - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
+      script:
+      - docker build -t $DOCKER_REPO_SLUG:latest .
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$MAJOR_VERSION .; else true ; fi
+      after_success:
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
+ 
