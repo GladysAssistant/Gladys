@@ -90,15 +90,6 @@ module.exports = function(oldVersion) {
 
   }
 
-  if(semver.lt(oldVersion, '3.10.1')) {
-
-    return gladys.update.updateAllData()
-
-      // finishing migration
-      .then(() => gladys.task.updateDbVersion('3.10.1'))
-      .then(() => gladys.task.dbMigration('3.10.1'));
-  }
-
   // default, we save in DB the current version of Gladys
   return gladys.task.updateDbVersion(gladys.version);
 };
