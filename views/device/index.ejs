@@ -66,13 +66,16 @@
                                                     
                                                     <!-- If the deviceType is not a sensor, display action form -->
                                                     <div ng-switch-default>
-                                                        <div ng-switch on="type.type">
+                                                        <div ng-switch on="type.type | lowercase">
                                                             <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
                                                             <div ng-switch-when="binary" class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
                                                                 <input type="checkbox" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
                                                                 <label class="toogle-label" for="mytoogle"></label>
                                                             </div>
-
+                                                            <!-- pushButton for push type -->
+                                                            <div ng-switch-when="push">
+                                                                <push-button type="text" ng-model="type.max" ng-click="vm.changeValue(type, type.max)"></push-button>
+                                                            </div>
                                                             <!-- ColorPicker for color type -->
                                                             <div ng-switch-when="color">
                                                                 <color-picker type="text" ng-model="type.lastValue" ng-change="vm.changeValue(type, type.lastValue)"></color-picker>
@@ -290,7 +293,7 @@
                                                     <div ng-show="type.sensor == 1">{{type.lastValue }} {{type.unit}}</div>
                                                     
                                                     <!-- If the deviceType is not a sensor and is not a binary, display input field -->
-                                                     <form class="form-inline" ng-show="!type.sensor && type.type != 'binary'"  >
+                                                     <form class="form-inline" ng-show="type.type != 'push' && !type.sensor && type.type != 'binary'"  >
                                                         <div class="form-group">
                                                             <div class="input-group">
                                                             <input 
