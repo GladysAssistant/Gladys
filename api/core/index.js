@@ -76,7 +76,12 @@ gladys.load = function load(cb) {
     gladys.task.init(function(){
 
         // gladys is ready
-        gladys.emit('ready'); 
+        gladys.emit('ready');
+        // create gladys-launched event
+        setTimeout(() => gladys.event.create({code: 'gladys-launched'})
+            .catch(err => err.message === 'EventType not found'
+                ? sails.log.info('gladys-launched eventType not found. Please update data.')
+                : sails.log.warn(err)), 10000)
         cb();
     });
 };
