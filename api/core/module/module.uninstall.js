@@ -29,9 +29,10 @@ module.exports = function(module){
          // we delete the folder
          var modulePath = './api/hooks/' + module.slug;
          var assetsDestinationProd = './www/hooks/' + module.slug;
+         var assetsDestinationProdTmp = './.tmp/public/hooks/' + module.slug;
          var assetsDestinationDev = './assets/hooks/' + module.slug; 
 
-         return [module, fse.remove(modulePath), fse.remove(assetsDestinationProd), fse.remove(assetsDestinationDev)];
+         return [module, fse.remove(modulePath), fse.remove(assetsDestinationProd), fse.remove(assetsDestinationProdTmp), fse.remove(assetsDestinationDev)];
       })
       .spread((module) => {
          
