@@ -11,4 +11,4 @@ NOTE: these things are not required to open a PR and can be done afterwards / wh
 
 ### Description of change
 
-<!-- Please provide a description of the change here. It's always best with screenshots, so don't hesitate to add some! -->
+Please provide a description of the change here. It's always best with screenshots, so don't hesitate to add some!
