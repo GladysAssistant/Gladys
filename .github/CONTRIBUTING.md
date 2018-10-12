@@ -29,8 +29,8 @@ We actively welcome your pull requests:
 1. Fork the repo and create your branch from `master`.
 2. If you've added code that should be tested, add tests.
 3. If you've changed the APIs, update the documentation.
-4. Ensure the test suite passes.
-5. Make sure your code lints.
+4. Ensure the test suite passes. (`npm test`)
+5. Make sure your code lints. (`npm run eslint`)
 6. Issue that pull request!
 
 ## Any contributions you make will be under the MIT Software License
