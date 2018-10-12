@@ -8,3 +8,4 @@ module.exports.getBoxTypes = require('./update.getBoxTypes.js');
 module.exports.getModes = require('./update.getModes.js');
 module.exports.getStates = require('./update.getStates.js');
 module.exports.getSentences = require('./update.getSentences.js');
+module.exports.updateAllData = require('./update.updateAllData.js');
