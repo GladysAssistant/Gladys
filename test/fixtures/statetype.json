@@ -12,5 +12,19 @@
         "name": "Test condition service",
         "service": "UNKNOWSERVICE",
         "function": "THISSERVICEDOESNOTEXIST"
+    },
+    {
+      "uuid": "c2a12a4a-0431-4850-a2d4-d1955a08b76f",
+      "id": 3,
+      "name": "Condition true",
+      "service": "test",
+      "function": "conditionTrue"
+    },
+    {
+      "uuid": "9bdf3847-c03c-4f36-82a2-b4de39b90599",
+      "id": 4,
+      "name": "Condition false",
+      "service": "test",
+      "function": "conditionFalse"
     }
 ]

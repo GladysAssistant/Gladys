@@ -145,6 +145,12 @@ function addTestModuleGladys(gladys){
         exec: function(){
             return Promise.resolve();
         },
+        conditionTrue: function(){
+          return Promise.resolve(true);
+        },
+        conditionFalse: function(){
+          return Promise.resolve(false);
+        },
         notify: function(notif, user){
             console.log('Test notification');
             return Promise.resolve();

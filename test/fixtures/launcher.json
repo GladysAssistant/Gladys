@@ -19,5 +19,12 @@
         "eventtype": 1,
         "active": 1,
         "user": 1
-    }
+    },
+    {
+      "id": 4,
+      "condition_template": "true",
+      "eventtype": 1,
+      "active": 1,
+      "user": 1
+  }
 ]

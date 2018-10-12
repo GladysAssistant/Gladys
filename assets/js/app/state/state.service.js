@@ -49,7 +49,8 @@
                 
                 var newState = {
                     state: state.state,
-                    launcher: state.launcher
+                    launcher: state.launcher,
+                    trueIf: state.trueIf
                 };
                 
                 // we create the condition template
