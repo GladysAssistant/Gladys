@@ -1,5 +1,4 @@
-
 module.exports.brain = {
-  savePath: './cache/classifier.json' ,
+  savePath: './cache/classifier.json',
   separator: ';'
 };

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const schedule = require('node-schedule');
 
 module.exports = function(cb){
@@ -11,29 +10,29 @@ module.exports = function(cb){
   
   gladys.brain.load()
     .then(() => {
-        sails.log.info('Gladys brain loaded with success !');
+      sails.log.info('Gladys brain loaded with success !');
     })
     .catch((err) => {
-        sails.log.error(`Error while loading brain ` + err);
+      sails.log.error(`Error while loading brain ` + err);
     });
 
 
-   gladys.alarm.checkAllAutoWakeUp();
+  gladys.alarm.checkAllAutoWakeUp();
   
   if(sails.config.environment !== 'production') {
     return cb();   
   }
 
-    // check if db migration is needed
-   gladys.task.checkDbVersion()
+  // check if db migration is needed
+  gladys.task.checkDbVersion()
     .then(() => {
-        sails.log.info('Successfully checked DB version.');
-        cb();
+      sails.log.info('Successfully checked DB version.');
+      cb();
     })
     .catch((err) => {
-        sails.log.error(`Error while performing DB migration.`);
-        sails.log.error(err);
-        cb();
+      sails.log.error(`Error while performing DB migration.`);
+      sails.log.error(err);
+      cb();
     });
   
   
@@ -46,9 +45,9 @@ module.exports = function(cb){
   rule.hour = 0;
   rule.minute = 1;
 
-  var j = schedule.scheduleJob(rule, function(){
-      gladys.sun.init().catch(sails.log.warn);
-      gladys.alarm.checkAllAutoWakeUp().catch(sails.log.warn);
+  schedule.scheduleJob(rule, function(){
+    gladys.sun.init().catch(sails.log.warn);
+    gladys.alarm.checkAllAutoWakeUp().catch(sails.log.warn);
   });
 
   // schedule alarm

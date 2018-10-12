@@ -11,6 +11,7 @@
       "window": false
   },
   "rules": {
+      "brace-style": ["error", "1tbs"],
       "semi": ["error", "always"],
       "quotes": ["error", "single", {
           "avoidEscape": true,

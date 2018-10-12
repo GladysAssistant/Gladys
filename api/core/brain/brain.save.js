@@ -9,14 +9,16 @@ var createClassifier = require('./brain.create.js');
  * File saved in cache/classifier.json
  */
 module.exports = function saveModel(){
-    return new Promise(function(resolve, reject){
-       var classifier = shared.getClassifier();
-       var intentClassifierString = serialize.toString(classifier, createClassifier);
-       fs.writeFile(sails.config.brain.savePath, intentClassifierString, 'utf8', function(err){
-           if(err) return reject(err);
+  return new Promise(function(resolve, reject){
+    var classifier = shared.getClassifier();
+    var intentClassifierString = serialize.toString(classifier, createClassifier);
+    fs.writeFile(sails.config.brain.savePath, intentClassifierString, 'utf8', function(err){
+      if(err) {
+        return reject(err); 
+      }
            
-           sails.log.info('Brain file saved with success');
-           return resolve('ok');
-       });
+      sails.log.info('Brain file saved with success');
+      return resolve('ok');
     });
+  });
 };

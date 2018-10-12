@@ -1,24 +1,19 @@
-var should = require('should');
-var validateCalendar = require('../../validator/calendarValidator.js');
 
 describe('Calendar', function() {
-
   describe('delete', function() {
-    
-    it('should delete calendar', function (done) {
-        
-        var calendar = {
-            id: 1
-        };
-        
-        gladys.calendar.delete(calendar).then(function(calendar){
-           done();
-        }).catch(function(err){
-            done(err);
+    it('should delete calendar', function(done) {
+      var calendar = {
+        id: 1
+      };
+
+      gladys.calendar
+        .delete(calendar)
+        .then(function(calendar) {
+          done();
+        })
+        .catch(function(err) {
+          done(err);
         });
-
     });
-    
   });
-
 });

@@ -12,6 +12,5 @@
 global.gladys = require('../api/core/index.js');
 
 module.exports.bootstrap = function(cb) {
-
-    gladys.load(cb);
+  gladys.load(cb);
 };

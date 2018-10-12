@@ -9,14 +9,14 @@ var Promise = require('bluebird');
  * Gladys will call an install function on the module
  */
 function init(){
-    return gladys.utils.sql(queries.getFreshInstalledModule, [])
-      .then(function(modules){
+  return gladys.utils.sql(queries.getFreshInstalledModule, [])
+    .then(function(modules){
           
-         // foreach module, exec install function
-         return Promise.map(modules, function(module){
-             return execInstallFunction(module);
-         });
+      // foreach module, exec install function
+      return Promise.map(modules, function(module){
+        return execInstallFunction(module);
       });
+    });
 }
 
 
@@ -25,33 +25,33 @@ function init(){
  */
 function execInstallFunction(module){
 
-   // if the module is not present, we remove it from the list
-   if(!gladys.modules[module.slug]){
-      return gladys.module.uninstall(module);
-   }
+  // if the module is not present, we remove it from the list
+  if(!gladys.modules[module.slug]){
+    return gladys.module.uninstall(module);
+  }
    
-   // we test if the module has an installation function
-   if (typeof gladys.modules[module.slug].install !== "function") {
+  // we test if the module has an installation function
+  if (typeof gladys.modules[module.slug].install !== 'function') {
      
-     // module installed with success, because no installation function is needed
-     module.status = 0;
-     return gladys.module.update(module);
-   }  
+    // module installed with success, because no installation function is needed
+    module.status = 0;
+    return gladys.module.update(module);
+  }  
    
-   return gladys.modules[module.slug].install()
-     .then(function(){
+  return gladys.modules[module.slug].install()
+    .then(function(){
        
-       // module installed with success
-       module.status = 0;
-       return module;
-     })    
-     .then(() => {
-        return gladys.module.update(module);
-     })
-     .catch(function(){
+      // module installed with success
+      module.status = 0;
+      return module;
+    })    
+    .then(() => {
+      return gladys.module.update(module);
+    })
+    .catch(function(){
        
-       // error while installing the module
-       module.status = 2;
-       return Promise.resolve(module);
-     });
+      // error while installing the module
+      module.status = 2;
+      return Promise.resolve(module);
+    });
 }

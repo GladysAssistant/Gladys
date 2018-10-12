@@ -1,26 +1,22 @@
-
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    house: {
+      model: 'House',
+      required: true
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
+    permission: {
+      type: 'integer'
+    },
 
-        house: {
-            model: 'House',
-            required: true
-        },
-
-        permission: {
-            type: 'integer'
-        },
-        
-        zones: {
-          collection: 'Zone',
-          via: 'rooms'
-        }
+    zones: {
+      collection: 'Zone',
+      via: 'rooms'
     }
-
+  }
 };

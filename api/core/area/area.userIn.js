@@ -24,33 +24,33 @@ const queries = require('./area.queries.js');
 
 module.exports = function userIn(user) {
 
-    // Getting all areas + events linked to areas
-    // The goal here is to rebuild the history of entering/leaving areas
-    return Promise.all([
-        gladys.utils.sql(queries.get, [user.id]), 
-        gladys.utils.sql(queries.getLastAreaEventPerArea, [user.id])
-    ])
+  // Getting all areas + events linked to areas
+  // The goal here is to rebuild the history of entering/leaving areas
+  return Promise.all([
+    gladys.utils.sql(queries.get, [user.id]), 
+    gladys.utils.sql(queries.getLastAreaEventPerArea, [user.id])
+  ])
     .spread((areas, events) => {
 
-        var areasWhereTheUserIsStillIn = [];
+      var areasWhereTheUserIsStillIn = [];
 
-        areas.forEach((area) => {
-            var found = false;
-            var i = 0;
+      areas.forEach((area) => {
+        var found = false;
+        var i = 0;
 
-            // we see if the last event seen about this area was an "enter-area" event, 
-            // "left-area", or no event at all
-            while(!found && i < events.length) {
-                if(parseInt(events[i].value) === area.id) {
-                    found = true;
-                    if(events[i].code === 'enter-area') {
-                        areasWhereTheUserIsStillIn.push(area);
-                    }
-                }
-                i++;
+        // we see if the last event seen about this area was an "enter-area" event, 
+        // "left-area", or no event at all
+        while(!found && i < events.length) {
+          if(parseInt(events[i].value) === area.id) {
+            found = true;
+            if(events[i].code === 'enter-area') {
+              areasWhereTheUserIsStillIn.push(area);
             }
-        });
+          }
+          i++;
+        }
+      });
 
-        return areasWhereTheUserIsStillIn;
+      return areasWhereTheUserIsStillIn;
     });
 };

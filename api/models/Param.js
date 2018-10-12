@@ -1,32 +1,28 @@
-
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true,
+      unique: true
+    },
 
-    attributes: {
+    description: {
+      type: 'string'
+    },
 
-        name: {
-           type:'string',
-           required: true,
-           unique: true 
-        },
+    type: {
+      type: 'string',
+      enum: ['visible', 'hidden', 'secret'],
+      defaultsTo: 'visible'
+    },
 
-        description: {
-            type:'string'
-        },
+    module: {
+      model: 'Module'
+    },
 
-        type: {
-            type: 'string',
-            enum: ['visible', 'hidden', 'secret'],
-            defaultsTo: 'visible'
-        },
-
-        module: {
-            model: 'Module'
-        },
-        
-        value: {
-            type:'string',
-            required: true
-        }
-
+    value: {
+      type: 'string',
+      required: true
     }
+  }
 };

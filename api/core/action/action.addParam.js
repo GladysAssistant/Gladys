@@ -1,4 +1,4 @@
 
 module.exports = function(param){
-    return ActionParam.create(param);
-}
+  return ActionParam.create(param);
+};

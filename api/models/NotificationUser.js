@@ -6,20 +6,17 @@
  */
 
 module.exports = {
+  attributes: {
+    notificationtype: {
+      model: 'NotificationType'
+    },
 
-    attributes: {
+    priority: {
+      type: 'integer'
+    },
 
-        notificationtype: {
-            model: 'NotificationType'
-        },
-
-        priority: {
-            type: 'integer'
-        },
-
-        user: {
-            model: 'User'
-        }
-
+    user: {
+      model: 'User'
     }
+  }
 };

@@ -1,9 +1,9 @@
 module.exports = {
-    getConversation: `
+  getConversation: `
         SELECT * FROM message WHERE conversation = ?
         ORDER BY datetime;
     `,
-    getByUser: `
+  getByUser: `
         SELECT message.*, user_sender.firstname AS sender_name, 
         user_receiver.firstname AS receiver_name
         FROM message 
@@ -15,7 +15,7 @@ module.exports = {
         LIMIT ?
         OFFSET ?;
     `,
-    getGladysMessages: `
+  getGladysMessages: `
         SELECT * FROM 
             (SELECT message.*, CASE  
             WHEN user_sender.id IS NOT NULL THEN user_sender.firstname

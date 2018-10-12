@@ -1,5 +1,5 @@
 module.exports = {
-    get: `
+  get: `
     SELECT device.*, room.name AS roomName 
     FROM device
     LEFT JOIN room ON device.room = room.id

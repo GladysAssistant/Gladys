@@ -1,6 +1,6 @@
 
 module.exports = {
-  delete: 'DELETE FROM machine WHERE id = ?;'  ,
+  delete: 'DELETE FROM machine WHERE id = ?;',
   get: 'SELECT * FROM machine;',
   getMyHouse: `
     SELECT house.* FROM house 

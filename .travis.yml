@@ -25,6 +25,7 @@ jobs:
         - mysql -e "create database IF NOT EXISTS gladystest;" -uroot
         - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
       script:
+        - "npm run eslint"
         - "grunt coverage"
         - "grunt buildProd"
       

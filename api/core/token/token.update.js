@@ -6,10 +6,10 @@ module.exports = function(token){
   
   return Token.update({id}, token)
     .then(function(tokens){
-       if(tokens.length){
-           return tokens[0];
-       } else {
-           return Promise.reject(new Error('NotFound'));
-       }
+      if(tokens.length){
+        return tokens[0];
+      } else {
+        return Promise.reject(new Error('NotFound'));
+      }
     });
 };

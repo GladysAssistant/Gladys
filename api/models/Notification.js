@@ -1,48 +1,44 @@
-
 module.exports = {
+  attributes: {
+    title: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    text: {
+      type: 'string',
+      required: true
+    },
 
-        title: {
-            type: 'string',
-            required: true
-        },
+    link: {
+      type: 'string'
+    },
 
-        text: {
-            type: 'string',
-            required: true
-        },
+    priority: {
+      type: 'integer',
+      min: -2,
+      max: 2,
+      defaultsTo: 0
+    },
 
-        link: {
-            type: 'string'
-        },
+    isRead: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
-        priority: {
-            type: 'integer',
-            min: -2,
-            max: 2,
-            defaultsTo: 0
-        },
+    icon: {
+      type: 'string',
+      required: true
+    },
 
-        isRead: {
-            type: 'boolean',
-            defaultsTo: false
-        },
+    iconColor: {
+      type: 'string',
+      required: true
+    },
 
-        icon: {
-            type: 'string',
-            required: true
-        },
-
-        iconColor: {
-            type: 'string',
-            required: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

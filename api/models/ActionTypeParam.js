@@ -6,27 +6,24 @@
  */
 
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    variablename: {
+      type: 'string',
+      required: true
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
-        
-        variablename: {
-            type:'string',
-            required: true  
-        },
+    path: {
+      type: 'string'
+    },
 
-        path: {
-            type: 'string'
-        },
-
-        actiontype: {
-            model: 'ActionType',
-            required: true
-        }
-
+    actiontype: {
+      model: 'ActionType',
+      required: true
     }
+  }
 };

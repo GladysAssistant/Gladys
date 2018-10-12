@@ -1,4 +1,4 @@
- /**
+/**
  * @public
  * @description This function return true or false, test if it's afternoon.
  * @name gladys.time.isItPM
@@ -22,9 +22,11 @@
  */
 
 module.exports = function isItPM(options){
-    return gladys.time.getMomentOfTheDay(options)
-      .then((result) => {
-          if(result.state === 'afternoon') return true; 
-          return false;
-      });
+  return gladys.time.getMomentOfTheDay(options)
+    .then((result) => {
+      if(result.state === 'afternoon') {
+        return true; 
+      } 
+      return false;
+    });
 };

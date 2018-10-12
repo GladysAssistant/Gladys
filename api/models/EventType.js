@@ -1,38 +1,34 @@
-
 module.exports = {
+  attributes: {
+    code: {
+      type: 'string',
+      required: true,
+      unique: true
+    },
 
-    attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-        code: {
-            type: 'string',
-            required: true,
-            unique: true
-        },
+    description: {
+      type: 'string'
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
+    category: {
+      type: 'string'
+    },
 
-        description: {
-            type: 'string'
-        },
-        
-        category: {
-            type: 'string'
-        },
+    service: {
+      type: 'string'
+    },
 
-        service: {
-            type: 'string'
-        },
+    faIcon: {
+      type: 'string'
+    },
 
-        faIcon: {
-            type: 'string'
-        },
-
-        iconColor: {
-            type: 'string'
-        },
-
+    iconColor: {
+      type: 'string'
     }
+  }
 };

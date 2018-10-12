@@ -15,7 +15,7 @@ module.exports = {
     SELECT * FROM actionparam
     JOIN actiontypeparam ON actionparam.actiontypeparam = actiontypeparam.id
     WHERE action = ?;
-  `  ,
+  `,
   getStates: `
     SELECT state.*, statetype.uuid, statetype.service, statetype.function, statetype.name FROM state 
     JOIN statetype ON state.state = statetype.id

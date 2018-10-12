@@ -1,34 +1,30 @@
-
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string'
+    },
 
-    attributes: {
+    uuid: {
+      type: 'uuid',
+      required: true,
+      unique: true
+    },
 
-        name: {
-            type: 'string'
-        },
-        
-        uuid:{
-            type:'uuid',
-            required: true,
-            unique: true
-        },
+    house: {
+      model: 'House'
+    },
 
-        house: {
-            model: 'House'
-        },
+    room: {
+      model: 'Room'
+    },
 
-        room: {
-            model: 'Room'
-        },
+    me: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
-        me: {
-            type: 'boolean',
-            defaultsTo: false
-        },
-
-        lastSeen: {
-            type: 'datetime'
-        }
-
+    lastSeen: {
+      type: 'datetime'
     }
+  }
 };

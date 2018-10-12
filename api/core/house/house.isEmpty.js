@@ -26,9 +26,11 @@ module.exports = function(options){
   return gladys.house.getUsers(options)  
     .then(function(users){
         
-        // if there are user inside, return false
-        if(users.length) return false;
+      // if there are user inside, return false
+      if(users.length) {
+        return false; 
+      }
         
-        return true;
+      return true;
     });
 };

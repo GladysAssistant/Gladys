@@ -16,5 +16,5 @@ var sendCommand = require('./television.sendCommand.js');
  */
 
 module.exports = function rewind(params) {
-    return sendCommand('rewind', params);
+  return sendCommand('rewind', params);
 };

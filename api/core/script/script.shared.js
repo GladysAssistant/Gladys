@@ -1,3 +1,3 @@
 module.exports = {
-    sandbox: sails.config.scripts.defaultSandbox
+  sandbox: sails.config.scripts.defaultSandbox
 };

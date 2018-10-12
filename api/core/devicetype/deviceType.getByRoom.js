@@ -1,5 +1,4 @@
 var queries = require('./deviceType.queries.js');
-var Promise = require('bluebird');
 
 /**
  * @public
@@ -15,34 +14,34 @@ var Promise = require('bluebird');
 
 module.exports = function(options){
 
-    options = options || {};
+  options = options || {};
 
-    var rooms = [];
-    var roomDictionnary = {};
+  var rooms = [];
+  var roomDictionnary = {};
     
-    // get all deviceTypes, filter or not by room
-    return gladys.utils.sql(queries.getByRooms, [options.room, options.room])
-        .then((deviceTypes) => {
+  // get all deviceTypes, filter or not by room
+  return gladys.utils.sql(queries.getByRooms, [options.room, options.room])
+    .then((deviceTypes) => {
 
-            // reorganize rooms in tree
-            deviceTypes.forEach(deviceType => {
+      // reorganize rooms in tree
+      deviceTypes.forEach(deviceType => {
                 
-                if(!roomDictionnary.hasOwnProperty(deviceType.roomId)) {
-                    roomDictionnary[deviceType.roomId] = rooms.length;
-                    rooms.push({
-                        id: deviceType.roomId,
-                        name: deviceType.roomName,
-                        house: deviceType.roomHouse,
-                        deviceTypes: []
-                    });
-                }
+        if(!roomDictionnary.hasOwnProperty(deviceType.roomId)) {
+          roomDictionnary[deviceType.roomId] = rooms.length;
+          rooms.push({
+            id: deviceType.roomId,
+            name: deviceType.roomName,
+            house: deviceType.roomHouse,
+            deviceTypes: []
+          });
+        }
 
-                var roomId = deviceType.roomId;
-                delete deviceType.roomId;
-                delete deviceType.roomName;
+        var roomId = deviceType.roomId;
+        delete deviceType.roomId;
+        delete deviceType.roomName;
                 
-                rooms[roomDictionnary[roomId]].deviceTypes.push(deviceType);
-            });
-            return rooms;
-        });
+        rooms[roomDictionnary[roomId]].deviceTypes.push(deviceType);
+      });
+      return rooms;
+    });
 };

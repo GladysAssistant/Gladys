@@ -1,9 +1,8 @@
-
 /**
  * @apiDefine EventSuccess
  * @apiSuccess {Integer} id Event id
  * @apiSuccess {Integer} user  User id
- * @apiSuccess {Integer} house  House id 
+ * @apiSuccess {Integer} house  House id
  * @apiSuccess {Integer} room  Room id
  * @apiSuccess {Integer} eventtype  Event Type id
  * @apiSuccess {String} code  Event code
@@ -21,58 +20,58 @@
  */
 
 module.exports = {
-    
-    /**
-     * @api {get} /event get all events
-     * @apiName GetEvents
-     * @apiGroup Event
-     * @apiPermission authenticated
-     *
-     * @apiParam {Integer} [take] Number of events to return
-     * @apiParam {Integer} [skip] Where to start (for pagination)
-     *
-     * @apiUse EventSuccess
-     */
-    index: function(req, res, next){
-        req.query.user = req.session.User;
-        gladys.event.get(req.query)
-          .then(function(events){
-              return res.json(events);
-          })
-          .catch(next);
-    },
-    
-     /**
-     * @api {post} /event create event
-     * @apiName CreateEvent
-     * @apiGroup Event
-     * @apiPermission authenticated
-     * 
-     * @apiUse EventParam
-     *
-     * @apiUse EventSuccess
-     */
-    create: function(req, res, next){
-        gladys.event.create(req.body)
-          .then((event) => res.status(201).json(event))
-          .catch(next);
-    },
+  /**
+   * @api {get} /event get all events
+   * @apiName GetEvents
+   * @apiGroup Event
+   * @apiPermission authenticated
+   *
+   * @apiParam {Integer} [take] Number of events to return
+   * @apiParam {Integer} [skip] Where to start (for pagination)
+   *
+   * @apiUse EventSuccess
+   */
+  index: function(req, res, next) {
+    req.query.user = req.session.User;
+    gladys.event
+      .get(req.query)
+      .then(function(events) {
+        return res.json(events);
+      })
+      .catch(next);
+  },
 
-    /**
-     * @api {get} /event/create create event (GET)
-     * @apiName CreateEventGet
-     * @apiGroup Event
-     * @apiPermission authenticated
-     * 
-     * @apiUse EventParam
-     *
-     * @apiUse EventSuccess
-     */
-    createGet: function(req, res, next){
-        gladys.event.create(req.query)
-          .then((event) => res.status(201).json(event))
-          .catch(next);
-    }
-	
+  /**
+   * @api {post} /event create event
+   * @apiName CreateEvent
+   * @apiGroup Event
+   * @apiPermission authenticated
+   *
+   * @apiUse EventParam
+   *
+   * @apiUse EventSuccess
+   */
+  create: function(req, res, next) {
+    gladys.event
+      .create(req.body)
+      .then(event => res.status(201).json(event))
+      .catch(next);
+  },
+
+  /**
+   * @api {get} /event/create create event (GET)
+   * @apiName CreateEventGet
+   * @apiGroup Event
+   * @apiPermission authenticated
+   *
+   * @apiUse EventParam
+   *
+   * @apiUse EventSuccess
+   */
+  createGet: function(req, res, next) {
+    gladys.event
+      .create(req.query)
+      .then(event => res.status(201).json(event))
+      .catch(next);
+  }
 };
-

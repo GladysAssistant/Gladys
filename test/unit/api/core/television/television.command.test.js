@@ -1,8 +1,5 @@
-
 describe('Television', function() {
-
   describe('command', function() {
-
     var commands = [
       {
         command: 'television-set-channel',
@@ -51,23 +48,21 @@ describe('Television', function() {
     ];
 
     commands.forEach(function(command) {
-
-      it(`should command television :${command.command} and answer ${command.answer}`, function (done) {
-
+      it(`should command television :${
+        command.command
+      } and answer ${command.answer}`, function(done) {
         var scope = {
           label: command.command
         };
 
-        gladys.television.command(scope)
-          .then(function(result){
-
+        gladys.television
+          .command(scope)
+          .then(function(result) {
             result.should.have.property('label', command.answer);
             done();
-          }).catch(done);
+          })
+          .catch(done);
       });
-
     });
-
   });
-
 });

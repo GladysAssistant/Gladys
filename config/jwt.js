@@ -1,5 +1,4 @@
-
 module.exports.jwt = {
-    secret: 'secret',
-    options: {}
+  secret: 'secret',
+  options: {}
 };

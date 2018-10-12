@@ -1,4 +1,4 @@
 
 module.exports = function(){
-    process.exit();
+  process.exit();
 };

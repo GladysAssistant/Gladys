@@ -1,6 +1,6 @@
 module.exports = {
 
-     getNotificationTypes: `
+  getNotificationTypes: `
         SELECT nt.*, module.machine 
         FROM notificationtype nt
         JOIN notificationuser nu ON (nt.id = nu.notificationtype)
@@ -9,7 +9,7 @@ module.exports = {
         ORDER BY nu.priority; 
     `,
 
-    getAnswers: `
+  getAnswers: `
         SELECT text FROM answer WHERE language = ? AND label = ?;
     `
 };
