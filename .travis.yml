@@ -76,4 +76,6 @@ jobs:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
       - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker tag $DOCKER_REPO_SLUG:$MAJOR_VERSION $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
+      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
  
