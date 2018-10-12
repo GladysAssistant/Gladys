@@ -75,6 +75,7 @@ function npmInstall(path){
 
 function copyAssets(modulePath, slug) {
     var assetsDestinationProd = './www/hooks/' + slug;
+    var assetsDestinationProdTmp = './.tmp/public/hooks/' + module.slug;
     var assetsDestinationDev = './assets/hooks/' + slug;
 
     // we test if the module has an assets folder
@@ -85,6 +86,7 @@ function copyAssets(modulePath, slug) {
                 // copy all files to the folder accessible for prod start and dev start
                 return Promise.all([
                     fse.copy(path.join(modulePath, 'assets'), assetsDestinationProd),
+                    fse.copy(path.join(modulePath, 'assets'), assetsDestinationProdTmp),
                     fse.copy(path.join(modulePath, 'assets'), assetsDestinationDev)
                 ]);
             }
