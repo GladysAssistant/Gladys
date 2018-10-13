@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "3.10.2",
+  "version": "3.10.3",
   "description": "Your personnal assistant, always here.",
   "scripts": {
     "start": "NODE_ENV=development node app.js",
