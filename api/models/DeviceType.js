@@ -78,13 +78,7 @@ module.exports = {
         },
 
         order: {
-           type: 'integer',
-           defaultsTo: 0
-       },
-       
-        color: {
-           type: 'string',
-           defaultsTo: '#FFFFFF'
+            type: 'integer'
         }
 
     }

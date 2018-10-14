@@ -401,7 +401,6 @@
   "forgot-password-reset-failed": "Your password was not changed. Maybe the link was not valid anymore (It is valid only 2 hours), or maybe your password length was too low. Please try again.",
   "preparation":"Preparation",
   "Order": "Order",
-  "color": "color",
   "function": "function",
   "functions": "functions"
 }

@@ -33,7 +33,7 @@
                                                     
                                         <!-- If the deviceType is not a sensor, display action form -->
                                         <div ng-switch-default>
-                                            <div ng-switch on="type.type">
+                                            <div ng-switch on="type.type | lowercase"> <!-- some module use 'COLOR' instead of 'color', like RFLink module-->
                                                 <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
                                                 <div ng-switch-when="binary" class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
                                                     <input type="checkbox" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />

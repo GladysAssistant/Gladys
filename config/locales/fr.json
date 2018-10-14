@@ -565,7 +565,6 @@
   "forgot-password-reset-failed": "Le changement de votre mot de passe a échoué. Le lien n'était peut être plus valide (il n'est valide que 2 heures) ou le mot de passe était trop court. Merci de ré-essayer.",
   "preparation":"Préparation",
   "order": "Ordre",
-  "color": "couleur",
   "function": "fonction",
   "functions": "fonctions"
 }

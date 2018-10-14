@@ -67,7 +67,7 @@
                                                     
                                                     <!-- If the deviceType is not a sensor, display action form -->
                                                     <div ng-switch-default>
-                                                        <div ng-switch on="type.type">
+                                                        <div ng-switch on="type.type | lowercase"> <!-- some module use 'COLOR' instead of 'color', like RFLink module-->
                                                             <!-- If the deviceType is not a sensor and is  a binary, display toogle -->
                                                             <div ng-switch-when="binary" class="toogle" ng-click="vm.changeValue(type, !type.lastValue);">
                                                                 <input type="checkbox" ng-model="type.lastValue" ng-true-value="1" ng-false-value="0" class="toogle-checkbox toogle-blue" />
@@ -416,9 +416,6 @@
                         <table id="example4" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th>
-                                        <%= __('color') %>
-                                    </th>
                                     <th style="width:6em">
                                         <%= __('order') %>
                                     </th>
@@ -436,11 +433,8 @@
                             <tbody>
                                 <tr ng-repeat="type in filtered=(vm.selectedRoom.deviceTypes | orderBy:'order':false | filter:{'display':1})"
                                     class="ng-cloak">
-                                    <td>
-                                        <google-color-picker color="type.color" options="vm.options" on-color-changed="vm.updateDeviceType({id: type.id, color: newColor});"></google-color-picker>
-                                    </td>
                                     <td><input type="number" class="form-control" ng-model="type.order"
-                                            ng-model-options='{ debounce: 500 }' ng-change="vm.updateDeviceType({id: type.id, order: type.order});" /></td>
+                                            ng-model-options='{ debounce: 1000 }' ng-change="vm.updateDeviceType({id: type.id, order: type.order});" /></td>
                                     <td>{{type.name}}</td>
                                     <td>{{type.deviceTypeName}}</td>
                                     <td>{{type.type}}</td>
