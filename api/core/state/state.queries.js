@@ -1,4 +1,4 @@
 
 module.exports = {
-    delete: 'DELETE FROM state WHERE id = ?;'
+  delete: 'DELETE FROM state WHERE id = ?;'
 };

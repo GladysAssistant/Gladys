@@ -1,4 +1,3 @@
-  
 /**
  * @apiDefine HouseSuccess
  * @apiSuccess {uuid} uuid House unique id
@@ -24,92 +23,93 @@
  */
 
 module.exports = {
-    
-    /**
-     * @api {get} /house get all houses
-     * @apiName GetHouses
-     * @apiGroup House
-     * @apiPermission authenticated
-     *
-     * @apiUse HouseSuccess
-     */
-    index: function(req, res, next){
-        gladys.house.get()
-          .then(function(houses){
-              return res.json(houses);
-          })
-          .catch(next);
-    },
-    
-    /**
-     * @api {post} /house create a house
-     * @apiName createHouse
-     * @apiGroup House
-     * @apiPermission authenticated
-     *
-     * @apiUse HouseParam
-     * 
-     * @apiUse HouseSuccess
-     */
-    create: function(req, res, next){
-        gladys.house.create(req.body)
-          .then(function(house){
-              return res.status(201).json(house);
-          })
-          .catch(next);
-    },
-    
-     /**
-     * @api {patch} /house/:id update a house
-     * @apiName updateHouse
-     * @apiGroup House
-     * @apiPermission authenticated
-     *
-     * @apiUse HouseParam
-     * 
-     * @apiUse HouseSuccess
-     */
-    update: function(req, res, next){
-        
-        req.body.id = req.params.id;
-        gladys.house.update(req.body)
-          .then(function(house){
-              return res.json(house);
-          })
-          .catch(next);
-    },
-    
-    /**
-     * @api {delete} /house/:id delete a house
-     * @apiName deleteHouse
-     * @apiGroup House
-     * @apiPermission authenticated
-     *
-     */
-    delete: function(req, res, next){
-        req.body.id = req.params.id;
-        gladys.house.delete(req.body)
-          .then(function(house){
-              return res.json(house);
-          })
-          .catch(next);
-    },
-    
-    /**
-     * @api {get} /house/:id/user get all user in a house
-     * @apiName getUserHouse
-     * @apiGroup House
-     * @apiPermission authenticated
-     *
-     * @apiUse UserSuccess 
-     */
-    getUsers: function(req, res, next){
-        gladys.house.getUsers({house: req.params.id})
-          .then(function(users){
-              return res.json(users);
-          })
-          .catch(next);
-    }
+  /**
+   * @api {get} /house get all houses
+   * @apiName GetHouses
+   * @apiGroup House
+   * @apiPermission authenticated
+   *
+   * @apiUse HouseSuccess
+   */
+  index: function(req, res, next) {
+    gladys.house
+      .get()
+      .then(function(houses) {
+        return res.json(houses);
+      })
+      .catch(next);
+  },
 
+  /**
+   * @api {post} /house create a house
+   * @apiName createHouse
+   * @apiGroup House
+   * @apiPermission authenticated
+   *
+   * @apiUse HouseParam
+   *
+   * @apiUse HouseSuccess
+   */
+  create: function(req, res, next) {
+    gladys.house
+      .create(req.body)
+      .then(function(house) {
+        return res.status(201).json(house);
+      })
+      .catch(next);
+  },
+
+  /**
+   * @api {patch} /house/:id update a house
+   * @apiName updateHouse
+   * @apiGroup House
+   * @apiPermission authenticated
+   *
+   * @apiUse HouseParam
+   *
+   * @apiUse HouseSuccess
+   */
+  update: function(req, res, next) {
+    req.body.id = req.params.id;
+    gladys.house
+      .update(req.body)
+      .then(function(house) {
+        return res.json(house);
+      })
+      .catch(next);
+  },
+
+  /**
+   * @api {delete} /house/:id delete a house
+   * @apiName deleteHouse
+   * @apiGroup House
+   * @apiPermission authenticated
+   *
+   */
+  delete: function(req, res, next) {
+    req.body.id = req.params.id;
+    gladys.house
+      .delete(req.body)
+      .then(function(house) {
+        return res.json(house);
+      })
+      .catch(next);
+  },
+
+  /**
+   * @api {get} /house/:id/user get all user in a house
+   * @apiName getUserHouse
+   * @apiGroup House
+   * @apiPermission authenticated
+   *
+   * @apiUse UserSuccess
+   */
+  getUsers: function(req, res, next) {
+    gladys.house
+      .getUsers({ house: req.params.id })
+      .then(function(users) {
+        return res.json(users);
+      })
+      .catch(next);
+  }
 };
-

@@ -4,11 +4,11 @@ module.exports = function(action){
     
   // first we delete actionsParams
   return gladys.utils.sql(queries.deleteParams, [action.id])
-     .then(function(){
+    .then(function(){
          
-         sails.log.info(`Action : deleting action ${action.id}`);
+      sails.log.info(`Action : deleting action ${action.id}`);
          
-         // then we delete actions
-         return gladys.utils.sql(queries.delete, [action.id]);
-     });
+      // then we delete actions
+      return gladys.utils.sql(queries.delete, [action.id]);
+    });
 };

@@ -1,12 +1,12 @@
 
- /**
+/**
  * Don't remove, it is useful for generating documentation :)
  * @public
  * @name Calendar
  * @class
  */
 
- /**
+/**
  * Don't remove, it is useful for generating documentation :)
  * @public
  * @name CalendarEvent

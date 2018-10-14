@@ -1,35 +1,31 @@
-
 module.exports = {
+  attributes: {
+    externalid: {
+      type: 'string',
+      required: true,
+      unique: true
+    },
 
-    attributes: {
+    name: {
+      type: 'string'
+    },
 
-        externalid: {
-            type: 'string',
-            required: true,
-            unique: true
-        },
+    description: {
+      type: 'string'
+    },
 
-        name: {
-            type: 'string'
-        },
+    service: {
+      type: 'string'
+    },
 
-        description: {
-            type: 'string'
-        },
+    active: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        service: {
-            type: 'string'
-        },
-
-        active: {
-            type: 'boolean',
-            defaultsTo: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

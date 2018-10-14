@@ -27,7 +27,7 @@ module.exports = function (deviceType){
   return gladys.utils.sql(queries.deleteDeviceStates, [deviceType.id])
     .then(() => {
 
-        // delete deviceType
-        return gladys.utils.sqlUnique(queries.delete, [deviceType.id]);  
+      // delete deviceType
+      return gladys.utils.sqlUnique(queries.delete, [deviceType.id]);  
     });
 };

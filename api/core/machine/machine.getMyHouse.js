@@ -7,5 +7,5 @@ var queries = require('./machine.queries.js');
  * is located in house 1. Calling this function will return house 1.
  */
 module.exports = function getMyHouse(){
-    return gladys.utils.sqlUnique(queries.getMyHouse, []);
+  return gladys.utils.sqlUnique(queries.getMyHouse, []);
 };

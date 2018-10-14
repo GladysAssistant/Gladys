@@ -247,6 +247,7 @@
   "device-create-button": "Créer",
   "notification-update-available-title": "Mise à jour disponible !",
   "notification-update-available-text": "Nouvelle version de Gladys :",
+  "notification-update-module-available-text": "peut être mis à jour en version",
   "installation-step": "Etape",
   "installation-create-account": "Création de votre compte",
   "installation-configuration": "Configuration",
@@ -298,6 +299,7 @@
   "parameters-box-table-delete": "Supprimer",
   "parameters-box-left": "Gauche",
   "parameters-box-right": "Droite",
+  "scenario-if-condition": "La condition est validée si",
   "scenario-list": "Mes scénarios",
   "scenario-help": "Aide",
   "scenario-table-event": "Déclencheur",
@@ -513,6 +515,10 @@
   "box-music-music-album": "Album",
   "box-music-music-select-room": "Sélectionnez la pièce ou est situéle lecteur de musique que vous souhaitez contrôler dans cette box :",
   "box-music-music-validate": "Valider",
+  "box-television-title": "Télévision",
+  "box-television-channel": "Chaine",
+  "box-television-television-select": "Sélectionnez la télévision que vous souhaitez contrôler dans cette box :",
+  "box-television-television-validate": "Valider",
   "box-chat-title": "Chat",
   "box-calendar-title": "Calendrier",
   "box-weather-title": "Météo",
@@ -566,5 +572,8 @@
   "preparation":"Préparation",
   "order": "Ordre",
   "function": "fonction",
-  "functions": "fonctions"
+  "functions": "fonctions",
+  "scenario-if-condition-true": "Vraie",
+  "scenario-if-condition-false": "Fausse",
+  "scenario-if-condition-is": "est"
 }

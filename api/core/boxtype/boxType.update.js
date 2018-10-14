@@ -34,10 +34,10 @@ module.exports = function update(boxType){
   delete boxType.id;
   return BoxType.update({id}, boxType)
     .then(function(types){
-       if(types.length === 0){
-           return Promise.reject(new Error('NotFound'));
-       } 
+      if(types.length === 0){
+        return Promise.reject(new Error('NotFound'));
+      } 
        
-       return types[0];
+      return types[0];
     });
 };

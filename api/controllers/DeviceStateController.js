@@ -13,7 +13,6 @@
  */
 
 module.exports = {
-  
   /**
    * @api {get} /devicestate get all deviceStates
    * @apiName getDeviceState
@@ -22,15 +21,16 @@ module.exports = {
    *
    * @apiParam {Integer} take the number of deviceState to return
    * @apiParam {Integer} skip the number of deviceState to skip
-   * 
+   *
    * @apiUse DeviceStateSuccess
    */
-  index: function(req, res, next){
-      gladys.deviceState.get(req.query)
-         .then(function(states){
-             return res.json(states);
-         })
-         .catch(next);
+  index: function(req, res, next) {
+    gladys.deviceState
+      .get(req.query)
+      .then(function(states) {
+        return res.json(states);
+      })
+      .catch(next);
   },
 
   /**
@@ -40,13 +40,14 @@ module.exports = {
    * @apiPermission authenticated
    *
    * @apiUse DeviceStateParam
-   * 
+   *
    * @apiUse DeviceStateSuccess
    */
-  create: function(req, res, next){
-      gladys.deviceState.create(req.body)
-        .then((state) => res.status(201).json(state))
-        .catch(next);
+  create: function(req, res, next) {
+    gladys.deviceState
+      .create(req.body)
+      .then(state => res.status(201).json(state))
+      .catch(next);
   },
 
   /**
@@ -56,13 +57,13 @@ module.exports = {
    * @apiPermission authenticated
    *
    * @apiUse DeviceStateParam
-   * 
+   *
    * @apiUse DeviceStateSuccess
    */
-  createGet: function(req, res, next){
-      gladys.deviceState.create(req.query)
-        .then((state) => res.status(201).json(state))
-        .catch(next);
+  createGet: function(req, res, next) {
+    gladys.deviceState
+      .create(req.query)
+      .then(state => res.status(201).json(state))
+      .catch(next);
   }
-    
 };

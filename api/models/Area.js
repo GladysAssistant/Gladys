@@ -6,33 +6,30 @@
  */
 
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    latitude: {
+      type: 'float',
+      required: true
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
+    longitude: {
+      type: 'float',
+      required: true
+    },
 
-        latitude: {
-            type: 'float',
-            required: true
-        },
+    radius: {
+      type: 'float',
+      required: true
+    },
 
-        longitude: {
-            type: 'float',
-            required: true
-        },
-
-        radius: {
-            type: 'float',
-            required: true
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

@@ -16,3 +16,4 @@ module.exports.getById = require('./module.getById.js');
 module.exports.uninstall = require('./module.uninstall.js');
 module.exports.update = require('./module.update.js');
 module.exports.upgrade = require('./module.upgrade.js');
+module.exports.checkUpdate = require('./module.checkUpdate.js');

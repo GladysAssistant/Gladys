@@ -1,12 +1,12 @@
 
- /**
+/**
  * Don't remove, it is useful for generating documentation :)
  * @public
  * @name Alarm
  * @class
  */
 
- module.exports.checkAllAutoWakeUp = require('./alarm.checkAllAutoWakeUp.js');
+module.exports.checkAllAutoWakeUp = require('./alarm.checkAllAutoWakeUp.js');
 module.exports.checkAutoWakeUp = require('./alarm.checkAutoWakeUp.js');
 module.exports.command = require('./alarm.command.js');
 module.exports.cancel = require('./alarm.cancel.js');

@@ -6,26 +6,24 @@
  */
 
 module.exports = {
-    
-    
-    /**
-     * get all categories
-     */
-    index: function(req, res, next){
-        gladys.category.get()
-          .then(function(categories){
-              return res.json(categories);
-          })
-          .catch(next);
-    }, 
-    
-    getEventTypes: function(req, res, next){
-      gladys.eventType.getByCategory({category: req.params.service})
-        .then(function(eventTypes){
-            return res.json(eventTypes);
-        })
-        .catch(next);
-    }
-	
-};
+  /**
+   * get all categories
+   */
+  index: function(req, res, next) {
+    gladys.category
+      .get()
+      .then(function(categories) {
+        return res.json(categories);
+      })
+      .catch(next);
+  },
 
+  getEventTypes: function(req, res, next) {
+    gladys.eventType
+      .getByCategory({ category: req.params.service })
+      .then(function(eventTypes) {
+        return res.json(eventTypes);
+      })
+      .catch(next);
+  }
+};

@@ -22,6 +22,6 @@
  */
 
 module.exports = function(machine) {
-    machine.lastSeen = new Date();
-    return gladys.machine.update(machine);
+  machine.lastSeen = new Date();
+  return gladys.machine.update(machine);
 };

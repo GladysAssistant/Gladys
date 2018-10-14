@@ -38,10 +38,10 @@ module.exports = function update (house) {
   
   return House.update({id}, house)
     .then(function(houses){
-       if(houses.length === 0){
-           return Promise.reject(new Error('NotFound'));
-       } else {
-           return Promise.resolve(houses[0]);
-       }
+      if(houses.length === 0){
+        return Promise.reject(new Error('NotFound'));
+      } else {
+        return Promise.resolve(houses[0]);
+      }
     });
 };

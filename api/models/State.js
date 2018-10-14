@@ -1,26 +1,27 @@
-
 module.exports = {
+  attributes: {
+    state: {
+      model: 'StateType',
+      required: true
+    },
 
-    attributes: {
+    condition_template: {
+      type: 'string'
+    },
 
-        state: {
-            model: 'StateType',
-            required: true
-        },
+    active: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        condition_template: {
-            type: 'string'
-        },
+    trueIf: {
+      type: 'boolean',
+      defaultsTo: true
+    },
 
-        active: {
-            type: 'boolean',
-            defaultsTo: true
-        },
-
-        launcher: {
-            model: 'Launcher',
-            required: true
-        }
-
+    launcher: {
+      model: 'Launcher',
+      required: true
     }
+  }
 };

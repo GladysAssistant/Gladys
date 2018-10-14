@@ -20,14 +20,13 @@
  */
 
 module.exports.connections = {
-
   /***************************************************************************
-  *                                                                          *
-  * Local disk storage for DEVELOPMENT ONLY                                  *
-  *                                                                          *
-  * Installed by default.                                                    *
-  *                                                                          *
-  ***************************************************************************/
+   *                                                                          *
+   * Local disk storage for DEVELOPMENT ONLY                                  *
+   *                                                                          *
+   * Installed by default.                                                    *
+   *                                                                          *
+   ***************************************************************************/
   localDiskDb: {
     adapter: 'sails-disk'
   },
@@ -37,27 +36,31 @@ module.exports.connections = {
     host: process.env.MYSQL_HOST_TEST || 'localhost',
     port: process.env.MYSQL_PORT_TEST || 3306,
     user: process.env.MYSQL_USER_TEST || 'root',
-    password: (typeof process.env.MYSQL_PASSWORD_TEST !== 'undefined') ? process.env.MYSQL_PASSWORD_TEST : 'root',
+    password:
+      typeof process.env.MYSQL_PASSWORD_TEST !== 'undefined'
+        ? process.env.MYSQL_PASSWORD_TEST
+        : 'root',
     database: process.env.MYSQL_DATABASE_TEST || 'gladystest'
   },
 
   /***************************************************************************
-  *                                                                          *
-  * MySQL is the world's most popular relational database.                   *
-  * http://en.wikipedia.org/wiki/MySQL                                       *
-  *                                                                          *
-  * Run: npm install sails-mysql                                             *
-  *                                                                          *
-  ***************************************************************************/
+   *                                                                          *
+   * MySQL is the world's most popular relational database.                   *
+   * http://en.wikipedia.org/wiki/MySQL                                       *
+   *                                                                          *
+   * Run: npm install sails-mysql                                             *
+   *                                                                          *
+   ***************************************************************************/
   sailsmysql: {
     adapter: 'sails-mysql',
     host: process.env.MYSQL_HOST || 'localhost',
     port: process.env.MYSQL_PORT || 3306,
     user: process.env.MYSQL_USER || 'root',
-    password: (typeof process.env.MYSQL_PASSWORD !== 'undefined') ? process.env.MYSQL_PASSWORD : 'root',
+    password:
+      typeof process.env.MYSQL_PASSWORD !== 'undefined' ? process.env.MYSQL_PASSWORD : 'root',
     database: process.env.MYSQL_DATABASE || 'gladys'
   },
-  
+
   travis: {
     adapter: 'sails-mysql',
     host: '127.0.0.1',
@@ -65,6 +68,5 @@ module.exports.connections = {
     user: 'travis',
     password: '',
     database: 'gladystest'
-  },
-
+  }
 };

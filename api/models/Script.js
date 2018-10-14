@@ -6,22 +6,19 @@
  */
 
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    text: {
+      type: 'text'
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
-
-        text: {
-            type: 'text'
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
+  }
 };

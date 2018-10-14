@@ -22,6 +22,7 @@ var cssFilesToInject = [
   'styles/scenario.css',
   'styles/device.css',
   'styles/toogle.css',
+
   'styles/global.css',
 
   // Inject boxs styles
@@ -38,6 +39,7 @@ var cssFilesToInject = [
   'styles/dependencies/adminLTE/_all-skins.min.css',
   'styles/dependencies/bootstrap-datetimepicker.min.css',
   'styles/dependencies/color-picker/color-picker.min.css',
+  'styles/dependencies/angular-ui-push-button.css',
   
   // Inject hooks styles
   'hooks/**/*.css',
@@ -85,6 +87,7 @@ var jsFilesToInject = [
   'js/dependencies/angular-chart.min.js',
   'js/dependencies/color-picker/color-picker.min.js',
   'js/dependencies/color-picker/angular-color-picker.js',
+  'js/dependencies/angular-ui-push-button.js',
   
   // Load first AngularModule definition
   'js/app/app.module.js',

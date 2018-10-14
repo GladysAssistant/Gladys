@@ -6,42 +6,39 @@
  */
 
 module.exports = {
+  attributes: {
+    name: {
+      type: 'string',
+      required: true
+    },
 
-    attributes: {
+    protocol: {
+      type: 'string',
+      required: true
+    },
 
-        name: {
-            type: 'string',
-            required: true
-        },
+    service: {
+      type: 'string',
+      required: true
+    },
 
-        protocol: {
-            type: 'string',
-            required: true
-        },
+    // can be useful to identify a device (ex: unique ID of a lamp)
+    identifier: {
+      type: 'string'
+    },
 
-        service: {
-            type: 'string',
-            required: true
-        },
+    room: {
+      model: 'Room'
+    },
 
-        // can be useful to identify a device (ex: unique ID of a lamp)
-        identifier: {
-          type: 'string'  
-        },
+    // The Gladys machine responsible of handling this device
+    machine: {
+      type: 'uuid'
+    },
 
-        room: {
-            model: 'Room',
-        },
-
-        // The Gladys machine responsible of handling this device
-        machine: {
-            type: 'uuid'
-        },
-
-        // if this device is linked to a user (like a phone/laptop/Smart Watch)
-        user: {
-            model: 'User'
-        }
-
+    // if this device is linked to a user (like a phone/laptop/Smart Watch)
+    user: {
+      model: 'User'
     }
+  }
 };

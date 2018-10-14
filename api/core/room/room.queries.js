@@ -1,7 +1,7 @@
 
 module.exports = {
-    delete: 'DELETE FROM room WHERE id = ?;'  ,
-    get: `
+  delete: 'DELETE FROM room WHERE id = ?;',
+  get: `
     SELECT room.*, house.name AS houseName, house.id as houseId 
     FROM room
     JOIN house ON (room.house = house.id)
@@ -9,5 +9,5 @@ module.exports = {
     LIMIT ?
     OFFSET ?;
    `,
-   getAll: 'SELECT * FROM room;'
+  getAll: 'SELECT * FROM room;'
 };

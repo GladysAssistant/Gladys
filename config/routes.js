@@ -21,96 +21,93 @@
  */
 
 module.exports.routes = {
-
   /***************************************************************************
-  *                                                                          *
-  * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
-  * etc. depending on your default view engine) your home page.              *
-  *                                                                          *
-  * (Alternatively, remove this and add an `index.html` file in your         *
-  * `assets` directory)                                                      *
-  *                                                                          *
-  ***************************************************************************/
-
+   *                                                                          *
+   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
+   * etc. depending on your default view engine) your home page.              *
+   *                                                                          *
+   * (Alternatively, remove this and add an `index.html` file in your         *
+   * `assets` directory)                                                      *
+   *                                                                          *
+   ***************************************************************************/
 
   // views
-  '/login' : 'WelcomeController.login',
-  'get /forgotpassword' : 'WelcomeController.forgotPassword',
-  'post /forgotpassword' : 'WelcomeController.postForgotPassword',
-  'get /resetpassword' : 'WelcomeController.resetPassword',
-  'post /resetpassword' : 'WelcomeController.postResetPassword',
+  '/login': 'WelcomeController.login',
+  'get /forgotpassword': 'WelcomeController.forgotPassword',
+  'post /forgotpassword': 'WelcomeController.postForgotPassword',
+  'get /resetpassword': 'WelcomeController.resetPassword',
+  'post /resetpassword': 'WelcomeController.postResetPassword',
   '/': 'WelcomeController.index',
   '/installation': 'WelcomeController.installation',
-  
+
   //dashboard
-  '/dashboard': 'DashboardController.index' ,
+  '/dashboard': 'DashboardController.index',
   '/dashboard/module/:id/configuration': 'DashboardController.moduleConfigView',
-  
+
   //Action
   'post /action': 'ActionController.create',
   'delete /action/:id': 'ActionController.delete',
   'patch /action/:id': 'ActionController.update',
   'post /action/:id/param': 'ActionController.addParam',
-  
-  
+
   //ActionParam
   'patch /actionparam/:id': 'ActionParamController.update',
-  
+
   //actionType
   'get /actiontype': 'ActionType.index',
   'get /actiontype/:id/params': 'ActionType.getParams',
-  
+
   // Alarm
   'get /alarm': 'AlarmController.index',
   'post /alarm': 'AlarmController.create',
   'post /alarm/timer': 'AlarmController.timer',
   'delete /alarm/:id': 'AlarmController.delete',
-  
+
   // Area
   'get /area': 'AreaController.index',
   'post /area': 'AreaController.create',
   'patch /area/:id': 'AreaController.update',
   'delete /area/:id': 'AreaController.delete',
-  
+
   // Box
   'get /box': 'BoxController.index',
   'get /box/:id': 'BoxController.getById',
   'post /box': 'BoxController.create',
   'patch /box/:id': 'BoxController.update',
   'delete /box/:id': 'BoxController.delete',
-  
+
   //BoxType
-  'get /boxtype' : 'BoxTypeController.index',
-  
+  'get /boxtype': 'BoxTypeController.index',
+
   // Brain
-  'get /brain/classify': 'BrainController.classify', 
-  'post /brain/trainnew': 'BrainController.trainNew', 
+  'get /brain/classify': 'BrainController.classify',
+  'post /brain/trainnew': 'BrainController.trainNew',
 
   // CalendarEvent
-  'get /calendarevent' : 'CalendarEventController.index',
-  'get /calendarevent/all' : 'CalendarEventController.get',
-  
+  'get /calendarevent': 'CalendarEventController.index',
+  'get /calendarevent/all': 'CalendarEventController.get',
+
   //Category
   'get /category': 'CategoryController.index',
   'get /category/:service/eventtype': 'CategoryController.getEventTypes',
-  
-  // Device 
+
+  // Device
   'get /device': 'DeviceController.index',
   'post /device': 'DeviceController.create',
   'patch /device/:id': 'DeviceController.update',
   'delete /device/:id': 'DeviceController.delete',
   'get /device/:id/devicetype': 'DeviceController.getDeviceTypes',
-  
-  
+
   // DeviceState
   'get /devicestate': 'DeviceStateController.index',
   'post /devicestate': 'DeviceStateController.create',
   'get /devicestate/create': 'DeviceStateController.createGet', // allowing get request too for creating devicestate
-  
+
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
   'post /devicetype': 'DeviceTypeController.create',
   'delete /devicetype/:id': 'DeviceTypeController.delete',
+  'get /devicetype/category': 'DeviceTypeController.getDeviceTypeByCategory',
   'get /devicetype/room': 'DeviceTypeController.getByRoom',
   'get /room/:id/devicetype': 'DeviceTypeController.getInRoom',
   'patch /devicetype/:id': 'DeviceTypeController.update',
@@ -122,23 +119,23 @@ module.exports.routes = {
   'get /sentence': 'SentenceController.index',
   'get /sentence/label': 'SentenceController.getLabels',
   'patch /sentence/:id': 'SentenceController.update',
-  
+
   // Event
   'get /event': 'EventController.index',
   'post /event': 'EventController.create',
   'get /event/create': 'EventController.createGet', // allowing get request too for creating event (useful for connected object)
-  
+
   //EventType
   'get /eventtype': 'EventTypeController.index',
   'get /eventtype/:id/launcherparam': 'EventTypeController.getLauncherParams',
-  
+
   // House
   'get /house': 'HouseController.index',
   'post /house': 'HouseController.create',
   'patch /house/:id': 'HouseController.update',
   'delete /house/:id': 'HouseController.delete',
   'get /house/:id/user': 'HouseController.getUsers',
-  
+
   // Launcher
   'get /launcher': 'LauncherController.index',
   'post /launcher': 'LauncherController.create',
@@ -152,9 +149,9 @@ module.exports.routes = {
   'get /location/create': 'LocationController.create',
   'get /location': 'LocationController.get',
   'get /user/:id/location': 'LocationController.getByUser',
-  
+
   // Machine
-  'get /machine' : 'MachineController.get',
+  'get /machine': 'MachineController.get',
   'post /machine': 'MachineController.create',
   'patch /machine/:id': 'MachineController.update',
   'delete /machine/:id': 'MachineController.delete',
@@ -163,8 +160,8 @@ module.exports.routes = {
   'get /mode': 'ModeController.index',
   'post /mode': 'ModeController.create',
   'delete /mode/:id': 'ModeController.delete',
-  'post /house/:id/mode': 'ModeController.change', 
-  
+  'post /house/:id/mode': 'ModeController.change',
+
   // Module
   'get /module': 'ModuleController.index',
   'post /module/install': 'ModuleController.install',
@@ -192,21 +189,21 @@ module.exports.routes = {
 
   // Message
   'post /message': 'MessageController.send',
-  'get /message/user/:id' : 'MessageController.getByUser',
-  
+  'get /message/user/:id': 'MessageController.getByUser',
+
   // Notification
   'get /notification': 'NotificationController.index',
   'patch /notification/read': 'NotificationController.read',
-  
+
   // NotificationType
   'get /notificationtype': 'NotificationTypeController.index',
-  
+
   // NotificationUser
   'get /notificationuser': 'NotificationUserController.index',
   'post /notificationuser': 'NotificationUserController.create',
   'patch /notificationuser/:id': 'NotificationUserController.update',
   'delete /notificationuser/:id': 'NotificationUserController.delete',
-  
+
   // Param
   'get /param': 'ParamController.index',
   'get /module/:id/param': 'ParamController.getByModule',
@@ -214,59 +211,78 @@ module.exports.routes = {
   'post /param': 'ParamController.create',
   'patch /param/:name': 'ParamController.update',
   'delete /param/:name': 'ParamController.delete',
-  
+
   // ParamUser
   'get /paramuser': 'ParamUserController.index',
   'post /paramuser': 'ParamUserController.create',
   'patch /paramuser/:name': 'ParamUserController.update',
   'delete /paramuser/:name': 'ParamUserController.delete',
 
-  // Scenario 
+  // Scenario
   'post /scenario/:id/export': 'ScenarioController.exportScenario',
   'post /scenario': 'ScenarioController.importScenario',
   'patch /scenario/:id': 'ScenarioController.updateScenario',
-  
+
   // Script
   'get /script': 'ScriptController.index',
   'post /script': 'ScriptController.create',
   'patch /script/:id': 'ScriptController.update',
   'post /script/:id/exec': 'ScriptController.exec',
   'delete /script/:id': 'ScriptController.delete',
-  
+
   // Room
   'get /room': 'RoomController.index',
   'post /room': 'RoomController.create',
   'patch /room/:id': 'RoomController.update',
   'delete /room/:id': 'RoomController.delete',
-  
+
   //Socket
   'post /socket/subscribe': 'SocketController.subscribe',
-  
+
   // State
   'post /state': 'StateController.create',
   'patch /state/:id': 'StateController.update',
   'delete /state/:id': 'StateController.delete',
   'post /state/:id/param': 'StateController.addParam',
-  
+
   // StateType
   'get /statetype': 'StateTypeController.index',
   'get /statetype/:id/param': 'StateTypeController.getStateTypeParams',
   'get /statetype/:id/templateparam': 'StateTypeController.getTemplateParams',
-  
-  
+
   // System
   'get /system': 'SystemController.index',
   'post /system/shutdown': 'SystemController.shutdown',
   'post /system/update': 'SystemController.update',
   'get /system/health': 'SystemController.healthCheck',
 
+  // Television
+  'post /television/state': 'TelevisionController.switchState',
+  'get /television/:id/state': 'TelevisionController.getState',
+  'post /television/channel': 'TelevisionController.setChannel',
+  'get /television/:id/channel': 'TelevisionController.getChannel',
+  'get /television/:id/mute': 'TelevisionController.getMuted',
+  'post /television/mute': 'TelevisionController.setMuted',
+  'post /television/fastforward': 'TelevisionController.fastForward',
+  'post /television/rewind': 'TelevisionController.rewind',
+  'post /television/pause': 'TelevisionController.pause',
+  'post /television/play': 'TelevisionController.play',
+  'post /television/stop': 'TelevisionController.stop',
+  'post /television/presskey': 'TelevisionController.pressKey',
+  'post /television/volume/down': 'TelevisionController.volumeDown',
+  'post /television/volume/up': 'TelevisionController.volumeUp',
+  'get /television/:id/source': 'TelevisionController.getSources',
+  'post /television/opensource': 'TelevisionController.openSource',
+  'post /television/openmenu': 'TelevisionController.openMenu',
+  'post /television/rec': 'TelevisionController.rec',
+  'post /television/customcommand': 'TelevisionController.customCommand',
+
   // Token
   'get /token': 'TokenController.index',
   'post /token': 'TokenController.create',
   'patch /token/:id': 'TokenController.update',
   'delete /token/:id': 'TokenController.delete',
-  
-  
+
   // Update
   'get /update/verify': 'UpdateController.verify',
   'get /update/action': 'UpdateController.updateActions',
@@ -277,7 +293,7 @@ module.exports.routes = {
   'get /update/box': 'UpdateController.updateBoxTypes',
   'get /update/category': 'UpdateController.updateCategories',
   'get /update/state': 'UpdateController.updateStates',
-  
+
   //User
   'get /user': 'UserController.index',
   'post /user': 'UserController.create',
@@ -288,20 +304,16 @@ module.exports.routes = {
   'get /user/whoami': 'UserController.whoami',
   'post /user/:user_id/house/:house_id/seen': 'UserController.seen',
 
-
   // Weather
   'get /weather': 'WeatherController.get'
 
-
-
   /***************************************************************************
-  *                                                                          *
-  * Custom routes here...                                                    *
-  *                                                                          *
-  *  If a request to a URL doesn't match any of the custom routes above, it  *
-  * is matched against Sails route blueprints. See `config/blueprints.js`    *
-  * for configuration options and examples.                                  *
-  *                                                                          *
-  ***************************************************************************/
-
+   *                                                                          *
+   * Custom routes here...                                                    *
+   *                                                                          *
+   *  If a request to a URL doesn't match any of the custom routes above, it  *
+   * is matched against Sails route blueprints. See `config/blueprints.js`    *
+   * for configuration options and examples.                                  *
+   *                                                                          *
+   ***************************************************************************/
 };

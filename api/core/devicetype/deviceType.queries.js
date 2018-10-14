@@ -8,7 +8,7 @@ module.exports = {
     WHERE dt.id = ?;
   `,
   getByRooms: `
-    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
+    SELECT d.name, dt.id, dt.type, dt.identifier as deviceTypeIdentifier, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
     dt.lastValueDatetime as lastChanged, dt.lastValue AS lastValue, room.id as roomId, room.name as roomName, room.house as roomHouse,
     dt.name as deviceTypeName, dt.order
     FROM device d
@@ -16,7 +16,7 @@ module.exports = {
     JOIN room ON d.room = room.id
     WHERE ( room.id = ? OR ? IS NULL )
   `,
-   getByRoom: `
+  getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,
    dt.lastValueDatetime as lastChanged, dt.lastValue
    FROM device d
@@ -63,7 +63,7 @@ module.exports = {
 
   getDeviceTypeByCategory:
   `
-    SELECT devicetype.* 
+    SELECT devicetype.*, device.name as deviceName
     FROM devicetype 
     JOIN device ON devicetype.device = device.id 
     WHERE category = ?

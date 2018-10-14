@@ -1,7 +1,6 @@
-
 // config/scenario.js
 
 module.exports.scenario = {
-	parameters : 'parameters',
-	userId : 'userId'
+  parameters: 'parameters',
+  userId: 'userId'
 };

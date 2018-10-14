@@ -20,5 +20,5 @@
  */
 
 module.exports = function(room){
-    return Room.create(room);
+  return Room.create(room);
 };

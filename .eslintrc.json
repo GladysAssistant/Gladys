@@ -1,0 +1,40 @@
+{
+  "parserOptions": {
+      "ecmaVersion": 2018
+  },
+  "env": {
+      "node": true
+  },
+  "globals": {
+      "document": false,
+      "navigator": false,
+      "window": false
+  },
+  "rules": {
+      "brace-style": ["error", "1tbs"],
+      "semi": ["error", "always"],
+      "quotes": ["error", "single", {
+          "avoidEscape": true,
+          "allowTemplateLiterals": true
+      }],
+      "arrow-spacing": ["error", {
+          "before": true,
+          "after": true
+      }],
+      "no-mixed-spaces-and-tabs": "error",
+      "no-eval": "error",
+      "block-spacing": ["error", "always"],
+      "comma-spacing": ["error", {
+          "before": false,
+          "after": true
+      }],
+      "indent": ["error", 2],
+      "camelcase": ["error", {
+          "properties": "never"
+      }],
+      "curly": ["error", "all"],
+      "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true, "allowTaggedTemplates": true }],
+      "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": true }],
+      "func-call-spacing": ["error", "never"]
+  }
+}

@@ -4,72 +4,82 @@ var template = require('es6-template-strings');
 
 module.exports = function(params)  {
 
-    // we get all the State of a specific launcher
-    return gladys.utils.sql(queries.getStatesLauncher, [params.launcher.id])
-        .then(function(statetypes) {
+  // we get all the State of a specific launcher
+  return gladys.utils.sql(queries.getStatesLauncher, [params.launcher.id])
+    .then(function(statetypes) {
 
-            // for each state, we verify the value
-            return Promise.map(statetypes, function(statetype) {
-                return verify(statetype, params);
-            });
-        });
+      // for each state, we verify the value
+      return Promise.map(statetypes, function(statetype) {
+        return verify(statetype, params);
+      });
+    });
 };
 
 
 function verify(statetype, params) {
 
-    var verifyFunction;
+  var verifyFunction;
     
-    sails.log.info(`Verifying condition "${statetype.name}" with template (${statetype.condition_template})`);
+  sails.log.info(`Verifying condition "${statetype.name}" with template (${statetype.condition_template})`);
 
-    // if it's a gladys core function
-    if (gladys[statetype.service] && typeof gladys[statetype.service][statetype.function] == "function") {
+  // if it's a gladys core function
+  if (gladys[statetype.service] && typeof gladys[statetype.service][statetype.function] == 'function') {
 
-        // the service is a gladys core function
-        verifyFunction = gladys[statetype.service][statetype.function];
-    }
+    // the service is a gladys core function
+    verifyFunction = gladys[statetype.service][statetype.function];
 
     // we test if the service function exist
-    else if (!gladys.modules[statetype.service] || typeof gladys.modules[statetype.service][statetype.function] !== "function") {
-        return Promise.reject(new Error(`gladys.modules.${statetype.service}.${statetype.function} is not a function`));
-    } else {
+  } else if (!gladys.modules[statetype.service] || typeof gladys.modules[statetype.service][statetype.function] !== 'function') {
+    
+    return Promise.reject(new Error(`gladys.modules.${statetype.service}.${statetype.function} is not a function`));
+  } else {
 
-        // the service is an external service
-        verifyFunction = gladys.modules[statetype.service][statetype.function];
-    }
+    // the service is an external service
+    verifyFunction = gladys.modules[statetype.service][statetype.function];
+  }
 
    
-     // we get all the params
-    return gladys.stateParam.getByState({state: statetype.stateId})
-        .then(function(stateParams){
+  // we get all the params
+  return gladys.stateParam.getByState({state: statetype.stateId})
+    .then(function(stateParams){
              
-             var paramsToSend = {};
+      var paramsToSend = {};
              
-             stateParams.forEach(function(stateParam){
-                 paramsToSend[stateParam.variablename] = stateParam.value;
-             });
+      stateParams.forEach(function(stateParam){
+        paramsToSend[stateParam.variablename] = stateParam.value;
+      });
              
-              // we call the service
-             return verifyFunction(paramsToSend);
-        })
-        .then(function(scope) {
-            
-            // module can send raw response if he don't need the template
-            if(scope === true) return Promise.resolve(scope);
-            if(scope === false) return Promise.reject(new Error('conditions_not_verified'));
-            
-            // if the scope is not a boolean, we inject it in the condition template
-            try {
-                var result = template('${' + statetype.condition_template + '}', scope);
-                if (result == 'true') {
-                    return Promise.resolve(scope);
-                } else  {
+      // we call the service
+      return verifyFunction(paramsToSend);
+    })
+    .then(function(scope) {
 
-                    // condition is not verified
-                    return Promise.reject(new Error('conditions_not_verified'));
-                }
-            } catch (e) {
-                return Promise.reject(new Error(e));
-            }
-        });
+      var trueIf = true;
+      if(statetype.trueIf === 0)  {
+        trueIf = false; 
+      }
+
+      // module can send raw response if he don't need the template
+      if(scope === trueIf) {
+        return Promise.resolve(scope); 
+      }
+      if(scope === !trueIf) {
+        return Promise.reject(new Error('conditions_not_verified')); 
+      }
+            
+      // if the scope is not a boolean, we inject it in the condition template
+      try {
+        var result = template('${' + statetype.condition_template + '}', scope);
+        var booleanResult = (result === 'true') ? true : false;
+        if (booleanResult == trueIf) {
+          return Promise.resolve(scope);
+        } else  {
+
+          // condition is not verified
+          return Promise.reject(new Error('conditions_not_verified'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    });
 }

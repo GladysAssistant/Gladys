@@ -1,36 +1,31 @@
-
 module.exports = {
+  attributes: {
+    datetime: {
+      type: 'datetime',
+      required: true
+    },
 
-    attributes: {
+    latitude: {
+      type: 'float',
+      required: true
+    },
 
-        datetime: {
-            type: 'datetime',
-            required: true
-        },
+    longitude: {
+      type: 'float',
+      required: true
+    },
 
-        latitude: {
-            type: 'float',
-            required: true
-        },
+    altitude: {
+      type: 'float'
+    },
 
-        longitude: {
-            type: 'float',
-            required: true
-        },
+    accuracy: {
+      type: 'float'
+    },
 
-        altitude: {
-            type: 'float'
-        },
-
-        accuracy: {
-            type: 'float'
-        },
-
-        user: {
-            model: 'User',
-            required: true
-        }
-
+    user: {
+      model: 'User',
+      required: true
     }
-
+  }
 };
