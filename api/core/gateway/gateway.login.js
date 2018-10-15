@@ -9,22 +9,9 @@ module.exports = function(email, password, twoFactorCode) {
 
       return gladysGatewayClient.loginInstance(loginResult.two_factor_token, twoFactorCode);
     })
+    .then(() =>  gladysGatewayClient.createInstance('Gladys Instance'))
     .then((gladysInstance) => {
-      if(gladysInstance !== null ) {
-        return gladysInstance;
-      } else {
-        return gladysGatewayClient.createInstance(gladys.system.getInfos().hostname || 'Gladys Instance');
-      }
-    })
-    .then((gladysInstance) => {
-      
-      // if the instance was already existing
-      if(!gladysInstance.instance) {
-        return gladysInstance;
-      }
-
-      // if not, the instance has just been created
-      // so we save all params
+    
       return Promise.all([
         gladys.param.setValue({ name: 'GLADYS_GATEWAY_REFRESH_TOKEN',  type: 'secret', value: gladysInstance.instance.refresh_token }),
         gladys.param.setValue({ name: 'GLADYS_GATEWAY_RSA_PRIVATE_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.rsaPrivateKeyJwk) }),
