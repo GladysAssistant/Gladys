@@ -119,7 +119,7 @@ module.exports = {
    */
   getByRoom: function(req, res, next) {
     gladys.deviceType
-      .getByRoom()
+      .getByRoom(req.query)
       .then(function(roomsDeviceTypes) {
         return res.json(roomsDeviceTypes);
       })
