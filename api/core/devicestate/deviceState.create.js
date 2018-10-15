@@ -39,6 +39,7 @@ module.exports = function(state){
 
       // broadcast news to everyone
       gladys.socket.emit('newDeviceState', state); 
+      gladys.emit('devicestate-new', state);
 
       var event = {
         code: 'devicetype-new-value',
