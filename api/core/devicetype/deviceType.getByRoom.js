@@ -15,12 +15,13 @@ var queries = require('./deviceType.queries.js');
 module.exports = function(options){
 
   options = options || {};
+  options.displayed_only = options.displayed_only === true ? 1 : null;
 
   var rooms = [];
   var roomDictionnary = {};
     
   // get all deviceTypes, filter or not by room
-  return gladys.utils.sql(queries.getByRooms, [options.room, options.room])
+  return gladys.utils.sql(queries.getByRooms, [options.room, options.room, options.displayed_only, options.displayed_only])
     .then((deviceTypes) => {
 
       // reorganize rooms in tree
