@@ -22,6 +22,7 @@
 
       function activate(){
         getStatus();
+        getKeysFingerprint();
       }
 
       function login() {
@@ -52,6 +53,13 @@
 
       function reconnect() {
         vm.connected = false;
+      }
+
+      function getKeysFingerprint() {
+        gatewayService.getKeysFingerprint()
+          .then(function(data) {
+            vm.fingerprints = data.data;
+          });
       }
   }
 })();

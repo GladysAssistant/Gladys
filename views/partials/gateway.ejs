@@ -54,8 +54,11 @@
                     </form>
 
                     <div ng-show="vm.connected === true">
-                        <div style="margin-top: 75px" class="alert alert-success col-sm-12">
+                        <div style="word-wrap:break-word;" class="alert alert-success col-sm-12" >
                            <p> <%= __('gateway-connected-sentence') %> <a style="cursor: pointer;" ng-click="vm.reconnect()"><%= __('gateway-connected-click-here') %></a>.</p>
+                           <hr />
+                           <p> <%= __('gateway-rsa-public-key-fingerprint') %> : {{vm.fingerprints.rsa_fingerprint}}</p>
+                           <p> <%= __('gateway-ecdsa-public-key-fingerprint') %> : {{vm.fingerprints.ecdsa_fingerprint}}</p>
                         </div>
                     </div>
 
