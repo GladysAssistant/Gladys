@@ -10,6 +10,9 @@ module.exports = function init() {
     .then(() => {
       sails.log.info(`Gladys Gateway: Connected with success!`);
       shared.isConnected = true;
+
+      // add listener
+      gladys.on('devicestate-new', (data) => gladysGatewayClient.newEventInstance('devicestate-new', data));
     })
     .catch((err) => {
       sails.log.info(`Gladys Gateway: Not connected.`);
