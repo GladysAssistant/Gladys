@@ -15,7 +15,9 @@ module.exports = function(email, password, twoFactorCode) {
       return Promise.all([
         gladys.param.setValue({ name: 'GLADYS_GATEWAY_REFRESH_TOKEN',  type: 'secret', value: gladysInstance.instance.refresh_token }),
         gladys.param.setValue({ name: 'GLADYS_GATEWAY_RSA_PRIVATE_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.rsaPrivateKeyJwk) }),
-        gladys.param.setValue({ name: 'GLADYS_GATEWAY_ECDSA_PRIVATE_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.ecdsaPrivateKeyJwk) })
+        gladys.param.setValue({ name: 'GLADYS_GATEWAY_ECDSA_PRIVATE_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.ecdsaPrivateKeyJwk) }),
+        gladys.param.setValue({ name: 'GLADYS_GATEWAY_RSA_PUBLIC_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.rsaPublicKeyJwk) }),
+        gladys.param.setValue({ name: 'GLADYS_GATEWAY_ECDSA_PUBLIC_KEY',  type: 'secret', value: JSON.stringify(gladysInstance.ecdsaPublicKeyJwk) })
       ]);
     })
     .then(() => gladys.gateway.init())

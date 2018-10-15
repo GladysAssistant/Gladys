@@ -23,5 +23,11 @@ module.exports = {
     res.json({
       connected: gladys.gateway.isConnected()
     });
+  },
+
+  getKeysFingerprint: function(req, res, next) {
+    gladys.gateway.getKeysFingerprint()
+      .then((fingerprints) => res.json(fingerprints))
+      .catch(next);
   }
 };

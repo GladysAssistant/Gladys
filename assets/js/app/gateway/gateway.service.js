@@ -12,7 +12,8 @@
       
       var service = {
           login: login,
-          getStatus: getStatus
+          getStatus: getStatus,
+          getKeysFingerprint: getKeysFingerprint
       };
 
       return service;
@@ -24,6 +25,10 @@
       function getStatus() {
           return $http({method: 'GET', url: '/gateway/status' });
       }
+
+      function getKeysFingerprint() {
+        return $http({method: 'GET', url: '/gateway/fingerprint' });
+    }
       
   }
 })();

@@ -417,5 +417,7 @@
   "gateway-connected-sentence": " Your Gladys instance is connected to the Gladys Gateway and will receive any command. If you want to reconnect, click",
   "gateway-connected-click-here": "here",
   "gateway-login-title": "Login to your Gladys Gateway account",
-  "gateway-two-factor-code": "6 digits two-factor code"
+  "gateway-two-factor-code": "6 digits two-factor code",
+  "gateway-rsa-public-key-fingerprint": "RSA public key fingerprint",
+  "gateway-ecdsa-public-key-fingerprint": "ECDSA public key fingerprint"
 }

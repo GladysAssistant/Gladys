@@ -132,6 +132,7 @@ module.exports.routes = {
   // Gateway
   'post /gateway/login': 'GatewayController.login',
   'get /gateway/status': 'GatewayController.isConnected',
+  'get /gateway/fingerprint': 'GatewayController.getKeysFingerprint',
 
   // House
   'get /house': 'HouseController.index',
