@@ -65,5 +65,34 @@ module.exports = {
       .create(req.query)
       .then(state => res.status(201).json(state))
       .catch(next);
+  },
+
+  /**
+   * @api {get} /devicestate/filtered get all deviceStates filtered by date range
+   * @apiName getDeviceStateFiltered
+   * @apiGroup DeviceState
+   * @apiPermission authenticated
+   *
+   * @apiParam {Integer} take the number of deviceState to return
+   * @apiParam {Integer} skip the number of deviceState to skip
+   * @apiParam {Date} startDate the date from which you want deviceState
+   * @apiParam {Date} endDate the date until which you want deviceState
+   *
+   * @apiUse DeviceStateSuccess
+   */
+  filtered: function(req, res, next) {
+    gladys.deviceState.getFiltered(req.query)
+      .then(function(states) {
+        return res.json(states);
+      })
+      .catch(next);
+  },
+
+  filteredMinMax: function(req, res, next) {
+    gladys.deviceState.getFilteredMinMax(req.query)
+      .then(function(states) {
+        return res.json(states);
+      })
+      .catch(next);
   }
 };

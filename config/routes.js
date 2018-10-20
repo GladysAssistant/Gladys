@@ -102,6 +102,8 @@ module.exports.routes = {
   'get /devicestate': 'DeviceStateController.index',
   'post /devicestate': 'DeviceStateController.create',
   'get /devicestate/create': 'DeviceStateController.createGet', // allowing get request too for creating devicestate
+  'get /devicestate/filtered': 'DeviceStateController.filtered',
+  'get /devicestate/filtered/minmax': 'DeviceStateController.filteredMinMax',
 
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
