@@ -572,5 +572,10 @@
   "preparation":"Préparation",
   "scenario-if-condition-true": "Vraie",
   "scenario-if-condition-false": "Fausse",
-  "scenario-if-condition-is": "est"
+  "scenario-if-condition-is": "est",
+  "chart": "Graphique",
+  "chart-slider-help": "% de lissage des données, de 0% (aucun lissage, toutes les valeurs sont affichées), à 98% (lissage maximale). Moins les données sont lissées, plus le temps d'affichage est long.",
+  "chart-tooltip-mini-maxi": "Affiche les courbes des valeurs minimales et maximales par jour sur la période choisie.",
+  "chart-label-mini-maxi": "Min. et max. par jour",
+  "chart-label-stepped-line": "Courbe en escalier"
 }
