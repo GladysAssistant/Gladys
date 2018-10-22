@@ -33,10 +33,8 @@
     var globalTimeRange = "days";
 
     var filter = {
-      //start: moment().subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss'),
-      //end: moment().format('YYYY-MM-DD HH:mm:ss'),
-      start:moment("2018-08-14 14:28").format('YYYY-MM-DD HH:mm:ss'),
-      end: moment("2018-08-15 14:28").format('YYYY-MM-DD HH:mm:ss'),
+      start: moment().subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss'),
+      end: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
 
     vm.currentDeviceType = null;
@@ -62,7 +60,6 @@
     }
 
     function activate() {
-      console.log(vm.currentDeviceType)
       activateCharts();
       waitForNewValue();
     }
