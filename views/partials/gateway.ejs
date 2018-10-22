@@ -48,8 +48,12 @@
                         </div>
 
                         <div style="margin-top:10px" class="form-group">
-                            <button id="btn-login" type="submit" class="btn btn-flat btn-success btn-block">
-                                <%= __('Login') %> </button>
+                            <button id="btn-login" type="submit" class="btn btn-flat btn-success btn-block" ng-show="!vm.connecting">
+                                <%= __('Login') %> 
+                            </button>
+                            <button class="btn btn-flat btn-success btn-block" ng-show="vm.connecting" disabled>
+                              <%= __('gateway-connecting') %> 
+                          </button>
                         </div>
                     </form>
 

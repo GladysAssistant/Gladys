@@ -419,5 +419,7 @@
   "gateway-login-title": "Login to your Gladys Gateway account",
   "gateway-two-factor-code": "6 digits two-factor code",
   "gateway-rsa-public-key-fingerprint": "RSA public key fingerprint",
-  "gateway-ecdsa-public-key-fingerprint": "ECDSA public key fingerprint"
+  "gateway-ecdsa-public-key-fingerprint": "ECDSA public key fingerprint",
+  "gateway-connecting": "Generating keys and connecting...",
+  "gateway-login-error": "Your email/password/two-factor code is invalid."
 }
