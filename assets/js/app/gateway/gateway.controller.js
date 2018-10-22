@@ -17,6 +17,7 @@
 
       vm.connected = null;
       vm.error = null;
+      vm.connecting = false;
 
       activate();
 
@@ -26,14 +27,17 @@
 
       function login() {
         vm.error = null;
+        vm.connecting = true;
         gatewayService.login(vm.email, vm.password, vm.twoFactorCode)
           .then(function() {
             return getKeysFingerprint();
           })
           .then(function() {
             vm.connected = true;
+            vm.connecting = false;
           })
           .catch(function(err) {
+            vm.connecting = false;
             if(err && err.status === 403) {
               if(err.data && err.data.code && err.data.code === '2FA_NOT_ENABLED') {
                 vm.error = '2FA_NOT_ENABLED';
