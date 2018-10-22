@@ -22,12 +22,14 @@
 
       function activate(){
         getStatus();
-        getKeysFingerprint();
       }
 
       function login() {
         vm.error = null;
         gatewayService.login(vm.email, vm.password, vm.twoFactorCode)
+          .then(function() {
+            return getKeysFingerprint();
+          })
           .then(function() {
             vm.connected = true;
           })
@@ -48,6 +50,7 @@
         gatewayService.getStatus()
           .then(function(data){
             vm.connected = data.data.connected;
+            if (vm.connected) return getKeysFingerprint();
           });
       }
 
