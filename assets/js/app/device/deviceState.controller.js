@@ -30,9 +30,9 @@
     var dataMin = [];
     var dataMax = [];
 
-    var labelDt = "";
+    var labelDt = '';
     var globalTime = 1;
-    var globalTimeRange = "days";
+    var globalTimeRange = 'days';
 
     var filter = {
       start: moment().subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss'),
@@ -53,17 +53,17 @@
       timePicker24Hour: true,
       startDate: moment(filter.start),
       endDate: moment(filter.end),
-      opens: "right",
-      drops: "down",
-      buttonClasses: "btn btn-sm btn-flat",
+      opens: 'right',
+      drops: 'down',
+      buttonClasses: 'btn btn-sm btn-flat',
       alwaysShowCalendars: false,
       locale: {
-        applyLabel: "",
-        cancelLabel: "",
-        customRangeLabel: "",
+        applyLabel: '',
+        cancelLabel: '',
+        customRangeLabel: '',
         format: 'l[, ]LT'
       }
-    }
+    };
 
     activate();
 
@@ -82,8 +82,8 @@
           moment.locale(language);
           localDateRangePickers()
             .then(function () {
-              activateDateRangePicker()
-            })
+              activateDateRangePicker();
+            });
         });
     }
 
@@ -105,7 +105,7 @@
         data: {
           datasets: [{
             data: dataMin,         // Configuration of the min curve
-            label: (vm.displayMinMax ? "min" : ""),
+            label: (vm.displayMinMax ? 'min' : ''),
             borderColor: (vm.displayMinMax ? 'rgba(14,135,73,1)' : 'rgba(14,135,73,0)'),
             backgroundColor: 'rgba(255,255,255,0)',
             borderWidth: 1,
@@ -123,16 +123,16 @@
             fill: 'start',
             steppedLine: (vm.steppedline ? 'after' : false)
           },
-            {
-              data: dataMax,         // Configuration of the min curve
-              label: (vm.displayMinMax ? "max" : ""),
-              borderColor: (vm.displayMinMax ? 'rgba(221,75,57,1)' : 'rgba(221,75,57,0)'),
-              backgroundColor: 'rgba(255,255,255,0)',
-              borderWidth: 1,
-              pointRadius: 2,
-              cubicInterpolationMode: 'monotone',
-              fill: false
-            }],
+          {
+            data: dataMax,         // Configuration of the min curve
+            label: (vm.displayMinMax ? 'max' : ''),
+            borderColor: (vm.displayMinMax ? 'rgba(221,75,57,1)' : 'rgba(221,75,57,0)'),
+            backgroundColor: 'rgba(255,255,255,0)',
+            borderWidth: 1,
+            pointRadius: 2,
+            cubicInterpolationMode: 'monotone',
+            fill: false
+          }],
         },
         options: {         // Configuring the axes of the graph
           scales: {
@@ -176,9 +176,9 @@
             callbacks: {
               title: function (tooltipItem, data) {
                 if (tooltipItem[0].datasetIndex === 1) {
-                  return moment(tooltipItem[0].xLabel).format('ll[, ]LTS')
+                  return moment(tooltipItem[0].xLabel).format('ll[, ]LTS');
                 } else {
-                  return moment(tooltipItem[0].xLabel).format('ll')
+                  return moment(tooltipItem[0].xLabel).format('ll');
                 }
               }
             }
@@ -195,18 +195,18 @@
       $('#daterangepicker').daterangepicker(config,
         function (start, end) {
           if (vm.currentDeviceType) {
-            globalTime = moment(end).diff(moment(start), 'days') // Recording the time period for navigation buttons
+            globalTime = moment(end).diff(moment(start), 'days'); // Recording the time period for navigation buttons
             filter.start = moment(start).format('YYYY-MM-DD HH:mm:ss');
-            filter.end = moment(end).format('YYYY-MM-DD HH:mm:ss')
-            getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end)
+            filter.end = moment(end).format('YYYY-MM-DD HH:mm:ss');
+            getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
           }
         }
-      )
+      );
     }
 
     // Enabling the dateRangePicker when changing the DT and refreshing the graph data
     $scope.$watch('vm.currentDeviceType', function () {
-      $('#daterangepickerFilter').removeClass('disabled-picker')
+      $('#daterangepickerFilter').removeClass('disabled-picker');
       refreshData();
     });
 
@@ -232,7 +232,7 @@
     function refreshData() {
       vm.ready = true;
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
-        getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end)
+        getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
       }
     }
 
@@ -250,7 +250,7 @@
         // if the device is the current device, push the value in the graph
         if (vm.currentDeviceType && deviceState.devicetype === vm.currentDeviceType.id) {
           dataDt.push({ x: deviceState.datetime, y: deviceState.value });
-          vm.chart.update()
+          vm.chart.update();
         }
       });
     }
@@ -261,9 +261,9 @@
       return deviceService.getFilteredStates(deviceType.id, startDate, endDate, 100 - vm.threshold)
         .then(function (data) {
           if (data.data.length !== 0) {
-            formatData(deviceType, data)
+            formatData(deviceType, data);
           } else {
-            notificationService.errorNotificationTranslated('CHART.NO_VALUES')
+            notificationService.errorNotificationTranslated('CHART.NO_VALUES');
           }
         });
     }
@@ -272,17 +272,27 @@
     function formatData(deviceType, data) {
       if (data.data.length > 0 || vm.currentDeviceType.id !== deviceType.id) {
         dataDt = data.data;
+
         // Logs the min and max values of the deviceState, to increase the Y axis
-        minY = (data.data.reduce((prev, current) => (prev.y < current.y) ? prev : current)).y;
-        maxY = (data.data.reduce((prev, current) => (prev.y > current.y) ? prev : current)).y;
-        filter.start = (data.data.reduce((prev, current) => (moment(prev.x).isBefore(moment(current.x))) ? prev : current)).x;
-        filter.end = (data.data.reduce((prev, current) => (moment(prev.x).isAfter(moment(current.x))) ? prev : current)).x;
+        minY = data.data.reduce(function (prev, current) {
+          return (prev.y < current.y ? prev : current).y;
+        });
+        maxY = data.data.reduce(function (prev, current) {
+          return (prev.y > current.y ? prev : current).y;
+        });
+        filter.start = data.data.reduce(function (prev, current) {
+          return (moment(prev.x).isBefore(moment(current.x)) ? prev : current).x;
+        });
+        filter.end = data.data.reduce(function (prev, current) {
+          return (moment(prev.x).isAfter(moment(current.x)) ? prev : current).x;
+        });
+        
         // Update the graph title
         labelDt = (deviceType.unit ? [deviceType.name + ' (' + deviceType.unit] + ')' : [deviceType.name]);
       }
       vm.currentDeviceType = deviceType;
       if (vm.displayMinMax) {
-        getMinMax()
+        getMinMax();
       } else {
         activateCharts();
       }
@@ -293,7 +303,7 @@
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
         var dateStart = moment(filter.start).format('YYYY-MM-DD HH:mm:ss');
         var dateEnd = moment(filter.end).format('YYYY-MM-DD HH:mm:ss');
-        return getFilteredDeviceStateMinMax(vm.currentDeviceType, dateStart, dateEnd)
+        return getFilteredDeviceStateMinMax(vm.currentDeviceType, dateStart, dateEnd);
       }
     }
 
@@ -303,39 +313,39 @@
       return deviceService.getFilteredStatesMinMax(deviceType.id, startDate, endDate)
         .then(function (data) {
           if (data.data.length !== 0) {
-            formatDataMinMax(deviceType, data)
+            formatDataMinMax(deviceType, data);
           } else {
-            notificationService.errorNotificationTranslated('CHART.NO_VALUES')
+            notificationService.errorNotificationTranslated('CHART.NO_VALUES');
           }
         });
     }
 
     function formatDataMinMax(deviceType, data) {
       if (data.data.length > 0 || vm.currentDeviceType.id !== deviceType.id) {
-        var minXY = data.data.map(dataMinXY)
-        var maxXY = data.data.map(dataMaxXY)
-        dataMin = minXY.map(jsonXY)
-        dataMax = maxXY.map(jsonXY)
+        var minXY = data.data.map(dataMinXY);
+        var maxXY = data.data.map(dataMaxXY);
+        dataMin = minXY.map(jsonXY);
+        dataMax = maxXY.map(jsonXY);
         activateCharts();
       }
     }
 
     function dataMinXY(item) {
-      var minX = moment(item.datetime).format('YYYY-MM-DD 03:00:00')
+      var minX = moment(item.datetime).format('YYYY-MM-DD 03:00:00');
       minX = (moment(item.datetime).isAfter(moment(filter.start))) ? minX : moment(filter.start);
       minX = (moment(minX).endOf('day').isBefore(moment(filter.end))) ? minX : moment(filter.end);
       return [minX, item.min];
     }
 
     function dataMaxXY(item) {
-      var maxX = moment(item.datetime).format('YYYY-MM-DD 15:00:00')
+      var maxX = moment(item.datetime).format('YYYY-MM-DD 15:00:00');
       maxX = (moment(item.datetime).isAfter(moment(filter.start))) ? maxX : moment(filter.start);
       maxX = (moment(maxX).endOf('day').isBefore(moment(filter.end))) ? maxX : moment(filter.end);
       return [maxX, item.max];
     }
 
     function jsonXY(item) {
-      return { "x": item[0], "y": item[1] };
+      return { 'x': item[0], 'y': item[1] };
     }
 
     function getLanguageCurrentUser() {
@@ -352,26 +362,26 @@
         $translate('APPLY')
           .then(function (text) {
             config.locale.applyLabel = text;
-          })
+          });
         $translate('CANCEL')
           .then(function (text) {
             config.locale.cancelLabel = text;
-          })
+          });
         $translate('CHART.CUSTOM_RANGE_LABEL')
           .then(function (text) {
             config.locale.customRangeLabel = text;
-          })
+          });
 
         // Translates the dateRangePicker's range into the user's language
         Object.getOwnPropertyNames(config.ranges).forEach(function (labelRange) {
-          var label = labelRange.replace(RegExp(" ", 'g'), "_")
-          label = label.toUpperCase()
+          var label = labelRange.replace(RegExp(' ', 'g'), '_');
+          label = label.toUpperCase();
           $translate('CHART.' + label.toUpperCase())
             .then(function (text) {
               config.ranges[text] = config.ranges[labelRange];
-              delete config.ranges[labelRange]
-            })
-        })
+              delete config.ranges[labelRange];
+            });
+        });
         resolve();
       });
     }
