@@ -93,7 +93,7 @@
                 displayFormats: {
                   second: 'LT',
                   minute: 'LT',
-                  hour: 'l[, ]LT',
+                  hour: 'LT',
                   day: 'l',
                   week: 'l',
                   month: 'l'
@@ -187,17 +187,17 @@
         
         // Logs the min and max values of the deviceState, to increase the Y axis
         minY = data.data.reduce(function (prev, current) {
-          return (prev.y < current.y ? prev : current).y;
-        });
+          return (prev.y < current.y ? prev : current);
+        }).y;
         maxY = data.data.reduce(function (prev, current) {
-          return (prev.y > current.y ? prev : current).y;
-        });
+          return (prev.y > current.y ? prev : current);
+        }).y;
         filter.start = data.data.reduce(function (prev, current) {
-          return (moment(prev.x).isBefore(moment(current.x)) ? prev : current).x;
-        });
+          return (moment(prev.x).isBefore(moment(current.x)) ? prev : current);
+        }).x;
         filter.end = data.data.reduce(function (prev, current) {
-          return (moment(prev.x).isAfter(moment(current.x)) ? prev : current).x;
-        });
+          return (moment(prev.x).isAfter(moment(current.x)) ? prev : current);
+        }).x;
         
         // Update the graph title
         labelDt = (deviceType.unit ? [deviceType.name + ' (' + deviceType.unit] + ')' : [deviceType.name]);
