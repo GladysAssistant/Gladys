@@ -1,0 +1,20 @@
+FROM arm32v7/node:8
+
+# Add tzdata for timezone settings
+RUN apt-get update && apt-get install -y tzdata
+
+# Create src folder
+RUN mkdir /src
+
+WORKDIR /src
+ADD . /src
+
+RUN apt-get update && apt-get install -y make gcc g++ python git && \
+    yarn install --production && npm install -g grunt-cli && grunt buildProd && npm uninstall -g grunt-cli \
+    apt-get remove -y make gcc g++ pyton git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Export listening port
+EXPOSE 8080
+
+CMD ["node" ,"app.js"]
