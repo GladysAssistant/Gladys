@@ -1,4 +1,4 @@
-FROM arm32v7/node:8
+FROM arm32v7/node:8.12-stretch
 
 # Add tzdata for timezone settings
 RUN apt-get update && apt-get install -y tzdata
