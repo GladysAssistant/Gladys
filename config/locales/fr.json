@@ -591,5 +591,7 @@
   "gateway-rsa-public-key-fingerprint": "Empreinte de la clé publique RSA",
   "gateway-ecdsa-public-key-fingerprint": "Empreinte de la clé publique ECDSA",
   "gateway-connecting": "Génération des clés et connexion en cours...",
-  "gateway-login-error": "Votre email/mot de passe/code d'authentification à deux facteurs est invalide."
+  "gateway-login-error": "Votre email/mot de passe/code d'authentification à deux facteurs est invalide.",
+  "gateway-users-list": "Utilisateurs",
+  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance."
 }

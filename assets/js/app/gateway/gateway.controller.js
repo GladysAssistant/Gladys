@@ -19,6 +19,9 @@
       vm.error = null;
       vm.connecting = false;
 
+      vm.saveUsersKeys = saveUsersKeys;
+      vm.changeUserStatus = changeUserStatus;
+
       activate();
 
       function activate(){
@@ -54,7 +57,10 @@
         gatewayService.getStatus()
           .then(function(data){
             vm.connected = data.data.connected;
-            if (vm.connected) return getKeysFingerprint();
+            if (vm.connected) {
+              getKeysFingerprint();
+              getUsersKeys();
+            }
           });
       }
 
@@ -66,6 +72,25 @@
         gatewayService.getKeysFingerprint()
           .then(function(data) {
             vm.fingerprints = data.data;
+          });
+      }
+
+      function getUsersKeys() {
+        gatewayService.getUsersKeys()
+          .then(function(data) {
+            vm.users = data.data;
+          });
+      }
+
+      function changeUserStatus(index, userId, userAccepted){
+        vm.users[index].accepted = !userAccepted;
+        saveUsersKeys();
+      }
+
+      function saveUsersKeys() {
+        gatewayService.saveUsersKeys(vm.users)
+          .then(function() {
+
           });
       }
   }

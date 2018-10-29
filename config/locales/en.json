@@ -427,5 +427,7 @@
   "gateway-rsa-public-key-fingerprint": "RSA public key fingerprint",
   "gateway-ecdsa-public-key-fingerprint": "ECDSA public key fingerprint",
   "gateway-connecting": "Generating keys and connecting...",
-  "gateway-login-error": "Your email/password/two-factor code is invalid."
+  "gateway-login-error": "Your email/password/two-factor code is invalid.",
+  "gateway-users-list": "Users",
+  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not."
 }

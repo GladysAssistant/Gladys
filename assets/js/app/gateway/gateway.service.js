@@ -13,7 +13,9 @@
       var service = {
           login: login,
           getStatus: getStatus,
-          getKeysFingerprint: getKeysFingerprint
+          getKeysFingerprint: getKeysFingerprint,
+          getUsersKeys: getUsersKeys,
+          saveUsersKeys: saveUsersKeys
       };
 
       return service;
@@ -28,7 +30,15 @@
 
       function getKeysFingerprint() {
         return $http({method: 'GET', url: '/gateway/fingerprint' });
-    }
+      }
+      
+      function getUsersKeys() {
+        return $http({method: 'GET', url: '/gateway/user' });
+      }
+
+      function saveUsersKeys(users) {
+        return $http({method: 'PATCH', url: '/gateway/user', data: users });
+      }
       
   }
 })();
