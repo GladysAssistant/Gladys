@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+const crypto = require('crypto');
 
 module.exports.callApi = function(userId, controllerFunc, params, query, data, callback) {
   
@@ -62,4 +63,10 @@ module.exports.importControllers = function() {
   }
 
   return controllers;
+};
+
+module.exports.generateFingerprint = function generateFingerprint(key) {
+  var hash = crypto.createHash('sha256').update(key).digest('hex');
+  var withColons = hash.replace(/(.{2})(?=.)/g, '$1:');
+  return withColons;
 };

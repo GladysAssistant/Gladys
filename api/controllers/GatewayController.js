@@ -29,5 +29,18 @@ module.exports = {
     gladys.gateway.getKeysFingerprint()
       .then((fingerprints) => res.json(fingerprints))
       .catch(next);
-  }
+  },
+
+  getUsersKeys: function(req, res, next) {
+    gladys.gateway.getUsersKeys()
+      .then((users) => res.json(users))
+      .catch(next);
+  },
+
+  saveUsersKeys: function(req, res, next) {
+    gladys.gateway.saveUsersKeys(req.body)
+      .then(() => res.json({ success: true }))
+      .catch(next);
+  } 
+
 };

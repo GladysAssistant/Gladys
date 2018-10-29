@@ -1,34 +1,58 @@
 const callApi = require('./utils').callApi;
 const importControllers = require('./utils').importControllers;
+const { generateFingerprint } = require('./utils');
 
 var controllers = importControllers();
 var idRouteRegex = /\/\d+\//g;
 
-module.exports = function(data, cb) {
-  switch (data.type) {
-  case 'gladys-api-call':
-    var route = (data.options.method + ' ' + data.options.url).toLowerCase();
+module.exports = function(data, rawMessage, cb) {
 
-    var id = route.match(idRouteRegex);
-    route = route.replace(idRouteRegex, '/:id/');
+  return gladys.param.getValue('GLADYS_GATEWAY_USERS_KEYS')
+    .then((users) => {
 
-    var params = {};
+      var rsaPublicKey = generateFingerprint(rawMessage.rsaPublicKeyRaw);
+      var ecdsaPublicKey = generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
 
-    if (id && id.length > 0) {
-      params.id = id[0].replace(/\//g, '');
-    }
+      users = JSON.parse(users);
 
-    var controller = controllers[route];
-    if (!controller) {
-      return cb({ error_code: 'ROUTE_NOT_FOUND', error_message: `Route: ${route} not found` });
-    }
+      var found = users.find((user) => {
+        return (
+          user.rsa_public_key === rsaPublicKey
+          && user.ecdsa_public_key === ecdsaPublicKey
+        );
+      });
 
-    callApi(data.sender_id, controller, params, data.options.query, data.options.data, cb);
-    break;
-
-  default:
-    sails.log.warn(`Gladys Gateway: Unknown message type ${data.type}`);
-    cb(new Error('INVALID_MESSAGE_TYPE'));
-    break;
-  }
+      if(!found || found.accepted === false) {
+        sails.log.warn(`User not allowed to control this Gladys instance. Please accept this user in your Gladys dashboard to allow him to control this instance.`);
+        return Promise.reject(new Error('USER_NOT_ACCEPTED_LOCALLY'));
+      }
+      
+      switch (data.type) {
+      case 'gladys-api-call':
+        var route = (data.options.method + ' ' + data.options.url).toLowerCase();
+    
+        var id = route.match(idRouteRegex);
+        route = route.replace(idRouteRegex, '/:id/');
+    
+        var params = {};
+    
+        if (id && id.length > 0) {
+          params.id = id[0].replace(/\//g, '');
+        }
+    
+        var controller = controllers[route];
+    
+        if (!controller) {
+          return cb({ error_code: 'ROUTE_NOT_FOUND', error_message: `Route: ${route} not found` });
+        }
+    
+        callApi(data.sender_id, controller, params, data.options.query, data.options.data, cb);
+        break;
+    
+      default:
+        sails.log.warn(`Gladys Gateway: Unknown message type ${data.type}`);
+        cb(new Error('INVALID_MESSAGE_TYPE'));
+        break;
+      }
+    });
 };
