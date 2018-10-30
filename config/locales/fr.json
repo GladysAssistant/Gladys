@@ -350,9 +350,11 @@
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
   "house-box-description": "Vous pouvez définir ici votre maison dans Gladys. Pour la latitude et la longitude, vous pouvez utiliser Google Maps pour trouver la latitude et la longitude votre maison, et la rentrer au format (par exemple) : latitude = 42.1, longitude = 43.2. Rappel: Toutes ces données restent en locale sur votre machine, et ne sont jamais envoyées nulle part.",
+  "house-box-check-occupation-description": "Vous pouvez définir une fréquence de vérification de la présence d'habitant dans votre/vos maison(s).</br>Pour cela, il faut dispoer d'une une solution pour indiquer à Gladys votre présence régulière dans la maison. Par exemple, le module gladys-bluetooth permet cela au moyen d'équipement bluetooth. Il faut ensuite déclarer la fréquence de contrôle ainsi que le temps entre la dernière fois que Gladys a vu l'utilisateur à la maison et le moment ou Gladys considère que cet utilisateur a quitté la maison.",
   "room-box-title": "Pièces",
   "mode-box-title": "Modes",
   "mode-box-description": "Les modes sont des états que la maison peut prendre. Une maison peut être dans un et un seul mode à la fois.",
+  "room-box-check-occupation": "Vérification de la présence des habitants",
   "mode-code": "Code",
   "mode-name": "Nom",
   "mode-description": "Description",
@@ -500,6 +502,7 @@
   "tooltip-machine-name": "Donnez un nom à votre machine",
   "tooltip-machine-house-choice": "Sélectionnez la maison dans laquelle se trouve la machine",
   "tooltip-machine-host": "Renseignez l'adresse IP de votre machine",
+  "tooltip-machine-room-choice": "Sélectionnez la pièce dans laquelle se trouve la machine",
   "tooltip-mode-code": "Attribuez un code à votre état, il doit être unique et sans espace",
   "tooltip-mode-name": "Donnez lui un nom",
   "tooltip-mode-description": "Ajoutez une description pour vous",
@@ -549,6 +552,7 @@
   "Edit": "Editer",
   "Create-event": "Créer un événement",
   "New-event": "Nouvel événement",
+  "Never": "Jamais",
   "manage-area": "Gérer les zones",
   "how-create-area": "Comment créer une zone ?",
   "how-create-area-text": "Pour créer une zone faite un clic droit sur la carte à l'endroit où vous souhaitez créer cette zone et cliquez sur le bouton nouvelle zone, puis remplissez les champs.",
@@ -593,5 +597,7 @@
   "gateway-connecting": "Génération des clés et connexion en cours...",
   "gateway-login-error": "Votre email/mot de passe/code d'authentification à deux facteurs est invalide.",
   "gateway-users-list": "Utilisateurs",
-  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance."
+  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance.",
+  "Time before considering user left": "Durée pour considérer que l'utilisateur a quitté la maison",
+  "Verification frequency": "Fréquence de vérification"
 }

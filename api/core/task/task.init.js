@@ -20,7 +20,7 @@ module.exports = function(cb){
   gladys.alarm.checkAllAutoWakeUp();
 
   gladys.gateway.init();
-  
+
   if(sails.config.environment !== 'production') {
     return cb();   
   }
@@ -74,4 +74,15 @@ module.exports = function(cb){
     gladys.module.checkUpdate();
   }, sails.config.update.checkUpdateInterval);  
  
+  // Run occupation check for houses if activated
+  gladys.house.getAll()
+    .then((houses) => {
+      houses.map(function(house) {
+        if(house.check_interval > 0) {
+          setInterval(function() {
+            gladys.house.checkUsersPresencePerHouse(house);
+          }, house.check_interval*60000);
+        }
+      });
+    });
 };

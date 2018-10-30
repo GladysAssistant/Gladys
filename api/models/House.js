@@ -39,6 +39,16 @@ module.exports = {
     longitude: {
       type: 'float',
       required: true
+    },
+
+    check_interval: {
+      type: 'integer',
+      defaultsTo: 0
+    },
+    
+    time_before_left: {
+      type: 'integer',
+      defaultsTo: 6
     }
   }
 };

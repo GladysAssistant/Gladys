@@ -21,3 +21,4 @@ module.exports.update = require('./house.update.js');
 module.exports.userSeen = require('./house.userSeen.js');
 module.exports.isUserAsleep = require('./house.isUserAsleep.js');
 module.exports.isMode = require('./house.isMode.js');
+module.exports.checkUsersPresencePerHouse = require('./house.checkUsersPresencePerHouse.js');
