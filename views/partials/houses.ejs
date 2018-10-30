@@ -69,36 +69,31 @@
           <%= __('house-box-check-occupation-description') %>
         </p>
 
-        <div class="row">
-            <div class="col-sm-12 col-xs-12 col-md-8 col-lg-6">
-            
-                <table id="check_interval" class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th><%= __('Name') %></th>
-                            <th><%= __('Verification') %></th>
-                            <th><%= __('Verification frequency') %></th>
-                            <th><%= __('Time before considering user left') %></th>
-                        </tr>
-                    </thead>
-                    <tr ng-repeat="house in vm.houses" class="ng-cloak">
-                        <td>{{house.name}}</td>
-                        <td>
-                            <div class="toogle" ng-click="vm.toggleHouseCheck(house)">
-                               <input type="checkbox" ng-model="house.check" class="toogle-checkbox toogle-blue" ng-true-value="1" ng-false-value="0"/>
-                                <label class="toogle-label" for="mytoogle"></label>
-                            </div>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" ng-disabled="!house.check" ng-change="vm.updateHouse(house)" ng-model="house.check_interval" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" ng-disabled="!house.check" ng-change="vm.updateHouse(house)" ng-model="house.time_before_left" />
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+        <table id="check_interval" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th><%= __('Name') %></th>
+                    <th><%= __('Verification') %></th>
+                    <th><%= __('Verification frequency') %></th>
+                    <th><%= __('Time before considering user left') %></th>
+                </tr>
+            </thead>
+            <tr ng-repeat="house in vm.houses" class="ng-cloak">
+                <td>{{house.name}}</td>
+                <td>
+                    <div class="toogle" ng-click="vm.toggleHouseCheck(house)">
+                       <input type="checkbox" ng-model="house.check" class="toogle-checkbox toogle-blue" ng-true-value="1" ng-false-value="0"/>
+                        <label class="toogle-label" for="mytoogle"></label>
+                    </div>
+                </td>
+                <td>
+                    <input type="text" class="form-control" ng-disabled="!house.check" ng-change="vm.updateHouse(house)" ng-model="house.check_interval" />
+                </td>
+                <td>
+                    <input type="text" class="form-control" ng-disabled="!house.check" ng-change="vm.updateHouse(house)" ng-model="house.time_before_left" />
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 

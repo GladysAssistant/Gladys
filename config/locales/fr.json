@@ -350,7 +350,7 @@
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
   "house-box-description": "Vous pouvez définir ici votre maison dans Gladys. Pour la latitude et la longitude, vous pouvez utiliser Google Maps pour trouver la latitude et la longitude votre maison, et la rentrer au format (par exemple) : latitude = 42.1, longitude = 43.2. Rappel: Toutes ces données restent en locale sur votre machine, et ne sont jamais envoyées nulle part.",
-  "house-box-check-occupation-description": "Vous pouvez définir une fréquence de vérification de la présence d'habitant dans votre/vos maison(s).</br>Pour cela, il faut dispoer d'une une solution pour indiquer à Gladys votre présence régulière dans la maison. Par exemple, le module gladys-bluetooth permet cela au moyen d'équipement bluetooth. Il faut ensuite déclarer la fréquence de contrôle ainsi que le temps entre la dernière fois que Gladys a vu l'utilisateur à la maison et le moment ou Gladys considère que cet utilisateur a quitté la maison.",
+  "house-box-check-occupation-description": "Vous pouvez définir une fréquence de vérification de la présence d'habitant dans votre/vos maison(s). Pour cela, il faut dispoer d'une une solution pour indiquer à Gladys votre présence régulière dans la maison. Par exemple, le module gladys-bluetooth permet cela au moyen d'équipement bluetooth. Il faut ensuite déclarer la fréquence de contrôle ainsi que le temps entre la dernière fois que Gladys a vu l'utilisateur à la maison et le moment ou Gladys considère que cet utilisateur a quitté la maison.",
   "room-box-title": "Pièces",
   "mode-box-title": "Modes",
   "mode-box-description": "Les modes sont des états que la maison peut prendre. Une maison peut être dans un et un seul mode à la fois.",
