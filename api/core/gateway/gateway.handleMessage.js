@@ -24,7 +24,12 @@ module.exports = function(data, rawMessage, cb) {
 
       if(!found || found.accepted === false) {
         sails.log.warn(`User not allowed to control this Gladys instance. Please accept this user in your Gladys dashboard to allow him to control this instance.`);
-        return Promise.reject(new Error('USER_NOT_ACCEPTED_LOCALLY'));
+        
+        return cb({
+          status: 403,
+          error_code: 'USER_NOT_ACCEPTED_LOCALLY',
+          error_message: 'User not allowed to control this Gladys instance'
+        });
       }
       
       switch (data.type) {
