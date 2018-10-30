@@ -50,7 +50,7 @@
     }
 }
   
-.circle {
+.btn-outer.circle, .btn-inner.circle {
     border-radius: 50% !important;
     padding: 0px !important;
     margin:0px !important;
