@@ -15,6 +15,7 @@ module.exports = {
     JOIN devicetype dt ON d.id = dt.device
     JOIN room ON d.room = room.id
     WHERE ( room.id = ? OR ? IS NULL )
+    AND (dt.display = ? OR ? IS NULL)
   `,
   getByRoom: `
    SELECT d.name, dt.id, dt.type, dt.category, dt.tag, dt.unit, dt.min, dt.max, dt.display, dt.sensor, d.identifier, dt.device, d.service,

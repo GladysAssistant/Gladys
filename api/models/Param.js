@@ -19,9 +19,9 @@ module.exports = {
     module: {
       model: 'Module'
     },
-
+    
     value: {
-      type: 'string',
+      type: 'text',
       required: true
     }
   }
