@@ -1,6 +1,5 @@
 const shared = require('./shared');
 const Promise = require('bluebird');
-const { generateFingerprint } = require('./utils');
 
 module.exports = function() {
   
@@ -19,11 +18,11 @@ module.exports = function() {
       }
 
       // we add to online users the list of local users, with the accepted = false flag
-      onlineUsers.forEach((onlineUser) => {
+      onlineUsers.forEach(async (onlineUser) => {
         
         // save keys as fingerprint
-        onlineUser.ecdsa_public_key = generateFingerprint(onlineUser.ecdsa_public_key);
-        onlineUser.rsa_public_key = generateFingerprint(onlineUser.rsa_public_key);
+        onlineUser.ecdsa_public_key = await shared.gladysGatewayClient.generateFingerprint(onlineUser.ecdsa_public_key);
+        onlineUser.rsa_public_key = await shared.gladysGatewayClient.generateFingerprint(onlineUser.rsa_public_key);
 
         var found = localUsers.find((elem) => {
           return (
