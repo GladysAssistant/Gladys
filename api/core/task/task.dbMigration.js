@@ -90,6 +90,17 @@ module.exports = function(oldVersion) {
 
   }
 
+  if(semver.lt(oldVersion, '3.11.0')) {
+
+    // modify param column, enable longer param
+    return gladys.utils.sql(`ALTER TABLE param MODIFY COLUMN value longtext;`).reflect()
+
+      // finishing migration
+      .then(() => gladys.task.updateDbVersion('3.11.0'))
+      .then(() => gladys.task.dbMigration('3.11.0'));
+
+  }
+
   // default, we save in DB the current version of Gladys
   return gladys.task.updateDbVersion(gladys.version);
 };
