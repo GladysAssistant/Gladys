@@ -36,6 +36,9 @@
             return getKeysFingerprint();
           })
           .then(function() {
+            return getUsersKeys();
+          })
+          .then(function() {
             vm.connected = true;
             vm.connecting = false;
           })
