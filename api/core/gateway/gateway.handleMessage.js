@@ -1,6 +1,6 @@
 const callApi = require('./utils').callApi;
 const importControllers = require('./utils').importControllers;
-const { generateFingerprint } = require('./utils');
+const shared = require('./shared');
 
 var controllers = importControllers();
 var idRouteRegex = /\/\d+\//g;
@@ -8,10 +8,10 @@ var idRouteRegex = /\/\d+\//g;
 module.exports = function(data, rawMessage, cb) {
 
   return gladys.param.getValue('GLADYS_GATEWAY_USERS_KEYS')
-    .then((users) => {
+    .then(async (users) => {
 
-      var rsaPublicKey = generateFingerprint(rawMessage.rsaPublicKeyRaw);
-      var ecdsaPublicKey = generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
+      var rsaPublicKey = await shared.gladysGatewayClient.generateFingerprint(rawMessage.rsaPublicKeyRaw);
+      var ecdsaPublicKey = await shared.gladysGatewayClient.generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
 
       users = JSON.parse(users);
 
