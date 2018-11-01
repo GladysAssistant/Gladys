@@ -3,98 +3,91 @@
   'use strict';
 
   angular
-      .module('gladys')
-      .controller('GatewayCtrl', GatewayCtrl);
+    .module('gladys')
+    .controller('GatewayCtrl', GatewayCtrl);
 
-  GatewayCtrl.$inject = ['gatewayService'];
+  GatewayCtrl.$inject = ['gatewayService', '$scope'];
 
-  function GatewayCtrl(gatewayService) {
-      /* jshint validthis: true */
-      var vm = this;
-      
-      vm.login = login;
-      vm.reconnect = reconnect;
+  function GatewayCtrl(gatewayService, $scope) {
+    /* jshint validthis: true */
+    var vm = this;
+    
+    vm.login = login;
+    vm.reconnect = reconnect;
 
-      vm.connected = null;
+    vm.connected = null;
+    vm.error = null;
+    vm.connecting = false;
+
+    vm.saveUsersKeys = saveUsersKeys;
+    vm.changeUserStatus = changeUserStatus;
+
+    activate();
+
+    function activate(){
+      subscribe();
+      refreshStatus();
+    }
+
+    function subscribe() {
+      io.socket.on('gladysGatewayLoginError', function (error) {
+        vm.connecting = false;
+        vm.error = error.error_code;
+        $scope.$apply();
+      });
+
+      io.socket.on('gladysGatewayLoginSuccess', function (error) {
+        vm.connecting = false;
+        refreshStatus();
+      });
+    }
+
+    function login() {
       vm.error = null;
-      vm.connecting = false;
+      vm.connecting = true;
+      
+      gatewayService.login(vm.email, vm.password, vm.twoFactorCode);
+    }
 
-      vm.saveUsersKeys = saveUsersKeys;
-      vm.changeUserStatus = changeUserStatus;
+    function refreshStatus() {
+      gatewayService.getStatus()
+        .then(function(data){
+          vm.connected = data.data.connected;
+          if (vm.connected) {
+            getKeysFingerprint();
+            getUsersKeys();
+          }
+        });
+    }
 
-      activate();
+    function reconnect() {
+      vm.connected = false;
+    }
 
-      function activate(){
-        getStatus();
-      }
+    function getKeysFingerprint() {
+      gatewayService.getKeysFingerprint()
+        .then(function(data) {
+          vm.fingerprints = data.data;
+        });
+    }
 
-      function login() {
-        vm.error = null;
-        vm.connecting = true;
-        gatewayService.login(vm.email, vm.password, vm.twoFactorCode)
-          .then(function() {
-            return getKeysFingerprint();
-          })
-          .then(function() {
-            return getUsersKeys();
-          })
-          .then(function() {
-            vm.connected = true;
-            vm.connecting = false;
-          })
-          .catch(function(err) {
-            vm.connecting = false;
-            if(err && err.status === 403) {
-              if(err.data && err.data.code && err.data.code === '2FA_NOT_ENABLED') {
-                vm.error = '2FA_NOT_ENABLED';
-              } else {
-                vm.error = 'INVALID_LOGIN';
-              }
-            } else {
-              vm.error = 'INVALID_LOGIN';
-            }
-          });
-      }
+    function getUsersKeys() {
+      gatewayService.getUsersKeys()
+        .then(function(data) {
+          vm.users = data.data;
+        });
+    }
 
-      function getStatus() {
-        gatewayService.getStatus()
-          .then(function(data){
-            vm.connected = data.data.connected;
-            if (vm.connected) {
-              getKeysFingerprint();
-              getUsersKeys();
-            }
-          });
-      }
+    function changeUserStatus(index, userId, userAccepted){
+      vm.users[index].accepted = !userAccepted;
+      saveUsersKeys();
+    }
 
-      function reconnect() {
-        vm.connected = false;
-      }
+    function saveUsersKeys() {
+      gatewayService.saveUsersKeys(vm.users)
+        .then(function() {
 
-      function getKeysFingerprint() {
-        gatewayService.getKeysFingerprint()
-          .then(function(data) {
-            vm.fingerprints = data.data;
-          });
-      }
-
-      function getUsersKeys() {
-        gatewayService.getUsersKeys()
-          .then(function(data) {
-            vm.users = data.data;
-          });
-      }
-
-      function changeUserStatus(index, userId, userAccepted){
-        vm.users[index].accepted = !userAccepted;
-        saveUsersKeys();
-      }
-
-      function saveUsersKeys() {
-        gatewayService.saveUsersKeys(vm.users)
-          .then(function() {
-
-          });
-      }
+        });
+    }
   }
 })();

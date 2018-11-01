@@ -420,6 +420,8 @@
   "gateway-left-explanation-know-more": "Read more",
   "gladys-gateway-login-error": "Invalid email/password",
   "gladys-gateway-2fa-error": "Two Factor Authentication is not enabled in your account. Please enable it before login in here.",
+  "gateway-server-error": "An unknown error happened. Please retry. For more informations, look at Gladys logs.",
+  "gateway-user-not-found": "There are no account on the Gladys Gateway with this email.",
   "gateway-connected-sentence": " Your Gladys instance is connected to the Gladys Gateway and will receive any command. If you want to reconnect, click",
   "gateway-connected-click-here": "here",
   "gateway-login-title": "Login to your Gladys Gateway account",
