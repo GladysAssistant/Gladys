@@ -1,7 +1,7 @@
 module.exports = {
 
   login: function(req, res, next) {
-    gladys.gateway.login(req.body.email, req.body.password, req.body.two_factor_code)
+    gladys.gateway.login(req.body.email, req.body.password, req.body.two_factor_code);
     res.json({ message: 'key generation and login started...'});
   },
 
