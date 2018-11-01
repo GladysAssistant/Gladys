@@ -350,7 +350,7 @@
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
   "house-box-description": "Vous pouvez définir ici votre maison dans Gladys. Pour la latitude et la longitude, vous pouvez utiliser Google Maps pour trouver la latitude et la longitude votre maison, et la rentrer au format (par exemple) : latitude = 42.1, longitude = 43.2. Rappel: Toutes ces données restent en locale sur votre machine, et ne sont jamais envoyées nulle part.",
-  "house-box-check-occupation-description": "Vous pouvez définir une fréquence de vérification de la présence d'habitant dans votre/vos maison(s). Pour cela, il faut dispoer d'une une solution pour indiquer à Gladys votre présence régulière dans la maison. Par exemple, le module gladys-bluetooth permet cela au moyen d'équipement bluetooth. Il faut ensuite déclarer la fréquence de contrôle ainsi que le temps entre la dernière fois que Gladys a vu l'utilisateur à la maison et le moment ou Gladys considère que cet utilisateur a quitté la maison.",
+  "house-box-check-occupation-description": "Vous pouvez activer la vérification cyclique de présence d'habitant dans votre/vos maison(s). Pour cela, il faut au paravant dispoer d'une une solution pour indiquer à Gladys votre présence régulière dans la maison. Par exemple, le module gladys-bluetooth permet cela au moyen d'équipement bluetooth. Cette vérification a lieu toutes les minutes par défaut, et Gladys consiidère qu'un habitant a quitté la maison s'il n'a pas été vu depuis 10min. Ces 2 valeurs peuvent être changé par des paramètres USER_CHECK_PRESENCE_FREQUENCY et USER_TIME_BEFORE_CONSIDERING_LEFT_HOME.",
   "room-box-title": "Pièces",
   "mode-box-title": "Modes",
   "mode-box-description": "Les modes sont des états que la maison peut prendre. Une maison peut être dans un et un seul mode à la fois.",
@@ -597,7 +597,5 @@
   "gateway-connecting": "Génération des clés et connexion en cours...",
   "gateway-login-error": "Votre email/mot de passe/code d'authentification à deux facteurs est invalide.",
   "gateway-users-list": "Utilisateurs",
-  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance.",
-  "Time before considering user left": "Durée pour considérer que l'utilisateur a quitté la maison",
-  "Verification frequency": "Fréquence de vérification"
+  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance."
 }

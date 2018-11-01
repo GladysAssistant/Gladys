@@ -19,7 +19,6 @@
         vm.getHouses = getHouses;
         vm.getRooms = getRooms;
         vm.toggleHouseCheck = toggleHouseCheck;
-        vm.updateHouse = updateHouse;
         vm.newHouse = {};
         vm.newRoom = {};
         
@@ -93,11 +92,7 @@
         function getHouses(options) {
             return houseService.get(options)
                 .then(function(data){
-                    vm.houses = data.data.map(function(house) {
-                        // ifcheck intervail > 0 it means check is active
-                        if(house.check_interval > 0) {house.check = 1} else { house.check = 0}
-                        return house;
-                    });
+                    vm.houses = data.data;
                 });
         }
 
@@ -111,23 +106,10 @@
         function toggleHouseCheck(house) {
             if(house.check === 0) {
                 house.check = 1;
-                house.check_interval = 5;
             } else {
                 house.check = 0;
-                house.check_interval = 0
             }
-            return updateHouse(house);
-        }
-
-        function updateHouse(house) {
-            return houseService.update(house.id, house)
-                .then(function(data) {
-                    house = data.data
-                    if(house.check_interval > 0) {house.check = 1} else { house.check = 0}
-                    for(var i = 0; i < vm.houses.length; i++) {
-                        if(vm.houses[i].id === house.id) vm.houses.splice(i, 1, house)
-                    };
-                });
+            return houseService.update(house.id, house);
         }
 
         function resetNewHouseFields() {

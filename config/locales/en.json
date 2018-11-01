@@ -188,7 +188,7 @@
   "area-tooltip-radius": "Enter a radius in meters e. g. 25",
   "house-box-title": "Houses",
   "house-box-description": "You can define here your houses in Gladys. Latitude and longitude can be found on Google Maps, and must be entered with the format (example): Latitude = 42.1, Longitude = 40.1. Remember, all this is saved on your machine and do not leave your Gladys installation.",
-  "house-box-check-occupation-description": "You can ask Gladys to check if your house is occupied by inhabitants at a given frequency. You need to tell Gladys that you are at home with, for exemple, the gladys-bluetooth module which can check your presence with a smartband or any smart bluetooth device. One setup, you have to fix the frequency Gladys will check occupation, and the time between the last time user has been seen and the moment Gladys consider this user has left house.",
+  "house-box-check-occupation-description": "You can ask Gladys to check if your house is occupied by inhabitants at a given frequency. You need to tell Gladys that you are at home with, for exemple, the gladys-bluetooth module which can check your presence with a smartband or any smart bluetooth device. By default, Gladys will check every minute, and consider user has left house after 10min missing. Those values can be modified by parameters USER_CHECK_PRESENCE_FREQUENCY and USER_TIME_BEFORE_CONSIDERING_LEFT_HOME.",
   "room-box-title": "Rooms",
   "mode-box-title": "Modes",
   "mode-box-description": "Modes are states the house can take. A house can be in one and only one mode at the same time.",
@@ -432,7 +432,5 @@
   "gateway-connecting": "Generating keys and connecting...",
   "gateway-login-error": "Your email/password/two-factor code is invalid.",
   "gateway-users-list": "Users",
-  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not.",
-  "Time before considering user left": "Time before considering user's left",
-  "Verification frequency": "Verification frequency"
+  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not."
 }

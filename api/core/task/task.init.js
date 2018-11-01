@@ -75,13 +75,22 @@ module.exports = function(cb){
   }, sails.config.update.checkUpdateInterval);  
  
   // Run occupation check for houses if activated
-  gladys.house.getAll()
-    .then((houses) => {
+  gladys.param.getValue('USER_CHECK_PRESENCE_FREQUENCY')
+    .then((checkFrequency) => {
+      return checkFrequency;
+    })
+    .catch(() => {
+      return 1;
+    })
+    .then((checkFrequency) => {
+      return [checkFrequency, gladys.house.getAll()];
+    })
+    .spread((checkFrequency, houses) => {
       houses.map(function(house) {
-        if(house.check_interval > 0) {
+        if(house === 1) {
           setInterval(function() {
             gladys.house.checkUsersPresencePerHouse(house);
-          }, house.check_interval*60000);
+          }, checkFrequency*60000);
         }
       });
     });

@@ -41,14 +41,9 @@ module.exports = {
       required: true
     },
 
-    check_interval: {
+    check: {
       type: 'integer',
       defaultsTo: 0
-    },
-    
-    time_before_left: {
-      type: 'integer',
-      defaultsTo: 6
     }
   }
 };
