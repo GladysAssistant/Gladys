@@ -1,65 +1,49 @@
 const Promise = require('bluebird');
 
-module.exports = function enterArea(location) {
+module.exports = function (location){
+
+  var newAreas = [];
+  var leftAreas = [];
+  var accuracy = location.accuracy || 0;
 
   return Promise.all([
-    gladys.area.inArea(location),
+    gladys.area.getDistance(location),
     gladys.area.userIn({id: location.user})
   ])
-    .spread((areas, lastAreasUser) => {
+    .spread((areasByDistance, lastAreasUser) => {
 
-      areas.forEach(function(area){
-        sails.log.info(`User ${location.user} detected in area ${area.name}`); 
+      lastAreasUser.forEach(function(lastArea) {
+        areasByDistance.forEach(function(areaDistance) {
+          // We check for each area where the user is inside, if the user has left it (ie: distance  > radius + accuracy), if so, we push the area in leftAreas
+          if(areaDistance.id === lastArea.id && areaDistance.distance > (areaDistance.radius + accuracy)) {
+            leftAreas.push(areaDistance);
+          }
+          if(areaDistance.id === lastArea.id && areaDistance.distance <= (areaDistance.radius + accuracy)) {
+            // user stil in this area, we just log it
+            sails.log.info(`User ${location.user} detected in area ${areaDistance.name}`);
+          }
+        });
       });
-                
-      // we remove the areas where the user was already in
-      var newAreas = removeDuplicateArea(lastAreasUser, areas);
-      var leftAreas = findLeftAreas(lastAreasUser, areas);
-        
+
+      // Then, we check the opposite. Did the user entered a new area ?
+      // Firf we remove all the areas the user is in from array aresByDistance
+      for(var i = areasByDistance.length - 1; i >= 0; i--){
+        for( var j = 0; j < lastAreasUser.length; j++){
+          if(areasByDistance[i] && (areasByDistance[i].id === lastAreasUser[j].id)) {
+            areasByDistance.splice(i, 1);
+          }
+        };
+      };
+
+      // Then for all this areas, we check the user has not entered in (with strict distance verification (we don't take accuracy into account here)
+      areasByDistance.forEach(function(areaDistance) {
+        if(areaDistance.distance < areaDistance.radius) {
+          newAreas.push(areaDistance);
+          sails.log.info(`User ${location.user} detected in area ${areaDistance.name}`);
+        }
+      });
+
+      // we now have an array of areas the user in
       return {newAreas, leftAreas};
     });
 };
-
-
-function findLeftAreas(lastAreasUser, areas){
-    
-  var leftAreas = [];
-    
-  lastAreasUser.forEach(function(lastAreaUser){
-    var found = false;
-    var i = 0;
-    while(!found && i < areas.length){
-      if(areas[i].id === lastAreaUser.id){
-        found = true;
-      }
-      i++;
-    }
-    if(!found){
-      leftAreas.push(lastAreaUser);
-    }
-  });
-    
-  return leftAreas;
-}
-
-function removeDuplicateArea(lastAreasUser, areas){
-    
-  var newAreas = [];
-    
-  // foreach new area, we test if the area is
-  // present in the old area (means that the user did not enter the area)
-  areas.forEach(function(area){
-    var found = false;
-    var i = 0;
-    while(!found && i < lastAreasUser.length){
-      if(lastAreasUser[i].id === area.id){
-        found = true;
-      }
-      i++;
-    }
-    if(!found){
-      newAreas.push(area);
-    }
-  });
-  return newAreas;
-}
