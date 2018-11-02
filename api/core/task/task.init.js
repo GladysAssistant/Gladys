@@ -18,6 +18,8 @@ module.exports = function(cb){
 
 
   gladys.alarm.checkAllAutoWakeUp();
+
+  gladys.gateway.init();
   
   if(sails.config.environment !== 'production') {
     return cb();   

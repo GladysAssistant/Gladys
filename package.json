@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "3.10.3",
+  "version": "3.11.3",
   "description": "Your personnal assistant, always here.",
   "scripts": {
     "start": "NODE_ENV=development node app.js",
@@ -22,6 +22,7 @@
     "gladys": "./app.js"
   },
   "dependencies": {
+    "@gladysproject/gladys-gateway-js": "^1.0.5",
     "barrels": "^1.6.5",
     "bcrypt": "3.0.0",
     "bluebird": "^3.5.0",
@@ -49,6 +50,8 @@
     "limdu": "0.9.4",
     "moment": "^2.18.1",
     "node-schedule": "^1.2.4",
+    "node-webcrypto-ossl": "^1.0.38",
+    "os-utils": "^0.0.14",
     "rc": "^1.2.1",
     "request": "^2.81.0",
     "sails": "^0.12.13",
