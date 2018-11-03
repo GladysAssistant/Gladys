@@ -73,8 +73,7 @@ module.exports = {
    * @apiGroup DeviceState
    * @apiPermission authenticated
    *
-   * @apiParam {Integer} take the number of deviceState to return
-   * @apiParam {Integer} skip the number of deviceState to skip
+   * @apiParam {threshold} Pourcentage of data smoothing, from 0% (no smoothing, all values are displayed), to 98% (maximum smoothing).
    * @apiParam {Date} startDate the date from which you want deviceState
    * @apiParam {Date} endDate the date until which you want deviceState
    *
@@ -87,6 +86,18 @@ module.exports = {
       })
       .catch(next);
   },
+
+  /**
+   * @api {get} /devicestate/filtered/minmax get min and max deviceStates filtered by date range
+   * @apiName getDeviceStateFilteredMinMax
+   * @apiGroup DeviceState
+   * @apiPermission authenticated
+   *
+   * @apiParam {Date} startDate the date from which you want deviceState
+   * @apiParam {Date} endDate the date until which you want deviceState
+   *
+   * @apiUse DeviceStateSuccess
+   */
 
   filteredMinMax: function(req, res, next) {
     gladys.deviceState.getFilteredMinMax(req.query)

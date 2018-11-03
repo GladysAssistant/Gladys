@@ -1,5 +1,5 @@
 var queries = require('./deviceState.queries.js');
-var downsampler = require("downsample-lttb");
+var downsampler = require('downsample-lttb');
 
 /**
  * @public
@@ -21,23 +21,27 @@ var downsampler = require("downsample-lttb");
  *          // do something
  *      })
  */
+
 module.exports = function getFiltered(options){
-  options.threshold = parseInt(options.threshold) || 50;
+
+  if(!options.threshold && options.threshold != 0) {
+    options.threshold = 50;
+  };
 
   if(options.devicetype) {
     return gladys.utils.sql(queries.getByDeviceTypeFiltered, [options.devicetype, options.startDate, options.endDate])
       .then((states) => {
-        return downsampled(states,options.threshold)
+        return downsampled(states, options.threshold);
       });
   } else {
     return gladys.utils.sql(queries.getFiltered, [options.startDate, options.endDate])
       .then((states) => {
-        return downsampled(states,options.threshold)
+        return downsampled(states, options.threshold);
       });
   }
 };
 
-function downsampled(states,threshold) {
+function downsampled(states, threshold) {
   var XY = states.map(dataXY); //conversion to [[X,Y0],...,[Xn,Yn]]
   var downsampledXY = downsampler.processData(XY, Math.round(Object.keys(XY).length * threshold / 100)); //Downsampling at 'threshold' %
   return downsampledXY.map(jsonXY); // conversion to [{datetime:D0, value:Y0},...,{datetime:Dn, value:Yn}]
@@ -45,11 +49,11 @@ function downsampled(states,threshold) {
 };
 
 function dataXY(item) {
-  var XY = [item.datetime,item.value];
+  var XY = [item.datetime, item.value];
   return XY;
 };
 
 function jsonXY(item) {
-  var XY = {"x":item[0], "y":item[1]};
+  var XY = {'x':item[0], 'y':item[1]};
   return XY;
 };

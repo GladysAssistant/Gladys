@@ -91,11 +91,11 @@
     }
 
     function getFilteredStates(deviceType, startDate, endDate, threshold){
-      return $http({method: 'GET', url: '/devicestate/filtered', params: {devicetype: deviceType, startDate: startDate ,endDate: endDate, threshold: threshold}});
+      return $http({method: 'GET', url: '/devicestate/filtered', params: {devicetype: deviceType, startDate: startDate, endDate: endDate, threshold: threshold}});
     }
 
     function getFilteredStatesMinMax(deviceType, startDate, endDate){
-      return $http({method: 'GET', url: '/devicestate/filtered/minmax', params: {devicetype: deviceType, startDate: startDate ,endDate: endDate}});
+      return $http({method: 'GET', url: '/devicestate/filtered/minmax', params: {devicetype: deviceType, startDate: startDate, endDate: endDate}});
     }
   }
 })();
