@@ -90,7 +90,7 @@ To do so, you'll have to create a `.env` file at the root of this project. The c
 **Note :** You will need to create the database as well in MySQL:
 
 ```sql
-CREATE DATABASE gladys; -- or whatever name you've set in your .env file.`
+CREATE DATABASE gladys CHARACTER SET utf8 COLLATE utf8_general_ci; -- or whatever name you've set in your .env file.`
 ```
 
 #### Compile assets
