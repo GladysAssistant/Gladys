@@ -18,8 +18,9 @@
     vm.currentSoundState = '';
     vm.currentChannel = '';
     vm.currentMuteState = '';
+    vm.multipleSource = false;
     vm.defaultSource = [{ label: 'TV' }];
-    vm.allSources = vm.defaultSource;
+    vm.allSources = defaultSource;
     vm.currentSource = vm.defaultSource[0].label;
     vm.currentDeviceName = '';
 
@@ -44,6 +45,8 @@
     vm.openMenu = openMenu;
     vm.rec = rec;
     vm.customCommand = customCommand;
+    vm.openInfo = openInfo;
+    vm.programVod = programVod;
 
     vm.thisChannel = null;
 
@@ -104,7 +107,6 @@
     }
 
     function getData(deviceId) {
-      console.log('getData-start');
       vm.devicetypes[deviceId].forEach(function(devicetype) {
         switch(devicetype.identifier){
         case 'Power':
@@ -126,7 +128,6 @@
           break;
         }
       });
-      console.log('getData-end');
     }
 
     function pressKey(key) {
@@ -140,15 +141,18 @@
       return televisionService.getSources({ device: vm.deviceId })
         .then(function (data) {
           if(data.status === 200){
-            if (data.data !== undefined || data.data.lenght != 0) {
+            if (data.data !== undefined && data.data > 0) {
               vm.allSources = data.data;
+              vm.multipleSource= true;
             }
           } else {
             vm.allSources = vm.defaultSource;
+            vm.multipleSource = false;
           }
         })
         .catch(function(data) {
           vm.allSources = vm.defaultSource;
+          vm.multipleSource = false;
         });
     }
 
@@ -281,6 +285,20 @@
     function customCommand(color) {
       return televisionService.customCommand({ device: vm.deviceId, color: color})
         .then(function() {
+
+        });
+    }
+    
+    function openInfo() {
+      return televisionService.openInfo({ device: vm.deviceId, controlType: 'openInfo' })
+        .then(function () {
+
+        });
+    }
+        
+    function programVod() {
+      return televisionService.programVod({ device: vm.deviceId, controlType: 'programVod' })
+        .then(function () {
 
         });
     }
