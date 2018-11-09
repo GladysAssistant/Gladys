@@ -334,7 +334,7 @@ module.exports = {
       .then(result => res.json(result))
       .catch(next);
   },
-    
+  
   /**
    * @api {post} /television/programPlus Program Plus
    * @apiName televisionProgramPlus
@@ -356,7 +356,7 @@ module.exports = {
    * @apiGroup television
    * @apiPermission authenticated
    *
-   * @apiUse televisionMinus
+   * @apiUse televisionParam
    */
   programMinus: function(req, res, next) {
     gladys.television
@@ -391,6 +391,23 @@ module.exports = {
   programVod: function(req, res, next) {
     gladys.television
       .programVod(req.body)
+      .then(result => res.json(result))
+      .catch(next);
+  },
+
+  /**
+   * @api {post} /television/getServices Get Services
+   * @apiName televisiongetServices
+   * @apiGroup television
+   * @apiPermission authenticated
+   *
+   * @apiUse televisionParam
+   *
+   * @apiSuccess {array} All television's services
+   */
+  getServices: function(req, res, next) {
+    gladys.television
+      .getServices(req.body)
       .then(result => res.json(result))
       .catch(next);
   }

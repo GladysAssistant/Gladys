@@ -18,11 +18,10 @@
     vm.currentSoundState = '';
     vm.currentChannel = '';
     vm.currentMuteState = '';
-    vm.multipleSource = false;
-    vm.defaultSource = [{ label: 'TV' }];
-    vm.allSources = defaultSource;
-    vm.currentSource = vm.defaultSource[0].label;
+    vm.allSources = '';
+    vm.currentSource = '';
     vm.currentDeviceName = '';
+    vm.availableService = '';
 
     vm.selectDevice = selectDevice;
 
@@ -62,7 +61,7 @@
         });
     }
 
-    function setBoxInformation(deviceId, deviceName){
+    function setBoxInformation(deviceId, deviceName, deviceService){
       vm.displayAskDeviceForm = false;
       vm.deviceId = deviceId;
       vm.currentDeviceName = deviceName;
@@ -70,8 +69,12 @@
       vm.currentSoundState = null;
       vm.currentChannel = null;
       vm.currentMuteState = null;
-      getData(deviceId);
-      getSources();
+      televisionService.getServices({'service':deviceService})
+        .then(function(data) {
+          vm.availableService = data.data;
+          getData(deviceId);
+          if (vm.availableService.getSources) {getSources();}               
+        });
     }
 
     function getDevices() {
@@ -90,7 +93,7 @@
             vm.devices.push({id:deviceId[1], name:deviceId[0]});
           });
           if (vm.box.params && vm.box.params.deviceId) {
-            setBoxInformation(vm.box.params.deviceId, vm.box.params.name);
+            setBoxInformation(vm.box.params.deviceId, vm.box.params.name, vm.box.params.service);
           } else {
             vm.displayAskDeviceForm = true;
           }
@@ -102,8 +105,20 @@
       if(typeof(device)==='string') {
         device = JSON.parse(device);
       }
-      boxService.update(vm.boxId, { params: { deviceId: device.id, name: device.name } });
-      setBoxInformation(device.id, device.name);
+      // recovers the available services from the selected device 
+      deviceService.get()
+        .then(function(res) {
+          var deviceSelected = res.data.filter(function(r) {
+            return r.id === parseInt(device.id);
+          });
+          device.service = deviceSelected[0].service;
+        })
+        .then(function() {
+          // save box parameters
+          boxService.update(vm.boxId, { params: { deviceId: device.id, name: device.name, service:device.service } });
+          // update box
+          setBoxInformation(device.id, device.name, device.service);
+        });
     }
 
     function getData(deviceId) {
@@ -141,18 +156,15 @@
       return televisionService.getSources({ device: vm.deviceId })
         .then(function (data) {
           if(data.status === 200){
-            if (data.data !== undefined && data.data > 0) {
+            if (data.data !== undefined || data.data != 0) {
               vm.allSources = data.data;
-              vm.multipleSource= true;
             }
           } else {
-            vm.allSources = vm.defaultSource;
-            vm.multipleSource = false;
+            vm.availableService.getSources = false;
           }
         })
         .catch(function(data) {
-          vm.allSources = vm.defaultSource;
-          vm.multipleSource = false;
+          vm.availableService.getSources = false;
         });
     }
 
@@ -229,21 +241,17 @@
     }
 
     function programPlus() {
-      if (!vm.currentChannel) {
-        vm.currentChannel = 0;
-      }
-      vm.thisChannel = parseInt(vm.currentChannel) + parseInt(1);
-      setChannel(vm.thisChannel);
+      return televisionService.programPlus({ device: vm.deviceId, controlType: 'programPlus' })
+        .then(function () {
+
+        });
     }
 
     function programMinus() {
-      if (!vm.currentChannel) {
-        vm.currentChannel = 0;
-      }
-      if (vm.thisChannel > 0) {
-        vm.thisChannel = parseInt(vm.currentChannel) - parseInt(1);
-        setChannel(vm.thisChannel);
-      }
+      return televisionService.programMinus({ device: vm.deviceId, controlType: 'programMinus' })
+        .then(function () {
+
+        });
     }
 
     function setChannel(channel) {
@@ -288,18 +296,18 @@
 
         });
     }
-    
+
     function openInfo() {
       return televisionService.openInfo({ device: vm.deviceId, controlType: 'openInfo' })
         .then(function () {
 
         });
     }
-        
+
     function programVod() {
       return televisionService.programVod({ device: vm.deviceId, controlType: 'programVod' })
         .then(function () {
-
+    
         });
     }
   }

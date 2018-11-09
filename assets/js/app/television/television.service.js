@@ -8,7 +8,7 @@
   televisionService.$inject = ['$http', 'cacheService'];
 
   function televisionService($http, cacheService) {
-        
+      
     var service = {
       play: play,
       pause: pause,
@@ -32,7 +32,8 @@
       programPlus: programPlus,
       programMinus: programMinus,
       openInfo: openInfo,
-      programVod: programVod
+      programVod: programVod,
+      getServices: getServices
     };
 
     return service;
@@ -112,21 +113,25 @@
     function customCommand(params) {
       return $http({method: 'POST', url: '/television/customcommand', data: params});
     }
-                
+                      
     function programPlus(params) {
       return $http({method: 'POST', url: '/television/programPlus', data: params});
     }
-        
+          
     function programMinus(params) {
       return $http({method: 'POST', url: '/television/programMinus', data: params});
     }
-    
+
     function openInfo(params) {
       return $http({method: 'POST', url: '/television/openInfo', data: params});
     }
-        
+              
     function programVod(params) {
       return $http({method: 'POST', url: '/television/programVod', data: params});
+    }
+                      
+    function getServices(params) {
+      return $http({method: 'POST', url: '/television/getServices', data: params});
     }
   }
 })();
