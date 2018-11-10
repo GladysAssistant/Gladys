@@ -81,7 +81,7 @@
             pointRadius: (dataDt.length > 25 ? 0 : 2),
             cubicInterpolationMode: 'default',
             fill: 'start',
-            steppedLine: false
+            steppedLine: (vm.currentDeviceType.type === 'binary' ? true : false)
           }],
         },
         options: {         // Configuring the axes of the graph

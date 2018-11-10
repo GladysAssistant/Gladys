@@ -233,6 +233,7 @@
       vm.ready = true;
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
         getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
+        vm.steppedline = (vm.currentDeviceType.type === 'binary');
       }
     }
 
