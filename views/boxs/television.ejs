@@ -22,7 +22,7 @@
           <div class="row" id="firstRow">
               <div class="col-xs-2 text-center">
                   <!--on/off-->
-                  <button type="button" ng-click="vm.switchState()" class="btn btn-margin btn-circle" ng-class="{'btn-danger' : !vm.currentPowerState, 'btn-success' : vm.currentPowerState}"><i
+                  <button type="button" ng-click="vm.switchState()" ng-class="{'btn-danger btn btn-margin btn-circle' : (vm.currentPowerState == '0'), 'btn-success btn btn-margin btn-circle' : (vm.currentPowerState == '1')}">><i
                           class="fa fa-power-off"></i></button>
               </div>
               <div class="col-xs-5 text-center">
