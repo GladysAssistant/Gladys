@@ -92,8 +92,8 @@ var translationsEN = {
     MAPS: {
         AREA: 'Area',
         NEW: 'New area',
-        EDIT: 'Modifier',
-        DELETE: 'Suprimer'
+        EDIT: 'Edit',
+        DELETE: 'Delete'
     }
 };
 
