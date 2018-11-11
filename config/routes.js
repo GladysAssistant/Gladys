@@ -287,7 +287,6 @@ module.exports.routes = {
   'post /television/programMinus': 'TelevisionController.programMinus',
   'post /television/openInfo': 'TelevisionController.openInfo',
   'post /television/programVod': 'TelevisionController.programVod',
-  'post /television/getServices': 'TelevisionController.getServices',
 
   // Token
   'get /token': 'TokenController.index',

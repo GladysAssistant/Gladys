@@ -32,8 +32,7 @@
       programPlus: programPlus,
       programMinus: programMinus,
       openInfo: openInfo,
-      programVod: programVod,
-      getServices: getServices
+      programVod: programVod
     };
 
     return service;
@@ -128,10 +127,6 @@
               
     function programVod(params) {
       return $http({method: 'POST', url: '/television/programVod', data: params});
-    }
-                      
-    function getServices(params) {
-      return $http({method: 'POST', url: '/television/getServices', data: params});
     }
   }
 })();

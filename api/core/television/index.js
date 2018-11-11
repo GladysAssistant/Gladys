@@ -32,4 +32,3 @@ module.exports.programPlus = require('./television.programPlus.js');
 module.exports.programMinus = require('./television.programMinus.js');
 module.exports.openInfo = require('./television.openInfo.js');
 module.exports.programVod = require('./television.programVod.js');
-module.exports.getServices = require('./television.getServices.js');

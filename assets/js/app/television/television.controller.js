@@ -5,9 +5,9 @@
     .module('gladys')
     .controller('TelevisionCtrl', TelevisionCtrl);
 
-  TelevisionCtrl.$inject = ['televisionService', 'deviceService', 'boxService'];
+  TelevisionCtrl.$inject = ['televisionService', 'deviceService', 'boxService', 'moduleService'];
 
-  function TelevisionCtrl(televisionService, deviceService, boxService) {
+  function TelevisionCtrl(televisionService, deviceService, boxService, moduleService) {
     /* jshint validthis: true */
     var vm = this;
     vm.devices = [];
@@ -21,7 +21,7 @@
     vm.allSources = '';
     vm.currentSource = '';
     vm.currentDeviceName = '';
-    vm.availableService = '';
+    vm.availableMethods = '';
 
     vm.selectDevice = selectDevice;
 
@@ -51,6 +51,12 @@
 
     vm.init = init;
 
+    var getMethods = {
+      'module': '',
+      'service': 'television',
+      'methods': ['play', 'pause', 'stop', 'rewind', 'fastForward', 'switchState', 'getState', 'setChannel', 'getChannel', 'setMuted', 'getMuted', 'volumeUp', 'volumeDown', 'pressKey', 'getSources', 'openSource', 'openMenu', 'rec', 'customCommand', 'programPlus', 'programMinus', 'openInfo', 'programVod']
+    };
+
     function init(id) {
       vm.boxId = id;
 
@@ -70,11 +76,14 @@
       vm.currentSoundState = null;
       vm.currentChannel = null;
       vm.currentMuteState = null;
-      televisionService.getServices({ 'service': deviceService })
+      getMethods.module = deviceService;
+      moduleService.getMethods(getMethods)
         .then(function(data) {
-          vm.availableService = data.data;
+          vm.availableMethods = data.data;
           getData(deviceId);
-          if (vm.availableService.getSources) { getSources(); }
+          if (vm.availableMethods.getSources) {
+            getSources();
+          }
         });
     }
 
@@ -125,23 +134,23 @@
     function getData(deviceId) {
       vm.devicetypes[deviceId].forEach(function(devicetype) {
         switch (devicetype.identifier) {
-          case 'Power':
-            vm.currentPowerState = devicetype.lastValue;
-            vm.devicePowerId = devicetype.id;
-            break;
-          case 'Sound':
-            vm.currentSoundState = devicetype.lastValue;
-            vm.deviceSoundId = devicetype.id;
-            break;
-          case 'Channel':
-            vm.currentChannel = devicetype.lastValue;
-            vm.thisChannel = devicetype.lastValue;
-            vm.deviceChannelId = devicetype.id;
-            break;
-          case 'Mute':
-            vm.currentMuteState = devicetype.lastValue;
-            vm.deviceMuteId = devicetype.id;
-            break;
+        case 'Power':
+          vm.currentPowerState = devicetype.lastValue;
+          vm.devicePowerId = devicetype.id;
+          break;
+        case 'Sound':
+          vm.currentSoundState = devicetype.lastValue;
+          vm.deviceSoundId = devicetype.id;
+          break;
+        case 'Channel':
+          vm.currentChannel = devicetype.lastValue;
+          vm.thisChannel = devicetype.lastValue;
+          vm.deviceChannelId = devicetype.id;
+          break;
+        case 'Mute':
+          vm.currentMuteState = devicetype.lastValue;
+          vm.deviceMuteId = devicetype.id;
+          break;
         }
       });
     }
@@ -161,11 +170,11 @@
               vm.allSources = data.data;
             }
           } else {
-            vm.availableService.getSources = false;
+            vm.availableMethods.getSources = false;
           }
         })
         .catch(function(data) {
-          vm.availableService.getSources = false;
+          vm.availableMethods.getSources = false;
         });
     }
 
@@ -227,14 +236,14 @@
 
     function switchState() {
       return televisionService.switchState({ device: vm.deviceId, state: !vm.currentPowerState, deviceTypeId: vm.devicePowerId })
-        .then(function(data) {
+        .then(function() {
 
         });
     }
 
     function getState() {
       return televisionService.getState({ device: vm.deviceId })
-        .then(function(data) {
+        .then(function() {
 
         });
     }
@@ -312,12 +321,9 @@
 
     // waiting for websocket message
     function waitForNewValue() {
-
       io.socket.on('newDeviceState', function(deviceState) {
-        console.log('television :', deviceState)
         if (deviceState.devicetype === vm.devicePowerId) {
           vm.currentPowerState = deviceState.value;
-          console.log('waitForNewValue:vm.currentPowerState', vm.currentPowerState)
         }
       });
     }

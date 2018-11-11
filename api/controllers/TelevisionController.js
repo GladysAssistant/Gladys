@@ -393,22 +393,5 @@ module.exports = {
       .programVod(req.body)
       .then(result => res.json(result))
       .catch(next);
-  },
-
-  /**
-   * @api {post} /television/getServices Get Services
-   * @apiName televisiongetServices
-   * @apiGroup television
-   * @apiPermission authenticated
-   *
-   * @apiUse televisionParam
-   *
-   * @apiSuccess {array} All television's services
-   */
-  getServices: function(req, res, next) {
-    gladys.television
-      .getServices(req.body)
-      .then(result => res.json(result))
-      .catch(next);
   }
 };
