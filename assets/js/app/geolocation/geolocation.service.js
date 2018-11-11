@@ -14,7 +14,8 @@
             create: create,
             get: get,
             getByUser: getByUser,
-            getCurrentPosition: getCurrentPosition
+            getCurrentPosition: getCurrentPosition,
+            getByUsersAndByDateRange: getByUsersAndByDateRange
         };
 
         return service;
@@ -50,6 +51,10 @@
                     reject('Navigator not capable of geolocation');
                 }
             });
+        }
+
+        function getByUsersAndByDateRange(dates) {
+            return $http({ method: 'GET', url: '/locations', params: dates});
         }
     }
 })();
