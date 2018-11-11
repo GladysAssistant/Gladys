@@ -13,6 +13,18 @@ module.exports = {
   },
 
   /**
+  * Create a notification
+  */
+  create: function(req, res, next){
+    req.body.user = req.session.User.id;
+    gladys.notification.create(req.body)
+      .then(function(notification){
+        return res.status(201).json(notification);
+      })
+      .catch(next);
+  },
+
+  /**
    * Read notifications from a particular user
    */
   read: function(req, res, next) {

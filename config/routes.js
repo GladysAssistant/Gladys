@@ -200,6 +200,7 @@ module.exports.routes = {
 
   // Notification
   'get /notification': 'NotificationController.index',
+  'post /notification': 'NotificationController.create',
   'patch /notification/read': 'NotificationController.read',
 
   // NotificationType
