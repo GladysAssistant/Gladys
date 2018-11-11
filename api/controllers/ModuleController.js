@@ -38,6 +38,25 @@ module.exports = {
       .catch(next);
   },
 
+  /**
+   * @api {post} /module/getMethods Get Methods
+   * @apiName modulegetMethods
+   * @apiGroup module
+   * @apiPermission authenticated
+   *
+   * @apiUse param
+   *
+   * @apiSuccess {array} All module's methods tested
+   */
+  getMethods: function(req, res, next) {
+    gladys.module
+      .getMethods(req.body)
+      .then(function(result) {
+        return res.json(result);
+      })
+      .catch(next);
+  },
+
   upgrade: function(req, res, next) {
     gladys.module.upgrade({ id: req.params.id, version: req.body.version });
     return res.json({ message: 'Upgrade started with success' });
