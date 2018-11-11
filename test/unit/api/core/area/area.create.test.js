@@ -9,7 +9,8 @@ describe('Area', function() {
         latitude: 37.773972,
         longitude: -122.431297,
         radius: 100,
-        user: 1
+        user: 1,
+        color: 7890
       };
 
       gladys.area
