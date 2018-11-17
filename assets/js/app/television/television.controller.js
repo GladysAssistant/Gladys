@@ -5,9 +5,9 @@
     .module('gladys')
     .controller('TelevisionCtrl', TelevisionCtrl);
 
-  TelevisionCtrl.$inject = ['televisionService', 'deviceService', 'boxService', 'moduleService'];
+  TelevisionCtrl.$inject = ['televisionService', 'deviceService', 'boxService', 'moduleService', '$scope'];
 
-  function TelevisionCtrl(televisionService, deviceService, boxService, moduleService) {
+  function TelevisionCtrl(televisionService, deviceService, boxService, moduleService, $scope) {
     /* jshint validthis: true */
     var vm = this;
     vm.devices = [];
@@ -324,6 +324,7 @@
       io.socket.on('newDeviceState', function(deviceState) {
         if (deviceState.devicetype === vm.devicePowerId) {
           vm.currentPowerState = deviceState.value;
+          $scope.$apply();
         }
       });
     }

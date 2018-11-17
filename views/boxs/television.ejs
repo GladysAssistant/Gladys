@@ -4,7 +4,7 @@
         <h3 ng-show="vm.displayAskDeviceForm" class="box-title">
             <%= __('box-television-title') %>
         </h3>
-        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} ({{vm.currentSource}})</h3>
+        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} <span ng-show="vm.currentSource.length > 0">({{vm.currentSource}})</span></h3>
         </span>
         <div ng-show="vm.deviceId" class="box-tools ng-cloak">
             <div class="pull-right box-tools">
