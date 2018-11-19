@@ -283,10 +283,10 @@ module.exports.routes = {
   'post /television/openmenu': 'TelevisionController.openMenu',
   'post /television/rec': 'TelevisionController.rec',
   'post /television/customcommand': 'TelevisionController.customCommand',
-  'post /television/programPlus': 'TelevisionController.programPlus',
-  'post /television/programMinus': 'TelevisionController.programMinus',
-  'post /television/openInfo': 'TelevisionController.openInfo',
-  'post /television/programVod': 'TelevisionController.programVod',
+  'post /television/program/plus': 'TelevisionController.programPlus',
+  'post /television/program/minus': 'TelevisionController.programMinus',
+  'post /television/openinfo': 'TelevisionController.openInfo',
+  'post /television/program/vod': 'TelevisionController.programVod',
 
   // Token
   'get /token': 'TokenController.index',

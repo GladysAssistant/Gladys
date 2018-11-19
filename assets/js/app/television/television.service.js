@@ -114,19 +114,19 @@
     }
                       
     function programPlus(params) {
-      return $http({method: 'POST', url: '/television/programPlus', data: params});
+      return $http({method: 'POST', url: '/television/program/plus', data: params});
     }
           
     function programMinus(params) {
-      return $http({method: 'POST', url: '/television/programMinus', data: params});
+      return $http({method: 'POST', url: '/television/program/minus', data: params});
     }
 
     function openInfo(params) {
-      return $http({method: 'POST', url: '/television/openInfo', data: params});
+      return $http({method: 'POST', url: '/television/openinfo', data: params});
     }
               
     function programVod(params) {
-      return $http({method: 'POST', url: '/television/programVod', data: params});
+      return $http({method: 'POST', url: '/television/program/vod', data: params});
     }
   }
 })();

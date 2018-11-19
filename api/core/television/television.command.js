@@ -63,20 +63,14 @@ module.exports = function command(scope) {
     break;
 
   case 'television-program-plus':
-    response.label = 'television-change-chaine';
-    calledFunc = gladys.television.getCurrentChannel(params)
-      .then((currentChannel) => {
-        return gladys.television.setChannel(parseInt(currentChannel)+parseInt(1));
-      })
+    response.label = 'television-program-next';
+    calledFunc = gladys.television.programPlus(params)
       .then(() => response);
     break;
 
   case 'television-program-minus':
-    response.label = 'television-change-chaine';
-    calledFunc = gladys.television.getCurrentChannel(params)
-      .then((currentChannel) => {
-        return gladys.television.setChannel(parseInt(currentChannel)-parseInt(1));
-      })
+    response.label = 'television-program-previous';
+    calledFunc = gladys.television.programMinus(params)
       .then(() => response);
     break;
 
@@ -101,6 +95,18 @@ module.exports = function command(scope) {
   case 'television-mute':
     response.label = 'television-mute';
     calledFunc = gladys.television.setMuted(params)
+      .then(() => response);
+    break;
+
+  case 'television-open-info':
+    response.label = 'television-open-info';
+    calledFunc = gladys.television.openInfo(params)
+      .then(() => response);
+    break; 
+
+  case 'television-program-vod':
+    response.label = 'television-program-vod';
+    calledFunc = gladys.television.programVod(params)
       .then(() => response);
     break; 
 

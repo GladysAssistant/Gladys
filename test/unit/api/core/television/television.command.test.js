@@ -27,11 +27,11 @@ describe('Television', function() {
       },
       {
         command: 'television-program-plus',
-        answer: 'television-change-chaine'
+        answer: 'television-program-next'
       },
       {
         command: 'television-program-minus',
-        answer: 'television-change-chaine'
+        answer: 'television-program-previous'
       },
       {
         command: 'television-volume-up',
@@ -44,6 +44,14 @@ describe('Television', function() {
       {
         command: 'television-mute',
         answer: 'television-mute'
+      },
+      {
+        command: 'television-program-vod',
+        answer: 'television-program-vod'
+      },
+      {
+        command: 'television-open-info',
+        answer: 'television-open-info'
       }
     ];
 
