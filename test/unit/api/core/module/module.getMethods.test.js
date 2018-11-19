@@ -4,8 +4,11 @@ describe('Module', function() {
       gladys.module
         .getMethods({ module: 'hue', service: 'television', methods: ['setChannel', 'getState'] })
         .then(result => {
-          result.should.have.property('setChannel').should.be.false();
-          result.should.have.property('getState').should.be.false();
+          result.should.be.object();
+          result.should.have.property('setChannel');
+          result.should.have.property('getState');
+          result.setChannel.should.be.false();
+          result.getState.should.be.false();
           done();
         })
         .catch(done);
