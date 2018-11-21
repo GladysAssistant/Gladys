@@ -4,9 +4,9 @@ describe('Module', function() {
       gladys.module
         .getMethods({ module: 'hue', service: 'television', methods: ['setChannel', 'getState'] })
         .then(result => {
-          result.should.be.object();
-          result.should.have.property('setChannel');
-          result.should.have.property('getState');
+          result.should.be.instanceof(Object);
+          result.should.have.property('setChannel', false);
+          result.should.have.property('getState', false);
           result.setChannel.should.be.false();
           result.getState.should.be.false();
           done();
