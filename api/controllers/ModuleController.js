@@ -44,7 +44,9 @@ module.exports = {
    * @apiGroup module
    * @apiPermission authenticated
    *
-   * @apiUse param
+   * @apiParam {String} module slug of the module.
+   * @apiParam {String} service name of the gladys API like 'television', 'music'... (Optional).
+   * @apiParam {Array} methods array of the method to be test.
    *
    * @apiSuccess {array} All module's methods tested
    */
