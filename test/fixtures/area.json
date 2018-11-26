@@ -22,5 +22,13 @@
         "longitude": -72,
         "radius": 100,
         "user": 2
+    },
+    {
+        "id": 4,
+        "name": "Tony's house",
+        "latitude": 40.7412,
+        "longitude": -73.9896,
+        "radius": 100,
+        "user": 2
     }
 ]
