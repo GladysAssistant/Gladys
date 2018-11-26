@@ -5,7 +5,8 @@
         "latitude": 40.7412,
         "longitude": -73.9896,
         "radius": 100,
-        "user": 1
+        "user": 1,
+        "color": 1234
     },
     {
         "id": 2,
@@ -13,7 +14,8 @@
         "latitude": 44,
         "longitude": -72,
         "radius": 100,
-        "user": 1
+        "user": 1,
+        "color": 4321
     },
     {
         "id": 3,
@@ -29,6 +31,7 @@
         "latitude": 40.7412,
         "longitude": -73.9896,
         "radius": 100,
-        "user": 2
+        "user": 2,
+        "color": 5678
     }
 ]

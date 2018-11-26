@@ -22,7 +22,8 @@ describe('Area', function() {
               longitude: -72,
               radius: 100,
               user: 2,
-              id: 3
+              id: 3,
+              color: 5678
             }
           ];
 

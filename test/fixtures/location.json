@@ -6,5 +6,37 @@
         "longitude": -72,
         "accuracy": 30,
         "datetime": "2015-05-12 18:00:00"
+    },
+    {
+        "id": 2,
+        "user": 1,
+        "latitude": 44,
+        "longitude": -72,
+        "accuracy": 30,
+        "datetime": "2015-05-12 18:02:00"
+    },
+    {
+        "id": 3,
+        "user": 1,
+        "latitude": 43.989,
+        "longitude": -71.989,
+        "accuracy": 30,
+        "datetime": "2015-05-12 18:04:00"
+    },
+    {
+        "id": 4,
+        "user": 1,
+        "latitude": 43.876,
+        "longitude": -71.987,
+        "accuracy": 30,
+        "datetime": "2015-05-12 18:08:00"
+    },
+    {
+        "id": 5,
+        "user": 1,
+        "latitude": 43.745,
+        "longitude": -72.109,
+        "accuracy": 30,
+        "datetime": "2015-05-12 18:12:00"
     }
 ]

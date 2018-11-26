@@ -179,6 +179,7 @@
   "area-latitude": "Latitude",
   "area-longitude": "Longitude",
   "area-radius": "Radius (meters)",
+  "area-color": "Color",
   "area-action": "Action",
   "area-new": "New",
   "area-delete": "Delete",
@@ -436,5 +437,10 @@
   "gateway-connecting": "Generating keys and connecting...",
   "gateway-login-error": "Your email/password/two-factor code is invalid.",
   "gateway-users-list": "Users",
-  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not."
+  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not.",
+  "area-start-range-date": "Start range date",
+  "area-end-range-date":"End range date",
+  "area-between": "Between",
+  "area-and-the": "and",
+  "area-last-known-location": "Last known locations"
 }

@@ -94,8 +94,8 @@ var translationsEN = {
   MAPS: {
     AREA: 'Area',
     NEW: 'New area',
-    EDIT: 'Modifier',
-    DELETE: 'Suprimer'
+    EDIT: 'Edit',
+    DELETE: 'Delete'
   },
   CHART: {
     NO_VALUES: 'No value to display.',

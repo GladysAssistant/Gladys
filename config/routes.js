@@ -158,6 +158,7 @@ module.exports.routes = {
   'get /location/create': 'LocationController.create',
   'get /location': 'LocationController.get',
   'get /user/:id/location': 'LocationController.getByUser',
+  'get /location/range': 'LocationController.getByDateRange',
 
   // Machine
   'get /machine': 'MachineController.get',
