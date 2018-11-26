@@ -20,9 +20,14 @@
         vm.getRooms = getRooms;
         vm.newHouse = {};
         vm.newRoom = {};
+        vm.updateRoom = updateRoom;
+        vm.updateHouse = updateHouse;
         
         vm.houses = [];
         vm.rooms = [];
+
+        vm.savingHouse = false;
+        vm.savingRoom = false;
 
         activate();
 
@@ -68,6 +73,28 @@
                         notificationService.errorNotificationTranslated('DEFAULT.ERROR');
                     }
                 });
+        }
+
+        function updateHouse(house) {
+          vm.savingHouse = true;
+          return houseService.update(house.id, house)
+            .then(function(){
+              vm.savingHouse = false;
+            })
+            .catch(function(err) {
+              vm.savingHouse = false;
+            });
+        }
+
+        function updateRoom(room) {
+          vm.savingRoom = true;
+          return roomService.update(room.id, room)
+            .then(function(){
+              vm.savingRoom = false;
+            })
+            .catch(function(err) {
+              vm.savingRoom = false;
+            });
         }
 
         function deleteHouse(index, id) {
