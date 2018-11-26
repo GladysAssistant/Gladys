@@ -30,6 +30,7 @@
                     getRooms();
                 }
             });
+        waitForNewValue();
       }
 
       function selectRoomId(id){
@@ -62,6 +63,45 @@
              deviceType.lastValue = data.data.value; 
           });
     }
+      
+      // waiting for websocket message
+      function waitForNewValue() {
+  
+        io.socket.on('newDeviceState', function(deviceState) {
+          updateValueType(deviceState);
+          updateRoomView(deviceState);
+        });
+
+      }
+  
+      function updateRoomView(newDeviceState) {
+        vm.room.deviceTypes.forEach(function(type) {
+            if (type.id === newDeviceState.devicetype) {
+            type.lastValue = newDeviceState.value;
+            type.lastChanged = newDeviceState.datetime;
+            $scope.$apply();
+            }
+        });
+      }
+  
+  
+      // loop foreach device and upadte the value when the type is found
+      function updateValueType(deviceState) {
+        var found = false;
+        var i = 0;
+        if (vm.room.deviceTypes) {
+          while (!found && i < vm.room.deviceTypes.length) {
+  
+            if (vm.room.deviceTypes[i].id == deviceState.devicetype) {
+              found = true;
+              vm.room.deviceTypes[i].lastValue = deviceState.value;
+              vm.room.deviceTypes[i].lastChanged = deviceState.datetime;
+              $scope.$apply();
+            }
+            i++;
+          }
+        }
+      }
       
     }
   })();
