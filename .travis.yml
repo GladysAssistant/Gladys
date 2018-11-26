@@ -10,6 +10,7 @@ jobs:
       node_js:
        - '8'
        - '10'
+       - 'node'
       cache: yarn
       services:
       - mysql
