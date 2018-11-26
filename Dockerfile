@@ -1,7 +1,7 @@
 FROM node:8-alpine
 
-# Add tzdata for timezone settings
-RUN apk add --no-cache tzdata
+# System dependencies
+RUN apk add --no-cache tzdata nmap
 
 # Create src folder
 RUN mkdir /src
