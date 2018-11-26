@@ -29,5 +29,12 @@ module.exports = {
         AND accuracy <= ?
         ORDER BY datetime DESC 
         LIMIT ? OFFSET ?;
+    `,
+  getEveryLocationUserBetweenDates:`
+       SELECT location.datetime,latitude, longitude, altitude, accuracy, firstname, lastname, user.id as user
+       FROM location 
+       JOIN user ON user.id = location.user 
+       WHERE location.datetime BETWEEN ? and ?
+       ORDER BY datetime asc
     `
 };

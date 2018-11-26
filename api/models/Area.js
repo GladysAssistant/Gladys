@@ -30,6 +30,11 @@ module.exports = {
     user: {
       model: 'User',
       required: true
-    }
+    },
+    color: {
+      type: 'integer',
+      required: true
+    },
+
   }
 };
