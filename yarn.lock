@@ -2409,6 +2409,10 @@ dotenv@6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.0.0.tgz#24e37c041741c5f4b25324958ebbc34bca965935"
 
+downsample-lttb@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/downsample-lttb/-/downsample-lttb-0.0.1.tgz#4450332d28d3f651966c876a0642a7f529908fd0"
+
 duplexer2@^0.1.2, duplexer2@~0.1.0:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer2/-/duplexer2-0.1.4.tgz#8b12dab878c0d69e3e7891051662a32fc6bddcc1"
