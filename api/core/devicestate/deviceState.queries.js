@@ -38,5 +38,25 @@ module.exports = {
   `,
   getLastDeviceState: `
     SELECT * FROM devicestate WHERE devicetype = ? ORDER BY datetime DESC LIMIT 1;
+  `,
+  getByDeviceTypeFiltered: `
+    SELECT datetime, value
+    FROM devicestate 
+    WHERE devicetype = ?
+    AND createdAt BETWEEN ? AND ?
+    ORDER BY datetime DESC;
+  `,
+  getFiltered: `
+    SELECT *, DATE_FORMAT(datetime,'%d %b %Y %T') AS dateFormat
+    FROM devicestate 
+    AND createdAt >= ?
+    AND createdAt <= ?
+    ORDER BY datetime DESC;
+  `,
+  getFilteredMinMax: `
+    SELECT min(value) AS min, max(value) AS max, date(datetime) AS datetime
+    FROM devicestate 
+    WHERE (devicetype=? AND datetime BETWEEN ? AND ?) 
+    group by date(datetime) ;
   `
 };

@@ -22,6 +22,8 @@ var cssFilesToInject = [
   'styles/scenario.css',
   'styles/device.css',
   'styles/toogle.css',
+  'styles/checkbox.css',
+  'styles/radio-button.css',
 
   'styles/global.css',
 
@@ -30,7 +32,6 @@ var cssFilesToInject = [
 
   // Inject dependencies styles
   'styles/dependencies/angular-ui-notification.min.css',
-  'styles/dependencies/angular-chart.min.css',
   'styles/dependencies/slider.css',
   'styles/dependencies/leaflet.css',
   'styles/dependencies/angular-bootstrap-calendar.min.css',
@@ -38,6 +39,7 @@ var cssFilesToInject = [
   'styles/dependencies/font-awesome.min.css',
   'styles/dependencies/adminLTE/_all-skins.min.css',
   'styles/dependencies/bootstrap-datetimepicker.min.css',
+  'styles/dependencies/bootstrap-daterangepicker.css',
   'styles/dependencies/color-picker/color-picker.min.css',
   'styles/dependencies/angular-ui-push-button.css',
   
@@ -63,6 +65,7 @@ var jsFilesToInject = [
   // Load Bootstrap components
   'js/dependencies/bootstrap.min.js',
   'js/dependencies/bootstrap-datetimepicker.min.js',
+  'js/dependencies/bootstrap-daterangepicker.js',
   'js/dependencies/bootstrap-slider.js',
 
   // Load angular components
@@ -84,7 +87,6 @@ var jsFilesToInject = [
   'js/dependencies/slider.js',
   'js/dependencies/ng-device-detector.min.js',
   'js/dependencies/angular-bootstrap-calendar-tpls.min.js',
-  'js/dependencies/angular-chart.min.js',
   'js/dependencies/color-picker/color-picker.min.js',
   'js/dependencies/color-picker/angular-color-picker.js',
   'js/dependencies/angular-ui-push-button.js',

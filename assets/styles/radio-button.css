@@ -1,0 +1,44 @@
+.radio {
+  display: block;
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.radio input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+.radio-checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: white;
+  border-radius: 50%;
+  border: 2px solid var(--radio-color, #3c8dbc);
+}
+.radio-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.radio input:checked ~ .radio-checkmark:after {
+  display: block;
+}
+.radio .radio-checkmark:after {
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--checkbox-color, #3c8dbc);
+}
