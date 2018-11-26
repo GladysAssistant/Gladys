@@ -54,10 +54,18 @@ function create(options) {
     .spread(function(notification, types, user) {
             
       sails.log.info(`Notification : create : Notification saved with success. Trying to send notification to user ID ${notification.user}`);
-            
-      return Promise.mapSeries(types, function(type) {
-        return startService(notification, type, user);
-      });
+
+      // remove socket, socket is sent in any way
+      types = types.filter((type) => type.service !== 'socket');
+
+      // send notification in websocket in any cases
+      return startService(notification, { service: 'socket' }, user)
+        .catch(() => true)
+
+        // then, try other ways
+        .then(() => Promise.mapSeries(types, function(type) {
+          return startService(notification, type, user);
+        }));
     })
     .catch(function(err) {
       if (err.message !== 'ok') {
@@ -90,7 +98,7 @@ function startService(notification, type, user) {
   return notify(notification, user)
     .then(function(result) {
             
-      sails.log.info(`Notification threw ${type.service} sent with success. Aborting the chain.`);
+      sails.log.info(`Notification threw ${type.service} sent with success.`);
             
       // if module resolved, we stop the promise chain
       // it means one notification worked! 
