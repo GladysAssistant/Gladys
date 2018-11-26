@@ -22,7 +22,7 @@
     transition: all 0.3s ease-in 0s; 
 }
 .toogle-checkbox.toogle-blue:checked + .toogle-label {
-    background-color: #428BCA;
+    background-color: #3c8dbc;
 }
 .toogle-checkbox.toogle-red:checked + .toogle-label {
     background-color: #dd4b39;
