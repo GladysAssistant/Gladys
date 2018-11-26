@@ -22,7 +22,8 @@ describe('Area', function() {
             'latitude': 44,
             'longitude': -72,
             'radius': 100,
-            'user': 2
+            'user': 2,
+            color: 4321
           };
      
           var newExpected = {
@@ -31,6 +32,7 @@ describe('Area', function() {
             'latitude': 40.7412,
             'longitude': -73.9896,
             'radius': 100,
+            color: 5678,
             'user': 2
           };
 

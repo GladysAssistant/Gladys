@@ -23,7 +23,7 @@ describe('Area', function() {
               radius: 100,
               user: 2,
               id: 3,
-              color: 5678
+              color: 4321
             }
           ];
 
