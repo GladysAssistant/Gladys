@@ -88,15 +88,15 @@
                 });
         }
 
-        function getHouses(options) {
-            return houseService.get(options)
+        function getHouses() {
+            return houseService.get({take: 10000})
                 .then(function(data){
                     vm.houses = data.data;
                 });
         }
 
-        function getRooms(options) {
-            return roomService.get(options)
+        function getRooms() {
+            return roomService.get({take: 10000})
                 .then(function(data){
                     vm.rooms = data.data;
                 });
