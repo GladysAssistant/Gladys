@@ -39,7 +39,7 @@ module.exports = {
   },
 
   /**
-   * @api {post} /module/getMethods Get Methods
+   * @api {post} /module/method Get Methods
    * @apiName modulegetMethods
    * @apiGroup module
    * @apiPermission authenticated

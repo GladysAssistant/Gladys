@@ -42,7 +42,7 @@
     }
 
     function getMethods(params) {
-      return $http({method: 'POST', url: '/module/methods', data: params});
+      return $http({method: 'POST', url: '/module/method', data: params});
     }
   }
 })();
