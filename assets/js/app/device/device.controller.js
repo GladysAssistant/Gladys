@@ -91,7 +91,7 @@
     }
     
     function getRooms(){
-        return roomService.get()
+        return roomService.get({take: 10000})
           .then(function(data){
               vm.rooms = data.data;
               vm.rooms.unshift({id: null, name: '----'});
@@ -99,7 +99,7 @@
     }
 
     function getUsers(){
-        return userService.get()
+        return userService.get({take: 10000})
             .then(function(data) {
                 vm.users = data.data;
                 vm.users.unshift({id: null, name: '----'});

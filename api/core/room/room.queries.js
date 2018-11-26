@@ -5,7 +5,7 @@ module.exports = {
     SELECT room.*, house.name AS houseName, house.id as houseId 
     FROM room
     JOIN house ON (room.house = house.id)
-    ORDER BY house.id
+    ORDER BY house.id, room.id
     LIMIT ?
     OFFSET ?;
    `,
