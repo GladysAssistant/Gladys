@@ -25,15 +25,16 @@
       exec: exec,
       getStates: getStates,
       getFilteredStates: getFilteredStates,
+      getDeviceTypeByCategory: getDeviceTypeByCategory,
       getFilteredStatesMinMax: getFilteredStatesMinMax
     };
 
     return service;
+        
+    // all about devices 
 
-    // all about devices
-
-    function get(take, skip) {
-      return $http({method: 'GET', url: '/device', params: {take: take, skip: skip}});
+    function get(take, skip, service) {
+      return $http({method: 'GET', url: '/device', params: {take: take, skip: skip, service: service}});
     }
 
     function create(device, types){
@@ -43,19 +44,20 @@
       };
       return $http({method: 'POST', url: '/device', data: data});
     }
-
+        
     function updateDevice(device){
       return $http({method: 'PATCH', url: '/device/' + device.id, data: device});
     }
-
+        
     function deleteDevice(id){
       return $http({method: 'DELETE', url: '/device/' + id});
     }
-
+        
     function getDeviceTypesDevice(id){
       return $http({method: 'GET', url: '/device/' + id + '/devicetype'});
     }
-
+        
+        
     // all about deviceTypes
     function getTypes(){
       return $http({method: 'GET', url: '/devicetype'});
@@ -64,19 +66,19 @@
     function createDeviceType(deviceType){
       return $http({method: 'POST', url: '/devicetype', data: deviceType});
     }
-
+        
     function updateDeviceType(deviceType){
       return $http({method: 'PATCH', url: '/devicetype/' + deviceType.id, data: deviceType});
     }
-
+        
     function deleteDeviceType(id){
       return $http({method: 'DELETE', url: '/devicetype/' + id});
     }
-
+        
     function exec(deviceType, value){
       return $http({method: 'POST', url: '/devicetype/' + deviceType.id + '/exec', data: {value: value}});
     }
-
+        
     function getDeviceTypeByRoom(){
       return $http({method: 'GET', url: '/devicetype/room'});
     }
@@ -96,6 +98,10 @@
 
     function getFilteredStatesMinMax(deviceType, startDate, endDate){
       return $http({method: 'GET', url: '/devicestate/filtered/minmax', params: {devicetype: deviceType, startDate: startDate, endDate: endDate}});
+    }
+
+    function getDeviceTypeByCategory(options){
+      return $http({method: 'GET', url: '/devicetype/category', params: options});
     }
   }
 })();
