@@ -333,7 +333,83 @@ describe('TelevisionController', function() {
       };
 
       request(sails.hooks.http.app)
-        .post('/television/rec?token=test')
+        .post('/television/customcommand?token=test')
+        .send(params)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err); 
+          }
+
+          done();
+        });
+    });
+
+    it('POST /television/program/plus ', function(done) {
+      var params = {
+        controlType: 'programPlus',
+        device: 5
+      };
+
+      request(sails.hooks.http.app)
+        .post('/television/program/plus?token=test')
+        .send(params)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err); 
+          }
+
+          done();
+        });
+    });
+
+    it('POST /television/program/minus ', function(done) {
+      var params = {
+        controlType: 'programMinus',
+        device: 5
+      };
+
+      request(sails.hooks.http.app)
+        .post('/television/program/minus?token=test')
+        .send(params)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err); 
+          }
+
+          done();
+        });
+    });
+
+    it('POST /television/openinfo ', function(done) {
+      var params = {
+        controlType: 'openInfo',
+        device: 5
+      };
+
+      request(sails.hooks.http.app)
+        .post('/television/openinfo?token=test')
+        .send(params)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err); 
+          }
+
+          done();
+        });
+    });
+
+    it('POST /television/program/vod ', function(done) {
+      var params = {
+        controlType: 'programVod',
+        device: 5
+      };
+
+      request(sails.hooks.http.app)
+        .post('/television/program/vod?token=test')
         .send(params)
         .expect(200)
         .end(function(err, res) {

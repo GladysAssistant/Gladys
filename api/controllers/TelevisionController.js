@@ -333,5 +333,65 @@ module.exports = {
       .customCommand(req.body)
       .then(result => res.json(result))
       .catch(next);
+  },
+  
+  /**
+   * @api {post} /television/program/plus Program Plus
+   * @apiName televisionProgramPlus
+   * @apiGroup television
+   * @apiPermission authenticated
+   *
+   * @apiUse televisionParam
+   */
+  programPlus: function(req, res, next) {
+    gladys.television
+      .programPlus(req.body)
+      .then(result => res.json(result))
+      .catch(next);
+  },
+    
+  /**
+   * @api {post} /television/program/minus Program Minus
+   * @apiName televisionProgramMinus
+   * @apiGroup television
+   * @apiPermission authenticated
+   *
+   * @apiUse televisionParam
+   */
+  programMinus: function(req, res, next) {
+    gladys.television
+      .programMinus(req.body)
+      .then(result => res.json(result))
+      .catch(next);
+  },
+
+  /**
+   * @api {post} /television/openinfo Open Info
+   * @apiName televisionOpenInfo
+   * @apiGroup television
+   * @apiPermission authenticated
+   *
+   * @apiUse televisionParam
+   */
+  openInfo: function(req, res, next) {
+    gladys.television
+      .openInfo(req.body)
+      .then(result => res.json(result))
+      .catch(next);
+  },
+  
+  /**
+   * @api {post} /television/program/vod Program Vod
+   * @apiName televisionProgramVod
+   * @apiGroup television
+   * @apiPermission authenticated
+   *
+   * @apiUse televisionParam
+   */
+  programVod: function(req, res, next) {
+    gladys.television
+      .programVod(req.body)
+      .then(result => res.json(result))
+      .catch(next);
   }
 };

@@ -4,7 +4,7 @@
         <h3 ng-show="vm.displayAskDeviceForm" class="box-title">
             <%= __('box-television-title') %>
         </h3>
-        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} ({{vm.currentSource}})</h3>
+        <span ng-show="vm.deviceId" class="ng-cloak"><h3 class="box-title">{{vm.currentDeviceName}} <span ng-show="vm.currentSource.length > 0">({{vm.currentSource}})</span></h3>
         </span>
         <div ng-show="vm.deviceId" class="box-tools ng-cloak">
             <div class="pull-right box-tools">
@@ -22,7 +22,7 @@
             <div class="row" id="firstRow">
                 <div class="col-xs-2 text-center">
                     <!--on/off-->
-                    <button type="button" ng-click="vm.switchState()" class="btn btn-danger btn-margin btn-circle"><i
+                    <button type="button" ng-click="vm.switchState()" ng-class="{'btn-danger btn btn-margin btn-circle' : (vm.currentPowerState == '0'), 'btn-success btn btn-margin btn-circle' : (vm.currentPowerState == '1')}"><i
                             class="fa fa-power-off"></i></button>
                 </div>
                 <div class="col-xs-5 text-center">
@@ -40,7 +40,7 @@
                     <!--Programme-->
                     <div class="btn-group">
                         <button type="button" ng-click="vm.programMinus()" class="btn btn-default btn-left-rounded">-</button>
-                        <button type="button" class="btn btn-default"><i class="fa fa-tv"></i></button>
+                        <button type="button" ng-click="vm.programVod()" class="btn btn-default"><i ng-class="vm.availableMethods.programVod ? 'fa fa-tv enabled':'fa fa-tv disabled'"></i></button>
                         <button type="button" ng-click="vm.programPlus()" class="btn btn-default btn-right-rounded">+</button>
                     </div>
                 </div>
@@ -83,10 +83,10 @@
                         </li>
                         <li></li>
                         <li>
-                            <button type="button" ng-click="vm.customCommand('red')" class="btn btn-danger btn-margin"></i></button>
-                            <button type="button" ng-click="vm.customCommand('green')" class="btn btn-success btn-margin"></i></button>
-                            <button type="button" ng-click="vm.customCommand('yellow')" class="btn btn-warning btn-margin"></i></button>
-                            <button type="button" ng-click="vm.customCommand('blue')" class="btn btn-info btn-margin"></i></button>
+                            <button ng-show="vm.availableMethods.customCommand" type="button" ng-click="vm.customCommand('red')" class="btn btn-danger btn-margin"></i></button>
+                            <button ng-show="vm.availableMethods.customCommand" type="button" ng-click="vm.customCommand('green')" class="btn btn-success btn-margin"></i></button>
+                            <button ng-show="vm.availableMethods.customCommand" type="button" ng-click="vm.customCommand('yellow')" class="btn btn-warning btn-margin"></i></button>
+                            <button ng-show="vm.availableMethods.customCommand" type="button" ng-click="vm.customCommand('blue')" class="btn btn-info btn-margin"></i></button>
                         </li>
                     </ul>
                 </div>
@@ -98,7 +98,7 @@
             </p>
             <div class="row">
                 <div class="col-xs-offset-2 col-xs-6">
-                    <select ng-model="vm.selectedDevice" class="form-control">
+                    <select ng-model="vm.selectedDevice" class="form-control" class="ng-cloak">
                         <option ng-repeat="device in vm.devices" value="{{device}}">{{device.name}}</option>
                     </select>
                 </div>
@@ -108,27 +108,25 @@
             </div>
         </div>
     </div>
-    <div ng-show="vm.deviceId" class="box-footer box-footer-color">
-        <div class="ng-cloak">
+    <div ng-show="vm.deviceId" class="box-footer box-footer-color ng-cloak">
             <div class="row no-gutter">
                 <div class="col-sm-6 text-center">
-                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
+                    <button ng-show="vm.availableMethods.getSources" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="glyphicon btn-cde-glyphicon glyphicon-log-in"></i></button>
                     <ul class="dropdown-menu pull-left" role="menu">
                         <li ng-repeat="source in vm.allSources"><a ng-click="vm.openSource(source.label)">{{source.label}}</a></li>
                     </ul>
-                    <button class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
+                    <button ng-show="vm.availableMethods.openMenu" class="btn btn-primary" ng-click="vm.openMenu()"><i class="fa fa-bars"></i></button>
                     <button type="button" ng-click="vm.pressKey('back')" class="btn btn-primary"><i class="fa fa-undo"></i></button>
-                    <button type="button" ng-click="vm.openInfo()" class="btn btn-primary"><i class="fa fa-info"></i></button>
+                    <button ng-show="vm.availableMethods.openInfo" type="button" ng-click="vm.openInfo()" class="btn btn-primary"><i class="fa fa-info"></i></button>
                 </div>
                 <div class="col-sm-6 text-center">
-                    <button class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
-                    <button class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
-                    <button class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
-                    <button class="btn btn-primary" ng-click="vm.stop()"><i class="fa fa-stop"></i></button>
-                    <button class="btn btn-primary" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></button>
-                    <button class="btn btn-danger" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
+                    <button ng-show="vm.availableMethods.rewind" class="btn btn-primary" ng-click="vm.rewind()"><i class="fa fa-backward"></i></button>
+                    <button ng-show="vm.availableMethods.play" class="btn btn-primary" ng-click="vm.play()"><i class="fa fa-play"></i></button>
+                    <button ng-show="vm.availableMethods.pause" class="btn btn-primary" ng-click="vm.pause()"><i class="fa fa-pause"></i></button>
+                    <button ng-show="vm.availableMethods.stop" class="btn btn-primary" ng-click="vm.stop()"><i class="fa fa-stop"></i></button>
+                    <button ng-show="vm.availableMethods.fastForward" class="btn btn-primary" ng-click="vm.fastForward()"><i class="fa fa-forward"></i></button>
+                    <button ng-show="vm.availableMethods.rec" class="btn btn-danger" ng-click="vm.rec()"><i class="glyphicon btn-cde-glyphicon glyphicon-record"></i></button>
                 </div>
             </div>
-        </div>
     </div>
 </div>
