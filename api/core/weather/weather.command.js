@@ -7,7 +7,32 @@ module.exports = function command(scope) {
   // get user position
   // accuracy is not that important, so put high value
   return gladys.location.getUser(scope.user, {accuracy: 3000})
+    
+    // fallback to house latitude/longitude if location does not exist
+    .catch(() => {
+      sails.log.info(`Weather : command : Location of user ${scope.user.id} not found, so taking house coordinate`);
+      return gladys.house.getAll()
+        .then((houses) => {
+          
+          if(houses.length === 0) { 
+            return new Error('Weather : command : No house found, unable to calculate weather');
+          } 
+
+          var house = houses[0];
+
+          if (!house.latitude || !house.longitude) {
+            return new Error('Weather : command : House do not have latitude & longitude, unable to calculate weather');
+          }
+
+          return {
+            latitude: house.latitude,
+            longitude: house.longitude
+          };
+        });
+    })
     .then((location) => {
+
+      sails.log.info(`Weather : command : Calculating weather at location latitude = "${location.latitude}", longitude = "${location.longitude}".`);
 
       var params = {
         latitude: location.latitude,

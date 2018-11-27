@@ -49,17 +49,24 @@ module.exports = function answer(result, user) {
       newMessage.senderName = user.assistantName;
       newMessage.needAnswer = result.response.needAnswer;
 
-      // test each notification system
-      return Promise.mapSeries(notificationTypes, function(notificationType) {
-        return trySendingMessage(newMessage, notificationType, user)
-          .catch((err) => {
+      // remove socket, socket is sent in any way
+      notificationTypes = notificationTypes.filter((type) => type.service !== 'socket');
 
-            // if error is normal, propagate error to abort chain
-            if(err.message == 'ok') {
-              return Promise.reject(err); 
-            }
-          });
-      })
+      // send notification in websocket in any cases
+      return trySendingMessage(newMessage, { service: 'socket' }, user)
+        .catch(() => true)
+
+        // then, try all the other ways
+        .then(() => Promise.mapSeries(notificationTypes, function(notificationType) {
+          return trySendingMessage(newMessage, notificationType, user)
+            .catch((err) => {
+  
+              // if error is normal, propagate error to abort chain
+              if(err.message == 'ok') {
+                return Promise.reject(err); 
+              }
+            });
+        }))
         .catch(function(err) {
           if (err.message !== 'ok') {
             sails.log.warn(err);
@@ -113,7 +120,7 @@ function trySendingMessage(newMessage, type, user) {
   return toCall(newMessage, user)
     .then(function(result) {
             
-      sails.log.info(`Message sent with success with ${type.service}. Aborting the chain.`);
+      sails.log.info(`Message sent with success with ${type.service}.`);
             
       // if module resolved, we stop the promise chain
       // it means one notification worked! 

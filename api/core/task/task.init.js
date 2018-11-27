@@ -68,6 +68,17 @@ module.exports = function(cb){
   // checking for update on module now
   gladys.module.checkUpdate();
 
+  // CheckUserPresence every XX minutes, default is 5 minutes
+  const DEFAULT_CHECK_USER_PRESENCE_FREQUENCY = 5;
+
+  gladys.param.getValue('USER_CHECK_PRESENCE_FREQUENCY')
+    .catch(() => DEFAULT_CHECK_USER_PRESENCE_FREQUENCY)
+    .then((checkFrequency) => {
+      setInterval(function() {
+        gladys.house.checkUsersPresence();
+      }, checkFrequency * 60 * 1000);
+    });
+
   // Check for update interval
   setInterval(function(){
     gladys.update.checkUpdate();

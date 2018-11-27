@@ -28,3 +28,7 @@ module.exports.openSource = require('./television.openSource.js');
 module.exports.openMenu = require('./television.openMenu.js');
 module.exports.rec = require('./television.rec.js');
 module.exports.customCommand = require('./television.customCommand.js');
+module.exports.programPlus = require('./television.programPlus.js');
+module.exports.programMinus = require('./television.programMinus.js');
+module.exports.openInfo = require('./television.openInfo.js');
+module.exports.programVod = require('./television.programVod.js');

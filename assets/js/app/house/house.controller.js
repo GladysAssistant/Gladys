@@ -20,9 +20,14 @@
         vm.getRooms = getRooms;
         vm.newHouse = {};
         vm.newRoom = {};
+        vm.updateRoom = updateRoom;
+        vm.updateHouse = updateHouse;
         
         vm.houses = [];
         vm.rooms = [];
+
+        vm.savingHouse = false;
+        vm.savingRoom = false;
 
         activate();
 
@@ -70,6 +75,28 @@
                 });
         }
 
+        function updateHouse(house) {
+          vm.savingHouse = true;
+          return houseService.update(house.id, house)
+            .then(function(){
+              vm.savingHouse = false;
+            })
+            .catch(function(err) {
+              vm.savingHouse = false;
+            });
+        }
+
+        function updateRoom(room) {
+          vm.savingRoom = true;
+          return roomService.update(room.id, room)
+            .then(function(){
+              vm.savingRoom = false;
+            })
+            .catch(function(err) {
+              vm.savingRoom = false;
+            });
+        }
+
         function deleteHouse(index, id) {
             return houseService.destroy(id)
                 .then(function(data){
@@ -88,15 +115,15 @@
                 });
         }
 
-        function getHouses(options) {
-            return houseService.get(options)
+        function getHouses() {
+            return houseService.get({take: 10000})
                 .then(function(data){
                     vm.houses = data.data;
                 });
         }
 
-        function getRooms(options) {
-            return roomService.get(options)
+        function getRooms() {
+            return roomService.get({take: 10000})
                 .then(function(data){
                     vm.rooms = data.data;
                 });

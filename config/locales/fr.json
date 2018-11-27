@@ -345,6 +345,7 @@
   "area-latitude": "Latitude",
   "area-longitude": "Longitude",
   "area-radius": "Rayon (mètre)",
+  "area-color": "Couleur",
   "area-action": "Action",
   "area-new": "Nouveau",
   "area-delete": "Supprimer",
@@ -579,6 +580,11 @@
   "scenario-if-condition-true": "Vraie",
   "scenario-if-condition-false": "Fausse",
   "scenario-if-condition-is": "est",
+  "chart": "Graphique",
+  "chart-slider-help": "% de lissage des données, de 0% (aucun lissage, toutes les valeurs sont affichées), à 98% (lissage maximale). Moins les données sont lissées, plus le temps d'affichage est long.",
+  "chart-tooltip-mini-maxi": "Affiche les courbes des valeurs minimales et maximales par jour sur la période choisie.",
+  "chart-label-mini-maxi": "Min. et max. par jour",
+  "chart-label-stepped-line": "Courbe en escalier",
   "parameters-gateway": "Gladys Gateway",
   "gateway-left-explanation": "Le Gladys Gateway est la meilleure façon de se connecter à Gladys depuis l'extérieur de votre réseau",
   "gateway-left-explanation-know-more": "En savoir plus",
@@ -595,5 +601,11 @@
   "gateway-connecting": "Génération des clés et connexion en cours...",
   "gateway-login-error": "Votre email/mot de passe/code d'authentification à deux facteurs est invalide.",
   "gateway-users-list": "Utilisateurs",
-  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance."
+  "gateway-users-explanation": "Avant de pouvoir contrôler votre Gladys, vous devez accepter ci-dessous les différents utilisateurs et leur clé publique. Grâce à cette sécurité, si le Gateway est compromit, votre instance Gladys n'est pas compromise car aucunes clés n'ayant pas été acceptée ici ne peut contrôler votre instance.",
+  "area-start-range-date": "Date de début",
+  "area-end-range-date": "Date de fin",
+  "area-between": "Entre le",
+  "area-and-the": "et le",
+  "area-last-known-location": "Dernières positions connues",
+  "house-box-saving": "Enregistrement en cours"
 }

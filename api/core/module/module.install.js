@@ -97,8 +97,10 @@ function copyAssets(modulePath, slug) {
  */
 function exec(command){
   return new Promise(function(resolve, reject){
-    childProcess.exec(command, function (err, stdout, stderr){
+    childProcess.exec(command, {maxBuffer: 1024 * 5000}, function (err, stdout, stderr){
       if(err) {
+        sails.log.warn('Module install : Fail to install NPM dependencies. Stderr :');
+        sails.log.warn(stderr);
         return reject(err); 
       }
             

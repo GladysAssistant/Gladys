@@ -13,8 +13,8 @@
             </ol>
         </section>
 
-        <!-- Main content -->
-        <section class="content">
+        <section class="content ng-cloak">
+
             <div id="map" style="width : 100%; height : 500px;">
                 <div class="leaflet-top leaflet-right">
                     <div class="leaflet-bar leaflet-control">
@@ -22,6 +22,70 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-solid">
+                        <div class="box-header">
+                            <div class="row">
+                                <div class="col-md-3 col-lg-2"></div>
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+                                    <center ng-show="vm.min"><%= __('area-between') %> <b>{{vm.min | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a'}}</b> <%= __('area-and-the') %><b> {{vm.max | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a'}}</b></center>
+                                    <center ng-show="!vm.min"><%= __('area-last-known-location') %></center>
+                                </div>
+                                <div class="col-md-3 col-lg-2"></div>
+                            </div>
+                        </div> 
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-3 col-lg-2"></div>
+                                <div class="col-xs-12 col-sm-6 col-md-3 col-lg-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='datetimepickerstartdate'>
+                                            <input type='text' class="form-control" id="startRange" placeholder="<%= __('area-start-range-date') %>" />
+                                            <span class="input-group-addon"><span class="fa fa-calendar "></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-lg-4">
+                                    <input 
+                                         id="timeline_slider"
+                                         type="text"
+                                         style="width:100%!important"
+                                         name="timeline"
+                	                 data-provide="slider"
+                	                 data-slider-min=1
+                	                 data-slider-max=1
+                	                 data-slider-step=1
+                                         data-slider-range=[1, 1]
+                	                 data-slider-tooltip="hide"
+                                    />
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-3 col-lg-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='datetimepickerenddate'>
+                                            <input type='text' class="form-control" id="endRange" placeholder="<%= __('area-end-range-date') %>"/>
+                                            <span class="input-group-addon"><span class="fa fa-calendar "></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-3 col-lg-2"></div>
+                            </div>
+                
+                            <div class="row">
+                                <div class="col-md-3 col-lg-2"></div>
+                                <div ng-repeat="(id, user) in vm.users" style="cursor: pointer;" class="col-xs-12 col-sm-6 col-md-3 col-lg-2" ng-click="vm.toggleUser(id)">
+                                    <i style="color: {{ user.color }}" ng-class="user.hidden ? 'fa fa-2x fa-square' : 'fa fa-2x fa-check-square'"></i>&nbsp;
+                                    <span style="top: 3px; padding-left: 3px; position: absolute;">{{ user.name }}</span>
+                                </div>
+                                <div class="col-md-3 col-lg-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
         </section><!-- /.content -->
 
     <div class="modal fade area-modal ng-cloak" tabindex="-1" role="dialog" aria-hidden="true">
@@ -68,6 +132,12 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="color" class="col-sm-5 control-label" ><%= __('area-color') %></label>
+                                        <div class="col-sm-7">
+                                            <color-picker type="text" ng-model="vm.area.color" id="color"></color-picker>
+                                        </div>
+                                    </div>
                                 </form>       
                             </div>           
                         </div> 

@@ -6,24 +6,31 @@
         .module('gladys')
         .controller('MapsCtrl', MapsCtrl);
 
-    MapsCtrl.$inject = ['geoLocationService', 'areaService', '$translate', '$scope', 'notificationService'];
+    MapsCtrl.$inject = ['geoLocationService', 'areaService', '$translate', '$scope', 'notificationService', 'userService', 'moment', '$timeout'];
 
-    function MapsCtrl(geoLocationService, areaService, $translate, $scope, notificationService) {
+    function MapsCtrl(geoLocationService, areaService, $translate, $scope, notificationService, userService, moment, $timeout) {
         /* jshint validthis: true */
         var vm = this;
         
         var leafletMap;
         var markerUser = {};
         var areaUser = {};
-
+        var ways = {};
+        var filteredWays = {};
         var lastDrawnId = null;
         var lastDrawnPolyLine = null;
+        var polylineUser = {};
+        var locs = [];
 
         vm.area = {};
         vm.createArea = createArea;
         vm.deleteArea = deleteArea;
         vm.updateArea = updateArea;
+        vm.toggleUser = toggleUser;
         vm.newArea = false;
+        vm.dates = {};
+        vm.timelines = {length: 1};
+        vm.users = {};
 
         var areaText;
         var newButtonText;
@@ -31,7 +38,14 @@
         var deleteButtonText;
         var popup = L.popup();
 
-        getPoints();
+        activate();
+
+       function activate() {
+           getLanguageCurrentUser().then(function(language) {
+             getPoints(language);
+           })
+           return ;
+        }
 
         var icon = L.icon({
             iconUrl: '/img/leaflet/marker-icon.png',
@@ -44,21 +58,61 @@
             shadowSize:[41,41]
         });
 
-        function getPoints(){
+        function getPoints(language){
             geoLocationService.get()
                 .then(function(data) {
                     vm.locations = data.data;
+
                     if(vm.locations.length) {
                         initMap(vm.locations[0].latitude, vm.locations[0].longitude, 10);
+                        for(var i = 0; i < vm.locations.length;i++) {
+                          if((vm.dates.start && vm.dates.start > vm.locations[i].datetime) || !vm.dates.start) {
+                            vm.dates.start = moment(vm.locations[i].datetime);
+                          }
+                          if((vm.dates.end && vm.dates.end < vm.locations[i].datetime) || !vm.dates.end) {
+                            vm.dates.end = moment(vm.locations[i].datetime);
+                          }
+                        };
                     } else {
 
                         // eiffel tower !
                         initMap(48.858093, 2.294694, 8);
+                        vm.dates.start = vm.dates.end = moment();
                     }
+                    vm.max = vm.dates.end;
                     
+                    $('#datetimepickerstartdate').datetimepicker({
+                      locale: language
+                    }).on('dp.change', function(e) {
+                      vm.dates.start = vm.min = e.date;
+                      if(vm.dates.start > vm.dates.end) {
+                        vm.dates.end = vm.max = vm.dates.start;
+                        $('#datetimepickerenddate').data("DateTimePicker").date(new Date(vm.dates.start));
+                        //$('#datetimepickerstartdate').datetimepicker({date: vm.dates.start})
+                      }
+                      getAllPositionsByDateRange(vm.dates);
+                    });
+                    $('#datetimepickerenddate').datetimepicker({
+                      locale: language
+                    }).on('dp.change', function(e) {
+                      vm.dates.end = vm.max = e.date;
+                      if(vm.dates.sart > vm.dates.end) {
+                        vm.dates.start = vm.min = vm.dates.end;
+                        //$('#datetimepickerenddate').datetimepicker({date: vm.dates.end})
+                        $('#datetimepickerstartdate').data("DateTimePicker").date(new Date(vm.dates.end));
+                      }
+                      getAllPositionsByDateRange(vm.dates);
+                    });
+
                     vm.locations.forEach(function(location){
+                        ways[location.user] = [];
+                        vm.users[location.user] = {
+                          color : 'hsla(' + (Math.random() * 360) + ', 100%, 50%, 0.8)',
+                          name : location.firstname + ' ' + location.lastname
+                        }
+
                         markerUser[location.user] = L.marker([location.latitude, location.longitude], {icon: icon}).addTo(leafletMap);
-                        markerUser[location.user].bindTooltip(location.firstname + ' ' + location.lastname).openTooltip();
+                        markerUser[location.user].bindTooltip(vm.users[location.user].name).openTooltip();
                         markerUser[location.user].on('click', function() {
                             drawLinesUser(location.user);
                         });
@@ -174,13 +228,22 @@
         }
 
         function newMapArea(area){
+            if(!area.color) {
+              area.color = '#0052D4';
+            } else {
+              area.color = '#' + (area.color).toString(16);
+            }
+
             areaUser[area.id] = L.circle([area.latitude, area.longitude], 
                 {id: area.id,
-                    name: area.name, 
-                    longitude: 
-                    area.longitude, 
-                    latitude: area.latitude, 
-                    radius: area.radius
+                 name: area.name, 
+                 longitude: 
+                 area.longitude, 
+                 latitude: area.latitude, 
+                 radius: area.radius,
+                 color: area.color,
+                 fillColor: area.color,
+                 fillOpacity: 0.2
                 }).addTo(leafletMap);
 
             areaUser[area.id].on('mouseover', function(){
@@ -219,6 +282,92 @@
 
         }
 
+        function filterPolylines(range) {
+          $timeout(function() {
+            vm.min = moment(locs[range[0]].datetime);
+            vm.max = moment(locs[range[1]].datetime);
+
+            for(var user in ways) {
+              filteredWays[user] = [];
+
+              if(polylineUser[user]) {
+                leafletMap.removeLayer(polylineUser[user]);
+              }
+              for(var i = 0; i < ways[user].length; i++) {
+                if(vm.min <= new Date(ways[user][i][2]) && new Date(ways[user][i][2]) <= vm.max) {
+                  filteredWays[user].push(ways[user][i]);
+                }
+              }
+              drawPolyline(filteredWays);
+            } 
+          });
+        }
+
+        function drawPolyline(w) {
+          for (var user in w) {
+            if(polylineUser[user]) {
+              leafletMap.removeLayer(polylineUser[user]);
+            }
+
+            polylineUser[user] = L.polyline([w[user]],
+              {
+                color: vm.users[user].color,
+                weight: 3,
+                opacity: .8,
+                dashArray: '10,8',
+                lineJoin: 'round'
+              }
+            ).addTo(leafletMap);
+          }
+        }
+
+        function toggleUser(user) {
+          if(!vm.users[user].hidden) {
+            leafletMap.removeLayer(polylineUser[user]);
+            vm.users[user].hidden = true;
+          } else {
+            var tmp = {};
+            if(filteredWays[user]) {
+              tmp[user] = filteredWays[user];
+              drawPolyline(tmp);
+            } else {
+              tmp[user] = ways[user];
+              drawPolyline(tmp);
+            }
+            vm.users[user].hidden = false;
+          }
+        }
+
+        function getAllPositionsByDateRange(dates) {
+            dates = {
+	      start: new Date(dates.start),
+              end: new Date(dates.end)
+            }
+            return geoLocationService.getByUsersAndByDateRange(dates)
+              .then(function(data) {
+                locs = data.data;
+                // Clear old ways
+                for (var user in ways) {
+                  ways[user] = [];
+                }
+                // resize the timeline slider
+                $("#timeline_slider").slider('setAttribute', 'max', locs.length-1)
+                  .slider('setAttribute', 'range', [0, locs.length-1])
+                  .slider('refresh')
+                  .on('change', function(e) {
+                    filterPolylines(e.value.newValue);
+                  });
+                $(".slider-selection").css("background", "#518cb8");
+                // Draw the ways on the map
+                for(var i = 0; i < locs.length;i++) {
+                  ways[locs[i].user].push([locs[i].latitude, locs[i].longitude, locs[i].datetime]);
+                }
+
+                drawPolyline(ways);
+              })
+
+        }
+
         function translateText(){
             $translate('MAPS.AREA')
                 .then(function(text) {
@@ -237,6 +386,14 @@
                     deleteButtonText = text 
                 });
             return;
+        }
+
+        function getLanguageCurrentUser(){
+          return userService.whoAmI()
+            .then(function(user){
+               vm.language = user.language.substring(0,2).toLowerCase();
+               return vm.language;
+          });
         }
     }
 })();

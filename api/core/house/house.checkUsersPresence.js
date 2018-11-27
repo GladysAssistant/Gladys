@@ -1,6 +1,9 @@
 const queries = require('./house.queries.js');
 const Promise = require('bluebird');
 
+// default time is 15 minutes
+const DEFAULT_USER_TIME_BEFORE_CONSIDERING_LEFT_HOME = 15;
+
 /**
  * @public
  * @description This function check if an user as at home and create an event in timeline
@@ -14,6 +17,7 @@ module.exports = function checkUsersPresence(){
 
   // first, get the time a user is considered not at home anymore
   return gladys.param.getValue('USER_TIME_BEFORE_CONSIDERING_LEFT_HOME')
+    .catch(() => DEFAULT_USER_TIME_BEFORE_CONSIDERING_LEFT_HOME)
     .then((timeBeforeLeftInMinute) => {
 
       // get all houses

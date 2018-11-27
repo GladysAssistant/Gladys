@@ -3,7 +3,7 @@
 <!-- NEW BOX -->
 <div class="box skin-box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title"><%= __('house-box-title') %></h3>
+        <h3 class="box-title"><%= __('house-box-title') %> <small class="ng-cloak" ng-show="vm.savingHouse"><%= __('house-box-saving') %></small></h3>
     </div>
 
 <div class="box-body table-responsive">
@@ -29,13 +29,13 @@
         <tbody>
             <tr ng-repeat="house in vm.houses" class="ng-cloak">
                 <td>{{house.id}}</td>
-                <td>{{house.name}}</td>
-                <td>{{house.address}}</td>
-                <td>{{house.city}}</td>
-                <td>{{house.postcode}}</td>
-                <td>{{house.country}}</td>
-                <td>{{house.latitude}}</td>
-                <td>{{house.longitude}}</td>
+                <td><input type="text" class="form-control" ng-model="house.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-name') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.address" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-adress') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.city" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-city') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.postcode" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-postcode') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.country" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-country') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.latitude" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-house-latitude') %>" /></td>
+                <td><input type="text" class="form-control" ng-model="house.longitude" ng-model-options='{ debounce: 500 }' ng-change="vm.updateHouse(house);" data-toggle="tooltip" data-original-title="<%= __('tooltip-house-longitude') %>" /></td>
                 <td><button ng-click="vm.deleteHouse($index, house.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
             </tr>
             <tr>
@@ -61,7 +61,7 @@
 <!-- NEW BOX -->
 <div class="box skin-box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title"><%= __('room-box-title') %></h3>
+        <h3 class="box-title"><%= __('room-box-title') %>  <small class="ng-cloak" ng-show="vm.savingRoom"><%= __('house-box-saving') %></small></h3>
     </div>
     
     <div class="box-body table-responsive">
@@ -78,7 +78,7 @@
         <tbody>
             <tr ng-repeat="room in vm.rooms" class="ng-cloak">
                 <td>{{room.id}}</td>
-                <td>{{room.name}}</td>
+                <td><input type="text" class="form-control" ng-model="room.name" ng-model-options='{ debounce: 500 }' ng-change="vm.updateRoom(room);"  data-toggle="tooltip" data-original-title="<%= __('tooltip-room-name') %>" /></td>
                 <td>{{room.houseName}}</td>
                 <td><button ng-click="vm.deleteRoom($index, room.id)" class= "btn btn-flat btn-danger  "><%= __('Delete') %></button></td>
             </tr>

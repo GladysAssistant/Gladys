@@ -10,6 +10,7 @@ jobs:
       node_js:
        - '8'
        - '10'
+       - 'node'
       cache: yarn
       services:
       - mysql
@@ -25,7 +26,7 @@ jobs:
         - mysql -u root -e "GRANT ALL PRIVILEGES ON gladystest.* TO 'travis'@'%';";
       script:
         - "npm run eslint"
-        - "grunt coverage"
+        - "npm test"
         - "grunt buildProd"
       
     - stage: Build & Deploy documentation
