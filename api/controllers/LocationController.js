@@ -60,5 +60,13 @@ module.exports = {
       .getByUser({ user: req.params.id, take: req.query.take, skip: req.query.skip })
       .then(locations => res.json(locations))
       .catch(next);
-  }
+  },
+
+  getByDateRange: function(req, res, next) {
+    gladys.location
+      .getByDateRange({ start: req.query.start, end: req.query.end })
+      .then(locations => res.json(locations))
+      .catch(next);
+  },
+
 };

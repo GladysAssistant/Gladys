@@ -18,5 +18,54 @@
     "id": 4,
     "value": 0,
     "devicetype": 3
+  },
+  {
+    "id": 5,
+    "value": 52,
+    "devicetype": 2,
+    "datetime": "2018-10-04",
+    "createdAt": "2018-10-04"
+  },
+  {
+    "id": 6,
+    "value": 13,
+    "devicetype": 2,
+    "datetime": "2018-10-05",
+    "createdAt": "2018-10-05"
+  },
+  {
+    "id": 7,
+    "value": 73,
+    "devicetype": 2,
+    "datetime": "2018-10-06",
+    "createdAt": "2018-10-06"
+  },
+  {
+    "id": 8,
+    "value": 2,
+    "devicetype": 2,
+    "datetime": "2018-10-06",
+    "createdAt": "2018-10-06"
+  },
+  {
+    "id": 9,
+    "value": 18,
+    "devicetype": 2,
+    "datetime": "2018-10-07",
+    "createdAt": "2018-10-07"
+  },
+  {
+    "id": 10,
+    "value": 90,
+    "devicetype": 2,
+    "datetime": "2018-10-09",
+    "createdAt": "2018-10-09"
+  },
+  {
+    "id": 11,
+    "value": 20,
+    "devicetype": 2,
+    "datetime": "2018-10-10",
+    "createdAt": "2018-10-10"
   }
 ]

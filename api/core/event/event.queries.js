@@ -14,5 +14,13 @@ module.exports = {
   purge: `
         DELETE FROM event
         WHERE datetime < NOW() - INTERVAL ? DAY;
+    `,
+  purgeByEventType: `
+        DELETE FROM event
+        USING event, eventtype
+        WHERE event.eventtype = eventtype.id
+        AND event.datetime < NOW() - INTERVAL ? DAY
+        AND eventtype.code = ?
     `
+
 };

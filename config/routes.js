@@ -102,6 +102,8 @@ module.exports.routes = {
   'get /devicestate': 'DeviceStateController.index',
   'post /devicestate': 'DeviceStateController.create',
   'get /devicestate/create': 'DeviceStateController.createGet', // allowing get request too for creating devicestate
+  'get /devicestate/filtered': 'DeviceStateController.filtered',
+  'get /devicestate/filtered/minmax': 'DeviceStateController.filteredMinMax',
 
   // DeviceType
   'get /devicetype': 'DeviceTypeController.index',
@@ -156,6 +158,7 @@ module.exports.routes = {
   'get /location/create': 'LocationController.create',
   'get /location': 'LocationController.get',
   'get /user/:id/location': 'LocationController.getByUser',
+  'get /location/range': 'LocationController.getByDateRange',
 
   // Machine
   'get /machine': 'MachineController.get',
@@ -175,6 +178,7 @@ module.exports.routes = {
   'post /module/:slug/config': 'ModuleController.config',
   'delete /module/:id': 'ModuleController.uninstall',
   'post /module/:id/upgrade': 'ModuleController.upgrade',
+  'post /module/method': 'ModuleController.getMethods',
 
   // Music
   'post /music/flushqueue': 'MusicController.flushQueue',
@@ -200,6 +204,7 @@ module.exports.routes = {
 
   // Notification
   'get /notification': 'NotificationController.index',
+  'post /notification': 'NotificationController.create',
   'patch /notification/read': 'NotificationController.read',
 
   // NotificationType
@@ -283,6 +288,10 @@ module.exports.routes = {
   'post /television/openmenu': 'TelevisionController.openMenu',
   'post /television/rec': 'TelevisionController.rec',
   'post /television/customcommand': 'TelevisionController.customCommand',
+  'post /television/program/plus': 'TelevisionController.programPlus',
+  'post /television/program/minus': 'TelevisionController.programMinus',
+  'post /television/openinfo': 'TelevisionController.openInfo',
+  'post /television/program/vod': 'TelevisionController.programVod',
 
   // Token
   'get /token': 'TokenController.index',

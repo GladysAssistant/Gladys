@@ -176,49 +176,94 @@
               </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="tab_3" data-ng-controller="DeviceStateCtrl as vm">
-                  
-                  <!-- BEGINNING OF TAB 3 -->
-                    <div class="row">
-                        <div class="col-md-8 pull-right">
-                            <form class="form-inline">
-                                <div class="form-group">
-                                    <label for="selectDeviceType"><%= __('devices-select-device-type') %> : </label>
-                                    <select name="selectDeviceType" id="selectDeviceType" class="form-control"
-                                        ng-options="(deviceType.name || deviceType.deviceName + ' - ' + deviceType.type) for deviceType in vm.deviceTypes track by deviceType.id"
-                                        ng-model="vm.currentDeviceType">
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                     <button class="btn btn-flat btn-info" ng-click="vm.previousStates();" ><%= __('devices-skip-previous') %></button>
-                                     <button class="btn btn-flat btn-info" ng-click="vm.nextStates();" ><%= __('devices-skip-next') %></button>
-                                </div>
-                                </form>
-                            
-                           
-                            
+                <div class="row">
+                  <div class="col-md-5">
+                    <form class="form-inline">
+                      <div class="form-group">
+                        <label for="selectDeviceType">
+                          <%= __('devices-select-device-type') %></label>
+                        <select name="selectDeviceType" id="selectDeviceType" class="form-control"
+                                ng-options="(deviceType.name || deviceType.deviceName + ' - ' + deviceType.type) group by deviceType.roomName for deviceType in vm.deviceTypes | orderBy:['roomName', 'id'] track by deviceType.id"
+                                ng-model="vm.currentDeviceType">
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-md-3">
+                    <form class="form-group">
+                      <div class="disabled-picker" id="daterangepickerFilter">
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="fa fa-clock-o"></i>
+                          </div>
+                          <input type="text" class="form-control pull-right" id="daterangepicker">
                         </div>
-                        <!-- col-md-4 -->
-                        
-                       
-                        <!-- col-md-6 -->
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <div class="checkbox" style="margin-top: 7px">
+                        <label data-toggle="tooltip" data-original-title="<%= __('chart-tooltip-mini-maxi') %>">
+                          <input type="checkbox" name="checkbox" ng-model="vm.displayMinMax" ng-click="vm.getMinMax()">
+                          <%= __('chart-label-mini-maxi') %>
+                          <span class="checkbox-checkmark"></span>
+                        </label>
+                      </div>
                     </div>
-                     <!-- /.row --> 
-                     
-                      
-                            
-                    <div>
-                        <canvas id="line" class="chart chart-line" chart-data="vm.chart.data"
-                         chart-labels='vm.chart.labels' chart-options="vm.options" chart-series="vm.chart.series">
-                        </canvas> 
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <div class="checkbox" style="margin-top: 7px">
+                        <label>
+                          <input type="checkbox" name="checkbox" ng-model="vm.steppedline" ng-click="vm.refreshData()">
+                          <%= __('chart-label-stepped-line') %>
+                          <span class="checkbox-checkmark"></span>
+                        </label>
+                      </div>
                     </div>
-                     
-                  <!-- END OF TAB 3 -->
+                  </div>
+                </div>
+                <!--END OF HEADER-->
+                <div class="box box-primary" ng-show="vm.ready">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">
+                      <span ng-show="vm.currentDeviceType">{{vm.currentDeviceType.roomName}}</span>
+                      <span ng-show="!vm.currentDeviceType">
+                                    <%= __('chart') %></span>
+                    </h3>
+                    <div class="box-tools">
+                      <button type="button" id="previousButton" class="btn btn-box-tool" ng-click="vm.previousStates()">
+                        <i class="fa fa-arrow-left"></i>
+                      </button>
+                      <button type="button" id="nextButton" class="btn btn-box-tool" ng-click="vm.nextStates()">
+                        <i class="fa fa-arrow-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="box-body" style="position: relative; height:60vh; width:100%">
+                    <canvas id="deviceChart"></canvas>
+                  </div>
+                </div>
+                <div class="row" ng-show="!vm.ready">
+                  <div class="col-centered col-md-12">
+                    <div class="spinner-box">
+                      <div class="spinner">
+                        <div class="double-bounce1"></div>
+                        <div class="double-bounce2"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <slider id="blue" ng-model="vm.threshold" min="0" step="1" max="98" value="vm.threshold"
+                          ng-model-options='{ debounce: 200 }' ng-change="vm.refreshData()">
+                  </slider>
+                  <p class="help-block">
+                    <%= __('chart-slider-help') %>
+                  </p>
+                </div>
               </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_3">
-
-              </div>
-              <!-- /.tab-pane -->
             </div>
             <!-- /.tab-content -->
           </div>
@@ -328,9 +373,15 @@
                                                 <td>
                                                     <select class="form-control" ng-model="vm.newType.category"  >
                                                         <option value="light"><%= __('devices-types-category-light') %></option>
+                                                        <option value="temperature-sensor"><%= __('devices-types-category-temperature-sensor') %></option>
+                                                        <option value="humidity-sensor"><%= __('devices-types-category-humidity-sensor') %></option>
+                                                        <option value="light-sensor"><%= __('devices-types-category-light-sensor') %></option>
+                                                        <option value="battery-sensor"><%= __('devices-types-category-battery-sensor') %></option>
+                                                        <option value="door-opening-sensor"><%= __('devices-types-category-door-opening-sensor') %></option>
+                                                        <option value="window-opening-sensor"><%= __('devices-types-category-window-opening-sensor') %></option>
                                                         <option value="outlet"><%= __('devices-types-category-outlet') %></option>
                                                         <option value="music"><%= __('devices-types-category-music') %></option>
-                                                        <option value="tv"><%= __('devices-types-category-tv') %></option>
+                                                        <option value="television"><%= __('devices-types-category-tv') %></option>
                                                         <option value="phone"><%= __('devices-types-category-phone') %></option>
                                                         <option value="computer"><%= __('devices-types-category-computer') %></option>
                                                     </select>    

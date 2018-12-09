@@ -179,6 +179,7 @@
   "area-latitude": "Latitude",
   "area-longitude": "Longitude",
   "area-radius": "Radius (meters)",
+  "area-color": "Color",
   "area-action": "Action",
   "area-new": "New",
   "area-delete": "Delete",
@@ -415,6 +416,11 @@
   "scenario-if-condition-true": "True",
   "scenario-if-condition-false": "False",
   "scenario-if-condition-is": "is",
+  "chart": "Chart",
+  "chart-slider-help": "% of data smoothing, from 0% (no smoothing, all values are displayed), to 98% (maximum smoothing). The less smoothed the data, the longer the display time.",
+  "chart-tooltip-mini-maxi": "Displays the minimum and maximum value curves per day over the selected period.",
+  "chart-label-mini-maxi": "Min. and max. per day",
+  "chart-label-stepped-line": "stepped line",
   "parameters-gateway": "Gladys Gateway",
   "gateway-left-explanation": "The Gladys Gateway is the best way to connect to Gladys from the outside of your network",
   "gateway-left-explanation-know-more": "Read more",
@@ -431,5 +437,11 @@
   "gateway-connecting": "Generating keys and connecting...",
   "gateway-login-error": "Your email/password/two-factor code is invalid.",
   "gateway-users-list": "Users",
-  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not."
+  "gateway-users-explanation": "You need to authorize users here before they can control Gladys. With this security, MITM attack is not possible. If the Gladys Gateway is compromised, your instance is not.",
+  "area-start-range-date": "Start range date",
+  "area-end-range-date":"End range date",
+  "area-between": "Between",
+  "area-and-the": "and",
+  "area-last-known-location": "Last known locations",
+  "house-box-saving": "Saving"
 }

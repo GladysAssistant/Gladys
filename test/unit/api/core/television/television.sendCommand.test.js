@@ -44,7 +44,11 @@ describe('Television', function() {
       'openSource',
       'openMenu',
       'rec',
-      'customCommand'
+      'customCommand',
+      'programPlus',
+      'programMinus',
+      'openInfo',
+      'programVod'
     ];
 
     functionsAvailable.forEach(function(func) {
@@ -93,7 +97,23 @@ describe('Television', function() {
         case 'customCommand':
           options = { device: 5, color: 'yellow' };
           break;
-
+        
+        case 'programPlus':
+          options = { device: 5, controlType: func };
+          break;
+        
+        case 'programMinus':
+          options = { device: 5, controlType: func };
+          break;
+                  
+        case 'openInfo':
+          options = { device: 5, controlType: func };
+          break;
+                
+        case 'programVod':
+          options = { device: 5, controlType: func };
+          break;
+        
         default:
           options = { device: 5 };
         }

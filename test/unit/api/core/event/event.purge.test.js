@@ -3,7 +3,7 @@ var validateEvent = require('../../validator/eventValidator.js');
 
 describe('Event', function() {
   describe('purge', function() {
-    it('should return 1 events', function(done) {
+    it('should return 1 event', function(done) {
       var event = {
         params: {
           eventtype: 3,

@@ -11,3 +11,4 @@ module.exports.get = require('./event.get.js');
 module.exports.getByEventType = require('./event.getByEventtype.js');
 module.exports.update = require('./event.update.js');
 module.exports.purge = require('./event.purge.js');
+module.exports.purgeByEventType = require('./event.purgeByEventtype.js');

@@ -311,6 +311,18 @@ function addTestModuleGladys(gladys) {
       },
       blueButton: function() {
         return Promise.resolve();
+      },
+      openInfo: function() {
+        return Promise.resolve();
+      },
+      programVod: function() {
+        return Promise.resolve();
+      },
+      programPlus: function() {
+        return Promise.resolve();
+      },
+      programMinus: function() {
+        return Promise.resolve();
       }
     }
   };
