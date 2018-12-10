@@ -53,7 +53,7 @@
             getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
             activate();
           } else {
-            $(document.getElementById(`chartMenu-${id}`)).dropdown('toggle');
+            $(document.getElementById('chartMenu-' + id)).dropdown('toggle');
           }
         });
       getDeviceTypes();
@@ -69,7 +69,7 @@
         vm.chart.destroy();
       }
 
-      vm.chart = new Chart(`deviceChart-${vm.boxId}`, {
+      vm.chart = new Chart('deviceChart-' + vm.boxId, {
         type: 'line',
         data: {
           datasets: [{
