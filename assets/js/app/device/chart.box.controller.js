@@ -20,7 +20,7 @@
 
     vm.box = null;
     vm.deviceTypes = [];
-    vm.chart;
+    vm.chart = null;
     var minY = null;
     var maxY = null;
     var gapGrap = 0.02;
@@ -28,9 +28,9 @@
     var dataDt = [];
     vm.threshold = 90;
 
-    var labelDt = "";
+    var labelDt = '';
     var globalTime = 1;
-    var globalTimeRange = "days";
+    var globalTimeRange = 'days';
 
     var filter = {
       start: moment().subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss'),
@@ -50,10 +50,10 @@
             vm.currentDeviceType.name = vm.box.params.name;
             vm.currentDeviceType.unit = vm.box.params.unit;
             vm.currentDeviceType.roomName = vm.box.params.roomName;
-            getFilteredDeviceState(vm.currentDeviceType,filter.start,filter.end);
+            getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
             activate();
           } else {
-            $(document.getElementById('chartMenu')).dropdown("toggle");
+            $(document.getElementById(`chartMenu-${id}`)).dropdown('toggle');
           }
         });
       getDeviceTypes();
@@ -69,7 +69,7 @@
         vm.chart.destroy();
       }
 
-      vm.chart = new Chart('deviceChart', {
+      vm.chart = new Chart(`deviceChart-${vm.boxId}`, {
         type: 'line',
         data: {
           datasets: [{
@@ -125,7 +125,7 @@
             mode: 'index',
             callbacks: {
               title: function (tooltipItem) {
-                return moment(tooltipItem[0].xLabel).format('ll[, ]LTS')
+                return moment(tooltipItem[0].xLabel).format('ll[, ]LTS');
               }
             }
           }
@@ -136,13 +136,14 @@
     }
 
     $scope.$watch('vm.currentDeviceType', function () {
-      saveCurrentDeviceType()
+      saveCurrentDeviceType();
       refreshData();
     });
 
     function saveCurrentDeviceType() {
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
-        boxService.update(vm.boxId, { params: { device: vm.currentDeviceType.id, name: vm.currentDeviceType.name, unit: vm.currentDeviceType.unit, roomName: vm.currentDeviceType.roomName } })
+        var name = vm.currentDeviceType.name ? vm.currentDeviceType.name : vm.currentDeviceType.type;
+        boxService.update(vm.boxId, { params: { device: vm.currentDeviceType.id, name: name, unit: vm.currentDeviceType.unit, roomName: vm.currentDeviceType.roomName } });
       }
     }
 
@@ -155,15 +156,18 @@
 
     // Navigation button, period to period
     function nextStates() {
-      filter.start = filter.end;
-      filter.end = moment(filter.end).add(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
+      var maxEnd = moment.min(moment(filter.end).add(globalTime, globalTimeRange), moment(Date.now()));
+      filter.end = maxEnd.format('YYYY-MM-DD HH:mm:ss');
+      filter.start = maxEnd.subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
       refreshData();
     }
 
     // Updates the graph data
     function refreshData() {
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
-        getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end)
+        filter.start= moment(filter.start).format('YYYY-MM-DD HH:mm:ss');
+        filter.end = moment(filter.end).format('YYYY-MM-DD HH:mm:ss');
+        getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
       }
     }
 
@@ -173,9 +177,9 @@
       return deviceService.getFilteredStates(deviceType.id, startDate, endDate, 100 - vm.threshold)
         .then(function (data) {
           if (data.data.length !== 0) {
-            formatData(deviceType, data)
+            formatData(deviceType, data);
           } else {
-            notificationService.errorNotificationTranslated('CHART.NO_VALUES')
+            notificationService.errorNotificationTranslated('CHART.NO_VALUES');
           }
         });
     }
@@ -200,7 +204,8 @@
         }).x;
         
         // Update the graph title
-        labelDt = (deviceType.unit ? [deviceType.name + ' (' + deviceType.unit] + ')' : [deviceType.name]);
+        var name = deviceType.name ? deviceType.name : deviceType.type;
+        labelDt = (deviceType.unit ? [name + ' (' + deviceType.unit] + ')' : [name]);
       }
       vm.currentDeviceType = deviceType;
       activateCharts();
@@ -218,8 +223,13 @@
       io.socket.on('newDeviceState', function (deviceState) {
         // if the device is the current device, push the value in the graph
         if (vm.currentDeviceType && deviceState.devicetype === vm.currentDeviceType.id) {
-          dataDt.push({ x: deviceState.datetime, y: deviceState.value });
-          vm.chart.update()
+          if(moment(deviceState.datetime).subtract(globalTime, globalTimeRange).isBefore(moment(filter.end))) {
+            dataDt.unshift({ x: deviceState.datetime, y: deviceState.value });
+            dataDt.pop();
+            filter.end = moment(deviceState.datetime).format('YYYY-MM-DD HH:mm:ss');
+            filter.start = moment(deviceState.datetime).subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
+            vm.chart.update();            
+          }
         }
       });
     }
