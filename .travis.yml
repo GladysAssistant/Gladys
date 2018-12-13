@@ -65,18 +65,11 @@ jobs:
           branch: master
 
     - stage: Build & Push Docker image
-      language: minimal
+      language: bash
       services: docker
       env:
       - DOCKER_REPO_SLUG=gladysproject/gladys
       - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
+      - DOCKER_CLI_EXPERIMENTAL=enabled
       script:
-      - docker build -t $DOCKER_REPO_SLUG:latest .
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker build -t $DOCKER_REPO_SLUG:$MAJOR_VERSION .; else true ; fi
-      after_success:
-      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - if [[ $TRAVIS_BRANCH = master ]]; then docker push $DOCKER_REPO_SLUG:latest; else true; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$MAJOR_VERSION; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker tag $DOCKER_REPO_SLUG:$MAJOR_VERSION $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
-      - if [[ $TRAVIS_TAG = $TRAVIS_BRANCH ]]; then docker push $DOCKER_REPO_SLUG:$TRAVIS_TAG; else true ; fi
- 
+      - bash docker/ci-docker-build.sh
