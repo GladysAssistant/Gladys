@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "3.11.3",
+  "version": "3.11.6",
   "description": "Your personnal assistant, always here.",
   "scripts": {
     "start": "NODE_ENV=development node app.js",
@@ -22,7 +22,7 @@
     "gladys": "./app.js"
   },
   "dependencies": {
-    "@gladysproject/gladys-gateway-js": "^1.0.5",
+    "@gladysproject/gladys-gateway-js": "1.0.7",
     "barrels": "^1.6.5",
     "bcrypt": "3.0.0",
     "bluebird": "^3.5.0",
