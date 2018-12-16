@@ -10,7 +10,8 @@ describe('Brain', function() {
       };
 
       var message = {
-        text: 'THIS IS A TEST, ARE YOU GETTING ME ???'
+        text: 'THIS IS A TEST, ARE YOU GETTING ME ???',
+        roomOrigin: 'salon'
       };
 
       gladys.brain
@@ -26,6 +27,7 @@ describe('Brain', function() {
             item.message.should.have.property('label');
             item.message.should.have.property('scope');
             item.message.scope.should.have.property('user');
+            item.message.scope.should.have.property('answerRoom');
             item.message.scope.user.should.not.have.property('password');
             item.response.should.have.property('label');
             item.response.should.have.property('text');
