@@ -1,14 +1,18 @@
 
-module.exports = function(originalText){
+module.exports = function(data){
   return gladys.room.getAll()
     .then(function(rooms){
         
       var result = [];
       var replaceRegex = '';
-           
+      var answerRoom = false;
+
       // foreach room, we verify if the room is present in the sentence
       rooms.forEach(function(room){
-        if(present(originalText, room.name)){
+        if(data.roomOrigin && present(data.roomOrigin, room.name)){
+          answerRoom = room;
+        }
+        if(present(data.text, room.name)){
           result.push(room);
           if(replaceRegex.length > 0) { 
             replaceRegex += '|'; 
@@ -16,16 +20,22 @@ module.exports = function(originalText){
           replaceRegex += room.name;
         }
       });
+   
+      // If no room provided in text while roomOrigin is set, we consider user want to apply action inside the originRoom
+      if(!result.length && answerRoom) {
+        result.push(answerRoom);
+      }
 
-      var text = originalText;
+      var text = data.text;
         
       if(replaceRegex.length > 0) {
-        text = originalText.replace(new RegExp(replaceRegex, 'gi'), '%ROOM%');
+        text = data.text.replace(new RegExp(replaceRegex, 'gi'), '%ROOM%');
       }
 
       return {
         text, 
-        rooms: result
+        rooms: result,
+        answerRoom: answerRoom
       };
     });
 };
@@ -37,7 +47,16 @@ module.exports = function(originalText){
  */
 function present(text, room){
   if(room) {
-    return ((noAccent(text).indexOf(noAccent(room)) > -1));
+    if(!Array.isArray(text)) {
+      return ((noAccent(text).indexOf(noAccent(room)) > -1));
+    } else {
+      for(var i = 0; i < text.length; i++) {
+        if(noAccent(text[i]).indexOf(noAccent(room)) > -1) {
+          return true;
+        }
+      } 
+    }
+    return false;
   } else {
     return false;
   }

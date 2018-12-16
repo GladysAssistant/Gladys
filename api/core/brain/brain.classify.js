@@ -5,18 +5,18 @@ const parser = require('./parser/parser.js');
 const answer = require('./brain.answer.js');
 
 module.exports = function classify(user, message){
+
   var start = process.hrtime();
-    
+
   if(!message.text || message.text.length === 0){
     return Promise.reject(new Error('BRAIN_NO_TEXT_GIVEN'));
   }
-
-  return parser.parse(message.text)
+  return parser.parse(message)
     .then((scope) => {
 
       // add language to scope so that called module can adapt to the current language
       scope.language = user.language.substr(0, 2).toLowerCase();
-            
+          
       // add user to scope so that called module can adapt to current user
       scope.user = user;
 

@@ -48,6 +48,7 @@ module.exports = function answer(result, user) {
       // adding senderName
       newMessage.senderName = user.assistantName;
       newMessage.needAnswer = result.response.needAnswer;
+      newMessage.answerRoom = result.message.scope.answerRoom;
 
       // remove socket, socket is sent in any way
       notificationTypes = notificationTypes.filter((type) => type.service !== 'socket');
