@@ -24,12 +24,14 @@ function exec(param) {
       if (param.value < types[0].min || param.value > types[0].max) {
         return Promise.reject(new Error('Incorrect value'));
       }
-            
-            
-      // if we send true or false, it's valid
-      // but it won't insert in db because validator
-      // need an integer
-      if(param.value === true || param.value == 'true'){
+
+      // if we sent a percentage,it meanswe want a percentage of the value's range available
+      if(param.percentage) {
+        param.value = types[0].min+((types[0].max-types[0].min) * (param.percentage/100));
+      } else if(param.value === true || param.value == 'true'){
+        // if we send true or false, it's valid
+        // but it won't insert in db because validator
+        // need an integer
         param.value = 1;
       } else if(param.value === false || param.value == 'false'){
         param.value = 0;
