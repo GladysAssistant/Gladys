@@ -101,6 +101,17 @@ module.exports = function(oldVersion) {
 
   }
 
+  if(semver.lt(oldVersion, '3.11.5')) {
+
+    // add color column in area
+    return gladys.utils.sql(`ALTER TABLE area ADD COLUMN color integer DEFAULT NULL;`).reflect()
+
+      // finishing migration
+      .then(() => gladys.task.updateDbVersion('3.11.5'))
+      .then(() => gladys.task.dbMigration('3.11.5'));
+
+  }
+
   // default, we save in DB the current version of Gladys
   return gladys.task.updateDbVersion(gladys.version);
 };
