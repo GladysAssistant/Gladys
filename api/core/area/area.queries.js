@@ -19,6 +19,7 @@ module.exports = {
   `,
   delete: 'DELETE FROM area WHERE id = ?;',
   get: 'SELECT * FROM area WHERE user = ?;',
+  getAll: 'SELECT * FROM area;',
   getLastAreaEventPerArea: `
     SELECT MAX(DATETIME) as datetime, value, eventtype.code as code
     FROM event 
