@@ -75,10 +75,10 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GladysProject/Gladys"
+    "url": "https://github.com/gladysassistant/Gladys"
   },
   "bugs": {
-    "url": "https://github.com/GladysProject/Gladys/issues"
+    "url": "https://github.com/gladysassistant/Gladys/issues"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "MIT"
