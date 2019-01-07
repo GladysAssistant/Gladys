@@ -1,9 +1,9 @@
 Gladys Project
 =======================
 
-[![Build Status](https://travis-ci.org/GladysProject/Gladys.svg?branch=v3)](https://travis-ci.org/GladysProject/Gladys)
+[![Build Status](https://travis-ci.org/gladysassistant/Gladys.svg?branch=v3)](https://travis-ci.org/gladysassistant/Gladys)
 
-![Alt](https://gladysproject.com/assets/images/presentation/facebook_share_gladys.jpg)
+![Alt](https://gladysassistant.com/assets/images/presentation/facebook_share_gladys.jpg)
 
 The Project
 -------------
@@ -25,8 +25,8 @@ This is just a simple scenario, possibilities with Gladys are just endless ! Don
 
 Interested in Gladys ? Try it at home, it's free and Open-Source !
 
-**Website :** [https://gladysproject.com](http://gladysproject.com) <br>
-**Community :** [https://community.gladysproject.com/](https://community.gladysproject.com/)
+**Website :** [https://gladysassistant.com](http://gladysassistant.com) <br>
+**Community :** [https://community.gladysassistant.com/](https://community.gladysassistant.com/)
 
 Gladys Raspbian image has **more than 32 000 downloads**, and Gladys community has more than **3 000 members** ! 
 
@@ -35,7 +35,7 @@ Who Am I ?
 
 My name is [Pierre-Gilles Leymarie](https://twitter.com/pierregillesl), I'm an indie maker, and recently I decided to move part-time on this open-source project Gladys!
 
-As I'm working completely for free for the community, you can support my work on [Patreon](https://www.patreon.com/gladysproject/overview) or [PayPal](https://www.paypal.me/gladysproject/35), to help me pay my food and rent so I'll not die 🤤😄
+As I'm working completely for free for the community, you can Gladys with the [Gladys Community Package](https://gladysassistant.com/gladys-community-package), to help me pay my food and rent so I'll not die 🤤😄
 
 Thanks a lot for your support 🙏
 
@@ -60,12 +60,12 @@ Prerequisites
 Getting Started
 ---------------
 
-The easiest way to get started is to install on a Raspberry Pi Gladys with the Raspbian image. See [https://gladysproject.com](https://gladysproject.com) for more informations.
+The easiest way to get started is to install on a Raspberry Pi Gladys with the Raspbian image. See [https://gladysassistant.com](https://gladysassistant.com) for more informations.
 
 But you can also install Gladys manually to develop on it:
 
 ```bash
-git clone https://github.com/GladysProject/gladys gladys
+git clone https://github.com/gladysassistant/gladys gladys
 ```
 
 ```bash
@@ -157,18 +157,18 @@ Contributing
 
 Pull requests are welcomed!
 
-See [Contributing.md](https://github.com/GladysProject/Gladys/blob/master/.github/CONTRIBUTING.md).
+See [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md).
 
 Links
 -------------
 
-- [Website](https://gladysproject.com)
-- [Community](https://community.gladysproject.com/)
-- [Patreon](https://www.patreon.com/gladysproject/overview)
-- [Twitter](https://twitter.com/gladysproject)
-- [Instagram](https://www.instagram.com/gladysproject/)
-- [Facebook](https://www.facebook.com/gladysproject)
-- [Developer Website](https://developer.gladysproject.com)
+- [Website](https://gladysassistant.com)
+- [Community](https://community.gladysassistant.com/)
+- [Patreon](https://www.patreon.com/gladysassistant/overview)
+- [Twitter](https://twitter.com/gladysassistant)
+- [Instagram](https://www.instagram.com/gladysassistant/)
+- [Facebook](https://www.facebook.com/gladysassistant)
+- [Developer Website](https://developer.gladysassistant.com)
 
 Community
 -------------
@@ -177,9 +177,9 @@ Gladys it's not just a project, it's a community of people. And we like to meet 
 
 See more on our Instagram account:
 
-[![Alt](https://gladysproject.com/assets/images/external/screenshot-instagram.png)](https://www.instagram.com/gladysproject/)
+[![Alt](https://gladysassistant.com/assets/images/external/screenshot-instagram.png)](https://www.instagram.com/gladysassistant/)
 
 Copyright & License
 -------------
 
-Copyright (c) 2013-2018 Gladys Project - Released under the [MIT license](https://github.com/GladysProject/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2018 Gladys Project - Released under the [MIT license](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
