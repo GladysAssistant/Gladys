@@ -50,8 +50,10 @@ jobs:
         - "mv docs jsdoc"
         - "mv ./jsdoc/ ./documentation/"
         - "mv ./apidoc/ ./documentation/"
+        - touch ./documentation/index.html
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
+        - echo "<a href=\"/apidoc/\">REST API documentation</a><br /><a href=\"/jsdoc/\">JavaScript API documentation</a>" >> ./documentation/index.html
       deploy:
         provider: pages
         repo: gladysassistant/documentation
