@@ -1,7 +1,7 @@
 Gladys Project
 =======================
 
-[![Build Status](https://travis-ci.org/gladysassistant/Gladys.svg?branch=v3)](https://travis-ci.org/gladysassistant/Gladys)
+[![Build Status](https://travis-ci.org/GladysAssistant/Gladys.svg?branch=master)](https://travis-ci.org/GladysAssistant/Gladys)
 
 ![Alt](https://gladysassistant.com/assets/images/presentation/facebook_share_gladys.jpg)
 
