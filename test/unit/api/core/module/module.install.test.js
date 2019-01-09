@@ -6,7 +6,7 @@ describe('Module', function() {
       this.timeout(20000);
 
       var module = {
-        url: 'https://github.com/GladysProject/gladys-downloader.git',
+        url: 'https://github.com/gladysassistant/gladys-downloader.git',
         slug: 'downloader'
       };
 

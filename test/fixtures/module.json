@@ -2,7 +2,7 @@
     {
         "id": 1,
         "name": "Test",
-        "url": "https://github.com/GladysProject/gladys-downloader.git",
+        "url": "https://github.com/gladysassistant/gladys-downloader.git",
         "version": "2.1",
         "status": 1,
         "slug": "test",
@@ -11,7 +11,7 @@
     {
         "id": 2,
         "name": "Philips Hue remote",
-        "url": "https://github.com/GladysProject/gladys-downloader.git",
+        "url": "https://github.com/gladysassistant/gladys-downloader.git",
         "version": "2.1",
         "status": 0,
         "slug": "hue",
