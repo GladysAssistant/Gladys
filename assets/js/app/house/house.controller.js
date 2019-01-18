@@ -6,9 +6,9 @@
         .module('gladys')
         .controller('HouseCtrl', HouseCtrl);
 
-    HouseCtrl.$inject = ['houseService', 'roomService', 'notificationService'];
+    HouseCtrl.$inject = ['houseService', 'roomService', 'notificationService', 'paramService'];
 
-    function HouseCtrl(houseService, roomService, notificationService) {
+    function HouseCtrl(houseService, roomService, notificationService, paramService) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -22,18 +22,21 @@
         vm.newRoom = {};
         vm.updateRoom = updateRoom;
         vm.updateHouse = updateHouse;
+        vm.updateCheckUserPresence = updateCheckUserPresence;
         
         vm.houses = [];
         vm.rooms = [];
 
         vm.savingHouse = false;
         vm.savingRoom = false;
+        vm.checkUserPresence = false;
 
         activate();
 
         function activate() {
             getHouses();
             getRooms();
+            getCheckUserPresenceValue()
             return ;
         }
 
@@ -97,6 +100,16 @@
             });
         }
 
+        function updateCheckUserPresence(){
+            paramService.create({name: 'CHECK_USER_PRESENCE', value: !vm.checkUserPresence})
+                .then(function(data){
+                    vm.checkUserPresence = !vm.checkUserPresence
+                })
+                .catch(function(){
+                    notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+                })
+        }
+
         function deleteHouse(index, id) {
             return houseService.destroy(id)
                 .then(function(data){
@@ -127,6 +140,13 @@
                 .then(function(data){
                     vm.rooms = data.data;
                 });
+        }
+
+        function getCheckUserPresenceValue(){
+            paramService.getValue('CHECK_USER_PRESENCE')
+                .then(function(data){
+                    vm.checkUserPresence = data.data.value
+                })
         }
 
         function resetNewHouseFields() {
