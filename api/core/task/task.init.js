@@ -67,7 +67,7 @@ module.exports = function(cb){
 
   // checking for update on module now
   gladys.module.checkUpdate();
-
+  
   // CheckUserPresence every XX minutes, default is 5 minutes
   const DEFAULT_CHECK_USER_PRESENCE_FREQUENCY = 5;
 
@@ -75,7 +75,9 @@ module.exports = function(cb){
     .catch(() => DEFAULT_CHECK_USER_PRESENCE_FREQUENCY)
     .then((checkFrequency) => {
       setInterval(function() {
-        gladys.house.checkUsersPresence();
+        if(userHasCheckPresence()){
+          gladys.house.checkUsersPresence();
+        }
       }, checkFrequency * 60 * 1000);
     });
 
@@ -86,3 +88,16 @@ module.exports = function(cb){
   }, sails.config.update.checkUpdateInterval);  
  
 };
+
+function userHasCheckPresence(){
+  return gladys.param.getValue('CHECK_USER_PRESENCE')
+    .catch((err) => {
+      if(err.message === 'Param CHECK_USER_PRESENCE not found'){
+        gladys.param.setValue({name: 'CHECK_USER_PRESENCE', value: 'false', type: 'secret'});
+      } else {
+        sails.log.err(err);
+      }
+      return false;
+    })
+    .then((value) => value);
+}
