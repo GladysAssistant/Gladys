@@ -49,7 +49,9 @@
         // waiting for websocket message
         function waitForNewEvent() {
             io.socket.on('newEvent', function (event) {
-                vm.events.unshift(event);
+                $scope.$apply(function(){
+                    vm.events.unshift(event)
+                })
             });
         }
         
