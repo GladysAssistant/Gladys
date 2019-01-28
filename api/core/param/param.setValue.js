@@ -27,8 +27,6 @@ module.exports = function setValue(param){
   return gladys.utils.sql(queries.getValue, [param.name])
     .then(function(params){
           
-      shared.cache[param.name] = param.value;
-          
       // if yes
       if(params.length > 0){
               
