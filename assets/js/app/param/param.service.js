@@ -15,7 +15,8 @@
             getByModule: getByModule,
             create: create, 
             update: update,
-            destroy: destroy
+            destroy: destroy,
+            getByName: getByName
         };
 
         return service;
@@ -23,6 +24,10 @@
         function get() {
             return $http({method: 'GET', url: '/param'});
         }
+
+        function getByName(name) {
+          return $http({method: 'GET', url: '/param/' + name});
+      }
 
         function getByModule(id) {
             return $http({method: 'GET', url: '/module/' + id + '/param'});
