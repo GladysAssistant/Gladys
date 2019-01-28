@@ -6,11 +6,13 @@
     .module('gladys')
     .controller('GatewayCtrl', GatewayCtrl);
 
-  GatewayCtrl.$inject = ['gatewayService', '$scope'];
+  GatewayCtrl.$inject = ['gatewayService', 'paramService', '$scope'];
 
-  function GatewayCtrl(gatewayService, $scope) {
+  function GatewayCtrl(gatewayService, paramService, $scope) {
     /* jshint validthis: true */
     var vm = this;
+
+    var OPEN_API_ACTIVATED_PARAM_NAME = 'GLADYS_GATEWAY_ENABLE_OPEN_API';
     
     vm.login = login;
     vm.reconnect = reconnect;
@@ -21,6 +23,7 @@
 
     vm.saveUsersKeys = saveUsersKeys;
     vm.changeUserStatus = changeUserStatus;
+    vm.switchOpenApiActivated = switchOpenApiActivated;
 
     activate();
 
@@ -56,7 +59,30 @@
           if (vm.connected) {
             getKeysFingerprint();
             getUsersKeys();
+            getOpenApiActivated();
           }
+        });
+    }
+
+    function getOpenApiActivated() {
+      paramService.getByName(OPEN_API_ACTIVATED_PARAM_NAME)
+        .then(function(data){
+          vm.openApiActivated = (data.data.value === 'true'); 
+        })
+        .catch(function(){
+          vm.openApiActivated = false;
+        });
+    }
+
+    function switchOpenApiActivated() {
+      var newValue = !vm.openApiActivated;
+      paramService.create({
+        name: OPEN_API_ACTIVATED_PARAM_NAME,
+        type: 'secret',
+        value: newValue
+      })
+        .then(function(){
+          vm.openApiActivated = newValue;
         });
     }
 
