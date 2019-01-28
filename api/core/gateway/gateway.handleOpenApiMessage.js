@@ -25,7 +25,6 @@ module.exports = async function(data, rawMessage, cb) {
       break;
     case 'create-event':
       const newEvent = await gladys.event.create(rawMessage.data);
-      console.log(newEvent);
       cb(newEvent);
       break;
     } 
