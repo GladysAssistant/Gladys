@@ -92,10 +92,12 @@
                 <h4 class="widget-user-username">
                     {{user.name}}
                 </h4>
-                <button type="button" class="close" style="float: right" ng-click="vm.changeUserStatus($index, user.id, user.accepted);" data-toggle="tooltip" data-placement="left" data-original-title="Supprimer">
-                    <i ng-show="user.accepted === false" class="fa fa-check-circle"></i>
-                    <i ng-show="user.accepted === true" class="fa fa-ban"></i>
-                </button>
+                <div  style="float: right">
+                <div class="toogle"  ng-click="vm.changeUserStatus($index, user.id, user.accepted);">
+                    <input type="checkbox" ng-model="user.accepted" ng-true-value="true" ng-false-value="false" class="toogle-checkbox toogle-blue" />
+                    <label class="toogle-label" for="mytoogle"></label>
+                  </div>
+                </div>
               </div>  
               <div class="box-footer no-padding">
                   <ul class="nav nav-stacked">
