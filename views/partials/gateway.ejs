@@ -109,4 +109,15 @@
         </div>
     </div>
 
+    <div class="box-body" ng-show="vm.connected === true">
+      <h3><%= __('gateway-open-api') %></h3>
+      <p><%= __('gateway-open-api-explanation') %></p>
+      <p><%= __('gateway-open-api-activate') %>:
+        <div class="toogle" ng-click="vm.switchOpenApiActivated()">
+            <input type="checkbox" ng-model="vm.openApiActivated" ng-true-value="true" ng-false-value="false" class="toogle-checkbox toogle-blue" />
+            <label class="toogle-label" for="mytoogle"></label>
+          </div>
+      </p>       
+  </div>
+
 </div>

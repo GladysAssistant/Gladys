@@ -443,5 +443,8 @@
   "area-between": "Between",
   "area-and-the": "and",
   "area-last-known-location": "Last known locations",
-  "house-box-saving": "Saving"
+  "house-box-saving": "Saving",
+  "gateway-open-api": "Gladys Gateway Open API",
+  "gateway-open-api-explanation": "To use the Open API of the Gladys Gateway, you need to activate this feature here first. By default, your Gladys local instance doesn't accept open API messages for security reason.",
+  "gateway-open-api-activate": "To activate the open API, click here"
 }
