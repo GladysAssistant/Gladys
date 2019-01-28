@@ -16,7 +16,7 @@
     vm.nextStates = nextStates;
     vm.refreshData = refreshData;
     vm.getMinMax = getMinMax;
-    vm.chart;
+    vm.chart = null;
     vm.threshold = 90;
     vm.ready = false;
     vm.displayMinMax = false;
@@ -221,8 +221,9 @@
 
     // Navigation button, period to period
     function nextStates() {
-      filter.start = filter.end;
-      filter.end = moment(filter.end).add(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
+      var maxEnd = moment.min(moment(filter.end).add(globalTime, globalTimeRange), moment(Date.now()));
+      filter.end = maxEnd.format('YYYY-MM-DD HH:mm:ss');
+      filter.start = maxEnd.subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
       $('#daterangepicker').data('daterangepicker').setStartDate(moment(filter.start).format('l[, ]LTS'));
       $('#daterangepicker').data('daterangepicker').setEndDate(moment(filter.end).format('l[, ]LTS'));
       refreshData();
@@ -232,6 +233,8 @@
     function refreshData() {
       vm.ready = true;
       if (vm.currentDeviceType && vm.currentDeviceType.id) {
+        filter.start= moment(filter.start).format('YYYY-MM-DD HH:mm:ss');
+        filter.end = moment(filter.end).format('YYYY-MM-DD HH:mm:ss');
         getFilteredDeviceState(vm.currentDeviceType, filter.start, filter.end);
         vm.steppedline = (vm.currentDeviceType.type === 'binary');
       }
@@ -250,7 +253,12 @@
       io.socket.on('newDeviceState', function (deviceState) {
         // if the device is the current device, push the value in the graph
         if (vm.currentDeviceType && deviceState.devicetype === vm.currentDeviceType.id) {
-          dataDt.push({ x: deviceState.datetime, y: deviceState.value });
+          dataDt.unshift({ x: deviceState.datetime, y: deviceState.value });
+          dataDT.pop();
+          filter.end = moment(deviceState.datetime).format('YYYY-MM-DD HH:mm:ss');
+          filter.start = moment(deviceState.datetime).subtract(globalTime, globalTimeRange).format('YYYY-MM-DD HH:mm:ss');
+          $('#daterangepicker').data('daterangepicker').setStartDate(moment(filter.start).format('l[, ]LTS'));
+          $('#daterangepicker').data('daterangepicker').setEndDate(moment(filter.end).format('l[, ]LTS'));
           vm.chart.update();
         }
       });
@@ -289,13 +297,13 @@
         }).x;
         
         // Update the graph title
-        labelDt = (deviceType.unit ? [deviceType.name + ' (' + deviceType.unit] + ')' : [deviceType.name]);
+        var name = deviceType.name ? deviceType.name : deviceType.type;
+        labelDt = (deviceType.unit ? [name + ' (' + deviceType.unit] + ')' : [name]);
       }
       vm.currentDeviceType = deviceType;
       if (vm.displayMinMax) {
         getMinMax();
       } else {
-        console.log('je suis passé par là!');
         activateCharts();
       }
     }
