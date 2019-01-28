@@ -1,6 +1,5 @@
 var queries = require('./param.queries.js');
 var Promise = require('bluebird');
-var shared = require('./param.shared.js');
 
 /**
  * @public

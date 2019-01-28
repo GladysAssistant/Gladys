@@ -1,5 +1,4 @@
 var queries = require('./param.queries.js');
-var shared = require('./param.shared.js');
 
 /**
  * @public
