@@ -6,9 +6,9 @@
         .module('gladys')
         .controller('EventCtrl', EventCtrl);
 
-    EventCtrl.$inject = ['eventService'];
+    EventCtrl.$inject = ['eventService', '$scope'];
 
-    function EventCtrl(eventService) {
+    function EventCtrl(eventService, $scope) {
         /* jshint validthis: true */
         var vm = this;
     	vm.events = [];
