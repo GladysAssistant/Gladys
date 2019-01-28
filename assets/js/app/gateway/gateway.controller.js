@@ -12,7 +12,7 @@
     /* jshint validthis: true */
     var vm = this;
 
-    const OPEN_API_ACTIVATED_PARAM_NAME = 'GLADYS_GATEWAY_ENABLE_OPEN_API';
+    var OPEN_API_ACTIVATED_PARAM_NAME = 'GLADYS_GATEWAY_ENABLE_OPEN_API';
     
     vm.login = login;
     vm.reconnect = reconnect;
@@ -75,7 +75,7 @@
     }
 
     function switchOpenApiActivated() {
-      const newValue = !vm.openApiActivated;
+      var newValue = !vm.openApiActivated;
       paramService.create({
         name: OPEN_API_ACTIVATED_PARAM_NAME,
         type: 'secret',
