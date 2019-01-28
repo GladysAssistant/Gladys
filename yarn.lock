@@ -6,9 +6,9 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@ctrlpanel/pbkdf2/-/pbkdf2-1.0.0.tgz#ea53fa99a5b1e2a4b9b36c4749f3f98ddcb965d7"
 
-"@gladysassistant/gladys-gateway-js@1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@gladysassistant/gladys-gateway-js/-/gladys-gateway-js-1.0.9.tgz#5d385761281a454d7e57b72fdd2ee04c7ca05231"
+"@gladysassistant/gladys-gateway-js@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@gladysassistant/gladys-gateway-js/-/gladys-gateway-js-1.1.0.tgz#d0806173afe2665e821f1d27a7a80d6f1a37012b"
   dependencies:
     "@ctrlpanel/pbkdf2" "^1.0.0"
     array-buffer-to-hex "^1.0.0"
