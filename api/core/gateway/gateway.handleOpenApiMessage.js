@@ -20,7 +20,7 @@ module.exports = async function(data, rawMessage, cb) {
   try {
     switch(rawMessage.action) {
     case 'create-message':
-      await gladys.brain.classify(user, { text: rawMessage.data.text });
+      await gladys.message.send(user, { text: rawMessage.data.text, receiver: null });
       cb({ success: true });
       break;
     case 'create-event':
