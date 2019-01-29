@@ -90,6 +90,11 @@ module.exports = function create(event){
       return eventSaved;
     })
     .then((eventSaved) => {
+
+      if(!eventSaved.user) {
+        return eventSaved;
+      }
+      
       gladys.socket.emit('newEvent', {
         id: eventSaved.id,
         name: eventType.name,
