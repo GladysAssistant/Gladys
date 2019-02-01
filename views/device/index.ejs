@@ -78,7 +78,7 @@
                                                             </div>
                                                             <!-- ColorPicker for color type -->
                                                             <div ng-switch-when="color">
-                                                                <color-picker type="text" ng-model="type.lastValue" ng-change="vm.changeValue(type, type.lastValue)"></color-picker>
+                                                                <color-picker type="text" ng-model="type.lastValue" ng-change="vm.changeValue(type, type.lastValue)" data-int-value="true"></color-picker>
                                                             </div>
 
                                                             <!-- If the deviceType is not a sensor and is not a binary, display input field -->
