@@ -141,6 +141,16 @@ Then, to start Gladys in dev mode:
 npm start
 ```
 
+## Upgrading Gladys inside the Raspbian image
+
+Connect in command line to your Raspberry Pi, and execute the following command:
+
+```
+/home/pi/rpi-update.sh
+```
+
+This will download new upgrades, stop Gladys and restart Gladys with the new version.
+
 FAQ
 -------------
 
