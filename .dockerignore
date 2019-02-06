@@ -19,4 +19,3 @@ node.d.ts
 .git
 .npmrc
 docker
-docker_tmp
