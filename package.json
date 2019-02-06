@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "3.11.6",
+  "version": "3.12.1",
   "description": "Your personnal assistant, always here.",
   "scripts": {
     "start": "NODE_ENV=development node app.js",
@@ -22,7 +22,7 @@
     "gladys": "./app.js"
   },
   "dependencies": {
-    "@gladysproject/gladys-gateway-js": "1.0.7",
+    "@gladysassistant/gladys-gateway-js": "1.1.0",
     "barrels": "^1.6.5",
     "bcrypt": "3.0.0",
     "bluebird": "^3.5.0",
@@ -75,10 +75,10 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GladysProject/Gladys"
+    "url": "https://github.com/gladysassistant/Gladys"
   },
   "bugs": {
-    "url": "https://github.com/GladysProject/Gladys/issues"
+    "url": "https://github.com/gladysassistant/Gladys/issues"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "MIT"

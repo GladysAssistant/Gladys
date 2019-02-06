@@ -6,9 +6,9 @@
         .module('gladys')
         .controller('EventCtrl', EventCtrl);
 
-    EventCtrl.$inject = ['eventService'];
+    EventCtrl.$inject = ['eventService', '$scope'];
 
-    function EventCtrl(eventService) {
+    function EventCtrl(eventService, $scope) {
         /* jshint validthis: true */
         var vm = this;
     	vm.events = [];
@@ -49,7 +49,9 @@
         // waiting for websocket message
         function waitForNewEvent() {
             io.socket.on('newEvent', function (event) {
-                vm.events.unshift(event);
+                $scope.$apply(function(){
+                    vm.events.unshift(event)
+                })
             });
         }
         

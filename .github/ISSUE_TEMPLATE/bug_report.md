@@ -6,7 +6,7 @@ about: Create a report to help us improve Gladys
 
 First, are you sure that you found a Gladys bug?
 
-If you are not sure, you can come discuss with us on [Gladys Community Forum](http://community.gladysproject.com/) 🙂
+If you are not sure, you can come discuss with us on [Gladys Community Forum](http://community.gladysassistant.com/) 🙂
 
 **Describe the bug**
 A clear and concise description of what the bug is.

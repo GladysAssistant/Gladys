@@ -607,5 +607,8 @@
   "area-between": "Entre le",
   "area-and-the": "et le",
   "area-last-known-location": "Dernières positions connues",
-  "house-box-saving": "Enregistrement en cours"
+  "house-box-saving": "Enregistrement en cours",
+  "gateway-open-api": "Gladys Gateway Open API",
+  "gateway-open-api-explanation": "Pour utiliser l'open API du Gladys Gateway, vous devez activer cette fonctionnalité ici. Par défaut, cette fonctionnalité est désactivée pour des raisons de sécurité.",
+  "gateway-open-api-activate": "Pour activer cette fonctionnalité, cliquez-ici"
 }

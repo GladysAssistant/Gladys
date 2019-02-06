@@ -50,16 +50,18 @@ jobs:
         - "mv docs jsdoc"
         - "mv ./jsdoc/ ./documentation/"
         - "mv ./apidoc/ ./documentation/"
+        - touch ./documentation/index.html
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/jsdoc/index.html
         - echo "<script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-42837031-1\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-42837031-1'); </script>" >> ./documentation/apidoc/index.html
+        - echo "<a href=\"/apidoc/\">REST API documentation</a><br /><a href=\"/jsdoc/\">JavaScript API documentation</a>" >> ./documentation/index.html
       deploy:
         provider: pages
-        repo: GladysProject/documentation
+        repo: gladysassistant/documentation
         skip_cleanup: true
         github_token: $GITHUB_TOKEN
         local_dir: documentation
         target-branch: gh-pages
-        fqdn: documentation.gladysproject.com
+        fqdn: documentation.gladysassistant.com
         verbose: true
         on:
           branch: master
@@ -68,7 +70,7 @@ jobs:
       language: bash
       services: docker
       env:
-      - DOCKER_REPO_SLUG=gladysproject/gladys
+      - DOCKER_REPO_SLUG=gladysassistant/gladys
       - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
       - DOCKER_CLI_EXPERIMENTAL=enabled
       script:
