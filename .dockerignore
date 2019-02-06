@@ -18,3 +18,5 @@ npm-debug.log
 node.d.ts
 .git
 .npmrc
+docker
+docker_tmp
