@@ -53,7 +53,7 @@ done
 docker run --rm --privileged multiarch/qemu-user-static:register --reset
 fold_end qemu.1
 
-docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+echo "$DOCKER_PASSWORD" | docker login -u="$DOCKER_USERNAME" --password-stdin
 
 #### Master build
 if [[ $TRAVIS_BRANCH = master ]]; then
