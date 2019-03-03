@@ -41,11 +41,11 @@ async function execInstallFunction(module){
     // we try installing the module
     await gladys.modules[module.slug].install();
     // if it succeeeds, we save status 0 in DB
-    await gladys.module.update({ id: module.id, status: 0 });
+    return gladys.module.update({ id: module.id, status: 0 });
   } catch(e) {
     sails.log.error(`Error while installing module ${module.slug}`);
     sails.log.error(e);
     // if not, the module is errored
-    await gladys.module.update({ id: module.id, status: 2 });
+    return gladys.module.update({ id: module.id, status: 2 });
   }
 }
