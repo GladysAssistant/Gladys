@@ -3,7 +3,7 @@
   "registration-birthdate-placeholder": "yyyy-mm-dd",
   "in-case-problem-check-forum": "If you have some troubles, you can check Gladys forum",
   "welcome-sentence-installation": "Welcome in the installation page of Gladys !",
-  "before-installing-sentence-installation": "Before installating Gladys, be sure that you have followed the configuration step on Gladys project website.",
+  "before-installing-sentence-installation": "Before installating Gladys, be sure that you have followed the configuration step on Gladys Assistant website.",
   "congrat-gladys-well-installed":"Congratulation ! Gladys is well installed.",
   "thank-you-for-installing-gladys": "Thank you very much for installing Gladys",
   "gladys-only-work":"Gladys is free, and only work because people use it. If you want developers to join the project, you can use the Twitter share button to help the project. Thank you :)",
@@ -445,5 +445,8 @@
   "area-between": "Between",
   "area-and-the": "and",
   "area-last-known-location": "Last known locations",
-  "house-box-saving": "Saving"
+  "house-box-saving": "Saving",
+  "gateway-open-api": "Gladys Gateway Open API",
+  "gateway-open-api-explanation": "To use the Open API of the Gladys Gateway, you need to activate this feature here first. By default, your Gladys local instance doesn't accept open API messages for security reason.",
+  "gateway-open-api-activate": "To activate the open API, click here"
 }
