@@ -23,7 +23,7 @@ function init(){
 /**
  * Execute the install function
  */
-function execInstallFunction(module){
+async function execInstallFunction(module){
 
   // if the module is not present, we remove it from the list
   if(!gladys.modules[module.slug]){
@@ -34,24 +34,18 @@ function execInstallFunction(module){
   if (typeof gladys.modules[module.slug].install !== 'function') {
      
     // module installed with success, because no installation function is needed
-    module.status = 0;
-    return gladys.module.update(module);
-  }  
+    return gladys.module.update({ id: module.id, status: 0 });
+  }
    
-  return gladys.modules[module.slug].install()
-    .then(function(){
-       
-      // module installed with success
-      module.status = 0;
-      return module;
-    })    
-    .then(() => {
-      return gladys.module.update(module);
-    })
-    .catch(function(){
-       
-      // error while installing the module
-      module.status = 2;
-      return Promise.resolve(module);
-    });
+  try {
+    // we try installing the module
+    await gladys.modules[module.slug].install();
+    // if it succeeeds, we save status 0 in DB
+    return gladys.module.update({ id: module.id, status: 0 });
+  } catch(e) {
+    sails.log.error(`Error while installing module ${module.slug}`);
+    sails.log.error(e);
+    // if not, the module is errored
+    return gladys.module.update({ id: module.id, status: 2 });
+  }
 }
