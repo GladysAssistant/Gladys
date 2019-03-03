@@ -351,6 +351,8 @@
   "area-delete": "Supprimer",
   "house-box-title": "Maisons",
   "house-box-description": "Vous pouvez définir ici votre maison dans Gladys. Pour la latitude et la longitude, vous pouvez utiliser Google Maps pour trouver la latitude et la longitude votre maison, et la rentrer au format (par exemple) : latitude = 42.1, longitude = 43.2. Rappel: Toutes ces données restent en locale sur votre machine, et ne sont jamais envoyées nulle part.",
+  "house-box-check-presence": "Détection de présence:",
+  "house-box-check-presence-description": "Activer/Désactiver la détection de présence dans la maison.",
   "room-box-title": "Pièces",
   "mode-box-title": "Modes",
   "mode-box-description": "Les modes sont des états que la maison peut prendre. Une maison peut être dans un et un seul mode à la fois.",
@@ -607,5 +609,8 @@
   "area-between": "Entre le",
   "area-and-the": "et le",
   "area-last-known-location": "Dernières positions connues",
-  "house-box-saving": "Enregistrement en cours"
+  "house-box-saving": "Enregistrement en cours",
+  "gateway-open-api": "Gladys Gateway Open API",
+  "gateway-open-api-explanation": "Pour utiliser l'open API du Gladys Gateway, vous devez activer cette fonctionnalité ici. Par défaut, cette fonctionnalité est désactivée pour des raisons de sécurité.",
+  "gateway-open-api-activate": "Pour activer cette fonctionnalité, cliquez-ici"
 }

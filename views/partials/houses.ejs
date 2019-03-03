@@ -4,6 +4,21 @@
 <div class="box skin-box box-primary">
     <div class="box-header with-border">
         <h3 class="box-title"><%= __('house-box-title') %> <small class="ng-cloak" ng-show="vm.savingHouse"><%= __('house-box-saving') %></small></h3>
+
+        <div class="pull-right" data-toggle="tooltip" data-original-title="<%= __('house-box-check-presence-description') %>">
+            <div class="raw">
+                <div class="col-sm-9 no-padding">
+                    <span><%= __('house-box-check-presence') %></span>
+                </div>
+                <div class="col-sm-3" style="padding-left: inherit;">
+                    <div class="toogle" ng-click="vm.updateCheckUserPresence()">
+                        <input type="checkbox" ng-model="vm.checkUserPresence" ng-true-value="true" ng-false-value="false" class="toogle-checkbox toogle-blue" />
+                        <label class="toogle-label" for="mytoogle"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 <div class="box-body table-responsive">
