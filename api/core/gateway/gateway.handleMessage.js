@@ -1,11 +1,16 @@
 const callApi = require('./utils').callApi;
 const importControllers = require('./utils').importControllers;
+const handleOpenApiMessage = require('./gateway.handleOpenApiMessage');
 const shared = require('./shared');
 
 var controllers = importControllers();
 var idRouteRegex = /\/\d+\//g;
 
 module.exports = function(data, rawMessage, cb) {
+
+  if (rawMessage.type === 'gladys-open-api') {
+    return handleOpenApiMessage(data, rawMessage, cb);
+  }
 
   return gladys.param.getValue('GLADYS_GATEWAY_USERS_KEYS')
     .then(async (users) => {
