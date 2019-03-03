@@ -167,7 +167,10 @@
         return deviceService.exec(deviceType, value)
           .then(function(data){
              deviceType.lastValue = data.data.value; 
-          });
+          })          
+          .catch(function(){
+            notificationService.errorNotificationTranslated('DEFAULT.ERROR');
+          })
     }
     
     function updateDeviceType(deviceType){
