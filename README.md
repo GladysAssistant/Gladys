@@ -173,10 +173,10 @@ Links
 
 - [Website](https://gladysassistant.com)
 - [Community](https://community.gladysassistant.com/)
-- [Patreon](https://www.patreon.com/gladysassistant/overview)
 - [Twitter](https://twitter.com/gladysassistant)
 - [Instagram](https://www.instagram.com/gladysassistant/)
 - [Facebook](https://www.facebook.com/gladysassistant)
+- [Support Gladys](https://gladysassistant.com/gladys-community-package)
 - [Developer Website](https://developer.gladysassistant.com)
 
 Copyright & License
