@@ -145,7 +145,7 @@
         function getCheckUserPresenceValue(){
             paramService.getValue('CHECK_USER_PRESENCE')
                 .then(function(data){
-                    vm.checkUserPresence = data.data.value
+                    vm.checkUserPresence = (data.data.value === 'true');
                 })
         }
 
