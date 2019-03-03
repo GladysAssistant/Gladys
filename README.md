@@ -1,9 +1,13 @@
-Gladys Assistant
-=======================
+<p align="center"><img width=60% src="https://gladysassistant.com/assets/images/external/gladys-logo-main-horizontal-01@2x.png"></p>
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![GitHub release](https://img.shields.io/github/release/gladysassistant/gladys.svg)
 [![Build Status](https://travis-ci.org/GladysAssistant/Gladys.svg?branch=master)](https://travis-ci.org/GladysAssistant/Gladys)
-
-![Alt](https://gladysassistant.com/assets/images/presentation/facebook_share_gladys.jpg)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+![Discourse posts](https://img.shields.io/discourse/https/community.gladysassistant.com/posts.svg)
+![GitHub](https://img.shields.io/github/license/GladysAssistant/Gladys.svg)
+![Twitter Follow](https://img.shields.io/twitter/follow/gladysassistant.svg?style=social)
+![GitHub stars](https://img.shields.io/github/stars/gladysassistant/gladys.svg?style=social)
 
 What it does
 -------------
@@ -25,67 +29,85 @@ This is just a simple scenario, possibilities with Gladys are just endless ! Don
 
 Interested in Gladys ? Try it at home, it's free and Open-Source !
 
-**Website :** [https://gladysassistant.com](http://gladysassistant.com) <br>
+**Website :** [https://gladysassistant.com](https://gladysassistant.com) <br>
 **Community :** [https://community.gladysassistant.com/](https://community.gladysassistant.com/)
 
-Gladys Raspbian image has **more than 32 000 downloads**, and Gladys community has more than **3 000 members** ! 
+Gladys Raspbian image has **more than 32 000 downloads**, and Gladys community has more than **2 000 members** ! 
 
-Who Am I ?
+Who Am I?
 -------------
 
 My name is [Pierre-Gilles Leymarie](https://twitter.com/pierregillesl), I'm an indie maker, and recently I decided to move part-time on this open-source project Gladys!
 
-As I'm working completely for free for the community, you can Gladys with the [Gladys Community Package](https://gladysassistant.com/gladys-community-package), to help me pay my food and rent so I'll not die 🤤😄
+As I'm working completely for free for the community, you can support this open-source project by subscribing to the [Gladys Community Package](https://gladysassistant.com/gladys-community-package)!
 
 Thanks a lot for your support 🙏
 
-Specifications
--------------
+Current development
+---------------
 
-Gladys is 100% written in Node.js.
+**Mars 2019:** We are currently working on the next major relase of Gladys, Gladys 4.
+
+It'll be built on top of Node.js + [preact](https://github.com/developit/preact/).
+
+If you want to help, join us on the repository [GladysAssistant/gladys-4-playground](https://github.com/GladysAssistant/gladys-4-playground).
+
 
 Prerequisites
 -------------
 
 - [Node.js](http://nodejs.org) ( >= v8.x.x )
-- [MySQL](http://www.mysql.com/)
+- [MySQL / MariaDB](http://www.mysql.com/)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
  - <img src="http://dc942d419843af05523b-ff74ae13537a01be6cfec5927837dcfe.r14.cf1.rackcdn.com/wp-content/uploads/windows-8-50x50.jpg" height="17">&nbsp;**Windows**: [Visual Studio](http://www.visualstudio.com/downloads/download-visual-studio-vs#d-express-windows-8)
  - <img src="https://lh5.googleusercontent.com/-2YS1ceHWyys/AAAAAAAAAAI/AAAAAAAAAAc/0LCb_tsTvmU/s46-c-k/photo.jpg" height="17">&nbsp;**Ubuntu**, **Debian**: `sudo apt-get install build-essential`
-
-
-
  
 Getting Started
 ---------------
 
+### Installing Gladys on a Raspberry Pi
+
 The easiest way to get started is to install on a Raspberry Pi Gladys with the Raspbian image. See [https://gladysassistant.com](https://gladysassistant.com) for more informations.
 
-But you can also install Gladys manually to develop on it:
+### Installing Gladys manually
+
+First, clone this repository:
 
 ```bash
-git clone https://github.com/gladysassistant/gladys gladys
+git clone https://github.com/gladysassistant/gladys gladys && cd gladys
 ```
 
+Then install a few global dependencies:
+
 ```bash
-cd gladys
+npm install -g grunt-cli yarn
 ```
 
+Install this project dependencies:
+
 ```bash
-npm install
+yarn
 ```
 
-If you want to use grunt, install grunt-cli :
+Now let's build the frontend: 
 
 ```bash
-npm install -g grunt-cli
+grunt buildProd
 ```
 
 #### Connect Gladys to MySQL
 
 To connect Gladys to your database, you will need to set some environment variables.
-To do so, you'll have to create a `.env` file at the root of this project. The content of this file can be found by looking at `.env-sample`, which lists all the customizable env vars.
+To do so, you'll have to create a `.env` file at the root of this project with the following content:
+
+```
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=YOUR_MYSQL_USER
+MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
+MYSQL_DATABASE=YOUR_GLADYS_DBNAME
+```
 
 **Note :** You will need to create the database as well in MySQL:
 
@@ -93,19 +115,11 @@ To do so, you'll have to create a `.env` file at the root of this project. The c
 CREATE DATABASE gladys CHARACTER SET utf8 COLLATE utf8_general_ci; -- or whatever name you've set in your .env file.`
 ```
 
-#### Compile assets
-
-If you want to recompile assets and run all tasks, you can run :
-
-```
-grunt buildProd
-```
-
 #### Create tables
 
 Gladys create automatically all the tables it needs.
 
-You need to execute the init file :
+You need to execute the init script:
 
 ```bash
 node init.js
@@ -119,26 +133,22 @@ node app.js
 
 #### Visit Gladys dashboard
 
-If you are on localhost, visit : `http://localhost:1337` (in development mode), or`http://localhost:8080` (in production).
+If you are on localhost, visit: `http://localhost:8080`, or `http://localhost:1337` if you are in development mode.
 
 If you want to access Gladys anywhere on your local network, just replace localhost by the ip of your machine.
 
-## Starting Gladys in development mode
+### Starting Gladys in development mode
 
-To start Gladys on your machine in development mode, and connect to your local MySQL instance, you can create a `.env` file at the root of your Gladys folder with the following content: 
+Install sails globally:
 
-```
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=YOUR_MYSQL_USER
-MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
-MYSQL_DATABASE=YOUR_GLADYS_DBNAME
+```bash
+npm install -g sails
 ```
 
-Then, to start Gladys in dev mode:
+Then run:
 
 ```
-npm start
+sails lift
 ```
 
 ## Upgrading Gladys inside the Raspbian image
@@ -150,17 +160,6 @@ Connect in command line to your Raspberry Pi, and execute the following command:
 ```
 
 This will download new upgrades, stop Gladys and restart Gladys with the new version.
-
-FAQ
--------------
-
-### `npm install` returns me a lot of errors !
-
-Make sure that node-gyp is working fine. Wait, what is node-gyp ?
->Node-gyp is a cross-platform command-line tool written in Node.js for compiling native addon modules for Node.js.
-
-To be sure that you're doing that good, check [node-gyp installation guide](https://github.com/TooTallNate/node-gyp#installation).
-
 
 Contributing
 -------------
@@ -180,16 +179,7 @@ Links
 - [Facebook](https://www.facebook.com/gladysassistant)
 - [Developer Website](https://developer.gladysassistant.com)
 
-Community
--------------
-
-Gladys it's not just a project, it's a community of people. And we like to meet in real life!
-
-See more on our Instagram account:
-
-[![Alt](https://gladysassistant.com/assets/images/external/screenshot-instagram.png)](https://www.instagram.com/gladysassistant/)
-
 Copyright & License
 -------------
 
-Copyright (c) 2013-2018 Gladys Assistant - Released under the [MIT license](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2019 Gladys Assistant - Released under the [MIT license](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
