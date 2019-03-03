@@ -2,6 +2,8 @@
 
 // force dev ENV
 process.env.NODE_ENV = 'development';
+// Load env files
+require('dotenv').config();
 
 var sailsApp = require('./index.js');
 
