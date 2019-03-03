@@ -73,5 +73,12 @@ jobs:
       - DOCKER_REPO_SLUG=gladysassistant/gladys
       - MAJOR_VERSION=$(echo $TRAVIS_TAG | cut -d'.' -f 1)
       - DOCKER_CLI_EXPERIMENTAL=enabled
+      before_script:
+      - sudo touch /etc/docker/daemon.json
+      - sudo cat /etc/docker/daemon.json
+      - sudo service docker stop
+      - 'echo ''{"dns": ["9.9.9.9","8.8.8.8"]}'' | sudo tee /etc/docker/daemon.json'
+      - sudo /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
+      - sudo service docker start
       script:
       - bash docker/ci-docker-build.sh
