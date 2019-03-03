@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-  
+
 /**
  * app.js
  *
@@ -26,9 +26,8 @@ if(!process.env.NODE_ENV){
   process.env.NODE_ENV = 'production';
 }
 
-if (process.env.NODE_ENV === 'development') {
-  require('dotenv').config();
-}
+// Load .env file if any
+require('dotenv').config();
 
 // Ensure we're in the project directory, so relative paths work as expected
 // no matter where we actually lift from.
@@ -48,15 +47,15 @@ process.chdir(__dirname);
     console.error('but if it doesn\'t, the app will run with the global sails instead!');
     return;
   }
-  
+
   var config = {
         hooks: {
             grunt: false
         }
   };
-  
+
   // Start server
   sails.lift(config);
-  
+
   module.exports = sails;
 })();
