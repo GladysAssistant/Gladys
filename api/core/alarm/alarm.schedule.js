@@ -3,6 +3,11 @@ var shared = require('./alarm.shared.js');
 module.exports = function schedule(alarm) {
   var rule;
 
+  if (alarm.autoWakeUp) {
+    sails.log.info(`Alarm ${alarm.id} is a auto wake up alarm. No need to schedule it.`);
+    return Promise.resolve(alarm);
+  }
+
   if(alarm.cronrule) {
 
     // if alarm is a cronrule
