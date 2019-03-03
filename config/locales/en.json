@@ -190,7 +190,7 @@
   "house-box-title": "Houses",
   "house-box-description": "You can define here your houses in Gladys. Latitude and longitude can be found on Google Maps, and must be entered with the format (example): Latitude = 42.1, Longitude = 40.1. Remember, all this is saved on your machine and do not leave your Gladys installation.",  
   "house-box-check-presence": "Presence detection:",
-  "house-box-check-presence-description": "Enable/Disable the presence detection of the house. For more information go to the official documentation in the configuration tab then housing.",
+  "house-box-check-presence-description": "Enable/Disable the presence detection in the house.",
   "room-box-title": "Rooms",
   "mode-box-title": "Modes",
   "mode-box-description": "Modes are states the house can take. A house can be in one and only one mode at the same time.",
