@@ -1,5 +1,4 @@
 var queries = require('./param.queries.js');
-var shared = require('./param.shared.js');
 
 /**
  * @public
@@ -26,8 +25,6 @@ module.exports = function setValue(param){
   // we test if the param exist
   return gladys.utils.sql(queries.getValue, [param.name])
     .then(function(params){
-          
-      shared.cache[param.name] = param.value;
           
       // if yes
       if(params.length > 0){

@@ -1,11 +1,11 @@
-Gladys Project
+Gladys Assistant
 =======================
 
 [![Build Status](https://travis-ci.org/GladysAssistant/Gladys.svg?branch=master)](https://travis-ci.org/GladysAssistant/Gladys)
 
 ![Alt](https://gladysassistant.com/assets/images/presentation/facebook_share_gladys.jpg)
 
-The Project
+What it does
 -------------
 
 Gladys is an home automation assistant to help you in your everyday life.
@@ -141,6 +141,16 @@ Then, to start Gladys in dev mode:
 npm start
 ```
 
+## Upgrading Gladys inside the Raspbian image
+
+Connect in command line to your Raspberry Pi, and execute the following command:
+
+```
+/home/pi/rpi-update.sh
+```
+
+This will download new upgrades, stop Gladys and restart Gladys with the new version.
+
 FAQ
 -------------
 
@@ -182,4 +192,4 @@ See more on our Instagram account:
 Copyright & License
 -------------
 
-Copyright (c) 2013-2018 Gladys Project - Released under the [MIT license](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2018 Gladys Assistant - Released under the [MIT license](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
