@@ -74,8 +74,9 @@ module.exports = function(cb){
   gladys.param.getValue('USER_CHECK_PRESENCE_FREQUENCY')
     .catch(() => DEFAULT_CHECK_USER_PRESENCE_FREQUENCY)
     .then((checkFrequency) => {
-      setInterval(function() {
-        if(userHasCheckPresence()){
+      setInterval(async function() {
+        const shouldCheckUserPresence = await userHasCheckPresence();
+        if(shouldCheckUserPresence){
           gladys.house.checkUsersPresence();
         }
       }, checkFrequency * 60 * 1000);
@@ -91,13 +92,13 @@ module.exports = function(cb){
 
 function userHasCheckPresence(){
   return gladys.param.getValue('CHECK_USER_PRESENCE')
-    .catch((err) => {
+    .catch(async (err) => {
       if(err.message === 'Param CHECK_USER_PRESENCE not found'){
-        gladys.param.setValue({name: 'CHECK_USER_PRESENCE', value: 'false', type: 'secret'});
+        await gladys.param.setValue({name: 'CHECK_USER_PRESENCE', value: 'false', type: 'secret'});
       } else {
         sails.log.err(err);
       }
       return false;
     })
-    .then((value) => value);
+    .then((value) => (value === true));
 }
