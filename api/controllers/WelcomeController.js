@@ -32,6 +32,13 @@ module.exports = {
     });
   },
 
+  loginBlockstack: function(req, res, next) {
+    res.view('welcome/login-blockstack', {
+      layout: null,
+      signupActive: sails.config.signup.active
+    });
+  },
+
   forgotPassword: function(req, res, next) {
     res.view('welcome/forgotpassword', {
       layout: null,

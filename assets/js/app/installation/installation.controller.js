@@ -6,9 +6,9 @@
     .module('gladys')
     .controller('installationCtrl', installationCtrl);
 
-  installationCtrl.$inject = ['installationService', 'userService','eventService', 'updateService', 'brainService'];
+  installationCtrl.$inject = ['installationService', 'userService','eventService', 'updateService', 'brainService', '$scope'];
 
-  function installationCtrl(installationService, userService, eventService, updateService, brainService) {
+  function installationCtrl(installationService, userService, eventService, updateService, brainService, $scope) {
     /* jshint validthis: true */
     var vm = this;
     vm.step = 1;
@@ -21,6 +21,7 @@
         language: 'en-US'
     };
     vm.changeStep = changeStep;
+    vm.loginWithBlockstack = loginWithBlockstack;
     vm.downloadProgress = 0;
     vm.downloadStep = 1;
   	
@@ -29,7 +30,7 @@
     function activate() {
       activateDateTimePicker();
       resetErrors();
-      updateAll();
+      verifyBlockstackLogin();
     }
     
     function installationFinished(){
@@ -47,6 +48,9 @@
     function changeStep(step){
         switch(step){
             case 2:
+              vm.step = step;
+            break;
+            case 3:
                 
                 // dirty way, I'm sorry
                 vm.newUser.birthdate = document.getElementById('birthdatepicker').value;
@@ -68,7 +72,7 @@
                     vm.createAccountError = err.data;
                 });
             break;
-            case 3:
+            case 4:
                 installationFinished();
                 vm.step = step;
             break;
@@ -204,6 +208,74 @@
         if(!((d = new Date(dateString))|0))
             return false; // Invalid date (or this could be epoch)
         return d.toISOString().slice(0,10) == dateString;
+    }
+
+    function loginWithBlockstack () {
+      var AUTH_FILE = '/authentication.json';
+
+      var loadBlockstack = function (callback) {
+        var script = document.createElement('script');
+        script.src = '/js/dependencies/blockstack/blockstack-bundle.js';
+        document.body.appendChild(script);
+          
+        script.onload = function() {
+          callback();
+        };
+      };
+
+      loadBlockstack(function() {
+
+        var generateToken = function () {
+          return Math.random().toString(36).slice(-8)
+            + Math.random().toString(36).slice(-8)
+            + Math.random().toString(36).slice(-8)
+            + Math.random().toString(36).slice(-8)
+        };
+
+        var getAuthInfos = function (userSession) {
+          var userData = userSession.loadUserData();
+          
+          var authInfos = {
+            email: userData.username + '@blockstack.org',
+            token: generateToken()
+          };
+          return userSession.putFile(AUTH_FILE, JSON.stringify(authInfos)).then((function() {
+            return authInfos;
+          }));
+        };
+
+        var userSession = new window.blockstack.UserSession();
+        var promise = Promise.resolve();
+        if (userSession.isUserSignedIn()) {
+          userSession.loadUserData();
+        } else if (userSession.isSignInPending()) {
+          promise = userSession.handlePendingSignIn();
+        } else {
+          var redirectURI = window.location.href;
+          var manifestURI = window.location.origin + '/js/dependencies/blockstack/manifest.json';
+          return userSession.redirectToSignIn(redirectURI, manifestURI);
+        }
+
+        promise
+          .then(function() {
+            // get gladys auth informations
+            return getAuthInfos(userSession);
+          })
+          .then(function(blockstackAuthInfos) {
+            vm.isBlockstackLogin = true;
+            vm.newUser.email = blockstackAuthInfos.email;
+            vm.newUser.password = blockstackAuthInfos.token;
+            changeStep(2);
+            $scope.$apply();
+          });
+                
+      });
+    }
+
+    function verifyBlockstackLogin() {
+      if(window.location.search.indexOf('authResponse') !== -1) {
+        loginWithBlockstack();
+      }
     }
    
   }

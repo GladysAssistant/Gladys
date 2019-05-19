@@ -102,6 +102,7 @@ module.exports.policies = {
   Welcome: {
     index: [],
     login: [],
+    loginBlockstack: [],
     forgotPassword: [],
     resetPassword: [],
     postForgotPassword: [],

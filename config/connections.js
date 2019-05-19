@@ -58,7 +58,7 @@ module.exports.connections = {
     user: process.env.MYSQL_USER || 'root',
     password:
       typeof process.env.MYSQL_PASSWORD !== 'undefined' ? process.env.MYSQL_PASSWORD : 'root',
-    database: process.env.MYSQL_DATABASE || 'gladys'
+    database: process.env.MYSQL_DATABASE || 'gladys2'
   },
 
   travis: {

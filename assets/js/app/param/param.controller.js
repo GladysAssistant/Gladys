@@ -6,9 +6,9 @@
         .module('gladys')
         .controller('ParamCtrl', ParamCtrl);
 
-    ParamCtrl.$inject = ['paramService', 'notificationService'];
+    ParamCtrl.$inject = ['paramService', 'notificationService', 'blockstackService'];
 
-    function ParamCtrl(paramService, notificationService) {
+    function ParamCtrl(paramService, notificationService, blockstackService) {
         /* jshint validthis: true */
         var vm = this;
         vm.params = [];
@@ -17,6 +17,10 @@
         vm.updateParam = updateParam;
         vm.deleteParam = deleteParam;
         vm.createParam = createParam;
+
+        vm.isBlockstackUsed = blockstackService.isBlockstackUsed();
+        vm.syncBlockstack = syncBlockstack;
+
         activate();
 
         function activate() {
@@ -62,6 +66,13 @@
                     notificationService.errorNotificationTranslated('DEFAULT.ERROR');
                 }
              });
+        }
+
+        function syncBlockstack() {
+           blockstackService.importData()
+            .then(function() {
+              get();
+            });
         }
     }
 })();
