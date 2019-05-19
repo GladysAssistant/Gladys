@@ -33,6 +33,7 @@ module.exports.routes = {
 
   // views
   '/login': 'WelcomeController.login',
+  '/login-blockstack': 'WelcomeController.loginBlockstack',
   'get /forgotpassword': 'WelcomeController.forgotPassword',
   'post /forgotpassword': 'WelcomeController.postForgotPassword',
   'get /resetpassword': 'WelcomeController.resetPassword',

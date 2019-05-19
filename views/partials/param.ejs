@@ -29,6 +29,10 @@
                 </tbody>
             </table>
 
+            <p ng-show="vm.isBlockstackUsed" style="margin-top:20px">
+              <button ng-click="vm.syncBlockstack()" class="btn btn-flat btn-success"><i class="fa fa-refresh"></i> <%= __('param-box-blockstack-sync') %></button>
+            </p>
+
         </div>  
 </div>
 
