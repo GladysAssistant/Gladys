@@ -19,10 +19,11 @@
                     <div class="login-box-msg text-green"><h2><%= __('Sign in') %></h2></div>
 
                     <% if ( typeof req.session.flash !== 'undefined') { %>
-                                    <div id="login-alert" class="alert alert-danger">
-                                            <%- JSON.stringify(req.flash('error')) %>
-                                    </div>
-                            <% } %>
+                          <div id="login-alert" class="alert alert-danger">
+                                  <%- req.flash('error') %>
+                          </div>
+                    <% } %>
+
                     <div class="form-group">
                         <input type="text" name="email" class="form-control" placeholder="<%= __('Email') %>"/>
                     </div>
@@ -39,14 +40,9 @@
                 </div>
             </form>
 
-           <!-- <div class="margin text-center">
-                <span>Sign in using social networks</span>
-                <br/>
-                <button class="btn bg-light-blue btn-circle"><i class="fa fa-facebook"></i></button>
-                <button class="btn bg-aqua btn-circle"><i class="fa fa-twitter"></i></button>
-                <button class="btn bg-red btn-circle"><i class="fa fa-google-plus"></i></button>
-
-            </div>-->
+           <div class="margin text-center">
+                <a href="/login-blockstack" class="btn btn-primary btn-sm"><i class="fa fa-cube"></i> <%= __('login-with-blockstack-button') %></i></a>
+            </div>
         </div>
 
         <script src="/js/dependencies/jquery.min.js"></script>
