@@ -17,11 +17,15 @@ async function getLightsFromBridge() {
     throw new Error(`Hue bridge not connected`);
   }
   const { lights } = await this.hueApi.lights();
-  const systemLanguage = this.gladys.stateManager.get('system', 'SYSTEM_LANGUAGE');
+  const { gladys } = this.gladys;
+  const { serviceId } = this.serviceId;
+  // TODO: Use Gladys State Manager ?
+  // const systemLanguage = this.gladys.stateManager.get('system', 'SYSTEM_LANGUAGE');
+  const systemLanguage = 'en';
   const all = lights.map((philipsHueLight) =>
-    this.gladys.device.create({
+    gladys.device.create({
       name: philipsHueLight.name,
-      service_id: this.serviceId,
+      service_id: serviceId,
       external_id: `${EXTERNAL_ID_BASE}:${philipsHueLight.id}`,
       should_poll: true,
       poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
