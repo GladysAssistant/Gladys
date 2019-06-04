@@ -13,7 +13,6 @@
     "arm64"
   ],
   "dependencies": {
-    "node-hue-api": "^2.4.4",
-    "os-locale": "^3.1.0"
+    "node-hue-api": "^2.4.4"
   }
 }

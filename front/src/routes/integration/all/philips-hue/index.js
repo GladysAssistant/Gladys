@@ -9,13 +9,28 @@ import integrationConfig from '../../../../config/integrations';
   actions
 )
 class PhilipsHueIntegration extends Component {
-  componentWillMount() {}
-
-  render({ user, getBridges, bridges, philipsHueGetBridgesStatus, philipsHueGetBridgeError }, {}) {
+  updateBridgeName = e => {
+    this.props.updateBridgeName('firstname', e.target.value);
+  };
+  render(
+    {
+      user,
+      getBridges,
+      discoverBridge,
+      configureBridge,
+      bridges,
+      philipsHueGetBridgesStatus,
+      philipsHueGetBridgeError
+    },
+    {}
+  ) {
     return (
       <PhilipsHuePage
         integration={integrationConfig[user.language]['philips-hue']}
         getBridges={getBridges}
+        discoverBridge={discoverBridge}
+        configureBridge={configureBridge}
+        updateBridgeName={this.updateBridgeName}
         philipsHueGetBridgesStatus={philipsHueGetBridgesStatus}
         philipsHueGetBridgeError={philipsHueGetBridgeError}
         bridges={bridges}

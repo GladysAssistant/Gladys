@@ -10,26 +10,27 @@ module.exports = function HueController(philipsHueLightHandler) {
   }
 
   /**
+   * @api {post} /api/v1/service/philips-hue/bridge/discover Discover Philips Hue Bridge and lights
+   * @apiName DiscoverBridge
+   * @apiParam {String} ipaddress IP Address of the bridge
+   * @apiGroup PhilipsHue
+   */
+  async function discoverBridge(req, res) {
+    const bridges = await philipsHueLightHandler.discoverBridge(req.body.name, req.body.ipaddress);
+    res.json(bridges);
+  }
+
+  /**
    * @api {post} /api/v1/service/philips-hue/bridge/configure Configure Philips Hue Bridge
    * @apiName ConfigureBridge
    * @apiParam {String} name Name of the bridge
    * @apiParam {String} ipaddress IP Address of the bridge
+   * @apiParam {String} userId User Id used to connect to the bridge
+   * @apiParam {Object[]} lights List of lights to configure
    * @apiGroup PhilipsHue
    */
   async function configureBridge(req, res) {
-    await philipsHueLightHandler.configureBridge(req.body.name, req.body.ipaddress);
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
-   * @api {get} /api/v1/service/philips-hue/bridge/lights Get lights from Philips Hue bridge
-   * @apiName getLightsFromBridge
-   * @apiGroup PhilipsHue
-   */
-  async function getLightsFromBridge(req, res) {
-    await philipsHueLightHandler.getLightsFromBridge();
+    await philipsHueLightHandler.configureBridge(req.body.name, req.body.ipaddress, req.body.userId, req.body.lights);
     res.json({
       success: true,
     });
@@ -68,13 +69,13 @@ module.exports = function HueController(philipsHueLightHandler) {
       authenticated: true,
       controller: getBridges,
     },
+    'post /api/v1/service/philips-hue/bridge/discover': {
+      authenticated: true,
+      controller: discoverBridge,
+    },
     'post /api/v1/service/philips-hue/bridge/configure': {
       authenticated: true,
       controller: configureBridge,
-    },
-    'get /api/v1/service/philips-hue/bridge/lights': {
-      authenticated: true,
-      controller: getLightsFromBridge,
     },
     'post /api/v1/service/philips-hue/bridge/lights/:deviceId/on': {
       authenticated: true,

@@ -1,6 +1,6 @@
 const { configureBridge } = require('./light.configureBridge');
+const { discoverBridge } = require('./light.discoverBridge');
 const { getBridges } = require('./light.getBridges');
-const { getLightsFromBridge } = require('./light.getLightsFromBridge');
 const { turnOn } = require('./light.turnOn');
 const { turnOff } = require('./light.turnOff');
 
@@ -10,7 +10,7 @@ const { turnOff } = require('./light.turnOff');
  * @param {Object} hueClient - Philips Hue Client.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
- * const exampleLightHandler = new ExampleLightHandler(gladys, client, serviceId);
+ * const philipsHueLightHandler = new PhilipsHueLightHandler(gladys, client, serviceId);
  */
 const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient, serviceId) {
   this.gladys = gladys;
@@ -20,10 +20,23 @@ const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient
   this.hueApi = null;
 };
 
+/**
+ * @description Reconnect to the philips hue bridge.
+ * @param {string} ipAddress - IP Address of the Philips Hue Bridge.
+ * @param {string} userId - User ID used to connect.
+ * @example
+ * init('162.198.1.1', 'OBUHKAP7FPRCnEhZOMp1P33TvTQLvthgEHd3SH-g');
+ */
+async function init(ipAddress, userId) {
+  const { HueApi } = this.hueClient;
+  this.hueApi = new HueApi(ipAddress, userId);
+}
+
 PhilipsHueLightHandler.prototype.configureBridge = configureBridge;
+PhilipsHueLightHandler.prototype.discoverBridge = discoverBridge;
 PhilipsHueLightHandler.prototype.getBridges = getBridges;
-PhilipsHueLightHandler.prototype.getLightsFromBridge = getLightsFromBridge;
 PhilipsHueLightHandler.prototype.turnOn = turnOn;
 PhilipsHueLightHandler.prototype.turnOff = turnOff;
+PhilipsHueLightHandler.prototype.init = init;
 
 module.exports = PhilipsHueLightHandler;

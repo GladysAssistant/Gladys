@@ -180,7 +180,8 @@
     "philipsHue": {
       "title": "Philips Hue",
       "introduction": "Configure here your Philips Hue lights. Gladys is compatible with <a href=\"{{link}}\">this set of Philips Hue lights</a>",
-      "searchForBridgesButton": "Scan network for bridges"
+      "searchForBridgesButton": "Scan network for bridges",
+      "saveConfigurationButton": "Save"
     },
     "rtspCamera": {
       "title": "RTSP Camera",

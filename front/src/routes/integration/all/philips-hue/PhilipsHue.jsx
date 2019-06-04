@@ -55,23 +55,72 @@ const PhilipsHuePage = ({ children, ...props }) => (
                       )}
                       <h3>List of available bridges</h3>
                       {props.bridges && (
-                        <p>Click on the toggle to connect to a Philips Hue bridge and imports lights in your Gladys</p>
+                        <p>
+                          Click on the toggle to connect to a Philips Hue bridge and imports lights in your Gladys.
+                          Don't forget to <b>press the link button</b> on the bridge before.
+                        </p>
                       )}
                       <div class="card-columns">
                         {props.bridges &&
                           props.bridges.map((bridge, index) => (
-                            <div class="card">
+                            <div class="card" style="width: 38rem;">
                               <div class="card-header">
                                 <h3 class="card-title">{bridge.name}</h3>
                                 <div class="card-options">
                                   <label class="custom-switch m-0">
-                                    <input type="checkbox" value="0" class="custom-switch-input" />
+                                    <input type="checkbox" class="custom-switch-input" onClick={props.discoverBridge} />
                                     <span class="custom-switch-indicator" />
                                   </label>
                                 </div>
                               </div>
                               <div class="card-body">
                                 <b>IP Address:</b> {bridge.ipaddress}
+                                {bridge.lights && (
+                                  <form onSubmit={props.configureBridge}>
+                                    <div class="form-row">
+                                      <div class="col-5">
+                                        <label for="bridge" class="col-form-label">
+                                          Bridge name
+                                        </label>
+                                      </div>
+                                      <div class="col-6">
+                                        <input type="text" id="bridge" class="form-control" value={bridge.name} />
+                                      </div>
+                                    </div>
+                                    {bridge.lights &&
+                                      bridge.lights.map((light, index) => (
+                                        <div class="form-row">
+                                          <div class="col-1 offset-1 form-check-inline">
+                                            <input
+                                              class="form-check-input"
+                                              type="checkbox"
+                                              value=""
+                                              checked="checked"
+                                              id={'device' + light.id + 'check'}
+                                            />
+                                          </div>
+                                          <div class="col-3">
+                                            <label for={'device' + light.id} class="col-form-label">
+                                              Peripheric {light.id}
+                                            </label>
+                                          </div>
+                                          <div class="col-6">
+                                            <input
+                                              type="text"
+                                              id={'device' + light.id}
+                                              class="form-control"
+                                              value={light.name}
+                                            />
+                                          </div>
+                                        </div>
+                                      ))}
+                                    <div class="form-footer">
+                                      <button class="btn btn-success btn-sm">
+                                        <Text id="integration.philipsHue.saveConfigurationButton" />
+                                      </button>
+                                    </div>
+                                  </form>
+                                )}
                               </div>
                             </div>
                           ))}

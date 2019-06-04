@@ -1,6 +1,7 @@
 const logger = require('../../utils/logger');
 const PhilipsHueLightHandler = require('./lib/light');
 const HueController = require('./api/hue.controller');
+const db = require('../../models');
 
 module.exports = function PhilipsHueService(gladys, serviceId) {
   // require the node-hue-api module
@@ -9,12 +10,33 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the PhilipsHueService service
+   * @description This function starts the PhilipsHueService service.
    * @example
    * gladys.services['philips-hue'].start();
    */
   async function start() {
     logger.log('starting Philips Hue service');
+    // Initialization of existing Hue Bridge
+    const device = await db.Device.findOne({
+      where: {
+        service_id: serviceId,
+      },
+      include: [
+        {
+          model: db.DeviceParam,
+          as: 'params',
+        },
+      ],
+    });
+    if (device != null) {
+      const ipAddress = device.params
+        .filter((p) => p.dataValues.name === 'BRIDGE_IP_ADDRESS')
+        .map((p) => p.dataValues.value);
+      const userId = device.params.filter((p) => p.dataValues.name === 'BRIDGE_USER_ID').map((p) => p.dataValues.value);
+      logger.info(`Connecting to hue bridge ${device.name} at ${ipAddress}...`);
+      philipsHueLightHandler.init(ipAddress, userId);
+    }
+    return null;
   }
 
   /**
