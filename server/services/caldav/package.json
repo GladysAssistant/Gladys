@@ -1,0 +1,20 @@
+{
+  "name": "caldav",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "dav": "^1.8.0",
+    "ical": "^0.6.0",
+    "moment": "^2.24.0"
+  }
+}
