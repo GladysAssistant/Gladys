@@ -1,0 +1,17 @@
+coverage:
+  status:
+    project:
+      front:
+        target: 90%
+        flags: front
+      server:
+        target: 90%
+        flags: server
+
+flags:
+  server:
+    paths:
+      - server
+  front:
+    paths:
+      - front

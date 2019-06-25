@@ -1,0 +1,8 @@
+{
+  "device": {
+    "binarySuffix": "On/Off",
+    "brightnessSuffix": "brightness",
+    "hueSuffix": "hue",
+    "saturationSuffix": "saturation"
+  }
+}

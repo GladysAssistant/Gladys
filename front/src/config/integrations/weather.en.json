@@ -1,0 +1,8 @@
+[
+  {
+    "key": "darksky",
+    "name": "DarkSky",
+    "description": "Get the weather in Gladys.",
+    "img": "/assets/integrations/cover/darksky.jpg"
+  }
+]

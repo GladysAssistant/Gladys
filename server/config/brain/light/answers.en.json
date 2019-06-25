@@ -1,0 +1,10 @@
+[
+  {
+    "label": "light.turn-on.success",
+    "answers": ["I turned on the light in room {{room}} with success!"]
+  },
+  {
+    "label": "light.turn-on.fail",
+    "answers": ["I didn't manage to turn on the light in room {{room}}."]
+  }
+]

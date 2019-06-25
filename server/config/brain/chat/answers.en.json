@@ -1,0 +1,6 @@
+[
+  {
+    "label": "question.no-intent-found",
+    "answers": ["I didn't understand what you said..."]
+  }
+]

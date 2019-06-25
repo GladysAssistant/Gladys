@@ -1,0 +1,168 @@
+version: 2.1
+
+shared: &shared
+  docker:
+    - image: docker:18.06.3-ce-git
+  working_directory: ~/gladys-build
+  steps:
+    - attach_workspace:
+        at: ~/gladys-build-front
+    - checkout:
+        path: ~/gladys-build
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - run:
+        name: Copy build front folder
+        command: cp -r ~/gladys-build-front/front/build/. ~/gladys-build/static
+    - run:
+        name: Show front folder
+        command: ls ~/gladys-build/static
+    - run:
+        name: Install build dependencies.
+        command: apk add --no-cache bash curl git jq make perl
+    - run:
+        name: Add dynamic shared vars to env.
+        command: |
+          .circleci/load_env.sh
+    - run:
+        name: Build and push Docker image.
+        command: |
+          source $BASH_ENV
+          .circleci/build-image.sh
+        no_output_timeout: 2h
+
+jobs:
+  test-server:
+    working_directory: ~/gladys-test # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/node:10
+    steps: # a collection of executable commands
+      - checkout:
+          path: ~/gladys-test
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get install -y libudev-dev sqlite3 openssl
+            wget https://github.com/OpenZWave/open-zwave/archive/V1.5.zip
+            unzip V1.5.zip
+            cd open-zwave-1.5
+            sudo make install
+            sudo ldconfig /usr/local/lib /usr/local/lib64
+      - run:
+          name: Install global dependencies
+          command: 'sudo npm install typescript node-gyp npm@latest -g'
+      - restore_cache: # special step to restore the dependency cache
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dependency-cache-{{ checksum "server/package.json" }}
+      - run:
+          name: Install NPM dependencies
+          command: cd server && npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "server/package.json" }}
+          paths:
+            - ./server/node_modules
+      - run:
+          name: Run prettier
+          command: cd server && npm run prettier-check
+      - run:
+          name: Run eslint
+          command: cd server && npm run eslint
+      - run:
+          name: Tests with coverage
+          command: cd server && npm run coverage
+      - run:
+          name: Push coverage
+          command: npm i && npm run push-coverage
+  test-front:
+    working_directory: ~/gladys-test/front # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/node:10
+    steps: # a collection of executable commands
+      - checkout:
+          path: ~/gladys-test
+      - run:
+          name: Install global dependencies
+          command: 'sudo npm install codecov npm@latest -g'
+      - restore_cache: # special step to restore the dependency cache
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install NPM dependencies
+          command: npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Run prettier
+          command: npm run prettier-check
+      - run:
+          name: Run eslint
+          command: npm run eslint
+  build-front:
+    working_directory: ~/gladys-build
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          name: Build Front
+          command: 'cd front && npm install && npm run build'
+      - persist_to_workspace:
+          root: ~/gladys-build
+          paths:
+            - front/build
+
+  build-armhf:
+    <<: *shared
+    environment:
+      QEMU_ARCH: arm
+      TAG: arm
+      TARGET: arm32v6
+  build-amd64:
+    <<: *shared
+    environment:
+      QEMU_ARCH: amd64
+      TAG: amd64
+      TARGET: amd64
+  build-i386:
+    <<: *shared
+    environment:
+      QEMU_ARCH: i386
+      TAG: i386
+      TARGET: i386
+  build-arm64v8:
+    <<: *shared
+    environment:
+      QEMU_ARCH: aarch64
+      TAG: arm64v8
+      TARGET: arm64v8
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test-server
+      - test-front
+      - build-front
+      - build-armhf:
+          requires:
+            - build-front
+          filters:
+            tags:
+              only: /.*/
+      - build-amd64:
+          requires:
+            - build-front
+      - build-i386:
+          requires:
+            - build-front
+          filters:
+            tags:
+              only: /.*/
+      - build-arm64v8:
+          requires:
+            - build-front
+          filters:
+            tags:
+              only: /.*/
