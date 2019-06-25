@@ -1,8 +1,0 @@
-[
-    {
-        "id": 1,
-        "name": "Script test",
-        "text": "console.log('Test script');",
-        "user": 1
-    }
-]
