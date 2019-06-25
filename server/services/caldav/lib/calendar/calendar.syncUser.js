@@ -1,44 +1,41 @@
 const logger = require('../../../../utils/logger');
-const { connect } = require('./connect.js');
-const { syncCalendars } = require('./calendar.syncCalendars.js');
-const { syncCalendarEvents } = require('./calendar.syncCalendarEvents.js');
 
 /**
  * @description Start user sync.
- * @param {Object} user - Gladys user to connect & sync.
+ * @param {Object} userId - Gladys user to connect & sync.
  * @returns {Promise} Resolving.
  * @example
- * syncUser(user)
+ * syncUser(user.id)
  */
-async function syncUser(user) {
-    const account = await connect(user);
+async function syncUser(userId) {
+  const account = await this.connect(userId);
 
-    // Clean all dav Calendar for full Sync
-    let gladysCalendars = await this.gladys.calendar.get(user.id);
-    let davCalendars = gladysCalendars.filter(calendar => calendar.service_id === this.serviceId);
-    davCalendars.forEach(calendar => {
-        calendar.destroy();
-    });
+  // Clean all dav Calendar for full Sync
+  let gladysCalendars = await this.gladys.calendar.get(userId);
+  let davCalendars = gladysCalendars.filter(calendar => calendar.service_id === this.serviceId);
 
-    await syncCalendars(account.calendars, user);
+  await Promise.all(davCalendars.map(calendar => {
+    return this.gladys.calendar.destroy(calendar.selector);
+  }));
 
-    gladysCalendars = await this.gladys.calendar.get(user.id);
-    // const gladysCalendars = await this.gladys.calendar.getByService('caldav');
-    davCalendars = gladysCalendars.filter(calendar => calendar.service_id === this.serviceId);
-    // foreach calendar, sync events
-    return Promise.all(davCalendars.map((davCalendar) => {
-        try {
-            return syncCalendarEvents(
-                davCalendar,
-                account.calendars.filter((calendar) => davCalendar.external_id === calendar.url)
-            );
-        } catch (err) {
-            logger.warn(`CalDAV - Calendar : Failed to sync calendar ${davCalendar.name} with externalid ${davCalendar.external_id}. ${err}`);
-            return Promise.reject(err);
-        };
-    }));
+  await this.syncCalendars(account.calendars, userId);
+
+  gladysCalendars = await this.gladys.calendar.get(userId);
+  davCalendars = gladysCalendars.filter(calendar => calendar.service_id === this.serviceId);
+  // foreach calendar, sync events
+  return Promise.all(davCalendars.map((davCalendar) => {
+    try {
+      return this.syncCalendarEvents(
+        davCalendar,
+        account.calendars.filter((calendar) => davCalendar.external_id === calendar.url)
+      );
+    } catch (err) {
+      logger.warn(`CalDAV - Calendar : Failed to sync calendar ${davCalendar.name} with externalid ${davCalendar.external_id}. ${err}`);
+      return Promise.reject(err);
+    };
+  }));
 };
 
 module.exports = {
-    syncUser
+  syncUser
 };
