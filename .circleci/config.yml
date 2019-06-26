@@ -144,25 +144,31 @@ workflows:
     jobs:
       - test-server
       - test-front
-      - build-front
+      - build-front:
+          requires:
+            - test-server
+            - test-front
       - build-armhf:
           requires:
             - build-front
           filters:
             tags:
-              only: /.*/
+              only: /v*/
       - build-amd64:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
       - build-i386:
           requires:
             - build-front
           filters:
             tags:
-              only: /.*/
+              only: /v*/
       - build-arm64v8:
           requires:
             - build-front
           filters:
             tags:
-              only: /.*/
+              only: /v*/
