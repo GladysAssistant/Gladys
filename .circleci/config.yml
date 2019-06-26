@@ -42,7 +42,7 @@ jobs:
       - run:
           name: Install system dependencies
           command: |
-            sudo apt-get install -y libudev-dev sqlite3 openssl openzwave
+            sudo apt-get install -y libudev-dev sqlite3 openssl openzwave libopenzwave1.5-dev
       - run:
           name: Install global dependencies
           command: 'sudo npm install typescript node-gyp npm@latest -g'
