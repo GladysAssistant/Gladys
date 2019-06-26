@@ -155,7 +155,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              ignore: /*/
+              ignore: /.*/
       - build-amd64:
           requires:
             - build-front
@@ -163,7 +163,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              ignore: /*/
+              ignore: /.*/
       - build-i386:
           requires:
             - build-front
@@ -171,7 +171,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              ignore: /*/
+              ignore: /.*/
       - build-arm64v8:
           requires:
             - build-front
@@ -179,4 +179,4 @@ workflows:
             tags:
               only: /v*/
             branches:
-              ignore: /*/
+              ignore: /.*/
