@@ -19,16 +19,21 @@ async function syncCalendarEvents(gladysCalendar, calendars) {
 
   // insert events in DB
   const formatedEvents = this.formatEvents(events, gladysCalendar);
-  const newEvents = await Promise.all(formatedEvents.map((formatedEvent) => {
-    return this.gladys.calendar.createEvent(gladysCalendar.selector, formatedEvent);
-  }));
+  const newEvents = await Promise.all(
+    formatedEvents.map((formatedEvent) => {
+      return this.gladys.calendar.createEvent(gladysCalendar.selector, formatedEvent);
+    }),
+  );
 
-  logger.info(`CalDAV : Successfully inserted ${formatedEvents.length} calendarEvents for ${gladysCalendar.name} in Gladys database.`);
+  logger.info(
+    `CalDAV : Successfully inserted ${formatedEvents.length} calendarEvents for ${
+      gladysCalendar.name
+    } in Gladys database.`,
+  );
 
   return newEvents;
-  // return sync(calendar.objects, gladysCalendar, this.formatEvents);
-};
+}
 
 module.exports = {
-  syncCalendarEvents
+  syncCalendarEvents,
 };

@@ -13,15 +13,16 @@ async function connect(userId) {
   const xhr = new this.dav.transport.Basic(
     new this.dav.Credentials({
       username: CALDAV_USERNAME,
-      password: CALDAV_PASSWORD
-    })
+      password: CALDAV_PASSWORD,
+    }),
   );
 
   const client = new this.dav.Client(xhr);
 
   const lastYear = new Date();
   lastYear.setFullYear(lastYear.getFullYear() - 1);
-  const lastYearString = lastYear.toISOString()
+  const lastYearString = lastYear
+    .toISOString()
     .split('.')[0]
     .concat('Z')
     .replace(/[-:]/g, '');
@@ -31,21 +32,27 @@ async function connect(userId) {
     accountType: 'caldav',
     loadCollections: true,
     loadObjects: true,
-    filters: [{
-      type: 'comp-filter',
-      attrs: { name: 'VCALENDAR' },
-      children: [{
+    filters: [
+      {
         type: 'comp-filter',
-        attrs: { name: 'VEVENT' },
-        children: [{
-          type: 'time-range',
-          attrs: { start: lastYearString },
-        }],
-      }]
-    }]
+        attrs: { name: 'VCALENDAR' },
+        children: [
+          {
+            type: 'comp-filter',
+            attrs: { name: 'VEVENT' },
+            children: [
+              {
+                type: 'time-range',
+                attrs: { start: lastYearString },
+              },
+            ],
+          },
+        ],
+      },
+    ],
   });
 }
 
 module.exports = {
-  connect
+  connect,
 };

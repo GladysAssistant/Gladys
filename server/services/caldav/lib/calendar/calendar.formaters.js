@@ -27,14 +27,9 @@ function formatRecurringEvents(event, gladysCalendar) {
 
   // For recurring events, get the set of event start dates that fall within the range
   // of dates we're looking for.
-  const dates = event.rrule.between(
-    rangeStart.toDate(),
-    rangeEnd.toDate(),
-    true,
-    (date, i) => {
-      return true;
-    }
-  );
+  const dates = event.rrule.between(rangeStart.toDate(), rangeEnd.toDate(), true, (date, i) => {
+    return true;
+  });
 
   // The "dates" array contains the set of dates within our desired date range range that are valid
   // for the recurrence rule.  *However*, it's possible for us to have a specific recurrence that
@@ -42,8 +37,8 @@ function formatRecurringEvents(event, gladysCalendar) {
   // to add *all* recurrence override entries into the set of dates that we check, and then later
   // filter out any recurrences that don't actually belong within our range.
   if (event.recurrences !== undefined) {
-    event.recurrences.forEach(r => {
-      // Only add dates that weren't already in the range we added from the rrule so that 
+    event.recurrences.forEach((r) => {
+      // Only add dates that weren't already in the range we added from the rrule so that
       // we don't double-add those events.
       if (this.moment(new Date(r)).isBetween(rangeStart, rangeEnd) !== true) {
         dates.push(new Date(r));
@@ -63,13 +58,13 @@ function formatRecurringEvents(event, gladysCalendar) {
     const dateLookupKey = date.toISOString().substring(0, 10);
 
     // For each date that we're checking, it's possible that there is a recurrence override for that one day.
-    if ((curEvent.recurrences !== undefined) && (curEvent.recurrences[dateLookupKey] !== undefined)) {
+    if (curEvent.recurrences !== undefined && curEvent.recurrences[dateLookupKey] !== undefined) {
       // We found an override, so for this recurrence, use a potentially different title,
       // start date, and duration.
       curEvent = curEvent.recurrences[dateLookupKey];
       startDate = this.moment(curEvent.start);
       curDuration = parseInt(this.moment(curEvent.end).format('x'), 10) - parseInt(startDate.format('x'), 10);
-    } else if ((curEvent.exdate !== undefined) && (curEvent.exdate[dateLookupKey] !== undefined)) {
+    } else if (curEvent.exdate !== undefined && curEvent.exdate[dateLookupKey] !== undefined) {
       // If there's no recurrence override, check for an exception date.
       // Exception dates represent exceptions to the rule.
       // This date is an exception date, which means we should skip it in the recurrence pattern.
@@ -80,7 +75,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     const recurrenceTitle = curEvent.summary;
     endDate = this.moment(parseInt(startDate.format('x'), 10) + curDuration, 'x');
 
-    // If this recurrence ends before the start of the date range, or starts after the end of the date range, 
+    // If this recurrence ends before the start of the date range, or starts after the end of the date range,
     // don't process it.
     if (endDate.isBefore(rangeStart) || startDate.isAfter(rangeEnd)) {
       showRecurrence = false;
@@ -92,7 +87,7 @@ function formatRecurringEvents(event, gladysCalendar) {
         selector: `${recurrenceTitle} ${startDate.format('YYYY-MM-DD-HHmm')}`,
         name: recurrenceTitle,
         location: event.location,
-        calendar_id: gladysCalendar.id
+        calendar_id: gladysCalendar.id,
       };
 
       if (event.start && event.start.tz === undefined) {
@@ -134,7 +129,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
         selector: `${icsEvent.summary} ${this.moment(icsEvent.start).format('YYYY-MM-DD-HHmm')}`,
         name: icsEvent.summary,
         location: icsEvent.location,
-        calendar_id: gladysCalendar.id
+        calendar_id: gladysCalendar.id,
       };
 
       if (icsEvent.start) {
@@ -151,7 +146,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
 
       events.push(newEvent);
     } else {
-      events = events.concat(this.formatRecurringEvents(icsEvent, gladysCalendar).filter(e => e !== null));
+      events = events.concat(this.formatRecurringEvents(icsEvent, gladysCalendar).filter((e) => e !== null));
     }
   });
 
@@ -174,7 +169,7 @@ function formatCalendars(caldavCalendars, userId) {
       name: caldavCalendar.displayName,
       description: caldavCalendar.description || `Calendar ${caldavCalendar.displayName}`,
       service_id: this.serviceId,
-      user_id: userId
+      user_id: userId,
     };
 
     calendars.push(newCalendar);
@@ -186,5 +181,5 @@ function formatCalendars(caldavCalendars, userId) {
 module.exports = {
   formatRecurringEvents,
   formatEvents,
-  formatCalendars
+  formatCalendars,
 };

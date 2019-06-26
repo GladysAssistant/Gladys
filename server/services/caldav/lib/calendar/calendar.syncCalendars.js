@@ -15,15 +15,17 @@ async function syncCalendars(calendars, userId) {
 
   // insert calendars in DB
   const formatedCalendars = this.formatCalendars(calendars, userId);
-  const newCalendars = await Promise.all(formatedCalendars.map((formatedCalendar) => {
-    return this.gladys.calendar.create(formatedCalendar);
-  }));
+  const newCalendars = await Promise.all(
+    formatedCalendars.map((formatedCalendar) => {
+      return this.gladys.calendar.create(formatedCalendar);
+    }),
+  );
 
   logger.info(`CalDAV : Successfully inserted ${formatedCalendars.length} calendars in Gladys database.`);
 
   return newCalendars;
-};
+}
 
 module.exports = {
-  syncCalendars
+  syncCalendars,
 };

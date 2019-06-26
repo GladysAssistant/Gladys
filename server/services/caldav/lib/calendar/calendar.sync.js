@@ -13,8 +13,8 @@ async function sync(userId) {
   } catch (err) {
     logger.warn(`CalDAV - Calendar : Unable to sync user ID ${userId}. ${err}`);
     return Promise.reject(err);
-  };
-};
+  }
+}
 
 module.exports = {
   sync,
