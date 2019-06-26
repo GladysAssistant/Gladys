@@ -18,11 +18,13 @@ We use github to host code, to track issues and feature requests, as well as acc
 
 Make sure you discussed with the team on [Gladys Community](https://community.gladysassistant.com/) to ensure your pull request goes in the same direction as current developements 🙂
 
-Then, please create a card on our public [Trello](https://trello.com/b/41GdzyPx/gladys-developement) to indicate that you are currently working on this feature. It's always great to know what others are doing!
+Then, create a GitHub Issue to indicate that you're working on the topic.
+
+As soon as you have code to show, create a draft PR so that your code is visible to the team so we can discuss the changes.
 
 ## All Code Changes Happen Through Pull Requests
 
-Pull requests are the best way to propose changes to the codebase. 
+Pull requests are the best way to propose changes to the codebase.
 
 We actively welcome your pull requests:
 
@@ -31,7 +33,8 @@ We actively welcome your pull requests:
 3. If you've changed the APIs, update the documentation.
 4. Ensure the test suite passes. (`npm test`)
 5. Make sure your code lints. (`npm run eslint`)
-6. Issue that pull request!
+6. Make sure your code is pretty (`npm run prettier`)
+7. Issue that pull request!
 
 ## Any contributions you make will be under the MIT Software License
 

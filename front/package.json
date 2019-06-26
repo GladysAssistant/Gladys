@@ -1,0 +1,84 @@
+{
+  "name": "gladys-front",
+  "scripts": {
+    "start": "per-env",
+    "start:production": "npm run -s serve",
+    "start:development": "npm run -s dev",
+    "build": "preact build --no-prerender",
+    "serve": "preact build && preact serve",
+    "dev": "preact watch -p 1444",
+    "eslint": "eslint src --ext .json --ext .js",
+    "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
+    "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-config-synacor": "^2.0.2",
+    "eslint-plugin-json": "^1.4.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^21.2.1",
+    "per-env": "^1.0.2",
+    "preact-cli": "^2.1.0",
+    "preact-render-spy": "^1.2.1",
+    "prettier": "^1.17.1"
+  },
+  "dependencies": {
+    "@gladysassistant/gladys-gateway-js": "^1.1.0",
+    "axios": "^0.18.0",
+    "classnames": "^2.2.6",
+    "create-react-ref": "^0.1.0",
+    "cropperjs": "^1.5.1",
+    "dayjs": "^1.8.14",
+    "debounce": "^1.2.0",
+    "dotenv": "^6.2.0",
+    "get-value": "^3.0.1",
+    "immutability-helper": "^3.0.0",
+    "leaflet": "^1.4.0",
+    "linkstate": "^1.1.1",
+    "moment": "^2.24.0",
+    "preact": "^8.2.6",
+    "preact-cli-plugin-fast-async": "^1.0.1",
+    "preact-compat": "^3.18.4",
+    "preact-i18n": "^1.2.2",
+    "preact-router": "^2.5.7",
+    "react-big-calendar": "^0.20.3",
+    "set-value": "^3.0.0",
+    "tabler-ui": "0.0.32",
+    "unistore": "^3.2.1",
+    "uuid": "^3.3.2",
+    "vis": "^4.21.0"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "verbose": true,
+    "setupFiles": [
+      "<rootDir>/tests/__mocks__/browserMocks.js"
+    ],
+    "testRegex": "(/(__tests__|tests)/.*|(\\.|/)(test|spec))\\.jsx?$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/tests/__mocks__/*"
+    ],
+    "testURL": "http://localhost:8080",
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/__mocks__/fileMock.js",
+      "\\.(css|less|scss)$": "identity-obj-proxy",
+      "^./style$": "identity-obj-proxy",
+      "^preact$": "<rootDir>/node_modules/preact/dist/preact.min.js",
+      "^react$": "preact-compat",
+      "^react-dom$": "preact-compat",
+      "^create-react-class$": "preact-compat/lib/create-react-class",
+      "^react-addons-css-transition-group$": "preact-css-transition-group"
+    }
+  }
+}

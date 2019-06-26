@@ -1,0 +1,6 @@
+[
+  {
+    "label": "weather.get",
+    "questions": ["What's the weather like?"]
+  }
+]

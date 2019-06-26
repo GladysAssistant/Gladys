@@ -1,0 +1,17 @@
+{
+  "name": "gladys-mqtt",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "mqtt": "^2.18.8"
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "label": "taxi.order",
+    "questions": ["Order me a taxi in %datetime% to %city%"],
+    "answers": ["Ok, got it. I'll order a taxi in {{datetime}} to {{city}}"],
+    "slots": [
+      {
+        "key": "city",
+        "mandatory": true,
+        "ifMissing": "Where are you going?",
+        "afterLastCondition": {
+          "after": "to"
+        }
+      },
+      {
+        "key": "datetime",
+        "mandatory": true,
+        "ifMissing": "When should I order this taxi?"
+      }
+    ]
+  }
+]

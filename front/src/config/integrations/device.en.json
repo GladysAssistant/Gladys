@@ -1,0 +1,14 @@
+[
+  {
+    "key": "zwave",
+    "name": "Z-Wave",
+    "description": "Control your Z-Wave devices.",
+    "img": "/assets/integrations/cover/zwave.jpg"
+  },
+  {
+    "key": "rtsp-camera",
+    "name": "RTSP Camera",
+    "description": "Display your camera in Gladys.",
+    "img": "/assets/integrations/cover/rtsp-camera.jpg"
+  }
+]

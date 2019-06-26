@@ -1,0 +1,8 @@
+{
+  "extends": ["eslint-config-synacor", "prettier"],
+  "rules": {
+    "react/jsx-indent-props": ["enabled", 2],
+    "brace-style": ["error", "1tbs"]
+  },
+  "plugins": ["json"]
+}

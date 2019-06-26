@@ -1,0 +1,19 @@
+.emptyStateDivBox {
+  width: 60%;
+  max-width: 400px;
+  margin-Left: auto;
+  margin-right: auto;
+  margin-top: 80px;
+  text-align: center;
+}
+
+.emptyStateImage {
+  margin-Left: auto;
+  margin-right: auto;
+  display: block;
+  max-width: 300px;
+}
+
+.emptyStateText {
+  margin-top: 20px;
+}

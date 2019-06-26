@@ -1,0 +1,163 @@
+{
+  "plugins": ["jsdoc", "require-jsdoc"],
+  "extends": ["airbnb-base", "plugin:jsdoc/recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "env": {
+    "node": true
+  },
+  "globals": {
+    "document": false,
+    "navigator": false,
+    "window": false,
+    "describe": true,
+    "it": true,
+    "TEST_BACKEND_APP": true,
+    "should": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true
+  },
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ],
+    "arrow-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "no-mixed-spaces-and-tabs": "error",
+    "no-eval": "error",
+    "block-spacing": ["error", "always"],
+    "comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+    "curly": ["error", "all"],
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true,
+        "allowTaggedTemplates": true
+      }
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "none",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "func-call-spacing": ["error", "never"],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": ["**/*.test.js"]
+      }
+    ],
+    "max-len": [
+      "error",
+      120,
+      2,
+      {
+        "ignoreUrls": true,
+        "ignoreComments": false,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "brace-style": [
+      "error",
+      "1tbs",
+      {
+        "allowSingleLine": false
+      }
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "jsdoc/check-examples": 0,
+    "jsdoc/check-param-names": 2,
+    "jsdoc/check-tag-names": 2,
+    "jsdoc/check-types": 2,
+    "jsdoc/newline-after-description": 2,
+    "jsdoc/no-undefined-types": 2,
+    "jsdoc/require-description": 2,
+    "jsdoc/require-description-complete-sentence": 2,
+    "jsdoc/require-example": 2,
+    "jsdoc/require-hyphen-before-param-description": 2,
+    "jsdoc/require-param": 2,
+    "jsdoc/require-param-description": 2,
+    "jsdoc/require-param-name": 2,
+    "jsdoc/require-param-type": 2,
+    "jsdoc/require-returns": 2,
+    "jsdoc/require-returns-check": 2,
+    "jsdoc/require-returns-description": 2,
+    "jsdoc/require-returns-type": 2,
+    "jsdoc/valid-types": 2,
+    "require-jsdoc": 2
+  },
+  "overrides": [
+    {
+      "files": ["services/**/*.js"],
+      "rules": {
+        "global-require": 0
+      }
+    },
+    {
+      "files": ["**/*.controller.js"],
+      "rules": {
+        "jsdoc/check-examples": 0,
+        "jsdoc/check-param-names": 0,
+        "jsdoc/check-tag-names": 0,
+        "jsdoc/check-types": 0,
+        "jsdoc/newline-after-description": 0,
+        "jsdoc/no-undefined-types": 0,
+        "jsdoc/require-description": 0,
+        "jsdoc/require-description-complete-sentence": 0,
+        "jsdoc/require-example": 0,
+        "jsdoc/require-hyphen-before-param-description": 0,
+        "jsdoc/require-param": 0,
+        "jsdoc/require-param-description": 0,
+        "jsdoc/require-param-name": 0,
+        "jsdoc/require-param-type": 0,
+        "jsdoc/require-returns": 0,
+        "jsdoc/require-returns-check": 0,
+        "jsdoc/require-returns-description": 0,
+        "jsdoc/require-returns-type": 0,
+        "jsdoc/valid-types": 0
+      }
+    }
+  ],
+  "settings": {
+    "jsdoc": {
+      "captionRequired": true
+    }
+  }
+}

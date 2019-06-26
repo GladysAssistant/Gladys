@@ -1,8 +1,9 @@
-node_modules
-bower_components
-.tmp
+**/node_modules
+server/test
 dump.rdb
+server/*.db
 .env
+**/.nyc_output
 lib-cov
 *.seed
 *.log
