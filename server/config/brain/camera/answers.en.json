@@ -1,0 +1,11 @@
+[
+  {
+    "label": "camera.get-image-room.success",
+    "answers": ["Here is what I see:"]
+  },
+
+  {
+    "label": "camera.get-image-room.no-image-found",
+    "answers": ["Sorry, I can't get a recent image."]
+  }
+]

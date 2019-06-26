@@ -1,0 +1,12 @@
+[
+  {
+    "label": "chat.greeting",
+    "questions": ["Hey!"],
+    "answers": ["Hey!"]
+  },
+  {
+    "label": "chat.i-love-you",
+    "questions": ["I love you"],
+    "answers": ["Me too!", "Of course you love me..."]
+  }
+]

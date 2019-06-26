@@ -1,0 +1,6 @@
+[
+  {
+    "label": "camera.get-image-room",
+    "questions": ["Show me a view of the camera in %room%", "Display camera image in %room%"]
+  }
+]
