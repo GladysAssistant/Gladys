@@ -90,9 +90,7 @@ function createActions(store) {
         return;
       }
       const userToCreate = Object.assign({}, state.newUser, {
-        birthdate: new Date(
-          `${state.newUser.birthdateYear}-${state.newUser.birthdateMonth}-${state.newUser.birthdateDay}`
-        )
+        birthdate: new Date(state.newUser.birthdateYear, state.newUser.birthdateMonth - 1, state.newUser.birthdateDay)
       });
       if (state.cropper) {
         userToCreate.picture = await getCropperBase64Image(state.cropper);

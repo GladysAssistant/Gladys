@@ -125,7 +125,7 @@ function createActions(store) {
         if (errored) {
           throw new Error();
         }
-        data.birthdate = new Date(`${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`);
+        data.birthdate = new Date(data.birthdateYear, data.birthdateMonth - 1, data.birthdateDay);
         delete data.birthdateYear;
         delete data.birthdateMonth;
         delete data.birthdateDay;
