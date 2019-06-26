@@ -36,9 +36,9 @@ We actively welcome your pull requests:
 6. Make sure your code is pretty (`npm run prettier`)
 7. Issue that pull request!
 
-## Any contributions you make will be under the MIT Software License
+## Any contributions you make will be under the Apache 2.0 License
 
-In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project.
+In short, when you submit code changes, your submissions are understood to be under the same Apache 2.0 License that covers the project.
 
 ## Report bugs using Github's [issues](https://github.com/gladysassistant/Gladys/issues)
 

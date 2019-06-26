@@ -1,7 +1,7 @@
 {
   "name": "gladys",
-  "version": "4.0.0",
-  "description": "Gladys 4",
+  "version": "4.0.0-alpha",
+  "description": "An open-source home assistant",
   "main": "index.js",
   "scripts": {
     "postinstall": "run-p install-server:dev install-front:dev",
