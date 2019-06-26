@@ -154,21 +154,29 @@ workflows:
           filters:
             tags:
               only: /v*/
+            branches:
+              ignore: /*/
       - build-amd64:
           requires:
             - build-front
           filters:
             tags:
               only: /v*/
+            branches:
+              ignore: /*/
       - build-i386:
           requires:
             - build-front
           filters:
             tags:
               only: /v*/
+            branches:
+              ignore: /*/
       - build-arm64v8:
           requires:
             - build-front
           filters:
             tags:
               only: /v*/
+            branches:
+              ignore: /*/
