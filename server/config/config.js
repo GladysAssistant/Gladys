@@ -35,9 +35,9 @@ module.exports = {
       underscored: true,
       freezeTableName: true,
     },
-    backupsFolder: '/var/lib/gladys/backups',
+    backupsFolder: process.env.BACKUP_FOLDER || '/var/lib/gladysassistant/backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
-    dockerImage: 'gladysassistant/gladys-4-playground',
-    tempFolder: '/tmp/gladys',
+    dockerImage: 'gladysassistant/gladys',
+    tempFolder: '/tmp/gladysassistant',
   },
 };

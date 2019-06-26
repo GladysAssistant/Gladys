@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  gladys:
+    image: gladysassistant/gladys:4.0.0-alpha-amd64
+    restart: always
+    environment:
+      NODE_ENV: production
+      SQLITE_FILE_PATH: /var/lib/gladysassistant/gladys-production.db
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/gladysassistant:/var/lib/gladysassistant
+    ports:
+      - '80:1443'
+      - '443:1443'
+  watchtower:
+    image: containrrr/watchtower:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
