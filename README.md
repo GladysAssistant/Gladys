@@ -22,7 +22,7 @@
 
 <img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
 
-## What it does
+## The Project
 
 Gladys is a home assistant who helps you in your everyday life.
 
