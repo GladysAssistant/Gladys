@@ -12,7 +12,8 @@ function createActions(store) {
     handleRoute(state, e) {
       store.setState({
         currentUrl: e.url,
-        showDropDown: false
+        showDropDown: false,
+        showCollapsedMenu: false
       });
     },
     toggleDropDown(state) {
