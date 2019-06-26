@@ -4,12 +4,15 @@ services:
   gladys:
     image: gladysassistant/gladys:4.0.0-alpha-arm
     restart: always
+    privileged: true
+    network: host
     environment:
       NODE_ENV: production
       SQLITE_FILE_PATH: /var/lib/gladysassistant/gladys-production.db
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/gladysassistant:/var/lib/gladysassistant
+      - /dev:/dev
     ports:
       - '80:1443'
       - '443:1443'
