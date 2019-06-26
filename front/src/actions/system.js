@@ -33,8 +33,6 @@ function createActions(store) {
         const systemInfos = await state.httpClient.get('/api/v1/system/info');
         const today = new Date().getTime();
         const systemStartedAt = today - systemInfos.uptime * 1000;
-        systemInfos.latest_gladys_version = 'latest';
-        systemInfos.new_release_available = true;
         systemInfos.uptime_formatted = dayjs(systemStartedAt)
           .locale(state.user.language)
           .fromNow();
