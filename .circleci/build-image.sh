@@ -4,10 +4,6 @@ set -eu
 
 export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
 
-if [ "$CIRCLE_BRANCH" = 'docker-build' ]; then
-  export IMAGE_ID="${REGISTRY}/${IMAGE}:latest-${TAG}"
-fi
-
 # ============
 # <qemu-support>
 if [ $QEMU_ARCH == 'amd64' ]; then
@@ -32,7 +28,3 @@ echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
 
 # Push push push
 docker push ${IMAGE_ID}
-if [ "$CIRCLE_BRANCH" = 'docker-build' ]; then
-  docker tag "${IMAGE_ID}" "${REGISTRY}/${IMAGE}:latest-${TAG}"
-  docker push "${REGISTRY}/${IMAGE}:latest-${TAG}"
-fi
