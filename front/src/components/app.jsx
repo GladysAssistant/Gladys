@@ -71,6 +71,7 @@ const AppRouter = connect(
         logout={props.logout}
       />
       <Router onChange={props.handleRoute}>
+        <Redirect path="/" to="/dashboard" />
         <Login path="/login" />
         <ForgotPassword path="/forgot-password" />
         <ResetPassword path="/reset-password" />
