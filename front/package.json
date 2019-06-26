@@ -4,7 +4,7 @@
     "start": "per-env",
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
-    "build": "preact build --no-prerender",
+    "build": "cross-env NODE_ENV=production preact build --no-prerender",
     "serve": "preact build && preact serve",
     "dev": "preact watch -p 1444",
     "eslint": "eslint src --ext .json --ext .js",
@@ -13,6 +13,7 @@
     "test": "jest --coverage"
   },
   "devDependencies": {
+    "cross-env": "^5.2.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^4.0.0",
     "eslint-config-synacor": "^2.0.2",
