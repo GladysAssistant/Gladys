@@ -9,7 +9,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs
+RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs ffmpeg
 
 RUN mkdir /src
 WORKDIR /src
