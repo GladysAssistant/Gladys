@@ -1,6 +1,7 @@
 import createActionsProfilePicture from './profilePicture';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
+import get from 'get-value';
 import { isUrlInArray } from '../utils/url';
 
 const OPEN_PAGES = ['/signup', '/login', '/forgot-password', '/reset-password'];
@@ -41,7 +42,12 @@ function createActions(store) {
           user: results[0]
         });
       } catch (e) {
-        route('/login');
+        const status = get(e, 'response.status');
+        if (status === 401) {
+          route('/login');
+        } else {
+          console.log(e);
+        }
       }
     },
     async logout(state, e) {

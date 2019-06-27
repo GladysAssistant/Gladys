@@ -1,23 +1,17 @@
-import config from '../../config';
-import gladysGatewayClient from '@gladysassistant/gladys-gateway-js';
-
 export class GatewayHttpClient {
-  constructor() {
-    this.gatewayClient = gladysGatewayClient({
-      serverUrl: config.serverUrl,
-      cryptoLib: window.crypto
-    });
+  constructor(session) {
+    this.session = session;
   }
 
   async get(url, query) {
-    return this.gatewayClient.request.get(url, query);
+    return this.session.gatewayClient.sendRequestGet(url, query);
   }
 
   async post(url, body) {
-    return this.gatewayClient.request.post(url, body);
+    return this.session.gatewayClient.sendRequestPost(url, body);
   }
 
   async patch(url, body) {
-    return this.gatewayClient.request.patch(url, body);
+    return this.session.gatewayClient.sendRequestPatch(url, body);
   }
 }

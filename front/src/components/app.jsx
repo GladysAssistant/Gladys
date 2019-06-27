@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
+import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
 import translationEn from '../config/i18n/en.json';
@@ -15,6 +16,7 @@ import Login from '../routes/login';
 import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
+import LoginGateway from '../routes/login-gateway';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -72,9 +74,11 @@ const AppRouter = connect(
       />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
-        <Login path="/login" />
-        <ForgotPassword path="/forgot-password" />
-        <ResetPassword path="/reset-password" />
+
+        {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}
+        {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
+        {config.gatewayMode ? <ForgotPassword path="/forgot-password" /> : <ForgotPassword path="/forgot-password" />}
+        {config.gatewayMode ? <ResetPassword path="/reset-password" /> : <ResetPassword path="/reset-password" />}
 
         <SignupWelcomePage path="/signup" />
         <SignupCreateAccountLocal path="/signup/create-account-local" />

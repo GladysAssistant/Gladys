@@ -1,11 +1,18 @@
+import config from '../../config';
 import { getCurrentUrl } from 'preact-router';
 import { HttpClient } from '../utils/HttpClient';
 import { DemoHttpClient } from '../utils/DemoHttpClient';
-import { Session } from '../utils/Session';
+import { Session } from './Session';
+import { GatewaySession } from './GatewaySession';
+import { GatewayHttpClient } from './GatewayHttpClient';
 
 function getDefaultState() {
-  const session = new Session();
-  const httpClient = process.env.DEMO_MODE === 'true' ? new DemoHttpClient() : new HttpClient(session);
+  const session = config.gatewayMode ? new GatewaySession() : new Session();
+  const httpClient = config.demoMode
+    ? new DemoHttpClient()
+    : config.gatewayMode
+    ? new GatewayHttpClient(session)
+    : new HttpClient(session);
   const state = {
     httpClient,
     session,

@@ -12,7 +12,7 @@ class Session {
   }
 
   init() {
-    if (process.env.DEMO_MODE === 'true') {
+    if (config.demoMode) {
       return null;
     }
     if (this.initialized) {
