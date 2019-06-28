@@ -48,7 +48,19 @@ function getRoutes(gladys) {
   const triggerController = TriggerController(gladys);
   const weatherController = WeatherController(gladys);
 
-  return {
+  const routes = {};
+
+  // add services routes
+  const services = Object.entries(gladys.service.getServices());
+  // foreach service
+  services.forEach((service) => {
+    // if the service has a controllers object
+    if (service[1].get().controllers) {
+      Object.assign(routes, service[1].get().controllers);
+    }
+  });
+
+  const coreRoutes = {
     // open routes
     'get /api/v1/ping': {
       authenticated: false,
@@ -437,6 +449,10 @@ function getRoutes(gladys) {
       controller: weatherController.getByHouse,
     },
   };
+
+  Object.assign(routes, coreRoutes);
+
+  return routes;
 }
 
 module.exports = getRoutes;

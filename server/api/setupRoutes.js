@@ -7,7 +7,6 @@ const CorsMiddleware = require('./middlewares/corsMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 
 // routes
-const setupServiceRoutes = require('./servicesRoutes');
 const getRoutes = require('./routes');
 const { setupGateway } = require('./setupGateway');
 
@@ -59,8 +58,6 @@ function setupRoutes(gladys) {
   });
 
   setupGateway(gladys, routes);
-
-  setupServiceRoutes(gladys, router, authMiddleware);
 
   return router;
 }
