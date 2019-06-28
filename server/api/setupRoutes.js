@@ -9,6 +9,7 @@ const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 // routes
 const setupServiceRoutes = require('./servicesRoutes');
 const getRoutes = require('./routes');
+const { setupGateway } = require('./setupGateway');
 
 /**
  * @description Setup the routes.
@@ -56,6 +57,8 @@ function setupRoutes(gladys) {
     // call the router with the params
     router[method](path, ...routerParams);
   });
+
+  setupGateway(gladys, routes);
 
   setupServiceRoutes(gladys, router, authMiddleware);
 

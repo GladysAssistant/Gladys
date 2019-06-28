@@ -28,6 +28,7 @@ class GatewaySession {
 
   init() {
     this.getUser();
+    this.connect();
   }
 
   reset() {

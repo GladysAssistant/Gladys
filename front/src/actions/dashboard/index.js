@@ -125,6 +125,7 @@ function createActions(store) {
           DashboardGetBoxesStatus: RequestStatus.Success
         });
       } catch (e) {
+        console.log(e);
         if (e.response && e.response.status === 404) {
           store.setState({
             dashboardNotConfigured: true,

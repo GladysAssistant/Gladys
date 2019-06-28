@@ -4,14 +4,36 @@ export class GatewayHttpClient {
   }
 
   async get(url, query) {
-    return this.session.gatewayClient.sendRequestGet(url, query);
+    try {
+      const result = await this.session.gatewayClient.sendRequestGet(url, query);
+      return result;
+    } catch (e) {
+      const error = {
+        response: e
+      };
+      throw error;
+    }
   }
 
   async post(url, body) {
-    return this.session.gatewayClient.sendRequestPost(url, body);
+    try {
+      const result = await this.session.gatewayClient.sendRequestPost(url, body);
+      return result;
+    } catch (e) {
+      throw {
+        response: e
+      };
+    }
   }
 
   async patch(url, body) {
-    return this.session.gatewayClient.sendRequestPatch(url, body);
+    try {
+      const result = await this.session.gatewayClient.sendRequestPatch(url, body);
+      return result;
+    } catch (e) {
+      throw {
+        response: e
+      };
+    }
   }
 }
