@@ -1,7 +1,7 @@
 /**
  * @description Transform weather field from Darksky to FE icon for display.
- * @param {String} weather - The weather field from the api.
- * @returns {String} Return a string with the fe icon class.
+ * @param {string} weather - The weather field from the api.
+ * @returns {string} Return a string with the fe icon class.
  * @example
  * const icon = translateWeatherToFeIcon(weather);
  */
@@ -75,13 +75,13 @@ const formatResults = (options, result) => {
       summary: dataHours[i].summary,
       weather: translateWeatherToFeIcon(dataHours[i].icon),
       apparent_temperature: Math.round(dataHours[i].apparentTemperature),
-      precipitation_type: Math.round(dataHours[i].precipType),
+      precipitation_type: dataHours[i].precipType,
       precipitation_probability: Math.round(dataHours[i].precipProbability * 100),
     });
   }
 
   return dataToReturn;
-}
+};
 
 module.exports = {
   formatResults,
