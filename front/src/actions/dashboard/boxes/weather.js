@@ -16,7 +16,7 @@ function createActions(store) {
         const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`);
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
-          .format('D MMM');
+          .format('dddd DD MMMM');
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           weather
         });
