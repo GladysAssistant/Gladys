@@ -12,9 +12,6 @@ class Session {
   }
 
   init() {
-    if (config.demoMode) {
-      return null;
-    }
     if (this.initialized) {
       return null;
     }
