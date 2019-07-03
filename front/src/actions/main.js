@@ -31,7 +31,7 @@ function createActions(store) {
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
       }
-      state.session.init();
+      await state.session.init();
       if (!state.session.isConnected()) {
         route('/login');
       }

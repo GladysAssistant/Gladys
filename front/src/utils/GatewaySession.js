@@ -26,9 +26,9 @@ class GatewaySession {
     });
   }
 
-  init() {
+  async init() {
     this.getUser();
-    this.connect();
+    await this.connect();
   }
 
   reset() {
@@ -42,13 +42,15 @@ class GatewaySession {
     return this.user !== null;
   }
 
-  connect() {
+  async connect() {
     let refreshToken = keyValueStore.get(GATEWAY_REFRESH_TOKEN_KEY);
     let serializedKeys = keyValueStore.get(GATEWAY_SERIALIZED_KEYS_KEY);
 
-    return this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
-      this.connected = true;
+    await this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
+      // new message
     });
+    this.connected = true;
+    this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
   }
 
   getUser() {
