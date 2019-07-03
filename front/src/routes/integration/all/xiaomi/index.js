@@ -15,7 +15,7 @@ class XiaomiIntegration extends Component {
   }
 
   render(props, {}) {
-    return <XiaomiCapteurTemperaturePage {...props} integration={integrationConfig[props.user.language]['xiaomi']} />;
+    return <XiaomiCapteurTemperaturePage {...props} integration={integrationConfig[props.user.language].xiaomi} />;
   }
 }
 

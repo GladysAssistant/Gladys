@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
-import Feature from './Feature';
+import Feature from './Feature.jsx';
 class XiaomiCapteurTemperatureBox extends Component {
   componentWillMount() {}
 
@@ -49,11 +49,12 @@ class XiaomiCapteurTemperatureBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {this.props.capteur.features.map((feature, index) => (
+                {this.props.capteur.features.map((feature, indexFeature) => (
                   <Feature
                     feature={feature}
-                    featureIndex={index}
-                    updateFeatureName={this.props.updateFeatureName}
+                    featureIndex={indexFeature}
+                    updateNameFeature={this.props.updateNameFeature}
+                    deviceIndex={this.props.capteurIndex}
                   />
                 ))}
                 <div class="form-group">

@@ -1,12 +1,6 @@
 import { RequestStatus } from '../../../../utils/consts';
 import update from 'immutability-helper';
-import uuid from 'uuid';
 import debounce from 'debounce';
-import {
-  DEVICE_POLL_FREQUENCIES,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
-} from '../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../actions/integration';
 
 function createActions(store) {
@@ -70,29 +64,18 @@ function createActions(store) {
         });
       }
     },
-    updateCapteurField(state, index, field, value) {
-      let xiaomiCapteurTemperature;
-      if (value.value) {
-        xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
-          [index]: {
-            features: {
-              [value.getAttribute('data-key')]: {
-                [field]: {
-                  $set: value.value
-                }
+    updateNameFeature(state, indexDevice, indexFeature, field, value) {
+      const xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
+        [indexDevice]: {
+          'features': {
+            [indexFeature]: {
+              [field]: {
+                $set: value
               }
             }
           }
-        });
-      } else {
-        xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
-          [index]: {
-            [field]: {
-              $set: value
-            }
-          }
-        });
-      }
+        }
+      });
       store.setState({
         xiaomiCapteurTemperature
       });
@@ -103,7 +86,7 @@ function createActions(store) {
         capteur.features[ind].name = feature.name;
       });
       await state.httpClient.post(`/api/v1/device`, capteur);
-    };
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 

@@ -26,6 +26,7 @@ const XiaomiCapteurTemperature = ({ children, ...props }) => (
                             capteur={capteur}
                             capteurIndex={index}
                             updateCapteurField={props.updateCapteurField}
+                            updateNameFeature={props.updateNameFeature}
                             saveCapteur={props.saveCapteur}
                             houses={props.houses}
                           />
