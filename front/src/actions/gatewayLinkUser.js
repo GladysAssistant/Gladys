@@ -1,7 +1,9 @@
 import get from 'get-value';
 import { RequestStatus } from '../utils/consts';
+import createActionsProfilePicture from './profilePicture';
 
 function createActions(store) {
+  const actionsProfilePicture = createActionsProfilePicture(store);
   const actions = {
     async getUsers(state) {
       store.setState({
@@ -28,6 +30,12 @@ function createActions(store) {
     },
     async saveUser(state, userId) {
       await state.session.gatewayClient.updateUserIdInGladys(userId);
+      // get user
+      const user = await state.httpClient.get('/api/v1/me');
+      // save user
+      state.session.saveUser(user);
+      // get profile picture
+      await actionsProfilePicture.loadProfilePicture(store.getState());
     }
   };
   return actions;

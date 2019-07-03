@@ -2,9 +2,11 @@ import get from 'get-value';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
 import { validateEmail } from '../../utils/validator';
 import { ERROR_MESSAGES } from '../../../../server/utils/constants';
+import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
 
 function createActions(store) {
+  const actionsProfilePicture = createActionsProfilePicture(store);
   const actions = {
     init(state) {
       store.setState({
@@ -71,6 +73,8 @@ function createActions(store) {
           const user = await state.httpClient.get('/api/v1/me');
           // save user
           state.session.saveUser(user);
+          // get profile picture
+          await actionsProfilePicture.loadProfilePicture(store.getState());
           route('/dashboard');
         } else {
           route('/link-gateway-user');
