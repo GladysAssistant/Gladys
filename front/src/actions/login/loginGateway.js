@@ -66,7 +66,7 @@ function createActions(store) {
         state.session.saveLoginInformations(data);
         // connect
         state.session.connect();
-        if (data.gladys_4_user_id) {
+        if (data.gladysUserId) {
           // get user
           const user = await state.httpClient.get('/api/v1/me');
           // save user
