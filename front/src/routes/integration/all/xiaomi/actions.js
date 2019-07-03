@@ -100,56 +100,10 @@ function createActions(store) {
     async saveCapteur(state, index, device) {
       let capteur = state.xiaomiCapteurTemperature[index];
       device.features.map((feature, ind) => {
-        capteur.features[ind].name = feature.name
+        capteur.features[ind].name = feature.name;
       });
-      console.log(capteur);
       await state.httpClient.post(`/api/v1/device`, capteur);
-    },
-    addCapteurTemperature(state) {
-      const uniqueId = uuid.v4();
-      let capteurTemperature = {
-        service_id: '3445bf82-1608-404b-bf77-a0dab85ae46c',
-        name: 'xiaomi-temperature-2',
-        external_id: uniqueId,
-        features: [{
-          name: 'xiaomi-temperature-2',
-          external_id: uniqueId,
-          category: 'temperature-sensor',
-          type: 'decimal',
-          read_only: true,
-          keep_history: true,
-          has_feedback: false,
-          min: -20,
-          max: 100
-        }]
-      }
-      try {
-        state.httpClient.post(`/api/v1/device`, capteurTemperature);
-      } catch (e) {
-        console.log(e)
-      }
-      const xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
-        $push: [{
-          service_id: '3445bf82-1608-404b-bf77-a0dab85ae46c',
-          name: 'xiaomi-temperature-1',
-          external_id: uniqueId,
-          features: [{
-            name: 'Temperature',
-            external_id: uniqueId,
-            category: 'temperature-sensor',
-            type: 'decimal',
-            read_only: true,
-            keep_history: true,
-            has_feedback: false,
-            min: -20,
-            max: 100
-          }]
-        }]
-      })
-      store.setState({
-        xiaomiCapteurTemperature
-      });
-    }
+    };
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 

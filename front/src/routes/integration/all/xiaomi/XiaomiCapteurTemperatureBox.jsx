@@ -2,10 +2,9 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
-
+import Feature from './Feature';
 class XiaomiCapteurTemperatureBox extends Component {
-  componentWillMount() {
-  }
+  componentWillMount() {}
 
   updateCapteurRoom = e => {
     this.props.updateCapteurField(this.props.capteurIndex, 'room_id', e.target.value);
@@ -51,28 +50,11 @@ class XiaomiCapteurTemperatureBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 {this.props.capteur.features.map((feature, index) => (
-                  <div class="form-group">
-                    {feature.unit && feature.unit === 'celsius' &&
-                      <label>
-                        <Text id="integration.xiaomi.nameLabelTemperature" />
-                      </label>
-                    }
-                    {feature.unit && feature.unit === '%' &&
-                      <label>
-                        <Text id="integration.xiaomi.nameLabelHumidity" />
-                      </label>
-                    }
-                    <Localizer>
-                      <input
-                        type="text"
-                        value={feature.name}
-                        onInput={this.updateFeatureName}
-                        data-key={index}
-                        class="form-control"
-                        placeholder={<Text id="integration.xiaomi.nameLabelFeature" />}
-                      />
-                    </Localizer>
-                  </div>
+                  <Feature
+                    feature={feature}
+                    featureIndex={index}
+                    updateFeatureName={this.props.updateFeatureName}
+                  />
                 ))}
                 <div class="form-group">
                   <label>

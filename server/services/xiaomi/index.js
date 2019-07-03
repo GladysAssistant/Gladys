@@ -3,7 +3,6 @@ const logger = require('../../utils/logger');
 const Hub = require('./lib/listen');
 
 module.exports = function XiaomiService(gladys, serviceId) {
-
   /**
    * @public
    * @description This function listen event on Xiaomi service

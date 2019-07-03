@@ -30,13 +30,13 @@ const XiaomiCapteurTemperature = ({ children, ...props }) => (
                             houses={props.houses}
                           />
                         ))}
-                      {props.xiaomiCapteurTemperature && props.xiaomiCapteurTemperature.length === 0 &&
+                      {props.xiaomiCapteurTemperature && props.xiaomiCapteurTemperature.length === 0 && (
                         <div class="col-md-12">
                           <div class={cx('text-center', style.emptyStateDivBox)}>
                             <Text id="integration.xiaomi.noCapteurFound" />
                           </div>
                         </div>
-                      }
+                      )}
                     </div>
                   </div>
                 </card-body>
