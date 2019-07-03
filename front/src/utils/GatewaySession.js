@@ -46,11 +46,13 @@ class GatewaySession {
     let refreshToken = keyValueStore.get(GATEWAY_REFRESH_TOKEN_KEY);
     let serializedKeys = keyValueStore.get(GATEWAY_SERIALIZED_KEYS_KEY);
 
-    await this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
-      // new message
-    });
-    this.connected = true;
-    this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
+    if (refreshToken && serializedKeys) {
+      await this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
+        // new message
+      });
+      this.connected = true;
+      this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
+    }
   }
 
   getUser() {

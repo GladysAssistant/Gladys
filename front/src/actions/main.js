@@ -56,7 +56,7 @@ function createActions(store) {
     async logout(state, e) {
       e.preventDefault();
       const user = state.session.getUser();
-      if (user.session_id) {
+      if (user && user.session_id) {
         await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
       }
       state.session.reset();

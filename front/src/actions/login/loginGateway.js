@@ -66,18 +66,14 @@ function createActions(store) {
         state.session.saveLoginInformations(data);
         // connect
         state.session.connect();
-        // get user
-        const user = await state.session.gatewayClient.getMyself();
-        // save user
-        state.session.saveUser(user);
-        // get setup state
-        const setupState = await state.session.gatewayClient.getSetupState();
-        const accountSetup =
-          setupState.billing_setup && setupState.gladys_instance_setup && setupState.user_gladys_acccount_linked;
-        if (accountSetup) {
+        if (data.gladys_4_user_id) {
+          // get user
+          const user = await state.httpClient.get('/api/v1/me');
+          // save user
+          state.session.saveUser(user);
           route('/dashboard');
         } else {
-          route('/gateway-setup');
+          route('/link-gateway-user');
         }
       } catch (e) {
         store.setState({
