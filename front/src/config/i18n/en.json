@@ -423,6 +423,10 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "caldav": {
+      "title": "CalDAV",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external calendar compatible. Then enter the configuration below."
     }
   },
   "editScene": {
