@@ -20,6 +20,8 @@ class GatewaySession {
     this.initialized = false;
     this.dispatcher = new Dispatcher();
     this.websocketConnected = false;
+    this.connected = false;
+    this.ready = false;
     this.gatewayClient = new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
       cryptoLib: window.crypto
@@ -39,7 +41,7 @@ class GatewaySession {
   }
 
   isConnected() {
-    return this.user !== null;
+    return this.connected;
   }
 
   async connect() {
@@ -47,10 +49,11 @@ class GatewaySession {
     let serializedKeys = keyValueStore.get(GATEWAY_SERIALIZED_KEYS_KEY);
 
     if (refreshToken && serializedKeys) {
+      this.connected = true;
       await this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
         // new message
       });
-      this.connected = true;
+      this.ready = true;
       this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
     }
   }

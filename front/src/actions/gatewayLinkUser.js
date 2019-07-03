@@ -1,3 +1,4 @@
+import get from 'get-value';
 import { RequestStatus } from '../utils/consts';
 
 function createActions(store) {
@@ -13,9 +14,16 @@ function createActions(store) {
           usersGetStatus: RequestStatus.Success
         });
       } catch (e) {
-        store.setState({
-          usersGetStatus: RequestStatus.Error
-        });
+        const errorMessage = get(e, 'response.error_message');
+        if (errorMessage === 'NO_INSTANCE_FOUND') {
+          store.setState({
+            usersGetStatus: RequestStatus.GatewayNoInstanceFound
+          });
+        } else {
+          store.setState({
+            usersGetStatus: RequestStatus.Error
+          });
+        }
       }
     },
     async saveUser(state, userId) {

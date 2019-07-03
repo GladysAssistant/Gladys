@@ -24,7 +24,7 @@ export class GatewayHttpClient {
   }
 
   async callApiWhenReady(func, url, data) {
-    if (this.session.connected) {
+    if (this.session.ready) {
       return this.callApi(func, url, data);
     }
     return new Promise(async (resolve, reject) => {

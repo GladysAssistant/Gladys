@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import { RequestStatus } from '../../utils/consts';
 
 const SignupLayout = ({ children, ...props }) => (
   <div class="page">
@@ -37,6 +38,16 @@ const SignupLayout = ({ children, ...props }) => (
                 >
                   <div class="loader" />
                   <div class="dimmer-content">
+                    {props.usersGetStatus === RequestStatus.GatewayNoInstanceFound && (
+                      <div class="alert alert-danger">
+                        <Text id="gatewayLinkUser.noInstanceFound" />
+                      </div>
+                    )}
+                    {props.usersGetStatus === RequestStatus.Error && (
+                      <div class="alert alert-danger">
+                        <Text id="httpErrors.unknownError" />
+                      </div>
+                    )}
                     <div class="form-group">
                       <label>
                         <Text id="gatewayLinkUser.label" />
@@ -47,7 +58,11 @@ const SignupLayout = ({ children, ...props }) => (
                       </select>
                     </div>
                     <div class="form-group">
-                      <button onClick={props.saveUser} class="btn btn-success">
+                      <button
+                        onClick={props.saveUser}
+                        disabled={props.usersGetStatus !== RequestStatus.Success}
+                        class="btn btn-success"
+                      >
                         <Text id="gatewayLinkUser.saveButton" />
                       </button>
                     </div>

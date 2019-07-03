@@ -3,9 +3,10 @@ import { connect } from 'unistore/preact';
 import LinkGatewayUserPage from './LinkGatewayUser';
 import actions from '../../actions/gatewayLinkUser';
 import { route } from 'preact-router';
+import { RequestStatus } from '../../utils/consts';
 
 @connect(
-  'users',
+  'users,usersGetStatus',
   actions
 )
 class LinkGatewayUser extends Component {
@@ -15,19 +16,20 @@ class LinkGatewayUser extends Component {
     });
   };
   saveUser = async () => {
-    this.setState({ loading: true });
+    this.setState({ savingUserLoading: true });
     try {
       await this.props.saveUser(this.state.selectedUser);
-      this.setState({ loading: false });
+      this.setState({ savingUserLoading: false });
       route('/dashboard');
     } catch (e) {
-      this.setState({ loading: false });
+      this.setState({ savingUserLoading: false });
     }
   };
   componentWillMount() {
     this.props.getUsers();
   }
-  render(props, { loading }) {
+  render(props, { savingUserLoading }) {
+    const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
     return <LinkGatewayUserPage {...props} selectUser={this.selectUser} saveUser={this.saveUser} loading={loading} />;
   }
 }

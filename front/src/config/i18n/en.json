@@ -515,6 +515,7 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
+    "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "saveButton": "Save"
   }
 }
