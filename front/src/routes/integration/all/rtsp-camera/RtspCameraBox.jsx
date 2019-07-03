@@ -111,8 +111,8 @@ class RtspCameraBox extends Component {
                   </label>
                   <select onChange={this.updateCameraRoom} class="form-control">
                     <option value="">-------</option>
-                    {props.houses &&
-                      props.houses.map(house => (
+                    {props.housesWithRooms &&
+                      props.housesWithRooms.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
                             <option selected={room.id === props.camera.room_id} value={room.id}>

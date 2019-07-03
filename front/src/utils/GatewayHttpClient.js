@@ -1,9 +1,3 @@
-const func = {
-  get: 'sendRequestGet',
-  post: 'sendRequestPost',
-  patch: 'sendRequestPatch'
-};
-
 export class GatewayHttpClient {
   constructor(session) {
     this.session = session;
@@ -17,9 +11,9 @@ export class GatewayHttpClient {
     });
   }
 
-  async callApi(method, url, data) {
+  async callApi(func, url, data) {
     try {
-      const result = await this.session.gatewayClient[func[method]](url, data);
+      const result = await this.session.gatewayClient[func](url, data);
       return result;
     } catch (e) {
       const error = {
@@ -29,15 +23,15 @@ export class GatewayHttpClient {
     }
   }
 
-  async callApiWhenReady(method, url, data) {
+  async callApiWhenReady(func, url, data) {
     if (this.session.connected) {
-      return this.callApi(method, url, data);
+      return this.callApi(func, url, data);
     }
     return new Promise(async (resolve, reject) => {
       this.queue.push(async () => {
         try {
-          const data = await this.callApi(method, url, data);
-          resolve(data);
+          const response = await this.callApi(func, url, data);
+          resolve(response);
         } catch (e) {
           reject(e);
         }
@@ -46,14 +40,14 @@ export class GatewayHttpClient {
   }
 
   async get(url, query) {
-    return this.callApiWhenReady('get', url, query);
+    return this.callApiWhenReady('sendRequestGet', url, query);
   }
 
   async post(url, body) {
-    return this.callApiWhenReady('post', url, body);
+    return this.callApiWhenReady('sendRequestPost', url, body);
   }
 
   async patch(url, body) {
-    return this.callApiWhenReady('patch', url, body);
+    return this.callApiWhenReady('sendRequestPatch', url, body);
   }
 }
