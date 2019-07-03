@@ -50,6 +50,7 @@ import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
+import XiaomiPage from '../routes/integration/all/xiaomi';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -103,6 +104,7 @@ const AppRouter = connect(
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
+        <XiaomiPage path="/dashboard/integration/device/xiaomi" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

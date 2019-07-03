@@ -252,6 +252,17 @@
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "xiaomi": {
+      "title": "Xioami",
+      "search": "Search capteur",
+      "nameLabelTemperature": "Device temperature",
+      "nameLabelHumidity": "Device humidity",
+      "nameLabelFeature": "Name of the feature",
+      "namePlaceholderTemperature": "Enter the name of the device",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "noCapteurFound": "No device found"
     }
   },
   "editScene": {

@@ -10,5 +10,11 @@
     "name": "RTSP Camera",
     "description": "Display your camera in Gladys.",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"
+  },
+  {
+    "key": "xiaomi",
+    "name": "Xiaomi",
+    "description": "Control xiaomi device",
+    "img": "/assets/integrations/cover/xiaomi.jpg"
   }
 ]
