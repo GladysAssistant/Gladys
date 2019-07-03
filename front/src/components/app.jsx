@@ -17,6 +17,7 @@ import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
 import LoginGateway from '../routes/login-gateway';
+import LinkGatewayUser from '../routes/gateway-setup';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -79,6 +80,7 @@ const AppRouter = connect(
         {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
         {config.gatewayMode ? <ForgotPassword path="/forgot-password" /> : <ForgotPassword path="/forgot-password" />}
         {config.gatewayMode ? <ResetPassword path="/reset-password" /> : <ResetPassword path="/reset-password" />}
+        {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
 
         <SignupWelcomePage path="/signup" />
         <SignupCreateAccountLocal path="/signup/create-account-local" />

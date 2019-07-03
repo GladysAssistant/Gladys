@@ -1,3 +1,5 @@
+const get = require('get-value');
+
 const { EVENTS } = require('../../utils/constants');
 
 /**
@@ -11,14 +13,15 @@ const { EVENTS } = require('../../utils/constants');
  * });
  */
 async function handleNewMessage(data, rawMessage, cb) {
-  if (!rawMessage.local_user_id) {
+  if (!rawMessage.local_user_id && get(data, 'options.url') !== '/api/v1/user') {
     cb({
       status: 400,
       error: 'GATEWAY_USER_NOT_LINKED',
     });
+    return;
   }
-  if (data.type === 'gladys-api-call' && rawMessage.local_user_id) {
-    const user = await this.user.getById(rawMessage.local_user_id);
+  if (data.type === 'gladys-api-call') {
+    const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
     this.event.emit(
       EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
       user,
@@ -29,7 +32,6 @@ async function handleNewMessage(data, rawMessage, cb) {
       cb,
     );
   }
-  return null;
 }
 
 module.exports = {

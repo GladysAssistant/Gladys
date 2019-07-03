@@ -43,8 +43,11 @@ function createActions(store) {
         });
       } catch (e) {
         const status = get(e, 'response.status');
+        const error = get(e, 'response.error');
         if (status === 401) {
           route('/login');
+        } else if (error === 'GATEWAY_USER_NOT_LINKED') {
+          route('/link-gateway-user');
         } else {
           console.log(e);
         }

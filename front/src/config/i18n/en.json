@@ -511,5 +511,10 @@
     "settings": "Settings",
     "needHelp": "Need help",
     "signOut": "Sign Out"
+  },
+  "gatewayLinkUser": {
+    "title": "Configure Gladys Plus",
+    "label": "Select you Gladys user",
+    "saveButton": "Save"
   }
 }
