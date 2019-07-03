@@ -11,12 +11,17 @@ const { EVENTS } = require('../../utils/constants');
  * });
  */
 async function handleNewMessage(data, rawMessage, cb) {
-  if (data.type === 'gladys-api-call') {
-    data.sender_id = '97fddeef-ab7f-444d-bafe-19acdec67634';
-    const users = await this.user.get();
+  if (!rawMessage.local_user_id) {
+    cb({
+      status: 400,
+      error: 'GATEWAY_USER_NOT_LINKED',
+    });
+  }
+  if (data.type === 'gladys-api-call' && rawMessage.local_user_id) {
+    const user = await this.user.getById(rawMessage.local_user_id);
     this.event.emit(
       EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
-      users[0],
+      user,
       data.options.method,
       data.options.url,
       data.options.query,
@@ -24,6 +29,7 @@ async function handleNewMessage(data, rawMessage, cb) {
       cb,
     );
   }
+  return null;
 }
 
 module.exports = {
