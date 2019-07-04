@@ -45,7 +45,7 @@ describe('DarkSkyService', () => {
     });
     expect(weather).to.deep.equal({
       alert: null,
-      apparent_temperature: '54.87',
+      apparent_temperature: 54.87,
       datetime: new Date('2019-03-28T07:50:18.000Z'),
       hours: [
         {
@@ -54,7 +54,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 11,
           precipitation_type: 'rain',
           summary: 'Partly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-night',
         },
         {
           apparent_temperature: 54,
@@ -62,7 +62,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 7,
           precipitation_type: 'rain',
           summary: 'Partly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-night',
         },
         {
           apparent_temperature: 53,
@@ -70,7 +70,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 9,
           precipitation_type: 'rain',
           summary: 'Partly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-night',
         },
         {
           apparent_temperature: 52,
@@ -78,7 +78,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 25,
           precipitation_type: 'rain',
           summary: 'Possible Light Rain',
-          weather: 'fe-cloud-rain',
+          weather: 'rain',
         },
         {
           apparent_temperature: 52,
@@ -86,7 +86,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 23,
           precipitation_type: 'rain',
           summary: 'Mostly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-night',
         },
         {
           apparent_temperature: 52,
@@ -94,7 +94,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 19,
           precipitation_type: 'rain',
           summary: 'Mostly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-night',
         },
         {
           apparent_temperature: 52,
@@ -102,7 +102,7 @@ describe('DarkSkyService', () => {
           precipitation_probability: 18,
           precipitation_type: 'rain',
           summary: 'Overcast',
-          weather: 'fe-cloud',
+          weather: 'cloudy',
         },
         {
           apparent_temperature: 52,
@@ -110,10 +110,10 @@ describe('DarkSkyService', () => {
           precipitation_probability: 19,
           precipitation_type: 'rain',
           summary: 'Mostly Cloudy',
-          weather: 'fe-cloud',
+          weather: 'partly-cloudy-day',
         },
       ],
-      temperature: '54.87',
+      temperature: 54.87,
       humidity: 76,
       precipitation_probability: 0,
       precipitation_type: undefined,
@@ -121,8 +121,8 @@ describe('DarkSkyService', () => {
       time_sunrise: new Date('2019-03-28T14:02:00.000Z'),
       time_sunset: new Date('2019-03-29T02:29:43.000Z'),
       units: 'si',
-      wind_speed: '5.25',
-      weather: 'fe-cloud',
+      wind_speed: 5.25,
+      weather: 'partly-cloudy-night',
     });
   });
   it('should return error, unable to contact third party provider', async () => {

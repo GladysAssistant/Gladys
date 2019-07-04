@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import dayjs from 'dayjs';
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
   RequestStatus,
@@ -19,13 +20,6 @@ const padding = {
 };
 
 const BOX_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
-
-const format24Hours = hours => {
-  if (hours < 10) {
-    return '0' + hours;
-  }
-  return hours;
-};
 
 const WeatherBox = ({ children, ...props }) => (
   <div class="card">
@@ -257,7 +251,7 @@ class WeatherBoxComponent extends Component {
         return (
           <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
             <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-              {format24Hours(new Date(hour.datetime).getHours())}h
+              {dayjs(hour.datetime).format('HH')}h
             </p>
             <p style={{ margin: 'auto', textAlign: 'center' }}>
               <i className={' fe ' + hour.weather} style={{ fontSize: '20px' }} />
