@@ -66,7 +66,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^2.0.3",
+    "@gladysassistant/gladys-gateway-js": "^3.0.0",
     "bcrypt": "^3.0.3",
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",
@@ -82,6 +82,7 @@
     "jsonwebtoken": "^8.4.0",
     "node-nlp": "^3.0.3",
     "node-webcrypto-ossl": "^1.0.45",
+    "path-to-regexp": "^3.0.0",
     "queue": "^6.0.0",
     "semver": "^6.1.1",
     "sequelize": "^4.42.0",

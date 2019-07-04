@@ -23,12 +23,13 @@ const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config) {
+const Gateway = function Gateway(variable, event, system, sequelize, config, user) {
   this.variable = variable;
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
   this.config = config;
+  this.user = user;
   this.connected = false;
   this.restoreInProgress = false;
   this.GladysGatewayClient = GladysGatewayClient;

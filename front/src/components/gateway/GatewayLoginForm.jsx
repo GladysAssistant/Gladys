@@ -1,6 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { RequestStatus, LoginStatus } from '../../../utils/consts';
+import { RequestStatus, LoginStatus } from '../../utils/consts';
 
 const GatewayLoginForm = ({ children, ...props }) => (
   <form onSubmit={!props.gatewayLoginStep2 ? props.login : props.loginTwoFactor} class="card">
