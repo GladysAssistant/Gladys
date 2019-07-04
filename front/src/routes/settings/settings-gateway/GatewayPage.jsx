@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import SettingsLayout from '../SettingsLayout';
-import GatewayLoginForm from './GatewayLoginForm';
+import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
 import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
 import GatewayUsersList from './GatewayUsersList';
