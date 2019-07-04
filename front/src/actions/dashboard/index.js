@@ -1,5 +1,6 @@
 import { RequestStatus } from '../../utils/consts';
 import update from 'immutability-helper';
+import get from 'get-value';
 import { DASHBOARD_TYPE } from '../../../../server/utils/constants';
 
 const EMPTY_DASHBOARD = {
@@ -121,11 +122,18 @@ function createActions(store) {
       try {
         const homeDashboard = await state.httpClient.get('/api/v1/dashboard/home');
         store.setState({
+          gatewayInstanceNotFound: false,
           homeDashboard,
           DashboardGetBoxesStatus: RequestStatus.Success
         });
       } catch (e) {
-        if (e.response && e.response.status === 404) {
+        const status = get(e, 'response.status');
+        const errorMessage = get(e, 'response.error_message');
+        if (status === 404 && errorMessage === 'NO_INSTANCE_FOUND') {
+          store.setState({
+            gatewayInstanceNotFound: true
+          });
+        } else if (status === 404) {
           store.setState({
             dashboardNotConfigured: true,
             homeDashboard: EMPTY_DASHBOARD

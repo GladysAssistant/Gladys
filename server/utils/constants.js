@@ -35,6 +35,7 @@ const EVENTS = {
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
     RESTORE_BACKUP: 'gateway.restore-backup',
+    NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
