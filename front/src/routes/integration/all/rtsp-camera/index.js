@@ -5,7 +5,7 @@ import RtspCameraPage from './RtspCamera';
 import integrationConfig from '../../../../config/integrations';
 
 @connect(
-  'user,rtspCameras,houses,getRtspCameraStatus',
+  'user,rtspCameras,housesWithRooms,getRtspCameraStatus',
   actions
 )
 class RtspCameraIntegration extends Component {

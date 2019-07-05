@@ -816,5 +816,8 @@
       "created_at": "2019-06-26T00:29:00.783Z",
       "updated_at": "2019-06-26T00:29:00.783Z"
     }
-  ]
+  ],
+  "get /api/v1/setup": {
+    "account_configured": true
+  }
 }

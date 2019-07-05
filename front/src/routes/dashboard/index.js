@@ -4,7 +4,7 @@ import DashboardPage from './DashboardPage';
 import actions from '../../actions/dashboard';
 
 @connect(
-  '',
+  'user,dashboardEditMode,dashboardNotConfigured,editDashboardDragEnable,homeDashboard,gatewayInstanceNotFound',
   actions
 )
 class Dashboard extends Component {
@@ -12,8 +12,8 @@ class Dashboard extends Component {
     this.props.getBoxes();
   }
 
-  render({}, {}) {
-    return <DashboardPage />;
+  render(props, {}) {
+    return <DashboardPage {...props} />;
   }
 }
 

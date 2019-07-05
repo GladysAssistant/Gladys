@@ -60,9 +60,9 @@ function createActions(store) {
         const params = {
           expand: 'rooms'
         };
-        const houses = await state.httpClient.get(`/api/v1/house`, params);
+        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
-          houses,
+          housesWithRooms,
           housesGetStatus: RequestStatus.Success
         });
       } catch (e) {
