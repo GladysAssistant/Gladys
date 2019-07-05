@@ -6,7 +6,7 @@ import get from 'get-value';
 
 const BOX_KEY = 'Weather';
 
-const translateWeatherToFeIcon = (weather) => {
+const translateWeatherToFeIcon = weather => {
   if (weather.search('snow') !== -1) {
     return 'fe-cloud-snow';
   }
@@ -34,8 +34,7 @@ const translateWeatherToFeIcon = (weather) => {
   return 'fe-question';
 };
 
-
-const createActions = (store) => {
+const createActions = store => {
   const boxActions = createBoxActions(store);
 
   const actions = {
@@ -46,11 +45,11 @@ const createActions = (store) => {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('dddd DD MMMM');
-          weather.temperature = weather.temperature.toFixed(2);
+        weather.temperature = weather.temperature.toFixed(2);
         weather.weather = translateWeatherToFeIcon(weather.weather);
         weather.hours.map(day => {
           day.weather = translateWeatherToFeIcon(day.weather);
-        })
+        });
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           weather
         });
@@ -70,6 +69,6 @@ const createActions = (store) => {
     }
   };
   return Object.assign({}, actions);
-}
+};
 
 export default createActions;
