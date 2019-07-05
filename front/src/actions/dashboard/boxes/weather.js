@@ -42,14 +42,18 @@ const createActions = store => {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`);
+        const displayMode = await state.httpClient.get('/api/v1/service/darksky/variable/DARKSKY_DISPLAY_MODE');
+        weather.options.display = displayMode.value;
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('dddd DD MMMM');
         weather.temperature = weather.temperature.toFixed(2);
         weather.weather = translateWeatherToFeIcon(weather.weather);
-        weather.hours.map(day => {
-          day.weather = translateWeatherToFeIcon(day.weather);
-        });
+        if (weather.options.display === 'advanced') {
+          weather.hours.map(day => {
+            day.weather = translateWeatherToFeIcon(day.weather);
+          });
+        }
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           weather
         });

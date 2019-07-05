@@ -41,23 +41,43 @@ const DarkSkyPage = ({ children, ...props }) => (
                               value={props.darkSkyApiKey}
                             />
                           </Localizer>
+                        </div>
+                        <div class="form-group mt-3">
+                          <div class="form-label">
+                            <Text id="integration.darkSky.displayModeLabel" />
+                          </div>
+                          <div class="input-group">
+                            <Localizer>
+                              <select
+                                class="form-control"
+                                value={props.darkSkyDisplayMode || 'basic'}
+                                onChange={props.updateDisplayMode}
+                              >
+                                {props.modes.map(mode => {
+                                  return <option value={mode.split(' ')[0]}>{mode}</option>;
+                                })}
+                              </select>
+                            </Localizer>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label>
+                            <Text id="integration.darkSky.instructionsToUse" />
+                          </label>
+                        </div>
+                        <div>
                           <span class="input-group-append">
                             <button
-                              class={cx('btn', 'btn-success', {
+                              class={cx('btn', 'btn-success', 'mx-auto', {
                                 'btn-loading': props.loading
                               })}
-                              onClick={props.saveApiKey}
+                              onClick={props.saveConfig}
                               type="button"
                             >
                               <Text id="integration.darkSky.saveButton" />
                             </button>
                           </span>
                         </div>
-                      </div>
-                      <div class="form-group">
-                        <label>
-                          <Text id="integration.darkSky.instructionsToUse" />
-                        </label>
                       </div>
                     </div>
                   </div>

@@ -6,39 +6,49 @@ const actions = store => ({
       darkSkyApiKey: e.target.value
     });
   },
-  async getApiKey(state) {
+  updateDisplayMode(state, e) {
     store.setState({
-      darkskyGetApiKeyStatus: RequestStatus.Getting
+      darkSkyDisplayMode: e.target.value
+    });
+  },
+  async getConfig(state) {
+    store.setState({
+      darkskyConfigStatus: RequestStatus.Getting
     });
     try {
-      const variable = await state.httpClient.get('/api/v1/service/darksky/variable/DARKSKY_API_KEY');
+      const apiKey = await state.httpClient.get('/api/v1/service/darksky/variable/DARKSKY_API_KEY');
+      const displayMode = await state.httpClient.get('/api/v1/service/darksky/variable/DARKSKY_DISPLAY_MODE');
       store.setState({
-        darkSkyApiKey: variable.value,
-        darkskyGetApiKeyStatus: RequestStatus.Success
+        darkSkyApiKey: apiKey.value,
+        darkSkyDisplayMode: displayMode.value,
+        darkskyGetConfigStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        darkskyGetApiKeyStatus: RequestStatus.Error
+        darkskyGetConfigStatus: RequestStatus.Error
       });
     }
   },
-  async saveApiKey(state) {
+  async saveConfig(state) {
     store.setState({
-      darkskySaveApiKeyStatus: RequestStatus.Getting
+      darkskySaveConfigStatus: RequestStatus.Getting
     });
     try {
-      // save api key
+      // save config
       await state.httpClient.post('/api/v1/service/darksky/variable/DARKSKY_API_KEY', {
-        value: state.darkSkyApiKey
+        value: state.darkSkyApiKey.trim()
+      });
+      await state.httpClient.post('/api/v1/service/darksky/variable/DARKSKY_DISPLAY_MODE', {
+        value: state.darkSkyDisplayMode
       });
       // start service
       await state.httpClient.post('/api/v1/service/darksky/start');
       store.setState({
-        darkskySaveApiKeyStatus: RequestStatus.Success
+        darkskySaveConfigStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        darkskySaveApiKeyStatus: RequestStatus.Error
+        darkskySaveConfigStatus: RequestStatus.Error
       });
     }
   }

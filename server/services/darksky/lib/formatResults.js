@@ -11,38 +11,39 @@ const formatResults = (options, result) => {
   const dataPoint = result.currently;
 
   dataToReturn.temperature = Number(dataPoint.temperature.toFixed(2));
-  dataToReturn.humidity = Math.round(dataPoint.humidity * 100);
-  dataToReturn.pressure = Math.round(dataPoint.pressure);
   dataToReturn.datetime = new Date(dataPoint.time * 1000);
   dataToReturn.units = options.units;
-  dataToReturn.wind_speed = Number(dataPoint.windSpeed.toFixed(2));
-  dataToReturn.apparent_temperature = Number(dataPoint.apparentTemperature.toFixed(2));
-  dataToReturn.precipitation_type = dataPoint.precipType;
-  dataToReturn.precipitation_probability = Math.round(dataPoint.precipProbability * 100);
   dataToReturn.weather = dataPoint.icon;
   dataToReturn.time_sunrise = new Date(result.daily.data[0].sunriseTime * 1000);
   dataToReturn.time_sunset = new Date(result.daily.data[0].sunsetTime * 1000);
-  dataToReturn.alert = null;
+  if (options.display === 'advanced') {
+    dataToReturn.humidity = Math.round(dataPoint.humidity * 100);
+    dataToReturn.wind_speed = Number(dataPoint.windSpeed.toFixed(2));
+    // dataToReturn.apparent_temperature = Number(dataPoint.apparentTemperature.toFixed(2));
+    // dataToReturn.precipitation_type = dataPoint.precipType;
+    // dataToReturn.precipitation_probability = Math.round(dataPoint.precipProbability * 100);
+    dataToReturn.alert = null;
 
-  if (result.alerts) {
-    dataToReturn.alert = {
-      title: result.alerts[0].title,
-      description: result.alerts[0].description,
-      severity: result.alerts[0].severity,
-    };
-  }
+    if (result.alerts) {
+      dataToReturn.alert = {
+        title: result.alerts[0].title,
+        description: result.alerts[0].description,
+        severity: result.alerts[0].severity,
+      };
+    }
 
-  const dataHours = result.hourly.data;
-  dataToReturn.hours = [];
-  for (let i = 1; i < 9; i += 1) {
-    dataToReturn.hours.push({
-      datetime: new Date(dataHours[i].time * 1000),
-      summary: dataHours[i].summary,
-      weather: dataHours[i].icon,
-      apparent_temperature: Math.round(dataHours[i].apparentTemperature),
-      precipitation_type: dataHours[i].precipType,
-      precipitation_probability: Math.round(dataHours[i].precipProbability * 100),
-    });
+    const dataHours = result.hourly.data;
+    dataToReturn.hours = [];
+    for (let i = 1; i < 9; i += 1) {
+      dataToReturn.hours.push({
+        datetime: new Date(dataHours[i].time * 1000),
+        summary: dataHours[i].summary,
+        weather: dataHours[i].icon,
+        apparent_temperature: Math.round(dataHours[i].apparentTemperature),
+        precipitation_type: dataHours[i].precipType,
+        precipitation_probability: Math.round(dataHours[i].precipProbability * 100),
+      });
+    }
   }
 
   return dataToReturn;

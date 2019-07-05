@@ -124,50 +124,13 @@ const WeatherBox = ({ children, ...props }) => (
                 {props.units === 'si' ? 'C' : 'F'}
               </span>
             </div>
-            <div>
-              <span>
-                <i
-                  class="fe fe-droplet"
-                  style={{
-                    paddingRight: '5px'
-                  }}
-                />
-                {props.humidity}
-                <span
-                  style={{
-                    fontSize: '12px'
-                  }}
-                >
-                  %
-                </span>
-              </span>
-              <span
-                style={{
-                  float: 'right'
-                }}
-              >
-                <i
-                  class="fe fe-wind"
-                  style={{
-                    paddingRight: '5px'
-                  }}
-                />
-                {props.wind}
-                <span
-                  style={{
-                    fontSize: '12px'
-                  }}
-                >
-                  {props.units === 'si' ? 'km/h' : 'm/h'}
-                </span>
-              </span>
-            </div>
           </div>
           <div
             class="col-3 text-right"
             style={{
               paddingRight: '10px',
-              paddingLeft: '10px'
+              paddingLeft: '10px',
+              marginTop: '-0.75rem'
             }}
           >
             <i
@@ -178,15 +141,57 @@ const WeatherBox = ({ children, ...props }) => (
             />
           </div>
         </div>
-        {props.alert_display}
-        <div
-          class="row"
-          style={{
-            marginTop: '0.5em'
-          }}
-        >
-          {props.hours_display}
-        </div>
+        {props.display === 'advanced' && (
+          <div class="col-9" style={{ padding: '0' }}>
+            <span>
+              <i
+                class="fe fe-droplet"
+                style={{
+                  paddingRight: '5px'
+                }}
+              />
+              {props.humidity}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
+                %
+              </span>
+            </span>
+            <span style={{ float: 'right' }}>
+              <i
+                class="fe fe-wind"
+                style={{
+                  paddingRight: '5px'
+                }}
+              />
+              {props.wind}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
+                {props.units === 'si' ? 'km/h' : 'm/h'}
+              </span>
+            </span>
+          </div>
+        )}
+        {props.display === 'advanced' && (
+          <div>
+            {props.alert_display}
+            <div
+              class="row"
+              style={{
+                marginTop: '0.5em'
+              }}
+            >
+              {props.hours_display}
+            </div>
+          </div>
+        )}
       </div>
     )}
   </div>
@@ -208,58 +213,63 @@ class WeatherBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Weather.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Weather.${props.x}_${props.y}`);
     const weatherObject = get(boxData, 'weather');
+
+    const display = get(weatherObject, 'options.display');
+    const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
     const sunrise = get(weatherObject, 'time_sunrise');
     const sunset = get(weatherObject, 'time_sunset');
-    let weather = get(weatherObject, 'weather');
     const units = get(weatherObject, 'units');
     const temperature = get(weatherObject, 'temperature');
-    const humidity = get(weatherObject, 'humidity');
-    let wind = get(weatherObject, 'wind_speed');
-    const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
-    const alert = get(weatherObject, 'alert');
-    let alert_display = '';
     const houseName = get(weatherObject, 'house.name');
+    let weather = get(weatherObject, 'weather');
     if (weather === 'fe-sun' && (weatherObject.datetime < sunrise || weatherObject.datetime > sunset)) {
       weather = 'fe-moon';
     }
-    if (units === 'si') {
-      wind = wind * 3.6;
-      wind = wind.toFixed(2);
-    }
-    if (typeof alert != 'undefined' && alert !== null) {
-      let color = '#FFD6D4';
-      if (alert.severity === 'warning') {
-        color = '#FF8D87';
+
+    let humidity, wind, alert_display, hours_display;
+
+    if (display === 'advanced') {
+      humidity = get(weatherObject, 'humidity');
+      wind = get(weatherObject, 'wind_speed');
+      const alert = get(weatherObject, 'alert');
+      if (units === 'si') {
+        wind = wind * 3.6;
+        wind = wind.toFixed(2);
       }
-      alert_display = (
-        <div
-          class="row"
-          style={{ fontSize: '0.75em', marginTop: '0.5em', backgroundColor: color, borderRadius: '3px' }}
-        >
-          <p style={{ margin: '2px', fontWeight: 'bold' }}>{alert.title}</p>
-          <p style={{ margin: '2px' }}>{alert.description}</p>
-        </div>
-      );
-    }
-    const hours = get(weatherObject, 'hours');
-    let hours_display = '';
-    if (typeof hours !== 'undefined') {
-      hours_display = hours.map(hour => {
-        if (hour.weather === 'fe-sun' && (hour.datetime < sunrise || hour.datetime > sunset)) {
-          hour.weather = 'fe-moon';
+      if (typeof alert != 'undefined' && alert !== null) {
+        let color = '#FFD6D4';
+        if (alert.severity === 'warning') {
+          color = '#FF8D87';
         }
-        return (
-          <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
-            <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-              {dayjs(hour.datetime).format('HH')}h
-            </p>
-            <p style={{ margin: 'auto', textAlign: 'center' }}>
-              <i className={' fe ' + hour.weather} style={{ fontSize: '20px' }} />
-            </p>
-            <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.apparent_temperature}&deg;</p>
+        alert_display = (
+          <div
+            class="row"
+            style={{ fontSize: '0.75em', marginTop: '0.5em', backgroundColor: color, borderRadius: '3px' }}
+          >
+            <p style={{ margin: '2px', fontWeight: 'bold' }}>{alert.title}</p>
+            <p style={{ margin: '2px' }}>{alert.description}</p>
           </div>
         );
-      });
+      }
+      const hours = get(weatherObject, 'hours');
+      if (typeof hours !== 'undefined') {
+        hours_display = hours.map(hour => {
+          if (hour.weather === 'fe-sun' && (hour.datetime < sunrise || hour.datetime > sunset)) {
+            hour.weather = 'fe-moon';
+          }
+          return (
+            <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
+                {dayjs(hour.datetime).format('HH')}h
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center' }}>
+                <i className={' fe ' + hour.weather} style={{ fontSize: '20px' }} />
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.apparent_temperature}&deg;</p>
+            </div>
+          );
+        });
+      }
     }
     return (
       <WeatherBox
@@ -276,6 +286,7 @@ class WeatherBoxComponent extends Component {
         sunrise={sunrise}
         sunset={sunset}
         alert_display={alert_display}
+        display={display}
       />
     );
   }

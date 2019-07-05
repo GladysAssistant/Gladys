@@ -5,10 +5,12 @@ const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 
 const DARKSKY_API_KEY = 'DARKSKY_API_KEY';
+const DARKSKY_DISPLAY_MODE = 'DARKSKY_DISPLAY_MODE';
 
 module.exports = function DarkSkyService(gladys, serviceId) {
   const { default: axios } = require('axios');
   let darkSkyApiKey;
+  let darkSkyDisplayMode;
 
   /**
    * @public
@@ -19,7 +21,11 @@ module.exports = function DarkSkyService(gladys, serviceId) {
   async function start() {
     logger.info('Starting Dark Sky service');
     darkSkyApiKey = await gladys.variable.getValue(DARKSKY_API_KEY, serviceId);
+    darkSkyDisplayMode = await gladys.variable.getValue(DARKSKY_DISPLAY_MODE, serviceId);
     if (!darkSkyApiKey) {
+      throw new ServiceNotConfiguredError('Dark Sky Service not configured');
+    }
+    if (!darkSkyDisplayMode) {
       throw new ServiceNotConfiguredError('Dark Sky Service not configured');
     }
   }
@@ -57,12 +63,16 @@ module.exports = function DarkSkyService(gladys, serviceId) {
       units: 'si',
       offset: 0,
     };
-    const optionsMerged = Object.assign({}, DEFAULT, options);
-    const { latitude, longitude, language, units } = optionsMerged;
 
     if (!darkSkyApiKey) {
       throw new ServiceNotConfiguredError('Dark Sky API Key not found');
     }
+    if (!darkSkyDisplayMode) {
+      throw new ServiceNotConfiguredError('Dark Sky API display mode not found');
+    }
+    const optionsMerged = Object.assign({}, DEFAULT, options, { display: darkSkyDisplayMode });
+    const { latitude, longitude, language, units } = optionsMerged;
+
     const url = `https://api.darksky.net/forecast/${darkSkyApiKey}/${latitude},${longitude}?language=${language}&units=${units}`;
     try {
       const { data } = await axios.get(url);

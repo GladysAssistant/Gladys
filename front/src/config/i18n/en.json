@@ -251,6 +251,7 @@
       "instructions": "You first need to create an account on DarkSky API website:",
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter DarkSky API key",
+      "displayModeLabel": "Finally, choose your display mode",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     }
