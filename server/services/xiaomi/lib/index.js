@@ -1,6 +1,5 @@
 const { Hub } = require('node-xiaomi-smart-home');
 const logger = require('../../../utils/logger');
-const { EVENTS } = require('../../../utils/constants');
 
 // EVENTS
 const { addSensorTh } = require('./event/xiaomi.addSensorTh');
@@ -32,7 +31,7 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
 
   // eslint-disable-next-line func-names
   xiaomi.on('data.weather', this.addSensorTh.bind(this));
-}
+};
 
 // EVENTS
 XiaomiManager.prototype.addSensorTh = addSensorTh;

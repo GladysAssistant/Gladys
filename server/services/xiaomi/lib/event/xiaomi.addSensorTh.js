@@ -2,11 +2,17 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 /**
  * @description Add node
- * @param {boolean} secure - Secure node.
+ * @param {number} sid - Id sensor.
+ * @param {number} temperature - Temperature sensor.
+ * @param {number} humidity - Humidity sensor.
+ * @param {number} pressure - Pressure sensor.
+ * @param {number} battery - Battery sensor.
  * @example
  * addSensorTh(true);
  */
 async function addSensorTh(sid, temperature, humidity, pressure, battery) {
+  logger.debug(`Xiaomi : set RAM variable and update value`);
+
   this.sensorTh[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-temperature`,

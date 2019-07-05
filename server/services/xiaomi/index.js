@@ -13,7 +13,6 @@ module.exports = function XiaomiService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting xiaomi service');
-    await Hub.hubDiscover(gladys, serviceId);
   }
 
   /**
