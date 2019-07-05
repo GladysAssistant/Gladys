@@ -3,27 +3,27 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import Feature from './Feature.jsx';
-class XiaomiCapteurTemperatureBox extends Component {
+class XiaomiSensorTemperatureBox extends Component {
   componentWillMount() {}
 
-  updateCapteurRoom = e => {
-    this.props.updateCapteurField(this.props.capteurIndex, 'room_id', e.target.value);
+  updateSensorRoom = e => {
+    this.props.updateSensorField(this.props.sensorIndex, 'room_id', e.target.value);
   };
 
-  updateCapteurName = e => {
-    this.props.updateCapteurField(this.props.capteurIndex, 'name', e.target.value);
+  updateSensorName = e => {
+    this.props.updateSensorField(this.props.sensorIndex, 'name', e.target.value);
   };
 
   updateFeatureName = e => {
-    this.props.updateCapteurField(this.props.capteurIndex, 'name', e.target);
+    this.props.updateSensorField(this.props.sensorIndex, 'name', e.target);
   };
 
-  saveCapteur = async () => {
+  saveSensor = async () => {
     this.setState({
       loading: true
     });
     try {
-      await this.props.saveCapteur(this.props.capteurIndex, this.props.capteur);
+      await this.props.saveSensor(this.props.sensorIndex, this.props.sensor);
       this.setState({
         saveError: null
       });
@@ -49,25 +49,25 @@ class XiaomiCapteurTemperatureBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {this.props.capteur.features.map((feature, indexFeature) => (
+                {this.props.sensor.features.map((feature, indexFeature) => (
                   <Feature
                     feature={feature}
                     featureIndex={indexFeature}
                     updateNameFeature={this.props.updateNameFeature}
-                    deviceIndex={this.props.capteurIndex}
+                    deviceIndex={this.props.sensorIndex}
                   />
                 ))}
                 <div class="form-group">
                   <label>
                     <Text id="integration.xiaomi.roomLabel" />
                   </label>
-                  <select class="form-control" onChange={this.updateCapteurRoom}>
+                  <select class="form-control" onChange={this.updateSensorRoom}>
                     <option value="">-------</option>
                     {props.houses &&
                       props.houses.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
-                            <option selected={room.id === props.capteur.room_id} value={room.id}>
+                            <option selected={room.id === props.sensor.room_id} value={room.id}>
                               {room.name}
                             </option>
                           ))}
@@ -76,7 +76,7 @@ class XiaomiCapteurTemperatureBox extends Component {
                   </select>
                 </div>
                 <div class="form-group">
-                  <button onClick={this.saveCapteur} class="btn btn-success mr-2">
+                  <button onClick={this.saveSensor} class="btn btn-success mr-2">
                     <Text id="integration.xiaomi.saveButton" />
                   </button>
                 </div>
@@ -89,4 +89,4 @@ class XiaomiCapteurTemperatureBox extends Component {
   }
 }
 
-export default XiaomiCapteurTemperatureBox;
+export default XiaomiSensorTemperatureBox;

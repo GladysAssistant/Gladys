@@ -1,8 +1,10 @@
 /* eslint-disable func-names */
 const logger = require('../../utils/logger');
-const Hub = require('./lib/listen');
+const XiaomiManager = require('./lib');
+const XiaomiController = require('./api/xiaomi.controller');
 
 module.exports = function XiaomiService(gladys, serviceId) {
+  const xiaomiManager = new XiaomiManager(gladys, serviceId);
   /**
    * @public
    * @description This function listen event on Xiaomi service
@@ -27,5 +29,6 @@ module.exports = function XiaomiService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    controllers: XiaomiController(gladys, xiaomiManager, serviceId),
   });
 };

@@ -226,9 +226,7 @@
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
-        "features": "Features",
-        "params": "Params",
-        "noFeatures": "No features",
+        "features": "Features",        "params": "Params",        "noFeatures": "No features",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "deviceCreatedSuccess": "The device was added with success."
@@ -254,15 +252,15 @@
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "xiaomi": {
-      "title": "Xioami",
-      "search": "Search capteur",
-      "nameLabelTemperature": "Device temperature",
-      "nameLabelHumidity": "Device humidity",
+      "title": "Xiaomi",
+      "search": "Search sensor",
+      "nameLabelTemperature": "Sensor temperature",
+      "nameLabelHumidity": "Sensor humidity",
       "nameLabelFeature": "Name of the feature",
       "namePlaceholderTemperature": "Enter the name of the device",
       "roomLabel": "Room",
       "saveButton": "Save",
-      "noCapteurFound": "No device found"
+      "noDeviceFound": "No device found"
     }
   },
   "editScene": {

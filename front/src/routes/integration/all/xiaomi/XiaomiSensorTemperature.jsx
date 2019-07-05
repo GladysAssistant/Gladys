@@ -1,10 +1,10 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import XiaomiCapteurTemperatureBox from './XiaomiCapteurTemperatureBox';
+import XiaomiSensorTemperatureBox from './XiaomiSensorTemperatureBox';
 import { RequestStatus } from '../../../../utils/consts';
 import style from './style.css';
 
-const XiaomiCapteurTemperature = ({ children, ...props }) => (
+const XiaomiSensorTemperature = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -20,21 +20,21 @@ const XiaomiCapteurTemperature = ({ children, ...props }) => (
                 <card-body>
                   <div class={cx('dimmer-content', style.xiaomiListBody)}>
                     <div class="row my-4 mx-2">
-                      {props.xiaomiCapteurTemperature &&
-                        props.xiaomiCapteurTemperature.map((capteur, index) => (
-                          <XiaomiCapteurTemperatureBox
-                            capteur={capteur}
-                            capteurIndex={index}
-                            updateCapteurField={props.updateCapteurField}
+                      {props.xiaomiSensorTemperature &&
+                        props.xiaomiSensorTemperature.map((sensor, index) => (
+                          <XiaomiSensorTemperatureBox
+                            sensor={sensor}
+                            sensorIndex={index}
+                            updateSensorField={props.updateSensorField}
                             updateNameFeature={props.updateNameFeature}
-                            saveCapteur={props.saveCapteur}
+                            saveSensor={props.saveSensor}
                             houses={props.houses}
                           />
                         ))}
-                      {props.xiaomiCapteurTemperature && props.xiaomiCapteurTemperature.length === 0 && (
+                      {props.xiaomiSensorTemperature && props.xiaomiSensorTemperature.length === 0 && (
                         <div class="col-md-12">
                           <div class={cx('text-center', style.emptyStateDivBox)}>
-                            <Text id="integration.xiaomi.noCapteurFound" />
+                            <Text id="integration.xiaomi.noSensorFound" />
                           </div>
                         </div>
                       )}
@@ -50,4 +50,4 @@ const XiaomiCapteurTemperature = ({ children, ...props }) => (
   </div>
 );
 
-export default XiaomiCapteurTemperature;
+export default XiaomiSensorTemperature;

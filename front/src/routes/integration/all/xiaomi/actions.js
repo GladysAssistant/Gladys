@@ -6,43 +6,51 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getXiaomiCapteurTemperature(state, take, skip) {
+    async getXiaomiSensorTemperature(state, take, skip) {
       store.setState({
-        getXiaomiCapteurTemperatureStatus: RequestStatus.Getting
+        getXiaomiSensorTemperatureStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getXiaomiCapteurTemperatureDir || 'asc',
+          order_dir: state.getXiaomiSensorTemperatureDir || 'asc',
           take,
           skip
         };
         if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
           options.search = state.rtspCameraSearch;
         }
-        const xiaomiCapteurTemperatureReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
+        const xiaomiSensorTemperatureReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
         // find camera url
-        xiaomiCapteurTemperatureReceived.forEach(camera => {
+        xiaomiSensorTemperatureReceived.forEach(camera => {
           const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
           if (cameraUrlParam) {
             camera.cameraUrl = cameraUrlParam;
           }
         });
-        let xiaomiCapteurTemperature;
+        let xiaomiSensorTemperature;
         if (skip === 0) {
-          xiaomiCapteurTemperature = xiaomiCapteurTemperatureReceived;
+          xiaomiSensorTemperature = xiaomiSensorTemperatureReceived;
         } else {
-          xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
-            $push: xiaomiCapteurTemperatureReceived
+          xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
+            $push: xiaomiSensorTemperatureReceived
           });
         }
         store.setState({
-          xiaomiCapteurTemperature,
-          getXiaomiCapteurTemperatureStatus: RequestStatus.Success
+          xiaomiSensorTemperature,
+          getXiaomiSensorTemperatureStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getXiaomiCapteurTemperatureStatus: e.message
+          getXiaomiSensorTemperatureStatus: e.message
         });
+      }
+    },
+    async getSensorTh(state) {
+      try {
+        const sensorTh = await state.httpClient.get(`/api/v1/service/xiaomi/sensorTh`);
+        console.log(sensorTh)
+      } catch (e) {
+        console.log('erreur')
       }
     },
     async getHouses(state) {
@@ -64,8 +72,20 @@ function createActions(store) {
         });
       }
     },
+    updateSensorField(state, index, field, value) {
+      const xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
+        [index]: {
+          [field]: {
+            $set: value
+          }
+        }
+      });
+      store.setState({
+        xiaomiSensorTemperature
+      })
+    },
     updateNameFeature(state, indexDevice, indexFeature, field, value) {
-      const xiaomiCapteurTemperature = update(state.xiaomiCapteurTemperature, {
+      const xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
         [indexDevice]: {
           'features': {
             [indexFeature]: {
@@ -77,15 +97,15 @@ function createActions(store) {
         }
       });
       store.setState({
-        xiaomiCapteurTemperature
+        xiaomiSensorTemperature
       });
     },
-    async saveCapteur(state, index, device) {
-      let capteur = state.xiaomiCapteurTemperature[index];
+    async saveSensor(state, index, device) {
+      let sensor = state.xiaomiSensorTemperature[index];
       device.features.map((feature, ind) => {
-        capteur.features[ind].name = feature.name;
+        sensor.features[ind].name = feature.name;
       });
-      await state.httpClient.post(`/api/v1/device`, capteur);
+      await state.httpClient.post(`/api/v1/device`, sensor);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
