@@ -1,8 +1,8 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { RequestStatus } from '../../../../utils/consts';
-import Feature from './Feature.jsx';
+import { RequestStatus } from '../../../../../utils/consts';
+import Feature from './Feature';
 class XiaomiSensorTemperatureBox extends Component {
   componentWillMount() {}
 
@@ -38,7 +38,7 @@ class XiaomiSensorTemperatureBox extends Component {
   };
 
   deleteSensor = async () => {
-    console.log('here')
+    console.log('here');
     this.setState({
       loading: true
     });

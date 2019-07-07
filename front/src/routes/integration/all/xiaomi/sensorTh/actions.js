@@ -1,7 +1,7 @@
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import debounce from 'debounce';
-import createActionsIntegration from '../../../../actions/integration';
+import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -21,11 +21,14 @@ function createActions(store) {
         const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensorTh`);
         let sensorThReceived = [];
         let sensorTh = [];
-        for(var i in temp)
-          sensorThReceived.push(temp [i]);
-        for(var i = 0; i<sensorThReceived.length; i+=1) {
+        for (let e in temp) {
+          if (temp[e]) {
+            sensorThReceived.push(temp[e]);
+          }
+        }
+        for (let i = 0; i < sensorThReceived.length; i += 1) {
           let testTrue = 1;
-          for(var j = 0; j<xiaomiSensorTemperatureReceived.length;j+=1) {
+          for (let j = 0; j < xiaomiSensorTemperatureReceived.length; j += 1) {
             if (sensorThReceived[i].name === xiaomiSensorTemperatureReceived[j].name) {
               testTrue = 0;
             }
@@ -84,12 +87,12 @@ function createActions(store) {
       });
       store.setState({
         xiaomiSensorTemperature
-      })
+      });
     },
     updateNameFeature(state, indexDevice, indexFeature, field, value) {
       const xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
         [indexDevice]: {
-          'features': {
+          features: {
             [indexFeature]: {
               [field]: {
                 $set: value

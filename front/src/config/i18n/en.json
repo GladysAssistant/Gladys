@@ -226,7 +226,9 @@
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
-        "features": "Features",        "params": "Params",        "noFeatures": "No features",
+        "features": "Features",
+        "params": "Params",
+        "noFeatures": "No features",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "deviceCreatedSuccess": "The device was added with success."
@@ -262,7 +264,8 @@
       "saveButton": "Save",
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
-      "missing": "Missing sensor"
+      "missing": "Missing sensor",
+      "sensorThTab": "Sensor Temperature"
     }
   },
   "editScene": {

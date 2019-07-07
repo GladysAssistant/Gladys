@@ -45,15 +45,19 @@ async function addSensorTh(sid, temperature, humidity, pressure, battery) {
       },
     ],
   };
-  const device = await this.gladys.device.get({ search: sid });
-  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-    device_feature_external_id: device[0].features[0].external_id,
-    state: temperature,
-  });
-  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-    device_feature_external_id: device[0].features[1].external_id,
-    state: humidity,
-  });
+  try {
+    const device = await this.gladys.device.get({ search: sid });
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: device[0].features[0].external_id,
+      state: temperature,
+    });
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: device[0].features[1].external_id,
+      state: humidity,
+    });
+  } catch (e) {
+    logger.debug(`No xiaomi sensor available`);
+  }
 }
 
 module.exports = {
