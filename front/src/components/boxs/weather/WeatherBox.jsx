@@ -214,7 +214,7 @@ class WeatherBoxComponent extends Component {
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Weather.${props.x}_${props.y}`);
     const weatherObject = get(boxData, 'weather');
 
-    const display = get(weatherObject, 'options.display');
+    const display = this.props.box.mode;
     const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
     const sunrise = get(weatherObject, 'time_sunrise');
     const sunset = get(weatherObject, 'time_sunset');

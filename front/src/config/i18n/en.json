@@ -133,7 +133,8 @@
         "serviceNotConfigured": "The DarkSky service is not configured. Please go to the 'Integrations' tab, and configure the DarkSky service.",
         "requestToThirdPartyFailed": "The request to DarkSKy API failed. Is your Gladys instance connected to the internet? Please go to the DarkSky configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the DarkSky configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editModeLabel": "Select the mode you want to display."
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here."
@@ -251,7 +252,6 @@
       "instructions": "You first need to create an account on DarkSky API website:",
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter DarkSky API key",
-      "displayModeLabel": "Finally, choose your display mode",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     }

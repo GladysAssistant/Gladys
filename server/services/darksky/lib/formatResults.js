@@ -16,12 +16,9 @@ const formatResults = (options, result) => {
   dataToReturn.weather = dataPoint.icon;
   dataToReturn.time_sunrise = new Date(result.daily.data[0].sunriseTime * 1000);
   dataToReturn.time_sunset = new Date(result.daily.data[0].sunsetTime * 1000);
-  if (options.display === 'advanced') {
+  if (options.mode === 'advanced') {
     dataToReturn.humidity = Math.round(dataPoint.humidity * 100);
     dataToReturn.wind_speed = Number(dataPoint.windSpeed.toFixed(2));
-    // dataToReturn.apparent_temperature = Number(dataPoint.apparentTemperature.toFixed(2));
-    // dataToReturn.precipitation_type = dataPoint.precipType;
-    // dataToReturn.precipitation_probability = Math.round(dataPoint.precipProbability * 100);
     dataToReturn.alert = null;
 
     if (result.alerts) {
@@ -45,7 +42,6 @@ const formatResults = (options, result) => {
       });
     }
   }
-
   return dataToReturn;
 };
 

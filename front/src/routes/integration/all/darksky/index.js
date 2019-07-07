@@ -2,10 +2,10 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import DarkSkyPage from './DarkSky';
-import { RequestStatus, GetWeatherModes } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
 
 @connect(
-  'user,darkSkyApiKey,darkSkyDisplayMode,darkskySaveConfigStatus,darkskyGetConfigStatus',
+  'user,darkSkyApiKey,darkskySaveConfigStatus,darkskyGetConfigStatus',
   actions
 )
 class DarkSkyIntegration extends Component {
@@ -16,7 +16,7 @@ class DarkSkyIntegration extends Component {
   render(props, {}) {
     const loading =
       props.darkskySaveConfigStatus === RequestStatus.Getting || props.darkskyGetConfigStatus === RequestStatus.Getting;
-    return <DarkSkyPage {...props} loading={loading} modes={GetWeatherModes} />;
+    return <DarkSkyPage {...props} loading={loading} />;
   }
 }
 

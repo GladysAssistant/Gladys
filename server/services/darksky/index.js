@@ -54,7 +54,8 @@ module.exports = function DarkSkyService(gladys, serviceId) {
    *   longitude: -2,
    *   offset: 0,
    *   language: 'fr',
-   *   units: 'si'
+   *   units: 'si',
+   *   mode: 'basic'
    * });
    */
   async function get(options) {
@@ -67,10 +68,7 @@ module.exports = function DarkSkyService(gladys, serviceId) {
     if (!darkSkyApiKey) {
       throw new ServiceNotConfiguredError('Dark Sky API Key not found');
     }
-    if (!darkSkyDisplayMode) {
-      throw new ServiceNotConfiguredError('Dark Sky API display mode not found');
-    }
-    const optionsMerged = Object.assign({}, DEFAULT, options, { display: darkSkyDisplayMode });
+    const optionsMerged = Object.assign({}, DEFAULT, options);
     const { latitude, longitude, language, units } = optionsMerged;
 
     const url = `https://api.darksky.net/forecast/${darkSkyApiKey}/${latitude},${longitude}?language=${language}&units=${units}`;

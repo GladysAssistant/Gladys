@@ -72,8 +72,8 @@ export const GetWeatherStatus = {
 };
 
 export const GetWeatherModes = [
-  'basic (Temperature)',
-  'advanced (Temperature with humidity, wind speed, previsions for the next 8 hours and forecast alerts)'
+  'basic (temperature)',
+  'advanced (temperature, humidity, wind speed, previsions for the next 8 hours and forecast alerts)'
 ];
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';

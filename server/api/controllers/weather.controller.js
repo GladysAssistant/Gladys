@@ -7,6 +7,7 @@ module.exports = function WeatherController(gladys) {
    * @api {get} /api/v1/user/:user_selector/weather get weather user
    * @apiName getWeatherUser
    * @apiGroup Weather
+   * @apiParam {string} [mode] Mode of the result
    * @apiSuccessExample {json} Success-Example
    * {
    *   "temperature": 27.28,
@@ -24,6 +25,7 @@ module.exports = function WeatherController(gladys) {
       latitude: lastLocation.latitude,
       longitude: lastLocation.longitude,
       language: req.user.language,
+      mode: req.query.mode || 'basic',
     };
     const weatherResult = await gladys.weather.get(options);
     res.json(weatherResult);
@@ -33,6 +35,7 @@ module.exports = function WeatherController(gladys) {
    * @api {get} /api/v1/house/:house_selector/weather get weather house
    * @apiName getWeatherHouse
    * @apiGroup Weather
+   * @apiParam {string} [mode] Mode of the result
    * @apiSuccessExample {json} Success-Example
    * {
    *   "temperature": 27.28,
@@ -53,6 +56,7 @@ module.exports = function WeatherController(gladys) {
       latitude: house.latitude,
       longitude: house.longitude,
       language: req.user.language,
+      mode: req.query.mode || 'basic',
     };
     const weatherResult = await gladys.weather.get(options);
     weatherResult.house = house;

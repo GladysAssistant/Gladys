@@ -35,7 +35,7 @@ describe('DarkSkyService', () => {
     const darkSkyService = DarkSkyService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await darkSkyService.stop();
   });
-  it('should return weather formatted', async () => {
+  it('should return weather formatted without any mode specified', async () => {
     const DarkSkyService = proxyquire('../../../services/darksky/index', workingAxios);
     const darkSkyService = DarkSkyService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await darkSkyService.start();
@@ -44,8 +44,43 @@ describe('DarkSkyService', () => {
       longitude: 10,
     });
     expect(weather).to.deep.equal({
+      datetime: new Date('2019-03-28T07:50:18.000Z'),
+      temperature: 54.87,
+      time_sunrise: new Date('2019-03-28T14:02:00.000Z'),
+      time_sunset: new Date('2019-03-29T02:29:43.000Z'),
+      units: 'si',
+      weather: 'partly-cloudy-night',
+    });
+  });
+  it('should return weather formatted in basic mode', async () => {
+    const DarkSkyService = proxyquire('../../../services/darksky/index', workingAxios);
+    const darkSkyService = DarkSkyService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await darkSkyService.start();
+    const weather = await darkSkyService.weather.get({
+      latitude: 12,
+      longitude: 10,
+      mode: 'basic',
+    });
+    expect(weather).to.deep.equal({
+      datetime: new Date('2019-03-28T07:50:18.000Z'),
+      temperature: 54.87,
+      time_sunrise: new Date('2019-03-28T14:02:00.000Z'),
+      time_sunset: new Date('2019-03-29T02:29:43.000Z'),
+      units: 'si',
+      weather: 'partly-cloudy-night',
+    });
+  });
+  it('should return weather formatted in advanced mode', async () => {
+    const DarkSkyService = proxyquire('../../../services/darksky/index', workingAxios);
+    const darkSkyService = DarkSkyService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await darkSkyService.start();
+    const weather = await darkSkyService.weather.get({
+      latitude: 12,
+      longitude: 10,
+      mode: 'advanced',
+    });
+    expect(weather).to.deep.equal({
       alert: null,
-      apparent_temperature: 54.87,
       datetime: new Date('2019-03-28T07:50:18.000Z'),
       hours: [
         {
@@ -115,9 +150,6 @@ describe('DarkSkyService', () => {
       ],
       temperature: 54.87,
       humidity: 76,
-      precipitation_probability: 0,
-      precipitation_type: undefined,
-      pressure: 1019,
       time_sunrise: new Date('2019-03-28T14:02:00.000Z'),
       time_sunset: new Date('2019-03-29T02:29:43.000Z'),
       units: 'si',
