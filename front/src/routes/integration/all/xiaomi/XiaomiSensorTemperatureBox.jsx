@@ -37,6 +37,26 @@ class XiaomiSensorTemperatureBox extends Component {
     });
   };
 
+  deleteSensor = async () => {
+    console.log('here')
+    this.setState({
+      loading: true
+    });
+    try {
+      await this.props.deleteSensor(this.props.sensorIndex);
+      this.setState({
+        deleteError: null
+      });
+    } catch (e) {
+      this.setState({
+        deleteError: RequestStatus.Error
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+
   render(props, { loading, saveError, testConnectionError }) {
     return (
       <div class="col-md-4">
@@ -78,6 +98,9 @@ class XiaomiSensorTemperatureBox extends Component {
                 <div class="form-group">
                   <button onClick={this.saveSensor} class="btn btn-success mr-2">
                     <Text id="integration.xiaomi.saveButton" />
+                  </button>
+                  <button onClick={this.deleteSensor} class="btn btn-danger mr-2">
+                    <Text id="integration.xiaomi.deleteButton" />
                   </button>
                 </div>
               </div>

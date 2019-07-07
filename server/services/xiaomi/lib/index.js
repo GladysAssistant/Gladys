@@ -17,7 +17,7 @@ const { getSensorTh } = require('./commands/xiaomi.getSensorTh');
 const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.sensorTh = [];
+  this.sensorTh = {};
   // eslint-disable-next-line vars-on-top
   const xiaomi = new Hub();
 

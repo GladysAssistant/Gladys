@@ -8,7 +8,8 @@ function createActions(store) {
   const actions = {
     async getXiaomiSensorTemperature(state, take, skip) {
       store.setState({
-        getXiaomiSensorTemperatureStatus: RequestStatus.Getting
+        getXiaomiSensorTemperatureStatus: RequestStatus.Getting,
+        sensorThGetStatus: RequestStatus.Getting
       });
       try {
         const options = {
@@ -16,17 +17,23 @@ function createActions(store) {
           take,
           skip
         };
-        if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
-          options.search = state.rtspCameraSearch;
-        }
         const xiaomiSensorTemperatureReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
-        // find camera url
-        xiaomiSensorTemperatureReceived.forEach(camera => {
-          const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
-          if (cameraUrlParam) {
-            camera.cameraUrl = cameraUrlParam;
+        const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensorTh`);
+        let sensorThReceived = [];
+        let sensorTh = [];
+        for(var i in temp)
+          sensorThReceived.push(temp [i]);
+        for(var i = 0; i<sensorThReceived.length; i+=1) {
+          let testTrue = 1;
+          for(var j = 0; j<xiaomiSensorTemperatureReceived.length;j+=1) {
+            if (sensorThReceived[i].name === xiaomiSensorTemperatureReceived[j].name) {
+              testTrue = 0;
+            }
           }
-        });
+          if (testTrue === 1) {
+            sensorTh.push(sensorThReceived[i]);
+          }
+        }
         let xiaomiSensorTemperature;
         if (skip === 0) {
           xiaomiSensorTemperature = xiaomiSensorTemperatureReceived;
@@ -37,20 +44,15 @@ function createActions(store) {
         }
         store.setState({
           xiaomiSensorTemperature,
+          sensorTh,
+          sensorThGetStatus: RequestStatus.Success,
           getXiaomiSensorTemperatureStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getXiaomiSensorTemperatureStatus: e.message
+          getXiaomiSensorTemperatureStatus: e.message,
+          sensorThGetStatus: RequestStatus.Error
         });
-      }
-    },
-    async getSensorTh(state) {
-      try {
-        const sensorTh = await state.httpClient.get(`/api/v1/service/xiaomi/sensorTh`);
-        console.log(sensorTh)
-      } catch (e) {
-        console.log('erreur')
       }
     },
     async getHouses(state) {
@@ -106,6 +108,15 @@ function createActions(store) {
         sensor.features[ind].name = feature.name;
       });
       await state.httpClient.post(`/api/v1/device`, sensor);
+    },
+    async deleteSensor(state, index) {
+      let sensor = state.xiaomiSensorTemperature[index];
+      await state.httpClient.delete('/api/v1/device/' + sensor.selector);
+      await this.getXiaomiSensorTemperature(100, 0);
+    },
+    async addSensor(state, index) {
+      await state.httpClient.post(`/api/v1/device`, this.sensorTh[index]);
+      await this.getXiaomiSensorTemperature(100, 0);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

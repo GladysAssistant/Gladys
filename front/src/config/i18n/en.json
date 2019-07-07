@@ -260,7 +260,9 @@
       "namePlaceholderTemperature": "Enter the name of the device",
       "roomLabel": "Room",
       "saveButton": "Save",
-      "noDeviceFound": "No device found"
+      "deleteButton": "Delete",
+      "noDeviceFound": "No device found",
+      "missing": "Missing sensor"
     }
   },
   "editScene": {
