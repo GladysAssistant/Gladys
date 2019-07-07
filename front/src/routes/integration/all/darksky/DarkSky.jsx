@@ -46,7 +46,7 @@ const DarkSkyPage = ({ children, ...props }) => (
                               class={cx('btn', 'btn-success', {
                                 'btn-loading': props.loading
                               })}
-                              onClick={props.saveApiKey}
+                              onClick={props.saveConfig}
                               type="button"
                             >
                               <Text id="integration.darkSky.saveButton" />
