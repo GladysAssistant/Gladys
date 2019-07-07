@@ -61,7 +61,8 @@ export const RequestStatus = {
   ConflictError: 'ConflictError',
   ValidationError: 'ValidationError',
   RateLimitError: 'RateLimitError',
-  ServiceNotConfigured: 'ServiceNotConfigured'
+  ServiceNotConfigured: 'ServiceNotConfigured',
+  GatewayNoInstanceFound: 'GatewayNoInstanceFound'
 };
 
 export const GetWeatherStatus = {

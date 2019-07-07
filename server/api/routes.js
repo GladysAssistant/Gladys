@@ -1,6 +1,3 @@
-const express = require('express');
-
-// Controllers
 const AreaController = require('./controllers/area.controller');
 const CalendarController = require('./controllers/calendar.controller');
 const CameraController = require('./controllers/camera.controller');
@@ -22,25 +19,14 @@ const TriggerController = require('./controllers/trigger.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 
-// Middlewares
-const AuthMiddleware = require('./middlewares/authMiddleware');
-const IsInstanceConfiguredMiddleware = require('./middlewares/isInstanceConfigured');
-const CorsMiddleware = require('./middlewares/corsMiddleware');
-const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
-
-// routes
-const setupServiceRoutes = require('./servicesRoutes');
-
 /**
- * @description Setup the routes.
- * @param {Object} gladys - Gladys library.
- * @returns {Object} Express router.
+ * @description Return object of routes.
+ * @param {Object} gladys - Gladys object.
+ * @returns {Object} Return object of routes.
  * @example
- * setupRoutes(gladys);
+ * getRoutes(gladys);
  */
-function setupRoutes(gladys) {
-  const router = express.Router();
-  // Configure router
+function getRoutes(gladys) {
   const areaController = AreaController(gladys);
   const calendarController = CalendarController(gladys);
   const cameraController = CameraController(gladys);
@@ -61,157 +47,412 @@ function setupRoutes(gladys) {
   const systemController = SystemController(gladys);
   const triggerController = TriggerController(gladys);
   const weatherController = WeatherController(gladys);
-  const authMiddleware = AuthMiddleware('dashboard:write', gladys);
-  const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
-  const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
 
-  // enable cross origin requests
-  router.use(CorsMiddleware);
+  const routes = {};
 
-  // open routes
-  router.get('/api/v1/ping', pingController.ping);
-  router.post('/api/v1/login', rateLimitMiddleware, userController.login);
-  router.post('/api/v1/access_token', userController.getAccessToken);
-  router.post('/api/v1/forgot_password', rateLimitMiddleware, userController.forgotPassword);
-  router.post('/api/v1/reset_password', rateLimitMiddleware, resetPasswordAuthMiddleware, userController.resetPassword);
-  router.get('/api/v1/setup', userController.getSetupState);
+  // add services routes
+  const services = Object.entries(gladys.service.getServices());
+  // foreach service
+  services.forEach((service) => {
+    // if the service has a controllers object
+    if (service[1].get().controllers) {
+      Object.assign(routes, service[1].get().controllers);
+    }
+  });
 
-  // this route is only useful for first signup
-  // we check that no account already exist
-  router.post('/api/v1/signup', isInstanceConfiguredMiddleware, userController.create);
+  const coreRoutes = {
+    // open routes
+    'get /api/v1/ping': {
+      authenticated: false,
+      controller: pingController.ping,
+    },
+    'post /api/v1/login': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.login,
+    },
+    'post /api/v1/access_token': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.getAccessToken,
+    },
+    'post /api/v1/forgot_password': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.forgotPassword,
+    },
+    'post /api/v1/reset_password': {
+      authenticated: false,
+      rateLimit: true,
+      resetPasswordAuth: true,
+      controller: userController.resetPassword,
+    },
+    'get /api/v1/setup': {
+      authenticated: false,
+      controller: userController.getSetupState,
+    },
+    'post /api/v1/signup': {
+      authenticated: false,
+      instanceNotConfigured: true,
+      controller: userController.create,
+    },
+    // area
+    'post /api/v1/area': {
+      authenticated: true,
+      controller: areaController.create,
+    },
+    'get /api/v1/area': {
+      authenticated: true,
+      controller: areaController.get,
+    },
+    'patch /api/v1/area/:area_selector': {
+      authenticated: true,
+      controller: areaController.update,
+    },
+    'delete /api/v1/area/:area_selector': {
+      authenticated: true,
+      controller: areaController.destroy,
+    },
+    // calendar
+    'post /api/v1/calendar': {
+      authenticated: true,
+      controller: calendarController.create,
+    },
+    'get /api/v1/calendar': {
+      authenticated: true,
+      controller: calendarController.get,
+    },
+    'get /api/v1/calendar/event': {
+      authenticated: true,
+      controller: calendarController.getEvents,
+    },
+    'patch /api/v1/calendar/:calendar_selector': {
+      authenticated: true,
+      controller: calendarController.update,
+    },
+    'delete /api/v1/calendar/:calendar_selector': {
+      authenticated: true,
+      controller: calendarController.destroy,
+    },
+    'post /api/v1/calendar/:calendar_selector/event': {
+      authenticated: true,
+      controller: calendarController.createEvent,
+    },
+    'patch /api/v1/calendar/event/:calendar_event_selector': {
+      authenticated: true,
+      controller: calendarController.updateEvent,
+    },
+    'delete /api/v1/calendar/event/:calendar_event_selector': {
+      authenticated: true,
+      controller: calendarController.destroyEvent,
+    },
+    // camera
+    'get /api/v1/camera': {
+      authenticated: true,
+      controller: cameraController.get,
+    },
+    'get /api/v1/camera/:camera_selector/image': {
+      authenticated: true,
+      controller: cameraController.getImage,
+    },
+    'post /api/v1/camera/:camera_selector/image': {
+      authenticated: true,
+      controller: cameraController.setImage,
+    },
+    // dashboard
+    'get /api/v1/dashboard': {
+      authenticated: true,
+      controller: dashboardController.get,
+    },
+    'post /api/v1/dashboard': {
+      authenticated: true,
+      controller: dashboardController.create,
+    },
+    'get /api/v1/dashboard/:dashboard_selector': {
+      authenticated: true,
+      controller: dashboardController.getBySelector,
+    },
+    'patch /api/v1/dashboard/:dashboard_selector': {
+      authenticated: true,
+      controller: dashboardController.update,
+    },
+    'delete /api/v1/dashboard/:dashboard_selector': {
+      authenticated: true,
+      controller: dashboardController.destroy,
+    },
+    // device
+    'post /api/v1/device': {
+      authenticated: true,
+      controller: deviceController.create,
+    },
+    'get /api/v1/device': {
+      authenticated: true,
+      controller: deviceController.get,
+    },
+    'get /api/v1/service/:service_name/device': {
+      authenticated: true,
+      controller: deviceController.getDevicesByService,
+    },
+    'get /api/v1/device/:device_selector': {
+      authenticated: true,
+      controller: deviceController.getBySelector,
+    },
+    'delete /api/v1/device/:device_selector': {
+      authenticated: true,
+      controller: deviceController.destroy,
+    },
+    // house
+    'post /api/v1/house': {
+      authenticated: true,
+      controller: houseController.create,
+    },
+    'patch /api/v1/house/:house_selector': {
+      authenticated: true,
+      controller: houseController.update,
+    },
+    'get /api/v1/house': {
+      authenticated: true,
+      controller: houseController.get,
+    },
+    'delete /api/v1/house/:house_selector': {
+      authenticated: true,
+      controller: houseController.destroy,
+    },
+    'get /api/v1/house/:house_selector/room': {
+      authenticated: true,
+      controller: houseController.getRooms,
+    },
+    'post /api/v1/house/:house_selector/user/:user_selector/seen': {
+      authenticated: true,
+      controller: houseController.userSeen,
+    },
+    // gateway
+    'get /api/v1/gateway/status': {
+      authenticated: true,
+      controller: gatewayController.getStatus,
+    },
+    'post /api/v1/gateway/login': {
+      authenticated: true,
+      controller: gatewayController.login,
+    },
+    'post /api/v1/gateway/login-two-factor': {
+      authenticated: true,
+      controller: gatewayController.loginTwoFactor,
+    },
+    'get /api/v1/gateway/key': {
+      authenticated: true,
+      controller: gatewayController.getUsersKeys,
+    },
+    'patch /api/v1/gateway/key': {
+      authenticated: true,
+      controller: gatewayController.getStatus,
+    },
+    'get /api/v1/gateway/backup': {
+      authenticated: true,
+      controller: gatewayController.getBackups,
+    },
+    'post /api/v1/gateway/backup': {
+      authenticated: true,
+      controller: gatewayController.createBackup,
+    },
+    'post /api/v1/gateway/backup/restore': {
+      authenticated: true,
+      controller: gatewayController.getStatus,
+    },
+    'get /api/v1/gateway/backup/restore/status': {
+      authenticated: true,
+      controller: gatewayController.getRestoreStatus,
+    },
+    'get /api/v1/gateway/instance/key': {
+      authenticated: true,
+      controller: gatewayController.getInstanceKeysFingerprint,
+    },
+    // room
+    'get /api/v1/room': {
+      authenticated: true,
+      controller: roomController.get,
+    },
+    'get /api/v1/room/:room_selector': {
+      authenticated: true,
+      controller: roomController.getBySelector,
+    },
+    'post /api/v1/house/:house_selector/room': {
+      authenticated: true,
+      controller: roomController.create,
+    },
+    'patch /api/v1/room/:room_selector': {
+      authenticated: true,
+      controller: roomController.update,
+    },
+    'delete /api/v1/room/:room_selector': {
+      authenticated: true,
+      controller: roomController.destroy,
+    },
+    // message
+    'post /api/v1/message': {
+      authenticated: true,
+      controller: messageController.create,
+    },
+    'get /api/v1/message': {
+      authenticated: true,
+      controller: messageController.get,
+    },
+    // service
+    'post /api/v1/service/:service_name/start': {
+      authenticated: true,
+      controller: serviceController.start,
+    },
+    'post /api/v1/service/:service_name/stop': {
+      authenticated: true,
+      controller: serviceController.stop,
+    },
+    'get /api/v1/service/:service_name': {
+      authenticated: true,
+      controller: serviceController.getByName,
+    },
+    // user
+    'get /api/v1/user': {
+      authenticated: true,
+      controller: userController.getUsers,
+    },
+    'get /api/v1/me': {
+      authenticated: true,
+      controller: userController.getMySelf,
+    },
+    'patch /api/v1/me': {
+      authenticated: true,
+      controller: userController.updateMySelf,
+    },
+    'get /api/v1/me/picture': {
+      authenticated: true,
+      controller: userController.getMyPicture,
+    },
+    // location
+    'post /api/v1/user/:user_selector/location': {
+      authenticated: true,
+      controller: locationController.create,
+    },
+    'get /api/v1/user/:user_selector/location': {
+      authenticated: true,
+      controller: locationController.getLocationsUser,
+    },
+    // variable
+    'post /api/v1/service/:service_name/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.setForLocalService,
+    },
+    'get /api/v1/service/:service_name/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.getByLocalService,
+    },
+    'post /api/v1/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.setValue,
+    },
+    // session
+    'post /api/v1/session/:session_id/revoke': {
+      authenticated: true,
+      controller: sessionController.revoke,
+    },
+    'post /api/v1/session/api_key': {
+      authenticated: true,
+      controller: sessionController.createApiKey,
+    },
+    'get /api/v1/session': {
+      authenticated: true,
+      controller: sessionController.get,
+    },
+    // light
+    'post /api/v1/light/:device_selector/on': {
+      authenticated: true,
+      controller: lightController.turnOn,
+    },
+    // scene
+    'post /api/v1/scene': {
+      authenticated: true,
+      controller: sceneController.create,
+    },
+    'get /api/v1/scene': {
+      authenticated: true,
+      controller: sceneController.get,
+    },
+    'get /api/v1/scene/:scene_selector': {
+      authenticated: true,
+      controller: sceneController.getBySelector,
+    },
+    'patch /api/v1/scene/:scene_selector': {
+      authenticated: true,
+      controller: sceneController.update,
+    },
+    'delete /api/v1/scene/:scene_selector': {
+      authenticated: true,
+      controller: sceneController.destroy,
+    },
+    'post /api/v1/scene/:scene_selector/start': {
+      authenticated: true,
+      controller: sceneController.start,
+    },
+    // system
+    'get /api/v1/system/info': {
+      authenticated: true,
+      controller: systemController.getSystemInfos,
+    },
+    'get /api/v1/system/disk': {
+      authenticated: true,
+      controller: systemController.getDiskSpace,
+    },
+    'get /api/v1/system/container': {
+      authenticated: true,
+      controller: systemController.getContainers,
+    },
+    'post /api/v1/system/shutdown': {
+      authenticated: true,
+      controller: systemController.shutdown,
+    },
+    'post /api/v1/system/upgrade/download': {
+      authenticated: true,
+      controller: systemController.downloadUpgrade,
+    },
+    'get /api/v1/system/upgrade/download/status': {
+      authenticated: true,
+      controller: systemController.getUpgradeDownloadStatus,
+    },
+    // trigger
+    'post /api/v1/trigger': {
+      authenticated: true,
+      controller: triggerController.create,
+    },
+    'get /api/v1/trigger': {
+      authenticated: true,
+      controller: triggerController.get,
+    },
+    'patch /api/v1/trigger/:trigger_selector': {
+      authenticated: true,
+      controller: triggerController.update,
+    },
+    'delete /api/v1/trigger/:trigger_selector': {
+      authenticated: true,
+      controller: triggerController.destroy,
+    },
+    // user
+    'post /api/v1/user': {
+      authenticated: true,
+      controller: userController.create,
+    },
+    // weather
+    'get /api/v1/user/:user_selector/weather': {
+      authenticated: true,
+      controller: weatherController.getByUser,
+    },
+    'get /api/v1/house/:house_selector/weather': {
+      authenticated: true,
+      controller: weatherController.getByHouse,
+    },
+  };
 
-  // we load all services routes
-  setupServiceRoutes(gladys, router, authMiddleware);
+  Object.assign(routes, coreRoutes);
 
-  // after this, all requests to /api must have authenticated
-  router.use('/api/*', authMiddleware);
-
-  // area
-  router.post('/api/v1/area', areaController.create);
-  router.get('/api/v1/area', areaController.get);
-  router.patch('/api/v1/area/:area_selector', areaController.update);
-  router.delete('/api/v1/area/:area_selector', areaController.destroy);
-
-  // calendar
-  router.post('/api/v1/calendar', calendarController.create);
-  router.get('/api/v1/calendar', calendarController.get);
-  router.get('/api/v1/calendar/event', calendarController.getEvents);
-  router.patch('/api/v1/calendar/:calendar_selector', calendarController.update);
-  router.delete('/api/v1/calendar/:calendar_selector', calendarController.destroy);
-  router.post('/api/v1/calendar/:calendar_selector/event', calendarController.createEvent);
-  router.patch('/api/v1/calendar/event/:calendar_event_selector', calendarController.updateEvent);
-  router.delete('/api/v1/calendar/event/:calendar_event_selector', calendarController.destroyEvent);
-
-  // camera
-  router.get('/api/v1/camera', cameraController.get);
-  router.get('/api/v1/camera/:camera_selector/image', cameraController.getImage);
-  router.post('/api/v1/camera/:camera_selector/image', cameraController.setImage);
-
-  // dashboard
-  router.get('/api/v1/dashboard', dashboardController.get);
-  router.post('/api/v1/dashboard', dashboardController.create);
-  router.get('/api/v1/dashboard/:dashboard_selector', dashboardController.getBySelector);
-  router.patch('/api/v1/dashboard/:dashboard_selector', dashboardController.update);
-  router.delete('/api/v1/dashboard/:dashboard_selector', dashboardController.destroy);
-
-  // device
-  router.post('/api/v1/device', deviceController.create);
-  router.get('/api/v1/device', deviceController.get);
-  router.get('/api/v1/service/:service_name/device', deviceController.getDevicesByService);
-  router.get('/api/v1/device/:device_selector', deviceController.getBySelector);
-  router.delete('/api/v1/device/:device_selector', deviceController.destroy);
-
-  // house
-  router.post('/api/v1/house', houseController.create);
-  router.patch('/api/v1/house/:house_selector', houseController.update);
-  router.get('/api/v1/house', houseController.get);
-  router.delete('/api/v1/house/:house_selector', houseController.destroy);
-  router.get('/api/v1/house/:house_selector/room', houseController.getRooms);
-  router.post('/api/v1/house/:house_selector/user/:user_selector/seen', houseController.userSeen);
-
-  // gateway
-  router.get('/api/v1/gateway/status', gatewayController.getStatus);
-  router.post('/api/v1/gateway/login', gatewayController.login);
-  router.post('/api/v1/gateway/login-two-factor', gatewayController.loginTwoFactor);
-  router.get('/api/v1/gateway/key', gatewayController.getUsersKeys);
-  router.patch('/api/v1/gateway/key', gatewayController.saveUsersKeys);
-  router.get('/api/v1/gateway/backup', gatewayController.getBackups);
-  router.post('/api/v1/gateway/backup', gatewayController.createBackup);
-  router.post('/api/v1/gateway/backup/restore', gatewayController.restoreBackup);
-  router.get('/api/v1/gateway/backup/restore/status', gatewayController.getRestoreStatus);
-  router.get('/api/v1/gateway/instance/key', gatewayController.getInstanceKeysFingerprint);
-
-  // room
-  router.get('/api/v1/room', roomController.get);
-  router.get('/api/v1/room/:room_selector', roomController.getBySelector);
-  router.post('/api/v1/house/:house_selector/room', roomController.create);
-  router.patch('/api/v1/room/:room_selector', roomController.update);
-  router.delete('/api/v1/room/:room_selector', roomController.destroy);
-
-  // message
-  router.post('/api/v1/message', messageController.create);
-  router.get('/api/v1/message', messageController.get);
-
-  // service
-  router.post('/api/v1/service/:service_name/start', serviceController.start);
-  router.post('/api/v1/service/:service_name/stop', serviceController.stop);
-  router.get('/api/v1/service/:service_name', serviceController.getByName);
-
-  // user
-  router.get('/api/v1/user', userController.getUsers);
-  router.get('/api/v1/me', userController.getMySelf);
-  router.patch('/api/v1/me', userController.updateMySelf);
-  router.get('/api/v1/me/picture', userController.getMyPicture);
-
-  // location
-  router.post('/api/v1/user/:user_selector/location', locationController.create);
-  router.get('/api/v1/user/:user_selector/location', locationController.getLocationsUser);
-
-  // variable
-  router.post('/api/v1/service/:service_name/variable/:variable_key', variableController.setForLocalService);
-  router.get('/api/v1/service/:service_name/variable/:variable_key', variableController.getByLocalService);
-  router.post('/api/v1/variable/:variable_key', variableController.setValue);
-
-  // session
-  router.post('/api/v1/session/:session_id/revoke', sessionController.revoke);
-  router.post('/api/v1/session/api_key', sessionController.createApiKey);
-  router.get('/api/v1/session', sessionController.get);
-
-  // light
-  router.post('/api/v1/light/:device_selector/on', lightController.turnOn);
-
-  // scene
-  router.post('/api/v1/scene', sceneController.create);
-  router.get('/api/v1/scene', sceneController.get);
-  router.get('/api/v1/scene/:scene_selector', sceneController.getBySelector);
-  router.patch('/api/v1/scene/:scene_selector', sceneController.update);
-  router.delete('/api/v1/scene/:scene_selector', sceneController.destroy);
-  router.post('/api/v1/scene/:scene_selector/start', sceneController.start);
-
-  // system
-  router.get('/api/v1/system/info', systemController.getSystemInfos);
-  router.get('/api/v1/system/disk', systemController.getDiskSpace);
-  router.get('/api/v1/system/container', systemController.getContainers);
-  router.post('/api/v1/system/shutdown', systemController.shutdown);
-  router.post('/api/v1/system/upgrade/download', systemController.downloadUpgrade);
-  router.get('/api/v1/system/upgrade/download/status', systemController.getUpgradeDownloadStatus);
-
-  // trigger
-  router.post('/api/v1/trigger', triggerController.create);
-  router.get('/api/v1/trigger', triggerController.get);
-  router.patch('/api/v1/trigger/:trigger_selector', triggerController.update);
-  router.delete('/api/v1/trigger/:trigger_selector', triggerController.destroy);
-
-  // user
-  router.post('/api/v1/user', userController.create);
-
-  // weather
-  router.get('/api/v1/user/:user_selector/weather', weatherController.getByUser);
-  router.get('/api/v1/house/:house_selector/weather', weatherController.getByHouse);
-
-  return router;
+  return routes;
 }
 
-module.exports = {
-  setupRoutes,
-};
+module.exports = getRoutes;
