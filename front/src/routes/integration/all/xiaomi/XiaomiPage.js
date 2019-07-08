@@ -17,9 +17,19 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="fe fe-thermometer" />
                     </span>
                     <Text id="integration.xiaomi.sensorThTab" />
+                  </Link>
+                  <Link
+                    href="/dashboard/integration/device/xiaomi/sensorMagnet"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-check-circle" />
+                    </span>
+                    <Text id="integration.xiaomi.sensorMagnetTab" />
                   </Link>
                 </div>
               </div>

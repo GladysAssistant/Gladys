@@ -265,7 +265,9 @@
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
       "missing": "Missing sensor",
-      "sensorThTab": "Sensor Temperature"
+      "sensorThTab": "Sensor Temperature",
+      "sensorMagnetTab": "Sensor Magnet",
+      "nameSensor": "Sensor name"
     }
   },
   "editScene": {

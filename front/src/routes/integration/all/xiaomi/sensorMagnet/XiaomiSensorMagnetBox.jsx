@@ -2,8 +2,8 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
-import Feature from './Feature';
-class XiaomiSensorTemperatureBox extends Component {
+
+class XiaomiSensorMagnetBox extends Component {
   componentWillMount() {}
 
   updateSensorRoom = e => {
@@ -11,7 +11,7 @@ class XiaomiSensorTemperatureBox extends Component {
   };
 
   updateSensorName = e => {
-    this.props.updateSensorField(this.props.sensorIndex, 'name', e.target.value);
+    this.props.updateNameField(this.props.sensorIndex, 'name', e.target.value);
   };
 
   updateFeatureName = e => {
@@ -68,14 +68,20 @@ class XiaomiSensorTemperatureBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {this.props.sensor.features.map((feature, indexFeature) => (
-                  <Feature
-                    feature={feature}
-                    featureIndex={indexFeature}
-                    updateNameFeature={this.props.updateNameFeature}
-                    deviceIndex={this.props.sensorIndex}
-                  />
-                ))}
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.xiaomi.nameLabelHumidity" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="text"
+                      value={this.props.sensor.features[0].name}
+                      onInput={this.updateSensorName}
+                      class="form-control"
+                      placeholder={<Text id="integration.xiaomi.nameSensor" />}
+                    />
+                  </Localizer>
+                </div>
                 <div class="form-group">
                   <label>
                     <Text id="integration.xiaomi.roomLabel" />
@@ -111,4 +117,4 @@ class XiaomiSensorTemperatureBox extends Component {
   }
 }
 
-export default XiaomiSensorTemperatureBox;
+export default XiaomiSensorMagnetBox;

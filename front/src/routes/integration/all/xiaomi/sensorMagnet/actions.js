@@ -6,60 +6,59 @@ import createActionsIntegration from '../../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getXiaomiSensorTemperature(state, take, skip) {
+    async getXiaomiSensorMagnet(state, take, skip) {
       store.setState({
-        getXiaomiSensorTemperatureStatus: RequestStatus.Getting,
-        sensorThGetStatus: RequestStatus.Getting
+        getXiaomiSensorMagnetStatus: RequestStatus.Getting,
+        sensorMagnetGetStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getXiaomiSensorTemperatureDir || 'asc',
+          order_dir: state.getXiaomiSensorMagnetDir || 'asc',
           take,
           skip
         };
-        const xiaomiSensorTemperatureReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
-
-        const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensorTh`);
-        let sensorThReceived = [];
-        let sensorTh = [];
+        const xiaomiSensorMagnetReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
+        const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensorMagnet`);
+        let sensorMagnetReceived = [];
+        let sensorMagnet = [];
         for (let e in temp) {
           if (temp[e]) {
-            sensorThReceived.push(temp[e]);
+            sensorMagnetReceived.push(temp[e]);
           }
         }
-        for (let i = 0; i < sensorThReceived.length; i += 1) {
+        for (let i = 0; i < sensorMagnetReceived.length; i += 1) {
           let testTrue = 1;
-          for (let j = 0; j < xiaomiSensorTemperatureReceived.length; j += 1) {
-            if (sensorThReceived[i].name === xiaomiSensorTemperatureReceived[j].name) {
+          for (let j = 0; j < xiaomiSensorMagnetReceived.length; j += 1) {
+            if (sensorMagnetReceived[i].name === xiaomiSensorMagnetReceived[j].name) {
               testTrue = 0;
             }
           }
           if (testTrue === 1) {
-            sensorTh.push(sensorThReceived[i]);
+            sensorMagnet.push(sensorMagnetReceived[i]);
           }
         }
-        let xiaomiSensorTemperature = [];
+        let xiaomiSensorMagnet = [];
         if (skip === 0) {
-          for (let k = 0; k < xiaomiSensorTemperatureReceived.length; k++) {
-            if (xiaomiSensorTemperatureReceived[k].features[0].unit === 'celsius') {
-              xiaomiSensorTemperature.push(xiaomiSensorTemperatureReceived[k]);
+          for (let k = 0; k < xiaomiSensorMagnetReceived.length; k++) {
+            if (xiaomiSensorMagnetReceived[k].features[0].unit === null) {
+              xiaomiSensorMagnet.push(xiaomiSensorMagnetReceived[k]);
             }
           }
         } else {
-          xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
-            $push: xiaomiSensorTemperatureReceived
+          xiaomiSensorMagnet = update(state.xiaomiSensorMagnet, {
+            $push: xiaomiSensorMagnetReceived
           });
         }
         store.setState({
-          xiaomiSensorTemperature,
-          sensorTh,
-          sensorThGetStatus: RequestStatus.Success,
-          getXiaomiSensorTemperatureStatus: RequestStatus.Success
+          xiaomiSensorMagnet,
+          sensorMagnet,
+          sensorMagnetGetStatus: RequestStatus.Success,
+          getXiaomiSensorMagnetStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getXiaomiSensorTemperatureStatus: e.message,
-          sensorThGetStatus: RequestStatus.Error
+          getXiaomiSensorMagnetStatus: e.message,
+          sensorMagnetGetStatus: RequestStatus.Error
         });
       }
     },
@@ -83,7 +82,7 @@ function createActions(store) {
       }
     },
     updateSensorField(state, index, field, value) {
-      const xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
+      const xiaomiSensorMagnet = update(state.xiaomiSensorMagnet, {
         [index]: {
           [field]: {
             $set: value
@@ -91,14 +90,14 @@ function createActions(store) {
         }
       });
       store.setState({
-        xiaomiSensorTemperature
+        xiaomiSensorMagnet
       });
     },
-    updateNameFeature(state, indexDevice, indexFeature, field, value) {
-      const xiaomiSensorTemperature = update(state.xiaomiSensorTemperature, {
-        [indexDevice]: {
+    updateNameField(state, index, field, value) {
+      const xiaomiSensorMagnet = update(state.xiaomiSensorMagnet, {
+        [index]: {
           features: {
-            [indexFeature]: {
+            0: {
               [field]: {
                 $set: value
               }
@@ -107,29 +106,30 @@ function createActions(store) {
         }
       });
       store.setState({
-        xiaomiSensorTemperature
+        xiaomiSensorMagnet
       });
     },
     async saveSensor(state, index, device) {
-      let sensor = state.xiaomiSensorTemperature[index];
+      let sensor = state.xiaomiSensorMagnet[index];
       device.features.map((feature, ind) => {
         sensor.features[ind].name = feature.name;
       });
       await state.httpClient.post(`/api/v1/device`, sensor);
     },
     async deleteSensor(state, index) {
-      let sensor = state.xiaomiSensorTemperature[index];
+      let sensor = state.xiaomiSensorMagnet[index];
       await state.httpClient.delete('/api/v1/device/' + sensor.selector);
-      const xiaomiSensorTemperature = update(state, {
-        xiaomiSensorTemperature: {
+      const xiaomiSensorMagnet = update(state, {
+        xiaomiSensorMagnet: {
           $splice: [[index, 1]]
         }
       });
-      store.setState(xiaomiSensorTemperature);
+      store.setState(xiaomiSensorMagnet);
+      await this.getXiaomiSensorMagnet(100, 0);
     },
     async addSensor(state, index) {
-      await state.httpClient.post(`/api/v1/device`, this.sensorTh[index]);
-      await this.getXiaomiSensorTemperature(100, 0);
+      await state.httpClient.post(`/api/v1/device`, this.sensorMagnet[index]);
+      await this.getXiaomiSensorMagnet(100, 0);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
