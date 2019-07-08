@@ -19,19 +19,6 @@ const Box = ({ children, ...props }) => {
   }
 };
 
-const onDragStart = (onDragStartFunction, x, y) => {
-  onDragStartFunction(x, y);
-};
-
-const onDragOver = (dragOverFunction, x, y) => e => {
-  e.preventDefault();
-  dragOverFunction(x, y, e);
-};
-
-const onDrop = (dropFunction, x, y) => event => {
-  dropFunction(x, y, event);
-};
-
 const EditBoxWithDragAndDrop = ({ children, ...props }) => (
   <div>
     {props.dragEnable && (
@@ -47,11 +34,7 @@ const EditBoxWithDragAndDrop = ({ children, ...props }) => (
         <p class="text-center">Drag and drop me here</p>
       </div>
     )}
-    <div
-      ondragstart={onDragStart(props.onDragStart, props.x, props.y)}
-      ondrop={onDrop(props.onDrop, props.x, props.y)}
-      ondragover={onDragOver(props.onDragOver, props.x, props.y)}
-    >
+    <div>
       <Box {...props} />
     </div>
   </div>

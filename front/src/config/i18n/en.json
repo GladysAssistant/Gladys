@@ -117,6 +117,7 @@
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
+    "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
@@ -526,5 +527,11 @@
     "settings": "Settings",
     "needHelp": "Need help",
     "signOut": "Sign Out"
+  },
+  "gatewayLinkUser": {
+    "title": "Configure Gladys Plus",
+    "label": "Select you Gladys user",
+    "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
+    "saveButton": "Save"
   }
 }

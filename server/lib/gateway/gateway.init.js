@@ -16,7 +16,7 @@ async function init() {
         gladysGatewayRefreshToken,
         JSON.parse(gladysGatewayRsaPrivateKey),
         JSON.parse(gladysGatewayEcdsaPrivateKey),
-        this.handleNewMessage,
+        this.handleNewMessage.bind(this),
       );
       this.connected = true;
     }

@@ -7,7 +7,7 @@ const errorMiddleware = require('./middlewares/errorMiddleware');
 const notFoundMiddleware = require('./middlewares/notFoundMiddleware');
 const WebsocketManager = require('./websockets');
 const logger = require('../utils/logger');
-const { setupRoutes } = require('./routes');
+const { setupRoutes } = require('./setupRoutes');
 
 const STATIC_FOLDER = path.join(__dirname, '/../static');
 
