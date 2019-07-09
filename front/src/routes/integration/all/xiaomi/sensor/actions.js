@@ -18,7 +18,7 @@ function createActions(store) {
           skip
         };
         const xiaomiSensorReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
-    
+
         const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensor`);
         let sensorReceived = [];
         let sensor = [];
@@ -48,7 +48,6 @@ function createActions(store) {
             $push: xiaomiSensorReceived
           });
         }
-        console.log(xiaomiSensor)
         store.setState({
           xiaomiSensor,
           sensor,
@@ -94,7 +93,6 @@ function createActions(store) {
       });
     },
     updateNameFeature(state, indexDevice, indexFeature, field, value) {
-      console.log('here')
       const xiaomiSensor = update(state.xiaomiSensor, {
         [indexDevice]: {
           features: {

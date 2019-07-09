@@ -1,5 +1,4 @@
 module.exports = function xiaomiController(gladys, xiaomiManager, serviceId) {
-  
   /**
    * @api {get} /api/v1/service/xiaomi Get Xiaomi sensor temperature
    * @apiName getTemperatureSensor

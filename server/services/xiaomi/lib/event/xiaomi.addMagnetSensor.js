@@ -35,7 +35,7 @@ async function addMagnetSensor(sid, closed, battery) {
       value = 1;
     } else {
       value = 0;
-    };
+    }
     const device = await this.gladys.device.get({ search: sid });
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: device[0].features[0].external_id,
