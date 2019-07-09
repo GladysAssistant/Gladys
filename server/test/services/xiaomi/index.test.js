@@ -121,4 +121,4 @@ describe('GET /api/v1/service/xiaomi/sensor/magnet', () => {
     await xiaomiController['get /api/v1/service/xiaomi/sensor/magnet'].controller(req, res);
     assert.calledWith(res.json, {});
   });
-})
+});
