@@ -83,13 +83,49 @@ const res = {
   json: fake.returns(null),
 };
 
+const sensorResult = {
+  12346: {
+    external_id: 'xiaomi:12346',
+    features: [{
+  category: 'temperature-sensor',
+  external_id: 'xiaomitemperature:12346:decimal:temperature',
+  has_feedback: false,
+  keep_history: true,
+  max: 100,
+  min: -20,
+  name: 'xiaomi-12346-temperature',
+  read_only: true,
+  type: 'decimal',
+  unit: 'celsius'
+}, {
+  category: 'humidity-sensor',
+  external_id: 'xiaomihumidity:12346:decimal',
+  has_feedback: false,
+  keep_history: true,
+  max: 100,
+  min: 0,
+  name: 'xiaomi-12346-humidity',
+  read_only: true,
+  type: 'decimal',
+  unit: '%'
+}],
+    name: 'xiaomi-12346-sensor-temp-hum-pression',
+    service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
+    should_poll: false
+  }
+};
+
 describe('GET /api/v1/service/xiaomi/sensor', () => {
   it('should get all sensors', async () => {
     const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.addTemperatureSensor(12346, 21, 50, 10, 50);
+    await xiaomiManager.addMotionSensor(12346, true, 50);
+    await xiaomiManager.addMagnetSensor(12346, true, 10);
+    await xiaomiManager.addThSensor(12346, 21, 50, 50);
     const req = {};
     const xiaomiController = XiaomiController(xiaomiManager);
     await xiaomiController['get /api/v1/service/xiaomi/sensor'].controller(req, res);
-    assert.calledWith(res.json, {});
+    assert.calledWith(res.json, sensorResult);
   });
 });
 
@@ -122,3 +158,34 @@ describe('GET /api/v1/service/xiaomi/sensor/magnet', () => {
     assert.calledWith(res.json, {});
   });
 });
+
+
+// describe('Update value of sensor', () => {
+//   it('should update value of magnet sensor', async () => {
+//     await authenticatedRequest
+//       .post('/api/v1/device')
+//       .send({
+//         service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bx',
+//         name: 'xiaomi-1234567-sensor-magnet',
+//         external_id: 'xiaomi:1234567',
+//         should_poll: false,
+//         features: [
+//           {
+//             name: 'xiaomi-1234567-closed',
+//             external_id: 'xiaomimagnet:1234567:binary:magnet',
+//             category: 'door-opening-sensor',
+//             type: 'binary',
+//             read_only: true,
+//             keep_history: true,
+//             has_feedback: false,
+//             min: false,
+//             max: true,
+//           },
+//         ],
+//       })
+//       .expect('Content-Type', /json/)
+//       .expect(200);
+//     const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bx');
+//     await xiaomiManager.addMotionSensor(1, true, 50);
+//   })
+// })
