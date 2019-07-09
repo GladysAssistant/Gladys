@@ -8,12 +8,12 @@ const { EVENTS } = require('../../../../utils/constants');
  * @param {number} pressure - Pressure sensor.
  * @param {number} battery - Battery sensor.
  * @example
- * addSensorTh(true);
+ * addTemperatureSensor(true);
  */
-async function addSensorTh(sid, temperature, humidity, pressure, battery) {
+async function addTemperatureSensor(sid, temperature, humidity, pressure, battery) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
 
-  this.sensorTh[sid] = {
+  this.temperatureSensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-temp-hum-pression`,
     external_id: `xiaomi:${sid}`,
@@ -61,5 +61,5 @@ async function addSensorTh(sid, temperature, humidity, pressure, battery) {
 }
 
 module.exports = {
-  addSensorTh,
+  addTemperatureSensor,
 };

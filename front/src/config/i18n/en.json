@@ -266,9 +266,9 @@
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
       "missing": "Missing sensor",
-      "sensorThTab": "Sensor Temperature",
+      "sensorTab": "Sensors xiaomi",
       "sensorMagnetTab": "Sensor Magnet",
-      "nameSensor": "Sensor name"
+      "nameDoorSensor": "Sensor Detection"
     }
   },
   "editScene": {

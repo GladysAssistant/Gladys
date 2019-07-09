@@ -53,8 +53,7 @@ import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
-import XiaomiSensorTh from '../routes/integration/all/xiaomi/sensorTh';
-import XiaomiSensorMagnetPage from '../routes/integration/all/xiaomi/sensorMagnet';
+import XiaomiSensorPage from '../routes/integration/all/xiaomi/sensor';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -111,9 +110,8 @@ const AppRouter = connect(
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
-        <Redirect path="/dashboard/integration/device/xiaomi" to="/dashboard/integration/device/xiaomi/sensorTh" />
-        <XiaomiSensorTh path="/dashboard/integration/device/xiaomi/sensorTh" />
-        <XiaomiSensorMagnetPage path="/dashboard/integration/device/xiaomi/sensorMagnet" />
+        <Redirect path="/dashboard/integration/device/xiaomi" to="/dashboard/integration/device/xiaomi/sensor" />
+        <XiaomiSensorPage path="/dashboard/integration/device/xiaomi/sensor" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

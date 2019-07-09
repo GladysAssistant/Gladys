@@ -3,24 +3,23 @@ const { EVENTS } = require('../../../../utils/constants');
 /**
  * @description Add node
  * @param {number} sid - Id sensor.
- * @param {boolean} closed - Closed magnet sensor.
+ * @param {boolean} motion - Closed motion sensor.
  * @param {number} battery - Battery sensor.
  * @example
- * addSensorMagnet(true);
+ * addMotionSensor(true);
  */
-async function addSensorMagnet(sid, closed, battery) {
+async function addMotionSensor(sid, motion, battery) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
-
-  this.sensorMagnet[sid] = {
+  this.motionSensor[sid] = {
     service_id: this.serviceId,
-    name: `xiaomi-${sid}-sensor-magnet`,
+    name: `xiaomi-${sid}-sensor-motion`,
     external_id: `xiaomi:${sid}`,
     should_poll: false,
     features: [
       {
-        name: `xiaomi-${sid}-closed`,
-        external_id: `xiaomimagnet:${sid}:binary:magnet`,
-        category: 'motion-sensor',
+        name: `xiaomi-${sid}-detect`,
+        external_id: `xiaomimotion:${sid}:binary:motion`,
+        category: 'door-opening-sensor',
         type: 'binary',
         read_only: true,
         keep_history: true,
@@ -32,7 +31,7 @@ async function addSensorMagnet(sid, closed, battery) {
   };
   try {
     let value = 0;
-    if (closed === true) {
+    if (motion === true) {
       value = 1;
     } else {
       value = 0;
@@ -43,10 +42,10 @@ async function addSensorMagnet(sid, closed, battery) {
       state: value,
     });
   } catch (e) {
-    logger.debug(`No xiaomi sensor magnet available`);
+    logger.debug(`No xiaomi sensor motion available`);
   }
 }
 
 module.exports = {
-  addSensorMagnet,
+  addMotionSensor,
 };

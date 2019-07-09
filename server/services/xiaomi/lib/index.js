@@ -1,13 +1,16 @@
-const { Hub } = require('node-xiaomi-smart-home');
 const logger = require('../../../utils/logger');
 
 // EVENTS
-const { addSensorTh } = require('./event/xiaomi.addSensorTh');
-const { addSensorMagnet } = require('./event/xiaomi.addSensorMagnet');
+const { addTemperatureSensor } = require('./event/xiaomi.addTemperatureSensor');
+const { addThSensor } = require('./event/xiaomi.addThSensor');
+const { addMagnetSensor } = require('./event/xiaomi.addMagnetSensor');
+const { addMotionSensor } = require('./event/xiaomi.addMotionSensor');
 
 // COMMANDS
-const { getSensorTh } = require('./commands/xiaomi.getSensorTh');
-const { getSensorMagnet } = require('./commands/xiaomi.getSensorMagnet');
+const { getTemperatureSensor } = require('./commands/xiaomi.getTemperatureSensor');
+const { getThSensor } = require('./commands/xiaomi.getThSensor');
+const { getMagnetSensor } = require('./commands/xiaomi.getMagnetSensor');
+const { getMotionSensor } = require('./commands/xiaomi.getMotionSensor');
 
 /**
  * @param {Object} gladys - The gladys object.
@@ -19,30 +22,33 @@ const { getSensorMagnet } = require('./commands/xiaomi.getSensorMagnet');
 const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.sensorTh = {};
-  this.sensorMagnet = {};
-  // eslint-disable-next-line vars-on-top
+  this.temperatureSensor = {};
+  this.magnetSensor = {};
+  this.motionSensor = {};
+  this.sensor = {};
+
+  const { Hub } = require('node-xiaomi-smart-home');
   const xiaomi = new Hub();
-
   xiaomi.listen();
-
-  // eslint-disable-next-line func-names
-  xiaomi.on('error', function(e) {
-    // eslint-disable-next-line no-console
+  xiaomi.on('error', function onError(e) {
     logger.debug(`${e}`);
   });
-
-  // eslint-disable-next-line func-names
-  xiaomi.on('data.weather', this.addSensorTh.bind(this));
-  xiaomi.on('data.magnet', this.addSensorMagnet.bind(this));
+  xiaomi.on('data.weather', this.addTemperatureSensor.bind(this));
+  xiaomi.on('data.magnet', this.addMagnetSensor.bind(this));
+  xiaomi.on('data.motion', this.addMotionSensor.bind(this));
+  xiaomi.on('data.th', this.addThSensor.bind(this));
 };
 
 // EVENTS
-XiaomiManager.prototype.addSensorTh = addSensorTh;
-XiaomiManager.prototype.addSensorMagnet = addSensorMagnet;
+XiaomiManager.prototype.addTemperatureSensor = addTemperatureSensor;
+XiaomiManager.prototype.addThSensor = addThSensor;
+XiaomiManager.prototype.addMagnetSensor = addMagnetSensor;
+XiaomiManager.prototype.addMotionSensor = addMotionSensor;
 
 // COMMANDS
-XiaomiManager.prototype.getSensorTh = getSensorTh;
-XiaomiManager.prototype.getSensorMagnet = getSensorMagnet;
+XiaomiManager.prototype.getTemperatureSensor = getTemperatureSensor;
+XiaomiManager.prototype.getThSensor = getThSensor;
+XiaomiManager.prototype.getMagnetSensor = getMagnetSensor;
+XiaomiManager.prototype.getMotionSensor = getMotionSensor;
 
 module.exports = XiaomiManager;

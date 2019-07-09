@@ -12,24 +12,14 @@ const DashboardSettings = ({ children, ...props }) => (
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
-                    href="/dashboard/integration/device/xiaomi/sensorTh"
+                    href="/dashboard/integration/device/xiaomi/sensor"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-thermometer" />
                     </span>
-                    <Text id="integration.xiaomi.sensorThTab" />
-                  </Link>
-                  <Link
-                    href="/dashboard/integration/device/xiaomi/sensorMagnet"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-check-circle" />
-                    </span>
-                    <Text id="integration.xiaomi.sensorMagnetTab" />
+                    <Text id="integration.xiaomi.sensorTab" />
                   </Link>
                 </div>
               </div>

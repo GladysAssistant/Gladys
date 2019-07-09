@@ -4,13 +4,13 @@ const logger = require('../../../../utils/logger');
  * @description Add node.
  * @returns {Array} Return array of sensor.
  * @example
- * xiaomi.getSensorTh(true);
+ * xiaomi.getTemperatureSensor(true);
  */
-function getSensorTh() {
+function getTemperatureSensor() {
   logger.debug(`Xiaomi : Geting sensor Th`);
-  return this.sensorTh;
+  return this.temperatureSensor;
 }
 
 module.exports = {
-  getSensorTh,
+  getTemperatureSensor,
 };
