@@ -1,4 +1,3 @@
-/* eslint-disable func-names */
 const logger = require('../../utils/logger');
 const XiaomiManager = require('./lib');
 const XiaomiController = require('./api/xiaomi.controller');
