@@ -27,6 +27,6 @@ module.exports = function XiaomiService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: XiaomiController(gladys, xiaomiManager, serviceId),
+    controllers: XiaomiController(xiaomiManager),
   });
 };

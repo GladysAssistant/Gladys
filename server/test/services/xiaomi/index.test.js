@@ -1,10 +1,11 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
-const { authenticatedRequest } = require('../../controllers/request.test');
+const { assert, fake } = require('sinon');
 
 const XiaomiService = proxyquire('../../../services/xiaomi/index', {});
 const XiaomiManager = require('../../../services/xiaomi/lib');
+const XiaomiController = require('../../../services/xiaomi/api/xiaomi.controller');
 
 describe('XiaomiService', () => {
   const xiaomiService = XiaomiService();
@@ -78,14 +79,46 @@ describe('Xiaomi commands', () => {
   });
 });
 
+const res = {
+  json: fake.returns(null),
+};
+
 describe('GET /api/v1/service/xiaomi/sensor', () => {
   it('should get all sensors', async () => {
-    await authenticatedRequest
-      .get('/api/v1/service/xiaomi/sensor')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).should.be.a('array');
-      });
+    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    const req = {};
+    const xiaomiController = XiaomiController(xiaomiManager);
+    await xiaomiController['get /api/v1/service/xiaomi/sensor'].controller(req, res);
+    assert.calledWith(res.json, {});
   });
 });
+
+describe('GET /api/v1/service/xiaomi/sensor/temperature', () => {
+  it('should get all temperature sensors', async () => {
+    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    const req = {};
+    const xiaomiController = XiaomiController(xiaomiManager);
+    await xiaomiController['get /api/v1/service/xiaomi/sensor'].controller(req, res);
+    assert.calledWith(res.json, {});
+  });
+});
+
+describe('GET /api/v1/service/xiaomi/sensor/motion', () => {
+  it('should get all motion sensors', async () => {
+    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    const req = {};
+    const xiaomiController = XiaomiController(xiaomiManager);
+    await xiaomiController['get /api/v1/service/xiaomi/sensor/motion'].controller(req, res);
+    assert.calledWith(res.json, {});
+  });
+});
+
+describe('GET /api/v1/service/xiaomi/sensor/magnet', () => {
+  it('should get all magnet sensors', async () => {
+    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    const req = {};
+    const xiaomiController = XiaomiController(xiaomiManager);
+    await xiaomiController['get /api/v1/service/xiaomi/sensor/magnet'].controller(req, res);
+    assert.calledWith(res.json, {});
+  });
+})

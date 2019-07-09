@@ -1,9 +1,10 @@
-const MockedClient = {
-  create: function create() {
-    return {
-      get: (url) => Promise.resolve(true),
-    };
-  },
-};
+const { fake } = require('sinon');
+const EventEmitter = require('events');
 
-module.exports = MockedClient;
+const XiaomiMock = function XiaomiMock(options) {};
+
+XiaomiMock.prototype = Object.create(new EventEmitter());
+
+XiaomiMock.prototype.addNode = fake.returns(null);
+
+module.exports = XiaomiMock;
