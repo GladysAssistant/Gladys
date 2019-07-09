@@ -86,33 +86,36 @@ const res = {
 const sensorResult = {
   12346: {
     external_id: 'xiaomi:12346',
-    features: [{
-  category: 'temperature-sensor',
-  external_id: 'xiaomitemperature:12346:decimal:temperature',
-  has_feedback: false,
-  keep_history: true,
-  max: 100,
-  min: -20,
-  name: 'xiaomi-12346-temperature',
-  read_only: true,
-  type: 'decimal',
-  unit: 'celsius'
-}, {
-  category: 'humidity-sensor',
-  external_id: 'xiaomihumidity:12346:decimal',
-  has_feedback: false,
-  keep_history: true,
-  max: 100,
-  min: 0,
-  name: 'xiaomi-12346-humidity',
-  read_only: true,
-  type: 'decimal',
-  unit: '%'
-}],
+    features: [
+      {
+        category: 'temperature-sensor',
+        external_id: 'xiaomitemperature:12346:decimal:temperature',
+        has_feedback: false,
+        keep_history: true,
+        max: 100,
+        min: -20,
+        name: 'xiaomi-12346-temperature',
+        read_only: true,
+        type: 'decimal',
+        unit: 'celsius',
+      },
+      {
+        category: 'humidity-sensor',
+        external_id: 'xiaomihumidity:12346:decimal',
+        has_feedback: false,
+        keep_history: true,
+        max: 100,
+        min: 0,
+        name: 'xiaomi-12346-humidity',
+        read_only: true,
+        type: 'decimal',
+        unit: '%',
+      },
+    ],
     name: 'xiaomi-12346-sensor-temp-hum-pression',
     service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
-    should_poll: false
-  }
+    should_poll: false,
+  },
 };
 
 describe('GET /api/v1/service/xiaomi/sensor', () => {
@@ -158,7 +161,6 @@ describe('GET /api/v1/service/xiaomi/sensor/magnet', () => {
     assert.calledWith(res.json, {});
   });
 });
-
 
 // describe('Update value of sensor', () => {
 //   it('should update value of magnet sensor', async () => {
