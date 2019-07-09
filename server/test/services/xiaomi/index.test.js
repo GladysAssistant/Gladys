@@ -1,8 +1,10 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
+const { authenticatedRequest } = require('../../controllers/request.test');
 
 const XiaomiService = proxyquire('../../../services/xiaomi/index', {});
+const XiaomiManager = require('../../../services/xiaomi/lib');
 
 describe('XiaomiService', () => {
   const xiaomiService = XiaomiService();
@@ -40,18 +42,50 @@ const gladys = {
   },
 };
 
-describe('XiaomiService.controllers', () => {
-  const xiaomiService = XiaomiService(gladys, 'be86c4db-489f-466c-aeea-1e262c4ee721');
+describe('Xioami events', () => {
+  const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
   it('shoud add temperature sensor', async () => {
-    await xiaomiService.controllers.addTemperatureSensor(12346, 21, 50, 10, 50);
+    await xiaomiManager.addTemperatureSensor(12346, 21, 50, 10, 50);
   });
   it('shoud add motion sensor', async () => {
-    await xiaomiService.controllers.addTemperatureSensor(12346, true, 50);
+    await xiaomiManager.addMotionSensor(12346, true, 50);
   });
   it('shoud add magnet sensor', async () => {
-    await xiaomiService.controllers.addTemperatureSensor(12346, true, 10);
+    await xiaomiManager.addMagnetSensor(12346, true, 10);
   });
   it('shoud add th sensor', async () => {
-    await xiaomiService.controllers.addThSensor(12346, 21, 50, 50);
+    await xiaomiManager.addThSensor(12346, 21, 50, 50);
+  });
+});
+
+describe('Xiaomi commands', () => {
+  const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+  it('should get temperature sensor', async () => {
+    const temperatureSensor = await xiaomiManager.getTemperatureSensor();
+    expect(temperatureSensor).to.be.instanceOf(Object);
+  });
+  it('should get motion sensor', async () => {
+    const motionSensor = await xiaomiManager.getMotionSensor();
+    expect(motionSensor).to.be.instanceOf(Object);
+  });
+  it('should get magnet sensor', async () => {
+    const magnetSensor = await xiaomiManager.getMagnetSensor();
+    expect(magnetSensor).to.be.instanceOf(Object);
+  });
+  it('should get th sensor', async () => {
+    const thSensor = await xiaomiManager.getThSensor();
+    expect(thSensor).to.be.instanceOf(Object);
+  });
+});
+
+describe('GET /api/v1/service/xiaomi/sensor', () => {
+  it('should get all sensors', async () => {
+    await authenticatedRequest
+      .get('/api/v1/service/xiaomi/sensor')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).should.be.a('array');
+      });
   });
 });
