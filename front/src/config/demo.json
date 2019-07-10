@@ -819,5 +819,81 @@
   ],
   "get /api/v1/setup": {
     "account_configured": true
+  },
+  "get /api/v1/service/xiaomi/device": [{
+    "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bd",
+    "name": "xiaomi-123465-sensor-temp-hum-pression",
+    "external_id": "xiaomi:123465",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "xiaomi-1-temperature",
+        "external_id": "xiaomitemperature:1:decimal:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -20,
+        "max": 100,
+        "last_value": 20
+      },
+      {
+        "name": "xiaomi-1-humidity",
+        "external_id": "xiaomihumidity:1:decimal",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "%",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "last_value": 54
+      }
+    ]
+  },
+  {
+    "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bd",
+    "name": "xiaomi-2-sensor-magnet",
+    "external_id": "xiaomi:2",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "xiaomi-2-closed",
+        "external_id": "xiaomimagnet:2:binary:magnet",
+        "category": "door-opening-sensor",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": false,
+        "max": true,
+        "last_value": 1
+      }
+    ]
+  }],
+  "get /api/v1/service/xiaomi/sensor": {
+    "2324": {
+      "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bd",
+      "name": "xiaomi-2324-sensor-magnet",
+      "external_id": "xiaomi:2324",
+      "should_poll": false,
+      "features": [
+        {
+          "name": "xiaomi-2324-closed",
+          "external_id": "xiaomimagnet:2324:binary:magnet",
+          "category": "door-opening-sensor",
+          "type": "binary",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": false,
+          "min": false,
+          "max": true,
+          "last_value": 1
+        }
+      ]
+    }
   }
 }
