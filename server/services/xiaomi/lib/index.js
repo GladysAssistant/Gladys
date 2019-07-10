@@ -5,6 +5,7 @@ const { addTemperatureSensor } = require('./event/xiaomi.addTemperatureSensor');
 const { addThSensor } = require('./event/xiaomi.addThSensor');
 const { addMagnetSensor } = require('./event/xiaomi.addMagnetSensor');
 const { addMotionSensor } = require('./event/xiaomi.addMotionSensor');
+const { getError } = require('./event/xiaomi.getError');
 
 // COMMANDS
 const { getTemperatureSensor } = require('./commands/xiaomi.getTemperatureSensor');
@@ -30,9 +31,7 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   const { Hub } = require('node-xiaomi-smart-home');
   const xiaomi = new Hub();
   xiaomi.listen();
-  xiaomi.on('error', function onError(e) {
-    logger.debug(`${e}`);
-  });
+  xiaomi.on('error', this.getError.bind(this));
   xiaomi.on('data.weather', this.addTemperatureSensor.bind(this));
   xiaomi.on('data.magnet', this.addMagnetSensor.bind(this));
   xiaomi.on('data.motion', this.addMotionSensor.bind(this));
@@ -44,6 +43,7 @@ XiaomiManager.prototype.addTemperatureSensor = addTemperatureSensor;
 XiaomiManager.prototype.addThSensor = addThSensor;
 XiaomiManager.prototype.addMagnetSensor = addMagnetSensor;
 XiaomiManager.prototype.addMotionSensor = addMotionSensor;
+XiaomiManager.prototype.getError = getError;
 
 // COMMANDS
 XiaomiManager.prototype.getTemperatureSensor = getTemperatureSensor;

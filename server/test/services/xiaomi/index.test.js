@@ -219,6 +219,10 @@ describe('Xioami events', () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     await xiaomiManager.addThSensor(123465, 21, 50, 50);
   });
+  it('should get error', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.getError('error');
+  })
 });
 
 const gladys = {
