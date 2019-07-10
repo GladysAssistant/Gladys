@@ -1,5 +1,3 @@
-const logger = require('../../../utils/logger');
-
 // EVENTS
 const { addTemperatureSensor } = require('./event/xiaomi.addTemperatureSensor');
 const { addThSensor } = require('./event/xiaomi.addThSensor');

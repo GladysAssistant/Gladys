@@ -1,10 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS } = require('../../../../utils/constants');
+
 /**
- * @description Add node
+ * @description Get Error
  * @param {string} e - Error.
  * @example
- * getError(true);
+ * getError('One Error');
  */
 async function getError(e) {
   logger.debug(`${e}`);
