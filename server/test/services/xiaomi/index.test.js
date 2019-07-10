@@ -36,28 +36,197 @@ describe('XiaomiService lifecycle', () => {
   });
 });
 
-const gladys = {
+const gladysTh = {
   event: new EventEmitter(),
-  variable: {
-    getValue: () => Promise.resolve('test'),
+  device: {
+    get: () =>
+      Promise.resolve([
+        {
+          service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
+          name: `xiaomi-123465-sensor-temp-hum-pression`,
+          external_id: `xiaomi:123465`,
+          should_poll: false,
+          features: [
+            {
+              name: `xiaomi-123465-temperature`,
+              external_id: `xiaomitemperature:123465:decimal:temperature`,
+              category: 'temperature-sensor',
+              type: 'decimal',
+              unit: 'celsius',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: -20,
+              max: 100,
+            },
+            {
+              name: `xiaomi-123465-humidity`,
+              external_id: `xiaomihumidity:123465:decimal`,
+              category: 'humidity-sensor',
+              type: 'decimal',
+              unit: '%',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: 0,
+              max: 100,
+            },
+          ],
+        },
+      ]),
+  },
+};
+
+const gladysTemperature = {
+  event: new EventEmitter(),
+  device: {
+    get: () =>
+      Promise.resolve([
+        {
+          service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
+          name: `xiaomi-123460-sensor-temp-hum-pression`,
+          external_id: `xiaomi:123460`,
+          should_poll: false,
+          features: [
+            {
+              name: `xiaomi-123460-temperature`,
+              external_id: `xiaomitemperature:123460:decimal:temperature`,
+              category: 'temperature-sensor',
+              type: 'decimal',
+              unit: 'celsius',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: -20,
+              max: 100,
+            },
+            {
+              name: `xiaomi-123460-humidity`,
+              external_id: `xiaomihumidity:123460:decimal`,
+              category: 'humidity-sensor',
+              type: 'decimal',
+              unit: '%',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: 0,
+              max: 100,
+            },
+          ],
+        },
+      ]),
+  },
+};
+
+const gladysMagnet = {
+  event: new EventEmitter(),
+  device: {
+    get: () =>
+      Promise.resolve([
+        {
+          service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
+          name: `xiaomi-123463-sensor-temp-hum-pression`,
+          external_id: `xiaomi:123463`,
+          should_poll: false,
+          features: [
+            {
+              name: `xiaomi-123463-temperature`,
+              external_id: `xiaomitemperature:123463:decimal:temperature`,
+              category: 'temperature-sensor',
+              type: 'decimal',
+              unit: 'celsius',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: -20,
+              max: 100,
+            },
+            {
+              name: `xiaomi-123463-humidity`,
+              external_id: `xiaomihumidity:123463:decimal`,
+              category: 'humidity-sensor',
+              type: 'decimal',
+              unit: '%',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: 0,
+              max: 100,
+            },
+          ],
+        },
+      ]),
+  },
+};
+
+const gladysMotion = {
+  event: new EventEmitter(),
+  device: {
+    get: () =>
+      Promise.resolve([
+        {
+          service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bd',
+          name: `xiaomi-123461-sensor-temp-hum-pression`,
+          external_id: `xiaomi:123461`,
+          should_poll: false,
+          features: [
+            {
+              name: `xiaomi-123461-temperature`,
+              external_id: `xiaomitemperature:123461:decimal:temperature`,
+              category: 'temperature-sensor',
+              type: 'decimal',
+              unit: 'celsius',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: -20,
+              max: 100,
+            },
+            {
+              name: `xiaomi-123461-humidity`,
+              external_id: `xiaomihumidity:123461:decimal`,
+              category: 'humidity-sensor',
+              type: 'decimal',
+              unit: '%',
+              read_only: true,
+              keep_history: true,
+              has_feedback: false,
+              min: 0,
+              max: 100,
+            },
+          ],
+        },
+      ]),
   },
 };
 
 describe('Xioami events', () => {
-  const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
   it('shoud add temperature sensor', async () => {
-    await xiaomiManager.addTemperatureSensor(12346, 21, 50, 10, 50);
+    const xiaomiManager = new XiaomiManager(gladysTemperature, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.addTemperatureSensor(123460, 21, 50, 10, 50);
   });
   it('shoud add motion sensor', async () => {
-    await xiaomiManager.addMotionSensor(12346, true, 50);
+    const xiaomiManager = new XiaomiManager(gladysMotion, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.addMotionSensor(123461, true, 50);
+    await xiaomiManager.addMotionSensor(123462, false, 50);
   });
   it('shoud add magnet sensor', async () => {
-    await xiaomiManager.addMagnetSensor(12346, true, 10);
+    const xiaomiManager = new XiaomiManager(gladysMagnet, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.addMagnetSensor(123463, true, 10);
+    await xiaomiManager.addMagnetSensor(123464, false, 10);
   });
   it('shoud add th sensor', async () => {
-    await xiaomiManager.addThSensor(12346, 21, 50, 50);
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    await xiaomiManager.addThSensor(123465, 21, 50, 50);
   });
 });
+
+const gladys = {
+  event: new EventEmitter(),
+  device: {
+    get: () => Promise.resolve('log'),
+  },
+};
 
 describe('Xiaomi commands', () => {
   const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
