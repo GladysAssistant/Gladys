@@ -123,6 +123,7 @@ function createActions(store) {
           $splice: [[index, 1]]
         }
       });
+      state.sensor.push(sensor);
       store.setState(xiaomiSensor);
     },
     async addSensor(state, index) {

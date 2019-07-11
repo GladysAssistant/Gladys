@@ -17,6 +17,18 @@ async function addMagnetSensor(sid, closed, battery) {
     should_poll: false,
     features: [
       {
+        name: `xiaomi-${sid}-battery`,
+        external_id: `xiaomibattery:${sid}:decimal:battery`,
+        category: 'battery-sensor',
+        type: 'decimal',
+        unit: '%',
+        read_only: true,
+        keep_history: true,
+        has_feedback: false,
+        min: 0,
+        max: 100,
+      },
+      {
         name: `xiaomi-${sid}-closed`,
         external_id: `xiaomimagnet:${sid}:binary:magnet`,
         category: 'door-opening-sensor',

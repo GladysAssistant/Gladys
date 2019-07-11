@@ -59,8 +59,21 @@ class XiaomiSensorBox extends Component {
 
   render(props, { loading, saveError, testConnectionError }) {
     return (
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card">
+          <div class="card-header">
+            {this.props.sensor.name}
+            {this.props.sensor.features[0].last_value && (
+              <div class="page-options d-flex">
+                <div class="tag tag-green">
+                  {this.props.sensor.features[0].last_value}%
+                  <span class="tag-addon">
+                    <i class="fe fe-battery" />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           <div
             class={cx('dimmer', {
               active: loading

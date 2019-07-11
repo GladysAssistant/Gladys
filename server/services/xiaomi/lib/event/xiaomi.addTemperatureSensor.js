@@ -20,6 +20,18 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
     should_poll: false,
     features: [
       {
+        name: `xiaomi-${sid}-battery`,
+        external_id: `xiaomibattery:${sid}:decimal:battery`,
+        category: 'battery-sensor',
+        type: 'decimal',
+        unit: '%',
+        read_only: true,
+        keep_history: true,
+        has_feedback: false,
+        min: 0,
+        max: 100,
+      },
+      {
         name: `xiaomi-${sid}-temperature`,
         external_id: `xiaomitemperature:${sid}:decimal:temperature`,
         category: 'temperature-sensor',
@@ -49,10 +61,14 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
     const device = await this.gladys.device.get({ search: sid });
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: device[0].features[0].external_id,
-      state: temperature,
+      state: battery,
     });
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: device[0].features[1].external_id,
+      state: temperature,
+    });
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: device[0].features[2].external_id,
       state: humidity,
     });
   } catch (e) {
