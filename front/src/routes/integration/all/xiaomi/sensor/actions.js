@@ -18,10 +18,14 @@ function createActions(store) {
           skip
         };
         const xiaomiSensorReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
-
         const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensor`);
         let sensorReceived = [];
         let sensor = [];
+        let numberSensor = 0;
+        if (xiaomiSensorReceived.length !== 0) {
+          let tempNumber = parseInt(xiaomiSensorReceived[xiaomiSensorReceived.length - 1].name.split('-')[1], 10);
+          numberSensor = tempNumber + 1;
+        }
         for (let e in temp) {
           if (temp[e]) {
             sensorReceived.push(temp[e]);
@@ -30,11 +34,16 @@ function createActions(store) {
         for (let i = 0; i < sensorReceived.length; i += 1) {
           let testTrue = 1;
           for (let j = 0; j < xiaomiSensorReceived.length; j += 1) {
-            if (sensorReceived[i].name === xiaomiSensorReceived[j].name) {
+            if (sensorReceived[i].external_id === xiaomiSensorReceived[j].external_id) {
               testTrue = 0;
             }
           }
           if (testTrue === 1) {
+            sensorReceived[i].name = sensorReceived[i].name.replace(/[0-9]+/, numberSensor);
+            for (let j = 0; j < sensorReceived[i].features.length; j++) {
+              sensorReceived[i].features[j].name = sensorReceived[i].features[j].name.replace(/[0-9]+/, numberSensor);
+            }
+            numberSensor += 1;
             sensor.push(sensorReceived[i]);
           }
         }
