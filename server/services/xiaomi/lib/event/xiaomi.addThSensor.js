@@ -57,7 +57,7 @@ async function addThSensor(sid, temperature, humidity, battery) {
     ],
   };
   try {
-    const device = await this.gladys.device.get({ search: sid });
+    const device = await this.gladys.device.get({ external_id: `xiaomi-${sid}` });
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: device[0].features[0].external_id,
       state: temperature,

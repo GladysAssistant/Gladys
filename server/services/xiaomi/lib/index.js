@@ -34,9 +34,6 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   xiaomi.on('data.magnet', this.addMagnetSensor.bind(this));
   xiaomi.on('data.motion', this.addMotionSensor.bind(this));
   xiaomi.on('data.th', this.addThSensor.bind(this));
-
-  this.addTemperatureSensor(1234, 20, 50, 10, 86);
-  this.addMotionSensor(12345, true, 86);
 };
 
 // EVENTS

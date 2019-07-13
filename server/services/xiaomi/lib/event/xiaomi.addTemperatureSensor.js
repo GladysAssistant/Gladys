@@ -16,12 +16,12 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
   this.temperatureSensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-temp-hum-pression`,
-    external_id: `xiaomi:${sid}`,
+    external_id: `xiaomi-${sid}`,
     should_poll: false,
     features: [
       {
         name: `xiaomi-${sid}-battery`,
-        external_id: `xiaomibattery:${sid}:decimal:battery`,
+        external_id: `xiaomi-${sid}-decimal-battery`,
         category: 'battery-sensor',
         type: 'decimal',
         unit: '%',
@@ -33,7 +33,7 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
       },
       {
         name: `xiaomi-${sid}-temperature`,
-        external_id: `xiaomitemperature:${sid}:decimal:temperature`,
+        external_id: `xiaomi-${sid}-decimal-temperature`,
         category: 'temperature-sensor',
         type: 'decimal',
         unit: 'celsius',
@@ -45,7 +45,7 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
       },
       {
         name: `xiaomi-${sid}-humidity`,
-        external_id: `xiaomihumidity:${sid}:decimal`,
+        external_id: `xiaomi-${sid}-decimal-humidity`,
         category: 'humidity-sensor',
         type: 'decimal',
         unit: '%',
@@ -58,18 +58,23 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
     ],
   };
   try {
-    const device = await this.gladys.device.get({ search: sid });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[0].external_id,
-      state: battery,
-    });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[1].external_id,
-      state: temperature,
-    });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[2].external_id,
-      state: humidity,
+    const devices = await this.gladys.device.get({ where: { external_id: { $like: `%${sid}` } } });
+    devices.map((device) => {
+      if (device.external_id === `xiaomi-${sid}`) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: device.features[0].external_id,
+          state: battery,
+        });
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: device.features[1].external_id,
+          state: temperature,
+        });
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: device.features[2].external_id,
+          state: humidity,
+        });
+      }
+      return null;
     });
   } catch (e) {
     logger.debug(`No xiaomi sensor available`);

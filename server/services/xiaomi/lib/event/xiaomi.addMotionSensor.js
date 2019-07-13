@@ -13,7 +13,7 @@ async function addMotionSensor(sid, motion, battery) {
   this.motionSensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-motion`,
-    external_id: `xiaomi:${sid}`,
+    external_id: `xiaomi-${sid}`,
     should_poll: false,
     features: [
       {
@@ -48,14 +48,19 @@ async function addMotionSensor(sid, motion, battery) {
     } else {
       value = 0;
     }
-    const device = await this.gladys.device.get({ search: sid });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[0].external_id,
-      state: battery,
-    });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[0].external_id,
-      state: value,
+    const devices = await this.gladys.device.get({ where: { external_id: { $like: `%${sid}` } } });
+    devices.map((device) => {
+      if (device.external_id === `xiaomi-${sid}`) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: device.features[0].external_id,
+          state: battery,
+        });
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: device.features[0].external_id,
+          state: value,
+        });
+      }
+      return null;
     });
   } catch (e) {
     logger.debug(`No xiaomi sensor motion available`);

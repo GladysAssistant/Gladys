@@ -39,9 +39,15 @@ function createActions(store) {
             }
           }
           if (testTrue === 1) {
-            sensorReceived[i].name = sensorReceived[i].name.replace(/[0-9]+/, numberSensor);
+            sensorReceived[i].name = sensorReceived[i].name.replace(
+              /xiaomi-[a-zA-Z0-9]+/,
+              'xiaomi-' + numberSensor.toString()
+            );
             for (let j = 0; j < sensorReceived[i].features.length; j++) {
-              sensorReceived[i].features[j].name = sensorReceived[i].features[j].name.replace(/[0-9]+/, numberSensor);
+              sensorReceived[i].features[j].name = sensorReceived[i].features[j].name.replace(
+                /xiaomi-[a-zA-Z0-9]+/,
+                'xiaomi-' + numberSensor.toString()
+              );
             }
             numberSensor += 1;
             sensor.push(sensorReceived[i]);
