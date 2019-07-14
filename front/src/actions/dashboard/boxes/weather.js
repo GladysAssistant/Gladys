@@ -7,28 +7,28 @@ import get from 'get-value';
 const BOX_KEY = 'Weather';
 
 const translateWeatherToFeIcon = weather => {
-  if (weather.search('snow') !== -1) {
+  if (weather === 'snow') {
     return 'fe-cloud-snow';
   }
-  if (weather.search('rain') !== -1) {
+  if (weather === 'rain') {
     return 'fe-cloud-rain';
   }
-  if (weather.search('clear') !== -1) {
+  if (weather === 'clear') {
     return 'fe-sun';
   }
-  if (weather.search('cloud') !== -1) {
+  if (weather === 'cloud') {
     return 'fe-cloud';
   }
-  if (weather.search('fog') !== -1) {
+  if (weather === 'fog') {
     return 'fe-cloud';
   }
-  if (weather.search('sleet') !== -1) {
+  if (weather === 'sleet') {
     return 'fe-cloud-drizzle';
   }
-  if (weather.search('wind') !== -1) {
+  if (weather === 'wind') {
     return 'fe-wind';
   }
-  if (weather.search('night') !== -1) {
+  if (weather === 'night') {
     return 'fe-moon';
   }
   return 'fe-question';

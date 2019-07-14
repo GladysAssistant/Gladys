@@ -134,7 +134,11 @@
         "requestToThirdPartyFailed": "The request to DarkSKy API failed. Is your Gladys instance connected to the internet? Please go to the DarkSky configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the DarkSky configuration panel.",
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
-        "editModeLabel": "Select the mode you want to display."
+        "editModeLabel": "Select the mode you want to display.",
+        "displayModes": {
+          "basic": "Basic : temperature",
+          "advanced": "Advanced : temperature, humidity, wind speed, previsions for the next 8 hours and forecast alerts"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here."

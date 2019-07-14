@@ -41,6 +41,8 @@
     ]
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
     "apidoc": "^0.17.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -71,6 +73,7 @@
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",
     "cross-env": "^5.2.0",
+    "dayjs": "^1.8.15",
     "dockerode": "^2.5.8",
     "express": "^4.16.4",
     "express-rate-limit": "^4.0.3",
@@ -80,6 +83,7 @@
     "handlebars": "^4.1.0",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
+    "moment": "^2.24.0",
     "node-nlp": "^3.0.3",
     "node-webcrypto-ossl": "^1.0.48",
     "path-to-regexp": "^3.0.0",

@@ -1,6 +1,16 @@
 [
   {
     "label": "weather.get",
-    "questions": ["What's the weather like?"]
+    "questions": ["What's the weather like?", "What's the weather?", "What's the current weather?"]
+  },
+  {
+    "label": "weather.getPrevisions",
+    "questions": [
+      "What will be the weather in %hours% hours?",
+      "What will be the weather in %days% days?",
+      "What will be the weather at %hours%?",
+      "What will be the weather %day%?",
+      "What will be the weather tomorrow?"
+    ]
   }
 ]

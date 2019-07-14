@@ -25,7 +25,8 @@ module.exports = function WeatherController(gladys) {
       latitude: lastLocation.latitude,
       longitude: lastLocation.longitude,
       language: req.user.language,
-      mode: req.query.mode || 'basic',
+      mode: req.query.mode,
+      datetime: req.query.datetime,
     };
     const weatherResult = await gladys.weather.get(options);
     res.json(weatherResult);
@@ -56,7 +57,8 @@ module.exports = function WeatherController(gladys) {
       latitude: house.latitude,
       longitude: house.longitude,
       language: req.user.language,
-      mode: req.query.mode || 'basic',
+      mode: req.query.mode,
+      datetime: req.query.datetime,
     };
     const weatherResult = await gladys.weather.get(options);
     weatherResult.house = house;

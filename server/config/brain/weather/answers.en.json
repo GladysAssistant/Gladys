@@ -8,10 +8,6 @@
     "answers": ["It's raining and temperature outside is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.clear",
-    "answers": ["It's a clear day today. Temperature outside is {{ temperature }} {{ units }}."]
-  },
-  {
     "label": "weather.get.success.cloud",
     "answers": ["It's cloudy outside and temperature is {{ temperature }} {{ units }}."]
   },
@@ -28,9 +24,31 @@
     "answers": ["Windy day today. Temperature outside is {{ temperature }} {{ units }}."]
   },
   {
+    "label": "weather.get.success.night",
+    "answers": ["Clear night today. Temperature outside is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.clear",
+    "answers": ["Clear day today. Temperature outside is {{ temperature }} {{ units }}."]
+  },
+  {
     "label": "weather.get.success.unknown",
     "answers": ["Temperature outside is {{ temperature }} {{ units }}."]
   },
+
+  {
+    "label": "weather.getPrevisions.success.daily",
+    "answers": [
+      "{{previsionDate}}, it will be {{summary}} outside. The temperature should be beetween {{temperatureMin}}{{units}} and {{temperatureMax}}{{units}}"
+    ]
+  },
+  {
+    "label": "weather.getPrevisions.success",
+    "answers": [
+      "{{previsionDate}} at {{previsionTime}}, it will be {{summary}} outside. The temperature should be around {{temperature}}{{units}}"
+    ]
+  },
+
   {
     "label": "weather.get.fail",
     "answers": ["There was an error while getting the weather."]

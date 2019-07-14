@@ -31,16 +31,17 @@ const EditWeatherBox = ({ children, ...props }) => (
       </div>
       <div>
         {GetWeatherModes.map(mode => {
+          const label = 'dashboard.boxes.weather.displayModes.' + mode;
           return (
             <label>
               <input
                 type="radio"
                 name="mode"
-                value={mode.split(' ')[0]}
-                checked={mode.split(' ')[0] === props.box.mode}
+                value={mode}
+                checked={mode === props.box.mode}
                 onChange={props.updateBoxMode}
               />
-              &nbsp;{mode}
+              &nbsp; <Text id={label} />
             </label>
           );
         })}

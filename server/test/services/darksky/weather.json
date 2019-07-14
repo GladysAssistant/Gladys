@@ -447,7 +447,7 @@
       {
         "time": 1553756400,
         "summary": "Partly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "clear-night",
         "precipIntensity": 0,
         "precipProbability": 0,
         "temperature": 55.4,
@@ -466,7 +466,7 @@
       {
         "time": 1553760000,
         "summary": "Partly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "rain",
         "precipIntensity": 0.0024,
         "precipProbability": 0.11,
         "precipType": "rain",
@@ -486,7 +486,7 @@
       {
         "time": 1553763600,
         "summary": "Partly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "clear-day",
         "precipIntensity": 0.0016,
         "precipProbability": 0.07,
         "precipType": "rain",
@@ -506,7 +506,7 @@
       {
         "time": 1553767200,
         "summary": "Partly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "snow",
         "precipIntensity": 0.0013,
         "precipProbability": 0.09,
         "precipType": "rain",
@@ -526,7 +526,7 @@
       {
         "time": 1553770800,
         "summary": "Possible Light Rain",
-        "icon": "rain",
+        "icon": "wind",
         "precipIntensity": 0.0355,
         "precipProbability": 0.25,
         "precipType": "rain",
@@ -546,7 +546,7 @@
       {
         "time": 1553774400,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "fog",
         "precipIntensity": 0.0059,
         "precipProbability": 0.23,
         "precipType": "rain",
@@ -566,7 +566,7 @@
       {
         "time": 1553778000,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-night",
+        "icon": "sleet",
         "precipIntensity": 0.004,
         "precipProbability": 0.19,
         "precipType": "rain",
@@ -586,7 +586,7 @@
       {
         "time": 1553781600,
         "summary": "Overcast",
-        "icon": "cloudy",
+        "icon": "sleet",
         "precipIntensity": 0.004,
         "precipProbability": 0.18,
         "precipType": "rain",
@@ -606,7 +606,7 @@
       {
         "time": 1553785200,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-day",
+        "icon": "clear-night",
         "precipIntensity": 0.0047,
         "precipProbability": 0.19,
         "precipType": "rain",
@@ -626,7 +626,7 @@
       {
         "time": 1553788800,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-day",
+        "icon": "wind",
         "precipIntensity": 0.0045,
         "precipProbability": 0.19,
         "precipType": "rain",
@@ -646,7 +646,7 @@
       {
         "time": 1553792400,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-day",
+        "icon": "test",
         "precipIntensity": 0.016,
         "precipProbability": 0.27,
         "precipType": "rain",
@@ -686,7 +686,7 @@
       {
         "time": 1553799600,
         "summary": "Mostly Cloudy",
-        "icon": "partly-cloudy-day",
+        "icon": "fog",
         "precipIntensity": 0.0061,
         "precipProbability": 0.21,
         "precipType": "rain",
@@ -1746,6 +1746,24 @@
       }
     ]
   },
+  "alerts": [
+    {
+      "title": "Flood Watch for Mason, WA",
+      "time": 1509993360,
+      "expires": 1510036680,
+      "severity": "warning",
+      "description": "...FLOOD WATCH REMAINS IN EFFECT THROUGH LATE MONDAY NIGHT...\nTHE FLOOD WATCH CONTINUES FOR\n* A PORTION OF NORTHWEST WASHINGTON...INCLUDING THE FOLLOWING\nCOUNTY...MASON.\n* THROUGH LATE FRIDAY NIGHT\n* A STRONG WARM FRONT WILL BRING HEAVY RAIN TO THE OLYMPICS\nTONIGHT THROUGH THURSDAY NIGHT. THE HEAVY RAIN WILL PUSH THE\nSKOKOMISH RIVER ABOVE FLOOD STAGE TODAY...AND MAJOR FLOODING IS\nPOSSIBLE.\n* A FLOOD WARNING IS IN EFFECT FOR THE SKOKOMISH RIVER. THE FLOOD\nWATCH REMAINS IN EFFECT FOR MASON COUNTY FOR THE POSSIBILITY OF\nAREAL FLOODING ASSOCIATED WITH A MAJOR FLOOD.\n",
+      "uri": "http://alerts.weather.gov/cap/wwacapget.php?x=WA1255E4DB8494.FloodWatch.1255E4DCE35CWA.SEWFFASEW.38e78ec64613478bb70fc6ed9c87f6e6"
+    },
+    {
+      "title": "(2) Flood Watch for Mason, WA",
+      "time": 1509993360,
+      "expires": 1510036680,
+      "severity": "watch",
+      "description": "(2)...FLOOD WATCH REMAINS IN EFFECT THROUGH LATE MONDAY NIGHT...\nTHE FLOOD WATCH CONTINUES FOR\n* A PORTION OF NORTHWEST WASHINGTON...INCLUDING THE FOLLOWING\nCOUNTY...MASON.\n* THROUGH LATE FRIDAY NIGHT\n* A STRONG WARM FRONT WILL BRING HEAVY RAIN TO THE OLYMPICS\nTONIGHT THROUGH THURSDAY NIGHT. THE HEAVY RAIN WILL PUSH THE\nSKOKOMISH RIVER ABOVE FLOOD STAGE TODAY...AND MAJOR FLOODING IS\nPOSSIBLE.\n* A FLOOD WARNING IS IN EFFECT FOR THE SKOKOMISH RIVER. THE FLOOD\nWATCH REMAINS IN EFFECT FOR MASON COUNTY FOR THE POSSIBILITY OF\nAREAL FLOODING ASSOCIATED WITH A MAJOR FLOOD.\n",
+      "uri": "http://alerts.weather.gov/cap/wwacapget.php?x=WA1255E4DB8494.FloodWatch.1255E4DCE35CWA.SEWFFASEW.38e78ec64613478bb70fc6ed9c87f6e6"
+    }
+  ],
   "flags": {
     "sources": ["nearest-precip", "nwspa", "cmc", "gfs", "hrrr", "icon", "isd", "madis", "nam", "sref", "darksky"],
     "nearest-station": 1.839,

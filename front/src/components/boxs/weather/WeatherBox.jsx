@@ -214,17 +214,12 @@ class WeatherBoxComponent extends Component {
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Weather.${props.x}_${props.y}`);
     const weatherObject = get(boxData, 'weather');
 
-    const display = this.props.box.mode;
+    const display = this.props.box.mode || 'basic';
     const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
-    const sunrise = get(weatherObject, 'time_sunrise');
-    const sunset = get(weatherObject, 'time_sunset');
     const units = get(weatherObject, 'units');
     const temperature = get(weatherObject, 'temperature');
     const houseName = get(weatherObject, 'house.name');
     let weather = get(weatherObject, 'weather');
-    if (weather === 'fe-sun' && (weatherObject.datetime < sunrise || weatherObject.datetime > sunset)) {
-      weather = 'fe-moon';
-    }
 
     let humidity, wind, alert_display, hours_display;
 
@@ -253,19 +248,27 @@ class WeatherBoxComponent extends Component {
       }
       const hours = get(weatherObject, 'hours');
       if (typeof hours !== 'undefined') {
+        let i = 0;
         hours_display = hours.map(hour => {
-          if (hour.weather === 'fe-sun' && (hour.datetime < sunrise || hour.datetime > sunset)) {
-            hour.weather = 'fe-moon';
+          const borderStyle = {};
+          if (i === 3) {
+            borderStyle.borderRight = '0.01em dotted grey';
+            borderStyle.marginRight = '0';
           }
+          if (i === 4) {
+            borderStyle.borderLeft = '0.01em dotted grey';
+            borderStyle.marginLeft = '0';
+          }
+          i += 1;
           return (
-            <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
+            <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' }, borderStyle)}>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-                {dayjs(hour.datetime).format('HH')}h
+                {dayjs(hour.datetime * 1000).format('HH')}h
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
                 <i className={' fe ' + hour.weather} style={{ fontSize: '20px' }} />
               </p>
-              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.apparent_temperature}&deg;</p>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.temperature}&deg;</p>
             </div>
           );
         });
@@ -283,8 +286,6 @@ class WeatherBoxComponent extends Component {
         hours_display={hours_display}
         humidity={humidity}
         wind={wind}
-        sunrise={sunrise}
-        sunset={sunset}
         alert_display={alert_display}
         display={display}
       />

@@ -71,10 +71,7 @@ export const GetWeatherStatus = {
   RequestToThirdPartyFailed: 'RequestToThirdPartyFailed'
 };
 
-export const GetWeatherModes = [
-  'basic (temperature)',
-  'advanced (temperature, humidity, wind speed, previsions for the next 8 hours and forecast alerts)'
-];
+export const GetWeatherModes = ['basic', 'advanced'];
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';

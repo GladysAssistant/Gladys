@@ -57,7 +57,7 @@ describe('GET /api/v1/house/:selector/weather', () => {
             created_at: '2019-02-12T07:49:07.556Z',
             updated_at: '2019-02-12T07:49:07.556Z',
           },
-          options: { latitude: 12, longitude: 12, language: 'en', mode: 'basic' },
+          options: { latitude: 12, longitude: 12, language: 'en' },
         });
       });
   });
