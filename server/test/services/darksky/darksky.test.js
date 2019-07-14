@@ -147,13 +147,13 @@ describe('DarkSkyService', () => {
       target: 'hourly',
     });
     expect(weather).to.deep.equal({
-      datetime: new Date('2019-03-28T07:00:00.000Z'),
+      datetime: new Date('2019-03-28T07:50:18.000Z'),
       temperature: 55,
       time_sunrise: new Date('2019-03-28T14:02:00.000Z'),
       time_sunset: new Date('2019-03-29T02:29:43.000Z'),
       units: 'si',
-      summary: 'dark night',
-      weather: 'night',
+      summary: 'cloudy',
+      weather: 'cloud',
     });
   });
   it('should return weather formatted in advanced mode', async () => {
@@ -169,7 +169,7 @@ describe('DarkSkyService', () => {
       datetime: new Date('2019-03-28T07:50:18.000Z'),
       hours: [
         {
-          apparent_temperature: 55,
+          temperature: 55,
           datetime: new Date('2019-03-28T08:00:00.000Z'),
           precipitation_probability: 11,
           precipitation_type: 'rain',
@@ -177,7 +177,7 @@ describe('DarkSkyService', () => {
           weather: 'rain',
         },
         {
-          apparent_temperature: 54,
+          temperature: 54,
           datetime: new Date('2019-03-28T09:00:00.000Z'),
           precipitation_probability: 7,
           precipitation_type: 'rain',
@@ -185,7 +185,7 @@ describe('DarkSkyService', () => {
           weather: 'clear',
         },
         {
-          apparent_temperature: 53,
+          temperature: 53,
           datetime: new Date('2019-03-28T10:00:00.000Z'),
           precipitation_probability: 9,
           precipitation_type: 'rain',
@@ -193,7 +193,7 @@ describe('DarkSkyService', () => {
           weather: 'snow',
         },
         {
-          apparent_temperature: 52,
+          temperature: 52,
           datetime: new Date('2019-03-28T11:00:00.000Z'),
           precipitation_probability: 25,
           precipitation_type: 'rain',
@@ -201,7 +201,7 @@ describe('DarkSkyService', () => {
           weather: 'wind',
         },
         {
-          apparent_temperature: 52,
+          temperature: 52,
           datetime: new Date('2019-03-28T13:00:00.000Z'),
           precipitation_probability: 19,
           precipitation_type: 'rain',
@@ -209,15 +209,15 @@ describe('DarkSkyService', () => {
           weather: 'sleet',
         },
         {
-          apparent_temperature: 52,
+          temperature: 52,
           datetime: new Date('2019-03-28T15:00:00.000Z'),
           precipitation_probability: 19,
           precipitation_type: 'rain',
           summary: 'Mostly Cloudy',
-          weather: 'night',
+          weather: 'clear',
         },
         {
-          apparent_temperature: 54,
+          temperature: 54,
           datetime: new Date('2019-03-28T17:00:00.000Z'),
           precipitation_probability: 27,
           precipitation_type: 'rain',
@@ -225,7 +225,7 @@ describe('DarkSkyService', () => {
           weather: 'unknown',
         },
         {
-          apparent_temperature: 56,
+          temperature: 56,
           datetime: new Date('2019-03-28T19:00:00.000Z'),
           precipitation_probability: 21,
           precipitation_type: 'rain',

@@ -94,7 +94,7 @@ const formatResults = (options, result) => {
       for (let i = 1; i < 13; i += 1) {
         if (i < 5 || i % 2 === 0) {
           dataToReturn.hours.push({
-            datetime: dataHours[i].time,
+            datetime: new Date(dataHours[i].time * 1000),
             summary: dataHours[i].summary,
             weather: translateIconToWeather(
               dataHours[i].icon,

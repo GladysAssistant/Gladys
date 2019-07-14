@@ -263,7 +263,7 @@ class WeatherBoxComponent extends Component {
           return (
             <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' }, borderStyle)}>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-                {dayjs(hour.datetime * 1000).format('HH')}h
+                {dayjs(hour.datetime).format('HH')}h
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
                 <i className={' fe ' + hour.weather} style={{ fontSize: '20px' }} />
