@@ -1,9 +1,12 @@
+const dgram = require('dgram');
 // EVENTS
 const { addTemperatureSensor } = require('./event/xiaomi.addTemperatureSensor');
 const { addThSensor } = require('./event/xiaomi.addThSensor');
 const { addMagnetSensor } = require('./event/xiaomi.addMagnetSensor');
 const { addMotionSensor } = require('./event/xiaomi.addMotionSensor');
 const { getError } = require('./event/xiaomi.getError');
+const { listening } = require('./event/xiaomi.listening');
+const { onMessage } = require('./event/xiaomi.onMessage');
 
 // COMMANDS
 const { getTemperatureSensor } = require('./commands/xiaomi.getTemperatureSensor');
@@ -26,14 +29,11 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.motionSensor = {};
   this.sensor = {};
 
-  const { Hub } = require('node-xiaomi-smart-home');
-  const xiaomi = new Hub();
-  xiaomi.listen();
-  xiaomi.on('error', this.getError.bind(this));
-  xiaomi.on('data.weather', this.addTemperatureSensor.bind(this));
-  xiaomi.on('data.magnet', this.addMagnetSensor.bind(this));
-  xiaomi.on('data.motion', this.addMotionSensor.bind(this));
-  xiaomi.on('data.th', this.addThSensor.bind(this));
+  this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+  this.socket.on('listening', this.listening.bind(this));
+  this.socket.on('message', this.onMessage.bind(this));
+  this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
+  this.socket.bind(9898)
 };
 
 // EVENTS
@@ -42,6 +42,8 @@ XiaomiManager.prototype.addThSensor = addThSensor;
 XiaomiManager.prototype.addMagnetSensor = addMagnetSensor;
 XiaomiManager.prototype.addMotionSensor = addMotionSensor;
 XiaomiManager.prototype.getError = getError;
+XiaomiManager.prototype.listening = listening;
+XiaomiManager.prototype.onMessage = onMessage;
 
 // COMMANDS
 XiaomiManager.prototype.getTemperatureSensor = getTemperatureSensor;

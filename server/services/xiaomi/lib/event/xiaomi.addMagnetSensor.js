@@ -8,7 +8,7 @@ const { EVENTS } = require('../../../../utils/constants');
  * @example
  * addMagnetSensor(true);
  */
-async function addMagnetSensor(sid, closed, battery) {
+async function addMagnetSensor(sid, closed) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
   this.magnetSensor[sid] = {
     service_id: this.serviceId,
@@ -51,10 +51,10 @@ async function addMagnetSensor(sid, closed, battery) {
     const devices = await this.gladys.device.get({ where: { external_id: { $like: `%${sid}` } } });
     devices.map((device) => {
       if (device.external_id === `xiaomi-${sid}`) {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: device.features[0].external_id,
-          state: battery,
-        });
+        // this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        //   device_feature_external_id: device.features[0].external_id,
+        //   state: battery,
+        // });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: device.features[1].external_id,
           state: value,

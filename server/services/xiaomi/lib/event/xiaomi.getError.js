@@ -8,6 +8,8 @@ const logger = require('../../../../utils/logger');
  */
 async function getError(e) {
   logger.debug(`${e}`);
+  console.log('\n\n')
+  console.log(e)
 }
 
 module.exports = {

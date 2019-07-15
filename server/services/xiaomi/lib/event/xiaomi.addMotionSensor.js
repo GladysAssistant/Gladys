@@ -8,7 +8,7 @@ const { EVENTS } = require('../../../../utils/constants');
  * @example
  * addMotionSensor(true);
  */
-async function addMotionSensor(sid, motion, battery) {
+async function addMotionSensor(sid, motion) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
   this.motionSensor[sid] = {
     service_id: this.serviceId,
@@ -51,10 +51,10 @@ async function addMotionSensor(sid, motion, battery) {
     const devices = await this.gladys.device.get({ where: { external_id: { $like: `%${sid}` } } });
     devices.map((device) => {
       if (device.external_id === `xiaomi-${sid}`) {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: device.features[0].external_id,
-          state: battery,
-        });
+        // this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        //   device_feature_external_id: device.features[0].external_id,
+        //   state: battery,
+        // });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: device.features[0].external_id,
           state: value,
