@@ -236,7 +236,7 @@ describe('Xioami events', () => {
   it('shoud send message from for switch', async () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     let msg = {
-      model: 'switch'
+      model: 'switch',
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -245,7 +245,7 @@ describe('Xioami events', () => {
   it('shoud send message from for double click wireless', async () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     let msg = {
-      model: 'remote.b286acn01'
+      model: 'remote.b286acn01',
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -257,8 +257,8 @@ describe('Xioami events', () => {
       model: 'sensor_magnet.aq2',
       sid: '1234',
       data: {
-        status: true
-      }
+        status: true,
+      },
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -270,8 +270,8 @@ describe('Xioami events', () => {
       model: 'sensor_motion.aq2',
       sid: '1234',
       data: {
-        status: true
-      }
+        status: true,
+      },
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -283,8 +283,8 @@ describe('Xioami events', () => {
       model: 'motion',
       sid: '1234',
       data: {
-        status: true
-      }
+        status: true,
+      },
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -296,8 +296,8 @@ describe('Xioami events', () => {
       model: 'magnet',
       sid: '1234',
       data: {
-        status: true
-      }
+        status: true,
+      },
     };
     msg = JSON.stringify(msg);
     const rsinfo = '';
@@ -311,8 +311,8 @@ describe('Xioami events', () => {
       data: {
         temperature: 2450,
         humidity: 4325,
-        voltage: 2984
-      }
+        voltage: 2984,
+      },
     };
     msg.data = JSON.stringify(msg.data);
     msg = JSON.stringify(msg);
