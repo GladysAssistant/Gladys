@@ -203,17 +203,27 @@ const gladysMotion = {
 describe('Xioami events', () => {
   it('shoud add temperature sensor', async () => {
     const xiaomiManager = new XiaomiManager(gladysTemperature, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    const data = {
+      temperature: 22.88,
+      humidity: 56.12,
+      voltage: 44,
+    };
     await xiaomiManager.addTemperatureSensor(123460, 21, 50, 10, 50);
+    await xiaomiManager.updateTemperatureSensor(123460, data);
   });
   it('shoud add motion sensor', async () => {
     const xiaomiManager = new XiaomiManager(gladysMotion, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
-    await xiaomiManager.addMotionSensor(123461, true, 50);
-    await xiaomiManager.addMotionSensor(123462, false, 50);
+    await xiaomiManager.addMotionSensor(123461, true);
+    await xiaomiManager.updateBooleanSensor(123461, true);
+    await xiaomiManager.addMotionSensor(123462, false);
+    await xiaomiManager.updateBooleanSensor(123462, false);
   });
   it('shoud add magnet sensor', async () => {
     const xiaomiManager = new XiaomiManager(gladysMagnet, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     await xiaomiManager.addMagnetSensor(123463, true, 10);
+    await xiaomiManager.updateBooleanSensor(123463, true);
     await xiaomiManager.addMagnetSensor(123464, false, 10);
+    await xiaomiManager.updateBooleanSensor(123464, true);
   });
   it('shoud add th sensor', async () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');

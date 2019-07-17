@@ -6,7 +6,7 @@ const logger = require('../../../../utils/logger');
  * addTemperatureSensor(true);
  */
 async function addTemperatureSensor(sid) {
-  logger.debug(`Xiaomi : set RAM variable and update value`);
+  logger.debug(`Xiaomi : set RAM variable`);
 
   this.sensor[sid] = {
     service_id: this.serviceId,

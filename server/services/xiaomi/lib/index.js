@@ -8,6 +8,7 @@ const { addMotionSensor } = require('./event/xiaomi.addMotionSensor');
 const { getError } = require('./event/xiaomi.getError');
 const { listening } = require('./event/xiaomi.listening');
 const { onMessage } = require('./event/xiaomi.onMessage');
+const { updateBooleanSensor } = require('./event/xiaomi.updateBooleanSensor');
 
 // COMMANDS
 const { getSensor } = require('./commands/xiaomi.getSensor');
@@ -40,6 +41,7 @@ XiaomiManager.prototype.getError = getError;
 XiaomiManager.prototype.listening = listening;
 XiaomiManager.prototype.onMessage = onMessage;
 XiaomiManager.prototype.updateTemperatureSensor = updateTemperatureSensor;
+XiaomiManager.prototype.updateBooleanSensor = updateBooleanSensor;
 
 // COMMANDS
 XiaomiManager.prototype.getSensor = getSensor;

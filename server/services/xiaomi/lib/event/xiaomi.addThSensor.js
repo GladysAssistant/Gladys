@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS } = require('../../../../utils/constants');
 /**
  * @description Add node
  * @param {number} sid - Id sensor.
@@ -10,18 +9,18 @@ const { EVENTS } = require('../../../../utils/constants');
  * addThSensor(true);
  */
 async function addThSensor(sid, temperature, humidity, battery) {
-  logger.debug(`Xiaomi : set RAM variable and update value`);
+  logger.debug(`Xiaomi : set RAM variable`);
 
   this.sensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-temp-hum-pression`,
-    external_id: `xiaomi:${sid}`,
+    external_id: `xiaomi-${sid}`,
     should_poll: false,
     features: [
       {
         name: `xiaomi-${sid}-battery`,
-        external_id: `xiaomibattery:${sid}:decimal:battery`,
-        category: 'battery-sensor',
+        external_id: `xiaomi-${sid}-decimal-battery`,
+        category: 'battery',
         type: 'decimal',
         unit: '%',
         read_only: true,
@@ -32,7 +31,7 @@ async function addThSensor(sid, temperature, humidity, battery) {
       },
       {
         name: `xiaomi-${sid}-temperature`,
-        external_id: `xiaomitemperature:${sid}:decimal:temperature`,
+        external_id: `xiaomi-${sid}-decimal-temperature`,
         category: 'temperature-sensor',
         type: 'decimal',
         unit: 'celsius',
@@ -44,7 +43,7 @@ async function addThSensor(sid, temperature, humidity, battery) {
       },
       {
         name: `xiaomi-${sid}-humidity`,
-        external_id: `xiaomihumidity:${sid}:decimal`,
+        external_id: `xiaomi-${sid}-decimal-humidity`,
         category: 'humidity-sensor',
         type: 'decimal',
         unit: '%',
@@ -56,19 +55,6 @@ async function addThSensor(sid, temperature, humidity, battery) {
       },
     ],
   };
-  try {
-    const device = await this.gladys.device.get({ external_id: `xiaomi-${sid}` });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[0].external_id,
-      state: temperature,
-    });
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device[0].features[1].external_id,
-      state: humidity,
-    });
-  } catch (e) {
-    logger.debug(`No xiaomi sensor available`);
-  }
 }
 
 module.exports = {

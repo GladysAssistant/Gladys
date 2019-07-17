@@ -15,15 +15,19 @@ async function onMessage(msg, rsinfo) {
       break;
     case 'sensor_magnet.aq2':
       this.addMagnetSensor(message.sid, message.data.status);
+      this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'sensor_motion.aq2':
       this.addMotionSensor(message.sid, message.data.status);
+      this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'motion':
       this.addMotionSensor(message.sid, message.data.status);
+      this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'magnet':
       this.addMagnetSensor(message.sid, message.data.status);
+      this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'weather.v1': {
       const tableData = JSON.parse(message.data);
