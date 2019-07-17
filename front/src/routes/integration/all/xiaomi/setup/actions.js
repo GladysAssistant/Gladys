@@ -124,11 +124,6 @@ function createActions(store) {
     },
     async addSensor(state, sensorSend) {
       await state.httpClient.post(`/api/v1/device`, sensorSend);
-      const sensor = update(state, {
-        sensor: {
-          $splice: [[index, 1]]
-        }
-      });
       await this.getXiaomiSensor(100, 0);
     }
   };

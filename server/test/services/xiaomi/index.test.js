@@ -234,21 +234,9 @@ const gladys = {
 
 describe('Xiaomi commands', () => {
   const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
-  it('should get temperature sensor', async () => {
-    const temperatureSensor = await xiaomiManager.getTemperatureSensor();
-    expect(temperatureSensor).to.be.instanceOf(Object);
-  });
-  it('should get motion sensor', async () => {
-    const motionSensor = await xiaomiManager.getMotionSensor();
-    expect(motionSensor).to.be.instanceOf(Object);
-  });
-  it('should get magnet sensor', async () => {
-    const magnetSensor = await xiaomiManager.getMagnetSensor();
-    expect(magnetSensor).to.be.instanceOf(Object);
-  });
-  it('should get th sensor', async () => {
-    const thSensor = await xiaomiManager.getThSensor();
-    expect(thSensor).to.be.instanceOf(Object);
+  it('should get all sensor', async () => {
+    const sensor = await xiaomiManager.getSensor();
+    expect(sensor).to.be.instanceOf(Object);
   });
 });
 
@@ -265,63 +253,3 @@ describe('GET /api/v1/service/xiaomi/sensor', () => {
     assert.calledWith(res.json, {});
   });
 });
-
-describe('GET /api/v1/service/xiaomi/sensor/temperature', () => {
-  it('should get all temperature sensors', async () => {
-    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
-    const req = {};
-    const xiaomiController = XiaomiController(xiaomiManager);
-    await xiaomiController['get /api/v1/service/xiaomi/sensor'].controller(req, res);
-    assert.calledWith(res.json, {});
-  });
-});
-
-describe('GET /api/v1/service/xiaomi/sensor/motion', () => {
-  it('should get all motion sensors', async () => {
-    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
-    const req = {};
-    const xiaomiController = XiaomiController(xiaomiManager);
-    await xiaomiController['get /api/v1/service/xiaomi/sensor/motion'].controller(req, res);
-    assert.calledWith(res.json, {});
-  });
-});
-
-describe('GET /api/v1/service/xiaomi/sensor/magnet', () => {
-  it('should get all magnet sensors', async () => {
-    const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
-    const req = {};
-    const xiaomiController = XiaomiController(xiaomiManager);
-    await xiaomiController['get /api/v1/service/xiaomi/sensor/magnet'].controller(req, res);
-    assert.calledWith(res.json, {});
-  });
-});
-
-// describe('Update value of sensor', () => {
-//   it('should update value of magnet sensor', async () => {
-//     await authenticatedRequest
-//       .post('/api/v1/device')
-//       .send({
-//         service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bx',
-//         name: 'xiaomi-1234567-sensor-magnet',
-//         external_id: 'xiaomi:1234567',
-//         should_poll: false,
-//         features: [
-//           {
-//             name: 'xiaomi-1234567-closed',
-//             external_id: 'xiaomimagnet:1234567:binary:magnet',
-//             category: 'door-opening-sensor',
-//             type: 'binary',
-//             read_only: true,
-//             keep_history: true,
-//             has_feedback: false,
-//             min: false,
-//             max: true,
-//           },
-//         ],
-//       })
-//       .expect('Content-Type', /json/)
-//       .expect(200);
-//     const xiaomiManager = new XiaomiManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bx');
-//     await xiaomiManager.addMotionSensor(1, true, 50);
-//   })
-// })

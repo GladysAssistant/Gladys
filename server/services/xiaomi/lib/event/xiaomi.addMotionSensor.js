@@ -4,13 +4,12 @@ const { EVENTS } = require('../../../../utils/constants');
  * @description Add node
  * @param {number} sid - Id sensor.
  * @param {boolean} motion - Closed motion sensor.
- * @param {number} battery - Battery sensor.
  * @example
  * addMotionSensor(true);
  */
 async function addMotionSensor(sid, motion) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
-  this.motionSensor[sid] = {
+  this.sensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-motion`,
     external_id: `xiaomi-${sid}`,
@@ -31,7 +30,7 @@ async function addMotionSensor(sid, motion) {
       {
         name: `xiaomi-${sid}-detect`,
         external_id: `xiaomimotion:${sid}:binary:motion`,
-        category: 'door-opening-sensor',
+        category: 'motion-sensor',
         type: 'binary',
         read_only: true,
         keep_history: true,
@@ -48,19 +47,9 @@ async function addMotionSensor(sid, motion) {
     } else {
       value = 0;
     }
-    const devices = await this.gladys.device.get({ where: { external_id: { $like: `%${sid}` } } });
-    devices.map((device) => {
-      if (device.external_id === `xiaomi-${sid}`) {
-        // this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        //   device_feature_external_id: device.features[0].external_id,
-        //   state: battery,
-        // });
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: device.features[0].external_id,
-          state: value,
-        });
-      }
-      return null;
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: this.sensor[sid].features[1].external_id,
+      state: value,
     });
   } catch (e) {
     logger.debug(`No xiaomi sensor motion available`);

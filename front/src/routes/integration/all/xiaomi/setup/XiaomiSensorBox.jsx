@@ -5,16 +5,29 @@ import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils
 
 class XiaomiSensorBox extends Component {
   componentWillMount() {
-    this.getTypeOfDevice()
+    this.getTypeOfDevice();
   }
 
   getTypeOfDevice = () => {
     let typeDevice = '';
-    if(this.props.sensor.features.length > 1) {
-      if(this.props.sensor.features[0].category === 'battery' && this.props.sensor.features[1].category === 'temperature-sensor') {
+    if (this.props.sensor.features.length > 1) {
+      if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'temperature-sensor'
+      ) {
         typeDevice = 'Capteur de température';
+      } else if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'door-opening-sensor'
+      ) {
+        typeDevice = 'Capteur de porte fenêtre';
+      } else if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'motion-sensor'
+      ) {
+        typeDevice = 'Capteur de Mouvement';
       }
-    };
+    }
     this.setState({
       typeDevice
     });
