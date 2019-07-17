@@ -16,24 +16,6 @@ class XiaomiSensor extends Component {
   updateSensorChoice = e => {
     this.setState({ selectSensor: e.target.value });
   };
-  addSensor = async () => {
-    this.setState({
-      loading: true
-    });
-    try {
-      await this.props.addSensor(this.state.selectSensor);
-      this.setState({
-        saveError: null
-      });
-    } catch (e) {
-      this.setState({
-        saveError: RequestStatus.Error
-      });
-    }
-    this.setState({
-      loading: false
-    });
-  };
 
   render(props, { loading, saveError, testConnectionError }) {
     return (
@@ -42,23 +24,6 @@ class XiaomiSensor extends Component {
           <h1 class="card-title">
             <Text id="integration.xiaomi.title" />
           </h1>
-          <div class="page-options d-flex">
-            <div class="input-icon ml-2">
-              <select class="form-control" onChange={this.updateSensorChoice}>
-                <option value="">-------</option>
-                {props.sensor && (
-                  <optgroup label={'sensor'}>
-                    {props.sensor.map((sensor, index) => (
-                      <option value={index}>{sensor.name}</option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-            </div>
-            <button class="btn btn-outline-primary ml-2" onClick={this.addSensor}>
-              <Text id="scene.newButton" /> <i class="fe fe-plus" />
-            </button>
-          </div>
         </div>
         <div class="card-body">
           <div class={cx('dimmer-content', style.xiaomiListBody)}>

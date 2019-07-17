@@ -18,6 +18,41 @@ function createActions(store) {
           skip
         };
         const xiaomiSensorReceived = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
+        const temp = await state.httpClient.get(`/api/v1/service/xiaomi/sensor`);
+        let sensorReceived = [];
+        let sensor = [];
+        let numberSensor = 0;
+        if (xiaomiSensorReceived.length !== 0) {
+          let tempNumber = parseInt(xiaomiSensorReceived[xiaomiSensorReceived.length - 1].name.split('-')[1], 10);
+          numberSensor = tempNumber + 1;
+        }
+        for (let e in temp) {
+          if (temp[e]) {
+            sensorReceived.push(temp[e]);
+          }
+        }
+        for (let i = 0; i < sensorReceived.length; i += 1) {
+          let testTrue = 1;
+          for (let j = 0; j < xiaomiSensorReceived.length; j += 1) {
+            if (sensorReceived[i].external_id === xiaomiSensorReceived[j].external_id) {
+              testTrue = 0;
+            }
+          }
+          if (testTrue === 1) {
+            sensorReceived[i].name = sensorReceived[i].name.replace(
+              /xiaomi-[a-zA-Z0-9]+/,
+              'xiaomi-' + numberSensor.toString()
+            );
+            for (let j = 0; j < sensorReceived[i].features.length; j++) {
+              sensorReceived[i].features[j].name = sensorReceived[i].features[j].name.replace(
+                /xiaomi-[a-zA-Z0-9]+/,
+                'xiaomi-' + numberSensor.toString()
+              );
+            }
+            numberSensor += 1;
+            sensor.push(sensorReceived[i]);
+          }
+        }
         let xiaomiSensor = [];
         if (skip === 0) {
           for (let k = 0; k < xiaomiSensorReceived.length; k++) {
@@ -29,7 +64,7 @@ function createActions(store) {
           });
         }
         store.setState({
-          xiaomiSensor,
+          sensor,
           sensorGetStatus: RequestStatus.Success,
           getXiaomiSensorStatus: RequestStatus.Success
         });
@@ -60,7 +95,7 @@ function createActions(store) {
       }
     },
     updateSensorField(state, index, field, value) {
-      const xiaomiSensor = update(state.xiaomiSensor, {
+      const sensor = update(state.sensor, {
         [index]: {
           [field]: {
             $set: value
@@ -68,7 +103,7 @@ function createActions(store) {
         }
       });
       store.setState({
-        xiaomiSensor
+        sensor
       });
     },
     updateNameFeature(state, indexDevice, indexFeature, field, value) {
@@ -87,23 +122,14 @@ function createActions(store) {
         xiaomiSensor
       });
     },
-    async saveSensor(state, index, device) {
-      let sensor = state.xiaomiSensor[index];
-      device.features.map((feature, ind) => {
-        sensor.features[ind].name = feature.name;
-      });
-      await state.httpClient.post(`/api/v1/device`, sensor);
-    },
-    async deleteSensor(state, index) {
-      let sensor = state.xiaomiSensor[index];
-      await state.httpClient.delete('/api/v1/device/' + sensor.selector);
-      const xiaomiSensor = update(state, {
-        xiaomiSensor: {
+    async addSensor(state, sensorSend) {
+      await state.httpClient.post(`/api/v1/device`, sensorSend);
+      const sensor = update(state, {
+        sensor: {
           $splice: [[index, 1]]
         }
       });
-      state.sensor.push(sensor);
-      store.setState(xiaomiSensor);
+      await this.getXiaomiSensor(100, 0);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

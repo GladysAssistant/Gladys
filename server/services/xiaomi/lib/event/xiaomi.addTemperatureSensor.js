@@ -22,7 +22,7 @@ async function addTemperatureSensor(sid, temperature, humidity, pressure, batter
       {
         name: `xiaomi-${sid}-battery`,
         external_id: `xiaomi-${sid}-decimal-battery`,
-        category: 'battery-sensor',
+        category: 'battery',
         type: 'decimal',
         unit: '%',
         read_only: true,

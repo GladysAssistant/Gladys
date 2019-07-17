@@ -21,6 +21,16 @@ const DashboardSettings = ({ children, ...props }) => (
                     </span>
                     <Text id="integration.xiaomi.sensorTab" />
                   </Link>
+                  <Link
+                    href="/dashboard/integration/device/xiaomi/setup"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-sliders" />
+                    </span>
+                    <Text id="integration.xiaomi.setupTab" />
+                  </Link>
                 </div>
               </div>
             </div>

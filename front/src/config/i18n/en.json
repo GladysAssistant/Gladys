@@ -256,17 +256,22 @@
     },
     "xiaomi": {
       "title": "Xiaomi",
+      "titleSetup": "Setup xiaomi sensor",
       "search": "Search sensor",
       "nameLabelTemperature": "Sensor temperature",
       "nameLabelHumidity": "Sensor humidity",
       "nameLabelFeature": "Name of the feature",
       "namePlaceholderTemperature": "Enter the name of the device",
+      "nameSensor": "Sensor Name",
       "roomLabel": "Room",
       "saveButton": "Save",
+      "createButton": "Create",
+      "noFeatures": "No features",
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
       "missing": "Missing sensor",
       "sensorTab": "Sensors xiaomi",
+      "setupTab": "Setup",
       "sensorMagnetTab": "Sensor Magnet",
       "nameDoorSensor": "Sensor Detection"
     }

@@ -203,6 +203,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT: 'light',
   BATTERY: 'battery',
   TEMPERATURE_SENSOR: 'temperature-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
   CAMERA: 'camera',
