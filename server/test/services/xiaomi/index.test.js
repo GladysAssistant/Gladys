@@ -318,6 +318,30 @@ describe('Xioami events', () => {
     msg = JSON.stringify(msg);
     const rsinfo = '';
     await xiaomiManager.onMessage(msg, rsinfo);
+    msg = {
+      model: 'weather.v1',
+      sid: '1234',
+      data: {
+        temperature: 2450,
+        humidity: 4325,
+        voltage: 1400,
+      },
+    };
+    msg.data = JSON.stringify(msg.data);
+    msg = JSON.stringify(msg);
+    await xiaomiManager.onMessage(msg, rsinfo);
+    msg = {
+      model: 'weather.v1',
+      sid: '1234',
+      data: {
+        temperature: 2450,
+        humidity: 4325,
+        voltage: 3600,
+      },
+    };
+    msg.data = JSON.stringify(msg.data);
+    msg = JSON.stringify(msg);
+    await xiaomiManager.onMessage(msg, rsinfo);
   });
 });
 
