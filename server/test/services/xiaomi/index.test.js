@@ -233,6 +233,92 @@ describe('Xioami events', () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     await xiaomiManager.getError('error');
   });
+  it('shoud send message from for switch', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'switch'
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from for double click wireless', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'remote.b286acn01'
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from xiaomi for magnet aqara', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'sensor_magnet.aq2',
+      sid: '1234',
+      data: {
+        status: true
+      }
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from xiaomi for motion aqara', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'sensor_motion.aq2',
+      sid: '1234',
+      data: {
+        status: true
+      }
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from xiaomi for motion', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'motion',
+      sid: '1234',
+      data: {
+        status: true
+      }
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from xiaomi for motion', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'magnet',
+      sid: '1234',
+      data: {
+        status: true
+      }
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
+  it('shoud send message from xiaomi for weather', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'weather.v1',
+      sid: '1234',
+      data: {
+        temperature: 2450,
+        humidity: 4325,
+        voltage: 2984
+      }
+    };
+    msg.data = JSON.stringify(msg.data);
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
 });
 
 const gladys = {
