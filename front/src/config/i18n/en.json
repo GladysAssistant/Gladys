@@ -485,6 +485,10 @@
     "motion-sensor": "Motion",
     "light-sensor": "Luminosity",
     "camera": "Camera",
+    "access-control": "Access Control",
+    "smoke-sensor": "Smoke",
+    "switch": "Switch",
+    "siren": "Siren",
     "unknown": "Unknown"
   },
   "errorPage": {
