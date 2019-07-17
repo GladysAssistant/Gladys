@@ -205,7 +205,11 @@ const DEVICE_FEATURE_CATEGORIES = {
   TEMPERATURE_SENSOR: 'temperature-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
+  SMOKE_SENSOR: 'smoke-sensor',
   CAMERA: 'camera',
+  SWITCH: 'switch',
+  SIREN: 'siren',
+  ACCESS_CONTROl: 'access-control',
   UNKNOWN: 'unknown',
 };
 
@@ -215,6 +219,7 @@ const DEVICE_FEATURE_TYPES = {
     BRIGHTNESS: 'brightness',
     HUE: 'hue',
     SATURATION: 'saturation',
+    POWER: 'power',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -223,8 +228,21 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  SWITCH: {
+    BINARY: 'binary',
+    POWER: 'power',
+    VOLTAGE: 'voltage',
+    CURRENT: 'current',
+    BURGLAR: 'burglar',
+  },
   CAMERA: {
     IMAGE: 'image',
+  },
+  SIREN: {
+    BINARY: 'binary',
+  },
+  ACCESS_CONTROL: {
+    MODE: 'mode',
   },
 };
 

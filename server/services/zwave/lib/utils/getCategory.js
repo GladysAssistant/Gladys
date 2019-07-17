@@ -14,15 +14,15 @@ function getCategory(value) {
   let found = false;
   let categoryFound = null;
   let i = 0;
-  const categories = Object.keys(CATEGORIES);
-  while (!found && i < categories.length) {
-    const category = CATEGORIES[categories[i]];
+  while (!found && i < CATEGORIES.length) {
+    const category = CATEGORIES[i];
     const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.class_id) : true;
     const validIndex = category.INDEXES ? category.INDEXES.includes(value.index) : true;
-    found = validComClass && validIndex;
+    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(value.productid) : true;
+    found = validComClass && validIndex && validProductId;
     if (found) {
       categoryFound = {
-        category: categories[i],
+        category: category.CATEGORY,
         type: category.TYPE,
       };
     }
