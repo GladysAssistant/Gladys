@@ -246,6 +246,9 @@ const DEVICE_FEATURE_TYPES = {
   ACCESS_CONTROL: {
     MODE: 'mode',
   },
+  UNKNOWN: {
+    UNKNOWN: 'unknown',
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
