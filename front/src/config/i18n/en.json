@@ -255,14 +255,12 @@
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "xiaomi": {
-      "title": "Xiaomi",
-      "titleSetup": "Setup xiaomi sensor",
-      "search": "Search sensor",
-      "nameLabelTemperature": "Sensor temperature",
-      "nameLabelHumidity": "Sensor humidity",
-      "nameLabelFeature": "Name of the feature",
-      "namePlaceholderTemperature": "Enter the name of the device",
+      "title": "List of Xiaomi Sensor",
+      "titleSetup": "Setup Xiaomi New Sensor",
       "nameSensor": "Sensor Name",
+      "temperatureSensor": "Temperature Sensor",
+      "doorOpeningSensor": "Door Sensor",
+      "motionSensor": "Motion Sensor",
       "roomLabel": "Room",
       "saveButton": "Save",
       "createButton": "Create",
@@ -270,10 +268,10 @@
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
       "missing": "Missing sensor",
-      "sensorTab": "Sensors xiaomi",
+      "sensorTab": "Xiaomi Sensors",
       "setupTab": "Setup",
-      "sensorMagnetTab": "Sensor Magnet",
-      "nameDoorSensor": "Sensor Detection"
+      "sensorMagnetTab": "Magnet Sensor",
+      "nameDoorSensor": "Motion Sensor"
     }
   },
   "editScene": {
@@ -502,6 +500,7 @@
   "deviceFeatureCategory": {
     "light": "Light",
     "battery": "Battery",
+    "humidity-sensor": "Humidity",
     "temperature-sensor": "Temperature",
     "motion-sensor": "Motion",
     "light-sensor": "Luminosity",

@@ -233,6 +233,15 @@ describe('Xioami events', () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     await xiaomiManager.getError('error');
   });
+  it('shoud send message from for other', async () => {
+    const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
+    let msg = {
+      model: 'other',
+    };
+    msg = JSON.stringify(msg);
+    const rsinfo = '';
+    await xiaomiManager.onMessage(msg, rsinfo);
+  });
   it('shoud send message from for switch', async () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     let msg = {
@@ -290,7 +299,7 @@ describe('Xioami events', () => {
     const rsinfo = '';
     await xiaomiManager.onMessage(msg, rsinfo);
   });
-  it('shoud send message from xiaomi for motion', async () => {
+  it('shoud send message from xiaomi for magnet', async () => {
     const xiaomiManager = new XiaomiManager(gladysTh, 'de051f90-f34a-4fd5-be2e-e502339ec9bd');
     let msg = {
       model: 'magnet',

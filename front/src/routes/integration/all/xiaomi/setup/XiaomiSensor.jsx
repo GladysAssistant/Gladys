@@ -16,24 +16,6 @@ class XiaomiSensor extends Component {
   updateSensorChoice = e => {
     this.setState({ selectSensor: e.target.value });
   };
-  addSensor = async () => {
-    this.setState({
-      loading: true
-    });
-    try {
-      await this.props.addSensor(this.state.selectSensor);
-      this.setState({
-        saveError: null
-      });
-    } catch (e) {
-      this.setState({
-        saveError: RequestStatus.Error
-      });
-    }
-    this.setState({
-      loading: false
-    });
-  };
 
   render(props, { loading, saveError, testConnectionError }) {
     return (

@@ -106,25 +106,14 @@ function createActions(store) {
         sensor
       });
     },
-    updateNameFeature(state, indexDevice, indexFeature, field, value) {
-      const xiaomiSensor = update(state.xiaomiSensor, {
-        [indexDevice]: {
-          features: {
-            [indexFeature]: {
-              [field]: {
-                $set: value
-              }
-            }
-          }
+    async addSensor(state, sensorSend, index) {
+      await state.httpClient.post(`/api/v1/device`, sensorSend);
+      const newState = update(state, {
+        sensor: {
+          $splice: [[index, 1]]
         }
       });
-      store.setState({
-        xiaomiSensor
-      });
-    },
-    async addSensor(state, sensorSend) {
-      await state.httpClient.post(`/api/v1/device`, sensorSend);
-      await this.getXiaomiSensor(100, 0);
+      store.setState(newState);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

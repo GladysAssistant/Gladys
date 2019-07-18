@@ -15,17 +15,17 @@ class XiaomiSensorBox extends Component {
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'temperature-sensor'
       ) {
-        typeDevice = 'Capteur de température';
+        return <Text id="integration.xiaomi.temperatureSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'door-opening-sensor'
       ) {
-        typeDevice = 'Capteur de porte fenêtre';
+        return <Text id="integration.xiaomi.doorOpeningSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'motion-sensor'
       ) {
-        typeDevice = 'Capteur de Mouvement';
+        return <Text id="integration.xiaomi.motionSensor" />;
       }
     }
     this.setState({
@@ -84,7 +84,9 @@ class XiaomiSensorBox extends Component {
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            {typeDevice}
+            <h4>
+              <i class="fe fe-cpu" /> {this.getTypeOfDevice()}
+            </h4>
             {this.props.sensor.features[0].last_value && (
               <div class="page-options d-flex">
                 <div class="tag tag-green">
