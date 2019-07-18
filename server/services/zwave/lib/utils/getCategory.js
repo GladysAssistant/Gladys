@@ -10,7 +10,7 @@ const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
  *  index: 1,
  * });
  */
-function getCategory(value) {
+function getCategory(node, value) {
   let found = false;
   let categoryFound = null;
   let i = 0;
@@ -18,8 +18,8 @@ function getCategory(value) {
     const category = CATEGORIES[i];
     const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.class_id) : true;
     const validIndex = category.INDEXES ? category.INDEXES.includes(value.index) : true;
-    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(value.productid) : true;
-    const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(value.producttype) : true;
+    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.productid) : true;
+    const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.producttype) : true;
     found = validComClass && validIndex && validProductId && validProductType;
     if (found) {
       categoryFound = {

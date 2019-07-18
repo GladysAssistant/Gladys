@@ -18,7 +18,7 @@ const addParamsAndFeatures = node => {
       const { min, max } = values[idx];
 
       if (values[idx].genre === 'user') {
-        const { category, type } = getCategory(values[idx]);
+        const { category, type } = getCategory(node, values[idx]);
         if (category !== 'unknown') {
           node.features.push({
             name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
@@ -177,18 +177,20 @@ const createActions = store => {
           const { min, max } = values[idx];
 
           if (values[idx].genre === 'user') {
-            const { category, type } = getCategory(values[idx]);
-            newDevice.features.push({
-              name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-              category,
-              type,
-              external_id: getDeviceFeatureExternalId(values[idx]),
-              read_only: values[idx].read_only,
-              unit: values[idx].units,
-              has_feedback: true,
-              min,
-              max
-            });
+            const { category, type } = getCategory(node, values[idx]);
+            if (category !== 'unknown') {
+              newDevice.features.push({
+                name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
+                category,
+                type,
+                external_id: getDeviceFeatureExternalId(values[idx]),
+                read_only: values[idx].read_only,
+                unit: values[idx].units,
+                has_feedback: true,
+                min,
+                max
+              });
+            }
           } else {
             newDevice.params.push({
               name: `${values[idx].label}-${values[idx].value_id}`,
