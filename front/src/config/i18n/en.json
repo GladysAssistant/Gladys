@@ -496,7 +496,10 @@
       "binary": "Motion"
     },
     "light-sensor": {
-      "decimal": "Luminosity"
+      "integer": "Luminosity"
+    },
+    "sismic-sensor": {
+      "decimal": "Sismic"
     },
     "camera": {
       "image": "Camera"
