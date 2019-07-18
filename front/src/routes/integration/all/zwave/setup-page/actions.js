@@ -46,9 +46,6 @@ const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     addLocalNode(state, node) {
-      if (!node.ready) {
-        return;
-      }
       addParamsAndFeatures(node);
       const nodeInArrayIndex = state.zwaveNodes.findIndex(n => n.id === node.id);
       let newState;
@@ -74,8 +71,7 @@ const createActions = store => {
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
-        const zwaveNodesWithUnactiveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
-        const zwaveNodes = zwaveNodesWithUnactiveNodes.filter(node => node.ready === true);
+        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
         zwaveNodes.forEach(node => addParamsAndFeatures(node));
         console.log(zwaveNodes);
         store.setState({
