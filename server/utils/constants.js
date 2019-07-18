@@ -206,6 +206,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
+  SISMIC_SENSOR: 'sismic-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
@@ -234,6 +235,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     BURGLAR: 'burglar',
+    DIMMER: 'dimmer',
   },
   CAMERA: {
     IMAGE: 'image',

@@ -479,16 +479,43 @@
     "restoreInProgressTitle": "Restoring backup in progress..."
   },
   "deviceFeatureCategory": {
-    "light": "Light",
-    "battery": "Battery",
-    "temperature-sensor": "Temperature",
-    "motion-sensor": "Motion",
-    "light-sensor": "Luminosity",
-    "camera": "Camera",
-    "access-control": "Access Control",
-    "smoke-sensor": "Smoke",
-    "switch": "Switch",
-    "siren": "Siren",
+    "light": {
+      "binary": "On/off",
+      "brightness": "Brightness",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "power": "Power consumption"
+    },
+    "battery": {
+      "level": "Battery"
+    },
+    "temperature-sensor": {
+      "decimal": "Temperature"
+    },
+    "motion-sensor": {
+      "binary": "Motion"
+    },
+    "light-sensor": {
+      "decimal": "Luminosity"
+    },
+    "camera": {
+      "image": "Camera"
+    },
+    "access-control": {
+      "mode": "Access Control Mode"
+    },
+    "smoke-sensor": {
+      "binary": "Smoke"
+    },
+    "switch": {
+      "voltage": "Voltage",
+      "current": "Current",
+      "binary": "Switch",
+      "dimmer": "Dimmer"
+    },
+    "siren": {
+      "binary": "Siren"
+    },
     "unknown": "Unknown"
   },
   "errorPage": {
