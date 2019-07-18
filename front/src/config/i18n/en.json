@@ -487,7 +487,7 @@
       "power": "Power consumption"
     },
     "battery": {
-      "level": "Battery"
+      "integer": "Battery"
     },
     "temperature-sensor": {
       "decimal": "Temperature"
@@ -511,12 +511,16 @@
       "voltage": "Voltage",
       "current": "Current",
       "binary": "Switch",
-      "dimmer": "Dimmer"
+      "dimmer": "Dimmer",
+      "burglar": "Burglar",
+      "power": "Power consumption"
     },
     "siren": {
       "binary": "Siren"
     },
-    "unknown": "Unknown"
+    "unknown": {
+      "unknown": "Unknown"
+    }
   },
   "errorPage": {
     "title": "Oops... This page does not exist.",
