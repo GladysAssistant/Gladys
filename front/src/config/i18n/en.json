@@ -261,6 +261,7 @@
       "temperatureSensor": "Temperature Sensor",
       "doorOpeningSensor": "Door Sensor",
       "motionSensor": "Motion Sensor",
+      "magnetSensor": "Magnet Sensor",
       "roomLabel": "Room",
       "saveButton": "Save",
       "createButton": "Create",

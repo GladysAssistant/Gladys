@@ -3,8 +3,7 @@
   "main": "index.js",
   "os": [
     "darwin",
-    "linux",
-    "win32"
+    "linux"
   ],
   "cpu": [
     "x64",

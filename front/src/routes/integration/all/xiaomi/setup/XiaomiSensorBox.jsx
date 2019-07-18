@@ -26,6 +26,11 @@ class XiaomiSensorBox extends Component {
         this.props.sensor.features[1].category === 'motion-sensor'
       ) {
         return <Text id="integration.xiaomi.motionSensor" />;
+      } else if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'magnet-sensor'
+      ) {
+        return <Text id="integration.xiaomi.magnetSensor" />;
       }
     }
     this.setState({
