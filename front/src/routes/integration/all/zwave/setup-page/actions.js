@@ -19,17 +19,19 @@ const addParamsAndFeatures = node => {
 
       if (values[idx].genre === 'user') {
         const { category, type } = getCategory(values[idx]);
-        node.features.push({
-          name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-          category,
-          type,
-          external_id: getDeviceFeatureExternalId(values[idx]),
-          read_only: values[idx].read_only,
-          unit: values[idx].units,
-          has_feedback: true,
-          min,
-          max
-        });
+        if (category !== 'unknown') {
+          node.features.push({
+            name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
+            category,
+            type,
+            external_id: getDeviceFeatureExternalId(values[idx]),
+            read_only: values[idx].read_only,
+            unit: values[idx].units,
+            has_feedback: true,
+            min,
+            max
+          });
+        }
       } else {
         node.params.push({
           name: `${values[idx].label}-${values[idx].value_id}`,
