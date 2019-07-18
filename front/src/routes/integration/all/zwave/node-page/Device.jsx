@@ -116,7 +116,7 @@ class ZWaveDeviceBox extends Component {
                       props.device.features &&
                       props.device.features.map(feature => (
                         <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}`} />
+                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
                             <i
                               class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
