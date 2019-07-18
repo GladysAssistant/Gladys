@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
+import get from 'get-value';
 
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
@@ -64,7 +65,9 @@ class ZwaveNode extends Component {
                         <span class="tag">
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
-                            <i class={`fe fe-${DeviceFeatureCategoriesIcon[feature.category]}`} />
+                            <i
+                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
+                            />
                           </div>
                         </span>
                       ))}
