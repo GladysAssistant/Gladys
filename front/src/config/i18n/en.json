@@ -257,11 +257,14 @@
     "xiaomi": {
       "title": "List of Xiaomi Sensor",
       "titleSetup": "Setup Xiaomi New Sensor",
+      "titleSetting": "Setting Xiaomi Service",
       "nameSensor": "Sensor Name",
       "temperatureSensor": "Temperature Sensor",
       "doorOpeningSensor": "Door Sensor",
       "motionSensor": "Motion Sensor",
       "magnetSensor": "Magnet Sensor",
+      "otherSensor": "Other Sensor",
+      "plugSensor": "Plug Sensor",
       "roomLabel": "Room",
       "saveButton": "Save",
       "createButton": "Create",
@@ -271,6 +274,7 @@
       "missing": "Missing sensor",
       "sensorTab": "Xiaomi Sensors",
       "setupTab": "Setup",
+      "settingTab": "Setting",
       "sensorMagnetTab": "Magnet Sensor",
       "nameDoorSensor": "Motion Sensor"
     }
@@ -506,6 +510,7 @@
     "motion-sensor": "Motion",
     "light-sensor": "Luminosity",
     "camera": "Camera",
+    "plug": "Plug Electricity",
     "unknown": "Unknown"
   },
   "errorPage": {

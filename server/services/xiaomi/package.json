@@ -12,6 +12,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "dgram": "^1.0.1"
+    "dgram": "^1.0.1",
+    "miio": "^0.15.6"
   }
 }

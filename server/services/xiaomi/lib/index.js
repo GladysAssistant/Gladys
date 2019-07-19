@@ -9,6 +9,7 @@ const { getError } = require('./event/xiaomi.getError');
 const { listening } = require('./event/xiaomi.listening');
 const { onMessage } = require('./event/xiaomi.onMessage');
 const { updateBooleanSensor } = require('./event/xiaomi.updateBooleanSensor');
+const { addPlugSensor } = require('./event/xiaomi.addPlugSensor');
 
 // COMMANDS
 const { getSensor } = require('./commands/xiaomi.getSensor');
@@ -28,6 +29,10 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
   this.socket.on('listening', this.listening.bind(this));
   this.socket.on('message', this.onMessage.bind(this));
+  this.addMotionSensor(113);
+  this.addMotionSensor(114);
+  this.addPlugSensor(111);
+  this.addPlugSensor(112);
   this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
   this.socket.bind(9898);
 };
@@ -42,6 +47,7 @@ XiaomiManager.prototype.listening = listening;
 XiaomiManager.prototype.onMessage = onMessage;
 XiaomiManager.prototype.updateTemperatureSensor = updateTemperatureSensor;
 XiaomiManager.prototype.updateBooleanSensor = updateBooleanSensor;
+XiaomiManager.prototype.addPlugSensor = addPlugSensor;
 
 // COMMANDS
 XiaomiManager.prototype.getSensor = getSensor;

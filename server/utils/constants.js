@@ -207,6 +207,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
   CAMERA: 'camera',
+  PLUG: 'plug',
   UNKNOWN: 'unknown',
 };
 

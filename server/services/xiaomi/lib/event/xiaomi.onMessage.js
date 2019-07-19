@@ -26,12 +26,16 @@ async function onMessage(msg, rsinfo) {
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'magnet':
-      this.addMagnetSensor(message.sid, message.data.status);
+      this.addMagnetSensor(message.sid);
+      this.updateBooleanSensor(message.sid, message.data.status);
+      break;
+    case 'plug':
+      this.addPlugSensor(message.sid, message.data.status);
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'weather.v1': {
       const tableData = JSON.parse(message.data);
-      tableData.tableDataerature /= 100;
+      tableData.temperature /= 100;
       tableData.humidity /= 100;
       if (tableData.voltage < 2800) {
         tableData.voltage = 0;

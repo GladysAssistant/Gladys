@@ -9,7 +9,6 @@ class XiaomiSensorBox extends Component {
   }
 
   getTypeOfDevice = () => {
-    let typeDevice = '';
     if (this.props.sensor.features.length > 1) {
       if (
         this.props.sensor.features[0].category === 'battery' &&
@@ -26,11 +25,20 @@ class XiaomiSensorBox extends Component {
         this.props.sensor.features[1].category === 'motion-sensor'
       ) {
         return <Text id="integration.xiaomi.motionSensor" />;
+      } else if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'magnet-sensor'
+      ) {
+        return <Text id="integration.xiaomi.magnetSensor" />;
+      } else if (
+        this.props.sensor.features[0].category === 'battery' &&
+        this.props.sensor.features[1].category === 'plug'
+      ) {
+        return <Text id="integration.xiaomi.plugSensor" />;
+      } else {
+        return <Text id="integration.xiaomi.otherSensor" />;
       }
     }
-    this.setState({
-      typeDevice
-    });
   };
 
   updateSensorRoom = e => {
@@ -79,7 +87,7 @@ class XiaomiSensorBox extends Component {
     });
   };
 
-  render(props, { typeDevice, loading, saveError, testConnectionError }) {
+  render(props, { loading, saveError, testConnectionError }) {
     return (
       <div class="col-md-6">
         <div class="card">
