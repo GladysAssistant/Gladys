@@ -253,6 +253,21 @@
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "sonos": {
+      "title": "Sonos",
+      "search": "Search sonos devices",
+      "empty": "No sonos devices found.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter the name of the speaker",
+      "roomLabel": "Room",
+      "sonosDeviceLabel": "Sonos speaker",
+      "spotifyRegionLabel": "Spotify Region",
+      "spotifyRegionEU": "Europe",
+      "spotifyRegionUS": "United States",
+      "testConnectionButton": "Test connection",
+      "saveButton": "Save",
+      "deleteButton": "Delete"
     }
   },
   "editScene": {

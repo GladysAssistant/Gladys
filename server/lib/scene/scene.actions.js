@@ -26,6 +26,9 @@ const actionsFunc = {
     const user = self.stateManager.get('user', action.user);
     await self.stateManager.get('service', 'telegram').message.send(user.telegram_user_id, action.text);
   },
+  [ACTIONS.MUSIC.PLAY]: async (self, action, scope) => {
+    await self.music.play(action.device, action.uri);
+  },
 };
 
 module.exports = {

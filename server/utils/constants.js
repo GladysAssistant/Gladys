@@ -169,6 +169,9 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
   },
+  MUSIC: {
+    PLAY: 'music.play',
+  },
   TIME: {
     DELAY: 'delay',
   },
@@ -206,6 +209,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
   CAMERA: 'camera',
+  MUSIC: 'music',
   UNKNOWN: 'unknown',
 };
 
@@ -225,6 +229,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+  },
+  MUSIC: {
+    MUSIC: 'music',
   },
 };
 

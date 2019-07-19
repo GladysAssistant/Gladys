@@ -13,6 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
+    "bluebird": "^3.5.5",
     "sonos": "^1.12.2"
   }
 }

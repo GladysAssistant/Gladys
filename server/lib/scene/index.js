@@ -9,9 +9,10 @@ const { getBySelector } = require('./scene.getBySelector');
 const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
 
-const SceneManager = function SceneManager(stateManager, event) {
+const SceneManager = function SceneManager(stateManager, event, music) {
   this.stateManager = stateManager;
   this.event = event;
+  this.music = music;
   this.scenes = {};
   // @ts-ignore
   this.queue = queue({

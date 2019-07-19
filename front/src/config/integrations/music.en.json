@@ -1,0 +1,8 @@
+[
+  {
+    "key": "sonos",
+    "name": "Sonos",
+    "description": "Control Sonos speaker.",
+    "img": "/assets/integrations/cover/sonos.jpg"
+  }
+]
