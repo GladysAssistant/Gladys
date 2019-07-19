@@ -37,7 +37,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-setting" />
+                      <i class="fe fe-settings" />
                     </span>
                     <Text id="integration.xiaomi.settingsTab" />
                   </Link>

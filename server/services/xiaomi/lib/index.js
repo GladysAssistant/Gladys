@@ -29,6 +29,10 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
   this.socket.on('listening', this.listening.bind(this));
   this.socket.on('message', this.onMessage.bind(this));
+  this.addMotionSensor(113);
+  this.addMotionSensor(114);
+  this.addPlugSensor(111);
+  this.addPlugSensor(112);
   this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
   this.socket.bind(9898);
 };

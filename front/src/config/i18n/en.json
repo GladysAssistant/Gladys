@@ -271,12 +271,14 @@
       "noFeatures": "No features",
       "deleteButton": "Delete",
       "noDeviceFound": "No device found",
+      "noSensorFound": "No sensor found, you have to wait before the gateway send new one ...",
       "missing": "Missing sensor",
       "sensorTab": "Xiaomi Sensors",
       "setupTab": "Setup",
-      "settingTab": "Setting",
+      "settingsTab": "Setting",
       "sensorMagnetTab": "Magnet Sensor",
-      "nameDoorSensor": "Motion Sensor"
+      "nameDoorSensor": "Motion Sensor",
+      "setPassword": "Set password of gateway"
     }
   },
   "editScene": {
