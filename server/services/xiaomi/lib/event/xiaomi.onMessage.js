@@ -14,15 +14,15 @@ async function onMessage(msg, rsinfo) {
     case 'remote.b286acn01':
       break;
     case 'sensor_magnet.aq2':
-      this.addMagnetSensor(message.sid, message.data.status);
+      this.addMagnetSensor(message.sid);
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'sensor_motion.aq2':
-      this.addMotionSensor(message.sid, message.data.status);
+      this.addMotionSensor(message.sid);
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'motion':
-      this.addMotionSensor(message.sid, message.data.status);
+      this.addMotionSensor(message.sid);
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'magnet':
@@ -30,7 +30,7 @@ async function onMessage(msg, rsinfo) {
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'plug':
-      this.addPlugSensor(message.sid, message.data.status);
+      this.addPlugSensor(message.sid);
       this.updateBooleanSensor(message.sid, message.data.status);
       break;
     case 'weather.v1': {

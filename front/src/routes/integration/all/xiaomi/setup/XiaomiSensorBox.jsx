@@ -14,29 +14,29 @@ class XiaomiSensorBox extends Component {
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'temperature-sensor'
       ) {
-        return <Text id="integration.xiaomi.temperatureSensor" />;
+        return <Text id="integration.xiaomi.sensors.temperatureSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'door-opening-sensor'
       ) {
-        return <Text id="integration.xiaomi.doorOpeningSensor" />;
+        return <Text id="integration.xiaomi.sensors.doorOpeningSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'motion-sensor'
       ) {
-        return <Text id="integration.xiaomi.motionSensor" />;
+        return <Text id="integration.xiaomi.sensors.motionSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'magnet-sensor'
       ) {
-        return <Text id="integration.xiaomi.magnetSensor" />;
+        return <Text id="integration.xiaomi.sensors.magnetSensor" />;
       } else if (
         this.props.sensor.features[0].category === 'battery' &&
         this.props.sensor.features[1].category === 'plug'
       ) {
-        return <Text id="integration.xiaomi.plugSensor" />;
+        return <Text id="integration.xiaomi.sensors.plugSensor" />;
       } else {
-        return <Text id="integration.xiaomi.otherSensor" />;
+        return <Text id="integration.xiaomi.sensors.otherSensor" />;
       }
     }
   };
@@ -97,19 +97,19 @@ class XiaomiSensorBox extends Component {
               <div class="card-body">
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.nameSensor" />
+                    <Text id="integration.xiaomi.setup.nameSensor" />
                   </label>
                   <input
                     type="text"
                     value={props.sensor.name}
                     onInput={this.updateSensorName}
                     class="form-control"
-                    placeholder={<Text id="integration.xiaomi.nameLabelFeature" />}
+                    placeholder={<Text id="integration.xiaomi.setup.nameLabelFeature" />}
                   />
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.roomLabel" />
+                    <Text id="integration.xiaomi.setup.roomLabel" />
                   </label>
                   <select class="form-control" onChange={this.updateSensorRoom}>
                     <option value="">-------</option>
@@ -141,13 +141,13 @@ class XiaomiSensorBox extends Component {
                         </span>
                       ))}
                     {(!props.sensor.features || props.sensor.features.length === 0) && (
-                      <Text id="integration.xiaomi.noFeatures" />
+                      <Text id="integration.xiaomi.setup.noFeatures" />
                     )}
                   </div>
                 </div>
                 <div class="form-group">
                   <button onClick={this.createSensor} class="btn btn-success mr-2">
-                    <Text id="integration.xiaomi.createButton" />
+                    <Text id="integration.xiaomi.setup.createButton" />
                   </button>
                 </div>
               </div>

@@ -2,11 +2,10 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Add node
  * @param {number} sid - Id sensor.
- * @param {boolean} motion - Closed motion sensor.
  * @example
  * addMotionSensor(true);
  */
-async function addMotionSensor(sid, motion) {
+async function addMotionSensor(sid) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
   this.sensor[sid] = {
     service_id: this.serviceId,

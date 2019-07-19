@@ -22,7 +22,7 @@ class XiaomiSensor extends Component {
       <div class="card">
         <div class="card-header">
           <h1 class="card-title">
-            <Text id="integration.xiaomi.title" />
+            <Text id="integration.xiaomi.sensor.title" />
           </h1>
         </div>
         <div class="card-body">
@@ -43,7 +43,7 @@ class XiaomiSensor extends Component {
               {props.xiaomiSensor && props.xiaomiSensor.length === 0 && (
                 <div class="col-md-12">
                   <div class={cx('text-center', style.emptyStateDivBox)}>
-                    <Text id="integration.xiaomi.noSensorFound" />
+                    <Text id="integration.xiaomi.sensor.noSensorFound" />
                   </div>
                 </div>
               )}

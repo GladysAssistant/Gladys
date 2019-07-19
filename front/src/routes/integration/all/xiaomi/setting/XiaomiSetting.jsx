@@ -19,7 +19,7 @@ class XiaomiSensor extends Component {
       <div class="card">
         <div class="card-header">
           <h1 class="card-title">
-            <Text id="integration.xiaomi.titleSetting" />
+            <Text id="integration.xiaomi.setting.title" />
           </h1>
         </div>
         <div class="card-body">
@@ -28,13 +28,13 @@ class XiaomiSensor extends Component {
             <h2>Not available now</h2>
             <div class="form-group">
               <label class="form-label">
-                <Text id="integration.xiaomi.setPassword" />
+                <Text id="integration.xiaomi.setting.setPassword" />
               </label>
               <input type="password" class="form-control" name="password-input-gateway" placeholder="Password.." />
             </div>
             <div class="form-group">
               <button onClick={this.createSensor} class="btn btn-success mr-2">
-                <Text id="integration.xiaomi.saveButton" />
+                <Text id="integration.xiaomi.setting.saveButton" />
               </button>
             </div>
           </div>

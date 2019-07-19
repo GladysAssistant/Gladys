@@ -2,13 +2,10 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Add node
  * @param {number} sid - Id sensor.
- * @param {number} temperature - Temperature sensor.
- * @param {number} humidity - Humidity sensor.
- * @param {number} battery - Battery sensor.
  * @example
  * addThSensor(true);
  */
-async function addThSensor(sid, temperature, humidity, battery) {
+async function addThSensor(sid) {
   logger.debug(`Xiaomi : set RAM variable`);
 
   this.sensor[sid] = {

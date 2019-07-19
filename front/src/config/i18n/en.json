@@ -255,30 +255,39 @@
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "xiaomi": {
-      "title": "List of Xiaomi Sensor",
-      "titleSetup": "Setup Xiaomi New Sensor",
-      "titleSetting": "Setting Xiaomi Service",
-      "nameSensor": "Sensor Name",
-      "temperatureSensor": "Temperature Sensor",
-      "doorOpeningSensor": "Door Sensor",
-      "motionSensor": "Motion Sensor",
-      "magnetSensor": "Magnet Sensor",
-      "otherSensor": "Other Sensor",
-      "plugSensor": "Plug Sensor",
-      "roomLabel": "Room",
-      "saveButton": "Save",
-      "createButton": "Create",
-      "noFeatures": "No features",
-      "deleteButton": "Delete",
-      "noDeviceFound": "No device found",
-      "noSensorFound": "No sensor found, you have to wait before the gateway send new one ...",
-      "missing": "Missing sensor",
+      "sensor": {
+        "title": "List of Xiaomi Sensor",
+        "noSensorFound": "No sensor found, add new in the setup tab",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "nameSensor": "Sensor Name",
+        "noFeatures": "No features",
+        "roomLabel": "Room"
+      },
+      "setup": {
+        "title": "Setup Xiaomi New Sensor",
+        "nameSensor": "Sensor Name",
+        "noFeatures": "No features",
+        "createButton": "Create",
+        "roomLabel": "Room",
+        "noSensorFound": "No sensor found, you have to wait before the gateway send new one ..."
+      },
+      "setting": {
+        "title": "Setting Xiaomi Service",
+        "setPassword": "Set password of gateway",
+        "saveButton": "Save"
+      },
+      "sensors": {
+        "temperatureSensor": "Temperature Sensor",
+        "doorOpeningSensor": "Door Sensor",
+        "motionSensor": "Motion Sensor",
+        "magnetSensor": "Magnet Sensor",
+        "otherSensor": "Other Sensor",
+        "plugSensor": "Plug Sensor"
+      },
       "sensorTab": "Xiaomi Sensors",
       "setupTab": "Setup",
-      "settingsTab": "Setting",
-      "sensorMagnetTab": "Magnet Sensor",
-      "nameDoorSensor": "Motion Sensor",
-      "setPassword": "Set password of gateway"
+      "settingsTab": "Setting"
     }
   },
   "editScene": {
@@ -513,6 +522,7 @@
     "light-sensor": "Luminosity",
     "camera": "Camera",
     "plug": "Plug Electricity",
+    "door-opening-sensor": "Door",
     "unknown": "Unknown"
   },
   "errorPage": {

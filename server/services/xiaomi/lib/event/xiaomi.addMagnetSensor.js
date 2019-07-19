@@ -2,11 +2,10 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Add node
  * @param {number} sid - Id sensor.
- * @param {boolean} closed - Closed magnet sensor.
  * @example
  * addMagnetSensor(true);
  */
-async function addMagnetSensor(sid, closed) {
+async function addMagnetSensor(sid) {
   logger.debug(`Xiaomi : set RAM variable and update value`);
   this.sensor[sid] = {
     service_id: this.serviceId,
