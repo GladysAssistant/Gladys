@@ -10,6 +10,7 @@ const HouseController = require('./controllers/house.controller');
 const LightController = require('./controllers/light.controller');
 const LocationController = require('./controllers/location.controller');
 const MessageController = require('./controllers/message.controller');
+const MusicController = require('./controllers/music.controller');
 const RoomController = require('./controllers/room.controller');
 const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
@@ -37,6 +38,7 @@ function getRoutes(gladys) {
   const userController = UserController(gladys);
   const houseController = HouseController(gladys);
   const messageController = MessageController(gladys);
+  const musicController = MusicController(gladys);
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
   const roomController = RoomController(gladys);
@@ -296,6 +298,15 @@ function getRoutes(gladys) {
     'get /api/v1/message': {
       authenticated: true,
       controller: messageController.get,
+    },
+    // music
+    'post /api/v1/music/:device_selector/play': {
+      authenticated: true,
+      controller: musicController.play,
+    },
+    'get /api/v1/music/:device_selector/playlist': {
+      authenticated: true,
+      controller: musicController.getPlaylist,
     },
     // service
     'post /api/v1/service/:service_name/start': {
