@@ -20,7 +20,7 @@ const accountRequest = {
           children: [
             {
               type: 'time-range',
-              attrs: { start: '20180625T220000Z' },
+              attrs: { start: '20180626T000000Z' },
             },
           ],
         },
@@ -56,7 +56,7 @@ describe('CalDAV connect', () => {
   connecter.dav.Client.returns({ createAccount });
 
   it('should start connection', async () => {
-    const clock = sinon.useFakeTimers(new Date(2019, 5, 26).getTime());
+    const clock = sinon.useFakeTimers(new Date('2019-06-26T00:00:00Z').getTime());
     const accountConnected = await connecter.connect(userId);
     expect(createAccount.args[0][0]).to.eql(accountRequest);
     expect(accountConnected).to.eql({ calendars: ['calendar1', 'calendar2', 'calendar3'] });
