@@ -26,7 +26,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * gladys.services.caldav.stop();
    */
   async function stop() {
-    logger.log('stopping example service');
+    logger.log('stopping CalDAV service');
   }
 
   return Object.freeze({

@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Sync Gladys calendar to external calendar.
  * @param {Object} gladysCalendar - Gladys calendar to sync.
- * @param {Object} calendars - Array of one calendar, containing calendar form server.
+ * @param {Object} calendars - Array of one calendar, containing calendar form caldav server.
  * @returns {Promise} Resolving with new events.
  * @example
  * syncCalendarEvents();

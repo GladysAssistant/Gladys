@@ -54,6 +54,7 @@
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",
     "mock-express-request": "^0.2.2",
+    "moment": "^2.24.0",
     "nock": "^10.0.6",
     "nodemon": "^1.19.0",
     "npm-run-all": "^4.1.5",
