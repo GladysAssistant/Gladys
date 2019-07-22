@@ -54,6 +54,10 @@ import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 
+// MQTT integration
+import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
+import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -109,6 +113,10 @@ const AppRouter = connect(
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
+
+        <Redirect path="/dashboard/integration/device/mqtt" to="/dashboard/integration/device/mqtt/device" />
+        <MqttDevicePage path="/dashboard/integration/device/mqtt/device" />
+        <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

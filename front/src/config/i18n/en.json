@@ -253,6 +253,32 @@
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "mqtt": {
+      "title": "MQTT",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "device": {
+        "title": "MQTT Devices",
+        "search": "Search devices",
+        "noDevices": "No MQTT devices added yet.",
+        "scanButton": "Scan",
+        "nameLabel": "Name",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      },
+      "setup": {
+        "title": "MQTT configuration",
+        "urlLabel": "Server URL",
+        "urlPlaceholder": "Ex: http://[mqtt-server-address]:[port]",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter server username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter server password",
+        "saveLabel": "Save configuration"
+      }
     }
   },
   "editScene": {
