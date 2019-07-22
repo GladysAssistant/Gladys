@@ -10,7 +10,7 @@ const logger = require('../../../../utils/logger');
  */
 async function syncCalendarEvents(gladysCalendar, calendars) {
   if (calendars.length !== 1) {
-    return Promise.resolve();
+    return Promise.reject();
   }
 
   const events = calendars[0].objects;

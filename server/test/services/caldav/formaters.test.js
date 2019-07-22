@@ -1,9 +1,12 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const moment = require('moment');
-const { formatEvents, formatCalendars } = require('../../../services/caldav/lib/calendar/calendar.formaters');
+const {
+  formatEvents,
+  formatRecurringEvents,
+  formatCalendars,
+} = require('../../../services/caldav/lib/calendar/calendar.formaters');
 
-// Format calendars
 const caldavCalendars = [
   {
     url: 'https://caldav.com/calendar1/',
@@ -54,16 +57,101 @@ const expectedEvents = [
   },
 ];
 
+const start1 = new Date('2019-06-01T09:00:00Z');
+Object.defineProperty(start1, 'tz', { value: 'Europe/London' });
+const start2 = new Date('2019-06-08T09:00:00Z');
+Object.defineProperty(start2, 'tz', { value: 'Europe/London' });
+const recurrEvents = [
+  {
+    uid: 'fdc2bf57-0adb-4300-8287-4a9b34dc3786',
+    start: start1,
+    end: new Date('2019-06-01T12:00:00Z'),
+    summary: 'Cours de tennis',
+    location: 'Stade Roland-Garros',
+    rrule: {
+      between: sinon.stub().returns([new Date('2019-06-01T09:00:00Z'), new Date('2019-06-15T09:00:00Z')]),
+    },
+    recurrences: [
+      '2017-06-02T12:00:00Z',
+      // '2019-06-08': {
+      //   start: start2,
+      //   end: new Date('2019-06-08T12:00:00Z'),
+      //   summary: 'Cours de tennis différent',
+      // },
+    ],
+    exdate: {
+      '2019-06-15': {
+        message: 'Cours de tennis annulé',
+      },
+    },
+  },
+  {
+    uid: '29f76a08-5439-4e04-bc1f-a67c32b47c80',
+    start: new Date('2019-09-27T00:00:00Z'),
+    summary: 'Anniversaire Pepper',
+    location: 'Paris',
+    rrule: {
+      between: sinon
+        .stub()
+        .returns([
+          new Date('2019-09-27T00:00:00Z'),
+          new Date('2020-09-27T00:00:00Z'),
+          new Date('2021-09-27T00:00:00Z'),
+        ]),
+    },
+  },
+];
+
+const expectedRecurrEvents = [
+  [
+    {
+      external_id: 'fdc2bf57-0adb-4300-8287-4a9b34dc37860',
+      selector: 'Cours de tennis 2019-06-01-0900',
+      name: 'Cours de tennis',
+      location: 'Stade Roland-Garros',
+      calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+      start: '2019-06-01T09:00:00.000Z',
+      end: '2019-06-01T12:00:00.000Z',
+    },
+    null,
+    null,
+  ],
+  [
+    {
+      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c800',
+      selector: 'Anniversaire Pepper 2019-09-27-0000',
+      name: 'Anniversaire Pepper',
+      location: 'Paris',
+      calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+      full_day: true,
+      start: '2019-09-27T00:00:00.000Z',
+      end: '2019-09-28T00:00:00.000Z',
+    },
+    {
+      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c801',
+      selector: 'Anniversaire Pepper 2020-09-27-0000',
+      name: 'Anniversaire Pepper',
+      location: 'Paris',
+      calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+      full_day: true,
+      start: '2020-09-27T00:00:00.000Z',
+      end: '2020-09-28T00:00:00.000Z',
+    },
+    null,
+  ],
+];
+
 describe('CalDAV formaters', () => {
   const formatter = {
     serviceId: '5d6c666f-56be-4929-9104-718a78556844',
     formatCalendars,
     formatEvents,
+    formatRecurringEvents,
     moment: moment.utc,
     ical: { parseICS: sinon.stub() },
   };
   const start = new Date('2019-02-25T10:00:00Z');
-  Object.defineProperty(start, 'tz', { value: 'Europe/Paris' });
+  Object.defineProperty(start, 'tz', { value: 'Europe/London' });
   formatter.ical.parseICS
     .onFirstCall()
     .returns({
@@ -85,6 +173,16 @@ describe('CalDAV formaters', () => {
         start: new Date('2019-04-01T10:00:00Z'),
         location: 'Toulouse',
       },
+    })
+    .onThirdCall()
+    .returns({
+      event: {
+        type: 'BAD_TYPE',
+        uid: '932394cb-80ec-4871-bce3-4bebe28ac1e0',
+        summary: 'Event 3',
+        start: new Date('2019-05-08T15:00:00Z'),
+        location: 'Lyon',
+      },
     });
 
   it('should format calendars', () => {
@@ -93,9 +191,27 @@ describe('CalDAV formaters', () => {
   });
 
   it('should format events', () => {
-    const formattedEvents = formatter.formatEvents(['event1', 'event2'], {
+    const formattedEvents = formatter.formatEvents(['event1', 'event2', 'event3'], {
       id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
     });
     expect(formattedEvents).to.eql(expectedEvents);
+  });
+
+  it('should format recurr events', () => {
+    const clock = sinon.useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
+    const formattedEvents = formatter.formatRecurringEvents(recurrEvents[0], {
+      id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    });
+    clock.restore();
+    expect(formattedEvents).to.eql(expectedRecurrEvents[0]);
+  });
+
+  it('should format full day recurr events', () => {
+    const clock = sinon.useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
+    const formattedEvents = formatter.formatRecurringEvents(recurrEvents[1], {
+      id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    });
+    clock.restore();
+    expect(formattedEvents).to.eql(expectedRecurrEvents[1]);
   });
 });

@@ -3,7 +3,7 @@
  * @description Format recurring events.
  * @param {Object} event - Event to format.
  * @param {Object} gladysCalendar - Gladys calendar where event is saved.
- * @returns {Object} Formatted event.
+ * @returns {Array} Formatted event.
  * @example
  * formatRecurringEvents(event, gladysCalendar)
  */

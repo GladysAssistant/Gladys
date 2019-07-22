@@ -1,6 +1,10 @@
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 const { syncUser } = require('../../../services/caldav/lib/calendar/calendar.syncUser');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 const serviceId = '5d6c666f-56be-4929-9104-718a78556844';
@@ -47,7 +51,7 @@ describe('CalDAV sync user', () => {
       .stub()
       .withArgs(calendars)
       .resolves(),
-    syncCalendarEvents: sinon.stub().resolves(),
+    syncCalendarEvents: sinon.stub(),
     gladys: {
       calendar: {
         get: sinon
@@ -60,6 +64,7 @@ describe('CalDAV sync user', () => {
   };
 
   it('should start user sync', async () => {
+    sync.syncCalendarEvents.resolves();
     await sync.syncUser(userId);
 
     expect(sync.gladys.calendar.destroy.callCount).to.equal(3);
@@ -74,5 +79,10 @@ describe('CalDAV sync user', () => {
       [gladysCalendars[2], [calendars[1]]],
       [gladysCalendars[3], [calendars[2]]],
     ]);
+  });
+
+  it('should fail start user sync', async () => {
+    sync.syncCalendarEvents.rejects(Error('Fail sync calendar events'));
+    expect(sync.syncUser(userId)).to.be.rejectedWith(Error, 'Fail sync calendar events');
   });
 });

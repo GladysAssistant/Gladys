@@ -1,6 +1,10 @@
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 const { syncCalendarEvents } = require('../../../services/caldav/lib/calendar/calendar.syncCalendarEvents');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const gladysCalendar = {
   name: 'Perso',
@@ -69,5 +73,11 @@ describe('CalDAV sync calendars events', () => {
     await sync.syncCalendarEvents(gladysCalendar, calendars);
     expect(sync.gladys.calendar.createEvent.callCount).to.equal(2);
     expect(sync.gladys.calendar.createEvent.args).to.eql([['perso', formatedEvents[0]], ['perso', formatedEvents[1]]]);
+  });
+
+  it('should fail sync calendars', async () => {
+    expect(
+      sync.syncCalendarEvents(gladysCalendar, [{ calendar: 'calendar1' }, { calendar: 'calendar2' }]),
+    ).to.be.rejectedWith();
   });
 });
