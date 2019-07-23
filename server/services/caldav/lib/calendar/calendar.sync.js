@@ -9,7 +9,8 @@ const logger = require('../../../../utils/logger');
  */
 async function sync(userId) {
   try {
-    return this.syncUser(userId);
+    const result = await this.syncUser(userId);
+    return result;
   } catch (err) {
     logger.warn(`CalDAV - Calendar : Unable to sync user ID ${userId}. ${err}`);
     return Promise.reject(err);

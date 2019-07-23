@@ -16,8 +16,7 @@ describe('CalDAV start sync', () => {
       .onFirstCall()
       .resolves('success')
       .onSecondCall()
-      .onSecondCall()
-      .rejects(Error("Error: can't access caldav server")),
+      .rejects(Error("Can't access caldav server")),
   };
 
   it('should success sync', async () => {
@@ -26,6 +25,6 @@ describe('CalDAV start sync', () => {
   });
 
   it('should failed sync', async () => {
-    expect(syncEnv.sync(userId)).to.be.rejectedWith(Error, "Error: can't access caldav server");
+    expect(syncEnv.sync(userId)).to.be.rejectedWith(Error, "Can't access caldav server");
   });
 });

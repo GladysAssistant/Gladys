@@ -26,12 +26,13 @@ async function syncUser(userId) {
   davCalendars = gladysCalendars.filter((calendar) => calendar.service_id === this.serviceId);
   // foreach calendar, sync events
   return Promise.all(
-    davCalendars.map((davCalendar) => {
+    davCalendars.map(async (davCalendar) => {
       try {
-        return this.syncCalendarEvents(
+        const result = await this.syncCalendarEvents(
           davCalendar,
           account.calendars.filter((calendar) => davCalendar.external_id === calendar.url),
         );
+        return result;
       } catch (err) {
         logger.warn(
           `CalDAV - Calendar : Failed to sync calendar ${davCalendar.name} with externalid ${
