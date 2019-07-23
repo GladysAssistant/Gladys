@@ -2,10 +2,14 @@ const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
 
 /**
  * @description Get a ZWave value and return a category in Gladys
+ * @param {Object} node - The node object.
  * @param {Object} value - Value object.
  * @returns {Object} Return the category in Gladys.
  * @example
  * const { category, type } = getCategory({
+ *  productid: '',
+ *  producttype: ''
+ * }, {
  *  class_id: 49,
  *  index: 1,
  * });

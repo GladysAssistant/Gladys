@@ -3,12 +3,12 @@ const { COMMAND_CLASSES, INDEXES } = require('../constants');
 /**
  * @description Bind value
  * @param {Object} value - Value object.
- * @returns {Object} Return the category in Gladys.
+ * @param {string} productId - ProductId string.
+ * @param {number} comclass - The comclass.
+ * @param {number} index - The index.
+ * @returns {number} Return the value adapted.
  * @example
- * const { category, type } = getCategory({
- *  class_id: 49,
- *  index: 1,
- * });
+ * const value = bindValue(6, 0x4501, 12, 1);
  */
 function bindValue(value, productId, comclass, index) {
   // Zipato Mini Keypad RFID
