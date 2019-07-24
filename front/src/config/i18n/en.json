@@ -479,13 +479,51 @@
     "restoreInProgressTitle": "Restoring backup in progress..."
   },
   "deviceFeatureCategory": {
-    "light": "Light",
-    "battery": "Battery",
-    "temperature-sensor": "Temperature",
-    "motion-sensor": "Motion",
-    "light-sensor": "Luminosity",
-    "camera": "Camera",
-    "unknown": "Unknown"
+    "light": {
+      "binary": "On/off",
+      "brightness": "Brightness",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "power": "Power consumption"
+    },
+    "battery": {
+      "integer": "Battery"
+    },
+    "temperature-sensor": {
+      "decimal": "Temperature"
+    },
+    "motion-sensor": {
+      "binary": "Motion"
+    },
+    "light-sensor": {
+      "integer": "Luminosity"
+    },
+    "sismic-sensor": {
+      "decimal": "Sismic"
+    },
+    "camera": {
+      "image": "Camera"
+    },
+    "access-control": {
+      "mode": "Access Control Mode"
+    },
+    "smoke-sensor": {
+      "binary": "Smoke"
+    },
+    "switch": {
+      "voltage": "Voltage",
+      "current": "Current",
+      "binary": "Switch",
+      "dimmer": "Dimmer",
+      "burglar": "Burglar",
+      "power": "Power consumption"
+    },
+    "siren": {
+      "binary": "Siren"
+    },
+    "unknown": {
+      "unknown": "Unknown"
+    }
   },
   "errorPage": {
     "title": "Oops... This page does not exist.",
