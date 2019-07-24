@@ -652,23 +652,27 @@
         {
           "name": "Temperature",
           "selector": "test-temperature",
-          "category": "temperature-sensor"
+          "category": "temperature-sensor",
+          "type": "decimal"
         },
         {
           "name": "Motion",
           "selector": "test-motion",
-          "category": "motion-sensor"
+          "category": "motion-sensor",
+          "type": "binary"
         },
         {
           "name": "Battery",
           "selector": "test-battery",
           "category": "battery",
+          "type": "integer",
           "last_value": "92"
         },
         {
           "name": "Lux",
           "selector": "test-light",
-          "category": "light-sensor"
+          "category": "light-sensor",
+          "type": "integer"
         }
       ],
       "room": {
