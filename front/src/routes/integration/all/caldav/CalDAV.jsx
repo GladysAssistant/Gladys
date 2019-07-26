@@ -24,7 +24,19 @@ const CaldavPage = ({ children, ...props }) => (
                         <MarkupText id="integration.caldav.introduction" />
                       </p>
                       <div class="form-group">
-                        <div class="form-label">CalDAV URL</div>
+                        <div class="form-label">CalDAV host</div>
+                        <select class="form-control" onChange={props.updateCaldavHost} value={props.caldavHost}>
+                          {['apple', 'other'].map(host => (
+                            <option value={host}>
+                              <Text id={`integration.caldav.services.${host}.name`} />
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <div class="form-label">
+                          <Text id={`integration.caldav.services.${props.caldavHost}.url`} />
+                        </div>
                         <input
                           type="text"
                           class="form-control"
@@ -34,7 +46,9 @@ const CaldavPage = ({ children, ...props }) => (
                         />
                       </div>
                       <div class="form-group">
-                        <div class="form-label">CalDAV Username</div>
+                        <div class="form-label">
+                          <Text id={`integration.caldav.services.${props.caldavHost}.username`} />
+                        </div>
                         <input
                           type="text"
                           class="form-control"
@@ -44,7 +58,9 @@ const CaldavPage = ({ children, ...props }) => (
                         />
                       </div>
                       <div class="form-group">
-                        <div class="form-label">CalDAV password</div>
+                        <div class="form-label">
+                          <Text id={`integration.caldav.services.${props.caldavHost}.password`} />
+                        </div>
                         <input
                           type="password"
                           class="form-control"
@@ -55,8 +71,11 @@ const CaldavPage = ({ children, ...props }) => (
                       </div>
                       <div class="form-group">
                         <span class="input-group-append">
-                          <button class="btn btn-primary" onClick={props.saveCaldavSettings}>
+                          <button class="btn btn-primary" onClick={props.saveCaldavSettings} style={{ marginRight: '10px' }}>
                             Save
+                          </button>
+                          <button class="btn btn-primary" onClick={props.startSync}>
+                            Try Sync
                           </button>
                         </span>
                       </div>

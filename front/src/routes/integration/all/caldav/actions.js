@@ -1,6 +1,17 @@
 import { RequestStatus } from '../../../../utils/consts';
 
 const actions = store => ({
+  updateCaldavHost(state, e) {
+    store.setState({
+      caldavHost: e.target.value
+    });
+
+    if (e.target.value === 'apple') {
+      store.setState({
+        caldavUrl: 'icloud.com'
+      });
+    }
+  },
   updateCaldavUrl(state, e) {
     store.setState({
       caldavUrl: e.target.value
@@ -20,34 +31,66 @@ const actions = store => ({
     store.setState({
       caldavGetSettingsStatus: RequestStatus.Getting
     });
+
+    let caldavHost = 'other';
+    let caldavUrl = '';
+    let caldavUsername = '';
+    let caldavPassword = '';
+
+    store.setState({
+      caldavHost,
+      caldavUrl,
+      caldavUsername,
+      caldavPassword,
+    });
+
     try {
-      const { value: caldavUrl } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_URL', {
+      const { value: host } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_HOST', {
         userRelated: true
       });
-      const { value: caldavUsername } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_USERNAME', {
+      caldavHost = host;
+
+      const { value: url } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_URL', {
         userRelated: true
       });
-      const { value: caldavPassword } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_PASSWORD', {
+      caldavUrl = url;
+
+      const { value: username } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_USERNAME', {
         userRelated: true
       });
+      caldavUsername = username;
+
+      const { value: password } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_PASSWORD', {
+        userRelated: true
+      });
+      caldavPassword = password;
 
       store.setState({
-        caldavUrl,
-        caldavUsername,
-        caldavPassword,
         caldavGetSettingsStatus: RequestStatus.Success
-      });
+      })
     } catch (e) {
       store.setState({
         caldavGetSettingsStatus: RequestStatus.Error
       });
     }
+
+    store.setState({
+      caldavHost,
+      caldavUrl,
+      caldavUsername,
+      caldavPassword,
+    });
   },
   async saveCaldavSettings(state) {
     store.setState({
       caldavSettingsStatus: RequestStatus.Getting
     });
     try {
+      // save caldav host
+      await state.httpClient.post('/api/v1/service/caldav/variable/CALDAV_HOST', {
+        value: state.caldavHost,
+        userRelated: true
+      });
       // save caldav url
       await state.httpClient.post('/api/v1/service/caldav/variable/CALDAV_URL', {
         value: state.caldavUrl,
@@ -66,6 +109,22 @@ const actions = store => ({
       // start service
       await state.httpClient.post('/api/v1/service/caldav/start');
 
+      const { url = state.caldavUrl } = await state.httpClient.get('/api/v1/service/caldav/config');
+      store.setState({
+        caldavUrl: url,
+        caldavSettingsStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      store.setState({
+        caldavSettingsStatus: RequestStatus.Error
+      });
+    }
+  },
+  async startSync(state) {
+    store.setState({
+      caldavSettingsStatus: RequestStatus.Getting
+    });
+    try {
       await state.httpClient.get('/api/v1/service/caldav/sync');
       store.setState({
         caldavSettingsStatus: RequestStatus.Success

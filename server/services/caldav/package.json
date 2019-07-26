@@ -15,6 +15,7 @@
   "dependencies": {
     "dav": "^1.8.0",
     "ical": "^0.6.0",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "xmldom": "^0.1.27"
   }
 }

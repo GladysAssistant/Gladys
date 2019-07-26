@@ -6,8 +6,10 @@ module.exports = function CalDAVService(gladys, serviceId) {
   const ical = require('ical');
   const dav = require('dav');
   const moment = require('moment');
+  const xmlDom = require('xmldom');
+  const https = require('https');
 
-  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment);
+  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, https);
 
   /**
    * @public

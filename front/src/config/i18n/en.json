@@ -426,7 +426,21 @@
     },
     "caldav": {
       "title": "CalDAV",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external calendar compatible. Then enter the configuration below."
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external calendar compatible. Then enter the configuration below.",
+      "services": {
+        "apple": {
+          "name": "iCloud Calendar",
+          "url": "iCloud URL",
+          "username": "Apple ID",
+          "password": "Password"
+        },
+        "other": {
+          "name": "Other",
+          "url": "CalDAV URL",
+          "username": "CalDAV Username",
+          "password": "CalDAV Password"
+        }
+      }
     }
   },
   "editScene": {

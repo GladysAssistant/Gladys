@@ -5,7 +5,7 @@ import CaldavPage from './CalDAV';
 import { RequestStatus } from '../../../../utils/consts';
 
 @connect(
-  'user,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus',
+  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus',
   actions
 )
 class CaldavIntegration extends Component {

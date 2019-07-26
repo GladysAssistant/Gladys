@@ -4,13 +4,17 @@ const { syncCalendarEvents } = require('./calendar/calendar.syncCalendarEvents')
 const { syncCalendars } = require('./calendar/calendar.syncCalendars');
 const { syncUser } = require('./calendar/calendar.syncUser');
 const { connect } = require('./calendar/connect');
+const { config } = require('./config/index');
+const { iCloud } = require('./config/iCloud');
 
-const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment) {
+const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, https) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.ical = ical;
   this.dav = dav;
   this.moment = moment;
+  this.xmlDom = xmlDom;
+  this.https = https;
 };
 
 CalDAVHandler.prototype.formatRecurringEvents = formatRecurringEvents;
@@ -21,5 +25,7 @@ CalDAVHandler.prototype.syncCalendarEvents = syncCalendarEvents;
 CalDAVHandler.prototype.syncCalendars = syncCalendars;
 CalDAVHandler.prototype.syncUser = syncUser;
 CalDAVHandler.prototype.connect = connect;
+CalDAVHandler.prototype.config = config;
+CalDAVHandler.prototype.iCloud = iCloud;
 
 module.exports = CalDAVHandler;

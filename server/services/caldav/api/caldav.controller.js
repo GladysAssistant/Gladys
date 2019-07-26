@@ -1,5 +1,15 @@
 module.exports = function CalDAVController(caldavHandler) {
   /**
+   * @api {get} /api/v1/service/caldav/config Check config
+   * @apiName Sync
+   * @apiGroup CalDAV
+   */
+  async function config(req, res) {
+    const configuration = await caldavHandler.config(req.user.id);
+    res.json(configuration);
+  }
+
+  /**
    * @api {get} /api/v1/service/caldav/sync Start caldav sync for a user
    * @apiName Sync
    * @apiGroup CalDAV
@@ -10,6 +20,10 @@ module.exports = function CalDAVController(caldavHandler) {
   }
 
   return {
+    'get /api/v1/service/caldav/config': {
+      authenticated: true,
+      controller: config,
+    },
     'get /api/v1/service/caldav/sync': {
       authenticated: true,
       controller: sync,
