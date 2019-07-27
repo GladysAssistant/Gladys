@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 

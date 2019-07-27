@@ -1,6 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-
 import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupTab = ({ children, ...props }) => {
@@ -14,7 +13,7 @@ const SetupTab = ({ children, ...props }) => {
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.mqttStatus === RequestStatus.Getting
+            active: props.connectMqttStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
@@ -29,45 +28,46 @@ const SetupTab = ({ children, ...props }) => {
                     name="mqttURL"
                     placeholder={<Text id="integration.mqtt.setup.urlPlaceholder" />}
                     value={props.mqttURL}
-                    onChange={e => updateConfig(e, 'mqttURL')}
                     class="form-control"
+                    onChange={props.updateConfigration}
                   />
                 </Localizer>
               </div>
 
               <div class="form-group">
-                <label for="mqttUser" class="form-label">
+                <label for="mqttUsername" class="form-label">
                   <Text id={`integration.mqtt.setup.userLabel`} />
                 </label>
                 <Localizer>
                   <input
-                    name="mqttUser"
+                    name="mqttUsername"
                     placeholder={<Text id="integration.mqtt.setup.userPlaceholder" />}
-                    value={props.mqttURL}
-                    onChange={e => updateConfig(e, 'mqttUser')}
+                    value={props.mqttUsername}
                     class="form-control"
+                    onChange={props.updateConfigration}
                   />
                 </Localizer>
               </div>
 
               <div class="form-group">
-                <label for="mqttPass" class="form-label">
+                <label for="mqttPassword" class="form-label">
                   <Text id={`integration.mqtt.setup.passwordLabel`} />
                 </label>
                 <Localizer>
                   <input
-                    name="mqttPass"
+                    name="mqttPassword"
+                    type="password"
                     placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
-                    value={props.mqttURL}
-                    onChange={e => updateConfig(e, 'mqttPass')}
+                    value={props.mqttPassword}
                     class="form-control"
+                    onChange={props.updateConfigration}
                   />
                 </Localizer>
               </div>
 
               <div class="row mt-10">
                 <div class="col">
-                  <button type="submit" class="btn btn-success" onClick={this.saveConfig}>
+                  <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
                     <Text id="integration.mqtt.setup.saveLabel" />
                   </button>
                 </div>
