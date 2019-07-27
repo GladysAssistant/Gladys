@@ -71,7 +71,11 @@ const CaldavPage = ({ children, ...props }) => (
                       </div>
                       <div class="form-group">
                         <span class="input-group-append">
-                          <button class="btn btn-primary" onClick={props.saveCaldavSettings} style={{ marginRight: '10px' }}>
+                          <button
+                            class="btn btn-primary"
+                            onClick={props.saveCaldavSettings}
+                            style={{ marginRight: '10px' }}
+                          >
                             Save
                           </button>
                           <button class="btn btn-primary" onClick={props.startSync}>

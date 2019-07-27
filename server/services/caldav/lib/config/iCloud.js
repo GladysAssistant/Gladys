@@ -14,37 +14,40 @@
  * )
  */
 function iCloudRequest(https, path, auth, postData) {
-    return new Promise((resolve, reject) => {
-        const req = https.request({
-            auth: `${auth.appleId}:${auth.password}`,
-            headers: {
-                Depth: '0',
-                'Content-Type': 'application/xml',
-                'Content-Length': postData.length
-            },
-            host: 'caldav.icloud.com',
-            method: 'PROPFIND',
-            path,
-            port: 443
-        }, (res) => {
-            let body = '';
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        auth: `${auth.appleId}:${auth.password}`,
+        headers: {
+          Depth: '0',
+          'Content-Type': 'application/xml',
+          'Content-Length': postData.length,
+        },
+        host: 'caldav.icloud.com',
+        method: 'PROPFIND',
+        path,
+        port: 443,
+      },
+      (res) => {
+        let body = '';
 
-            res.on('data', (data) => {
-                body += data;
-            });
-
-            res.on('end', () => {
-                resolve(body);
-            });
+        res.on('data', (data) => {
+          body += data;
         });
 
-        req.on('error', (err) => {
-            reject(err);
+        res.on('end', () => {
+          resolve(body);
         });
+      },
+    );
 
-        req.write(postData);
-        req.end();
+    req.on('error', (err) => {
+      reject(err);
     });
+
+    req.write(postData);
+    req.end();
+  });
 }
 
 /**
@@ -56,12 +59,12 @@ function iCloudRequest(https, path, auth, postData) {
  * iCloud('tony.stark@icloud.com', '1234567890')
  */
 async function iCloud(userId, appleId, password) {
-    const auth = {
-        appleId,
-        password
-    };
+  const auth = {
+    appleId,
+    password,
+  };
 
-    let postData = `
+  let postData = `
         <propfind xmlns='DAV:'>
             <prop>
                 <current-user-principal/>
@@ -69,10 +72,11 @@ async function iCloud(userId, appleId, password) {
         </propfind>
     `;
 
-    let xml = await iCloudRequest(this.https, '/', auth, postData);
-    let xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
-    const path = xmlDoc.getElementsByTagName('current-user-principal')[0].getElementsByTagName('href')[0].childNodes[0].nodeValue;
-    postData = `
+  let xml = await iCloudRequest(this.https, '/', auth, postData);
+  let xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
+  const path = xmlDoc.getElementsByTagName('current-user-principal')[0].getElementsByTagName('href')[0].childNodes[0]
+    .nodeValue;
+  postData = `
         <propfind xmlns='DAV:' xmlns:cd='urn:ietf:params:xml:ns:caldav'>
             <prop>
                 <cd:calendar-home-set/>
@@ -80,13 +84,16 @@ async function iCloud(userId, appleId, password) {
         </propfind>
     `;
 
-    xml = await iCloudRequest(this.https, path, auth, postData);
-    xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
-    const url = xmlDoc.getElementsByTagName('calendar-home-set')[0].getElementsByTagName('href')[0].childNodes[0].nodeValue.split(':443')[0];
-    await this.gladys.variable.setValue('CALDAV_URL', url, this.serviceId, userId);
-    return { url };
+  xml = await iCloudRequest(this.https, path, auth, postData);
+  xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
+  const url = xmlDoc
+    .getElementsByTagName('calendar-home-set')[0]
+    .getElementsByTagName('href')[0]
+    .childNodes[0].nodeValue.split(':443')[0];
+  await this.gladys.variable.setValue('CALDAV_URL', url, this.serviceId, userId);
+  return { url };
 }
 
 module.exports = {
-    iCloud,
+  iCloud,
 };

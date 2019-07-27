@@ -41,7 +41,7 @@ const actions = store => ({
       caldavHost,
       caldavUrl,
       caldavUsername,
-      caldavPassword,
+      caldavPassword
     });
 
     try {
@@ -67,7 +67,7 @@ const actions = store => ({
 
       store.setState({
         caldavGetSettingsStatus: RequestStatus.Success
-      })
+      });
     } catch (e) {
       store.setState({
         caldavGetSettingsStatus: RequestStatus.Error
@@ -78,7 +78,7 @@ const actions = store => ({
       caldavHost,
       caldavUrl,
       caldavUsername,
-      caldavPassword,
+      caldavPassword
     });
   },
   async saveCaldavSettings(state) {
