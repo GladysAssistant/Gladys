@@ -6,13 +6,13 @@ import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 
 @connect(
-  'user,session,mqttStatus',
+  'user,session,mqttURL,mqttUsername,mqttPassword,mqttTopics,connectMqttStatus,currentTopicStatus,currentTopic',
   actions
 )
 class MqttNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('mqtt');
-    // this.props.getStatus();
+    this.props.loadProps();
   }
 
   render(props, {}) {

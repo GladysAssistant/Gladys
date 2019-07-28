@@ -7,19 +7,19 @@ const event = new EventEmitter();
 const mqttApi = Object.assign(event, {
   disconnected: true,
   subscribe: fake.resolves(null),
-  _end: fake.resolves(null),
+  internalEnd: fake.resolves(null),
   end: () => {
     mqttApi.disconnected = true;
-    mqttApi._end();
-  }
+    mqttApi.internalEnd();
+  },
 });
 
 const MockedMqttClient = {
-  _connect: fake.returns(mqttApi),
+  internalConnect: fake.returns(mqttApi),
   connect: () => {
     mqttApi.disconnected = false;
-    return MockedMqttClient._connect();
-  }
+    return MockedMqttClient.internalConnect();
+  },
 };
 
 module.exports = {

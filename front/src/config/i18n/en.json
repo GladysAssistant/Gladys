@@ -262,7 +262,6 @@
         "title": "MQTT Devices",
         "search": "Search devices",
         "noDevices": "No MQTT devices added yet.",
-        "scanButton": "Scan",
         "nameLabel": "Name",
         "featuresLabel": "Features",
         "noFeatures": "No features",
@@ -277,7 +276,11 @@
         "userPlaceholder": "Enter server username",
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter server password",
-        "saveLabel": "Save configuration"
+        "topicLabel": "Topics to subscribe",
+        "topicPlaceholder": "Ex: gladys/master/#",
+        "topicAddLabel": "Add topic",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration."
       }
     }
   },
