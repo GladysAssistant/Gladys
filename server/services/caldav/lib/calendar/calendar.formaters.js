@@ -140,7 +140,11 @@ function formatEvents(caldavEvents, gladysCalendar) {
         newEvent.end = icsEvent.end.toISOString();
       }
 
-      if (icsEvent.start && icsEvent.start.tz === undefined) {
+      if (
+        icsEvent.start &&
+        icsEvent.start.tz === undefined &&
+        Number.isInteger(this.moment(icsEvent.end).diff(this.moment(icsEvent.start), 'days', true))
+      ) {
         newEvent.full_day = true;
       }
 

@@ -47,6 +47,12 @@ export const SceneGetStatus = {
   Error: 'Error'
 };
 
+export const CalendarGetEventsStatus = {
+  Getting: 'Getting',
+  GetError: 'GetError',
+  Success: 'Success'
+};
+
 export const RequestStatus = {
   Getting: 'Getting',
   Success: 'Success',
