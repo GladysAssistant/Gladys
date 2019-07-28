@@ -16,6 +16,10 @@ async function connect() {
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }
 
+  if (this.mqttClient) {
+    this.disconnect()
+  }
+
   logger.debug(`Trying to connect to MQTT server ${mqttUrl}...`);
   this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
     username: mqttUsername,
