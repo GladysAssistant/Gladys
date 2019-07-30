@@ -6,7 +6,7 @@ import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 
 @connect(
-  'user,session,mqttURL,mqttUsername,mqttPassword,mqttTopics,connectMqttStatus,currentTopicStatus,currentTopic',
+  'user,session,mqttURL,mqttUsername,mqttPassword,connectMqttStatus',
   actions
 )
 class MqttNodePage extends Component {

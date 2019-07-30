@@ -23,14 +23,14 @@ describe('MqttService', () => {
   const mqttService = MqttService(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
   it('should start service', async () => {
     await mqttService.start();
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);
     expect(mqttService.client.mqttClient.disconnected).to.eq(false);
   });
 
   it('should start service while already started', async () => {
     await mqttService.start();
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(mqttService.client.mqttClient.internalEnd);
     assert.calledOnce(MockedMqttClient.internalConnect);
     expect(mqttService.client.mqttClient.disconnected).to.eq(false);
