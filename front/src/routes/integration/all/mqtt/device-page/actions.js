@@ -1,10 +1,14 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
+import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
+import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
+import { route } from 'preact-router';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
+  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getMqttDevices(state, take, skip) {
       store.setState({
@@ -35,6 +39,7 @@ function createActions(store) {
         });
       } catch (e) {
         store.setState({
+          mqttDevices: [],
           getMqttDevicesStatus: RequestStatus.Error
         });
       }
@@ -74,10 +79,82 @@ function createActions(store) {
         getMqttDeviceOrderDir: e.target.value
       });
       await actions.getMqttDevices(store.getState(), 20, 0);
+    },
+    async addDevice(state) {
+      const uniqueId = uuid.v4();
+      const mqttDevices = update(state.mqttDevices, {
+        $push: [
+          {
+            id: uniqueId,
+            name: null,
+            should_poll: false,
+            external_id: null,
+            service_id: state.currentIntegration.id,
+            features: []
+          }
+        ]
+      });
+      store.setState({
+        mqttDevices
+      });
+
+      route(`/dashboard/integration/device/mqtt/device/${uniqueId}`);
+    },
+    async addDeviceFeature(state, index, category) {
+      const mqttDevices = update(state.mqttDevices, {
+        [index]: {
+          features: {
+            $push: [
+              {
+                category,
+                type: 'decimal',
+                read_only: true,
+                has_feedback: false,
+                min: -50,
+                max: 50
+              }
+            ]
+          }
+        }
+      });
+
+      store.setState({
+        mqttDevices
+      });
+    },
+    async updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
+      const mqttDevices = update(state.mqttDevices, {
+        [deviceIndex]: {
+          features: {
+            [featureIndex]: {
+              [property]: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+
+      store.setState({
+        mqttDevices
+      });
+    },
+    async deleteFeature(state, deviceIndex, featureIndex) {
+      const mqttDevices = update(state.mqttDevices, {
+        [deviceIndex]: {
+          features: {
+            $splice: [[featureIndex, 1]]
+          }
+        }
+      });
+
+      store.setState({
+        mqttDevices
+      });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, actions);
+  return Object.assign({}, houseActions, integrationActions, actions);
 }
 
 export default createActions;

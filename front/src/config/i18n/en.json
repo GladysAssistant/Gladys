@@ -262,11 +262,26 @@
         "title": "MQTT Devices",
         "search": "Search devices",
         "noDevices": "No MQTT devices added yet.",
+        "noNameLabel": "No name",
         "nameLabel": "Name",
+        "roomLabel": "Room",
+        "externalIdLabel": "Device external ID",
+        "externalIdPlaceholder": "Device unique ID",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device"
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter feature name",
+        "externalIdLabel": "Feature external ID",
+        "externalIdPlaceholder": "Feature MQTT message key",
+        "addButton": "Add feature",
+        "deleteLabel": "Delete feature"
       },
       "setup": {
         "title": "MQTT configuration",
@@ -276,9 +291,6 @@
         "userPlaceholder": "Enter server username",
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter server password",
-        "topicLabel": "Topics to subscribe",
-        "topicPlaceholder": "Ex: gladys/master/#",
-        "topicAddLabel": "Add topic",
         "saveLabel": "Save configuration",
         "error": "An error occured while saving configuration."
       }

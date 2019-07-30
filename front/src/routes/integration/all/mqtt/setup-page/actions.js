@@ -12,7 +12,7 @@ const createActions = store => {
         mqttURL = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_URL');
         mqttUsername = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_USERNAME');
         if (mqttUsername.value) {
-          mqttPassword = "FAKE_PASSWORD";
+          mqttPassword = 'FAKE_PASSWORD';
         }
       } finally {
         store.setState({
@@ -22,7 +22,6 @@ const createActions = store => {
           passwordChanges: false
         });
       }
-
     },
     updateConfigration(state, e) {
       const data = {};

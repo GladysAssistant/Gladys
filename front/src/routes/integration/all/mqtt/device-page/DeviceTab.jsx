@@ -5,7 +5,7 @@ import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 
-const NodeTab = ({ children, ...props }) => (
+const DeviceTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
@@ -33,6 +33,9 @@ const NodeTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
+        <button onClick={props.addDevice} class="btn btn-outline-primary ml-2">
+          <Text id="scene.newButton" /> <i class="fe fe-plus" />
+        </button>
       </div>
     </div>
     <div class="card-body">
@@ -64,4 +67,4 @@ const NodeTab = ({ children, ...props }) => (
   </div>
 );
 
-export default NodeTab;
+export default DeviceTab;

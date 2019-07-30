@@ -13,6 +13,7 @@ class MqttDevicePage extends Component {
   componentWillMount() {
     this.props.getMqttDevices(20, 0);
     this.props.getHouses();
+    this.props.getIntegrationByName('mqtt');
   }
 
   render(props, {}) {

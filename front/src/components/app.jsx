@@ -56,6 +56,7 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
+import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
 const defaultState = getDefaultState();
@@ -116,6 +117,7 @@ const AppRouter = connect(
 
         <Redirect path="/dashboard/integration/device/mqtt" to="/dashboard/integration/device/mqtt/device" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt/device" />
+        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/device/:uuid" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
 
         <ChatPage path="/dashboard/chat" />

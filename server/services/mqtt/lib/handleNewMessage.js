@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');
+const { devicestate } = require('./message/devicestate');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -13,6 +14,9 @@ function handleNewMessage(topic, message) {
     switch (topic) {
       case 'gladys/master/device/create':
         this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
+        break;
+      case 'gladys/master/devicestate/create':
+        devicestate(this, JSON.parse(message));
         break;
       default:
         logger.info(`MQTT : Topic ${topic} not handled.`);
