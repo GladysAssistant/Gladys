@@ -1,5 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
+import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
+import get from 'get-value';
 
 class MqttFeatureBox extends Component {
   updateFeatureName(e) {
@@ -8,6 +10,14 @@ class MqttFeatureBox extends Component {
 
   updateFeatureExternalId(e) {
     this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'external_id', e.target.value);
+  }
+
+  updateFeatureMinValue(e) {
+    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'min', e.target.value);
+  }
+
+  updateFeatureMaxValue(e) {
+    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'max', e.target.value);
   }
 
   deleteFeature() {
@@ -19,6 +29,8 @@ class MqttFeatureBox extends Component {
 
     this.updateFeatureName = this.updateFeatureName.bind(this);
     this.updateFeatureExternalId = this.updateFeatureExternalId.bind(this);
+    this.updateFeatureMinValue = this.updateFeatureMinValue.bind(this);
+    this.updateFeatureMaxValue = this.updateFeatureMaxValue.bind(this);
     this.deleteFeature = this.deleteFeature.bind(this);
   }
 
@@ -27,7 +39,8 @@ class MqttFeatureBox extends Component {
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <Text id={`deviceFeatureCategory.${props.feature.category}`} />
+            <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${props.feature.category}.${props.feature.type}`)}`} />
+            <Text id={`deviceFeatureCategory.${props.feature.category}.${props.feature.type}`} />
           </div>
           <div class="card-body">
             <div class="form-group" class="form-label" for={`featueName_${props.featureIndex}`}>
@@ -57,6 +70,37 @@ class MqttFeatureBox extends Component {
                   onChange={this.updateFeatureExternalId}
                   class="form-control"
                   placeholder={<Text id="integration.mqtt.feature.externalIdPlaceholder" />}
+                />
+              </Localizer>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for={`min_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.minLabel" />
+              </label>
+              <Localizer>
+                <input
+                  id={`min_${props.featureIndex}`}
+                  type="number"
+                  value={props.feature.min}
+                  onChange={this.updateFeatureMinValue}
+                  class="form-control"
+                  placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
+                />
+              </Localizer>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for={`max_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.maxLabel" />
+              </label>
+              <Localizer>
+                <input
+                  id={`max_${props.featureIndex}`}
+                  type="number"
+                  value={props.feature.max}
+                  onChange={this.updateFeatureMaxValue}
+                  class="form-control"
+                  placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
                 />
               </Localizer>
             </div>

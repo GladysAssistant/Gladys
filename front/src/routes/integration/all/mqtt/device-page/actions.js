@@ -88,7 +88,7 @@ function createActions(store) {
             id: uniqueId,
             name: null,
             should_poll: false,
-            external_id: null,
+            external_id: uniqueId,
             service_id: state.currentIntegration.id,
             features: []
           }
@@ -100,18 +100,16 @@ function createActions(store) {
 
       route(`/dashboard/integration/device/mqtt/device/${uniqueId}`);
     },
-    async addDeviceFeature(state, index, category) {
+    async addDeviceFeature(state, index, category, type) {
       const mqttDevices = update(state.mqttDevices, {
         [index]: {
           features: {
             $push: [
               {
                 category,
-                type: 'decimal',
+                type,
                 read_only: true,
-                has_feedback: false,
-                min: -50,
-                max: 50
+                has_feedback: false
               }
             ]
           }

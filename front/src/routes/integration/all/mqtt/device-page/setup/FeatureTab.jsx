@@ -1,10 +1,10 @@
-import { Text } from 'preact-i18n';
+import { Text, withText } from 'preact-i18n';
 import { Component } from 'preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 import Feature from './Feature';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
-import { RequestStatus } from '../../../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../../../../../server/utils/constants';
+import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import MqttDeviceForm from '../DeviceForm';
 import cx from 'classnames';
 
@@ -42,7 +42,8 @@ class FeatureTab extends Component {
   }
 
   addFeature() {
-    this.props.addDeviceFeature(this.props.deviceIndex, this.state.selectedFeature);
+    const featureData = this.state.selectedFeature.split('|');
+    this.props.addDeviceFeature(this.props.deviceIndex, featureData[0], featureData[1]);
 
     this.setState({
       selectedFeature: undefined
@@ -100,11 +101,13 @@ class FeatureTab extends Component {
                       <option value="">
                         <Text id="global.emptySelectOption" />
                       </option>
-                      {Object.values(DEVICE_FEATURE_CATEGORIES).map(category => (
-                        <option value={category} selected={category === selectedFeature}>
-                          <Text id={`deviceFeatureCategory.${category}`} />
-                        </option>
-                      ))}
+                      {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
+                        Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
+                          <option value={`${category}|${type}`} selected={selectedFeature === `${category}|${type}`}>
+                            <Text id={`deviceFeatureCategory.${category}.${type}`} />
+                          </option>
+                        ))
+                      )}
                     </select>
                     <button onClick={this.addFeature} class="btn btn-outline-success ml-2" disabled={!selectedFeature}>
                       <Text id="integration.mqtt.feature.addButton" />

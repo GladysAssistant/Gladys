@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import get from 'get-value';
 
 class MqttDeviceForm extends Component {
   updateName = e => {
@@ -33,6 +34,7 @@ class MqttDeviceForm extends Component {
             />
           </Localizer>
         </div>
+
         <div class="form-group">
           <label class="form-label" for="room">
             <Text id="integration.mqtt.device.roomLabel" />
@@ -53,21 +55,7 @@ class MqttDeviceForm extends Component {
               ))}
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="externalid">
-            <Text id="integration.mqtt.device.externalIdLabel" />
-          </label>
-          <Localizer>
-            <input
-              id="externalid"
-              type="text"
-              value={props.device.external_id}
-              onChange={this.updateExternalId}
-              class="form-control"
-              placeholder={<Text id="integration.mqtt.device.externalIdPlaceholder" />}
-            />
-          </Localizer>
-        </div>
+
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.mqtt.device.featuresLabel" />
@@ -77,9 +65,9 @@ class MqttDeviceForm extends Component {
               props.device.features &&
               props.device.features.map(feature => (
                 <span class="tag">
-                  <Text id={`deviceFeatureCategory.${feature.category}`} />
+                  <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                   <div class="tag-addon">
-                    <i class={`fe fe-${DeviceFeatureCategoriesIcon[feature.category]}`} />
+                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
                   </div>
                 </span>
               ))}
