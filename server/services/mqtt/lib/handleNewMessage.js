@@ -15,6 +15,9 @@ function handleNewMessage(topic, message) {
       case 'gladys/master/device/create':
         this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
         break;
+      case 'gladys/master/state/create':
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, JSON.parse(message));
+        break;
       case 'gladys/master/devicestate/create':
         devicestate(this, JSON.parse(message));
         break;
