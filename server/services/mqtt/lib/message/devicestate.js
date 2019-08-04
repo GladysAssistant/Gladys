@@ -1,3 +1,5 @@
+const { EVENTS } = require('../../../../utils/constants');
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {Object} mqttHandler - The Gladys MQTT client.
@@ -12,7 +14,7 @@ function devicestate(mqttHandler, message) {
     state: message.state.value,
   };
 
-  mqttHandler.gladys.device.newStateEvent(event);
+  mqttHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
 }
 
 module.exports = {
