@@ -58,6 +58,7 @@ class MqttFeatureBox extends Component {
                 />
               </Localizer>
             </div>
+
             <div class="form-group">
               <label class="form-label" for={`externalid_${props.featureIndex}`}>
                 <Text id="integration.mqtt.feature.externalIdLabel" />
@@ -104,6 +105,7 @@ class MqttFeatureBox extends Component {
                 />
               </Localizer>
             </div>
+
             <div class="form-group">
               <button onClick={this.deleteFeature} class="btn btn-outline-danger">
                 <Text id="integration.mqtt.feature.deleteLabel" />

@@ -101,15 +101,18 @@ function createActions(store) {
       route(`/dashboard/integration/device/mqtt/device/${uniqueId}`);
     },
     async addDeviceFeature(state, index, category, type) {
+      const uniqueId = uuid.v4();
       const mqttDevices = update(state.mqttDevices, {
         [index]: {
           features: {
             $push: [
               {
+                id: uniqueId,
                 category,
                 type,
                 read_only: true,
-                has_feedback: false
+                has_feedback: false,
+                keep_history: true
               }
             ]
           }

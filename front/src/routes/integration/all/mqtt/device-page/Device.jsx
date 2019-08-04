@@ -53,7 +53,7 @@ class MqttDeviceBox extends Component {
 
                   <Link href={`/dashboard/integration/device/mqtt/device/${props.device.id}`}>
                     <button class="btn btn-outline-success float-right">
-                      <Text id="integration.mqtt.feature.addButton" />
+                      <Text id="integration.mqtt.device.addButton" />
                     </button>
                   </Link>
                 </div>
