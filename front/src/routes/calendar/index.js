@@ -19,18 +19,32 @@ class Map extends Component {
     let from, to;
 
     if (Array.isArray(range)) {
-      from = moment(range[0]).subtract(1, 'day').toDate();
-      to = moment(range[range.length-1]).add(1, 'day').toDate();
+      from = moment(range[0])
+        .subtract(1, 'day')
+        .toDate();
+      to = moment(range[range.length - 1])
+        .add(1, 'day')
+        .toDate();
     } else {
-      from = moment(range.start).subtract(1, 'day').toDate();
-      to = moment(range.end).add(1, 'day').toDate();
+      from = moment(range.start)
+        .subtract(1, 'day')
+        .toDate();
+      to = moment(range.end)
+        .add(1, 'day')
+        .toDate();
     }
     this.props.getEventsInRange(from, to);
-  }
+  };
 
   componentWillMount() {
-    const from = moment().startOf('month').subtract(7, 'day').toDate();
-    const to = moment().endOf('month').add(7, 'day').toDate();
+    const from = moment()
+      .startOf('month')
+      .subtract(7, 'day')
+      .toDate();
+    const to = moment()
+      .endOf('month')
+      .add(7, 'day')
+      .toDate();
     this.props.getEventsInRange(from, to);
   }
 

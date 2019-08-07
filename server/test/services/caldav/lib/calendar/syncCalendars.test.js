@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { syncCalendars } = require('../../../services/caldav/lib/calendar/calendar.syncCalendars');
+const { syncCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncCalendars');
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 

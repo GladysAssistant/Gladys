@@ -1,7 +1,7 @@
 module.exports = function CalDAVController(caldavHandler) {
   /**
    * @api {get} /api/v1/service/caldav/config Check config
-   * @apiName Sync
+   * @apiName Config
    * @apiGroup CalDAV
    */
   async function config(req, res) {

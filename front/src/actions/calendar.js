@@ -17,7 +17,7 @@ function createActions(store) {
             start: new Date(event.start),
             end: new Date(event.end),
             allDay: event.full_day
-          }
+          };
         });
         store.setState({
           eventsFormated,
@@ -29,7 +29,7 @@ function createActions(store) {
         });
       }
     }
-  }
+  };
   return actions;
 }
 

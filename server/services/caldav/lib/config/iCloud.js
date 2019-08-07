@@ -50,6 +50,10 @@ function iCloudRequest(https, path, auth, postData) {
   });
 }
 
+const icloud = {
+  iCloudRequest,
+};
+
 /**
  * @description Auto configure iCloud account.
  * @param {string} userId - Gladys User ID.
@@ -65,26 +69,26 @@ async function iCloud(userId, appleId, password) {
   };
 
   let postData = `
-        <propfind xmlns='DAV:'>
-            <prop>
-                <current-user-principal/>
-            </prop>
-        </propfind>
-    `;
+    <propfind xmlns='DAV:'>
+      <prop>
+        <current-user-principal/>
+      </prop>
+    </propfind>
+  `;
 
-  let xml = await iCloudRequest(this.https, '/', auth, postData);
+  let xml = await icloud.iCloudRequest(this.https, '/', auth, postData);
   let xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
   const path = xmlDoc.getElementsByTagName('current-user-principal')[0].getElementsByTagName('href')[0].childNodes[0]
     .nodeValue;
   postData = `
-        <propfind xmlns='DAV:' xmlns:cd='urn:ietf:params:xml:ns:caldav'>
-            <prop>
-                <cd:calendar-home-set/>
-            </prop>
-        </propfind>
-    `;
+    <propfind xmlns='DAV:' xmlns:cd='urn:ietf:params:xml:ns:caldav'>
+      <prop>
+        <cd:calendar-home-set/>
+      </prop>
+    </propfind>
+  `;
 
-  xml = await iCloudRequest(this.https, path, auth, postData);
+  xml = await icloud.iCloudRequest(this.https, path, auth, postData);
   xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
   const url = xmlDoc
     .getElementsByTagName('calendar-home-set')[0]
@@ -94,6 +98,6 @@ async function iCloud(userId, appleId, password) {
   return { url };
 }
 
-module.exports = {
-  iCloud,
-};
+icloud.iCloud = iCloud;
+
+module.exports = icloud;

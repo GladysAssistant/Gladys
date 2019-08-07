@@ -5,7 +5,7 @@ const {
   formatEvents,
   formatRecurringEvents,
   formatCalendars,
-} = require('../../../services/caldav/lib/calendar/calendar.formaters');
+} = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
 
 const caldavCalendars = [
   {
@@ -48,10 +48,11 @@ const expectedEvents = [
   },
   {
     external_id: '71c01038-2231-4dee-a230-6820fdb1136e',
-    selector: 'Event 2 2019-04-01-1000',
+    selector: 'Event 2 2019-04-01-0000',
     name: 'Event 2',
     location: 'Toulouse',
-    start: '2019-04-01T10:00:00.000Z',
+    start: '2019-04-01T00:00:00.000Z',
+    end: '2019-04-02T00:00:00.000Z',
     full_day: true,
     calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
   },
@@ -170,7 +171,8 @@ describe('CalDAV formaters', () => {
         type: 'VEVENT',
         uid: '71c01038-2231-4dee-a230-6820fdb1136e',
         summary: 'Event 2',
-        start: new Date('2019-04-01T10:00:00Z'),
+        start: new Date('2019-04-01T00:00:00Z'),
+        end: new Date('2019-04-02T00:00:00Z'),
         location: 'Toulouse',
       },
     })

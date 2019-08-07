@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-const { syncUser } = require('../../../services/caldav/lib/calendar/calendar.syncUser');
+const { syncUser } = require('../../../../../services/caldav/lib/calendar/calendar.syncUser');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
