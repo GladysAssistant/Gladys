@@ -2,7 +2,7 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { EVENTS } = require('../../../../utils/constants');
-const { MockedMqttClient } = require('../mocks.test');
+const { MockedMqttClient, mqttApi } = require('../mocks.test');
 
 const gladys = {
   variable: {
@@ -10,6 +10,9 @@ const gladys = {
   },
   event: {
     emit: fake.returns(null),
+  },
+  location: {
+    create: fake.returns(null),
   },
 };
 

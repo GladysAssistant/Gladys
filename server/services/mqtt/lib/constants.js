@@ -7,6 +7,9 @@ const CONFIGURATION = {
 const DEFAULT = {
   TOPICS: [
     'gladys/master/#', // Default gladys topic
+    'owntracks/+/+', // Owntracks topic
+    'stat/+/+', // Sonoff topic
+    'tele/+/+', // Sonoff topic
   ],
 };
 

@@ -223,6 +223,26 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
+    "sonoff": {
+      "title": "Sonoff",
+      "search": "Search devices",
+      "newButton": "New",
+      "noDeviceFound": "No Sonoff device found.",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic",
+      "topicPlaceholder": "%topic% Sonoff MQTT value",
+      "modelLabel": "Sonoff Model",
+      "model": {
+        "basic": "Sonoff Basic",
+        "pow": "Sonoff Pow",
+        "s26": "Sonoff S26 Smart Plug"
+      },
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "saveError": "There was an error saving the device."
+    },
     "zwave": {
       "title": "Z-Wave",
       "deviceTab": "Devices",

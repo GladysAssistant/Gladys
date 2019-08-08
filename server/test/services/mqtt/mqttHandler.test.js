@@ -41,7 +41,7 @@ describe('MqttHandler', () => {
 
   it('should call subscribe function', async () => {
     event.emit('connect');
-    assert.callCount(mqttHandler.mqttClient.subscribe, 1);
+    assert.callCount(mqttHandler.mqttClient.subscribe, 4);
   });
 
   it('should create device', () => {
