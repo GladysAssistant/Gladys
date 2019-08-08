@@ -7,14 +7,14 @@ const { connect } = require('./calendar/connect');
 const { config } = require('./config/index');
 const { iCloud } = require('./config/iCloud');
 
-const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, https) {
+const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, request) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.ical = ical;
   this.dav = dav;
   this.moment = moment;
   this.xmlDom = xmlDom;
-  this.https = https;
+  this.request = request;
 };
 
 CalDAVHandler.prototype.formatRecurringEvents = formatRecurringEvents;

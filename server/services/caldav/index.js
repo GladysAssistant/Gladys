@@ -7,9 +7,9 @@ module.exports = function CalDAVService(gladys, serviceId) {
   const dav = require('dav');
   const moment = require('moment');
   const xmlDom = require('xmldom');
-  const https = require('https');
+  const request = require('request-promise-native');
 
-  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, https);
+  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, request);
 
   /**
    * @public

@@ -1,58 +1,29 @@
 /**
  * @description Request iCloud.
- * @param {*} https - Module https to request.
+ * @param {*} request - Module request.
  * @param {string} path - Request path.
  * @param {Object} auth - User account credentials.
  * @param {string} postData - Request body.
  * @returns {Promise} Resolving with request response.
  * @example
- * iCloudRequest(https, '/', {
+ * iCloudRequest(request, '/', {
  *         appleId: 'tony.stark@icloud.com',
  *         password: '12345'
  *     },
  *     '<propfind xmlns=\'DAV:\'>...</propfind>'
  * )
  */
-function iCloudRequest(https, path, auth, postData) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(
-      {
-        auth: `${auth.appleId}:${auth.password}`,
-        headers: {
-          Depth: '0',
-          'Content-Type': 'application/xml',
-          'Content-Length': postData.length,
-        },
-        host: 'caldav.icloud.com',
-        method: 'PROPFIND',
-        path,
-        port: 443,
-      },
-      (res) => {
-        let body = '';
-
-        res.on('data', (data) => {
-          body += data;
-        });
-
-        res.on('end', () => {
-          resolve(body);
-        });
-      },
-    );
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.write(postData);
-    req.end();
+function iCloudRequest(request, path, auth, postData) {
+  return request({
+    auth: {
+      username: auth.appleId,
+      password: auth.password,
+    },
+    uri: `https://caldav.icloud.com${path}`,
+    method: 'PROPFIND',
+    body: postData,
   });
 }
-
-const icloud = {
-  iCloudRequest,
-};
 
 /**
  * @description Auto configure iCloud account.
@@ -76,7 +47,7 @@ async function iCloud(userId, appleId, password) {
     </propfind>
   `;
 
-  let xml = await icloud.iCloudRequest(this.https, '/', auth, postData);
+  let xml = await iCloudRequest(this.request, '/', auth, postData);
   let xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
   const path = xmlDoc.getElementsByTagName('current-user-principal')[0].getElementsByTagName('href')[0].childNodes[0]
     .nodeValue;
@@ -88,7 +59,7 @@ async function iCloud(userId, appleId, password) {
     </propfind>
   `;
 
-  xml = await icloud.iCloudRequest(this.https, path, auth, postData);
+  xml = await iCloudRequest(this.request, path, auth, postData);
   xmlDoc = new this.xmlDom.DOMParser().parseFromString(xml);
   const url = xmlDoc
     .getElementsByTagName('calendar-home-set')[0]
@@ -98,6 +69,7 @@ async function iCloud(userId, appleId, password) {
   return { url };
 }
 
-icloud.iCloud = iCloud;
-
-module.exports = icloud;
+module.exports = {
+  iCloudRequest,
+  iCloud,
+};

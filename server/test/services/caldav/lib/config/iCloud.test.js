@@ -24,13 +24,6 @@ const postDatas = [
 ];
 
 describe('CalDAV config', () => {
-  const iCloudRequestStub = sinon
-    .stub(icloud, 'iCloudRequest')
-    .onFirstCall()
-    .resolves('xml')
-    .onSecondCall()
-    .resolves('xml2');
-
   const parseFromStringsStub = sinon.stub().returns({
     getElementsByTagName: sinon.stub().returns([
       {
@@ -39,7 +32,7 @@ describe('CalDAV config', () => {
           .onFirstCall()
           .returns([
             {
-              childNodes: [{ nodeValue: 'stark-entreprise.com' }],
+              childNodes: [{ nodeValue: '/calendar/12345' }],
             },
           ])
           .onSecondCall()
@@ -60,7 +53,12 @@ describe('CalDAV config', () => {
         setValue: sinon.stub().resolves(),
       },
     },
-    https: 'module-https',
+    request: sinon
+      .stub()
+      .onFirstCall()
+      .resolves('xml')
+      .onSecondCall()
+      .resolves('xml2'),
     xmlDom: {
       DOMParser: sinon.stub().returns({ parseFromString: parseFromStringsStub }),
     },
@@ -69,17 +67,27 @@ describe('CalDAV config', () => {
   it('should config apple url', async () => {
     const result = await configEnv.iCloud(userId, appleId, password);
 
-    expect(iCloudRequestStub.getCall(0).args).to.eql([
-      'module-https',
-      '/',
-      { appleId: 'tony.stark@icloud.com', password: '7a69-edb2-42ca-9e5e' },
-      postDatas[0],
+    expect(configEnv.request.getCall(0).args).to.eql([
+      {
+        auth: {
+          username: 'tony.stark@icloud.com',
+          password: '7a69-edb2-42ca-9e5e',
+        },
+        uri: 'https://caldav.icloud.com/',
+        method: 'PROPFIND',
+        body: postDatas[0],
+      },
     ]);
-    expect(iCloudRequestStub.getCall(1).args).to.eql([
-      'module-https',
-      'stark-entreprise.com',
-      { appleId: 'tony.stark@icloud.com', password: '7a69-edb2-42ca-9e5e' },
-      postDatas[1],
+    expect(configEnv.request.getCall(1).args).to.eql([
+      {
+        auth: {
+          username: 'tony.stark@icloud.com',
+          password: '7a69-edb2-42ca-9e5e',
+        },
+        uri: 'https://caldav.icloud.com/calendar/12345',
+        method: 'PROPFIND',
+        body: postDatas[1],
+      },
     ]);
     expect(configEnv.gladys.variable.setValue.getCall(0).args).to.eql([
       'CALDAV_URL',
