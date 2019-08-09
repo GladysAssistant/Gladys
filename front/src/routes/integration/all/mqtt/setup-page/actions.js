@@ -17,7 +17,7 @@ const createActions = store => {
       } finally {
         store.setState({
           mqttURL: (mqttURL || {}).value,
-          mqttUsername: (mqttUsername || {}).value,
+          mqttUsername: (mqttUsername || { value: '' }).value,
           mqttPassword,
           passwordChanges: false
         });
