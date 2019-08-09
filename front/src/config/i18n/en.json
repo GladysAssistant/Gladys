@@ -288,8 +288,8 @@
       },
       "setup": {
         "title": "MQTT configuration",
-        "urlLabel": "Server URL",
-        "urlPlaceholder": "Ex: http://[mqtt-server-address]:[port]",
+        "urlLabel": "Broker URL",
+        "urlPlaceholder": "Ex: http://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
         "userPlaceholder": "Enter server username",
         "passwordLabel": "Password",
