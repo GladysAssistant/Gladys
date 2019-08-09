@@ -25,7 +25,7 @@ function createActions(store) {
         let sonoffsReceived = await state.httpClient.get('/api/v1/service/mqtt/device', options);
         sonoffsReceived = sonoffsReceived
           .filter(device => {
-            return device.params.find(p => p.name === 'brand' && p.value === 'sonoff');
+            return device.params.find(p => p.name === 'subService' && p.value === 'sonoff');
           })
           .map(device => {
             const model = device.params.find(p => p.name === 'model');
@@ -65,7 +65,7 @@ function createActions(store) {
             service_id: state.currentIntegration.id,
             params: [
               {
-                name: 'brand',
+                name: 'subService',
                 value: 'sonoff'
               }
             ]
@@ -113,7 +113,14 @@ function createActions(store) {
         feature.name = device.name + ' - ' + feature.type;
         feature.external_id = device.external_id + ':' + feature.type;
       });
-      await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      savedDevice.model = device.model;
+      const sonoffDevices = update(state.sonoffDevices, {
+        $splice: [[index, 1, savedDevice]]
+      });
+      store.setState({
+        sonoffDevices
+      });
     },
     async deleteDevice(state, index) {
       const device = state.sonoffDevices[index];
