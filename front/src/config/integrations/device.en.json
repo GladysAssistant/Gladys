@@ -34,5 +34,11 @@
     "name": "Tasmota",
     "description": "Control your Tasmota devices.",
     "img": "/assets/integrations/cover/tasmota.jpg"
+  },
+  {
+    "key": "zigbee2mqtt",
+    "name": "zigbee2mqtt",
+    "description": "Control your Zigbee devices over MQTT.",
+    "img": "/assets/integrations/cover/zigbee2mqtt.jpg"
   }
 ]

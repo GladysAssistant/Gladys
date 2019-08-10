@@ -67,6 +67,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';

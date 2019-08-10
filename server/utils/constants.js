@@ -221,6 +221,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY: 'battery',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   MOTION_SENSOR: 'motion-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
   LIGHT_SENSOR: 'light-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SISMIC_SENSOR: 'sismic-sensor',
