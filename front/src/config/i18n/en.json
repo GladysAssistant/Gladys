@@ -264,6 +264,21 @@
         "conflictError": "Current topic is already in use."
       }
     },
+    "zigbee2mqtt": {
+      "title": "zigbee2mqtt",
+      "search": "Search devices",
+      "newButton": "New",
+      "noDeviceFound": "No zigbee2mqtt device found.",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic",
+      "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
+      "modelLabel": "Device Model",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "saveError": "There was an error saving the device."
+    },
     "zwave": {
       "title": "Z-Wave",
       "deviceTab": "Devices",
