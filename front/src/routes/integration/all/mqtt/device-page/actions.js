@@ -44,8 +44,14 @@ function createActions(store) {
         });
       }
     },
-    async saveDevice(state, device) {
-      await state.httpClient.post('/api/v1/device', device);
+    async saveDevice(state, device, index) {
+      const savedDevice = await state.httpClient.post('/api/v1/device', device);
+      const newState = update(state, {
+        mqttDevices: {
+          $splice: [[index, 1, savedDevice]]
+        }
+      });
+      store.setState(newState);
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
@@ -98,7 +104,7 @@ function createActions(store) {
         mqttDevices
       });
 
-      route(`/dashboard/integration/device/mqtt/device/${uniqueId}`);
+      route(`/dashboard/integration/device/mqtt/edit`);
     },
     async addDeviceFeature(state, index, category, type) {
       const uniqueId = uuid.v4();
@@ -111,8 +117,7 @@ function createActions(store) {
                 category,
                 type,
                 read_only: true,
-                has_feedback: false,
-                keep_history: true
+                has_feedback: false
               }
             ]
           }

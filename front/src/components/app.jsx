@@ -115,9 +115,9 @@ const AppRouter = connect(
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
 
-        <Redirect path="/dashboard/integration/device/mqtt" to="/dashboard/integration/device/mqtt/device" />
-        <MqttDevicePage path="/dashboard/integration/device/mqtt/device" />
-        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/device/:uuid" />
+        <MqttDevicePage path="/dashboard/integration/device/mqtt" />
+        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
+        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
 
         <ChatPage path="/dashboard/chat" />

@@ -4,42 +4,17 @@ import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import get from 'get-value';
 
 class MqttFeatureBox extends Component {
-  updateFeatureName(e) {
-    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'name', e.target.value);
-  }
-
-  updateFeatureExternalId(e) {
-    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'external_id', e.target.value);
-  }
-
-  updateFeatureMinValue(e) {
-    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'min', e.target.value);
-  }
-
-  updateFeatureMaxValue(e) {
-    this.props.updateFeatureProperty(this.props.deviceIndex, this.props.featureIndex, 'max', e.target.value);
-  }
-
-  deleteFeature() {
-    this.props.deleteFeature(this.props.deviceIndex, this.props.featureIndex);
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.updateFeatureName = this.updateFeatureName.bind(this);
-    this.updateFeatureExternalId = this.updateFeatureExternalId.bind(this);
-    this.updateFeatureMinValue = this.updateFeatureMinValue.bind(this);
-    this.updateFeatureMaxValue = this.updateFeatureMaxValue.bind(this);
-    this.deleteFeature = this.deleteFeature.bind(this);
-  }
-
   render({ ...props }) {
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${props.feature.category}.${props.feature.type}`)}`} />
+            <i
+              class={`mr-2 fe fe-${get(
+                DeviceFeatureCategoriesIcon,
+                `${props.feature.category}.${props.feature.type}`
+              )}`}
+            />
             <Text id={`deviceFeatureCategory.${props.feature.category}.${props.feature.type}`} />
           </div>
           <div class="card-body">
@@ -52,7 +27,7 @@ class MqttFeatureBox extends Component {
                   id={`featueName_${props.featureIndex}`}
                   type="text"
                   value={props.feature.name}
-                  onChange={this.updateFeatureName}
+                  onChange={e => props.updateFeatureProperty(e, 'name', props.featureIndex)}
                   class="form-control"
                   placeholder={<Text id="integration.mqtt.feature.namePlaceholder" />}
                 />
@@ -68,7 +43,7 @@ class MqttFeatureBox extends Component {
                   id={`externalid_${props.featureIndex}`}
                   type="text"
                   value={props.feature.external_id}
-                  onChange={this.updateFeatureExternalId}
+                  onChange={e => props.updateFeatureProperty(e, 'external_id', props.featureIndex)}
                   class="form-control"
                   placeholder={<Text id="integration.mqtt.feature.externalIdPlaceholder" />}
                 />
@@ -84,7 +59,7 @@ class MqttFeatureBox extends Component {
                   id={`min_${props.featureIndex}`}
                   type="number"
                   value={props.feature.min}
-                  onChange={this.updateFeatureMinValue}
+                  onChange={e => props.updateFeatureProperty(e, 'min', props.featureIndex)}
                   class="form-control"
                   placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
                 />
@@ -99,7 +74,7 @@ class MqttFeatureBox extends Component {
                   id={`max_${props.featureIndex}`}
                   type="number"
                   value={props.feature.max}
-                  onChange={this.updateFeatureMaxValue}
+                  onChange={e => props.updateFeatureProperty(e, 'max', props.featureIndex)}
                   class="form-control"
                   placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
                 />
@@ -107,7 +82,7 @@ class MqttFeatureBox extends Component {
             </div>
 
             <div class="form-group">
-              <button onClick={this.deleteFeature} class="btn btn-outline-danger">
+              <button onClick={() => props.deleteFeature(props.featureIndex)} class="btn btn-outline-danger">
                 <Text id="integration.mqtt.feature.deleteLabel" />
               </button>
             </div>

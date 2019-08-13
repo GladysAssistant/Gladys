@@ -269,7 +269,8 @@
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "addButton": "Edit features",
+        "returnButton": "Return back",
+        "editButton": "Edit details",
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device"

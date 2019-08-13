@@ -11,7 +11,7 @@ class MqttDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({ loading: true });
     try {
-      await this.props.saveDevice(this.props.device);
+      await this.props.saveDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
       this.setState({ error: RequestStatus.Error });
     }
@@ -51,9 +51,9 @@ class MqttDeviceBox extends Component {
                     <Text id="integration.mqtt.device.deleteButton" />
                   </button>
 
-                  <Link href={`/dashboard/integration/device/mqtt/device/${props.device.id}`}>
-                    <button class="btn btn-outline-success float-right">
-                      <Text id="integration.mqtt.device.addButton" />
+                  <Link href={`/dashboard/integration/device/mqtt/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.mqtt.device.editButton" />
                     </button>
                   </Link>
                 </div>
