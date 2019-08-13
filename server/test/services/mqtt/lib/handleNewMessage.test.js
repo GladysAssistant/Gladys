@@ -19,6 +19,7 @@ describe('Mqtt handle message', () => {
   const mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
 
   beforeEach(async () => {
+    mqttHandler.init();
     await mqttHandler.connect();
     sinon.reset();
   });
@@ -66,5 +67,11 @@ describe('Mqtt handle message', () => {
       state: message.state.value,
     };
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('handle stric topic', () => {
+    mqttHandler.handleNewMessage('gladys/master/#', '{}');
+
+    assert.notCalled(gladys.event.emit);
   });
 });

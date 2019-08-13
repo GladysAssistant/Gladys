@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION, DEFAULT } = require('./constants');
+const { CONFIGURATION } = require('./constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
@@ -28,10 +28,8 @@ async function connect() {
   });
   this.mqttClient.on('connect', () => {
     logger.info(`Connected to MQTT server ${mqttUrl}`);
-
-    DEFAULT.TOPICS.forEach((topic) => {
-      logger.info(`Subscribing to default MQTT topic ${topic}`);
-      this.mqttClient.subscribe(topic);
+    Object.keys(this.topicBinds).forEach((topic) => {
+      this.subscribe(topic, this.topicBinds[topic]);
     });
   });
   this.mqttClient.on('error', (err) => {
