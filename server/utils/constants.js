@@ -291,6 +291,7 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
+  PRESSURE_KPA: 'kPa',
 };
 
 const ACTIONS_STATUS = {
@@ -338,6 +339,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_PROGRESS: 'upgrade.download-progress',
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
+  },
+  ZIGBEE2MQTT: {
+    SCAN: 'zigbee2mqtt.scan',
   },
   ZWAVE: {
     NODE_READY: 'zwave.node-ready',
