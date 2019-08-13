@@ -225,8 +225,17 @@
     },
     "sonoff": {
       "title": "Sonoff",
-      "search": "Search devices",
-      "newButton": "New",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "device": {
+        "title": "Sonoff Devices",
+        "search": "Search devices",
+        "newButton": "New"
+      },
+      "discover": {
+        "title": "Sonoff Discover",
+        "error": "Error discovering Sonoff devices."
+      },
       "noDeviceFound": "No Sonoff device found.",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
@@ -240,6 +249,7 @@
         "s26": "Sonoff S26 Smart Plug"
       },
       "saveButton": "Save",
+      "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "saveError": "There was an error saving the device."
     },

@@ -1,8 +1,8 @@
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
-import createActionsIntegration from '../../../../actions/integration';
+import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -21,19 +21,13 @@ function createActions(store) {
           options.search = state.sonoffSearch;
         }
 
-        // TODO how to get MQTT Sonoff device ? Using device param ?
-        let sonoffsReceived = await state.httpClient.get('/api/v1/service/mqtt/device', options);
-        sonoffsReceived = sonoffsReceived
-          .filter(device => {
-            return device.params.find(p => p.name === 'subService' && p.value === 'sonoff');
-          })
-          .map(device => {
-            const model = device.params.find(p => p.name === 'model');
-            if (model) {
-              device.model = model.value;
-            }
-            return device;
-          });
+        const sonoffsReceived = await state.httpClient.get('/api/v1/service/sonoff/device', options);
+        sonoffsReceived.forEach(device => {
+          const model = device.params.find(p => p.name === 'model');
+          if (model) {
+            device.model = model.value;
+          }
+        });
 
         let sonoffDevices;
         if (skip === 0) {
@@ -62,13 +56,7 @@ function createActions(store) {
             id: uniqueId,
             name: null,
             should_poll: false,
-            service_id: state.currentIntegration.id,
-            params: [
-              {
-                name: 'subService',
-                value: 'sonoff'
-              }
-            ]
+            service_id: state.currentIntegration.id
           }
         ]
       });
@@ -84,6 +72,23 @@ function createActions(store) {
           }
         }
       });
+      store.setState({
+        sonoffDevices
+      });
+    },
+    updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
+      const sonoffDevices = update(state.sonoffDevices, {
+        [deviceIndex]: {
+          features: {
+            [featureIndex]: {
+              [property]: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+
       store.setState({
         sonoffDevices
       });

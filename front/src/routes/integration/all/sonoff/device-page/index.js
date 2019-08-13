@@ -1,7 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
-import SonoffPage from './SonoffPage';
+import SonoffPage from '../SonoffPage';
+import DeviceTab from './DeviceTab';
 
 @connect(
   'user,sonoffDevices,housesWithRooms,getSonoffStatus',
@@ -11,11 +12,15 @@ class SonoffIntegration extends Component {
   componentWillMount() {
     this.props.getSonoffDevices(100, 0);
     this.props.getHouses();
-    this.props.getIntegrationByName('mqtt');
+    this.props.getIntegrationByName('sonoff');
   }
 
   render(props, {}) {
-    return <SonoffPage {...props} />;
+    return (
+      <SonoffPage>
+        <DeviceTab {...props} />
+      </SonoffPage>
+    );
   }
 }
 

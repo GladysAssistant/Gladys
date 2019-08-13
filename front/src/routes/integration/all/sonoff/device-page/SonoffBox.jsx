@@ -1,13 +1,23 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import models from './models';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../utils/consts';
+import { GetFeatures, Models } from './models';
+import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
 class SonoffBox extends Component {
   updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
+
+    const { features } = this.props.sonoffDevices[this.props.deviceIndex];
+    if (features.length > 1) {
+      features.forEach((feature, featureIndex) => {
+        if (featureIndex > 0) {
+          const newName = `${e.target.value} - ${feature.type}`;
+          this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'name', newName);
+        }
+      });
+    }
   };
 
   updateRoom = e => {
@@ -16,11 +26,17 @@ class SonoffBox extends Component {
 
   updateTopic = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'external_id', e.target.value);
+
+    const { features } = this.props.sonoffDevices[this.props.deviceIndex];
+    features.forEach((feature, featureIndex) => {
+      const newExternalId = feature.external_id.replace('/^(.*):', e.target.value);
+      this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'external_id', newExternalId);
+    });
   };
 
   updateModel = e => {
     const selectedModel = e.target.value;
-    const params = this.props.device.params.slice();
+    const params = (this.props.device.params || []).slice();
     const model = params.find(p => p.name === 'model');
 
     if (model) {
@@ -34,7 +50,11 @@ class SonoffBox extends Component {
 
     this.props.updateDeviceField(this.props.deviceIndex, 'model', selectedModel);
     this.props.updateDeviceField(this.props.deviceIndex, 'params', params);
-    this.props.updateDeviceField(this.props.deviceIndex, 'features', models[selectedModel]);
+    this.props.updateDeviceField(
+      this.props.deviceIndex,
+      'features',
+      GetFeatures(selectedModel, this.props.device.name, this.props.device.external_id)
+    );
   };
 
   saveDevice = async () => {
@@ -74,7 +94,7 @@ class SonoffBox extends Component {
 
   render(props, { loading, saveError }) {
     return (
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card">
           <div
             class={cx('dimmer', {
@@ -150,8 +170,8 @@ class SonoffBox extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {models &&
-                      Object.keys(models).map(model => (
+                    {Models &&
+                      Object.keys(Models).map(model => (
                         <option selected={model === props.device.model} value={model}>
                           <Text id={`integration.sonoff.model.${model}`}>{model}</Text>
                         </option>

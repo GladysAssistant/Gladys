@@ -14,7 +14,6 @@ const mqttApi = Object.assign(event, {
     mqttApi.disconnected = true;
     mqttApi.internalEnd();
   },
-  publish: fake.returns(null),
 });
 
 const MockedMqttClient = {
@@ -26,7 +25,6 @@ const MockedMqttClient = {
 };
 
 module.exports = {
-  mqttApi,
   MockedMqttClient,
   mqttApi,
   event,
