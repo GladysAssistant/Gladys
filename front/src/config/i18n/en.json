@@ -244,9 +244,9 @@
       "topicPlaceholder": "%topic% Sonoff MQTT value",
       "modelLabel": "Sonoff Model",
       "model": {
-        "basic": "Sonoff Basic",
-        "pow": "Sonoff Pow",
-        "s26": "Sonoff S26 Smart Plug"
+        "basic": "Basic",
+        "pow": "Pow",
+        "s26": "S20/S26 Smart Plug"
       },
       "saveButton": "Save",
       "alreadyCreatedButton": "Already created",
