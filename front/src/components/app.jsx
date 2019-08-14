@@ -67,7 +67,6 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
-import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -77,6 +76,10 @@ import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 // Sonoff
 import SonoffPage from '../routes/integration/all/sonoff/device-page';
 import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
+
+// Zigbee2mqtt
+import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
+import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -172,6 +175,8 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <SonoffPage path="/dashboard/integration/device/sonoff" />
         <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+        <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
+        <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
