@@ -48,7 +48,7 @@ function handleMqttMessage(topic, message) {
       this.mqttDevices[deviceExternalId] = {
         name: statusMsg.Status.FriendlyName[0],
         external_id: deviceExternalId,
-        features: featureConverter(statusMsg.Status.Module, statusMsg.Status.FriendlyName[0], deviceExternalId),
+        features: featureConverter(uuid, statusMsg.Status.Module, statusMsg.Status.FriendlyName[0], deviceExternalId),
         params: paramsConverter(statusMsg.Status.Module),
         service_id: this.serviceId,
         should_poll: false,

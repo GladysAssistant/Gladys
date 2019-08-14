@@ -1,7 +1,6 @@
-const uuid = require('uuid');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
-const featureConverter = (tasmotaModule, deviceName, deviceTopic) => {
+const featureConverter = (uuid, tasmotaModule, deviceName, deviceTopic) => {
   const features = [];
   switch (tasmotaModule) {
     case 6: {

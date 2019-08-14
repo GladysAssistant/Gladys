@@ -1,3 +1,4 @@
+import uuid from 'uuid';
 import { featureConverter } from '../../../../../../../server/services/sonoff/utils/featureConverter';
 
 export const Models = {
@@ -7,5 +8,5 @@ export const Models = {
 };
 
 export const GetFeatures = (modelName, deviceName, deviceTopic) => {
-  return featureConverter(Models[modelName], deviceName, deviceTopic);
+  return featureConverter(uuid, Models[modelName], deviceName, deviceTopic);
 };

@@ -1,17 +1,18 @@
 const { expect } = require('chai');
+const uuid = require('uuid');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 const { featureConverter } = require('../../../../services/sonoff/utils/featureConverter');
 
 describe('SonoffService - featureConverter', () => {
   it('get features for unkown device', () => {
-    const features = featureConverter(-1);
+    const features = featureConverter(uuid, -1);
 
     expect(features).to.be.lengthOf(0);
   });
 
   it('get features for Sonoff Basic', () => {
-    const features = featureConverter(1);
+    const features = featureConverter(uuid, 1);
 
     expect(features).to.be.lengthOf(1);
 
@@ -20,7 +21,7 @@ describe('SonoffService - featureConverter', () => {
   });
 
   it('get features for Sonoff Pow', () => {
-    const features = featureConverter(8);
+    const features = featureConverter(uuid, 8);
 
     expect(features).to.be.lengthOf(1);
 
@@ -29,7 +30,7 @@ describe('SonoffService - featureConverter', () => {
   });
 
   it('get features for Sonoff Plug S2x', () => {
-    const features = featureConverter(6);
+    const features = featureConverter(uuid, 6);
 
     expect(features).to.be.lengthOf(2);
 
