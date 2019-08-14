@@ -4,6 +4,7 @@ import cx from 'classnames';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
+import { Link } from 'preact-router/match';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">

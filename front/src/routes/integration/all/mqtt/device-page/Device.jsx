@@ -1,9 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import get from 'get-value';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import MqttDeviceForm from './DeviceForm';
 import { Link } from 'preact-router/match';
 
