@@ -1,8 +1,8 @@
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
-import createActionsIntegration from '../../../../actions/integration';
+import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -21,19 +21,13 @@ function createActions(store) {
           options.search = state.zigbee2mqttSearch;
         }
 
-        // TODO how to get MQTT Zigbee2mqtt device ? Using device param ?
-        let zigbee2mqttsReceived = await state.httpClient.get('/api/v1/service/mqtt/device', options);
-        zigbee2mqttsReceived = zigbee2mqttsReceived
-          .filter(device => {
-            return device.params.find(p => p.name === 'subService' && p.value === 'zigbee2mqtt');
-          })
-          .map(device => {
-            const model = device.params.find(p => p.name === 'model');
-            if (model) {
-              device.model = model.value;
-            }
-            return device;
-          });
+        const zigbee2mqttsReceived = await state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options);
+        zigbee2mqttsReceived.forEach(device => {
+          const model = device.params.find(p => p.name === 'model');
+          if (model) {
+            device.model = model.value;
+          }
+        });
 
         let zigbee2mqttDevices;
         if (skip === 0) {
@@ -62,13 +56,7 @@ function createActions(store) {
             id: uniqueId,
             name: null,
             should_poll: false,
-            service_id: state.currentIntegration.id,
-            params: [
-              {
-                name: 'subService',
-                value: 'zigbee2mqtt'
-              }
-            ]
+            service_id: state.currentIntegration.id
           }
         ]
       });
@@ -110,8 +98,7 @@ function createActions(store) {
     async saveDevice(state, index) {
       const device = state.zigbee2mqttDevices[index];
       device.features.forEach(feature => {
-        feature.name = device.name + ' - ' + feature.type;
-        feature.external_id = device.external_id + ':' + feature.type;
+        feature.name = `${device.name} - ${feature.category}`;
       });
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       savedDevice.model = device.model;

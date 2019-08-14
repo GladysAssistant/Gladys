@@ -729,6 +729,82 @@
       ]
     }
   ],
+  "get /api/v1/service/zigbee2mqtt": {},
+  "get /api/v1/service/zigbee2mqtt/device": [
+    {
+      "name": "Smart LED",
+      "external_id": "0x12456",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "features": [
+        {
+          "category": "light",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNLDP12LM"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/zigbee2mqtt/discover": [
+    {
+      "name": "Xiaomi MiJia temperature & humidity sensor",
+      "external_id": "0x234567",
+      "features": [
+        {
+          "category": "temperature-sensor",
+          "type": "decimal"
+        },
+        {
+          "category": "humidity-sensor",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "WSDCGQ01LM"
+        }
+      ]
+    },
+    {
+      "name": "Xiaomi Mi power plug",
+      "external_id": "0x345678",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNCZ02LM"
+        }
+      ]
+    },
+    {
+      "name": "Smart LED",
+      "external_id": "0x12456",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "features": [
+        {
+          "category": "light",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNLDP12LM"
+        }
+      ]
+    }
+  ],
   "get /api/v1/service/rtsp-camera/device": [
     {
       "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",
