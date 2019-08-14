@@ -4,7 +4,6 @@ import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
-import { route } from 'preact-router';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -86,27 +85,7 @@ function createActions(store) {
       });
       await actions.getMqttDevices(store.getState(), 20, 0);
     },
-    async addDevice(state) {
-      const uniqueId = uuid.v4();
-      const mqttDevices = update(state.mqttDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            should_poll: false,
-            external_id: uniqueId,
-            service_id: state.currentIntegration.id,
-            features: []
-          }
-        ]
-      });
-      store.setState({
-        mqttDevices
-      });
-
-      route(`/dashboard/integration/device/mqtt/edit`);
-    },
-    async addDeviceFeature(state, index, category, type) {
+    addDeviceFeature(state, index, category, type) {
       const uniqueId = uuid.v4();
       const mqttDevices = update(state.mqttDevices, {
         [index]: {
@@ -128,7 +107,7 @@ function createActions(store) {
         mqttDevices
       });
     },
-    async updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
+    updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
       const mqttDevices = update(state.mqttDevices, {
         [deviceIndex]: {
           features: {
@@ -145,7 +124,7 @@ function createActions(store) {
         mqttDevices
       });
     },
-    async deleteFeature(state, deviceIndex, featureIndex) {
+    deleteFeature(state, deviceIndex, featureIndex) {
       const mqttDevices = update(state.mqttDevices, {
         [deviceIndex]: {
           features: {

@@ -33,9 +33,11 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        <button onClick={props.addDevice} class="btn btn-outline-primary ml-2">
-          <Text id="scene.newButton" /> <i class="fe fe-plus" />
-        </button>
+        <Link href="/dashboard/integration/device/mqtt/edit">
+          <button class="btn btn-outline-primary ml-2">
+            <Text id="scene.newButton" /> <i class="fe fe-plus" />
+          </button>
+        </Link>
       </div>
     </div>
     <div class="card-body">
