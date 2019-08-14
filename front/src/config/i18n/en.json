@@ -263,18 +263,23 @@
       }
     },
     "zigbee2mqtt": {
-      "title": "zigbee2mqtt",
-      "search": "Search devices",
-      "newButton": "New",
+      "title": "Zigbee2mqtt",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "device": {
+        "title": "Zigbee2mqtt Devices",
+        "search": "Search devices"
+      },
       "noDeviceFound": "No zigbee2mqtt device found.",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
-      "modelLabel": "Device Model",
+      "featuresLabel": "Features",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "alreadyExistsButton": "Already created",
       "saveError": "There was an error saving the device."
     },
     "zwave": {
@@ -828,6 +833,18 @@
     "temperature-sensor": {
       "decimal": "Temperature"
     },
+    "humidity-sensor": {
+      "integer": "Humidity"
+    },
+    "pressure-sensor": {
+      "integer": "Pressure"
+    },
+    "presence-sensor": {
+      "binary": "Presence"
+    },
+    "water-sensor": {
+      "binary": "Water"
+    },
     "motion-sensor": {
       "push": "Motion",
       "binary": "Motion"
@@ -874,17 +891,11 @@
     "button": {
       "click": "Button"
     },
-    "pressure-sensor": {
-      "decimal": "Pressure"
-    },
     "leak-sensor": {
       "binary": "Leak"
     },
     "opening-sensor": {
       "binary": "Opening"
-    },
-    "humidity-sensor": {
-      "decimal": "Humidity"
     },
     "vibration-sensor": {
       "status": "Status",

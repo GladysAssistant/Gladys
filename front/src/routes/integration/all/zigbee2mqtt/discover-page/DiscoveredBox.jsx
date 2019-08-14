@@ -1,40 +1,16 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import models from './models';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../utils/consts';
+import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
-class Zigbee2mqttBox extends Component {
+class DiscoveredBox extends Component {
   updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
   };
 
   updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
-  };
-
-  updateTopic = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'external_id', e.target.value);
-  };
-
-  updateModel = e => {
-    const selectedModel = e.target.value;
-    const params = this.props.device.params.slice();
-    const model = params.find(p => p.name === 'model');
-
-    if (model) {
-      model.value = selectedModel;
-    } else {
-      params.push({
-        name: 'model',
-        value: selectedModel
-      });
-    }
-
-    this.props.updateDeviceField(this.props.deviceIndex, 'model', selectedModel);
-    this.props.updateDeviceField(this.props.deviceIndex, 'params', params);
-    this.props.updateDeviceField(this.props.deviceIndex, 'features', models[selectedModel]);
   };
 
   saveDevice = async () => {
@@ -56,25 +32,9 @@ class Zigbee2mqttBox extends Component {
     });
   };
 
-  deleteDevice = async () => {
-    this.setState({
-      loading: true
-    });
-    try {
-      await this.props.deleteDevice(this.props.deviceIndex);
-    } catch (e) {
-      this.setState({
-        deleteError: RequestStatus.Error
-      });
-    }
-    this.setState({
-      loading: false
-    });
-  };
-
   render(props, { loading, saveError }) {
     return (
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card">
           <div
             class={cx('dimmer', {
@@ -135,33 +95,15 @@ class Zigbee2mqttBox extends Component {
                       id={`topic_${props.deviceIndex}`}
                       type="text"
                       value={props.device.external_id}
-                      onInput={this.updateTopic}
                       class="form-control"
-                      placeholder={<Text id="integration.zigbee2mqtt.topicPlaceholder" />}
+                      disabled="true"
                     />
                   </Localizer>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`model_${props.deviceIndex}`}>
-                    <Text id="integration.zigbee2mqtt.modelLabel" />
-                  </label>
-                  <select onChange={this.updateModel} class="form-control" id={`model_${props.deviceIndex}`}>
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {models &&
-                      Object.keys(models).map(model => (
-                        <option selected={model === props.device.model} value={model}>
-                          <Text id={`integration.zigbee2mqtt.model.${model}`}>{model}</Text>
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <div class="form-group">
                   <label class="form-label">
-                    <Text id="integration.zigbee2mqtt.device.featuresLabel" />
+                    <Text id="integration.zigbee2mqtt.featuresLabel" />
                   </label>
                   <div class="tags">
                     {props.device &&
@@ -180,12 +122,16 @@ class Zigbee2mqttBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.zigbee2mqtt.saveButton" />
-                  </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
-                    <Text id="integration.zigbee2mqtt.deleteButton" />
-                  </button>
+                  {props.device.created_at && (
+                    <button disabled="true" class="btn btn-primary mr-2">
+                      <Text id="integration.zigbee2mqtt.alreadyExistsButton" />
+                    </button>
+                  )}
+                  {!props.device.created_at && (
+                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                      <Text id="integration.zigbee2mqtt.saveButton" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -196,4 +142,4 @@ class Zigbee2mqttBox extends Component {
   }
 }
 
-export default Zigbee2mqttBox;
+export default DiscoveredBox;

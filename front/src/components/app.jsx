@@ -67,7 +67,6 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
-import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -78,6 +77,10 @@ import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
+
+// Zigbee2mqtt
+import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
+import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -174,6 +177,8 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
+        <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

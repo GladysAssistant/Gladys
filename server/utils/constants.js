@@ -359,7 +359,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
   ZIGBEE2MQTT: {
-    SCAN: 'zigbee2mqtt.scan',
+    DISCOVER: 'zigbee2mqtt.discover',
   },
   ZWAVE: {
     DRIVER_READY: 'zwave.driver-ready',
