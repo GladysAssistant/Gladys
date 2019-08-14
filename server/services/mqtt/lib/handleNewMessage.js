@@ -19,7 +19,7 @@ function handleNewMessage(topic, message) {
       extactMatch(this, topic, message);
     } else {
       Object.keys(this.topicBinds).forEach((key) => {
-        const regexKey = key.replace('+', '[a-z0-9]+').replace('#', '[/a-z0-9]+');
+        const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
 
         if (topic.match(regexKey)) {
           forwardedMessage = true;
