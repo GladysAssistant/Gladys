@@ -3,6 +3,7 @@ const http = require('http');
 const compression = require('compression');
 const WebSocket = require('ws');
 const path = require('path');
+const OAuthServer = require('express-oauth-server');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const notFoundMiddleware = require('./middlewares/notFoundMiddleware');
 const WebsocketManager = require('./websockets');
@@ -27,6 +28,13 @@ function start(gladys, port, options) {
 
   // parse json
   app.use(express.json());
+
+  // allow OAuth2 security
+  const oauth = new OAuthServer({
+    model: gladys.oauth,
+  });
+  app.post('/oauth/authorize', oauth.authorize());
+  app.post('/oauth/token', oauth.token());
 
   if (options.serveFront) {
     // serving static app

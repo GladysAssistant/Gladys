@@ -29,6 +29,11 @@ const TriggerModel = require('./trigger');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
+// OAuth
+const OAuthAccessTokenModel = require('./oauth_access_token');
+const OAuthClientModel = require('./oauth_client');
+const OAuthAuthorizationCodeModel = require('./oauth_authorization_code');
+
 const models = {
   Area: AreaModel(sequelize, Sequelize),
   Calendar: CalendarModel(sequelize, Sequelize),
@@ -52,6 +57,10 @@ const models = {
   Trigger: TriggerModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
+  // OAuth
+  OAuthAccessToken: OAuthAccessTokenModel(sequelize, Sequelize),
+  OAuthClient: OAuthClientModel(sequelize, Sequelize),
+  OAuthAuthorizationCode: OAuthAuthorizationCodeModel(sequelize, Sequelize),
 };
 
 // Associate all model

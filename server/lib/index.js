@@ -24,6 +24,7 @@ const TriggerManager = require('./trigger');
 const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
+const Oauth = require('./oauth');
 
 /**
  * @description Start a new Gladys instance
@@ -66,6 +67,7 @@ function Gladys(params = {}) {
   const trigger = new TriggerManager(event, stateManager, scene);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user);
+  const oauth = new Oauth(user);
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
@@ -91,6 +93,7 @@ function Gladys(params = {}) {
     trigger,
     variable,
     weather,
+    oauth,
     start: async () => {
       if (!params.disableBrainLoading) {
         await brain.load();
