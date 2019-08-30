@@ -18,6 +18,7 @@ const SystemController = require('./controllers/system.controller');
 const TriggerController = require('./controllers/trigger.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const OAuthController = require('./controllers/oauth.controller');
 
 /**
  * @description Return object of routes.
@@ -47,6 +48,7 @@ function getRoutes(gladys) {
   const systemController = SystemController(gladys);
   const triggerController = TriggerController(gladys);
   const weatherController = WeatherController(gladys);
+  const oauthController = OAuthController(gladys);
 
   const routes = {};
 
@@ -463,6 +465,15 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    // oauth
+    'post /api/vi/oauth': {
+      authenticated: true,
+      controller: oauthController.createClient,
+    },
+    'get /api/vi/oauth/:client_id': {
+      authenticated: true,
+      controller: oauthController.getClient,
     },
   };
 
