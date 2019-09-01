@@ -5,6 +5,7 @@ const db = require('../../models');
  * @param {Object} token - The access token.
  * @param {Object} client - The OAuth client.
  * @param {Object} user - The user.
+ * @returns {Object} The created token.
  * @example
  * oauth.saveToken(
  * {
@@ -25,7 +26,11 @@ async function saveToken(token, client, user) {
   newToken.client_id = client.client_id;
   newToken.user_id = user.id;
 
-  return db.OAuthAccessToken.create(newToken);
+  const created = await db.OAuthAccessToken.create(newToken);
+  if (created) {
+    return created.get({ plain: true });
+  }
+  return created;
 }
 
 module.exports = {

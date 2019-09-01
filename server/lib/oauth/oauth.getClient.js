@@ -22,6 +22,7 @@ async function getClient(clientId, clientSecret) {
   if (client) {
     client.redirect_uris = (client.redirect_uris || []).split('|');
     client.grants = (client.grants || []).split('|');
+    return client.get({ plain: true });
   }
   return client;
 }

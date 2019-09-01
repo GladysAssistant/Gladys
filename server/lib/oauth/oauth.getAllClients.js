@@ -16,7 +16,7 @@ async function getAllClients() {
       client.grants = [];
     }
   });
-  return clients;
+  return clients.map((client) => client.get({ plain: true }));
 }
 
 module.exports = {

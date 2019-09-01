@@ -7,8 +7,8 @@ const db = require('../../models');
  * @example
  * oauth.getRefreshToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
-function getRefreshToken(bearerToken) {
-  return db.OAuthAccessToken.findOne({
+async function getRefreshToken(bearerToken) {
+  const refreshToken = await db.OAuthAccessToken.findOne({
     where: {
       refresh_token: bearerToken,
     },
@@ -17,6 +17,11 @@ function getRefreshToken(bearerToken) {
       as: 'user',
     },
   });
+
+  if (refreshToken) {
+    return refreshToken.get({ plain: true });
+  }
+  return refreshToken;
 }
 
 module.exports = {

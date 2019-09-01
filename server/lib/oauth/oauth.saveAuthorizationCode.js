@@ -25,7 +25,8 @@ async function saveAuthorizationCode(authorizationCode, client, user) {
   newAuthorizationCode.client_id = client.client_id;
   newAuthorizationCode.user_id = user.id;
 
-  return db.OAuthAuthorizationCode.create(newAuthorizationCode);
+  const created = await db.OAuthAuthorizationCode.create(newAuthorizationCode);
+  return created.get({ plain: true });
 }
 
 module.exports = {

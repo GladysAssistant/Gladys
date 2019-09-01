@@ -18,8 +18,11 @@ async function createClient(client) {
   clientClone.grants = (client.grants || []).join('|');
 
   const created = await db.OAuthClient.create(clientClone);
-  created.redirect_uris = created.redirect_uris.split('|');
-  created.grants = created.grants.split('|');
+  if (created) {
+    created.redirect_uris = created.redirect_uris.split('|');
+    created.grants = created.grants.split('|');
+    return created.get({ plain: true });
+  }
   return created;
 }
 

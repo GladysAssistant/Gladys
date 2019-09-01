@@ -7,8 +7,8 @@ const db = require('../../models');
  * @example
  * oauth.getAccessToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
-function getAccessToken(bearerToken) {
-  return db.OAuthAccessToken.findOne({
+async function getAccessToken(bearerToken) {
+  const accessToken = await db.OAuthAccessToken.findOne({
     where: {
       access_token: bearerToken,
     },
@@ -17,6 +17,11 @@ function getAccessToken(bearerToken) {
       as: 'user',
     },
   });
+
+  if (accessToken) {
+    return accessToken.get({ plain: true });
+  }
+  return accessToken;
 }
 
 module.exports = {
