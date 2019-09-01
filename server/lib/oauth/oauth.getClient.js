@@ -20,11 +20,8 @@ async function getClient(clientId, clientSecret) {
   });
 
   if (client) {
-    return {
-      clientId: client.client_id,
-      clientSecret: client.client_secret,
-      grants: ['password'],
-    };
+    client.redirect_uris = (client.redirect_uris || []).split('|');
+    client.grants = (client.grants || []).split('|');
   }
   return client;
 }

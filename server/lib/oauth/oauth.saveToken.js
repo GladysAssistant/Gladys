@@ -2,16 +2,16 @@ const db = require('../../models');
 
 /**
  * @description Save token.
- * @param {string} token - The access token.
- * @param {string} client - The OAuth client.
- * @param {string} user - The user.
+ * @param {Object} token - The access token.
+ * @param {Object} client - The OAuth client.
+ * @param {Object} user - The user.
  * @example
  * oauth.saveToken(
  * {
- *  accessToken: '1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
- *  accessTokenExpiresOn: new Date(),
- *  refreshToken: '2/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
- *  refreshTokenExpiresOn: new Date(),
+ *  access_token: '1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
+ *  access_token_expires_on: new Date(),
+ *  refresh_token: '2/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
+ *  refresh_token_expires_on: new Date(),
  * },
  * client: {
  *  client_id: 'my-client',
@@ -22,8 +22,8 @@ const db = require('../../models');
  */
 async function saveToken(token, client, user) {
   const newToken = Object.assign({}, token);
-  newToken.client = client;
-  newToken.user = user;
+  newToken.client_id = client.client_id;
+  newToken.user_id = user.id;
 
   return db.OAuthAccessToken.create(newToken);
 }

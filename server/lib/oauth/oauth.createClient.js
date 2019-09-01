@@ -1,7 +1,5 @@
-const WebCrypto = require('node-webcrypto-ossl');
+const uuid = require('uuid');
 const db = require('../../models');
-
-const crypto = new WebCrypto();
 
 /**
  * @description Get client.
@@ -10,19 +8,19 @@ const crypto = new WebCrypto();
  * @example
  * oauth.createClient({
  *   client_id: 'my-client',
- *   redirect_uri: [ 'http://my-first-url', 'http://my-second_url' ],
+ *   redirect_uris: [ 'http://my-first-url', 'http://my-second_url' ],
  * });
  */
 async function createClient(client) {
-  client.client_secret = await crypto.generateKey({
-    name: 'RSASSA-PKCS1-v1_5',
-    modulusLength: 256,
-    publicExponent: new Uint8Array([1, 0, 1]),
-    hash: {
-      name: 'SHA-256',
-    },
-  });
-  return db.OAuthClient.create(client);
+  const clientClone = Object.assign({}, client);
+  clientClone.client_secret = uuid.v4();
+  clientClone.redirect_uris = (client.redirect_uris || []).join('|');
+  clientClone.grants = (client.grants || []).join('|');
+
+  const created = await db.OAuthClient.create(clientClone);
+  created.redirect_uris = created.redirect_uris.split('|');
+  created.grants = created.grants.split('|');
+  return created;
 }
 
 module.exports = {

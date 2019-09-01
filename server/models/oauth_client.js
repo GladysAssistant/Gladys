@@ -10,9 +10,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
       },
-      redirect_uri: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+      redirect_uris: {
+        type: DataTypes.STRING,
         allowNull: false,
+      },
+      grants: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {},

@@ -467,13 +467,17 @@ function getRoutes(gladys) {
       controller: weatherController.getByHouse,
     },
     // oauth
-    'post /api/vi/oauth': {
+    'post /api/v1/oauth': {
       authenticated: true,
       controller: oauthController.createClient,
     },
-    'get /api/vi/oauth/:client_id': {
+    'get /api/v1/oauth/:client_id': {
       authenticated: true,
       controller: oauthController.getClient,
+    },
+    'get /api/v1/oauth': {
+      authenticated: true,
+      controller: oauthController.get,
     },
   };
 

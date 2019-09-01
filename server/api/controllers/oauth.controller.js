@@ -27,16 +27,51 @@ module.exports = function OAuthController(gladys) {
    *
    * @apiSuccessExample {json} Success-Example
    * {
-   *
+   *   client_id: 'oauth_client_1',
+   *   client_secret: 'this_is_secret_for_oauth_client_1',
+   *   redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
+   *   grants: ['grant_1', 'grant_2'],
    * }
    */
   async function getClient(req, res) {
     const client = await gladys.oauth.getClient(req.params.client_id);
+    if (!client) {
+      res.status(404);
+    }
     res.json(client);
+  }
+
+  /**
+   * @api {get} /api/v1/oauth
+   * @apiName get
+   * @apiGroup OAuth
+   * @apiDescription Get OAuth all clients.
+   *
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   {
+   *     client_id: 'oauth_client_1',
+   *     client_secret: 'this_is_secret_for_oauth_client_1',
+   *     redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
+   *     grants: ['grant_1', 'grant_2'],
+   *   },
+   *   {
+   *     client_id: 'oauth_client_2',
+   *     client_secret: 'this_is_secret_for_oauth_client_2',
+   *     redirect_uris: ['http://oauth2.fr'],
+   *   }
+   * ]
+   *
+   * }
+   */
+  async function get(req, res) {
+    const clients = await gladys.oauth.getAllClients();
+    res.json(clients);
   }
 
   return Object.freeze({
     createClient: asyncMiddleware(createClient),
     getClient: asyncMiddleware(getClient),
+    get: asyncMiddleware(get),
   });
 };

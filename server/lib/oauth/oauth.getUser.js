@@ -6,9 +6,9 @@
  * @example
  * oauth.getUser('username@gladys.com', 'password');
  */
-function getUser(email, password) {
+async function getUser(email, password) {
   try {
-    return this.user.login(email, password);
+    return await this.user.login(email, password);
   } catch (e) {
     return false;
   }

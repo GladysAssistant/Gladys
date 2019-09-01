@@ -2,15 +2,15 @@ const db = require('../../models');
 
 /**
  * @description Save token.
- * @param {string} authorizationCode - The authorization code.
- * @param {string} client - The OAuth client.
- * @param {string} user - The user.
+ * @param {Object} authorizationCode - The authorization code.
+ * @param {Object} client - The OAuth client.
+ * @param {Object} user - The user.
  * @example
  * oauth.saveAuthorizationCode(
  * {
  *  code: 'fehzfo',
  *  scope: 'password',
- *  expiresAt: new Date(),
+ *  expires_at: new Date(),
  *  redirect_uri: 'https://my-redirect.uri',
  * },
  * client: {
@@ -22,8 +22,8 @@ const db = require('../../models');
  */
 async function saveAuthorizationCode(authorizationCode, client, user) {
   const newAuthorizationCode = Object.assign({}, authorizationCode);
-  newAuthorizationCode.client = client;
-  newAuthorizationCode.user = user;
+  newAuthorizationCode.client_id = client.client_id;
+  newAuthorizationCode.user_id = user.id;
 
   return db.OAuthAuthorizationCode.create(newAuthorizationCode);
 }
