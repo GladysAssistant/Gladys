@@ -25,6 +25,6 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python git openssl lib
 ENV NODE_ENV production
 
 # Export listening port
-EXPOSE 1443
+EXPOSE 80
 
 CMD ["npm" ,"run", "start:prod"]
