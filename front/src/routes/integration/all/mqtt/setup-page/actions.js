@@ -12,7 +12,7 @@ const createActions = store => {
         mqttURL = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_URL');
         mqttUsername = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_USERNAME');
         if (mqttUsername.value) {
-          mqttPassword = 'FAKE_PASSWORD';
+          mqttPassword = '*********'; // this is just used so that the field is filled
         }
       } finally {
         store.setState({
