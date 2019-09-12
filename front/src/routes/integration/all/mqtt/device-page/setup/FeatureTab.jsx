@@ -26,6 +26,9 @@ const FeatureTab = ({ children, ...props }) => (
       <div class="loader" />
       <div class="dimmer-content">
         <div class="card-body">
+          <div class="alert alert-secondary">
+            <MarkupText id="integration.mqtt.feature.externalIdMessage" />
+          </div>
           {props.saveStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
               <Text id="integration.mqtt.device.saveError" />
@@ -46,10 +49,6 @@ const FeatureTab = ({ children, ...props }) => (
           {props.device && (
             <div>
               <MqttDeviceForm {...props} />
-
-              <div class="alert alert-secondary">
-                <MarkupText id="integration.mqtt.feature.externalIdMessage" />
-              </div>
 
               <div class="form-group form-inline">
                 <select class="form-control" onChange={props.selectFeature}>
