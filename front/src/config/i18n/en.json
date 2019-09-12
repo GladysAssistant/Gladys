@@ -279,6 +279,7 @@
         "nameLabel": "Name",
         "namePlaceholder": "Enter feature name",
         "externalIdLabel": "Feature external ID",
+        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
@@ -290,11 +291,11 @@
       "setup": {
         "title": "MQTT configuration",
         "urlLabel": "Broker URL",
-        "urlPlaceholder": "Ex: http://[mqtt-broker-address]:[port]",
+        "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
-        "userPlaceholder": "Enter server username",
+        "userPlaceholder": "Enter MQTT broker username",
         "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter server password",
+        "passwordPlaceholder": "Enter MQTT broker password",
         "saveLabel": "Save configuration",
         "error": "An error occured while saving configuration."
       }

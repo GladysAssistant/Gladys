@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import Feature from './Feature';
 import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../../../../../server/utils/constants';
@@ -9,6 +9,11 @@ import cx from 'classnames';
 const FeatureTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
+      <Link href="/dashboard/integration/device/mqtt">
+        <button class="btn btn-secondary mr-2">
+          ◀️ <Text id="integration.mqtt.device.returnButton" />
+        </button>
+      </Link>
       <h3 class="card-title">
         {(props.device && props.device.name) || <Text id="integration.mqtt.device.noNameLabel" />}
       </h3>
@@ -42,6 +47,10 @@ const FeatureTab = ({ children, ...props }) => (
             <div>
               <MqttDeviceForm {...props} />
 
+              <div class="alert alert-secondary">
+                <MarkupText id="integration.mqtt.feature.externalIdMessage" />
+              </div>
+
               <div class="form-group form-inline">
                 <select class="form-control" onChange={props.selectFeature}>
                   <option value="" selected={!props.selectedFeature}>
@@ -72,14 +81,14 @@ const FeatureTab = ({ children, ...props }) => (
               </div>
 
               <div class="form-group">
+                <Link href="/dashboard/integration/device/mqtt">
+                  <button class="btn btn-secondary mr-2">
+                    ◀️ <Text id="integration.mqtt.device.returnButton" />
+                  </button>
+                </Link>
                 <button onClick={props.saveDevice} class="btn btn-success mr-2">
                   <Text id="integration.mqtt.device.saveButton" />
                 </button>
-                <Link href="/dashboard/integration/device/mqtt">
-                  <button class="btn btn-secondary mr-2">
-                    <Text id="integration.mqtt.device.returnButton" />
-                  </button>
-                </Link>
               </div>
             </div>
           )}

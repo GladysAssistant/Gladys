@@ -68,11 +68,19 @@ class MqttDeviceSetupPage extends Component {
   }
 
   updateFeatureProperty(e, property, featureIndex) {
+    let value = e.target.value;
+    if (property === 'external_id' && !value.startsWith('mqtt:')) {
+      if (value.length < 5) {
+        value = 'mqtt:';
+      } else {
+        value = `mqtt:${value}`;
+      }
+    }
     const device = update(this.state.device, {
       features: {
         [featureIndex]: {
           [property]: {
-            $set: e.target.value
+            $set: value
           }
         }
       }
@@ -137,7 +145,7 @@ class MqttDeviceSetupPage extends Component {
     } else {
       const loadedDevice = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`);
 
-      if (loadedDevice && loadedDevice.service_id === this.props.currentIntegration.id) {
+      if (loadedDevice && this.props.currentIntegration && loadedDevice.service_id === this.props.currentIntegration.id) {
         device = loadedDevice;
       }
     }
