@@ -28,7 +28,7 @@ class MqttDeviceForm extends Component {
               id="deviceName"
               type="text"
               value={props.device.name}
-              onChange={this.updateName}
+              onInput={this.updateName}
               class="form-control"
               placeholder={<Text id="integration.mqtt.device.nameLabel" />}
             />

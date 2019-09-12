@@ -55,10 +55,10 @@ class MqttDeviceSetupPage extends Component {
     });
   }
 
-  updateDeviceProperty(e, property) {
+  updateDeviceProperty(deviceIndex, property, value) {
     const device = update(this.state.device, {
       [property]: {
-        $set: e.target.value
+        $set: value
       }
     });
 
