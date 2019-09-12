@@ -67,10 +67,14 @@ const createActions = store => {
       store.setState({
         mqttConnected: true
       });
-      setTimeout(() => store.setState({
-        mqttConnected: false,
-        connectMqttStatus: undefined
-      }), 3000);
+      setTimeout(
+        () =>
+          store.setState({
+            mqttConnected: false,
+            connectMqttStatus: undefined
+          }),
+        3000
+      );
     },
     displayMqttError(state, error) {
       store.setState({

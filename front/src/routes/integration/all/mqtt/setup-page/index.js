@@ -22,7 +22,7 @@ class MqttNodePage extends Component {
     );
   }
 
-  render(props, { }) {
+  render(props, {}) {
     return (
       <MqttPage integration={integrationConfig[props.user.language].mqtt}>
         <SetupTab {...props} />

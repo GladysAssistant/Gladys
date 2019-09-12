@@ -40,7 +40,7 @@ async function connect() {
     logger.warn(`Error while connecting to MQTT - ${err}`);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
-      payload: err
+      payload: err,
     });
   });
   this.mqttClient.on('message', (topic, message) => {

@@ -301,8 +301,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
-    ERROR: 'mqtt.error'
-  }
+    ERROR: 'mqtt.error',
+  },
 };
 
 const DASHBOARD_TYPE = {
