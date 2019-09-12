@@ -128,7 +128,7 @@ async function create(device) {
 
   // we get the whole device from the DB to avoid
   // having a partial final object
-  const newDevice = await getByExternalId(device.external_id);
+  const newDevice = (await getByExternalId(device.external_id)).get({ plain: true });
 
   // save created device in RAM
   this.add(newDevice);
