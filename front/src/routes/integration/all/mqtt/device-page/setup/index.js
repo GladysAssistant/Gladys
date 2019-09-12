@@ -29,6 +29,7 @@ class MqttDeviceSetupPage extends Component {
           {
             id: uuid.v4(),
             category: featureData[0],
+            external_id: 'mqtt:',
             type: featureData[1],
             read_only: true,
             has_feedback: false,
