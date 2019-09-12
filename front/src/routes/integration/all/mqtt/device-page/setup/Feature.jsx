@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import get from 'get-value';
 
@@ -45,6 +46,33 @@ const MqttFeatureBox = ({ children, ...props }) => {
               />
             </Localizer>
           </div>
+
+          {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && (
+            <div class="form-group">
+              <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.unitLabel" />
+              </label>
+              <Localizer>
+                <select
+                  id={`unit_${props.featureIndex}`}
+                  type="text"
+                  value={props.feature.unit}
+                  onChange={props.updateUnit}
+                  class="form-control"
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
+                    <Text id="deviceFeatureUnit.celsius" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
+                    <Text id="deviceFeatureUnit.fahrenheit" />
+                  </option>
+                </select>
+              </Localizer>
+            </div>
+          )}
 
           <div class="form-group">
             <label class="form-label" for={`min_${props.featureIndex}`}>
@@ -101,6 +129,9 @@ class MqttFeatureBoxComponent extends Component {
   updateMax = e => {
     this.props.updateFeatureProperty(e, 'max', this.props.featureIndex);
   };
+  updateUnit = e => {
+    this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
+  };
   deleteFeature = () => {
     this.props.deleteFeature(this.props.featureIndex);
   };
@@ -112,6 +143,7 @@ class MqttFeatureBoxComponent extends Component {
         updateExternalId={this.updateExternalId}
         updateMin={this.updateMin}
         updateMax={this.updateMax}
+        updateUnit={this.updateUnit}
         deleteFeature={this.deleteFeature}
       />
     );

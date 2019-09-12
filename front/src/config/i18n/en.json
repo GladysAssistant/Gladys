@@ -281,6 +281,7 @@
         "externalIdLabel": "Feature external ID",
         "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
+        "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
@@ -524,13 +525,17 @@
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress..."
   },
+  "deviceFeatureUnit": {
+    "celsius": "Celsius (°C)",
+    "fahrenheit": "Fahrenheit (°F)"
+  },
   "deviceFeatureCategory": {
     "light": {
-      "binary": "On/off",
-      "brightness": "Brightness",
-      "hue": "Hue",
-      "saturation": "Saturation",
-      "power": "Power consumption"
+      "binary": "Light On/Off",
+      "brightness": "Light Brightness",
+      "hue": "Light Hue",
+      "saturation": "Light Saturation",
+      "power": "Light Power consumption"
     },
     "battery": {
       "integer": "Battery"
@@ -557,12 +562,12 @@
       "binary": "Smoke"
     },
     "switch": {
-      "voltage": "Voltage",
-      "current": "Current",
+      "voltage": "Switch Voltage",
+      "current": "Switch Current",
       "binary": "Switch",
-      "dimmer": "Dimmer",
-      "burglar": "Burglar",
-      "power": "Power consumption"
+      "dimmer": "Switch Dimmer",
+      "burglar": "Switch Burglar",
+      "power": "Switch Power consumption"
     },
     "siren": {
       "binary": "Siren"
