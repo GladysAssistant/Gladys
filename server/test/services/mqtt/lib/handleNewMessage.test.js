@@ -46,27 +46,10 @@ describe('Mqtt handle message', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW, {});
   });
 
-  it('should create device state', () => {
-    mqttHandler.handleNewMessage('gladys/master/state/create', '{}');
+  it('should update device state', () => {
+    mqttHandler.handleNewMessage('gladys/master/device/state/update', '{}');
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {});
-  });
-
-  it('should create device state', () => {
-    const message = {
-      identifier: 'id',
-      type: 'type',
-      state: {
-        value: '0',
-      },
-    };
-    mqttHandler.handleNewMessage('gladys/master/devicestate/create', JSON.stringify(message));
-
-    const expectedEvent = {
-      device_feature_external_id: `${message.identifier}:${message.type}`,
-      state: message.state.value,
-    };
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
   it('handle stric topic', () => {
