@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
@@ -18,6 +18,9 @@ const SetupTab = ({ children, ...props }) => {
         >
           <div class="loader" />
           <div class="dimmer-content">
+            <p>
+              <MarkupText id="integration.mqtt.setup.mqttDescription" />
+            </p>
             {props.connectMqttStatus === RequestStatus.Error && (
               <p class="alert alert-danger">
                 <Text id="integration.mqtt.setup.error" />

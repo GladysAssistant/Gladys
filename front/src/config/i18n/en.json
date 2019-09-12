@@ -292,6 +292,7 @@
       },
       "setup": {
         "title": "MQTT configuration",
+        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
