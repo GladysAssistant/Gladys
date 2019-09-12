@@ -78,6 +78,20 @@ async function create(device) {
     } else {
       // or update it
       await deviceInDb.update(device, { transaction });
+
+      // we delete all features which doesn't exist anymore
+      await Promise.map(deviceInDb.features, async (existingFeature, index) => {
+        if (!features.find((newFeature) => newFeature.id === existingFeature.id)) {
+          await existingFeature.destroy({ transaction });
+        }
+      });
+
+      // we delete all params which doesn't exist anymore
+      await Promise.map(deviceInDb.params, async (existingParam) => {
+        if (!params.find((newParam) => newParam.id === existingParam.id)) {
+          await existingParam.destroy({ transaction });
+        }
+      });
     }
 
     deviceToReturn = deviceInDb.get({ plain: true });

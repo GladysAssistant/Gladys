@@ -60,9 +60,12 @@ describe('Device', () => {
     expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
     expect(newDevice).to.have.property('selector', 'test-device');
     expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(1);
     newDevice.params.forEach((param) => {
       expect(param).to.have.property('value', 'UPDATED_VALUE');
     });
+    expect(newDevice.features).to.deep.equal([]);
   });
   it('should create device, one feature and one param', async () => {
     const stateManager = new StateManager(event);
