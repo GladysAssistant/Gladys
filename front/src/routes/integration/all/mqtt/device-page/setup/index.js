@@ -5,6 +5,7 @@ import FeatureTab from './FeatureTab';
 import MqttPage from '../../MqttPage';
 import integrationConfig from '../../../../../../config/integrations';
 import uuid from 'uuid';
+import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 
@@ -103,10 +104,18 @@ class MqttDeviceSetupPage extends Component {
         device
       });
     } catch (e) {
-      this.setState({
-        saveStatus: RequestStatus.Error,
-        loading: false
-      });
+      const status = get(e, 'response.status');
+      if (status === 409) {
+        this.setState({
+          saveStatus: RequestStatus.ConflictError,
+          loading: false
+        });
+      } else {
+        this.setState({
+          saveStatus: RequestStatus.Error,
+          loading: false
+        });
+      }
     }
   }
 

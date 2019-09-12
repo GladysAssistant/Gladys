@@ -34,6 +34,11 @@ const FeatureTab = ({ children, ...props }) => (
               <Text id="integration.mqtt.device.saveError" />
             </div>
           )}
+          {props.saveStatus === RequestStatus.ConflictError && (
+            <div class="alert alert-danger">
+              <Text id="integration.mqtt.device.saveConflictError" />
+            </div>
+          )}
           {!props.loading && !props.device && (
             <div>
               <p class="alert alert-danger">
