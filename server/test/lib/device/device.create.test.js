@@ -130,5 +130,4 @@ describe('Device', () => {
     expect(newDevice).to.have.property('features');
     expect(newDevice).to.have.property('params');
   });
-
 });
