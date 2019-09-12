@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
@@ -31,9 +32,16 @@ async function connect() {
     Object.keys(this.topicBinds).forEach((topic) => {
       this.subscribe(topic, this.topicBinds[topic]);
     });
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
+    });
   });
   this.mqttClient.on('error', (err) => {
     logger.warn(`Error while connecting to MQTT - ${err}`);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+      payload: err
+    });
   });
   this.mqttClient.on('message', (topic, message) => {
     this.handleNewMessage(topic, message.toString());

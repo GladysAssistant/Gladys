@@ -299,6 +299,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NODE_READY: 'zwave.node-ready',
     SCAN_COMPLETE: 'zwave.scan-complete',
   },
+  MQTT: {
+    CONNECTED: 'mqtt.connected',
+    ERROR: 'mqtt.error'
+  }
 };
 
 const DASHBOARD_TYPE = {

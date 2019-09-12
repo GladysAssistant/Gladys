@@ -23,7 +23,21 @@ const SetupTab = ({ children, ...props }) => {
                 <Text id="integration.mqtt.setup.error" />
               </p>
             )}
-
+            {props.connectMqttStatus === RequestStatus.Success && !props.mqttConnected && (
+              <p class="alert alert-info">
+                <Text id="integration.mqtt.setup.connecting" />
+              </p>
+            )}
+            {props.mqttConnected && (
+              <p class="alert alert-success">
+                <Text id="integration.mqtt.setup.connected" />
+              </p>
+            )}
+            {props.mqttConnectionError && (
+              <p class="alert alert-danger">
+                <Text id="integration.mqtt.setup.connectionError" /> - {props.mqttConnectionError}
+              </p>
+            )}
             <form>
               <div class="form-group">
                 <label for="mqttURL" class="form-label">

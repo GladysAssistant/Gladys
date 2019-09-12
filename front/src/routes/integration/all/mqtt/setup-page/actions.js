@@ -19,7 +19,8 @@ const createActions = store => {
           mqttURL: (mqttURL || {}).value,
           mqttUsername: (mqttUsername || { value: '' }).value,
           mqttPassword,
-          passwordChanges: false
+          passwordChanges: false,
+          connected: false
         });
       }
     },
@@ -34,7 +35,8 @@ const createActions = store => {
     async saveConfiguration(state) {
       event.preventDefault();
       store.setState({
-        connectMqttStatus: RequestStatus.Getting
+        connectMqttStatus: RequestStatus.Getting,
+        mqttConnected: false
       });
       try {
         await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_URL', {
@@ -59,6 +61,22 @@ const createActions = store => {
           passwordChanges: false
         });
       }
+    },
+    displayConnectedMessage(state) {
+      // display 3 seconds a message "MQTT connected"
+      store.setState({
+        mqttConnected: true
+      });
+      setTimeout(() => store.setState({
+        mqttConnected: false,
+        connectMqttStatus: undefined
+      }), 3000);
+    },
+    displayMqttError(state, error) {
+      store.setState({
+        mqttConnected: false,
+        mqttConnectionError: error
+      });
     }
   };
   return Object.assign({}, actions, integrationActions);
