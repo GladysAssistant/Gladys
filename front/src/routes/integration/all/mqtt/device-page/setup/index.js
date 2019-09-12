@@ -145,7 +145,11 @@ class MqttDeviceSetupPage extends Component {
     } else {
       const loadedDevice = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`);
 
-      if (loadedDevice && this.props.currentIntegration && loadedDevice.service_id === this.props.currentIntegration.id) {
+      if (
+        loadedDevice &&
+        this.props.currentIntegration &&
+        loadedDevice.service_id === this.props.currentIntegration.id
+      ) {
         device = loadedDevice;
       }
     }

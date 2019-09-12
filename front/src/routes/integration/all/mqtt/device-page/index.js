@@ -16,7 +16,7 @@ class MqttDevicePage extends Component {
     this.props.getIntegrationByName('mqtt');
   }
 
-  render(props, { }) {
+  render(props, {}) {
     return (
       <MqttPage integration={integrationConfig[props.user.language].mqtt}>
         <DeviceTab {...props} />
