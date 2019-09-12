@@ -1,5 +1,4 @@
 const { EVENTS } = require('../../../../utils/constants');
-const { devicestate } = require('./devicestate');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -14,11 +13,8 @@ function handleGladysMessage(topic, message) {
     case 'gladys/master/device/create':
       this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
       break;
-    case 'gladys/master/state/create':
+    case 'gladys/master/device/state/update':
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, JSON.parse(message));
-      break;
-    case 'gladys/master/devicestate/create':
-      devicestate(this, JSON.parse(message));
       break;
     default:
       logger.info(`MQTT : Gladys topic ${topic} not handled.`);
