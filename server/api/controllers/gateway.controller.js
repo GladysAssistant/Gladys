@@ -29,7 +29,7 @@ module.exports = function GatewayController(gladys) {
   async function logout(req, res) {
     await gladys.gateway.disconnect();
     res.json({
-      success: true
+      success: true,
     });
   }
 

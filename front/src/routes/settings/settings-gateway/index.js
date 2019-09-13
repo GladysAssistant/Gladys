@@ -15,7 +15,7 @@ class SettingsGateway extends Component {
     this.props.getInstanceKeys();
   }
 
-  render(props, { }) {
+  render(props, {}) {
     return <GatewayPage {...props} />;
   }
 }

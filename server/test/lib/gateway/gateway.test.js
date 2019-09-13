@@ -139,7 +139,7 @@ describe('gateway', () => {
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const websocketMessage = {
         type: 'zwave.new-node',
-        payload: {}
+        payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
       assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);

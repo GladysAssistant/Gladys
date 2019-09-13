@@ -85,7 +85,7 @@ function createActions(store) {
       try {
         await state.httpClient.post('/api/v1/gateway/logout');
         store.setState({
-          gatewayDisconnectStatus: RequestStatus.Success,
+          gatewayDisconnectStatus: RequestStatus.Success
         });
         actions.getStatus(store.getState());
       } catch (e) {
