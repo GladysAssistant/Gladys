@@ -652,23 +652,27 @@
         {
           "name": "Temperature",
           "selector": "test-temperature",
-          "category": "temperature-sensor"
+          "category": "temperature-sensor",
+          "type": "decimal"
         },
         {
           "name": "Motion",
           "selector": "test-motion",
-          "category": "motion-sensor"
+          "category": "motion-sensor",
+          "type": "binary"
         },
         {
           "name": "Battery",
           "selector": "test-battery",
           "category": "battery",
+          "type": "integer",
           "last_value": "92"
         },
         {
           "name": "Lux",
           "selector": "test-light",
-          "category": "light-sensor"
+          "category": "light-sensor",
+          "type": "integer"
         }
       ],
       "room": {
@@ -678,6 +682,7 @@
       }
     }
   ],
+  "get /api/v1/service/mqtt": {},
   "get /api/v1/service/rtsp-camera/device": [
     {
       "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",

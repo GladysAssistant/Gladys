@@ -18,18 +18,20 @@ const addParamsAndFeatures = node => {
       const { min, max } = values[idx];
 
       if (values[idx].genre === 'user') {
-        const { category, type } = getCategory(values[idx]);
-        node.features.push({
-          name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-          category,
-          type,
-          external_id: getDeviceFeatureExternalId(values[idx]),
-          read_only: values[idx].read_only,
-          unit: values[idx].units,
-          has_feedback: true,
-          min,
-          max
-        });
+        const { category, type } = getCategory(node, values[idx]);
+        if (category !== 'unknown') {
+          node.features.push({
+            name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
+            category,
+            type,
+            external_id: getDeviceFeatureExternalId(values[idx]),
+            read_only: values[idx].read_only,
+            unit: values[idx].units,
+            has_feedback: true,
+            min,
+            max
+          });
+        }
       } else {
         node.params.push({
           name: `${values[idx].label}-${values[idx].value_id}`,
@@ -44,9 +46,6 @@ const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     addLocalNode(state, node) {
-      if (!node.ready) {
-        return;
-      }
       addParamsAndFeatures(node);
       const nodeInArrayIndex = state.zwaveNodes.findIndex(n => n.id === node.id);
       let newState;
@@ -72,8 +71,7 @@ const createActions = store => {
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
-        const zwaveNodesWithUnactiveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
-        const zwaveNodes = zwaveNodesWithUnactiveNodes.filter(node => node.ready === true);
+        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
         zwaveNodes.forEach(node => addParamsAndFeatures(node));
         console.log(zwaveNodes);
         store.setState({
@@ -175,18 +173,20 @@ const createActions = store => {
           const { min, max } = values[idx];
 
           if (values[idx].genre === 'user') {
-            const { category, type } = getCategory(values[idx]);
-            newDevice.features.push({
-              name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-              category,
-              type,
-              external_id: getDeviceFeatureExternalId(values[idx]),
-              read_only: values[idx].read_only,
-              unit: values[idx].units,
-              has_feedback: true,
-              min,
-              max
-            });
+            const { category, type } = getCategory(node, values[idx]);
+            if (category !== 'unknown') {
+              newDevice.features.push({
+                name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
+                category,
+                type,
+                external_id: getDeviceFeatureExternalId(values[idx]),
+                read_only: values[idx].read_only,
+                unit: values[idx].units,
+                has_feedback: true,
+                min,
+                max
+              });
+            }
           } else {
             newDevice.params.push({
               name: `${values[idx].label}-${values[idx].value_id}`,

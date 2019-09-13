@@ -60,9 +60,48 @@ describe('Device', () => {
     expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
     expect(newDevice).to.have.property('selector', 'test-device');
     expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(1);
     newDevice.params.forEach((param) => {
       expect(param).to.have.property('value', 'UPDATED_VALUE');
     });
+    expect(newDevice.features).to.deep.equal([]);
+  });
+  it('should update device and delete params/features', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceByExternalId', 'test-device-external', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Test device',
+      selector: 'test-device',
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: '10',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
+      ],
+    });
+    const device = new Device(event, {}, stateManager);
+    const newDevice = await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      params: [],
+    });
+    expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(0);
+    expect(newDevice.features).to.have.lengthOf(0);
   });
   it('should create device, one feature and one param', async () => {
     const stateManager = new StateManager(event);
