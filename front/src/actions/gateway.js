@@ -78,6 +78,22 @@ function createActions(store) {
         });
       }
     },
+    async disconnect(state) {
+      store.setState({
+        gatewayDisconnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/gateway/logout');
+        store.setState({
+          gatewayDisconnectStatus: RequestStatus.Success,
+        });
+        actions.getStatus(store.getState());
+      } catch (e) {
+        store.setState({
+          gatewayDisconnectStatus: RequestStatus.Error
+        });
+      }
+    },
     async getKeys(state) {
       store.setState({
         gatewayGetKeysStatus: RequestStatus.Getting

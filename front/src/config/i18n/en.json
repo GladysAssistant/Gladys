@@ -484,7 +484,9 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA key",
     "userEcdsaKey": "ECDSA key",
-    "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list."
+    "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list.",
+    "disconnectTitle": "Disconnect your Plus account",
+    "disconnectButton": "Disconnect"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",

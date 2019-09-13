@@ -4,7 +4,7 @@ import GatewayPage from './GatewayPage';
 import actions from '../../../actions/gateway';
 
 @connect(
-  'gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus',
+  'gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus',
   actions
 )
 class SettingsGateway extends Component {
@@ -15,7 +15,7 @@ class SettingsGateway extends Component {
     this.props.getInstanceKeys();
   }
 
-  render(props, {}) {
+  render(props, { }) {
     return <GatewayPage {...props} />;
   }
 }
