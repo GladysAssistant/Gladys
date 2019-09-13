@@ -30,7 +30,15 @@ class LinkGatewayUser extends Component {
   }
   render(props, { savingUserLoading, error }) {
     const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
-    return <LinkGatewayUserPage {...props} error={error} selectUser={this.selectUser} saveUser={this.saveUser} loading={loading} />;
+    return (
+      <LinkGatewayUserPage
+        {...props}
+        error={error}
+        selectUser={this.selectUser}
+        saveUser={this.saveUser}
+        loading={loading}
+      />
+    );
   }
 }
 
