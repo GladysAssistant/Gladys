@@ -228,7 +228,7 @@ describe('gateway', () => {
         setValue: fake.resolves(null),
       };
       const user = {
-        getById: fake.rejects(new NotFoundError('User not found')),
+        getById: fake.rejects(new NotFoundError('User "0cd30aef-9c4e-4a23-88e3-3547971296e5" not found')),
       };
       const eventGateway = new EventEmitter();
       const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
@@ -249,8 +249,12 @@ describe('gateway', () => {
             local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           },
           (res) => {
-            expect(res).to.have.property('error', 'LINKED_USER_NOT_FOUND');
-            resolve();
+            try {
+              expect(res).to.have.property('error', 'LINKED_USER_NOT_FOUND');
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
           },
         );
       });
