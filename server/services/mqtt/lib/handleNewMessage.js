@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -9,14 +8,28 @@ const { EVENTS } = require('../../../utils/constants');
  * handleNewMessage('/gladys/master/heartbeat', '{}');
  */
 function handleNewMessage(topic, message) {
+  logger.trace(`Receives MQTT message from ${topic} : ${message}`);
+
   try {
-    switch (topic) {
-      case 'gladys/master/device/create':
-        this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
-        break;
-      default:
-        logger.info(`MQTT : Topic ${topic} not handled.`);
-        break;
+    let forwardedMessage = false;
+
+    const extactMatch = this.topicBinds[topic];
+    if (extactMatch) {
+      forwardedMessage = true;
+      extactMatch(this, topic, message);
+    } else {
+      Object.keys(this.topicBinds).forEach((key) => {
+        const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
+
+        if (topic.match(regexKey)) {
+          forwardedMessage = true;
+          this.topicBinds[key](topic, message);
+        }
+      }, this);
+    }
+
+    if (!forwardedMessage) {
+      logger.warn(`No subscription found for MQTT topic ${topic}`);
     }
   } catch (e) {
     logger.warn(`Unable to handle new MQTT message in topic ${topic}`);

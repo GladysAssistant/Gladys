@@ -253,6 +253,57 @@
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "mqtt": {
+      "title": "MQTT",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "device": {
+        "title": "MQTT Devices",
+        "search": "Search devices",
+        "noDevices": "No MQTT devices added yet.",
+        "noNameLabel": "No name",
+        "nameLabel": "Name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "returnButton": "Return back",
+        "editButton": "Edit details",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter feature name",
+        "externalIdLabel": "Feature external ID",
+        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdPlaceholder": "Feature MQTT message key",
+        "unitLabel": "Unit",
+        "minLabel": "Minimum value",
+        "minPlaceholder": "Enter feature minimum value",
+        "maxLabel": "Maximum value",
+        "maxPlaceholder": "Enter feature maximum value",
+        "addButton": "Add feature",
+        "deleteLabel": "Delete feature"
+      },
+      "setup": {
+        "title": "MQTT configuration",
+        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "urlLabel": "Broker URL",
+        "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter MQTT broker username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter MQTT broker password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your MQTT broker...",
+        "connected": "Connected to the MQTT broker with success !"
+      }
     }
   },
   "editScene": {
@@ -478,13 +529,17 @@
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress..."
   },
+  "deviceFeatureUnit": {
+    "celsius": "Celsius (°C)",
+    "fahrenheit": "Fahrenheit (°F)"
+  },
   "deviceFeatureCategory": {
     "light": {
-      "binary": "On/off",
-      "brightness": "Brightness",
-      "hue": "Hue",
-      "saturation": "Saturation",
-      "power": "Power consumption"
+      "binary": "Light On/Off",
+      "brightness": "Light Brightness",
+      "hue": "Light Hue",
+      "saturation": "Light Saturation",
+      "power": "Light Power consumption"
     },
     "battery": {
       "integer": "Battery"
@@ -511,12 +566,12 @@
       "binary": "Smoke"
     },
     "switch": {
-      "voltage": "Voltage",
-      "current": "Current",
+      "voltage": "Switch Voltage",
+      "current": "Switch Current",
       "binary": "Switch",
-      "dimmer": "Dimmer",
-      "burglar": "Burglar",
-      "power": "Power consumption"
+      "dimmer": "Switch Dimmer",
+      "burglar": "Switch Burglar",
+      "power": "Switch Power consumption"
     },
     "siren": {
       "binary": "Siren"
