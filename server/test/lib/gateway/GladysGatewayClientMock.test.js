@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { fake } = require('sinon');
 
-class GladysGatewayClientMock { }
+class GladysGatewayClientMock {}
 
 GladysGatewayClientMock.prototype.login = fake.resolves({
   two_factor_token: 'token',
