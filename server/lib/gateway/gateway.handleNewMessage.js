@@ -32,7 +32,6 @@ async function handleNewMessage(data, rawMessage, cb) {
     });
     return;
   }
-
   if (!rawMessage.local_user_id && get(data, 'options.url') !== '/api/v1/user') {
     cb({
       status: 400,
@@ -53,7 +52,7 @@ async function handleNewMessage(data, rawMessage, cb) {
         cb,
       );
     } catch (e) {
-      if (e instanceof NotFoundError && e.message === 'User not found') {
+      if (e instanceof NotFoundError && e.message === `User "${rawMessage.local_user_id}" not found`) {
         cb({
           status: 404,
           error: 'LINKED_USER_NOT_FOUND',

@@ -50,8 +50,10 @@ class GatewaySession {
 
     if (refreshToken && serializedKeys) {
       this.connected = true;
-      await this.gatewayClient.userConnect(refreshToken, serializedKeys, () => {
-        // new message
+      await this.gatewayClient.userConnect(refreshToken, serializedKeys, (type, message) => {
+        if (type === 'message') {
+          this.dispatcher.dispatch(message.event, message.data);
+        }
       });
       this.ready = true;
       this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
