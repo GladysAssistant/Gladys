@@ -80,9 +80,16 @@ function createActions(store) {
           route('/link-gateway-user');
         }
       } catch (e) {
-        store.setState({
-          gatewayLoginStatus: RequestStatus.Error
-        });
+        const error = get(e, 'response.error');
+        // if user was previously linked to another instance, we reset the user id
+        if (error === 'LINKED_USER_NOT_FOUND') {
+          await state.session.gatewayClient.updateUserIdInGladys(null);
+          route('/link-gateway-user');
+        } else {
+          store.setState({
+            gatewayLoginStatus: RequestStatus.Error
+          });
+        }
       }
     },
     updateLoginEmail(state, e) {
