@@ -50,4 +50,8 @@ export class GatewayHttpClient {
   async patch(url, body) {
     return this.callApiWhenReady('sendRequestPatch', url, body);
   }
+
+  async delete(url) {
+    return this.callApiWhenReady('sendRequestDelete', url);
+  }
 }

@@ -54,4 +54,6 @@ GladysGatewayClientMock.prototype.getLatestGladysVersion = fake.resolves({
 
 GladysGatewayClientMock.prototype.disconnect = fake.returns(null);
 
+GladysGatewayClientMock.prototype.generateFingerprint = fake.resolves('fingerprint');
+
 module.exports = GladysGatewayClientMock;
