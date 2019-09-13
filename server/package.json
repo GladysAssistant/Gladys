@@ -77,7 +77,7 @@
     "form-data": "^2.3.3",
     "fs-extra": "^8.0.1",
     "get-value": "^3.0.1",
-    "handlebars": "^4.1.0",
+    "handlebars": "^4.1.2",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
     "node-nlp": "^3.0.3",
