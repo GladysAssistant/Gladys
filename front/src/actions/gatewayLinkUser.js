@@ -11,13 +11,11 @@ function createActions(store) {
       });
       try {
         const users = await state.httpClient.get(`/api/v1/user`);
-        console.log(users);
         store.setState({
           users,
           usersGetStatus: RequestStatus.Success
         });
       } catch (e) {
-        console.log(e);
         const errorMessage = get(e, 'response.error_message');
         if (errorMessage === 'NO_INSTANCE_FOUND') {
           store.setState({

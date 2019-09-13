@@ -22,15 +22,15 @@ class LinkGatewayUser extends Component {
       this.setState({ savingUserLoading: false });
       route('/dashboard');
     } catch (e) {
-      this.setState({ savingUserLoading: false });
+      this.setState({ savingUserLoading: false, error: true });
     }
   };
   componentWillMount() {
     this.props.getUsers();
   }
-  render(props, { savingUserLoading }) {
+  render(props, { savingUserLoading, error }) {
     const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
-    return <LinkGatewayUserPage {...props} selectUser={this.selectUser} saveUser={this.saveUser} loading={loading} />;
+    return <LinkGatewayUserPage {...props} error={error} selectUser={this.selectUser} saveUser={this.saveUser} loading={loading} />;
   }
 }
 

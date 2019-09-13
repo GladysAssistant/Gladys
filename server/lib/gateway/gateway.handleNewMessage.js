@@ -24,7 +24,7 @@ async function handleNewMessage(data, rawMessage, cb) {
     (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
   );
 
-  if (!found || !found.accepted) {
+  if ((!found || !found.accepted) && get(data, 'options.url') !== '/api/v1/user') {
     cb({
       status: 403,
       error: 'USER_NOT_ACCEPTED_LOCALLY',

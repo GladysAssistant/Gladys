@@ -17,7 +17,7 @@ async function disconnect() {
     await this.variable.destroy('GLADYS_GATEWAY_RSA_PUBLIC_KEY');
     await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PUBLIC_KEY');
     await this.variable.destroy('GLADYS_GATEWAY_BACKUP_KEY');
-    await this.variable.destroy('GLADYS_GATEWAY_BACKUP_KEY');
+    await this.variable.destroy('GLADYS_GATEWAY_USERS_KEYS');
   } catch (e) {
     logger.debug(e);
     this.connected = false;
