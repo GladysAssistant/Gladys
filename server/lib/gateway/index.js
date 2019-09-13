@@ -19,6 +19,8 @@ const { getInstanceKeysFingerprint } = require('./gateway.getInstanceKeysFingerp
 const { getUsersKeys } = require('./gateway.getUsersKeys');
 const { getLatestGladysVersion } = require('./gateway.getLatestGladysVersion');
 const { downloadBackup } = require('./gateway.downloadBackup');
+const { disconnect } = require('./gateway.disconnect');
+const { forwardWebsockets } = require('./gateway.forwardWebsockets');
 const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
@@ -37,6 +39,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
   this.event.on(EVENTS.GATEWAY.RESTORE_BACKUP, eventFunctionWrapper(this.restoreBackupEvent.bind(this)));
   this.event.on(EVENTS.SYSTEM.CHECK_UPGRADE, eventFunctionWrapper(this.getLatestGladysVersion.bind(this)));
+  this.event.on(EVENTS.WEBSOCKET.SEND_ALL, eventFunctionWrapper(this.forwardWebsockets.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -50,6 +53,8 @@ Gateway.prototype.getInstanceKeysFingerprint = getInstanceKeysFingerprint;
 Gateway.prototype.getUsersKeys = getUsersKeys;
 Gateway.prototype.getLatestGladysVersion = getLatestGladysVersion;
 Gateway.prototype.downloadBackup = downloadBackup;
+Gateway.prototype.disconnect = disconnect;
+Gateway.prototype.forwardWebsockets = forwardWebsockets;
 Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;

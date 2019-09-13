@@ -120,4 +120,29 @@ describe('gateway', () => {
       expect(version).to.have.property('created_at');
     });
   });
+
+  describe('gateway.disconnect', () => {
+    it('should disconnect Gateway', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      await gateway.disconnect();
+    });
+  });
+  describe('gateway.forwardWebsockets', () => {
+    it('should forward a websocket message', async () => {
+      const gateway = new Gateway({}, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const websocketMessage = {
+        type: 'zwave.new-node',
+        payload: {}
+      };
+      gateway.forwardWebsockets(websocketMessage);
+      assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
+    });
+  });
 });
