@@ -10,5 +10,11 @@
     "name": "RTSP Camera",
     "description": "Display your camera in Gladys.",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"
+  },
+  {
+    "key": "mqtt",
+    "name": "MQTT",
+    "description": "Connect to MQTT server.",
+    "img": "/assets/integrations/cover/mqtt.jpg"
   }
 ]
