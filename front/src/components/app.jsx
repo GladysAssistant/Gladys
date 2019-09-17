@@ -57,6 +57,11 @@ import XiaomiSensorPage from '../routes/integration/all/xiaomi/sensor';
 import XiaomiSetupPage from '../routes/integration/all/xiaomi/setup';
 import XiaomiSettingPage from '../routes/integration/all/xiaomi/setting';
 
+// MQTT integration
+import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
+import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
+import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -116,6 +121,11 @@ const AppRouter = connect(
         <XiaomiSensorPage path="/dashboard/integration/device/xiaomi/sensor" />
         <XiaomiSetupPage path="/dashboard/integration/device/xiaomi/setup" />
         <XiaomiSettingPage path="/dashboard/integration/device/xiaomi/setting" />
+
+        <MqttDevicePage path="/dashboard/integration/device/mqtt" />
+        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
+        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
+        <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

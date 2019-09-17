@@ -16,5 +16,11 @@
     "name": "Xiaomi",
     "description": "Control xiaomi device",
     "img": "/assets/integrations/cover/xiaomi.jpg"
+  },
+  {
+    "key": "mqtt",
+    "name": "MQTT",
+    "description": "Connect to MQTT server.",
+    "img": "/assets/integrations/cover/mqtt.jpg"
   }
 ]

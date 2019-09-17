@@ -206,8 +206,13 @@ const DEVICE_FEATURE_CATEGORIES = {
   HUMIDITY_SENSOR: 'humidity-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LIGHT_SENSOR: 'light-sensor',
+  SMOKE_SENSOR: 'smoke-sensor',
+  SISMIC_SENSOR: 'sismic-sensor',
   CAMERA: 'camera',
   PLUG: 'plug',
+  SWITCH: 'switch',
+  SIREN: 'siren',
+  ACCESS_CONTROl: 'access-control',
   UNKNOWN: 'unknown',
 };
 
@@ -217,6 +222,7 @@ const DEVICE_FEATURE_TYPES = {
     BRIGHTNESS: 'brightness',
     HUE: 'hue',
     SATURATION: 'saturation',
+    POWER: 'power',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -225,8 +231,25 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  SWITCH: {
+    BINARY: 'binary',
+    POWER: 'power',
+    VOLTAGE: 'voltage',
+    CURRENT: 'current',
+    BURGLAR: 'burglar',
+    DIMMER: 'dimmer',
+  },
   CAMERA: {
     IMAGE: 'image',
+  },
+  SIREN: {
+    BINARY: 'binary',
+  },
+  ACCESS_CONTROL: {
+    MODE: 'mode',
+  },
+  UNKNOWN: {
+    UNKNOWN: 'unknown',
   },
 };
 
@@ -277,6 +300,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   ZWAVE: {
     NODE_READY: 'zwave.node-ready',
     SCAN_COMPLETE: 'zwave.scan-complete',
+  },
+  MQTT: {
+    CONNECTED: 'mqtt.connected',
+    ERROR: 'mqtt.error',
   },
 };
 
