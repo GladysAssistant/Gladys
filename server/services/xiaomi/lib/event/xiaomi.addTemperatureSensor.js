@@ -11,7 +11,7 @@ async function addTemperatureSensor(sid) {
   this.sensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-temp-hum-pression`,
-    external_id: `xiaomi-${sid}`,
+    external_id: `${sid}`,
     should_poll: false,
     features: [
       {

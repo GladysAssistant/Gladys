@@ -259,6 +259,7 @@
         "title": "List of Xiaomi Sensor",
         "noSensorFound": "No sensor found, add new in the setup tab",
         "saveButton": "Save",
+        "sidSensor": "Sensor SID",
         "deleteButton": "Delete",
         "nameSensor": "Sensor Name",
         "noFeatures": "No features",
@@ -267,6 +268,7 @@
       "setup": {
         "title": "Setup Xiaomi New Sensor",
         "nameSensor": "Sensor Name",
+        "sidSensor": "Sensor SID",
         "noFeatures": "No features",
         "createButton": "Create",
         "roomLabel": "Room",

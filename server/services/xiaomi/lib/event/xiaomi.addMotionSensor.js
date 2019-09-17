@@ -10,7 +10,7 @@ async function addMotionSensor(sid) {
   this.sensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-motion`,
-    external_id: `xiaomi-${sid}`,
+    external_id: `${sid}`,
     should_poll: false,
     features: [
       {

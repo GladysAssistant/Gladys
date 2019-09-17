@@ -128,6 +128,18 @@ class XiaomiSensorBox extends Component {
                 </div>
                 <div class="form-group">
                   <label>
+                    <Text id="integration.xiaomi.setup.sidSensor" />
+                  </label>
+                  <input
+                    type="text"
+                    value={props.sensor.external_id}
+                    disabled
+                    class="form-control"
+                    placeholder={<Text id="integration.xiaomi.setup.nameLabelFeature" />}
+                  />
+                </div>
+                <div class="form-group">
+                  <label>
                     <Text id="integration.xiaomi.sensor.roomLabel" />
                   </label>
                   <select class="form-control" onChange={this.updateSensorRoom}>

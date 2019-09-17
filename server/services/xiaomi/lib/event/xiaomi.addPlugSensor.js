@@ -10,7 +10,7 @@ async function addPlugSensor(sid) {
   this.sensor[sid] = {
     service_id: this.serviceId,
     name: `xiaomi-${sid}-sensor-plug`,
-    external_id: `xiaomi-${sid}`,
+    external_id: `${sid}`,
     should_poll: false,
     features: [
       {
