@@ -31,12 +31,6 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.socket.on('message', this.onMessage.bind(this));
   this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
   this.socket.bind(9898);
-  this.addTemperatureSensor(1);
-  this.addTemperatureSensor(2);
-  this.addPlugSensor(3);
-  this.addMotionSensor(4);
-  this.addThSensor(5);
-  this.addMagnetSensor(6);
 };
 
 // EVENTS

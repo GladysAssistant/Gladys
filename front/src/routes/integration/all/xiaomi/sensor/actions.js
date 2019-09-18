@@ -28,6 +28,7 @@ function createActions(store) {
             $push: xiaomiSensorReceived
           });
         }
+        console.log('HERE')
         store.setState({
           xiaomiSensor,
           sensorGetStatus: RequestStatus.Success,

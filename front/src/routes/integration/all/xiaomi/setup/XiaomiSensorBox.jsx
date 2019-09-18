@@ -141,21 +141,6 @@ class XiaomiSensorBox extends Component {
                   <label>
                     <Text id="integration.zwave.device.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.sensor &&
-                      props.sensor.features &&
-                      props.sensor.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}`} />
-                          <div class="tag-addon">
-                            <i class={`fe fe-${DeviceFeatureCategoriesIcon[feature.category]}`} />
-                          </div>
-                        </span>
-                      ))}
-                    {(!props.sensor.features || props.sensor.features.length === 0) && (
-                      <Text id="integration.xiaomi.setup.noFeatures" />
-                    )}
-                  </div>
                 </div>
                 <div class="form-group">
                   <button onClick={this.createSensor} class="btn btn-success mr-2">
