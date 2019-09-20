@@ -12,13 +12,25 @@ module.exports = function GatewayController(gladys) {
     res.json(status);
   }
   /**
-   * @api {get} /api/v1/gateway/login
+   * @api {post} /api/v1/gateway/login
    * @apiName Login
    * @apiGroup Gateway
    */
   async function login(req, res) {
     const loginResult = await gladys.gateway.login(req.body.email, req.body.password);
     res.json(loginResult);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/logout
+   * @apiName Logout
+   * @apiGroup Gateway
+   */
+  async function logout(req, res) {
+    await gladys.gateway.disconnect();
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -115,6 +127,7 @@ module.exports = function GatewayController(gladys) {
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     login: asyncMiddleware(login),
+    logout: asyncMiddleware(logout),
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
     getUsersKeys: asyncMiddleware(getUsersKeys),
     saveUsersKeys: asyncMiddleware(saveUsersKeys),

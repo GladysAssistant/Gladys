@@ -23,6 +23,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python git openssl lib
     && apk del .build-deps
 
 ENV NODE_ENV production
+ENV SERVER_PORT 80
 
 # Export listening port
 EXPOSE 80

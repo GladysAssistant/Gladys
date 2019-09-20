@@ -44,9 +44,25 @@ module.exports = function VariableController(gladys) {
     res.json(variable);
   }
 
+  /**
+   * @api {get} /api/variable/:variable_key Get variable
+   * @apiName getVariable
+   * @apiGroup Variable
+   *
+   * @apiParam {string} value value to save
+   */
+  async function getValue(req, res) {
+    const value = await gladys.variable.getValue(req.params.variable_key);
+    if (!value) {
+      throw new NotFoundError('VARIABLE_NOT_FOUND');
+    }
+    res.json({ value });
+  }
+
   return Object.freeze({
     setForLocalService: asyncMiddleware(setForLocalService),
     setValue: asyncMiddleware(setValue),
+    getValue: asyncMiddleware(getValue),
     getByLocalService: asyncMiddleware(getByLocalService),
   });
 };

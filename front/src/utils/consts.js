@@ -62,7 +62,8 @@ export const RequestStatus = {
   ValidationError: 'ValidationError',
   RateLimitError: 'RateLimitError',
   ServiceNotConfigured: 'ServiceNotConfigured',
-  GatewayNoInstanceFound: 'GatewayNoInstanceFound'
+  GatewayNoInstanceFound: 'GatewayNoInstanceFound',
+  UserNotAcceptedLocally: 'UserNotAcceptedLocally'
 };
 
 export const GetWeatherStatus = {

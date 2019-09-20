@@ -43,6 +43,11 @@ const SignupLayout = ({ children, ...props }) => (
                         <Text id="gatewayLinkUser.noInstanceFound" />
                       </div>
                     )}
+                    {props.error && (
+                      <div class="alert alert-danger">
+                        <Text id="gatewayLinkUser.error" />
+                      </div>
+                    )}
                     {props.usersGetStatus === RequestStatus.Error && (
                       <div class="alert alert-danger">
                         <Text id="httpErrors.unknownError" />

@@ -4,7 +4,7 @@ import GatewayPage from './GatewayPage';
 import actions from '../../../actions/gateway';
 
 @connect(
-  'gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus',
+  'gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus',
   actions
 )
 class SettingsGateway extends Component {
@@ -13,6 +13,7 @@ class SettingsGateway extends Component {
     this.props.getStatus();
     this.props.getKeys();
     this.props.getInstanceKeys();
+    this.props.getBackupKey();
   }
 
   render(props, {}) {

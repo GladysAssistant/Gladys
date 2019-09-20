@@ -479,12 +479,19 @@
     "yourGatewayIsNotConnected": "Your Gladys instance is currently not connected to the remote gateway.",
     "instanceRsaKey": "Instance RSA key fingerprint",
     "instanceEcdsaKey": "Instance ECDSA key fingerprint",
+    "backupKeyTitle": "Backup Key",
+    "backupKeyDescription": "Your backup key is used to securely encrypt your Gladys backups. Please save this key somewhere outside of Gladys to be able to restore Gladys. We recommend using a password manager for that.",
+    "backupKeyLabel": "Your backup key",
+    "backupKeyPlaceholder": "Enter/Restore a backup key",
+    "saveBackupKeyButton": "Save",
     "usersListTitle": "Remote users",
     "userColumn": "User",
     "statusColumn": "Status",
     "userRsaKey": "RSA key",
     "userEcdsaKey": "ECDSA key",
-    "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list."
+    "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list.",
+    "disconnectTitle": "Disconnect your Plus account",
+    "disconnectButton": "Disconnect"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
@@ -514,6 +521,8 @@
     "wrongCredentials": "Wrong email/password.",
     "invalidEmail": "Invalid email",
     "networkError": "Network Error: Are you sure your Gladys instance is connected to the internet?",
+    "userNotAcceptedLocally": "Your user is not accepted locally, please go back to your Gladys instance and allow access to this user in settings.",
+    "unknownError": "An unknown error occurred. Please contact us for more informations.",
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
     "loginTwoFactorButtonText": "Finalize Login"
@@ -609,6 +618,7 @@
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
+    "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save"
   }
 }

@@ -24,9 +24,36 @@ async function init() {
     logger.debug(e);
     this.connected = false;
   }
+
   if (process.env.NODE_ENV === 'production') {
     try {
       await this.getLatestGladysVersion();
+    } catch (e) {
+      logger.debug(e);
+    }
+
+    if (!this.connected) {
+      return;
+    }
+
+    try {
+      const backups = await this.getBackups();
+      let shouldBackup = false;
+      if (backups.length === 0) {
+        shouldBackup = true;
+      } else {
+        const lastBackupTimestamp = new Date(backups[0].created_at).getTime();
+        const yesterday = new Date().getTime() - 24 * 60 * 60 * 1000;
+        if (lastBackupTimestamp <= yesterday) {
+          shouldBackup = true;
+        }
+      }
+      if (shouldBackup) {
+        logger.debug(`Trying to backup instance to Gladys Gateway`);
+        await this.backup();
+      } else {
+        logger.debug(`Not backing up instance to Gladys Gateway, last backup is recent.`);
+      }
     } catch (e) {
       logger.debug(e);
     }

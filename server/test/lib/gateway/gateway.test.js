@@ -12,6 +12,8 @@ const Gateway = proxyquire('../../../lib/gateway', {
 });
 
 const getConfig = require('../../../utils/getConfig');
+const { EVENTS } = require('../../../utils/constants');
+const { NotFoundError } = require('../../../utils/coreErrors');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -118,6 +120,199 @@ describe('gateway', () => {
       const version = await gateway.getLatestGladysVersion();
       expect(version).to.have.property('name');
       expect(version).to.have.property('created_at');
+    });
+  });
+
+  describe('gateway.disconnect', () => {
+    it('should disconnect Gateway', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      await gateway.disconnect();
+    });
+  });
+  describe('gateway.forwardWebsockets', () => {
+    it('should forward a websocket message', async () => {
+      const gateway = new Gateway({}, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const websocketMessage = {
+        type: 'zwave.new-node',
+        payload: {},
+      };
+      gateway.forwardWebsockets(websocketMessage);
+      assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
+    });
+  });
+
+  describe('gateway.handleNewMessage', () => {
+    it('should handle a new gateway message and reject it', async () => {
+      const variable = {
+        getValue: fake.resolves('[]'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {},
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+          },
+          (res) => {
+            expect(res).to.have.property('error', 'USER_NOT_ACCEPTED_LOCALLY');
+            resolve();
+          },
+        );
+      });
+    });
+    it('should handle a new gateway message and reject it, user not accepted', async () => {
+      const variable = {
+        getValue: fake.resolves(
+          JSON.stringify([
+            {
+              rsa_public_key: 'fingerprint',
+              ecdsa_public_key: 'fingerprint',
+              accepted: false,
+            },
+          ]),
+        ),
+        setValue: fake.resolves(null),
+      };
+      const user = {
+        getById: fake.resolves({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = new EventEmitter();
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-api-call',
+            options: {
+              method: 'get',
+              url: '/api/v1/house',
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            expect(res).to.have.property('error', 'USER_NOT_ACCEPTED_LOCALLY');
+            resolve();
+          },
+        );
+      });
+    });
+    it('should handle a new gateway message and reject it, user not found', async () => {
+      const variable = {
+        getValue: fake.resolves(
+          JSON.stringify([
+            {
+              rsa_public_key: 'fingerprint',
+              ecdsa_public_key: 'fingerprint',
+              accepted: true,
+            },
+          ]),
+        ),
+        setValue: fake.resolves(null),
+      };
+      const user = {
+        getById: fake.rejects(new NotFoundError('User "0cd30aef-9c4e-4a23-88e3-3547971296e5" not found')),
+      };
+      const eventGateway = new EventEmitter();
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-api-call',
+            options: {
+              method: 'get',
+              url: '/api/v1/house',
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            try {
+              expect(res).to.have.property('error', 'LINKED_USER_NOT_FOUND');
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+        );
+      });
+    });
+    it('should handle a new gateway message and handle it', async () => {
+      const variable = {
+        getValue: fake.resolves(
+          JSON.stringify([
+            {
+              rsa_public_key: 'fingerprint',
+              ecdsa_public_key: 'fingerprint',
+              accepted: true,
+            },
+          ]),
+        ),
+        setValue: fake.resolves(null),
+      };
+      const user = {
+        getById: fake.resolves({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = new EventEmitter();
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      eventGateway.on(EVENTS.GATEWAY.NEW_MESSAGE_API_CALL, (one, two, three, four, five, cb) => {
+        cb([
+          {
+            name: 'My house',
+          },
+        ]);
+      });
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-api-call',
+            options: {
+              method: 'get',
+              url: '/api/v1/house',
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            expect(res).to.deep.equal([
+              {
+                name: 'My house',
+              },
+            ]);
+            resolve();
+          },
+        );
+      });
     });
   });
 });
