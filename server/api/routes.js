@@ -353,6 +353,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.setValue,
     },
+    'get /api/v1/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.getValue,
+    },
     // session
     'post /api/v1/session/:session_id/revoke': {
       authenticated: true,
