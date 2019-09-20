@@ -9,7 +9,7 @@ describe('GET /api/v1/variable/:variable_name', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.deep.equal({
-          value: 'VALUE'
+          value: 'VALUE',
         });
       });
   });
@@ -29,7 +29,7 @@ describe('GET /api/v1/service/:service_name/variable/:variable_name', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.deep.equal({
-          value: 'VALUE'
+          value: 'VALUE',
         });
       });
   });
@@ -46,7 +46,7 @@ describe('POST /api/v1/variable/:variable_name', () => {
     await authenticatedRequest
       .post('/api/v1/variable/NEW_VARIABLE_VALUE')
       .send({
-        value: 'NEW_DATA'
+        value: 'NEW_DATA',
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -58,7 +58,7 @@ describe('POST /api/v1/variable/:variable_name', () => {
     await authenticatedRequest
       .post('/api/v1/variable/GLADYS_GATEWAY_RSA_PUBLIC_KEY')
       .send({
-        value: 'NEW_DATA'
+        value: 'NEW_DATA',
       })
       .expect('Content-Type', /json/)
       .expect(200)

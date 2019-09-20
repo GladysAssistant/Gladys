@@ -2,7 +2,7 @@ import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus, LoginStatus } from '../utils/consts';
 import { validateEmail } from '../utils/validator';
-import { ERROR_MESSAGES } from '../../../server/utils/constants';
+import { ERROR_MESSAGES, SYSTEM_VARIABLE_NAMES } from '../../../server/utils/constants';
 
 function createActions(store) {
   const actions = {
@@ -93,6 +93,44 @@ function createActions(store) {
           gatewayDisconnectStatus: RequestStatus.Error
         });
       }
+    },
+    async getBackupKey(state) {
+      store.setState({
+        gatewayGetBackupKeyStatus: RequestStatus.Getting
+      });
+      try {
+        const data = await state.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_KEY}`);
+        store.setState({
+          gatewayBackupKey: data.value,
+          gatewayGetBackupKeyStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewayGetBackupKeyStatus: RequestStatus.Error
+        });
+      }
+    },
+    async saveBackupKey(state) {
+      store.setState({
+        gatewaySaveBackupKeyStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_KEY}`, {
+          value: state.gatewayBackupKey
+        });
+        store.setState({
+          gatewaySaveBackupKeyStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewaySaveBackupKeyStatus: RequestStatus.Error
+        });
+      }
+    },
+    async updateBackupKey(state, e) {
+      store.setState({
+        gatewayBackupKey: e.target.value
+      });
     },
     async getKeys(state) {
       store.setState({

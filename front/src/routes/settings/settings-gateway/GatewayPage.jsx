@@ -4,6 +4,7 @@ import SettingsLayout from '../SettingsLayout';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
 import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
+import GatewayBackupKey from './GatewayBackupKey';
 import GatewayUsersList from './GatewayUsersList';
 import GatewayDisconnect from './GatewayDisconnect';
 
@@ -31,6 +32,9 @@ const GatewayPage = ({ children, ...props }) => (
         </div>
         <div class="col-md-12">
           <GatewayUsersList {...props} />
+        </div>
+        <div class="col-md-12">
+          <GatewayBackupKey {...props} />
         </div>
         <div class="col-md-12">
           <GatewayDisconnect gatewayDisconnectStatus={props.gatewayDisconnectStatus} disconnect={props.disconnect} />
