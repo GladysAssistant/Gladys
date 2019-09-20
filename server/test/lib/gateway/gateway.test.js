@@ -123,6 +123,31 @@ describe('gateway', () => {
     });
   });
 
+  describe('gateway.disconnect', () => {
+    it('should disconnect Gateway', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      await gateway.disconnect();
+    });
+  });
+  describe('gateway.forwardWebsockets', () => {
+    it('should forward a websocket message', async () => {
+      const gateway = new Gateway({}, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const websocketMessage = {
+        type: 'zwave.new-node',
+        payload: {},
+      };
+      gateway.forwardWebsockets(websocketMessage);
+      assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
+    });
+  });
+
   describe('gateway.handleNewMessage', () => {
     it('should handle a new gateway message and reject it', async () => {
       const variable = {
@@ -203,7 +228,7 @@ describe('gateway', () => {
         setValue: fake.resolves(null),
       };
       const user = {
-        getById: fake.rejects(new NotFoundError('User not found')),
+        getById: fake.rejects(new NotFoundError('User "0cd30aef-9c4e-4a23-88e3-3547971296e5" not found')),
       };
       const eventGateway = new EventEmitter();
       const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
@@ -224,8 +249,12 @@ describe('gateway', () => {
             local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           },
           (res) => {
-            expect(res).to.have.property('error', 'LINKED_USER_NOT_FOUND');
-            resolve();
+            try {
+              expect(res).to.have.property('error', 'LINKED_USER_NOT_FOUND');
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
           },
         );
       });

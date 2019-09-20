@@ -85,6 +85,10 @@ function createActions(store) {
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);
           route('/link-gateway-user');
+        } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
+          store.setState({
+            gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
+          });
         } else {
           store.setState({
             gatewayLoginStatus: RequestStatus.Error

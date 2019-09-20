@@ -235,6 +235,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.login,
     },
+    'post /api/v1/gateway/logout': {
+      authenticated: true,
+      controller: gatewayController.logout,
+    },
     'post /api/v1/gateway/login-two-factor': {
       authenticated: true,
       controller: gatewayController.loginTwoFactor,
@@ -245,7 +249,7 @@ function getRoutes(gladys) {
     },
     'patch /api/v1/gateway/key': {
       authenticated: true,
-      controller: gatewayController.getStatus,
+      controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
       authenticated: true,
@@ -348,6 +352,10 @@ function getRoutes(gladys) {
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
       controller: variableController.setValue,
+    },
+    'get /api/v1/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.getValue,
     },
     // session
     'post /api/v1/session/:session_id/revoke': {
