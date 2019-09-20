@@ -73,6 +73,15 @@ describe('GET /api/v1/gateway/status', () => {
   });
 });
 
+describe('POST /api/v1/gateway/logout', () => {
+  it('should disconnect gateway', async () => {
+    await authenticatedRequest
+      .post('/api/v1/gateway/logout')
+      .expect('Content-Type', /json/)
+      .expect(200);
+  });
+});
+
 describe('GET /api/v1/gateway/instance/key', () => {
   it('should get instance keys', async () => {
     await authenticatedRequest
