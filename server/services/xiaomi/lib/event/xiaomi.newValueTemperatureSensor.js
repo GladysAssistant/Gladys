@@ -6,6 +6,11 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
+const { getBatteryPercent } = require('../utils/getBatteryPercent');
+
+const MIN_VOLT = 2800;
+const MAX_VOLT = 3300;
+
 /**
  * @description New value received temperature sensor.
  * @param {Object} message - Message received.
@@ -79,6 +84,14 @@ async function newValueTemperatureSensor(message, data) {
   }
 
   this.sensors[sid] = newSensor;
+
+  // emit battery event
+  if (data.voltage) {
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `xiaomi:${sid}:battery`,
+      state: getBatteryPercent(data.voltage, MIN_VOLT, MAX_VOLT),
+    });
+  }
 
   // emit temperature event
   if (data.temperature) {

@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
+const { MOTION_STATUS } = require('../utils/deviceStatus');
 const { getBatteryPercent } = require('../utils/getBatteryPercent');
 
 const MIN_VOLT = 2800;
@@ -82,14 +83,14 @@ async function newValueMotionSensor(message, data) {
   if (data.status === 'motion') {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:motion`,
-      state: 1,
+      state: MOTION_STATUS.MOTION,
     });
   }
   // if no motion event is detected, emit no-motion event
   if (data.no_motion) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:motion`,
-      state: 0,
+      state: MOTION_STATUS.NO_MOTION,
     });
   }
   if (data.lux) {

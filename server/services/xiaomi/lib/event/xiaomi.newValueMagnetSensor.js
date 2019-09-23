@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
+const { MAGNET_STATUS } = require('../utils/deviceStatus');
 const { getBatteryPercent } = require('../utils/getBatteryPercent');
 
 const MIN_VOLT = 2800;
@@ -39,7 +40,6 @@ async function newValueMagnetSensor(message, data) {
         type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
         read_only: true,
         keep_history: true,
-        has_feedback: false,
         min: 0,
         max: 1,
       },
@@ -52,7 +52,6 @@ async function newValueMagnetSensor(message, data) {
         unit: DEVICE_FEATURE_UNITS.PERCENT,
         read_only: true,
         keep_history: true,
-        has_feedback: false,
         min: 0,
         max: 100,
       },
@@ -71,14 +70,14 @@ async function newValueMagnetSensor(message, data) {
   if (data.status === 'open') {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:magnet`,
-      state: 1,
+      state: MAGNET_STATUS.OPEN,
     });
   }
   // if magnet was closed
   if (data.status === 'close') {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:magnet`,
-      state: 0,
+      state: MAGNET_STATUS.CLOSE,
     });
   }
 }
