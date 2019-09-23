@@ -26,6 +26,9 @@ async function onMessage(msg, rsinfo) {
     case 'sensor_cube.aqgl01':
       this.newValueCube(message, data);
       break;
+    case 'switch':
+      this.newValueSwitch(message, data);
+      break;
     default:
       logger.info(`Xiaomi device "${message.model}" not handled yet!`);
       break;
