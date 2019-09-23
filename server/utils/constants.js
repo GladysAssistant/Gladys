@@ -214,6 +214,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SWITCH: 'switch',
   SIREN: 'siren',
   ACCESS_CONTROl: 'access-control',
+  CUBE: 'cube',
   UNKNOWN: 'unknown',
 };
 
@@ -248,6 +249,10 @@ const DEVICE_FEATURE_TYPES = {
   },
   ACCESS_CONTROL: {
     MODE: 'mode',
+  },
+  CUBE: {
+    MODE: 'mode',
+    ROTATION: 'rotation',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',

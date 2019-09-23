@@ -20,10 +20,12 @@ async function onMessage(msg, rsinfo) {
       this.newValueMagnetSensor(message, data);
       break;
     case 'sensor_ht':
-    case 'weather.v1': {
+    case 'weather.v1':
       this.newValueTemperatureSensor(message, data);
       break;
-    }
+    case 'sensor_cube.aqgl01':
+      this.newValueCube(message, data);
+      break;
     default:
       logger.info(`Xiaomi device "${message.model}" not handled yet!`);
       break;
