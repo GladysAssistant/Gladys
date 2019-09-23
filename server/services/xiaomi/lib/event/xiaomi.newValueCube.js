@@ -30,10 +30,11 @@ async function newValueCube(message, data) {
     name: `Xiaomi Cube`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-cube',
     should_poll: false,
     features: [
       {
-        name: 'Cube Event',
+        name: 'Cube Mode',
         selector: `xiaomi:${sid}:cube:mode`,
         external_id: `xiaomi:${sid}:cube:mode`,
         category: DEVICE_FEATURE_CATEGORIES.CUBE,
@@ -44,7 +45,7 @@ async function newValueCube(message, data) {
         max: 1,
       },
       {
-        name: 'Opening Sensor',
+        name: 'Cube Rotation',
         selector: `xiaomi:${sid}:cube:rotation`,
         external_id: `xiaomi:${sid}:cube:rotation`,
         category: DEVICE_FEATURE_CATEGORIES.CUBE,
@@ -68,7 +69,7 @@ async function newValueCube(message, data) {
       },
     ],
   };
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit new battery value event
   if (data.voltage) {

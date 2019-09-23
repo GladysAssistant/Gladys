@@ -27,13 +27,14 @@ async function newValueMotionSensor(message, data) {
     name: `Xiaomi Motion Sensor`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-motion',
     should_poll: false,
     features: [
       {
         name: 'Motion',
         external_id: `xiaomi:${sid}:motion`,
         category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
         read_only: true,
         keep_history: true,
         min: 0,
@@ -70,7 +71,7 @@ async function newValueMotionSensor(message, data) {
     });
   }
 
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit new battery value event
   if (data.voltage) {

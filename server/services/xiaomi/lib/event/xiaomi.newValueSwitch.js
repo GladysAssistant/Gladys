@@ -30,6 +30,7 @@ async function newValueSwitch(message, data) {
     name: `Xiaomi Switch`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-switch',
     should_poll: false,
     features: [
       {
@@ -57,7 +58,7 @@ async function newValueSwitch(message, data) {
       },
     ],
   };
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit new battery value event
   if (data.voltage) {

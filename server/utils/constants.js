@@ -210,6 +210,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SISMIC_SENSOR: 'sismic-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
@@ -317,6 +318,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
+  },
+  XIAOMI: {
+    NEW_DEVICE: 'xiaomi.new-device',
   },
 };
 

@@ -30,6 +30,7 @@ async function newValueMagnetSensor(message, data) {
     name: `Xiaomi Magnet`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-magnet',
     should_poll: false,
     features: [
       {
@@ -57,7 +58,7 @@ async function newValueMagnetSensor(message, data) {
       },
     ],
   };
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit new battery value event
   if (data.voltage) {

@@ -1,4 +1,5 @@
 // EVENTS
+const { addDevice } = require('./event/xiaomi.addDevice');
 const { newValueCube } = require('./event/xiaomi.newValueCube');
 const { newValueMagnetSensor } = require('./event/xiaomi.newValueMagnetSensor');
 const { newValueMotionSensor } = require('./event/xiaomi.newValueMotionSensor');
@@ -26,6 +27,7 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
 };
 
 // EVENTS
+XiaomiManager.prototype.addDevice = addDevice;
 XiaomiManager.prototype.newValueCube = newValueCube;
 XiaomiManager.prototype.newValueMagnetSensor = newValueMagnetSensor;
 XiaomiManager.prototype.newValueMotionSensor = newValueMotionSensor;

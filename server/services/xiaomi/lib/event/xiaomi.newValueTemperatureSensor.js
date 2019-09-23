@@ -27,6 +27,7 @@ async function newValueTemperatureSensor(message, data) {
     name: 'Xiaomi Temperature Sensor',
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-temperature',
     should_poll: false,
     features: [
       {
@@ -83,7 +84,7 @@ async function newValueTemperatureSensor(message, data) {
     });
   }
 
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit battery event
   if (data.voltage) {

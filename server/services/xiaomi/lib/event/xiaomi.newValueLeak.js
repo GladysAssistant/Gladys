@@ -30,6 +30,7 @@ async function newValueLeak(message, data) {
     name: `Xiaomi Leak`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
+    model: 'xiaomi-leak',
     should_poll: false,
     features: [
       {
@@ -57,7 +58,7 @@ async function newValueLeak(message, data) {
       },
     ],
   };
-  this.sensors[sid] = newSensor;
+  this.addDevice(sid, newSensor);
 
   // emit new battery value event
   if (data.voltage) {
