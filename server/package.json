@@ -66,7 +66,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.0.0",
+    "@gladysassistant/gladys-gateway-js": "^3.2.2",
     "bcrypt": "^3.0.3",
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",

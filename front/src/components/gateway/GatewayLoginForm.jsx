@@ -15,10 +15,14 @@ const GatewayLoginForm = ({ children, ...props }) => (
           <div class="card-title">
             <Text id="gatewayLogin.cardTitle" />
           </div>
-
           {props.gatewayLoginStatus === LoginStatus.WrongCredentialsError && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.wrongCredentials" />
+            </div>
+          )}
+          {props.gatewayLoginStatus === RequestStatus.UserNotAcceptedLocally && (
+            <div class="alert alert-danger" role="alert">
+              <Text id="gatewayLogin.userNotAcceptedLocally" />
             </div>
           )}
           {props.gatewayLoginStatus === RequestStatus.NetworkError && (
@@ -26,7 +30,11 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Text id="gatewayLogin.networkError" />
             </div>
           )}
-
+          {props.gatewayLoginStatus === RequestStatus.Error && (
+            <div class="alert alert-danger" role="alert">
+              <Text id="gatewayLogin.unknownError" />
+            </div>
+          )}
           {!props.gatewayLoginStep2 && (
             <div class="form-group">
               <label class="form-label">
@@ -49,7 +57,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               </div>
             </div>
           )}
-
           {!props.gatewayLoginStep2 && (
             <div class="form-group">
               <label class="form-label">
@@ -69,7 +76,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               </Localizer>
             </div>
           )}
-
           {props.gatewayLoginStep2 && (
             <div class="form-group">
               <label class="form-label">
@@ -90,7 +96,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               </div>
             </div>
           )}
-
           <div class="form-footer">
             {!props.gatewayLoginStep2 && (
               <button
