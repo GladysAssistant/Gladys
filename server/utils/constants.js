@@ -210,6 +210,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SISMIC_SENSOR: 'sismic-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',

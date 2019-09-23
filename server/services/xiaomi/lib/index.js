@@ -4,6 +4,7 @@ const { newValueMagnetSensor } = require('./event/xiaomi.newValueMagnetSensor');
 const { newValueMotionSensor } = require('./event/xiaomi.newValueMotionSensor');
 const { newValueTemperatureSensor } = require('./event/xiaomi.newValueTemperatureSensor');
 const { newValueSwitch } = require('./event/xiaomi.newValueSwitch');
+const { newValueLeak } = require('./event/xiaomi.newValueLeak');
 const { listening } = require('./event/xiaomi.listening');
 const { onMessage } = require('./event/xiaomi.onMessage');
 
@@ -30,6 +31,7 @@ XiaomiManager.prototype.newValueMagnetSensor = newValueMagnetSensor;
 XiaomiManager.prototype.newValueMotionSensor = newValueMotionSensor;
 XiaomiManager.prototype.newValueTemperatureSensor = newValueTemperatureSensor;
 XiaomiManager.prototype.newValueSwitch = newValueSwitch;
+XiaomiManager.prototype.newValueLeak = newValueLeak;
 XiaomiManager.prototype.listening = listening;
 XiaomiManager.prototype.onMessage = onMessage;
 
