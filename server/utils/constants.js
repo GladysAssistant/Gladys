@@ -208,6 +208,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT_SENSOR: 'light-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SISMIC_SENSOR: 'sismic-sensor',
+  PRESSURE_SENSOR: 'pressure-sensor',
+  OPENING_SENSOR: 'opening-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
@@ -256,6 +258,8 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+  PASCAL: 'pascal',
+  LUX: 'lux',
 };
 
 const ACTIONS_STATUS = {
