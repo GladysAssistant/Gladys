@@ -70,7 +70,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF power state to ON (STATUS topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/my_device/STATUS', '{ "Status": {"Module": 1, "Power": 1, "FriendlyName": ["name"] }}');
+    sonoffHandler.handleMqttMessage(
+      'stat/my_device/STATUS',
+      '{ "Status": {"Module": 1, "Power": 1, "FriendlyName": ["name"] }}',
+    );
 
     const expectedEvent = {
       device_feature_external_id: `sonoff:my_device:binary`,
