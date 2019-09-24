@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { featureConverter } from '../../../../../../../server/services/sonoff/utils/featureConverter';
+import models from '../../../../../../../server/services/sonoff/models';
 
 export const Models = {
   basic: 1,
@@ -8,5 +8,9 @@ export const Models = {
 };
 
 export const GetFeatures = (modelName, deviceName, deviceTopic) => {
-  return featureConverter(uuid, Models[modelName], deviceName, deviceTopic);
+  if (models[modelName]) {
+    return models[modelName].getFeatures(uuid, deviceName, deviceTopic);
+  }
+
+  return [];
 };

@@ -25,13 +25,13 @@ const getFeatures = (uuid, deviceName, deviceTopic) => {
     {
       id: uuid.v4(),
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.POWER_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
       read_only: true,
       has_feedback: false,
       min: 0,
       max: 10000,
-      name: `${deviceName} - ${DEVICE_FEATURE_CATEGORIES.POWER_SENSOR}`,
-      external_id: `sonoff:${deviceTopic}:${DEVICE_FEATURE_TYPES.SWITCH.POWER_SENSOR}`,
+      name: `${deviceName} - ${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
+      external_id: `sonoff:${deviceTopic}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
     },
   ];
 };
