@@ -27,10 +27,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF power state to ON (POWER topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/POWER', 'ON');
+    sonoffHandler.handleMqttMessage('stat/my_device/POWER', 'ON');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:binary`,
+      device_feature_external_id: `sonoff:my_device:binary`,
       state: 1,
     };
 
@@ -39,10 +39,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF power state to OFF (POWER topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/POWER', 'OFF');
+    sonoffHandler.handleMqttMessage('stat/my_device/POWER', 'OFF');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:binary`,
+      device_feature_external_id: `sonoff:my_device:binary`,
       state: 0,
     };
 
@@ -51,10 +51,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF sensor state to 125 (SENSOR topic)', () => {
-    sonoffHandler.handleMqttMessage('tele/sonoff/SENSOR', '{ "ENERGY": { "Current": 125 }}');
+    sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "Current": 125 }}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:power`,
+      device_feature_external_id: `sonoff:my_device:power`,
       state: 125,
     };
 
@@ -62,11 +62,18 @@ describe('Mqtt handle message', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
+  it('should change SONOFF power state to ON (STATUS topic unknown device)', () => {
+    sonoffHandler.handleMqttMessage('stat/my_device/STATUS', '{ "Status": { "Power": 1, "FriendlyName": ["name"] }}');
+
+    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should change SONOFF power state to ON (STATUS topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/STATUS', '{ "Status": { "Power": 1, "FriendlyName": ["name"] }}');
+    sonoffHandler.handleMqttMessage('stat/my_device/STATUS', '{ "Status": {"Module": 1, "Power": 1, "FriendlyName": ["name"] }}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:binary`,
+      device_feature_external_id: `sonoff:my_device:binary`,
       state: 1,
     };
 
@@ -75,10 +82,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF power state to ON (STATE topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/STATE', '{ "POWER": "ON"}');
+    sonoffHandler.handleMqttMessage('stat/my_device/STATE', '{ "POWER": "ON"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:binary`,
+      device_feature_external_id: `sonoff:my_device:binary`,
       state: 1,
     };
 
@@ -87,10 +94,10 @@ describe('Mqtt handle message', () => {
   });
 
   it('should change SONOFF power state to OFF (STATE topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/STATE', '{ "POWER": "OFF"}');
+    sonoffHandler.handleMqttMessage('stat/my_device/STATE', '{ "POWER": "OFF"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:switch:binary`,
+      device_feature_external_id: `sonoff:my_device:binary`,
       state: 0,
     };
 
@@ -99,14 +106,14 @@ describe('Mqtt handle message', () => {
   });
 
   it('should ask for SONOFF status (LWT topic)', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/LWT', 'anything');
+    sonoffHandler.handleMqttMessage('stat/my_device/LWT', 'anything');
 
-    assert.calledWith(mqttService.client.publish, 'cmnd/sonoff/status');
+    assert.calledWith(mqttService.client.publish, 'cmnd/my_device/status');
     assert.notCalled(gladys.event.emit);
   });
 
   it('should do nothing on unkown SONOFF topic', () => {
-    sonoffHandler.handleMqttMessage('stat/sonoff/UNKOWN', '{ "POWER": "ON"}');
+    sonoffHandler.handleMqttMessage('stat/my_device/UNKOWN', '{ "POWER": "ON"}');
 
     assert.notCalled(mqttService.client.publish);
     assert.notCalled(gladys.event.emit);
