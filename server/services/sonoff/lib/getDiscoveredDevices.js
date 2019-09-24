@@ -6,8 +6,8 @@
  */
 function getDiscoveredDevices() {
   const discovered = Object.values(this.mqttDevices).map((d) => {
-    const exisitng = this.gladys.stateManager.get('deviceByExternalId', d.external_id);
-    return exisitng || d;
+    const existing = this.gladys.stateManager.get('deviceByExternalId', d.external_id);
+    return existing || d;
   });
 
   return discovered;
