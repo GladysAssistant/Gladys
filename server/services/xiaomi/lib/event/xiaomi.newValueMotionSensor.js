@@ -32,11 +32,13 @@ async function newValueMotionSensor(message, data) {
     features: [
       {
         name: 'Motion',
+        selector: `xiaomi:${sid}:motion`,
         external_id: `xiaomi:${sid}:motion`,
         category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
         read_only: true,
         keep_history: true,
+        has_feedback: true,
         min: 0,
         max: 1,
       },
@@ -49,6 +51,7 @@ async function newValueMotionSensor(message, data) {
         unit: DEVICE_FEATURE_UNITS.PERCENT,
         read_only: true,
         keep_history: true,
+        has_feedback: true,
         min: 0,
         max: 100,
       },
@@ -66,6 +69,7 @@ async function newValueMotionSensor(message, data) {
       unit: DEVICE_FEATURE_UNITS.LUX,
       read_only: true,
       keep_history: true,
+      has_feedback: true,
       min: 0,
       max: 1200,
     });
