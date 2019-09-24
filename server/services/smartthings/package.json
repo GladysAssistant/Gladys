@@ -4,6 +4,7 @@
   "main": "index.js",
   "dependencies": {
     "axios": "^0.19.0",
+    "http-signature": "^1.2.0",
     "st-schema": "^1.1.2"
   }
 }

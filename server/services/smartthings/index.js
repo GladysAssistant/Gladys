@@ -1,8 +1,9 @@
 const logger = require('../../utils/logger');
 const SmartThingsHandler = require('./lib');
+const SmartThingsController = require('./api/smartthings.controller');
 
 module.exports = function SmartThingsService(gladys, serviceId) {
-  const stHandler = new SmartThingsHandler(gladys, serviceId);
+  const smartthingsHandler = new SmartThingsHandler(gladys, serviceId);
   /**
    * @public
    * @description This function starts service
@@ -11,6 +12,7 @@ module.exports = function SmartThingsService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting SmartThings service');
+    smartthingsHandler.checkClient();
   }
 
   /**
@@ -26,5 +28,6 @@ module.exports = function SmartThingsService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    controllers: SmartThingsController(smartthingsHandler),
   });
 };

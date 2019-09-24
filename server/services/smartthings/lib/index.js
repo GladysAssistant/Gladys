@@ -1,3 +1,7 @@
+const { checkClient } = require('./smartthings.checkClient');
+const { discoveryRequest } = require('./connector/discoveryRequest');
+const { stateRefreshRequest } = require('./connector/stateRefreshRequest');
+
 /**
  * @description Add ability to connect to SmartThings.
  * @param {Object} gladys - Gladys instance.
@@ -9,5 +13,9 @@ const SmartThingsHandler = function SmartThingsHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
 };
+
+SmartThingsHandler.prototype.checkClient = checkClient;
+SmartThingsHandler.prototype.discoveryRequest = discoveryRequest;
+SmartThingsHandler.prototype.stateRefreshRequest = stateRefreshRequest;
 
 module.exports = SmartThingsHandler;
