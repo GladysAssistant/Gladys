@@ -27,12 +27,15 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
       },
       selector: {
         allowNull: false,
         unique: true,
+        type: DataTypes.STRING,
+      },
+      model: {
+        allowNull: true,
         type: DataTypes.STRING,
       },
       external_id: {
