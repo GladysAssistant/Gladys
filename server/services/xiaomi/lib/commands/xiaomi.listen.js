@@ -1,6 +1,7 @@
 const dgram = require('dgram');
 const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
+const SERVER_PORT = 9898;
 /**
  * @description Listen.
  * @example
@@ -11,7 +12,7 @@ function listen() {
   this.socket.on('listening', eventFunctionWrapper(this.listening.bind(this)));
   this.socket.on('message', eventFunctionWrapper(this.onMessage.bind(this)));
   //  this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
-  this.socket.bind(9898);
+  this.socket.bind(SERVER_PORT);
 }
 
 module.exports = {

@@ -11,6 +11,9 @@ async function onMessage(msg, rsinfo) {
   logger.debug(message);
   const data = message.data ? JSON.parse(message.data) : null;
   switch (message.model) {
+    case 'gateway':
+      this.newValueGateway(message, data);
+      break;
     case 'motion':
     case 'sensor_motion.aq2':
       this.newValueMotionSensor(message, data);

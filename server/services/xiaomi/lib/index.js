@@ -1,6 +1,7 @@
 // EVENTS
 const { addDevice } = require('./event/xiaomi.addDevice');
 const { newValueCube } = require('./event/xiaomi.newValueCube');
+const { newValueGateway } = require('./event/xiaomi.newValueGateway');
 const { newValueMagnetSensor } = require('./event/xiaomi.newValueMagnetSensor');
 const { newValueMotionSensor } = require('./event/xiaomi.newValueMotionSensor');
 const { newValueTemperatureSensor } = require('./event/xiaomi.newValueTemperatureSensor');
@@ -12,6 +13,7 @@ const { onMessage } = require('./event/xiaomi.onMessage');
 // COMMANDS
 const { getSensors } = require('./commands/xiaomi.getSensors');
 const { listen } = require('./commands/xiaomi.listen');
+const { setValue } = require('./commands/xiaomi.setValue');
 
 /**
  * @param {Object} gladys - The gladys object.
@@ -29,6 +31,7 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
 // EVENTS
 XiaomiManager.prototype.addDevice = addDevice;
 XiaomiManager.prototype.newValueCube = newValueCube;
+XiaomiManager.prototype.newValueGateway = newValueGateway;
 XiaomiManager.prototype.newValueMagnetSensor = newValueMagnetSensor;
 XiaomiManager.prototype.newValueMotionSensor = newValueMotionSensor;
 XiaomiManager.prototype.newValueTemperatureSensor = newValueTemperatureSensor;
@@ -40,5 +43,6 @@ XiaomiManager.prototype.onMessage = onMessage;
 // COMMANDS
 XiaomiManager.prototype.listen = listen;
 XiaomiManager.prototype.getSensors = getSensors;
+XiaomiManager.prototype.setValue = setValue;
 
 module.exports = XiaomiManager;
