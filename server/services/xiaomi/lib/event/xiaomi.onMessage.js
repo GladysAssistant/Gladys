@@ -32,6 +32,12 @@ async function onMessage(msg, rsinfo) {
     case 'switch':
       this.newValueSwitch(message, data);
       break;
+    case 'smoke':
+      this.newValueSmoke(message, data);
+      break;
+    case 'vibration':
+      this.newValueVibration(message, data);
+      break;
     case 'sensor_wleak.aq1':
       this.newValueLeak(message, data);
       break;

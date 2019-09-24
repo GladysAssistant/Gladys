@@ -211,6 +211,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRESSURE_SENSOR: 'pressure-sensor',
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
+  VIBRATION_SENSOR: 'vibration-sensor',
   LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
@@ -256,6 +257,14 @@ const DEVICE_FEATURE_TYPES = {
   CUBE: {
     MODE: 'mode',
     ROTATION: 'rotation',
+  },
+  VIBRATION_SENSOR: {
+    STATUS: 'status',
+    TILT_ANGLE: 'tilt-angle',
+    ACCELERATION_X: 'acceleration-x',
+    ACCELERATION_Y: 'acceleration-y',
+    ACCELERATION_Z: 'acceleration-z',
+    BED_ACTIVITY: 'bed-activity',
   },
   BUTTON: {
     CLICK: 'click',
