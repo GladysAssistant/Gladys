@@ -304,6 +304,30 @@
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
         "connected": "Connected to the MQTT broker with success !"
       }
+    },
+    "xiaomi": {
+      "device": {
+        "title": "Xiaomi devices in Gladys",
+        "noDevices": "No Xiaomi devices added yet.",
+        "searchPlaceholder": "Search Xiaomi devices",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      },
+      "setup": {
+        "title": "Xiaomi devices not in Gladys",
+        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode.",
+        "createDeviceInGladys": "Connect in Gladys"
+      },
+      "models": {
+        "motion": "Motion Sensor",
+        "temperature": "Temperature Sensor",
+        "switch": "Switch",
+        "cube": "Cube",
+        "leak": "Leak Sensor",
+        "magnet": "Magnet Sensor"
+      }
     }
   },
   "editScene": {
@@ -557,10 +581,12 @@
       "decimal": "Temperature"
     },
     "motion-sensor": {
+      "push": "Motion",
       "binary": "Motion"
     },
     "light-sensor": {
-      "integer": "Luminosity"
+      "integer": "Luminosity",
+      "decimal": "Luminosity"
     },
     "sismic-sensor": {
       "decimal": "Sismic"
@@ -584,6 +610,25 @@
     },
     "siren": {
       "binary": "Siren"
+    },
+    "cube": {
+      "mode": "Mode",
+      "rotation": "Rotation"
+    },
+    "button": {
+      "click": "Button"
+    },
+    "pressure-sensor": {
+      "decimal": "Pressure"
+    },
+    "leak-sensor": {
+      "binary": "Leak"
+    },
+    "opening-sensor": {
+      "binary": "Opening"
+    },
+    "humidity-sensor": {
+      "decimal": "Humidity"
     },
     "unknown": {
       "unknown": "Unknown"
