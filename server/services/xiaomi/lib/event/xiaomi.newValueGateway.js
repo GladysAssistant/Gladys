@@ -1,5 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const {
+  EVENTS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
 
 /**
  * @description Add Xiaomi Gateway.
@@ -70,6 +75,19 @@ async function newValueGateway(message, data) {
           min: 0,
           max: 100,
         },
+        {
+          name: 'Luminosity',
+          selector: `xiaomi:${sid}:luminosity`,
+          external_id: `xiaomi:${sid}:luminosity`,
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: DEVICE_FEATURE_UNITS.LUX,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 1200,
+        },
       ],
       params: [
         {
@@ -83,6 +101,13 @@ async function newValueGateway(message, data) {
       ],
     };
     this.addDevice(sid, newSensor);
+  }
+
+  if (data.illumination) {
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `xiaomi:${sid}:luminosity`,
+      state: data.illumination,
+    });
   }
 }
 
