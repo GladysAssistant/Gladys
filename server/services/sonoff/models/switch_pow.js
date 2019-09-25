@@ -4,7 +4,7 @@ const getParams = () => {
   return [
     {
       name: 'model',
-      value: 'basic',
+      value: 'pow',
     },
   ];
 };
