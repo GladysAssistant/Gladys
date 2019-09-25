@@ -54,6 +54,10 @@ async function onMessage(msg, rsinfo) {
     case 'ctrl_ln1':
       this.newValueSingleWiredSwitchNeutral(message, data);
       break;
+    case 'ctrl_ln2.aq1':
+    case 'ctrl_ln2':
+      this.newValueDuplexWiredSwitchNeutral(message, data);
+      break;
     default:
       logger.info(`Xiaomi device "${message.model}" not handled yet!`);
       break;

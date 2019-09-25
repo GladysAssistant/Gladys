@@ -4,25 +4,25 @@ const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../
 const { WIRED_SWITCH_STATUS } = require('../utils/deviceStatus');
 
 /**
- * @description New value single duplex switch received.
+ * @description New value duplex wired switch neutral received.
  * @param {Object} message - Message received.
  * @param {Object} data - Data received.
  * @example
- * newValueDuplexWiredSwitch({model:''}, {
+ * newValueDuplexWiredSwitchNeutral({model:''}, {
  *    channel_0: 'on'
  * });
  */
-async function newValueDuplexWiredSwitch(message, data) {
+async function newValueDuplexWiredSwitchNeutral(message, data) {
   const { sid } = message;
-  logger.debug(`Xiaomi : New value duplex wired switch, sid = ${sid}`);
-  const EXTERNAL_ID_CHANNEL_0_BINARY = `xiaomi:${sid}:duplex-wired-switch:channel-0:binary`;
-  const EXTERNAL_ID_CHANNEL_1_BINARY = `xiaomi:${sid}:duplex-wired-switch:channel-1:binary`;
+  logger.debug(`Xiaomi : New value duplex wired switch neutral, sid = ${sid}`);
+  const EXTERNAL_ID_CHANNEL_0_BINARY = `xiaomi:${sid}:duplex-wired-switch-neutral:channel-0:binary`;
+  const EXTERNAL_ID_CHANNEL_1_BINARY = `xiaomi:${sid}:duplex-wired-switch-neutral:channel-1:binary`;
   const newSensor = {
     service_id: this.serviceId,
-    name: `Xiaomi Duplex Wired Switch`,
+    name: `Xiaomi Duplex Wired Switch Neutral`,
     selector: `xiaomi:${sid}`,
     external_id: `xiaomi:${sid}`,
-    model: 'xiaomi-duplex-wired-switch',
+    model: 'xiaomi-duplex-wired-switch-neutral',
     should_poll: false,
     features: [
       {
@@ -83,5 +83,5 @@ async function newValueDuplexWiredSwitch(message, data) {
 }
 
 module.exports = {
-  newValueDuplexWiredSwitch,
+  newValueDuplexWiredSwitchNeutral,
 };
