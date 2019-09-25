@@ -33,6 +33,11 @@ const PLUG_STATUS = {
   OFF: 0,
 };
 
+const WIRED_SWITCH_STATUS = {
+  ON: 1,
+  OFF: 0,
+};
+
 const LEAK_STATUS = {
   LEAK: 1,
   NO_LEAK: 0,
@@ -47,6 +52,7 @@ const VIBRATION_STATUS = {
 
 module.exports = {
   SWITCH_STATUS,
+  WIRED_SWITCH_STATUS,
   MOTION_STATUS,
   CUBE_STATUS,
   MAGNET_STATUS,
