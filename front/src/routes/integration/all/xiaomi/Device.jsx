@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
@@ -76,7 +77,9 @@ class XiaomiDeviceBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 <div class="form-group">
-                  <label>Xiaomi SID</label>
+                  <label>
+                    <Text id="integration.xiaomi.device.sidLabel" />
+                  </label>
                   <input type="text" value={props.device.external_id.split(':')[1]} class="form-control" disabled />
                 </div>
                 <div class="form-group">
@@ -126,6 +129,11 @@ class XiaomiDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.xiaomi.device.deleteButton" />
                   </button>
+                  <Link href={`/dashboard/integration/device/xiaomi/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.xiaomi.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

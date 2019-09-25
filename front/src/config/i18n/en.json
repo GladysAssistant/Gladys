@@ -310,10 +310,12 @@
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
         "searchPlaceholder": "Search Xiaomi devices",
+        "sidLabel": "Xiaomi SID",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "editButton": "Edit details"
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
@@ -598,7 +600,8 @@
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
-      "binary": "Smoke"
+      "binary": "Smoke",
+      "decimal": "Density"
     },
     "switch": {
       "voltage": "Switch Voltage",
@@ -606,7 +609,8 @@
       "binary": "Switch",
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
-      "power": "Switch Power consumption"
+      "power": "Power consumption",
+      "energy": "Energy consumption"
     },
     "siren": {
       "binary": "Siren"
@@ -629,6 +633,14 @@
     },
     "humidity-sensor": {
       "decimal": "Humidity"
+    },
+    "vibration-sensor": {
+      "status": "Status",
+      "tilt-angle": "Tilt Angle",
+      "acceleration-x": "Acceleration X",
+      "acceleration-y": "Acceleration Y",
+      "acceleration-z": "Acceleration Z",
+      "bed-activity": "Bed Activity"
     },
     "unknown": {
       "unknown": "Unknown"
@@ -665,5 +677,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save"
+  },
+  "editDeviceForm": {
+    "returnButton": "Return back"
   }
 }
