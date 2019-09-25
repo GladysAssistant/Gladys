@@ -2,14 +2,21 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Xiaomi onMessage callback.
  * @param {Buffer} msg - The message buffer.
- * @param {string} rsinfo - Rs info.
+ * @param {Object} rsinfo - Rs info.
  * @example
  * xiaomi.onMessage('{"model": "motion"}');
  */
 async function onMessage(msg, rsinfo) {
   const message = JSON.parse(msg.toString());
+  const ip = rsinfo.address;
   logger.debug(message);
   const data = message.data ? JSON.parse(message.data) : null;
+  if (message.sid) {
+    // save gateway ip of sensor
+    this.gatewayIpBySensorSid.set(message.sid, ip);
+    // save sensor model
+    this.sensorModelBySensorSid.set(message.sid, message.model);
+  }
   switch (message.model) {
     case 'gateway':
       this.newValueGateway(message, data);

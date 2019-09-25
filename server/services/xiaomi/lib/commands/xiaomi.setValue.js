@@ -19,12 +19,13 @@ function setValue(device, deviceFeature, state) {
   const rgb = hslToRgb(214, 1, 0.5);
   const rgbNumber = 0xff000000 + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]; // eslint-disable-line no-bitwise
   const sid = device.external_id.split(':')[1];
-  const ip = getDeviceParam(this.sensors[sid], 'GATEWAY_IP');
-  const token = getDeviceParam(this.sensors[sid], 'GATEWAY_TOKEN');
+  const ip = this.gatewayIpBySensorSid.get(sid);
+  const token = this.gatewayTokenByIp.get(ip);
   const password = getDeviceParam(this.sensors[sid], 'GATEWAY_PASSWORD');
   if (!ip || !token || !password) {
     throw new Error('Missing information to connect to the Gateway');
   }
+  const key = generateGatewayKey(token, password);
   switch (device.model) {
     case 'xiaomi-gateway':
       msg = {
@@ -33,7 +34,18 @@ function setValue(device, deviceFeature, state) {
         sid,
         data: JSON.stringify({
           rgb: rgbNumber,
-          key: generateGatewayKey(token, password),
+          key,
+        }),
+      };
+      break;
+    case 'xiaomi-duplex-wired-switch':
+      msg = {
+        cmd: 'write',
+        model: this.sensorModelBySensorSid.get(sid),
+        sid,
+        data: JSON.stringify({
+          channel_0: 'off',
+          key,
         }),
       };
       break;

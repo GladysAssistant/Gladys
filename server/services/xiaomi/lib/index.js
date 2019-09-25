@@ -35,6 +35,9 @@ const XiaomiManager = function hubDiscover(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.sensors = {};
+  this.gatewayIpBySensorSid = new Map();
+  this.sensorModelBySensorSid = new Map();
+  this.gatewayTokenByIp = new Map();
 };
 
 // EVENTS

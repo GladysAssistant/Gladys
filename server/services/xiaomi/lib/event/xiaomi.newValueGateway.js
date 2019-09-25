@@ -100,10 +100,11 @@ async function newValueGateway(message, data) {
         },
       ],
     };
+    this.gatewayTokenByIp.set(data.ip, message.token);
     this.addDevice(sid, newSensor);
   }
 
-  if (data.illumination) {
+  if (data && data.illumination) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:luminosity`,
       state: data.illumination,
