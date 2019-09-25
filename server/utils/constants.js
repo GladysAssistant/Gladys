@@ -240,6 +240,7 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
+    ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     BURGLAR: 'burglar',
@@ -280,6 +281,8 @@ const DEVICE_FEATURE_UNITS = {
   PERCENT: 'percent',
   PASCAL: 'pascal',
   LUX: 'lux',
+  KILOWATT: 'kilowatt',
+  KILOWATT_HOUR: 'kilowatt-hour',
 };
 
 const ACTIONS_STATUS = {

@@ -41,6 +41,9 @@ async function onMessage(msg, rsinfo) {
     case 'sensor_wleak.aq1':
       this.newValueLeak(message, data);
       break;
+    case 'plug':
+      this.newValuePlug(message, data);
+      break;
     default:
       logger.info(`Xiaomi device "${message.model}" not handled yet!`);
       break;
