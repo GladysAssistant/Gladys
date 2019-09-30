@@ -1,24 +1,4 @@
 /*  
-    case 'sensor_wleak.aq1':
-      this.newValueLeak(message, data);
-      break;
-    case 'plug':
-      this.newValuePlug(message, data);
-      break;
-    case 'ctrl_neutral1':
-      this.newValueSingleWiredSwitch(message, data);
-      break;
-    case 'ctrl_neutral2':
-      this.newValueDuplexWiredSwitch(message, data);
-      break;
-    case 'ctrl_ln1.aq1':
-    case 'ctrl_ln1':
-      this.newValueSingleWiredSwitchNeutral(message, data);
-      break;
-    case 'ctrl_ln2.aq1':
-    case 'ctrl_ln2':
-      this.newValueDuplexWiredSwitchNeutral(message, data);
-      break;
     case '86sw2':
       this.newValueDuplexWirelessSwitch(message, data);
       break;
@@ -148,6 +128,109 @@ const MESSAGES = [
     data: JSON.stringify({
       status: 'no_leak',
       voltage: 3000,
+    }),
+  },
+  // PLUG
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'plug',
+    data: JSON.stringify({
+      status: 'on',
+      load_power: 100,
+      power_consumed: 10000,
+    }),
+  },
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'plug',
+    data: JSON.stringify({
+      status: 'off',
+      load_power: 100,
+      power_consumed: 10000,
+    }),
+  },
+  // SINGLE WIRED SWITCH
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_neutral1',
+    data: JSON.stringify({
+      channel_0: 'on',
+    }),
+  },
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_neutral1',
+    data: JSON.stringify({
+      channel_0: 'off',
+    }),
+  },
+  // DUPLEX WIRED SWITCH
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_neutral2',
+    data: JSON.stringify({
+      channel_0: 'on',
+      channel_1: 'on',
+    }),
+  },
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_neutral2',
+    data: JSON.stringify({
+      channel_0: 'off',
+      channel_1: 'off',
+    }),
+  },
+  // SINGLE WIRED SWITCH NEUTRAL
+  {
+    sid: `1245${(counter += 1)}`,
+    model: ' ctrl_ln1.aq1',
+    data: JSON.stringify({
+      channel_0: 'on',
+    }),
+  },
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_ln1',
+    data: JSON.stringify({
+      channel_0: 'off',
+    }),
+  },
+  // DUPLEX WIRED SWITCH NEUTRAL
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_ln2.aq1',
+    data: JSON.stringify({
+      channel_0: 'on',
+      channel_1: 'on',
+    }),
+  },
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'ctrl_ln2',
+    data: JSON.stringify({
+      channel_0: 'off',
+      channel_1: 'off',
+    }),
+  },
+  // DUPLEX WIRELESS SWITCH
+  {
+    sid: `1245${(counter += 1)}`,
+    model: '86sw2',
+    data: JSON.stringify({
+      voltage: 3000,
+      channel_0: 'click',
+      channel_1: 'click',
+      dual_channel: 'click',
+    }),
+  },
+  // SINGLE WIRELESS SWITCH
+  {
+    sid: `1245${(counter += 1)}`,
+    model: '86sw1',
+    data: JSON.stringify({
+      voltage: 3000,
+      channel_0: 'click',
     }),
   },
 ];

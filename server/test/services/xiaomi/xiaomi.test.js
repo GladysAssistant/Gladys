@@ -9,7 +9,7 @@ const XiaomiManager = proxyquire('../../../services/xiaomi/lib', {
 
 const MESSAGES = require('./messagesToTest.test');
 
-describe.only('Xiaomi Service', () => {
+describe('Xiaomi Service', () => {
   const gladys = {
     event: new EventEmitter(),
   };
