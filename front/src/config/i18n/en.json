@@ -679,6 +679,15 @@
     "saveButton": "Save"
   },
   "editDeviceForm": {
-    "returnButton": "Return back"
+    "returnButton": "Return back",
+    "noName": "No name",
+    "nameLabel": "Name",
+    "roomLabel": "Room",
+    "featuresLabel": "Features",
+    "namePlaceholder": "Enter name",
+    "externalIdLabel": "External ID",
+    "externalIdPlaceholder": "Enter external ID",
+    "saveButton": "Save",
+    "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API."
   }
 }

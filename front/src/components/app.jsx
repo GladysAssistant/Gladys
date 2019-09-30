@@ -54,6 +54,7 @@ import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
+import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -122,6 +123,7 @@ const AppRouter = connect(
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
+        <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
