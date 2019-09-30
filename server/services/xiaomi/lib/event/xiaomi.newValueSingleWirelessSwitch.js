@@ -22,7 +22,7 @@ const MAX_VOLT = 3300;
  *    channel_0: 'on'
  * });
  */
-async function newValueSingleWirelessSwitch(message, data) {
+function newValueSingleWirelessSwitch(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value single wired switch, sid = ${sid}`);
   const EXTERNAL_ID_BUTTON = `xiaomi:${sid}:single-wireless-switch:button`;

@@ -12,7 +12,7 @@ const { WIRED_SWITCH_STATUS } = require('../utils/deviceStatus');
  *    channel_0: 'on'
  * });
  */
-async function newValueDuplexWiredSwitch(message, data) {
+function newValueDuplexWiredSwitch(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value duplex wired switch, sid = ${sid}`);
   const EXTERNAL_ID_CHANNEL_0_BINARY = `xiaomi:${sid}:duplex-wired-switch:channel-0:binary`;

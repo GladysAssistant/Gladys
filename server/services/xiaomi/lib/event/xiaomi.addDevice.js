@@ -7,7 +7,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  * @example
  * xiaomi.addDevice(sid, device);
  */
-async function addDevice(sid, device) {
+function addDevice(sid, device) {
   const doesntExistYet = this.sensors[sid] === undefined;
   this.sensors[sid] = device;
   if (doesntExistYet) {

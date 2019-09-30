@@ -18,7 +18,7 @@ const MAX_VOLT = 3300;
  * @example
  * newValueTemperatureSensor(message, data);
  */
-async function newValueTemperatureSensor(message, data) {
+function newValueTemperatureSensor(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value temperature sensor, sid = ${sid}`);
 

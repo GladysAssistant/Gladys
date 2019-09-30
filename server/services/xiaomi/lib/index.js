@@ -1,3 +1,5 @@
+const dgram = require('dgram');
+
 // EVENTS
 const { addDevice } = require('./event/xiaomi.addDevice');
 const { newValueCube } = require('./event/xiaomi.newValueCube');
@@ -29,9 +31,10 @@ const { setValue } = require('./commands/xiaomi.setValue');
  * @param {string} serviceId - Identification of the service.
  * @description Create all device if not exist by listening
  * @example
- * hubDiscover(gladys, serviceId)
+ * XiaomiManager(gladys, serviceId)
  */
-const XiaomiManager = function hubDiscover(gladys, serviceId) {
+const XiaomiManager = function XiaomiManager(gladys, serviceId) {
+  this.dgram = dgram;
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.sensors = {};

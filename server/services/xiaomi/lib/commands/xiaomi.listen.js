@@ -1,4 +1,3 @@
-const dgram = require('dgram');
 const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
 const SERVER_PORT = 9898;
@@ -8,7 +7,7 @@ const SERVER_PORT = 9898;
  * xiaomi.listen();
  */
 function listen() {
-  this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+  this.socket = this.dgram.createSocket({ type: 'udp4', reuseAddr: true });
   this.socket.on('listening', eventFunctionWrapper(this.listening.bind(this)));
   this.socket.on('message', eventFunctionWrapper(this.onMessage.bind(this)));
   //  this.socket.on('data.weather', this.addTemperatureSensor.bind(this));

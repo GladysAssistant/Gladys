@@ -21,7 +21,7 @@ const MAX_VOLT = 3300;
  *    status: 1
  * });
  */
-async function newValueSmoke(message, data) {
+function newValueSmoke(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value smoke, sid = ${sid}`);
   const newSensor = {

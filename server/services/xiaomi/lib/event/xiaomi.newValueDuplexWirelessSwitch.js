@@ -22,7 +22,7 @@ const MAX_VOLT = 3300;
  *    channel_0: 'on'
  * });
  */
-async function newValueDuplexWirelessSwitch(message, data) {
+function newValueDuplexWirelessSwitch(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value duplex wireless switch, sid = ${sid}`);
   const EXTERNAL_ID_CHANNEL_0_BUTTON = `xiaomi:${sid}:duplex-wireless-switch:channel-0:button`;

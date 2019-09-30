@@ -12,7 +12,7 @@ const { WIRED_SWITCH_STATUS } = require('../utils/deviceStatus');
  *    channel_0: 'on'
  * });
  */
-async function newValueSingleWiredSwitchNeutral(message, data) {
+function newValueSingleWiredSwitchNeutral(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value single wired switch neutral, sid = ${sid}`);
   const EXTERNAL_ID_BINARY = `xiaomi:${sid}:single-wired-switch-neutral:binary`;

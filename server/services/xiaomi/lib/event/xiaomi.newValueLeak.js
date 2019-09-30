@@ -22,7 +22,7 @@ const MAX_VOLT = 3300;
  *    status: 'leak'
  * });
  */
-async function newValueLeak(message, data) {
+function newValueLeak(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value leak sensor, sid = ${sid}`);
   const newSensor = {

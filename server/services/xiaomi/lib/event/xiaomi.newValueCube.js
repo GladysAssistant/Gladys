@@ -22,7 +22,7 @@ const MAX_VOLT = 3300;
  *    status: 1
  * });
  */
-async function newValueCube(message, data) {
+function newValueCube(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value cube, sid = ${sid}`);
   const newSensor = {

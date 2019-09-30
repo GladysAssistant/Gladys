@@ -15,7 +15,7 @@ const {
  *    status: 1
  * });
  */
-async function newValueGateway(message, data) {
+function newValueGateway(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value gateway, sid = ${sid}`);
   if (message.cmd === 'heartbeat' && message.token) {
@@ -40,40 +40,16 @@ async function newValueGateway(message, data) {
           max: 1,
         },
         {
-          name: 'Hue',
-          selector: `xiaomi:${sid}:gateway:hue`,
-          external_id: `xiaomi:${sid}:gateway:hue`,
+          name: 'Color',
+          selector: `xiaomi:${sid}:gateway:color`,
+          external_id: `xiaomi:${sid}:gateway:color`,
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+          type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
           read_only: false,
-          keep_history: true,
+          keep_history: false,
           has_feedback: false,
           min: 0,
-          max: 360,
-        },
-        {
-          name: 'Saturation',
-          selector: `xiaomi:${sid}:gateway:saturation`,
-          external_id: `xiaomi:${sid}:gateway:saturation`,
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
-          read_only: false,
-          keep_history: true,
-          has_feedback: false,
-          min: 0,
-          max: 100,
-        },
-        {
-          name: 'Brightness',
-          selector: `xiaomi:${sid}:gateway:brightness`,
-          external_id: `xiaomi:${sid}:gateway:brightness`,
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-          read_only: false,
-          keep_history: true,
-          has_feedback: false,
-          min: 0,
-          max: 100,
+          max: 0,
         },
         {
           name: 'Luminosity',

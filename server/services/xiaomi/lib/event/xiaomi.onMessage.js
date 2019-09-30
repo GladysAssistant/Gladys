@@ -6,7 +6,7 @@ const logger = require('../../../../utils/logger');
  * @example
  * xiaomi.onMessage('{"model": "motion"}');
  */
-async function onMessage(msg, rsinfo) {
+function onMessage(msg, rsinfo) {
   const message = JSON.parse(msg.toString());
   const ip = rsinfo.address;
   logger.debug(message);

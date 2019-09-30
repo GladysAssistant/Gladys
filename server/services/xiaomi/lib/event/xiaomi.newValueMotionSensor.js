@@ -19,7 +19,7 @@ const MAX_VOLT = 3300;
  * @example
  * newValueMotionSensor(1234);
  */
-async function newValueMotionSensor(message, data) {
+function newValueMotionSensor(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value motion sensor, sid = ${sid}`);
   const newSensor = {

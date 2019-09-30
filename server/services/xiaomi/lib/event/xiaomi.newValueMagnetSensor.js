@@ -22,7 +22,7 @@ const MAX_VOLT = 3300;
  *    status: 1
  * });
  */
-async function newValueMagnetSensor(message, data) {
+function newValueMagnetSensor(message, data) {
   const { sid } = message;
   logger.debug(`Xiaomi : New value magnet sensor, sid = ${sid}`);
   const newSensor = {
