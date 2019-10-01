@@ -20,6 +20,16 @@
     "invalidEmail": "Invalid email",
     "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
   },
+  "authorize": {
+    "authorizeTitle": "{{client}} would like to:",
+    "unknownClientTitle": "{{client}} is unknown by Gladys and will not authorize it to get your data.",
+    "denyClientTitle": "{{client}} has been refused to communicate with Gladys.",
+    "allowButtonText": "Allow",
+    "denyButtonText": "Deny",
+    "grants": {
+      "user": "Acces to your public profile"
+    }
+  },
   "signup": {
     "welcome": {
       "title": "Welcome in Gladys 🙋",

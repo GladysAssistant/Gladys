@@ -12,7 +12,7 @@ export class HttpClient {
   getAxiosHeaders() {
     const headers = {};
     if (this.session.getAccessToken()) {
-      headers.authorization = `Bearer ${this.session.getAccessToken()}`;
+      headers.Authorization = `Bearer ${this.session.getAccessToken()}`;
     }
     return headers;
   }

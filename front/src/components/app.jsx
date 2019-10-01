@@ -24,6 +24,7 @@ import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
+import Authorize from '../routes/oauth';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -132,6 +133,9 @@ const AppRouter = connect(
         )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
+
+        <Authorize path="/authorize" />
+
         <SignupCreateAccountLocal path="/signup/create-account-local" />
         <SignupCreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
         <SignupPreferences path="/signup/preference" />
