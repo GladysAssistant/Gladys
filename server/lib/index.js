@@ -67,7 +67,7 @@ function Gladys(params = {}) {
   const trigger = new TriggerManager(event, stateManager, scene);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user);
-  const oauth = new Oauth(user);
+  const oauth = new Oauth(user, session);
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
