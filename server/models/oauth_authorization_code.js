@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         references: {
           model: 't_oauth_client',
-          key: 'client_id',
+          key: 'id',
         },
       },
       user_id: {
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {},
   );
-  oauthAuthorizationCode.associate = function(models) {
+  oauthAuthorizationCode.associate = (models) => {
     oauthAuthorizationCode.belongsTo(models.User, {
       foreignKey: 'user_id',
       targetKey: 'id',
@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     oauthAuthorizationCode.belongsTo(models.OAuthClient, {
       foreignKey: 'client_id',
-      targetKey: 'client_id',
+      targetKey: 'id',
       as: 'client',
     });
   };

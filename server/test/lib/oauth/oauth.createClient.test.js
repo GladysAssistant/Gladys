@@ -2,34 +2,37 @@ const { expect, assert } = require('chai');
 const OauthManager = require('../../../lib/oauth');
 
 describe('oauth.createClient', () => {
-  const oauthManager = new OauthManager();
+  const oauthManager = new OauthManager({}, {});
 
-  it('should create OAuth client and generate secrect', async () => {
+  it('should create OAuth client and generate secret', async () => {
     const clientToCreate = {
-      client_id: 'new_oauth_client_1',
+      id: 'new_oauth_client_1',
+      name: 'client name',
       redirect_uris: ['uri_1', 'uri_2'],
     };
 
     const client = await oauthManager.createClient(clientToCreate);
 
     expect(client).to.deep.include(clientToCreate);
-    expect(client.client_secret).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(client.secret).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
-  it('should create OAuth client and generate secrect, no redirect_uris', async () => {
+  it('should create OAuth client and generate secret, no redirect_uris', async () => {
     const clientToCreate = {
-      client_id: 'new_oauth_client_2',
+      id: 'new_oauth_client_2',
+      name: 'client name',
     };
 
     const client = await oauthManager.createClient(clientToCreate);
 
     expect(client).to.deep.include(clientToCreate);
-    expect(client.client_secret).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(client.secret).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
   it('should not create already existing OAuth client', async () => {
     const clientToCreate = {
-      client_id: 'oauth_client_1',
+      id: 'oauth_client_1',
+      name: 'client name',
       redirect_uris: ['uri_1', 'uri_2'],
     };
 

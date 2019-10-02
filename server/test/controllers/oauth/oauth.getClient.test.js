@@ -10,16 +10,18 @@ describe('GET /oauth', () => {
       .then((res) => {
         expect(res.body).to.deep.eq([
           {
-            client_id: 'oauth_client_1',
-            client_secret: 'this_is_secret_for_oauth_client_1',
+            id: 'oauth_client_1',
+            secret: 'this_is_secret_for_oauth_client_1',
+            name: 'OAuth Client 1',
             redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
             grants: ['grant_1', 'grant_2'],
             created_at: '2019-02-12T07:49:07.556Z',
             updated_at: '2019-02-12T07:49:07.556Z',
           },
           {
-            client_id: 'oauth_client_2',
-            client_secret: 'this_is_secret_for_oauth_client_2',
+            id: 'oauth_client_2',
+            secret: 'this_is_secret_for_oauth_client_2',
+            name: 'OAuth Client 2',
             redirect_uris: ['http://oauth2.fr'],
             grants: [],
             created_at: '2019-02-12T07:49:07.556Z',
@@ -38,8 +40,9 @@ describe('GET /oauth/:client_id', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.deep.include({
-          client_id: 'oauth_client_1',
-          client_secret: 'this_is_secret_for_oauth_client_1',
+          id: 'oauth_client_1',
+          name: 'OAuth client 1',
+          secret: 'this_is_secret_for_oauth_client_1',
           redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
           grants: ['grant_1', 'grant_2'],
         });

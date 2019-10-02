@@ -1,12 +1,18 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('t_oauth_client', {
-      client_id: {
+      id: {
         type: Sequelize.STRING,
         primaryKey: true,
+        allowNull: false,
       },
-      client_secret: {
+      secret: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       redirect_uris: {
         type: Sequelize.STRING,

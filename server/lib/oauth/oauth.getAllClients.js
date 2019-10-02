@@ -2,7 +2,7 @@ const db = require('../../models');
 
 /**
  * @description Get all clients.
- * @returns {any[]} The OAuth clients.
+ * @returns {Promise} The OAuth clients.
  * @example
  * oauth.getAllClients();
  */

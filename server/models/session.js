@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      client_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {},
   );
@@ -49,6 +53,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'user_id',
       targetKey: 'id',
       as: 'user',
+    });
+    session.hasOne(models.OAuthClient, {
+      foreignKey: 'client_id',
+      sourceKey: 'id',
+      as: 'client',
     });
   };
 

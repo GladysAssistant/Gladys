@@ -22,7 +22,7 @@ module.exports = {
         primaryKey: true,
         references: {
           model: 't_oauth_client',
-          key: 'client_id',
+          key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',

@@ -1,32 +1,39 @@
 const db = require('../../models');
 
 /**
- * @description Save token.
- * @param {Object} authorizationCode - The authorization code.
- * @param {Object} client - The OAuth client.
- * @param {Object} user - The user.
+ * @description Invoked to save an authorization code.
+ * @param {Object} code - The code to be saved.
+ * @param {Object} client - The client associated with the authorization code.
+ * @param {Object} user - The user associated with the authorization code.
+ * @returns {Promise} An Object representing the authorization code and associated data.
  * @example
  * oauth.saveAuthorizationCode(
  * {
- *  code: 'fehzfo',
+ *  authorizationCode: 'fehzfo',
  *  scope: 'password',
- *  expires_at: new Date(),
- *  redirect_uri: 'https://my-redirect.uri',
+ *  expiresAt: new Date(),
+ *  redirectUri: 'https://my-redirect.uri',
  * },
  * client: {
- *  client_id: 'my-client',
+ *  id: 'my-client',
  * },
  * user: {
  *  id: 'random-uuid',
  * });
  */
-async function saveAuthorizationCode(authorizationCode, client, user) {
-  const newAuthorizationCode = Object.assign({}, authorizationCode);
-  newAuthorizationCode.client_id = client.client_id;
-  newAuthorizationCode.user_id = user.id;
+async function saveAuthorizationCode(code, client, user) {
+  const newAuthorizationCode = {
+    code: code.authorizationCode,
+    scope: code.scope,
+    expires_at: code.expiresAt,
+    redirect_uri: code.redirectUri,
+    client_id: client.id,
+    user_id: user.id,
+  };
 
-  const created = await db.OAuthAuthorizationCode.create(newAuthorizationCode);
-  return created.get({ plain: true });
+  await db.OAuthAuthorizationCode.create(newAuthorizationCode);
+
+  return { ...code, client, user };
 }
 
 module.exports = {

@@ -2,13 +2,18 @@ module.exports = (sequelize, DataTypes) => {
   const oauthClient = sequelize.define(
     't_oauth_client',
     {
-      client_id: {
+      id: {
         type: DataTypes.STRING,
         primaryKey: true,
+        allowNull: false,
       },
-      client_secret: {
+      secret: {
         type: DataTypes.STRING,
-        primaryKey: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       redirect_uris: {
         type: DataTypes.STRING,

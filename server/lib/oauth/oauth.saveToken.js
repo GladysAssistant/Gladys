@@ -1,36 +1,51 @@
 const db = require('../../models');
+const { SESSION_TOKEN_TYPES } = require('../../utils/constants');
+const { hashRefreshToken } = require('../../utils/refreshToken');
 
 /**
- * @description Save token.
- * @param {Object} token - The access token.
- * @param {Object} client - The OAuth client.
- * @param {Object} user - The user.
- * @returns {Object} The created token.
+ * @description Invoked to save an access token and optionally a refresh token, depending on the grant type.
+ * @param {Object} token - The token(s) to be saved.
+ * @param {Object} client - The client associated with the token(s).
+ * @param {Object} user - The user associated with the token(s).
+ * @returns {Promise} An Object representing the token(s) and associated data.
  * @example
  * oauth.saveToken(
  * {
- *  access_token: '1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
- *  access_token_expires_on: new Date(),
- *  refresh_token: '2/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
- *  refresh_token_expires_on: new Date(),
+ *  accessToken: '1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
+ *  accessTokenExpiresAt: new Date(),
+ *  refreshToken: '2/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM',
+ *  refreshTokenExpiresAt: new Date(),
+ *  scope: 'scope',
  * },
  * client: {
- *  client_id: 'my-client',
+ *  id: 'my-client',
  * },
  * user: {
- *  id: 'random-uuid',
+ *  id: 'user-uuid',
  * });
  */
 async function saveToken(token, client, user) {
-  const newToken = Object.assign({}, token);
-  newToken.client_id = client.client_id;
-  newToken.user_id = user.id;
+  const accessToken = {
+    user_id: user.id,
+    token_type: SESSION_TOKEN_TYPES.ACCESS_TOKEN,
+    token_hash: hashRefreshToken(token.accessToken),
+    scope: token.scope || 'dashboard:read',
+    valid_until: token.accessTokenExpiresAt,
+    client_id: client.id,
+  };
+  await db.Session.create(accessToken);
 
-  const created = await db.OAuthAccessToken.create(newToken);
-  if (created) {
-    return created.get({ plain: true });
-  }
-  return created;
+  const refreshToken = {
+    user_id: user.id,
+    token_type: SESSION_TOKEN_TYPES.REFRESH_TOKEN,
+    token_hash: hashRefreshToken(token.refreshToken),
+    scope: token.scope || 'dashboard:read',
+    valid_until: token.refreshTokenExpiresAt,
+    client_id: client.id,
+  };
+  await db.Session.create(refreshToken);
+
+  return { ...token, user, client };
 }
 
 module.exports = {

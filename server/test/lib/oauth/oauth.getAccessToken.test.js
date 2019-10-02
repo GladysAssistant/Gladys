@@ -2,18 +2,21 @@ const { expect } = require('chai');
 const OauthManager = require('../../../lib/oauth');
 
 describe('oauth.getAccessToken', () => {
-  const oauthManager = new OauthManager();
+  const oauthManager = new OauthManager({}, {});
 
   it('should get OAuth access token', async () => {
-    const accessToken = await oauthManager.getAccessToken('oauth_token_1');
+    const accessToken = await oauthManager.getAccessToken('oauth-access-token');
     expect(accessToken).to.deep.include({
-      id: '0cd30aef-9c4e-4a23-88e3-354797129001',
-      access_token: 'oauth_token_1',
-      access_token_expires_on: new Date('2019-08-12 07:49:07.556 +00:00'),
-      refresh_token: 'refresh_token_1',
-      refresh_token_expires_on: new Date('2019-08-12 17:49:07.556 +00:00'),
-      user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      accessToken: 'oauth-access-token',
+      client: {
+        id: 'oauth_client_1',
+      },
+      user: {
+        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
     });
+    expect(accessToken).to.have('accessTokenExpiresAt');
+    expect(accessToken).to.have('scope');
   });
 
   it('should get no OAuth access token', async () => {

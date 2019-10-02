@@ -21,7 +21,10 @@ describe('oauth.getUser', () => {
   });
 
   it('should get no user', async () => {
-    const accessToken = await oauthManager.getUser('unknown@gladys.com', 'mysuperpassword');
-    expect(accessToken).to.eq(false);
+    try {
+      await oauthManager.getUser('unknown@gladys.com', 'mysuperpassword');
+    } catch (e) {
+      expect(e.message).to.eq('User "unknown@gladys.com" not found');
+    }
   });
 });

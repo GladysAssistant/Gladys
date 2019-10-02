@@ -1,27 +1,45 @@
 const db = require('../../models');
+const { SESSION_TOKEN_TYPES } = require('../../utils/constants');
+const { hashRefreshToken } = require('../../utils/refreshToken');
 
 /**
- * @description Get the refresh token.
- * @param {string} bearerToken - The bearer token.
- * @returns {any} The token with refresh token.
+ * @description Invoked to retrieve an existing refresh token previously saved through Model#saveToken().
+ * @param {string} refreshToken - The refresh token to retrieve.
+ * @returns {Promise} An Object representing the refresh token and associated data.
  * @example
  * oauth.getRefreshToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
-async function getRefreshToken(bearerToken) {
-  const refreshToken = await db.OAuthAccessToken.findOne({
+async function getRefreshToken(refreshToken) {
+  const refreshTokenHash = hashRefreshToken(refreshToken);
+  const token = await db.Session.findOne({
     where: {
-      refresh_token: bearerToken,
-    },
-    include: {
-      model: db.User,
-      as: 'user',
+      token_type: SESSION_TOKEN_TYPES.REFRESH_TOKEN,
+      token_hash: refreshTokenHash,
     },
   });
 
-  if (refreshToken) {
-    return refreshToken.get({ plain: true });
+  if (token && token.client_id) {
+    const user = await db.User.findOne({
+      where: {
+        id: token.user_id,
+      },
+    }).get({ plain: true });
+
+    const client = await db.OAuthClient.findOne({
+      where: {
+        id: token.client_id,
+      },
+    }).get({ plain: true });
+
+    return {
+      refreshToken,
+      refreshTokenExpiresAt: new Date(token.valid_until),
+      scope: token.scope,
+      client,
+      user,
+    };
   }
-  return refreshToken;
+  return null;
 }
 
 module.exports = {
