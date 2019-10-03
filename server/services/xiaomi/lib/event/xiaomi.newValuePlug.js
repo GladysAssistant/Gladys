@@ -83,30 +83,9 @@ function newValuePlug(message, data) {
         min: 0,
         max: 1,
       },
-      {
-        name: 'Battery',
-        selector: `xiaomi:${sid}:battery`,
-        external_id: `xiaomi:${sid}:battery`,
-        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-        unit: DEVICE_FEATURE_UNITS.PERCENT,
-        read_only: true,
-        keep_history: true,
-        has_feedback: true,
-        min: 0,
-        max: 100,
-      },
     ],
   };
   this.addDevice(sid, newSensor);
-
-  // emit new battery value event
-  if (data.voltage) {
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: `xiaomi:${sid}:battery`,
-      state: getBatteryPercent(data.voltage, MIN_VOLT, MAX_VOLT),
-    });
-  }
 
   if (data.load_power) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
