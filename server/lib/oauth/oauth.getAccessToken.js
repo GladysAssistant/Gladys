@@ -1,6 +1,4 @@
 const db = require('../../models');
-const { SESSION_TOKEN_TYPES } = require('../../utils/constants');
-const { hashRefreshToken } = require('../../utils/refreshToken');
 
 /**
  * @description Invoked to retrieve an existing access token previously saved through Model#saveToken().
@@ -11,33 +9,32 @@ const { hashRefreshToken } = require('../../utils/refreshToken');
  * oauth.getAccessToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
 async function getAccessToken(accessToken) {
-  const accessTokenHash = hashRefreshToken(accessToken);
+  const payload = this.session.validateAccessToken(accessToken, 'dashboard:write');
   const token = await db.Session.findOne({
     where: {
-      token_type: SESSION_TOKEN_TYPES.ACCESS_TOKEN,
-      token_hash: accessTokenHash,
+      id: payload.session_id,
     },
   });
 
-  if (token && token.client_id) {
-    const user = await db.User.findOne({
-      where: {
-        id: token.user_id,
-      },
-    });
+  if (token) {
+    const user = await this.user.getById(payload.user_id);
 
-    const client = await db.OAuthClient.findOne({
-      where: {
-        id: token.client_id,
-      },
-    });
+    let client;
+    if (token.client_id) {
+      client = await db.OAuthClient.findOne({
+        where: {
+          id: token.client_id,
+        },
+      });
+      client = client.get({ plain: true });
+    }
 
     return {
       accessToken,
       accessTokenExpiresAt: new Date(token.valid_until),
       scope: token.scope,
-      client: client.get({ plain: true }),
-      user: user.get({ plain: true }),
+      client,
+      user,
     };
   }
   return null;

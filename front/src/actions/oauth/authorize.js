@@ -9,7 +9,7 @@ function createActions(store) {
         oauthState: queryParams.state
       });
       try {
-        const oauthClient = await state.httpClient.get(`/api/v1/oauth/${queryParams.client_id}`);
+        const oauthClient = await state.httpClient.get(`/api/v1/oauth/client/${queryParams.client_id}`);
         store.setState({
           oauthClient,
           oauthStatus: RequestStatus.Success

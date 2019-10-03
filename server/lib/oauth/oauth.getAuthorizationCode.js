@@ -17,13 +17,21 @@ async function getAuthorizationCode(authorizationCode) {
   });
 
   if (created) {
+    const user = await this.user.getById(created.user_id);
+
+    const client = await db.OAuthClient.findOne({
+      where: {
+        id: created.client_id,
+      },
+    });
+
     return {
       code: created.code,
       expiresAt: new Date(created.expires_at),
       redirectUri: created.redirect_uri,
       scope: created.scope,
-      client: created.client,
-      user: created.user,
+      client: client.get({ plain: true }),
+      user,
     };
   }
 

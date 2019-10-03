@@ -22,7 +22,7 @@ async function getClient(clientId, clientSecret) {
 
   if (client !== null) {
     const plainClient = client.get({ plain: true });
-    plainClient.redirectUris = (plainClient.redirect_uris || '').split('|').filter((d) => d.length > 0);
+    plainClient.redirectUris = plainClient.redirect_uris.split('|').filter((d) => d.length > 0);
     plainClient.redirect_uris = plainClient.redirectUris;
     plainClient.grants = (plainClient.grants || '').split('|').filter((d) => d.length > 0);
     return plainClient;

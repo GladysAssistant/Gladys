@@ -7,7 +7,7 @@ module.exports = function OAuthController(gladys) {
   });
 
   /**
-   * @api {get} /api/v1/oauth/:client_id
+   * @api {get} /api/v1/oauth/client/:client_id
    * @apiName getClient
    * @apiGroup OAuth
    * @apiDescription Get OAuth client information.
@@ -30,7 +30,7 @@ module.exports = function OAuthController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/oauth
+   * @api {get} /api/v1/oauth/client
    * @apiName get
    * @apiGroup OAuth
    * @apiDescription Get OAuth all clients.
@@ -69,9 +69,14 @@ module.exports = function OAuthController(gladys) {
     const request = new OAuthServer.Request(req);
     const response = new OAuthServer.Response(res);
 
-    return oauth.token(request, response).then((success) => {
-      return res.json(success);
-    });
+    return oauth
+      .token(request, response)
+      .then((success) => {
+        return res.json(success);
+      })
+      .catch((err) => {
+        return res.status(err.status || 500).send(err);
+      });
   }
 
   /**

@@ -8,7 +8,7 @@ module.exports = {
           secret: 'this_is_secret_for_oauth_client_1',
           name: 'OAuth client 1',
           redirect_uris: 'http://oauth1.fr|http://oauth1.com',
-          grants: 'grant_1|grant_2',
+          grants: 'authorization_code|grant_2',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },

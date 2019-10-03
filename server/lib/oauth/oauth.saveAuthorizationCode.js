@@ -24,7 +24,7 @@ const db = require('../../models');
 async function saveAuthorizationCode(code, client, user) {
   const newAuthorizationCode = {
     code: code.authorizationCode,
-    scope: code.scope,
+    scope: code.scope || 'dashboard:write',
     expires_at: code.expiresAt,
     redirect_uri: code.redirectUri,
     client_id: client.id,

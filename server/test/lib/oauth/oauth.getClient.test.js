@@ -11,7 +11,7 @@ describe('oauth.getClient', () => {
       name: 'OAuth client 1',
       secret: 'this_is_secret_for_oauth_client_1',
       redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
-      grants: ['grant_1', 'grant_2'],
+      grants: ['authorization_code', 'grant_2'],
     });
   });
 
@@ -22,7 +22,7 @@ describe('oauth.getClient', () => {
       name: 'OAuth client 1',
       secret: 'this_is_secret_for_oauth_client_1',
       redirect_uris: ['http://oauth1.fr', 'http://oauth1.com'],
-      grants: ['grant_1', 'grant_2'],
+      grants: ['authorization_code', 'grant_2'],
     });
   });
 
