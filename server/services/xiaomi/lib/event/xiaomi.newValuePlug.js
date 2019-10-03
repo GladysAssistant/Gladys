@@ -7,10 +7,6 @@ const {
 } = require('../../../../utils/constants');
 
 const { PLUG_STATUS } = require('../utils/deviceStatus');
-const { getBatteryPercent } = require('../utils/getBatteryPercent');
-
-const MIN_VOLT = 2800;
-const MAX_VOLT = 3300;
 
 /**
  * @description New value plug received.
