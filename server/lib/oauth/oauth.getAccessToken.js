@@ -24,20 +24,20 @@ async function getAccessToken(accessToken) {
       where: {
         id: token.user_id,
       },
-    }).get({ plain: true });
+    });
 
     const client = await db.OAuthClient.findOne({
       where: {
         id: token.client_id,
       },
-    }).get({ plain: true });
+    });
 
     return {
       accessToken,
       accessTokenExpiresAt: new Date(token.valid_until),
       scope: token.scope,
-      client,
-      user,
+      client: client.get({ plain: true }),
+      user: user.get({ plain: true }),
     };
   }
   return null;

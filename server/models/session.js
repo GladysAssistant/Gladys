@@ -54,11 +54,6 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: 'id',
       as: 'user',
     });
-    session.hasOne(models.OAuthClient, {
-      foreignKey: 'client_id',
-      sourceKey: 'id',
-      as: 'client',
-    });
   };
 
   return session;

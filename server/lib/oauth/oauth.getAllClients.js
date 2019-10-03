@@ -8,15 +8,14 @@ const db = require('../../models');
  */
 async function getAllClients() {
   const clients = await db.OAuthClient.findAll();
-  clients.forEach((client) => {
-    client.redirect_uris = (client.redirect_uris || []).split('|');
-    if (client.grants) {
-      client.grants = client.grants.split('|');
-    } else {
-      client.grants = [];
-    }
+
+  return clients.map((client) => {
+    const plainClient = client.get({ plain: true });
+    plainClient.redirectUris = (plainClient.redirect_uris || '').split('|').filter((d) => d.length > 0);
+    plainClient.redirect_uris = plainClient.redirectUris;
+    plainClient.grants = (plainClient.grants || '').split('|').filter((d) => d.length > 0);
+    return plainClient;
   });
-  return clients.map((client) => client.get({ plain: true }));
 }
 
 module.exports = {

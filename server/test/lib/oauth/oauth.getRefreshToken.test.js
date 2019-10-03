@@ -6,17 +6,19 @@ describe('oauth.getRefreshToken', () => {
 
   it('should get OAuth refresh token', async () => {
     const refreshToken = await oauthManager.getRefreshToken('oauth-refresh-token');
-    expect(refreshToken).to.deep.include({
-      refreshToken: 'oauth-refresh-token',
-      client: {
-        id: 'oauth_client_1',
-      },
-      user: {
-        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      },
+    expect(refreshToken).to.have.property('refreshToken', 'oauth-refresh-token');
+    expect(refreshToken).to.have.property('refreshTokenExpiresAt');
+    expect(refreshToken).to.have.property('scope');
+
+    expect(refreshToken).to.have.property('client');
+    expect(refreshToken.client).to.deep.include({
+      id: 'oauth_client_1',
     });
-    expect(refreshToken).to.have('refreshTokenExpiresAt');
-    expect(refreshToken).to.have('scope');
+
+    expect(refreshToken).to.have.property('user');
+    expect(refreshToken.user).to.deep.include({
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+    });
   });
 
   it('should get no OAuth refresh token', async () => {
