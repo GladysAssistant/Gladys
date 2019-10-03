@@ -12,6 +12,8 @@ const MESSAGES = [
   {
     sid: `1245${(counter += 1)}`,
     model: 'gateway',
+    msg: 'heartbeat',
+    token: 'aeiazisjflkj',
     data: JSON.stringify({
       illumination: 12,
     }),
@@ -73,13 +75,15 @@ const MESSAGES = [
     sid: `1245${(counter += 1)}`,
     model: 'sensor_cube.aqgl01',
     data: JSON.stringify({
-      status: 'flip',
+      voltage: 5000,
+      status: 'tap_twice',
     }),
   },
   {
     sid: `1245${(counter += 1)}`,
     model: 'sensor_cube.aqgl01',
     data: JSON.stringify({
+      voltage: 100,
       rotate: 10,
     }),
   },
@@ -99,6 +103,7 @@ const MESSAGES = [
       alarm: 1,
       status: 1,
       density: 5,
+      voltage: 3000,
     }),
   },
   // VIBRATION

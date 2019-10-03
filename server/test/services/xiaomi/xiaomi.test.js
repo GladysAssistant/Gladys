@@ -16,6 +16,7 @@ describe('Xiaomi Service', () => {
   const xiaomiManager = new XiaomiManager(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
   it('should listen', async () => {
     xiaomiManager.listen();
+    xiaomiManager.listening();
   });
   MESSAGES.forEach((message) => {
     const rsiInfo = {
