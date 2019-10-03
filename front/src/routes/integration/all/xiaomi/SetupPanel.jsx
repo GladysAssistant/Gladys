@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import XiaomiSensor from './XiaomiSensor';
@@ -13,7 +13,7 @@ const SetupTab = ({ children, ...props }) => (
     </div>
     <div class="card-body">
       <div class="alert alert-info">
-        <Text id="integration.xiaomi.setup.description" />
+        <MarkupText id="integration.xiaomi.setup.description" />
       </div>
       <div
         class={cx('dimmer', {

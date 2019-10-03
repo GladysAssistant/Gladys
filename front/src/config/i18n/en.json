@@ -319,7 +319,7 @@
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
-        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode.",
+        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
         "createDeviceInGladys": "Connect in Gladys"
       },
       "models": {
