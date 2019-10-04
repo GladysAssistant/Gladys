@@ -353,6 +353,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
+  SMARTTHINGS: {
+    INITIALIZATION_DONE: 'smartthings.initialization-done',
+    INITIALIZATION_FAILED: 'smartthings.initialization-failed',
+  },
 };
 
 const DASHBOARD_TYPE = {

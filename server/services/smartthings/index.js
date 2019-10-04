@@ -12,7 +12,7 @@ module.exports = function SmartThingsService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting SmartThings service');
-    smartthingsHandler.checkClient();
+    await smartthingsHandler.init();
   }
 
   /**

@@ -1,12 +1,16 @@
-const deviceHandler = require('./handler_types');
+const deviceHandler = require('../handler_types');
 
 /**
  * @description Determines the SmartThings device handler according to Gladys device features.
- * @param {*} features - Device features.
- * @return {*} Selected handler.
+ * @param {Array} features - Device features.
+ * @returns {string} Selected handler.
+ *
  * @see https://smartthings.developer.samsung.com/docs/devices/smartthings-schema/device-handler-types.html#Reference
+ *
+ * @example
+ * getDeviceHandlerType(device.features);
  */
-function getDeviceHandler(features) {
+function getDeviceHandlerType(features = []) {
   const featureCategoryTypes = [];
 
   let lastCategory;
@@ -30,7 +34,7 @@ function getDeviceHandler(features) {
       }, 0);
 
       if (nbMatches === handler.types.length && nbMatches > lastNbMatches) {
-        selectedHandler = handler;
+        selectedHandler = handler.value;
         lastNbMatches = nbMatches;
       }
     }
@@ -44,5 +48,5 @@ function getDeviceHandler(features) {
 }
 
 module.exports = {
-  getDeviceHandler,
+  getDeviceHandlerType,
 };

@@ -1,4 +1,4 @@
-const logger = require('../../../utils/logger');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Check if OAuth client exists, if not, creates it.
@@ -24,7 +24,7 @@ async function checkClient() {
   } else {
     logger.debug(`Smartthings OAuth client already created.`);
   }
-};
+}
 
 module.exports = {
   checkClient,
