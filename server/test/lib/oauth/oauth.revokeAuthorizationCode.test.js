@@ -7,9 +7,9 @@ describe('oauth.revokeAuthorizationCode', () => {
 
   it('should revoke AuthorizationCode', async () => {
     const authCode = {
-      code: 'd71204f44',
+      code: 'd71204f82',
       user: {
-        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        id: '7a137a56-069e-4996-8816-36558174b727',
       },
       client: {
         id: 'oauth_client_2',

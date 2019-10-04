@@ -14,12 +14,12 @@ describe('oauth.getAuthorizationCode', () => {
 
     expect(authorizationCode).to.have.property('client');
     expect(authorizationCode.client).to.deep.include({
-      id: 'oauth_client_2',
+      id: 'oauth_client_1',
     });
 
     expect(authorizationCode).to.have.property('user');
     expect(authorizationCode.user).to.deep.include({
-      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      id: '7a137a56-069e-4996-8816-36558174b727',
     });
   });
 
