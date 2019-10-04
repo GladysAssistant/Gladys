@@ -687,6 +687,7 @@
     "namePlaceholder": "Enter name",
     "externalIdLabel": "External ID",
     "externalIdPlaceholder": "Enter external ID",
+    "unitLabel": "Unit",
     "saveButton": "Save",
     "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API."
   }
