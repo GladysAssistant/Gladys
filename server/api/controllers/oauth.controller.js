@@ -1,11 +1,6 @@
-const OAuthServer = require('oauth2-server');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
 module.exports = function OAuthController(gladys) {
-  const oauth = new OAuthServer({
-    model: gladys.oauth,
-  });
-
   /**
    * @api {get} /api/v1/oauth/client/:client_id
    * @apiName getClient
@@ -66,17 +61,7 @@ module.exports = function OAuthController(gladys) {
    * @apiDescription Generates access/refresh token.
    */
   async function token(req, res) {
-    const request = new OAuthServer.Request(req);
-    const response = new OAuthServer.Response(res);
-
-    return oauth
-      .token(request, response)
-      .then((success) => {
-        return res.json(success);
-      })
-      .catch((err) => {
-        return res.status(err.status || 500).send(err);
-      });
+    return gladys.oauth.token(req, res);
   }
 
   /**
@@ -86,14 +71,7 @@ module.exports = function OAuthController(gladys) {
    * @apiDescription OAuth2 Authorize flow.
    */
   async function authorize(req, res) {
-    const request = new OAuthServer.Request(req);
-    const response = new OAuthServer.Response(res);
-
-    return oauth.authorize(request, response).then(() => {
-      const { location } = response.headers;
-      delete response.headers.location;
-      return res.json({ uri: location, headers: response.headers });
-    });
+    return gladys.oauth.authorize(req, res);
   }
 
   return Object.freeze({

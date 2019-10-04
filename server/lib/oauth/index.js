@@ -1,3 +1,4 @@
+const OAuthServer = require('oauth2-server');
 const { generateOAuthAccessToken } = require('./oauth.generateAccessToken');
 const { generateOAuthRefreshToken } = require('./oauth.generateRefreshToken');
 const { getAccessToken } = require('./oauth.getAccessToken');
@@ -12,6 +13,9 @@ const { revokeToken } = require('./oauth.revokeToken');
 const { revokeAuthorizationCode } = require('./oauth.revokeAuthorizationCode');
 const { createClient } = require('./oauth.createClient');
 const { getAllClients } = require('./oauth.getAllClients');
+const { authenticate } = require('./oauth.authenticate');
+const { authorize } = require('./oauth.authorize');
+const { token } = require('./oauth.token');
 
 /**
  * @description Centralize OAuth model require for 'oauth2-server' dependency.
@@ -25,6 +29,10 @@ const { getAllClients } = require('./oauth.getAllClients');
 const OauthManager = function OauthManager(user, session) {
   this.user = user;
   this.session = session;
+
+  this.oauthServer = new OAuthServer({
+    model: this,
+  });
 };
 
 // oauth2-server model
@@ -43,5 +51,9 @@ OauthManager.prototype.revokeAuthorizationCode = revokeAuthorizationCode;
 // Others
 OauthManager.prototype.createClient = createClient;
 OauthManager.prototype.getAllClients = getAllClients;
+// Methods
+OauthManager.prototype.authenticate = authenticate;
+OauthManager.prototype.authorize = authorize;
+OauthManager.prototype.token = token;
 
 module.exports = OauthManager;
