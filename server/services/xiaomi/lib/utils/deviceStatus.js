@@ -1,0 +1,62 @@
+const SWITCH_STATUS = {
+  NO_CLICK: 0,
+  CLICK: 1,
+  DOUBLE_CLICK: 2,
+  LONG_CLICK_PRESS: 3,
+  LONG_CLICK_RELEASE: 4,
+};
+
+const MOTION_STATUS = {
+  MOTION: 1,
+  NO_MOTION: 0,
+};
+
+const CUBE_STATUS = {
+  SLEEP: 0,
+  ALERT: 1,
+  TAP_TWICE: 2,
+  FLIP90: 3,
+  FLIP180: 4,
+  ROTATE: 5,
+  SHAKE_AIR: 6,
+  MOVE: 7,
+  FREE_FALL: 8,
+};
+
+const MAGNET_STATUS = {
+  OPEN: 1,
+  CLOSE: 0,
+};
+
+const PLUG_STATUS = {
+  ON: 1,
+  OFF: 0,
+};
+
+const WIRED_SWITCH_STATUS = {
+  ON: 1,
+  OFF: 0,
+};
+
+const LEAK_STATUS = {
+  LEAK: 1,
+  NO_LEAK: 0,
+};
+
+const VIBRATION_STATUS = {
+  SLEEP: 0,
+  VIBRATE: 1,
+  TILT: 2,
+  FREE_FALL: 3,
+};
+
+module.exports = {
+  SWITCH_STATUS,
+  WIRED_SWITCH_STATUS,
+  MOTION_STATUS,
+  CUBE_STATUS,
+  MAGNET_STATUS,
+  PLUG_STATUS,
+  LEAK_STATUS,
+  VIBRATION_STATUS,
+};

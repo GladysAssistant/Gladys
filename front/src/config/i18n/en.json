@@ -304,6 +304,32 @@
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
         "connected": "Connected to the MQTT broker with success !"
       }
+    },
+    "xiaomi": {
+      "device": {
+        "title": "Xiaomi devices in Gladys",
+        "noDevices": "No Xiaomi devices added yet.",
+        "searchPlaceholder": "Search Xiaomi devices",
+        "sidLabel": "Xiaomi SID",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit details"
+      },
+      "setup": {
+        "title": "Xiaomi devices not in Gladys",
+        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
+        "createDeviceInGladys": "Connect in Gladys"
+      },
+      "models": {
+        "motion": "Motion Sensor",
+        "temperature": "Temperature Sensor",
+        "switch": "Switch",
+        "cube": "Cube",
+        "leak": "Leak Sensor",
+        "magnet": "Magnet Sensor"
+      }
     }
   },
   "editScene": {
@@ -557,10 +583,12 @@
       "decimal": "Temperature"
     },
     "motion-sensor": {
+      "push": "Motion",
       "binary": "Motion"
     },
     "light-sensor": {
-      "integer": "Luminosity"
+      "integer": "Luminosity",
+      "decimal": "Luminosity"
     },
     "sismic-sensor": {
       "decimal": "Sismic"
@@ -572,7 +600,8 @@
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
-      "binary": "Smoke"
+      "binary": "Smoke",
+      "decimal": "Density"
     },
     "switch": {
       "voltage": "Switch Voltage",
@@ -580,10 +609,38 @@
       "binary": "Switch",
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
-      "power": "Switch Power consumption"
+      "power": "Power consumption",
+      "energy": "Energy consumption"
     },
     "siren": {
       "binary": "Siren"
+    },
+    "cube": {
+      "mode": "Mode",
+      "rotation": "Rotation"
+    },
+    "button": {
+      "click": "Button"
+    },
+    "pressure-sensor": {
+      "decimal": "Pressure"
+    },
+    "leak-sensor": {
+      "binary": "Leak"
+    },
+    "opening-sensor": {
+      "binary": "Opening"
+    },
+    "humidity-sensor": {
+      "decimal": "Humidity"
+    },
+    "vibration-sensor": {
+      "status": "Status",
+      "tilt-angle": "Tilt Angle",
+      "acceleration-x": "Acceleration X",
+      "acceleration-y": "Acceleration Y",
+      "acceleration-z": "Acceleration Z",
+      "bed-activity": "Bed Activity"
     },
     "unknown": {
       "unknown": "Unknown"
@@ -620,5 +677,18 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save"
+  },
+  "editDeviceForm": {
+    "returnButton": "Return back",
+    "noName": "No name",
+    "nameLabel": "Name",
+    "roomLabel": "Room",
+    "featuresLabel": "Features",
+    "namePlaceholder": "Enter name",
+    "externalIdLabel": "External ID",
+    "externalIdPlaceholder": "Enter external ID",
+    "unitLabel": "Unit",
+    "saveButton": "Save",
+    "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API."
   }
 }
