@@ -12,7 +12,7 @@ const MESSAGES = [
   {
     sid: `1245${(counter += 1)}`,
     model: 'gateway',
-    msg: 'heartbeat',
+    cmd: 'heartbeat',
     token: 'aeiazisjflkj',
     data: JSON.stringify({
       illumination: 12,
@@ -93,6 +93,7 @@ const MESSAGES = [
     model: 'switch',
     data: JSON.stringify({
       status: 'click',
+      voltage: 3000,
     }),
   },
   // SMOKE
@@ -143,6 +144,7 @@ const MESSAGES = [
       status: 'on',
       load_power: 100,
       power_consumed: 10000,
+      inuse: 1,
     }),
   },
   {
@@ -189,7 +191,7 @@ const MESSAGES = [
   // SINGLE WIRED SWITCH NEUTRAL
   {
     sid: `1245${(counter += 1)}`,
-    model: ' ctrl_ln1.aq1',
+    model: 'ctrl_ln1.aq1',
     data: JSON.stringify({
       channel_0: 'on',
     }),
@@ -233,6 +235,15 @@ const MESSAGES = [
   {
     sid: `1245${(counter += 1)}`,
     model: '86sw1',
+    data: JSON.stringify({
+      voltage: 3000,
+      channel_0: 'click',
+    }),
+  },
+  // unknown
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'unknown-device',
     data: JSON.stringify({
       voltage: 3000,
       channel_0: 'click',
