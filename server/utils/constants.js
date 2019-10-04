@@ -208,10 +208,17 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT_SENSOR: 'light-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SISMIC_SENSOR: 'sismic-sensor',
+  PRESSURE_SENSOR: 'pressure-sensor',
+  OPENING_SENSOR: 'opening-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
+  VIBRATION_SENSOR: 'vibration-sensor',
+  LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
   ACCESS_CONTROl: 'access-control',
+  CUBE: 'cube',
+  BUTTON: 'button',
   UNKNOWN: 'unknown',
 };
 
@@ -221,6 +228,7 @@ const DEVICE_FEATURE_TYPES = {
     BRIGHTNESS: 'brightness',
     HUE: 'hue',
     SATURATION: 'saturation',
+    COLOR: 'color',
     POWER: 'power',
   },
   SENSOR: {
@@ -233,6 +241,7 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
+    ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     BURGLAR: 'burglar',
@@ -247,6 +256,21 @@ const DEVICE_FEATURE_TYPES = {
   ACCESS_CONTROL: {
     MODE: 'mode',
   },
+  CUBE: {
+    MODE: 'mode',
+    ROTATION: 'rotation',
+  },
+  VIBRATION_SENSOR: {
+    STATUS: 'status',
+    TILT_ANGLE: 'tilt-angle',
+    ACCELERATION_X: 'acceleration-x',
+    ACCELERATION_Y: 'acceleration-y',
+    ACCELERATION_Z: 'acceleration-z',
+    BED_ACTIVITY: 'bed-activity',
+  },
+  BUTTON: {
+    CLICK: 'click',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -256,6 +280,10 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+  PASCAL: 'pascal',
+  LUX: 'lux',
+  KILOWATT: 'kilowatt',
+  KILOWATT_HOUR: 'kilowatt-hour',
 };
 
 const ACTIONS_STATUS = {
@@ -303,6 +331,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
+  },
+  XIAOMI: {
+    NEW_DEVICE: 'xiaomi.new-device',
   },
 };
 

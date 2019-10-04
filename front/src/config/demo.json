@@ -824,5 +824,158 @@
   ],
   "get /api/v1/setup": {
     "account_configured": true
+  },
+  "get /api/v1/service/xiaomi/sensor": [
+    {
+      "name": "Xiaomi Temperature",
+      "external_id": "xiaomi:1234",
+      "selector": "xiaomi:1234",
+      "features": [
+        {
+          "name": "Temperature",
+          "selector": "xiaomi:12344:temperature",
+          "external_id": "xiaomi:12344:temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "unit": "celsius",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": -20,
+          "max": 60
+        },
+        {
+          "name": "Humidity",
+          "selector": "xiaomi:12344:humidity",
+          "external_id": "xiaomi:12344:humidity",
+          "category": "humidity-sensor",
+          "type": "decimal",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "Battery",
+          "selector": "xiaomi:12344:battery",
+          "external_id": "xiaomi:12344:battery",
+          "category": "battery",
+          "type": "integer",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/xiaomi/device": [
+    {
+      "id": "e5317b24-28e1-4839-9879-0bb7a3102e98",
+      "name": "Xiaomi Temperature",
+      "external_id": "xiaomi:1234",
+      "selector": "xiaomi:1234",
+      "room_id": "f99ab22a-e6a8-4756-b1fe-4d19dc8c8620",
+      "service_id": "70cb1e17-3b17-4886-83ab-45b00a9e03b1",
+      "features": [
+        {
+          "name": "Temperature",
+          "selector": "xiaomi:12344:temperature",
+          "external_id": "xiaomi:12344:temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "unit": "celsius",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": -20,
+          "max": 60
+        },
+        {
+          "name": "Humidity",
+          "selector": "xiaomi:12344:humidity",
+          "external_id": "xiaomi:12344:humidity",
+          "category": "humidity-sensor",
+          "type": "decimal",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "Battery",
+          "selector": "xiaomi:12344:battery",
+          "external_id": "xiaomi:12344:battery",
+          "category": "battery",
+          "type": "integer",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/xiaomi": {
+    "id": "70cb1e17-3b17-4886-83ab-45b00a9e03b1",
+    "name": "Xiaomi",
+    "selector": "xiaomi"
+  },
+  "get /api/v1/device/xiaomi:1234": {
+    "id": "e5317b24-28e1-4839-9879-0bb7a3102e98",
+    "name": "Xiaomi Temperature",
+    "external_id": "xiaomi:1234",
+    "selector": "xiaomi:1234",
+    "room_id": "f99ab22a-e6a8-4756-b1fe-4d19dc8c8620",
+    "service_id": "70cb1e17-3b17-4886-83ab-45b00a9e03b1",
+    "features": [
+      {
+        "name": "Temperature",
+        "selector": "xiaomi:12344:temperature",
+        "external_id": "xiaomi:12344:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": -20,
+        "max": 60
+      },
+      {
+        "name": "Humidity",
+        "selector": "xiaomi:12344:humidity",
+        "external_id": "xiaomi:12344:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Battery",
+        "selector": "xiaomi:12344:battery",
+        "external_id": "xiaomi:12344:battery",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": 0,
+        "max": 100
+      }
+    ]
   }
 }

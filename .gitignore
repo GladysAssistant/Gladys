@@ -9,6 +9,7 @@ build
 static
 gladys-backups
 qemu-*
+coverage
 
 # VSCode
 .vscode

@@ -47,9 +47,16 @@ async function get(options) {
   };
 
   if (optionsWithDefault.search) {
-    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
-      [Op.like]: `%${optionsWithDefault.search}%`,
-    });
+    queryParams.where = {
+      [Op.or]: [
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
+          [Op.like]: `%${optionsWithDefault.search}%`,
+        }),
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('external_id')), {
+          [Op.like]: `%${optionsWithDefault.search}%`,
+        }),
+      ],
+    };
   }
 
   if (optionsWithDefault.service) {

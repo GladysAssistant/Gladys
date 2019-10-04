@@ -1,0 +1,15 @@
+{
+  "name": "gladys-xiaomi",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {}
+}
