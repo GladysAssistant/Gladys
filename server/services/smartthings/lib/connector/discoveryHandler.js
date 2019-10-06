@@ -15,8 +15,7 @@ const logger = require('../../../../utils/logger');
 function discoveryHandler(response) {
   const gladysDevices = this.getDevices();
 
-  Object.values(gladysDevices).forEach((store) => {
-    const device = store.get();
+  Object.values(gladysDevices).forEach((device) => {
     try {
       const deviceHandlerType = getDeviceHandlerType(device.features);
       response.addDevice(device.external_id, device.name, deviceHandlerType);
