@@ -709,6 +709,17 @@
       ]
     }
   ],
+  "get /api/v1/service/smartthings": {},
+  "get /api/v1/service/smartthings/variable/SMARTTHINGS_PUBLIC_KEY": {
+    "value": "BZQCoLIUo0qVgEA1glvC"
+  },
+  "get /api/v1/service/smartthings/variable/SMARTTHINGS_SECRET_KEY": {
+    "value": "728IVZ0tZGFTLVn2F06S"
+  },
+  "get /api/v1/oauth/client/smartthings": {
+    "id": "smartthings",
+    "secret": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7"
+  },
   "get /api/v1/service/rtsp-camera/device": [
     {
       "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",

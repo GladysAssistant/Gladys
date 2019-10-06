@@ -97,6 +97,17 @@ const IntegrationMenu = connect(
           <Text id="integration.root.menu.navigation" />
         </Link>
       )}
+
+      <Link
+        activeClassName="active"
+        href="/dashboard/integration/third-party"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+      >
+        <span class="icon mr-3">
+          <i class="fe fe-external-link" />
+        </span>
+        <Text id="integration.root.menu.thirdParty" />
+      </Link>
     </div>
   );
 });

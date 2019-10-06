@@ -1,0 +1,8 @@
+[
+  {
+    "key": "smartthings",
+    "name": "Samsung SmartThings",
+    "description": "Synchronize and manage Gladys devices with Samsung SmartThins application",
+    "img": "/assets/integrations/cover/smartthings.jpg"
+  }
+]
