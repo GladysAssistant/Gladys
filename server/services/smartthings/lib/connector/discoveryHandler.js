@@ -18,7 +18,11 @@ function discoveryHandler(response) {
   Object.values(gladysDevices).forEach((device) => {
     try {
       const deviceHandlerType = getDeviceHandlerType(device.features);
-      response.addDevice(device.external_id, device.name, deviceHandlerType);
+      response
+        .addDevice(device.external_id, device.name, deviceHandlerType)
+        .manufacturerName('Gladys')
+        .modelName(device.external_id)
+        .roomName(device.room.name);
     } catch (e) {
       logger.warn(`SmartThings device handler type not detected for ${device.external_id} : ${e}`);
     }

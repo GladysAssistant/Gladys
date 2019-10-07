@@ -1,9 +1,10 @@
 const { call } = require('../call');
+
 /**
  * @description Create new application.
  * @param {Object} app - Application to create.
  * @param {string} token - OAuth bearer token.
- * @returns {Object} Created application.
+ * @returns {Promise} Created application.
  * @see https://smartthings.developer.samsung.com/docs/api-ref/st-api.html#operation/createApp
  * @example
  * create(location, 'my-bearer-token')

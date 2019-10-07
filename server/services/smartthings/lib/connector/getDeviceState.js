@@ -1,4 +1,5 @@
-// const deviceHandler = require('../handler_types');
+const logger = require('../../../../utils/logger');
+const { CAPABILITY_BY_FEATURE_CATEGORY } = require('../utils/capabilities');
 
 /**
  * @description Determines the SmartThings device handler according to Gladys device features.
@@ -11,22 +12,40 @@
  * getDeviceState(device.features);
  */
 function getDeviceState(features) {
-  // return features.map((feature) => {
-  return [
-    {
-      component: 'main',
-      capability: 'st.healthCheck',
-      attribute: 'healthStatus',
-      value: 'online',
-    },
-    {
-      component: 'main',
-      capability: 'st.imageCapture',
-      attribute: 'image',
-      value: 'https://home.trovato.fr:9999/api/v1/camera/livingroom/image',
-    },
-  ];
-  // });
+  const states = [];
+
+  features.forEach((feature) => {
+    const capability = (CAPABILITY_BY_FEATURE_CATEGORY[feature.category] || {})[feature.type];
+
+    if (capability) {
+      capability.attributes.forEach((attribute) => {
+        if (!attribute.type || attribute.type === feature.type) {
+          const state = {
+            component: 'main',
+            capability: `st.${capability.name}`,
+            attribute: attribute.name,
+          };
+
+          attribute.properties.forEach((property) => {
+            state[property.name] = property.value(feature);
+          });
+
+          states.push(state);
+        }
+      });
+    } else {
+      logger.warn(`SmartThings doesn't handle ${feature.category} / ${feature.type} feature yet.`);
+    }
+  });
+
+  states.push({
+    component: 'main',
+    capability: 'st.healthCheck',
+    attribute: 'healthStatus',
+    value: states.length ? 'online' : 'offline',
+  });
+
+  return states;
 }
 
 module.exports = {
