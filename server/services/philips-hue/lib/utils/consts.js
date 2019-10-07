@@ -1,0 +1,22 @@
+const BRIDGE_MODEL = 'philips-hue-bridge';
+const BRIDGE_EXTERNAL_ID_BASE = 'philips-hue:bridge';
+const HUE_APP_NAME = 'Gladys';
+const HUE_DEVICE_NAME = 'Gladys Instance';
+const BRIDGE_IP_ADDRESS = 'BRIDGE_IP_ADDRESS';
+const BRIDGE_USERNAME = 'BRIDGE_USERNAME';
+const BRIDGE_SERIAL_NUMBER = 'BRIDGE_SERIAL_NUMBER';
+const LIGHT_MODEL = 'philips-hue-light';
+
+const LIGHT_EXTERNAL_ID_BASE = 'philips-hue-light';
+
+module.exports = {
+  BRIDGE_MODEL,
+  BRIDGE_EXTERNAL_ID_BASE,
+  HUE_APP_NAME,
+  HUE_DEVICE_NAME,
+  BRIDGE_IP_ADDRESS,
+  BRIDGE_USERNAME,
+  BRIDGE_SERIAL_NUMBER,
+  LIGHT_MODEL,
+  LIGHT_EXTERNAL_ID_BASE,
+};

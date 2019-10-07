@@ -6,9 +6,12 @@ const logger = require('../../../../utils/logger');
  * getBridges();
  */
 async function getBridges() {
-  const bridges = await this.hueClient.nupnpSearch();
-  logger.info(`PhilipsHueService: Found ${bridges.length} bridges`);
-  return bridges;
+  this.bridges = await this.hueClient.discovery.nupnpSearch();
+  logger.info(`PhilipsHueService: Found ${this.bridges.length} bridges`);
+  this.bridges.forEach((bridge) => {
+    this.bridgesBySerialNumber.set(bridge.model.serial, bridge);
+  });
+  return this.bridges;
 }
 
 module.exports = {

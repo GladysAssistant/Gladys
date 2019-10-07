@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "node-hue-api": "^2.4.4"
+    "bluebird": "^3.7.0",
+    "node-hue-api": "^3.2.1"
   }
 }
