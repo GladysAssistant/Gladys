@@ -46,7 +46,30 @@ function setDeviceParam(device, paramName, newValue) {
   return null;
 }
 
+/**
+ * @description Get Device param by name.
+ * @param {Object} device - Device Object to parse.
+ * @param {string} category - The category of the feature to get.
+ * @param {string} type - The type of the feature to get.
+ * @returns {string} Return param.
+ * @example
+ * const value = getDeviceFeature({
+ *  features: [{ category: 'light', type: 'binary' }]
+ * }, 'light', 'binary');
+ */
+function getDeviceFeature(device, category, type) {
+  if (!get(device, 'features')) {
+    return null;
+  }
+  const feature = device.features.find((oneFeature) => oneFeature.category === category && oneFeature.type === type);
+  if (feature) {
+    return feature;
+  }
+  return null;
+}
+
 module.exports = {
   getDeviceParam,
   setDeviceParam,
+  getDeviceFeature,
 };

@@ -167,6 +167,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  DEVICE: {
+    SET_VALUE: 'device.set-value',
+  },
   LIGHT: {
     TURN_ON: 'light.turn-on',
   },

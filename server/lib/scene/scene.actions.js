@@ -1,7 +1,13 @@
 const { ACTIONS } = require('../../utils/constants');
+const { getDeviceFeature } = require('../../utils/device');
 const logger = require('../../utils/logger');
 
 const actionsFunc = {
+  [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
+    const device = self.stateManager.get('device', action.device);
+    const deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
+    return self.device.setValue(device, deviceFeature, action.value);
+  },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     const light = self.stateManager.get('device', action.device);
     return light.turnOn();

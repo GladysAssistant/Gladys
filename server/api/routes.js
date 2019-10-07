@@ -201,6 +201,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.destroy,
     },
+    'post /api/v1/device/:device_selector/:feature_category/:feature_type/value': {
+      authenticated: true,
+      controller: deviceController.setValue,
+    },
     // house
     'post /api/v1/house': {
       authenticated: true,
