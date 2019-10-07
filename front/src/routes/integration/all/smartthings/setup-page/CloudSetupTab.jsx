@@ -17,7 +17,9 @@ const CloudSetupTab = ({ children, ...props }) => {
 
         <div
           class={cx('dimmer', {
-            active: props.configureSmartthingsStatus === RequestStatus.Getting
+            active:
+              props.configureSmartthingsStatus === RequestStatus.Getting ||
+              props.loadSmartthingsStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
@@ -28,7 +30,7 @@ const CloudSetupTab = ({ children, ...props }) => {
               </p>
             )}
             {props.configureSmartthingsStatus === RequestStatus.Success && (
-              <p class="alert alert-info">
+              <p class="alert alert-success">
                 <Text id="integration.smartthings.setup.cloud.saved" />
               </p>
             )}

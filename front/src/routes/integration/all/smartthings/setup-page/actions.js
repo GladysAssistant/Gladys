@@ -8,31 +8,42 @@ const createActions = store => {
       let smartthingsClientId;
       let smartthingsClientSecret;
       let smartthingsClient;
-      let addDetailsSmartthingsStatus = RequestStatus.Error;
       store.setState({
+        loadSmartthingsStatus: RequestStatus.Getting,
         addDetailsSmartthingsStatus: RequestStatus.Getting
       });
 
+      let newState = {};
       try {
         smartthingsClientId = await state.httpClient.get('/api/v1/service/smartthings/variable/SMARTTHINGS_PUBLIC_KEY');
         smartthingsClientSecret = await state.httpClient.get(
           '/api/v1/service/smartthings/variable/SMARTTHINGS_SECRET_KEY'
         );
-        smartthingsClient = await state.httpClient.get('/api/v1/oauth/client/smartthings');
-        addDetailsSmartthingsStatus = RequestStatus.Success;
-        store.setState({
+
+        newState = {
           smartthingsClientId: smartthingsClientId.value,
-          smartthingsClientSecret: smartthingsClientSecret.value
-        });
-      } finally {
-        store.setState({
-          smartthingsClientId: (smartthingsClientId || {}).value,
-          smartthingsClientSecret: (smartthingsClientSecret || {}).value,
-          addDetailsSmartthingsStatus,
-          smartthingsGladysClientId: (smartthingsClient || {}).id,
-          smartthingsGladysClientSecret: (smartthingsClient || {}).secret
-        });
+          smartthingsClientSecret: smartthingsClientSecret.value,
+          loadSmartthingsStatus: RequestStatus.Success
+        };
+      } catch (e) {
+        newState = {
+          loadSmartthingsStatus: RequestStatus.Success
+        };
       }
+
+      try {
+        smartthingsClient = await state.httpClient.get('/api/v1/oauth/client/smartthings');
+        newState = {
+          ...newState,
+          smartthingsGladysClientId: smartthingsClient.id,
+          smartthingsGladysClientSecret: smartthingsClient.secret,
+          addDetailsSmartthingsStatus: RequestStatus.Success
+        };
+      } catch (e) {
+        newState = { ...newState, addDetailsSmartthingsStatus: RequestStatus.Success };
+      }
+
+      store.setState(newState);
     },
     updateConfigration(state, e) {
       const data = {};
@@ -48,9 +59,10 @@ const createActions = store => {
         await state.httpClient.post('/api/v1/service/smartthings/variable/SMARTTHINGS_PUBLIC_KEY', {
           value: state.smartthingsClientId
         });
-        await state.httpClient.post('/api/v1/service/smartthings/variable/SMARTTHINGS_PUBLIC_SECRET', {
+        await state.httpClient.post('/api/v1/service/smartthings/variable/SMARTTHINGS_SECRET_KEY', {
           value: state.smartthingsClientSecret
         });
+        await state.httpClient.post('/api/v1/service/smartthings/init');
 
         store.setState({
           configureSmartthingsStatus: RequestStatus.Success

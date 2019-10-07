@@ -7,7 +7,7 @@ import CloudSetupTab from './CloudSetupTab';
 import ServiceSetupTab from './ServiceSetupTab';
 
 @connect(
-  'user,session,configureSmartthingsStatus,smartthingsClientId,smartthingsClientSecret,appDetailsSmartthingsStatus,smartthingsGladysClientId,smartthingsGladysClientSecret',
+  'user,session,configureSmartthingsStatus,smartthingsClientId,smartthingsClientSecret,appDetailsSmartthingsStatus,smartthingsGladysClientId,smartthingsGladysClientSecret,loadSmartthingsStatus',
   actions
 )
 class SmartthingsSetupPage extends Component {

@@ -418,7 +418,7 @@
           "saveLabel": "Save configuration"
         },
         "service": {
-          "title": "Gladys Credentials",
+          "title": "SmartThings Gladys Credentials",
           "clientId": "Client ID",
           "clientSecret": "Client Secret"
         }

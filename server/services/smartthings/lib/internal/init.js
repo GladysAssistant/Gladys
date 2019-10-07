@@ -1,8 +1,9 @@
 const { VARIABLES } = require('../../utils/constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Initialize all needs to make SmartThings works.
+ * @returns {Promise<boolean>} Indicates if well configured.
  * @example
  * await smartthingsHandler.init();
  */
@@ -14,16 +15,14 @@ async function init() {
     const clientSecret = await this.gladys.variable.getValue(VARIABLES.SMT_SECRET_KEY, this.serviceId);
 
     this.createConnector(clientId, clientSecret);
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.SMARTTHINGS.INITIALIZATION_DONE,
-    });
+    logger.info('SmartThings well configured.');
   } catch (e) {
     this.connector = null;
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.SMARTTHINGS.INITIALIZATION_FAILED,
-      payload: e,
-    });
+    logger.warn('SmartThings failed to configure due to missing credentials.');
+    return false;
   }
+
+  return true;
 }
 
 module.exports = {

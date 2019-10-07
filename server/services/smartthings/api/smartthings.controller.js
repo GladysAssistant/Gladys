@@ -9,10 +9,31 @@ module.exports = function SmartThingsController(smartThingsHandler) {
     smartThingsHandler.handleHttpCallback(req, res);
   }
 
+  /**
+   * @api {post} /api/v1/service/smartthings/init Entry point for SmartThings initialization.
+   * @apiName Init
+   * @apiGroup SmartThings
+   */
+  async function init(req, res) {
+    const result = await smartThingsHandler.init();
+
+    if (result) {
+      res.status(200);
+    } else {
+      res.status(500);
+    }
+
+    res.json({ configured: result });
+  }
+
   return {
     'post /api/v1/service/smartthings/schema': {
       authenticated: false,
       controller: schema,
+    },
+    'post /api/v1/service/smartthings/init': {
+      authenticated: true,
+      controller: init,
     },
   };
 };
