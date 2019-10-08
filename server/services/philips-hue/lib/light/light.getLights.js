@@ -5,6 +5,7 @@ const {
   DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
+const logger = require('../../../../utils/logger');
 
 const { getDeviceParam } = require('../../../../utils/device');
 
@@ -84,6 +85,20 @@ async function getLights() {
               max: 100,
             },
           ],
+        });
+      } else {
+        logger.info(`Philips Hue Light of model ${philipsHueLight.modelid} is not handled yet !`);
+        lightsToReturn.push({
+          name: philipsHueLight.name,
+          service_id: this.serviceId,
+          external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
+          selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
+          should_poll: true,
+          model: philipsHueLight.modelid,
+          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+          features: [],
+          not_handled: true,
+          raw_philips_hue_device: philipsHueLight,
         });
       }
     });
