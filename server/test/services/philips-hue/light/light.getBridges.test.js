@@ -12,7 +12,7 @@ describe('PhilipsHueService', () => {
     const bridges = await philipsHueService.device.getBridges();
     expect(bridges).to.deep.equal([
       {
-        name: 'Philips hue',
+        name: 'Philips Hue Bridge',
         ipaddress: '192.168.2.245',
         model: {
           serial: '1234',
