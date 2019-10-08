@@ -1,41 +1,50 @@
+const { fake } = require('sinon');
 const lights = require('./lights.json');
-
-class HueApi {
-  constructor() {
-    this.userId = 'PHILIPS_HUE_USER_ID_TEST';
-  }
-
-  async registerUser(host, name) {
-    return Promise.resolve(this.userId);
-  }
-
-  async setLightState(lightId, state) {
-    return Promise.resolve(this.userId);
-  }
-
-  async lights() {
-    return Promise.resolve(this.userId).then(() => lights);
-  }
-}
 
 const STATE_ON = { _values: { on: true } };
 const STATE_OFF = { _values: { off: true } };
 
+class LightState {
+  on() {
+    this.test = 1; // useless, this is just for eslint
+    return STATE_ON;
+  }
+
+  off() {
+    this.test = 1; // useless, this is just for eslint
+    return STATE_OFF;
+  }
+}
+
 const MockedPhilipsHueClient = {
-  HueApi,
-  lightState: {
-    create: () => ({
-      on: () => STATE_ON,
-      off: () => STATE_OFF,
-    }),
+  v3: {
+    lightStates: LightState,
+    api: {
+      create: () => ({
+        users: {
+          createUser: fake.resolves({
+            username: 'username',
+          }),
+        },
+        lights: {
+          getAll: fake.resolves(lights.lights),
+          setLightState: fake.resolves(null),
+        },
+      }),
+    },
+    discovery: {
+      nupnpSearch: () =>
+        Promise.resolve([
+          {
+            name: 'Philips Hue Bridge',
+            ipaddress: '192.168.2.245',
+            model: {
+              serial: '1234',
+            },
+          },
+        ]),
+    },
   },
-  nupnpSearch: () =>
-    Promise.resolve([
-      {
-        name: 'Philips hue',
-        ipaddress: '192.168.2.245',
-      },
-    ]),
 };
 
 module.exports = MockedPhilipsHueClient;

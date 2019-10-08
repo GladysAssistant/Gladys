@@ -7,13 +7,16 @@ const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
 });
 
 describe('PhilipsHueService', () => {
-  const philipsHueService = PhilipsHueService();
   it('getBridges should return bridges', async () => {
-    const bridges = await philipsHueService.light.getBridges();
+    const philipsHueService = PhilipsHueService();
+    const bridges = await philipsHueService.device.getBridges();
     expect(bridges).to.deep.equal([
       {
         name: 'Philips hue',
         ipaddress: '192.168.2.245',
+        model: {
+          serial: '1234',
+        },
       },
     ]);
   });

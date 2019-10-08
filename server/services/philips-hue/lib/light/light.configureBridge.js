@@ -33,6 +33,7 @@ async function configureBridge(serialNumber) {
       name: bridge.name,
       service_id: this.serviceId,
       external_id: `${BRIDGE_EXTERNAL_ID_BASE}:${serialNumber}`,
+      selector: `${BRIDGE_EXTERNAL_ID_BASE}:${serialNumber}`,
       model: BRIDGE_MODEL,
       features: [],
       params: [
