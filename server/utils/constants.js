@@ -191,6 +191,7 @@ const ACTIONS = {
 const INTENTS = {
   LIGHT: {
     TURN_ON: 'intent.light.turn-on',
+    TURN_OFF: 'intent.light.turn-off',
   },
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
