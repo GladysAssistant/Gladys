@@ -24,6 +24,11 @@ describe('MqttHandler', () => {
     sinon.reset();
   });
 
+  it('should have falsy status', async () => {
+    expect(mqttHandler.configured).to.eq(false);
+    expect(mqttHandler.connected).to.eq(false);
+  });
+
   it('should have binded topics', async () => {
     expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#']);
   });
@@ -32,6 +37,8 @@ describe('MqttHandler', () => {
     await mqttHandler.connect();
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);
+    expect(mqttHandler.configured).to.eq(true);
+    expect(mqttHandler.connected).to.eq(false);
   });
 
   it('should call error', async () => {
@@ -42,6 +49,8 @@ describe('MqttHandler', () => {
   it('should call subscribe function', async () => {
     event.emit('connect');
     assert.calledOnce(mqttHandler.mqttClient.subscribe);
+    expect(mqttHandler.configured).to.eq(true);
+    expect(mqttHandler.connected).to.eq(true);
   });
 
   it('should create device', () => {

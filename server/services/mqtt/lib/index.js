@@ -6,6 +6,7 @@ const { handleGladysMessage } = require('./handler/handleGladysMessage');
 const { publish } = require('./publish');
 const { subscribe } = require('./subscribe');
 const { unsubscribe } = require('./unsubscribe');
+const { status } = require('./status');
 
 /**
  * @description Add ability to connect to a MQTT broker.
@@ -22,6 +23,8 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
   this.mqttClient = null;
 
   this.topicBinds = {};
+  this.configured = false;
+  this.connected = false;
 };
 
 MqttHandler.prototype.init = init;
@@ -32,5 +35,6 @@ MqttHandler.prototype.handleGladysMessage = handleGladysMessage;
 MqttHandler.prototype.publish = publish;
 MqttHandler.prototype.subscribe = subscribe;
 MqttHandler.prototype.unsubscribe = unsubscribe;
+MqttHandler.prototype.status = status;
 
 module.exports = MqttHandler;

@@ -3,6 +3,7 @@ const MqttController = require('../../../../services/mqtt/api/mqtt.controller');
 
 const mqttHandler = {
   connect: fake.resolves(true),
+  status: fake.resolves(true),
 };
 
 describe('POST /api/v1/service/mqtt/connect', () => {
@@ -26,5 +27,24 @@ describe('POST /api/v1/service/mqtt/connect', () => {
 
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
     assert.calledWith(mqttHandler.connect, 'url', 'username', 'password');
+  });
+});
+
+describe('GET /api/v1/service/mqtt/status', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+  });
+
+  it('Status test', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/status'].controller(req, res);
+    assert.calledOnce(mqttHandler.status);
+    assert.calledOnce(res.json);
   });
 });

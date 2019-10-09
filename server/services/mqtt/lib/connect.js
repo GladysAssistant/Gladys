@@ -15,8 +15,10 @@ async function connect() {
 
   const variablesFound = mqttUrl;
   if (!variablesFound) {
+    this.configured = false;
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }
+  this.configured = true;
 
   if (this.mqttClient) {
     this.disconnect();
@@ -35,6 +37,7 @@ async function connect() {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
     });
+    this.connected = true;
   });
   this.mqttClient.on('error', (err) => {
     logger.warn(`Error while connecting to MQTT - ${err}`);

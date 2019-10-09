@@ -315,6 +315,11 @@
       "title": "MQTT",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "status": {
+        "notConfigured": "MQTT service is not configured, please go to ",
+        "notConnected": "MQTT service failed to connect to network, please go to ",
+        "setupPageLink": "MQTT configuration page"
+      },
       "device": {
         "title": "MQTT Devices",
         "search": "Search devices",
