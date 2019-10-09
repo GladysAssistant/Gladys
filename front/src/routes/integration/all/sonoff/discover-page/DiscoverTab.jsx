@@ -4,6 +4,7 @@ import cx from 'classnames';
 import EmptyState from './EmptyState';
 import DiscoveredBox from './DiscoveredBox';
 import style from './style.css';
+import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -13,6 +14,8 @@ const DeviceTab = ({ children, ...props }) => (
       </h1>
     </div>
     <div class="card-body">
+      <CheckMqttPanel />
+
       <div class="alert alert-secondary">
         <Text id="integration.sonoff.discover.description" />
       </div>

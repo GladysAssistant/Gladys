@@ -16,16 +16,19 @@ class CheckMqttPanel extends Component {
   render(props, {}) {
     let messageKey;
     if (!props.mqttStatusConfigured) {
-      messageKey = "integration.mqtt.status.notConfigured";
+      messageKey = 'integration.mqtt.status.notConfigured';
     } else if (!props.mqttStatusConnected) {
-      messageKey = "integration.mqtt.status.notConnected";
+      messageKey = 'integration.mqtt.status.notConnected';
     } else {
       return null;
     }
 
     return (
       <div class="alert alert-warning">
-        <Text id={messageKey} /><Link href="/dashboard/integration/device/mqtt/setup"><Text id="integration.mqtt.status.setupPageLink" /></Link>
+        <Text id={messageKey} />
+        <Link href="/dashboard/integration/device/mqtt/setup">
+          <Text id="integration.mqtt.status.setupPageLink" />
+        </Link>
       </div>
     );
   }
