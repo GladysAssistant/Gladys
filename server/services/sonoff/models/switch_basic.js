@@ -1,12 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
-const getParams = () => {
-  return [
-    {
-      name: 'model',
-      value: 'basic',
-    },
-  ];
+const getModel = () => {
+  return 'sonoff-basic';
 };
 
 const getFeatures = (uuid, deviceName, deviceTopic) => {
@@ -27,5 +22,5 @@ const getFeatures = (uuid, deviceName, deviceTopic) => {
 
 module.exports = {
   getFeatures,
-  getParams,
+  getModel,
 };

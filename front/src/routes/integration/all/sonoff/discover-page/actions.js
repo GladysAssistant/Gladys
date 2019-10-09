@@ -11,13 +11,6 @@ function createActions(store) {
       });
       try {
         const discoveredDevices = await state.httpClient.get('/api/v1/service/sonoff/discover');
-        discoveredDevices.forEach(device => {
-          const model = device.params.find(p => p.name === 'model');
-          if (model) {
-            device.model = model.value;
-          }
-        });
-
         store.setState({
           discoveredDevices,
           loading: false,

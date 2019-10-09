@@ -48,7 +48,7 @@ function handleMqttMessage(topic, message) {
           name: friendlyName,
           external_id: `sonoff:${deviceExternalId}`,
           features: model.getFeatures(uuid, friendlyName, deviceExternalId),
-          params: model.getParams(),
+          model: model.getModel(),
           service_id: this.serviceId,
           should_poll: false,
           id: uuid.v4(),

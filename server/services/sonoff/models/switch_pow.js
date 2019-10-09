@@ -1,12 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
-const getParams = () => {
-  return [
-    {
-      name: 'model',
-      value: 'pow',
-    },
-  ];
+const getModel = () => {
+  return 'sonoff-pow';
 };
 
 const getFeatures = (uuid, deviceName, deviceTopic) => {
@@ -30,6 +25,7 @@ const getFeatures = (uuid, deviceName, deviceTopic) => {
       has_feedback: false,
       min: 0,
       max: 10000,
+      unit: 'A',
       name: `${deviceName} - ${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
       external_id: `sonoff:${deviceTopic}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
     },
@@ -38,5 +34,5 @@ const getFeatures = (uuid, deviceName, deviceTopic) => {
 
 module.exports = {
   getFeatures,
-  getParams,
+  getModel,
 };

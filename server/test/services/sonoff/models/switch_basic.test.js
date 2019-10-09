@@ -7,16 +7,10 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 const modelId = 1;
 
 describe('SonoffService - Model - Basic', () => {
-  it('get params for Sonoff Basic', () => {
-    const params = models[modelId].getParams();
+  it('get model for Sonoff Basic', () => {
+    const model = models[modelId].getModel();
 
-    expect(params).to.be.lengthOf(1);
-    expect(params).deep.eq([
-      {
-        name: 'model',
-        value: 'basic',
-      },
-    ]);
+    expect(model).to.eq('sonoff-basic');
   });
 
   it('get features for Sonoff Basic', () => {

@@ -22,13 +22,6 @@ function createActions(store) {
         }
 
         const sonoffsReceived = await state.httpClient.get('/api/v1/service/sonoff/device', options);
-        sonoffsReceived.forEach(device => {
-          const model = device.params.find(p => p.name === 'model');
-          if (model) {
-            device.model = model.value;
-          }
-        });
-
         let sonoffDevices;
         if (skip === 0) {
           sonoffDevices = sonoffsReceived;

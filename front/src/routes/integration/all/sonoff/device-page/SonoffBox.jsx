@@ -36,20 +36,8 @@ class SonoffBox extends Component {
 
   updateModel = e => {
     const selectedModel = e.target.value;
-    const params = (this.props.device.params || []).slice();
-    const model = params.find(p => p.name === 'model');
-
-    if (model) {
-      model.value = selectedModel;
-    } else {
-      params.push({
-        name: 'model',
-        value: selectedModel
-      });
-    }
 
     this.props.updateDeviceField(this.props.deviceIndex, 'model', selectedModel);
-    this.props.updateDeviceField(this.props.deviceIndex, 'params', params);
     this.props.updateDeviceField(
       this.props.deviceIndex,
       'features',
