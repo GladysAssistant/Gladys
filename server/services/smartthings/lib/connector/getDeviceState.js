@@ -22,12 +22,12 @@ function getDeviceState(features) {
         if (!attribute.type || attribute.type === feature.type) {
           const state = {
             component: 'main',
-            capability: `st.${capability.name}`,
+            capability: `st.${capability.capability.id}`,
             attribute: attribute.name,
           };
 
           attribute.properties.forEach((property) => {
-            state[property.name] = property.value(feature);
+            state[property.name] = property.mapper(feature);
           });
 
           states.push(state);
