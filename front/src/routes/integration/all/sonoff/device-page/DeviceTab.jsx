@@ -49,8 +49,9 @@ const DeviceTab = ({ children, ...props }) => (
         <div class={cx('dimmer-content', style.sonoffListBody)}>
           <div class="row">
             {props.sonoffDevices &&
+              props.sonoffDevices.length > 0 &&
               props.sonoffDevices.map((device, index) => <SonoffBox {...props} device={device} deviceIndex={index} />)}
-            {props.sonoffDevices && props.sonoffDevices.length === 0 && <EmptyState />}
+            {!props.sonoffDevices || (props.sonoffDevices.length === 0 && <EmptyState addDevice={props.addDevice} />)}
           </div>
         </div>
       </div>
