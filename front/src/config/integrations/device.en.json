@@ -32,7 +32,7 @@
   {
     "key": "sonoff",
     "name": "Sonoff",
-    "description": "Control your Sonoff devices, using Tasmota firmware.",
+    "description": "Control your Sonoff devices.",
     "img": "/assets/integrations/cover/sonoff.jpg"
   }
 ]
