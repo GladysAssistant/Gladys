@@ -231,7 +231,7 @@
         "title": "Sonoff devices in Gladys",
         "search": "Search devices",
         "newButton": "New",
-        "noDeviceFound": "No Sonoff device found. Please use following actions :"
+        "noDeviceFound": "No Sonoff device found. You can add device with following actions :"
       },
       "discover": {
         "title": "Sonoff discover devices over MQTT",
