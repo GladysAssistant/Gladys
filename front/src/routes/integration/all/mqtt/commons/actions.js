@@ -10,7 +10,8 @@ const createActions = store => {
       } finally {
         store.setState({
           mqttStatusConfigured: mqttStatus.configured,
-          mqttStatusConnected: mqttStatus.connected
+          mqttStatusConnected: mqttStatus.connected,
+          mqttStatusLoaded: true
         });
       }
     }

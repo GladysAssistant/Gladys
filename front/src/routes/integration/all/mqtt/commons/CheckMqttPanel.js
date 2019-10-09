@@ -5,7 +5,7 @@ import actions from './actions';
 import { Text } from 'preact-i18n';
 
 @connect(
-  'user,session,mqttStatusConnected,mqttStatusConfigured',
+  'user,session,mqttStatusConnected,mqttStatusConfigured,mqttStatusLoaded',
   actions
 )
 class CheckMqttPanel extends Component {
@@ -20,6 +20,10 @@ class CheckMqttPanel extends Component {
     } else if (!props.mqttStatusConnected) {
       messageKey = 'integration.mqtt.status.notConnected';
     } else {
+      return null;
+    }
+
+    if (!props.mqttStatusLoaded) {
       return null;
     }
 
