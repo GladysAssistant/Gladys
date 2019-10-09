@@ -49,7 +49,8 @@ function createActions(store) {
             id: uniqueId,
             name: null,
             should_poll: false,
-            service_id: state.currentIntegration.id
+            service_id: state.currentIntegration.id,
+            external_id: 'sonoff:'
           }
         ]
       });

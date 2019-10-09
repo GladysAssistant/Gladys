@@ -242,8 +242,8 @@
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Topic",
-      "topicPlaceholder": "%topic% Sonoff MQTT value",
+      "topicLabel": "Topic (%topic% Sonoff MQTT)",
+      "topicPlaceholder": "Should starts with 'sonoff:'",
       "modelLabel": "Sonoff Model",
       "model": {
         "sonoff-basic": "Basic",
