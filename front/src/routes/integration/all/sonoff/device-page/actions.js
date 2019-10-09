@@ -111,8 +111,8 @@ function createActions(store) {
         feature.name = device.name + ' - ' + feature.type;
         feature.external_id = device.external_id + ':' + feature.type;
       });
+      device.selector = device.external_id;
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
-      savedDevice.model = device.model;
       const sonoffDevices = update(state.sonoffDevices, {
         $splice: [[index, 1, savedDevice]]
       });

@@ -253,7 +253,10 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
-      "saveError": "There was an error saving the device."
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "conflictError": "Current topic is already in use."
+      }
     },
     "zwave": {
       "title": "Z-Wave",

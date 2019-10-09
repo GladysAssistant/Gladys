@@ -34,7 +34,7 @@ class SonoffBox extends Component {
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error
+        saveError: e
       });
     }
     this.setState({
@@ -59,6 +59,11 @@ class SonoffBox extends Component {
   };
 
   render(props, { loading, saveError }) {
+    let errorMessage = 'integration.sonoff.error.defaultError';
+    if (saveError && saveError.response && saveError.response.status === 409) {
+      errorMessage = 'integration.sonoff.error.conflictError';
+    }
+
     return (
       <div class="col-md-6">
         <div class="card">
@@ -72,7 +77,7 @@ class SonoffBox extends Component {
               <div class="card-body">
                 {saveError && (
                   <div class="alert alert-danger">
-                    <Text id="integration.sonoff.saveError" />
+                    <Text id={errorMessage} />
                   </div>
                 )}
                 <div class="form-group">

@@ -73,8 +73,8 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.discoveredDevices[index];
+      device.selector = device.external_id;
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
-      savedDevice.model = device.model;
       const discoveredDevices = update(state.discoveredDevices, {
         $splice: [[index, 1, savedDevice]]
       });
