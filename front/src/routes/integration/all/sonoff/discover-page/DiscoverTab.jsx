@@ -13,6 +13,9 @@ const DeviceTab = ({ children, ...props }) => (
       </h1>
     </div>
     <div class="card-body">
+      <div class="alert alert-secondary">
+        <Text id="integration.sonoff.discover.description" />
+      </div>
       <div
         class={cx('dimmer', {
           active: props.loading

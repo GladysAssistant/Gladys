@@ -228,15 +228,17 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "device": {
-        "title": "Sonoff Devices",
+        "title": "Sonoff devices in Gladys",
         "search": "Search devices",
-        "newButton": "New"
+        "newButton": "New",
+        "noDeviceFound": "No Sonoff device found."
       },
       "discover": {
-        "title": "Sonoff Discover",
-        "error": "Error discovering Sonoff devices."
+        "title": "Sonoff discover devices",
+        "description": "Configured Sonoff devices are automatically dicovered over MQTT network. You can now simply add them to Gladys.",
+        "error": "Error discovering Sonoff devices.",
+        "noDeviceFound": "<p>No Sonoff device found.</p><p>Be sure you have well follow the <a href=\"https://github.com/arendst/Sonoff-Tasmota/wiki\" target=\"_blank\">Sonoff-Tasmota installation user guide</a>.</p>"
       },
-      "noDeviceFound": "No Sonoff device found.",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
