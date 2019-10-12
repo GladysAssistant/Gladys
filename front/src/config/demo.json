@@ -683,22 +683,21 @@
     }
   ],
   "get /api/v1/service/mqtt": {},
+  "get /api/v1/service/mqtt/status": {
+    "configured": true,
+    "connected": true
+  },
   "get /api/v1/service/sonoff": {},
   "get /api/v1/service/sonoff/device": [
     {
       "name": "Switch",
-      "external_id": "sonoff-basic",
+      "external_id": "sonoff:sonoff-basic",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "model": "sonoff-basic",
       "features": [
         {
           "category": "switch",
           "type": "binary"
-        }
-      ],
-      "params": [
-        {
-          "name": "model",
-          "value": "basic"
         }
       ]
     }
@@ -706,33 +705,24 @@
   "get /api/v1/service/sonoff/discover": [
     {
       "name": "Sonoff Basic Kitchen",
-      "external_id": "sonoff-basic",
+      "external_id": "sonoff:sonoff-basic",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "model": "sonoff-basic",
       "features": [
         {
           "category": "switch",
           "type": "binary"
-        }
-      ],
-      "params": [
-        {
-          "name": "model",
-          "value": "basic"
         }
       ]
     },
     {
       "name": "Sonoff Pow Kitchen",
-      "external_id": "sonoff-pow",
+      "external_id": "sonoff:sonoff-pow",
+      "model": "sonoff-pow",
       "features": [
         {
           "category": "switch",
           "type": "binary"
-        }
-      ],
-      "params": [
-        {
-          "name": "model",
-          "value": "pow"
         }
       ]
     }
