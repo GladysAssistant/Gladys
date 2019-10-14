@@ -14,7 +14,7 @@ const PhilipsHuePage = ({ children, ...props }) => (
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
-                    href="/dashboard/integration/device/philips-hue"
+                    href="/dashboard/integration/device/philips-hue/device"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
