@@ -32,16 +32,17 @@ function createActions(store) {
       });
       store.setState(newState);
     },
-    async turnOnLight(state, deviceSelector) {
-      await state.httpClient.post(`/api/v1/light/${deviceSelector}/on`);
-    },
-    async turnOffLight(state, deviceSelector) {
-      await state.httpClient.post(`/api/v1/light/${deviceSelector}/off`);
+    async setValue(state, deviceFeatureSelector, value) {
+      await state.httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
+        value
+      });
     },
     async updateValue(state, device, deviceFeature, roomIndex, deviceIndex, deviceFeatureIndex, value, oldValue) {
       actions.updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value);
       if (deviceFeature.category === 'light' && deviceFeature.type === 'binary') {
-        await actions.turnOnLight(state, device.selector);
+        await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
+          value
+        });
       }
     },
     updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value) {

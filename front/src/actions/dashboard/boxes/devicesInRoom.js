@@ -1,6 +1,7 @@
 import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
 import createDeviceActions from '../../device';
+import update from 'immutability-helper';
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../../server/utils/constants');
 
 const BOX_KEY = 'DevicesInRoom';
@@ -54,13 +55,9 @@ function createActions(store) {
         device.features.forEach(feature => {
           const isLightBinary =
             feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY;
-          if (isLightBinary && action === 1) {
-            promises.push(deviceActions.turnOnLight(state, device.selector));
-            feature.last_value = 1;
-            feature.last_value_changed = new Date();
-          } else if (isLightBinary && action === 0) {
-            promises.push(deviceActions.turnOffLight(state, device.selector));
-            feature.last_value = 0;
+          if (isLightBinary) {
+            promises.push(deviceActions.setValue(state, feature.selector, action));
+            feature.last_value = action;
             feature.last_value_changed = new Date();
           }
         });
@@ -69,6 +66,32 @@ function createActions(store) {
         room: data.room
       });
       await Promise.all(promises);
+    },
+    async updateValue(state, x, y, device, deviceFeature, deviceIndex, featureIndex, action) {
+      await deviceActions.setValue(state, deviceFeature.selector, action);
+      const data = boxActions.getBoxData(state, BOX_KEY, x, y);
+      const newData = update(data, {
+        room: {
+          devices: {
+            [deviceIndex]: {
+              features: {
+                [featureIndex]: {
+                  last_value: {
+                    $set: action
+                  },
+                  last_value_changed: {
+                    $set: new Date()
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+      console.log(newData);
+      boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+        room: newData.room
+      });
     }
   };
   return Object.assign({}, actions, boxActions);

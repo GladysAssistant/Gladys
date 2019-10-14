@@ -56,6 +56,8 @@ const RoomCard = ({ children, ...props }) => {
               props.devices.map((device, deviceIndex) =>
                 device.features.map((deviceFeature, deviceFeatureIndex) => (
                   <DeviceRow
+                    x={props.x}
+                    y={props.y}
                     device={device}
                     deviceFeature={deviceFeature}
                     roomIndex={props.roomIndex}

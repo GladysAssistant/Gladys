@@ -13,7 +13,7 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
  * turnOff(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  console.log(device, deviceFeature);
+  logger.debug(`Changing state of light ${device.external_id} with value = ${value}`);
   const { lightId, bridgeSerialNumber } = parseExternalId(device.external_id);
   const hueApi = this.hueApisBySerialNumber.get(bridgeSerialNumber);
   if (!hueApi) {

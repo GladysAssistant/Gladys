@@ -4,8 +4,15 @@ const logger = require('../../utils/logger');
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
-    const device = self.stateManager.get('device', action.device);
-    const deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
+    let device;
+    let deviceFeature;
+    if (action.device_feature) {
+      deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
+      device = self.stateManager.get('deviceById', deviceFeature.device_id);
+    } else {
+      device = self.stateManager.get('device', action.device);
+      deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
+    }
     return self.device.setValue(device, deviceFeature, action.value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {

@@ -7,6 +7,7 @@
 function add(device) {
   this.stateManager.setState('device', device.selector, device);
   this.stateManager.setState('deviceByExternalId', device.external_id, device);
+  this.stateManager.setState('deviceById', device.id, device);
   device.features.forEach((feature) => {
     this.stateManager.setState('deviceFeature', feature.selector, feature);
     this.stateManager.setState('deviceFeatureByExternalId', feature.external_id, feature);
