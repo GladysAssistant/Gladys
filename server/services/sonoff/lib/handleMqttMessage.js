@@ -65,6 +65,7 @@ function handleMqttMessage(topic, message) {
       break;
     }
     // Device state topic
+    case 'RESULT':
     case 'STATE': {
       const stateMsg = JSON.parse(message);
       const stateValue = stateMsg.POWER;
