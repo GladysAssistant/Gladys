@@ -13,7 +13,7 @@ const gladys = {
   },
 };
 const mqttService = {
-  client: {
+  device: {
     publish: fake.returns(null),
   },
 };
@@ -34,7 +34,7 @@ describe('Mqtt handle message', () => {
       state: 1,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
@@ -46,7 +46,7 @@ describe('Mqtt handle message', () => {
       state: 0,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
@@ -58,14 +58,14 @@ describe('Mqtt handle message', () => {
       state: 125,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
   it('should change SONOFF power state to ON (STATUS topic unknown device)', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/STATUS', '{ "Status": { "Power": 1, "FriendlyName": ["name"] }}');
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);
   });
 
@@ -80,7 +80,7 @@ describe('Mqtt handle message', () => {
       state: 1,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
@@ -92,7 +92,7 @@ describe('Mqtt handle message', () => {
       state: 1,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
@@ -104,21 +104,21 @@ describe('Mqtt handle message', () => {
       state: 0,
     };
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
   it('should ask for SONOFF status (LWT topic)', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/LWT', 'anything');
 
-    assert.calledWith(mqttService.client.publish, 'cmnd/my_device/status');
+    assert.calledWith(mqttService.device.publish, 'cmnd/my_device/status');
     assert.notCalled(gladys.event.emit);
   });
 
   it('should do nothing on unkown SONOFF topic', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/UNKOWN', '{ "POWER": "ON"}');
 
-    assert.notCalled(mqttService.client.publish);
+    assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);
   });
 });

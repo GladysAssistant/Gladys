@@ -18,13 +18,13 @@ describe('SonoffService', () => {
 
   it('should start service', async () => {
     await sonoffService.start();
-    assert.calledOnce(sonoffService.client.connect);
-    assert.notCalled(sonoffService.client.disconnect);
+    assert.calledOnce(sonoffService.device.connect);
+    assert.notCalled(sonoffService.device.disconnect);
   });
 
   it('should stop service', async () => {
     sonoffService.stop();
-    assert.notCalled(sonoffService.client.connect);
-    assert.calledOnce(sonoffService.client.disconnect);
+    assert.notCalled(sonoffService.device.connect);
+    assert.calledOnce(sonoffService.device.disconnect);
   });
 });

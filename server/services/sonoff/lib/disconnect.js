@@ -5,8 +5,8 @@
  */
 function disconnect() {
   // Unsubscribe to Sonoff topics
-  this.mqttService.client.unsubscribe('stat/+/+');
-  this.mqttService.client.unsubscribe('tele/+/+');
+  this.mqttService.device.unsubscribe('stat/+/+');
+  this.mqttService.device.unsubscribe('tele/+/+');
 }
 
 module.exports = {

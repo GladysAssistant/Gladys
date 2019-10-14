@@ -4,7 +4,7 @@ const { fake, assert } = sinon;
 const SonoffHandler = require('../../../../services/sonoff/lib');
 
 const mqttService = {
-  client: {
+  device: {
     subscribe: fake.returns(null),
   },
 };
@@ -26,8 +26,8 @@ describe('SonoffHandler - connect', () => {
     sonoffHandler.connect();
 
     assert.calledWith(gladys.service.getService, 'mqtt');
-    assert.callCount(mqttService.client.subscribe, 2);
-    mqttService.client.subscribe.firstCall.calledWith('stat/+/+', sonoffHandler.handleMqttMessage.bind(sonoffHandler));
-    mqttService.client.subscribe.secondCall.calledWith('tele/+/+', sonoffHandler.handleMqttMessage.bind(sonoffHandler));
+    assert.callCount(mqttService.device.subscribe, 2);
+    mqttService.device.subscribe.firstCall.calledWith('stat/+/+', sonoffHandler.handleMqttMessage.bind(sonoffHandler));
+    mqttService.device.subscribe.secondCall.calledWith('tele/+/+', sonoffHandler.handleMqttMessage.bind(sonoffHandler));
   });
 });

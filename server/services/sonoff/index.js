@@ -30,7 +30,7 @@ module.exports = function SonoffService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    client: sonoffHandler,
+    device: sonoffHandler,
     controllers: SonoffController(sonoffHandler),
   });
 };

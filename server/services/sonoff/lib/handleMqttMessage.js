@@ -77,7 +77,7 @@ function handleMqttMessage(topic, message) {
     }
     // Online status
     case 'LWT': {
-      this.mqttService.client.publish(`cmnd/${deviceExternalId}/status`);
+      this.mqttService.device.publish(`cmnd/${deviceExternalId}/status`);
       break;
     }
     default: {

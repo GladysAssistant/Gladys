@@ -4,7 +4,7 @@ const { fake, assert } = sinon;
 const SonoffHandler = require('../../../../services/sonoff/lib');
 
 const mqttService = {
-  client: {
+  device: {
     unsubscribe: fake.returns(null),
   },
 };
@@ -20,7 +20,7 @@ describe('SonoffHandler - disconnect', () => {
   it('disconnect with unsubscription', () => {
     sonoffHandler.disconnect();
 
-    assert.calledWith(mqttService.client.unsubscribe, 'stat/+/+');
-    assert.calledWith(mqttService.client.unsubscribe, 'tele/+/+');
+    assert.calledWith(mqttService.device.unsubscribe, 'stat/+/+');
+    assert.calledWith(mqttService.device.unsubscribe, 'tele/+/+');
   });
 });
