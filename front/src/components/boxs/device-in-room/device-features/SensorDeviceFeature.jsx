@@ -1,3 +1,5 @@
+import { Text } from 'preact-i18n';
+import { DEVICE_FEATURE_UNITS } from '../../../../../../server/utils/constants';
 const OPEN_CLOSE_SENSORS = ['door-opening-sensor', 'window-opening-sensor'];
 
 const SensorDeviceType = ({ children, ...props }) => (
@@ -19,11 +21,20 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {OPEN_CLOSE_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
       <td class="text-right">
-        {props.deviceFeature.last_value}
+        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.category === 'temperature-sensor' && (
           <span>{props.deviceFeature.unit === 'celsius' ? '°C' : '°F'}</span>
         )}
-        {props.deviceFeature.category !== 'temperature-sensor' && <span>{props.deviceFeature.unit}</span>}
+        {props.deviceFeature.category !== 'temperature-sensor' && props.deviceFeature.last_value !== null && (
+          <span>
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PERCENT && '%'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT && 'kW'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
+          </span>
+        )}
       </td>
     )}
     {OPEN_CLOSE_SENSORS.indexOf(props.deviceFeature.category) !== -1 && (

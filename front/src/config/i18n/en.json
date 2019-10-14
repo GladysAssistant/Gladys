@@ -136,7 +136,8 @@
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
       },
       "devicesInRoom": {
-        "editRoomLabel": "Select the room you want to display here."
+        "editRoomLabel": "Select the room you want to display here.",
+        "noValue": "No value recorded"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
