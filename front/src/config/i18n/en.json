@@ -179,8 +179,18 @@
     },
     "philipsHue": {
       "title": "Philips Hue",
-      "introduction": "Configure here your Philips Hue lights. Gladys is compatible with <a href=\"{{link}}\">this set of Philips Hue lights</a>",
-      "searchForBridgesButton": "Scan network for bridges"
+      "deviceTab": "Devices",
+      "setupTab": "Setup Bridges",
+      "setup": {
+        "connectedBridgesTitle": "Connected bridges",
+        "disconnectButton": "Disconnect",
+        "bridgesOnNetwork": "Bridges on network",
+        "connectButton": "Connect/Reconnect",
+        "scanButton": "Scan network",
+        "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
+        "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
+        "noBridgesConnected": "No bridges connected."
+      }
     },
     "rtspCamera": {
       "title": "RTSP Camera",

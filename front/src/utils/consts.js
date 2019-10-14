@@ -41,12 +41,6 @@ export const DeviceGetByRoomStatus = {
   Error: 'Error'
 };
 
-export const PhilipsHueGetBridgesStatus = {
-  Getting: 'Getting',
-  Success: 'Success',
-  Error: 'Error'
-};
-
 export const SceneGetStatus = {
   Getting: 'Getting',
   Success: 'Success',
@@ -63,7 +57,8 @@ export const RequestStatus = {
   RateLimitError: 'RateLimitError',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally'
+  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
+  PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed'
 };
 
 export const GetWeatherStatus = {
