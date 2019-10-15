@@ -85,11 +85,13 @@ const Header = ({ ...props }) => {
                     <i class="fe fe-message-square" /> <Text id="header.chat" />
                   </Link>
                 </li>
-                <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard/device" class="nav-link">
-                    <i class="fe fe-toggle-right" /> <Text id="header.devices" />
-                  </Link>
-                </li>
+                {false && (
+                  <li class="nav-item">
+                    <Link activeClassName="active" href="/dashboard/device" class="nav-link">
+                      <i class="fe fe-toggle-right" /> <Text id="header.devices" />
+                    </Link>
+                  </li>
+                )}
                 <li class="nav-item">
                   <Link
                     href="/dashboard/integration/device"
