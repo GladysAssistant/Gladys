@@ -18,19 +18,46 @@ class SonoffBox extends Component {
         }
       });
     }
+
+    this.setState({
+      loading: false
+    });
   };
 
   updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
+
+    this.setState({
+      loading: false
+    });
   };
 
   updateTopic = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'external_id', e.target.value);
+    let { value } = e.target;
+    if (!value.startsWith('sonoff:')) {
+      console.log('dont starts with sonoff:', value);
+      if (value.length < 7) {
+        console.log('< 7', value);
+        value = 'sonoff:';
+      } else {
+        console.log('>= 7', value);
+        value = `sonoff:${value}`;
+      }
+    }
+    const currentDevice = this.props.device;
+    const originalExternalId = currentDevice.external_id;
+    const { features } = currentDevice;
 
-    const { features } = this.props.sonoffDevices[this.props.deviceIndex];
+    console.log(value);
+    this.props.updateDeviceField(this.props.deviceIndex, 'external_id', value);
+
     features.forEach((feature, featureIndex) => {
-      const newExternalId = feature.external_id.replace('/^(.*):', e.target.value);
+      const newExternalId = feature.external_id.replace(originalExternalId, value);
       this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'external_id', newExternalId);
+    });
+
+    this.setState({
+      loading: false
     });
   };
 
@@ -43,6 +70,10 @@ class SonoffBox extends Component {
       'features',
       GetFeatures(selectedModel, this.props.device.name, this.props.device.external_id)
     );
+
+    this.setState({
+      loading: false
+    });
   };
 
   saveDevice = async () => {
