@@ -71,7 +71,10 @@ function createActions(store) {
           displayGatewayLogin: false,
           gatewayLoginStep2: false
         });
-        await actions.getStatus(state);
+        await actions.getStatus(store.getState());
+        await actions.getKeys(store.getState());
+        await actions.getInstanceKeys(store.getState());
+        await actions.getBackupKey(store.getState());
       } catch (e) {
         store.setState({
           gatewayLoginStatus: RequestStatus.Error
