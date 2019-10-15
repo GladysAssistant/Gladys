@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
+import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 
@@ -62,7 +63,8 @@ class RtspCameraBox extends Component {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
   updateCameraRoom = e => {
-    this.props.updateCameraField(this.props.cameraIndex, 'room_id', e.target.value);
+    const newRoom = e.target.value === '' ? null : e.target.value;
+    this.props.updateCameraField(this.props.cameraIndex, 'room_id', newRoom);
   };
   componentWillMount() {}
 
@@ -130,7 +132,7 @@ class RtspCameraBox extends Component {
                   <Localizer>
                     <input
                       type="text"
-                      value={props.camera.cameraUrl.value}
+                      value={get(props, 'camera.cameraUrl.value')}
                       onInput={this.updateCameraUrl}
                       class="form-control"
                       placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
