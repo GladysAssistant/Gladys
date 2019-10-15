@@ -17,7 +17,7 @@ class SonoffIntegration extends Component {
 
   render(props, {}) {
     return (
-      <SonoffPage>
+      <SonoffPage user={props.user}>
         <DeviceTab {...props} />
       </SonoffPage>
     );

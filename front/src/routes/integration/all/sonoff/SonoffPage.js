@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const SonoffPage = ({ children }) => (
+const SonoffPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -34,6 +35,15 @@ const SonoffPage = ({ children }) => (
                     </span>
                     <Text id="integration.sonoff.discoverTab" />
                   </Link>
+
+                  <div class="mt-5 mb-5 text-center">
+                    <DeviceConfigurationLink
+                      user={user}
+                      buttonClass="btn-light"
+                      labelKey="integration.sonoff.discover.documentation"
+                      documentKey="sonoff-configuration"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

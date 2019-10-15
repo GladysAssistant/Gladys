@@ -237,9 +237,10 @@
       },
       "discover": {
         "title": "Sonoff discover devices over MQTT",
-        "description": "Configured Sonoff devices are automatically dicovered over MQTT network. You can now simply add them to Gladys.",
+        "description": "Configured Sonoff devices are automatically dicovered over MQTT network.",
         "error": "Error discovering Sonoff devices.",
-        "noDeviceFound": "<p>No Sonoff device discovered.</p><p>Be sure you well followed the <a href=\"https://github.com/arendst/Sonoff-Tasmota/wiki\" target=\"_blank\">Sonoff-Tasmota installation user guide</a>.</p>"
+        "noDeviceFound": "No Sonoff device discovered.",
+        "documentation": "Sonoff documentation"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
