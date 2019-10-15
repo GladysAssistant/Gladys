@@ -3,7 +3,6 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import MqttDeviceForm from './DeviceForm';
-import { Link } from 'preact-router/match';
 
 class MqttDeviceBox extends Component {
   saveDevice = async () => {
@@ -48,12 +47,6 @@ class MqttDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.mqtt.device.deleteButton" />
                   </button>
-
-                  <Link href={`/dashboard/integration/device/mqtt/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
-                      <Text id="integration.mqtt.device.editButton" />
-                    </button>
-                  </Link>
                 </div>
               </div>
             </div>
