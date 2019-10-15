@@ -79,10 +79,20 @@ const RoomCard = ({ children, ...props }) => {
   actions
 )
 class DevicesInRoomComponent extends Component {
+  updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
+
   componentDidMount() {
     this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, payload =>
-      this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
     );
   }
 
