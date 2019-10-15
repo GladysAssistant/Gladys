@@ -51,7 +51,7 @@ function setDeviceParam(device, paramName, newValue) {
  * @param {Object} device - Device Object to parse.
  * @param {string} category - The category of the feature to get.
  * @param {string} type - The type of the feature to get.
- * @returns {string} Return param.
+ * @returns {Object} Return feature.
  * @example
  * const value = getDeviceFeature({
  *  features: [{ category: 'light', type: 'binary' }]

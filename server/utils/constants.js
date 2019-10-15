@@ -304,6 +304,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
   },
+  DEVICE: {
+    NEW_STATE: 'device.new-state',
+  },
   MESSAGE: {
     NEW: 'message.new',
   },

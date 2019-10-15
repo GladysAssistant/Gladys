@@ -1,6 +1,7 @@
 const { configureBridge } = require('./light.configureBridge');
 const { getBridges } = require('./light.getBridges');
 const { init } = require('./light.init');
+const { poll } = require('./light.poll');
 const { getLights } = require('./light.getLights');
 const { setValue } = require('./light.setValue');
 
@@ -27,6 +28,7 @@ const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient
 PhilipsHueLightHandler.prototype.configureBridge = configureBridge;
 PhilipsHueLightHandler.prototype.getBridges = getBridges;
 PhilipsHueLightHandler.prototype.init = init;
+PhilipsHueLightHandler.prototype.poll = poll;
 PhilipsHueLightHandler.prototype.getLights = getLights;
 PhilipsHueLightHandler.prototype.setValue = setValue;
 

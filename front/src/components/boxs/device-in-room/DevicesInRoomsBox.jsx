@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../../../actions/dashboard/boxes/devicesInRoom';
 import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
-// import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 
 import DeviceRow from './DeviceRow';
@@ -81,6 +81,9 @@ const RoomCard = ({ children, ...props }) => {
 class DevicesInRoomComponent extends Component {
   componentDidMount() {
     this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, payload =>
+      this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload)
+    );
   }
 
   render(props, {}) {
