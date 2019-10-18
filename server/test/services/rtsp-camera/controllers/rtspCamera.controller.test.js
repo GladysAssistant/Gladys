@@ -25,6 +25,5 @@ describe('POST /api/v1/service/rtsp-camera/camera/test', () => {
     };
     await rtspCameraController['post /api/v1/service/rtsp-camera/camera/test'].controller(req, res);
     assert.calledWith(rtspCameraService.getImage, device);
-    assert.calledWith(res.send, 'base64image');
   });
 });
