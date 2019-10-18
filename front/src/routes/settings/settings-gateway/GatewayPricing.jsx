@@ -103,7 +103,7 @@ const GatewayPricing = ({ children, ...props }) => (
               </li>
             </ul>
             <div class="text-center mt-6">
-              <a href="#" class="btn btn-green btn-block">
+              <a href="https://gladysassistant.com/pricing" class="btn btn-green btn-block">
                 <Text id="gatewayPricing.subscribeButton" />
               </a>
             </div>
