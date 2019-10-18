@@ -110,12 +110,12 @@ const Profile = ({ children, ...props }) => {
         <label class="form-label">
           <Text id="profile.languageLabel" />
         </label>
+        <small>
+          <Text id="profile.frenchComingSoon" />
+        </small>
         <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control custom-select">
           <option value="en">
             <Text id="profile.english" />
-          </option>
-          <option value="fr">
-            <Text id="profile.french" />
           </option>
         </select>
       </div>
