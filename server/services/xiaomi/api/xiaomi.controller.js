@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function xiaomiController(xiaomiManager) {
   /**
    * @api {get} /api/v1/service/xiaomi/sensor Get Xiaomi sensors
@@ -12,7 +14,7 @@ module.exports = function xiaomiController(xiaomiManager) {
   return {
     'get /api/v1/service/xiaomi/sensor': {
       authenticated: true,
-      controller: getSensors,
+      controller: asyncMiddleware(getSensors),
     },
   };
 };

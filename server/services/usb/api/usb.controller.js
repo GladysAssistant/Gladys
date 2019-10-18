@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function UsbController({ list }) {
   /**
    * @api {get} /api/v1/service/usb/port List USB ports
@@ -12,7 +14,7 @@ module.exports = function UsbController({ list }) {
   return {
     'get /api/v1/service/usb/port': {
       authenticated: true,
-      controller: getUsbPorts,
+      controller: asyncMiddleware(getUsbPorts),
     },
   };
 };
