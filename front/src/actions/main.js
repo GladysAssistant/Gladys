@@ -4,7 +4,16 @@ import { route } from 'preact-router';
 import get from 'get-value';
 import { isUrlInArray } from '../utils/url';
 
-const OPEN_PAGES = ['/signup', '/login', '/forgot-password', '/reset-password'];
+const OPEN_PAGES = [
+  '/signup',
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+  '/gateway-configure-two-factor',
+  '/signup-gateway',
+  '/subscribe-gateway',
+  '/confirm-email'
+];
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);

@@ -22,5 +22,11 @@
     "name": "MQTT",
     "description": "Connect to MQTT server.",
     "img": "/assets/integrations/cover/mqtt.jpg"
+  },
+  {
+    "key": "philips-hue",
+    "name": "Philips Hue",
+    "description": "Control Philips Hue Lights.",
+    "img": "/assets/integrations/cover/philips-hue.jpg"
   }
 ]

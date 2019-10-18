@@ -22,6 +22,7 @@ class LinkGatewayUser extends Component {
       this.setState({ savingUserLoading: false });
       route('/dashboard');
     } catch (e) {
+      console.log(e);
       this.setState({ savingUserLoading: false, error: true });
     }
   };

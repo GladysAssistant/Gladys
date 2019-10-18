@@ -34,11 +34,16 @@ function createActions(store) {
           state.gatewayLoginEmail,
           state.gatewayLoginPassword
         );
-        store.setState({
-          gatewayLoginResults,
-          gatewayLoginStep2: true,
-          gatewayLoginStatus: RequestStatus.Success
-        });
+        if (gatewayLoginResults.two_factor_token) {
+          store.setState({
+            gatewayLoginResults,
+            gatewayLoginStep2: true,
+            gatewayLoginStatus: RequestStatus.Success
+          });
+        } else {
+          state.session.saveTwoFactorAccessToken(gatewayLoginResults.access_token);
+          route('/gateway-configure-two-factor');
+        }
       } catch (e) {
         const error = get(e, 'response.data.error');
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {

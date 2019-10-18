@@ -18,6 +18,12 @@ import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
+import SignupGateway from '../routes/signup-gateway';
+import SubscribeGateway from '../routes/subscribe-gateway';
+import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
+import GatewayForgotPassword from '../routes/gateway-forgot-password';
+import GatewayResetPassword from '../routes/gateway-reset-password';
+import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -43,11 +49,14 @@ import SettingsAdvancedPage from '../routes/settings/settings-advanced';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
+import SettingsBilling from '../routes/settings/settings-billing';
+import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
 import DarkSkyPage from '../routes/integration/all/darksky';
-import PhilipsHuePage from '../routes/integration/all/philips-hue';
+import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
+import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
@@ -82,20 +91,40 @@ const AppRouter = connect(
       />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
-
         {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}
         {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
-        {config.gatewayMode ? <ForgotPassword path="/forgot-password" /> : <ForgotPassword path="/forgot-password" />}
-        {config.gatewayMode ? <ResetPassword path="/reset-password" /> : <ResetPassword path="/reset-password" />}
+        {config.gatewayMode ? (
+          <GatewayForgotPassword path="/forgot-password" />
+        ) : (
+          <ForgotPassword path="/forgot-password" />
+        )}
+        {config.gatewayMode ? (
+          <GatewayResetPassword path="/reset-password" />
+        ) : (
+          <ResetPassword path="/reset-password" />
+        )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
+        {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
+        {config.gatewayMode ? <SubscribeGateway path="/subscribe-gateway" /> : <Error type="404" default />}
+        {config.gatewayMode ? (
+          <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
+        ) : (
+          <Error type="404" default />
+        )}
+        {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
+        {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
+        {config.gatewayMode ? (
+          <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
+        ) : (
+          <Error type="404" default />
+        )}
 
-        <SignupWelcomePage path="/signup" />
+        {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
         <SignupCreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
         <SignupPreferences path="/signup/preference" />
         <SignupConfigureHouse path="/signup/configure-house" />
         <SignupSuccess path="/signup/success" />
-
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
@@ -106,25 +135,26 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" />
         <IntegrationPage path="/dashboard/integration/weather" />
         <IntegrationPage path="/dashboard/integration/navigation" />
-
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
-        <PhilipsHuePage path="/dashboard/integration/device/philips-hue" />
+        <Redirect
+          path="/dashboard/integration/device/philips-hue"
+          to="/dashboard/integration/device/philips-hue/device"
+        />
+        <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
+        <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
-
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
-
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <CalendarPage path="/dashboard/calendar" />
@@ -132,7 +162,6 @@ const AppRouter = connect(
         <NewScenePage path="/dashboard/scene/new" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
         <TriggerPage path="/dashboard/trigger" />
-
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />

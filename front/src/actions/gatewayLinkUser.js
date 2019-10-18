@@ -1,9 +1,7 @@
 import get from 'get-value';
 import { RequestStatus } from '../utils/consts';
-import createActionsProfilePicture from './profilePicture';
 
 function createActions(store) {
-  const actionsProfilePicture = createActionsProfilePicture(store);
   const actions = {
     async getUsers(state) {
       store.setState({
@@ -16,8 +14,10 @@ function createActions(store) {
           usersGetStatus: RequestStatus.Success
         });
       } catch (e) {
+        console.log(e);
         const errorMessage = get(e, 'response.error_message');
-        if (errorMessage === 'NO_INSTANCE_FOUND') {
+        const errorMessageOtherFormat = get(e, 'response.message');
+        if (errorMessage === 'NO_INSTANCE_FOUND' || errorMessageOtherFormat === 'NO_INSTANCE_DETECTED') {
           store.setState({
             usersGetStatus: RequestStatus.GatewayNoInstanceFound
           });
@@ -30,12 +30,8 @@ function createActions(store) {
     },
     async saveUser(state, userId) {
       await state.session.gatewayClient.updateUserIdInGladys(userId);
-      // get user
-      const user = await state.httpClient.get('/api/v1/me');
-      // save user
-      state.session.saveUser(user);
-      // get profile picture
-      await actionsProfilePicture.loadProfilePicture(store.getState());
+      // hard redirect, to reload websocket connection
+      window.location = '/dashboard';
     }
   };
   return actions;

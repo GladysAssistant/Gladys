@@ -1,9 +1,12 @@
+const logger = require('../../utils/logger');
+
 /**
  * @description Init scheduler.
  * @example
  * scheduler.init();
  */
 async function init() {
+  logger.debug(`Scheduler.init`);
   // foreach job
   this.jobs.forEach((job) => {
     // if the job is already scheduled, we cancel it

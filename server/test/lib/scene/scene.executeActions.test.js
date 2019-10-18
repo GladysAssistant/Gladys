@@ -165,4 +165,94 @@ describe('scene.executeActions', () => {
     );
     return chaiAssert.isRejected(promise, 'Action type "THISDOESNOTEXIST" does not exist.');
   });
+  it('should execute action device.setValue', async () => {
+    const example = {
+      stop: fake.resolves(null),
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('service', 'example', example);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      device_id: 'device-id',
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-device-feature',
+            value: 11,
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      { device_id: 'device-id' },
+      11,
+    );
+  });
+  it('should execute action device.setValue', async () => {
+    const example = {
+      stop: fake.resolves(null),
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('service', 'example', example);
+    stateManager.setState('device', 'my-device', {
+      id: 'device-id',
+      features: [
+        {
+          category: 'light',
+          type: 'binary',
+        },
+      ],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device: 'my-device',
+            feature_category: 'light',
+            feature_type: 'binary',
+            value: 1,
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [
+          {
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'binary',
+      },
+      1,
+    );
+  });
 });

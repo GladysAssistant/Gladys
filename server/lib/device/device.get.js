@@ -70,6 +70,13 @@ async function get(options) {
     queryParams.where = queryParams.where ? Sequelize.and(queryParams.where, condition) : condition;
   }
 
+  if (optionsWithDefault.model) {
+    const condition = {
+      model: optionsWithDefault.model,
+    };
+    queryParams.where = queryParams.where ? Sequelize.and(queryParams.where, condition) : condition;
+  }
+
   const devices = await db.Device.findAll(queryParams);
 
   const devicesPlain = devices.map((device) => device.get({ plain: true }));

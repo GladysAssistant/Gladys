@@ -47,6 +47,21 @@ describe('Device.get', () => {
       .to.be.instanceOf(Array)
       .and.have.lengthOf(0);
   });
+  it('should get devices filtered by model', async () => {
+    const stateManager = new StateManager(event);
+    const service = {
+      getLocalServiceByName: fake.resolves({
+        id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service);
+    const devices = await device.get({
+      model: 'my-unknown-model',
+    });
+    expect(devices)
+      .to.be.instanceOf(Array)
+      .and.have.lengthOf(0);
+  });
   it('should throw not found error', async () => {
     const stateManager = new StateManager(event);
     const service = {

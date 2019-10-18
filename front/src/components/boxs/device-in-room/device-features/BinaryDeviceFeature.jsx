@@ -1,13 +1,13 @@
 const BinaryDeviceType = ({ children, ...props }) => {
   function updateValue() {
     props.updateValue(
+      props.x,
+      props.y,
       props.device,
       props.deviceFeature,
-      props.roomIndex,
       props.deviceIndex,
       props.deviceFeatureIndex,
-      !props.deviceFeature.lastValue,
-      props.deviceFeature.lastValue
+      props.deviceFeature.last_value === 1 ? 0 : 1
     );
   }
 
@@ -16,8 +16,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
       <td>
         <i class="fe fe-toggle-right" />
       </td>
-      {props.deviceFeature.deviceFeatureName && <td>{props.deviceFeature.deviceFeatureName}</td>}
-      {!props.deviceFeature.deviceFeatureName && <td>{props.deviceFeature.name}</td>}
+      <td>{props.device.name}</td>
       <td class="text-right">
         <label class="custom-switch">
           <input

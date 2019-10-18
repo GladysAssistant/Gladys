@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const { assert, expect } = require('chai');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const PhilipsHueClient = require('../mocks.test');
@@ -19,16 +19,25 @@ const gladys = {
 };
 
 describe('PhilipsHueService', () => {
-  const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
   it('should configure bridge', async () => {
-    const device = await philipsHueService.light.configureBridge('Bridge', '192.168.1.1');
-    expect(device).to.have.property('name', 'Bridge');
-    expect(device).to.have.property('selector', 'bridge');
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.getBridges();
+    const device = await philipsHueService.device.configureBridge('1234');
+    expect(device).to.have.property('name', 'Philips Hue Bridge');
+    expect(device).to.have.property('selector', 'philips-hue-bridge-1234');
+    expect(device).to.have.property('external_id', 'philips-hue:bridge:1234');
     expect(device).to.have.property('features');
     expect(device).to.have.property('params');
     expect(device.params[0]).to.have.property('name', 'BRIDGE_IP_ADDRESS');
-    expect(device.params[0]).to.have.property('value', '192.168.1.1');
-    expect(device.params[1]).to.have.property('name', 'BRIDGE_USER_ID');
-    expect(device.params[1]).to.have.property('value', 'PHILIPS_HUE_USER_ID_TEST');
+    expect(device.params[0]).to.have.property('value', '192.168.2.245');
+    expect(device.params[1]).to.have.property('name', 'BRIDGE_USERNAME');
+    expect(device.params[1]).to.have.property('value', 'username');
+    expect(device.params[2]).to.have.property('name', 'BRIDGE_SERIAL_NUMBER');
+    expect(device.params[2]).to.have.property('value', '1234');
+  });
+  it('should not configure bridge', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    const promise = philipsHueService.device.configureBridge('1234');
+    return assert.isRejected(promise);
   });
 });

@@ -1,4 +1,8 @@
+const Promise = require('bluebird');
+
+const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Command a light.
@@ -10,10 +14,39 @@ const logger = require('../../../utils/logger');
  */
 async function command(message, classification, context) {
   try {
+    const devices = await this.getLightsInRoom(context.room);
     switch (classification.intent) {
-      case 'light.turnon':
-        await this.turnOn(context.device, context.deviceFeature);
+      case 'light.turn-on':
+        // foreach devices in room
+        await Promise.map(devices, async (device) => {
+          // Get the binary feature
+          const deviceFeature = getDeviceFeature(
+            device,
+            DEVICE_FEATURE_CATEGORIES.LIGHT,
+            DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+          );
+          // and if the binary feature exists, call it
+          if (deviceFeature) {
+            await this.turnOn(device, deviceFeature);
+          }
+        });
         this.messageManager.replyByIntent(message, 'light.turn-on.success', context);
+        break;
+      case 'light.turn-off':
+        // foreach devices in room
+        await Promise.map(devices, async (device) => {
+          // Get the binary feature
+          const deviceFeature = getDeviceFeature(
+            device,
+            DEVICE_FEATURE_CATEGORIES.LIGHT,
+            DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+          );
+          // and if the binary feature exists, call it
+          if (deviceFeature) {
+            await this.turnOff(device, deviceFeature);
+          }
+        });
+        this.messageManager.replyByIntent(message, 'light.turn-off.success', context);
         break;
       default:
         throw new Error('Not found');

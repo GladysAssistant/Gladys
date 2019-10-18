@@ -10,7 +10,7 @@ shared: &shared
     - checkout:
         path: ~/gladys-build
     - setup_remote_docker:
-        docker_layer_caching: true
+        docker_layer_caching: false
     - run:
         name: Copy build front folder
         command: cp -r ~/gladys-build-front/front/build/. ~/gladys-build/static

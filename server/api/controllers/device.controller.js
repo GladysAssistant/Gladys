@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
+const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
 module.exports = function DeviceController(gladys) {
   /**
@@ -56,11 +57,47 @@ module.exports = function DeviceController(gladys) {
     });
   }
 
+  /**
+   * @api {post} /api/v1/device/:device_selector/:feature_category/:feature_type/value setValue
+   * @apiName setValue
+   * @apiGroup Device
+   */
+  async function setValue(req, res) {
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device: req.params.device_selector,
+      feature_category: req.params.feature_category,
+      feature_type: req.params.feature_type,
+      value: req.body.value,
+      status: ACTIONS_STATUS.PENDING,
+    };
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    res.json(action);
+  }
+
+  /**
+   * @api {post} /api/v1/device_feature/:device_feature_selector/value setValueFeature
+   * @apiName setValueFeature
+   * @apiGroup Device
+   */
+  async function setValueFeature(req, res) {
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: req.params.device_feature_selector,
+      value: req.body.value,
+      status: ACTIONS_STATUS.PENDING,
+    };
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    res.json(action);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
     getDevicesByService: asyncMiddleware(getDevicesByService),
     getBySelector: asyncMiddleware(getBySelector),
     destroy: asyncMiddleware(destroy),
+    setValue: asyncMiddleware(setValue),
+    setValueFeature: asyncMiddleware(setValueFeature),
   });
 };

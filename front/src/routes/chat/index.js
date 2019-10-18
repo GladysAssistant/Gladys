@@ -8,9 +8,15 @@ import actions from '../../actions/message';
   actions
 )
 class Chat extends Component {
-  componentWillMount() {
+  newChatMessage = payload => this.props.pushMessage(payload);
+
+  componentDidMount() {
     this.props.getMessages();
-    this.props.session.dispatcher.addListener('message.new', payload => this.props.pushMessage(payload));
+    this.props.session.dispatcher.addListener('message.new', this.newChatMessage);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener('message.new', this.newChatMessage);
   }
 
   render({}, {}) {
