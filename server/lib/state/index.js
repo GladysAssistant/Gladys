@@ -56,10 +56,9 @@ function getKey(entity, entitySelector, key) {
  * stateManager.delete('house', 'main-house');
  */
 function deleteState(entity, entitySelector) {
-  if (!this.state[entity][entitySelector]) {
-    return null;
+  if (this.state[entity][entitySelector]) {
+    delete this.state[entity][entitySelector];
   }
-  delete this.state[entity][entitySelector];
 }
 
 const StateManager = function StateManager(event) {

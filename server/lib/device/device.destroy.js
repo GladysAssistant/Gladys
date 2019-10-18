@@ -51,6 +51,7 @@ async function destroy(selector) {
       }
     }
   });
+  return null;
 }
 
 module.exports = {
