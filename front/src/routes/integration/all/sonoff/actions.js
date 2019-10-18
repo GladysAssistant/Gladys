@@ -1,8 +1,9 @@
-import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
-import uuid from 'uuid';
 import debounce from 'debounce';
-import createActionsIntegration from '../../../../../actions/integration';
+import uuid from 'uuid';
+import { RequestStatus } from '../../../../utils/consts';
+import createActionsIntegration from '../../../../actions/integration';
+import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -41,51 +42,23 @@ function createActions(store) {
         });
       }
     },
-    addDevice(state) {
-      const uniqueId = uuid.v4();
-      const sonoffDevices = update(state.sonoffDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            should_poll: false,
-            service_id: state.currentIntegration.id,
-            external_id: 'sonoff:'
-          }
-        ]
-      });
+    async getDiscoveredSonoffDevices(state) {
       store.setState({
-        sonoffDevices
+        loading: true
       });
-    },
-    updateDeviceField(state, index, field, value) {
-      const sonoffDevices = update(state.sonoffDevices, {
-        [index]: {
-          [field]: {
-            $set: value
-          }
-        }
-      });
-      store.setState({
-        sonoffDevices
-      });
-    },
-    updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
-      const sonoffDevices = update(state.sonoffDevices, {
-        [deviceIndex]: {
-          features: {
-            [featureIndex]: {
-              [property]: {
-                $set: value
-              }
-            }
-          }
-        }
-      });
-
-      store.setState({
-        sonoffDevices
-      });
+      try {
+        const discoveredDevices = await state.httpClient.get('/api/v1/service/sonoff/discover');
+        store.setState({
+          discoveredDevices,
+          loading: false,
+          errorLoading: false
+        });
+      } catch (e) {
+        store.setState({
+          loading: false,
+          errorLoading: true
+        });
+      }
     },
     async getHouses(state) {
       store.setState({
@@ -106,19 +79,71 @@ function createActions(store) {
         });
       }
     },
-    async saveDevice(state, index) {
-      const device = state.sonoffDevices[index];
-      device.features.forEach(feature => {
-        feature.name = device.name + ' - ' + feature.type;
-        feature.external_id = device.external_id + ':' + feature.type;
-      });
-      device.selector = device.external_id;
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+    addDevice(state) {
+      const uniqueId = uuid.v4();
       const sonoffDevices = update(state.sonoffDevices, {
-        $splice: [[index, 1, savedDevice]]
+        $push: [
+          {
+            id: uniqueId,
+            name: null,
+            should_poll: false,
+            service_id: state.currentIntegration.id,
+            external_id: 'sonoff:'
+          }
+        ]
       });
       store.setState({
         sonoffDevices
+      });
+    },
+    updateDeviceField(state, listName, index, field, value) {
+      const devices = update(state[listName], {
+        [index]: {
+          [field]: {
+            $set: value
+          }
+        }
+      });
+      store.setState({
+        [listName]: devices
+      });
+    },
+    updateFeatureProperty(state, listName, deviceIndex, featureIndex, property, value) {
+      const devices = update(state[listName], {
+        [deviceIndex]: {
+          features: {
+            [featureIndex]: {
+              [property]: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+
+      store.setState({
+        [listName]: devices
+      });
+    },
+    async saveDevice(state, listName, index) {
+      const device = state[listName][index];
+      device.selector = device.external_id;
+
+      device.features.forEach(feature => {
+        feature.name = device.name;
+        if (DEVICE_FEATURE_TYPES.SWITCH.BINARY !== feature.type) {
+          feature.name += ` - ${feature.type}`;
+        }
+        feature.external_id = `${device.external_id}:${feature.category}:${feature.type}`;
+        feature.selector = feature.external_id;
+      });
+
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const devices = update(state[listName], {
+        $splice: [[index, 1, savedDevice]]
+      });
+      store.setState({
+        [listName]: devices
       });
     },
     async deleteDevice(state, index) {

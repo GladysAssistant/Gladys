@@ -6,21 +6,11 @@ import get from 'get-value';
 
 class SonoffBox extends Component {
   updateName = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
-
-    const { features } = this.props.discoveredDevices[this.props.deviceIndex];
-    if (features.length > 1) {
-      features.forEach((feature, featureIndex) => {
-        if (featureIndex > 0) {
-          const newName = `${e.target.value} - ${feature.type}`;
-          this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'name', newName);
-        }
-      });
-    }
+    this.props.updateDeviceField('discoveredDevices', this.props.deviceIndex, 'name', e.target.value);
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
+    this.props.updateDeviceField('discoveredDevices', this.props.deviceIndex, 'room_id', e.target.value);
   };
 
   saveDevice = async () => {
@@ -28,7 +18,7 @@ class SonoffBox extends Component {
       loading: true
     });
     try {
-      await this.props.saveDevice(this.props.deviceIndex);
+      await this.props.saveDevice('discoveredDevices', this.props.deviceIndex);
       this.setState({
         saveError: null
       });

@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from './actions';
+import actions from '../actions';
 import SonoffPage from '../SonoffPage';
 import DiscoverTab from './DiscoverTab';
 

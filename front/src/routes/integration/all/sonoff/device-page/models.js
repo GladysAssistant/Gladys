@@ -1,4 +1,3 @@
-import uuid from 'uuid';
 import models from '../../../../../../../server/services/sonoff/models';
 
 export const Models = {
@@ -7,10 +6,10 @@ export const Models = {
   'sonoff-s2x': 8
 };
 
-export const GetFeatures = (modelName, deviceName, deviceTopic) => {
+export const GetFeatures = modelName => {
   const modelKey = Models[modelName];
   if (modelKey && models[modelKey]) {
-    return models[modelKey].getFeatures(uuid, deviceName, deviceTopic);
+    return models[modelKey].getFeatures();
   }
 
   return [];

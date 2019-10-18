@@ -1,4 +1,3 @@
-const uuid = require('uuid');
 const logger = require('../../../utils/logger');
 const { EVENTS, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const models = require('../models');
@@ -47,11 +46,10 @@ function handleMqttMessage(topic, message) {
         this.mqttDevices[deviceExternalId] = {
           name: friendlyName,
           external_id: `sonoff:${deviceExternalId}`,
-          features: model.getFeatures(uuid, friendlyName, deviceExternalId),
+          features: model.getFeatures(),
           model: model.getModel(),
           service_id: this.serviceId,
           should_poll: false,
-          id: uuid.v4(),
         };
 
         event = {

@@ -7,17 +7,7 @@ import get from 'get-value';
 
 class SonoffBox extends Component {
   updateName = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
-
-    const { features } = this.props.sonoffDevices[this.props.deviceIndex];
-    if (features.length > 1) {
-      features.forEach((feature, featureIndex) => {
-        if (featureIndex > 0) {
-          const newName = `${e.target.value} - ${feature.type}`;
-          this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'name', newName);
-        }
-      });
-    }
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'name', e.target.value);
 
     this.setState({
       loading: false
@@ -25,7 +15,7 @@ class SonoffBox extends Component {
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'room_id', e.target.value);
 
     this.setState({
       loading: false
@@ -44,17 +34,8 @@ class SonoffBox extends Component {
         value = `sonoff:${value}`;
       }
     }
-    const currentDevice = this.props.device;
-    const originalExternalId = currentDevice.external_id;
-    const { features } = currentDevice;
 
-    console.log(value);
-    this.props.updateDeviceField(this.props.deviceIndex, 'external_id', value);
-
-    features.forEach((feature, featureIndex) => {
-      const newExternalId = feature.external_id.replace(originalExternalId, value);
-      this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'external_id', newExternalId);
-    });
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'external_id', value);
 
     this.setState({
       loading: false
@@ -63,13 +44,10 @@ class SonoffBox extends Component {
 
   updateModel = e => {
     const selectedModel = e.target.value;
+    console.log(GetFeatures(selectedModel));
 
-    this.props.updateDeviceField(this.props.deviceIndex, 'model', selectedModel);
-    this.props.updateDeviceField(
-      this.props.deviceIndex,
-      'features',
-      GetFeatures(selectedModel, this.props.device.name, this.props.device.external_id)
-    );
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'model', selectedModel);
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'features', GetFeatures(selectedModel));
 
     this.setState({
       loading: false
@@ -81,7 +59,7 @@ class SonoffBox extends Component {
       loading: true
     });
     try {
-      await this.props.saveDevice(this.props.deviceIndex);
+      await this.props.saveDevice('sonoffDevices', this.props.deviceIndex);
       this.setState({
         saveError: null
       });

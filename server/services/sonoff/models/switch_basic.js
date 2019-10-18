@@ -4,18 +4,15 @@ const getModel = () => {
   return 'sonoff-basic';
 };
 
-const getFeatures = (uuid, deviceName, deviceTopic) => {
+const getFeatures = () => {
   return [
     {
-      id: uuid.v4(),
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       read_only: false,
       has_feedback: true,
       min: 0,
       max: 1,
-      name: `${deviceName}`,
-      external_id: `sonoff:${deviceTopic}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
     },
   ];
 };
