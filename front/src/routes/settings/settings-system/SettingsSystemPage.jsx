@@ -187,7 +187,7 @@ const SystemPage = ({ children, ...props }) => (
           <h3 class="card-header">
             <Text id="systemSettings.containers" />
           </h3>
-          <div class="table-responsive">
+          <div class="table-responsive" style={{ maxHeight: '200px' }}>
             <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
               <thead>
                 <tr>
