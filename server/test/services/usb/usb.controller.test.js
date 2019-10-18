@@ -25,6 +25,5 @@ describe('GET /api/v1/service/usb/port', () => {
     const req = {};
     await usbController['get /api/v1/service/usb/port'].controller(req, res);
     assert.calledOnce(list);
-    assert.calledWith(res.json, ports);
   });
 });
