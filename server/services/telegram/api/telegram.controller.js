@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function TelegramController(messageHandler) {
   /**
    * @api {get} /api/v1/service/telegram/link Get custom link
@@ -14,7 +16,7 @@ module.exports = function TelegramController(messageHandler) {
   return {
     'get /api/v1/service/telegram/link': {
       authenticated: true,
-      controller: getCustomLink,
+      controller: asyncMiddleware(getCustomLink),
     },
   };
 };
