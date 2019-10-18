@@ -7,10 +7,6 @@ const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
   'node-hue-api': PhilipsHueClient,
 });
 
-const philipsHueError = {
-  getHueErrorType: () => 101,
-};
-
 const StateManager = require('../../../../lib/state');
 const DeviceManager = require('../../../../lib/device');
 
@@ -43,14 +39,5 @@ describe('PhilipsHueService', () => {
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     const promise = philipsHueService.device.configureBridge('1234');
     return assert.isRejected(promise);
-  });
-  it('should not configure bridge', async () => {
-    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    await philipsHueService.device.getBridges();
-    philipsHueService.device.hueClient.api.create = () => {
-      throw philipsHueError;
-    };
-    const promise = philipsHueService.device.configureBridge('1234');
-    return assert.isRejected(promise, 'BRIDGE_BUTTON_NOT_PRESSED');
   });
 });
