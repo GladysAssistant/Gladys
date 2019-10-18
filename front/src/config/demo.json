@@ -977,5 +977,134 @@
         "max": 100
       }
     ]
-  }
+  },
+  "get /api/v1/service/philips-hue": {
+    "id": "1147bdef-0c95-40f1-a7ef-922ebcad7d0e",
+    "name": "Philips Hue",
+    "selector": "philips-hue"
+  },
+  "get /api/v1/service/philips-hue/light": [
+    {
+      "id": "1",
+      "name": "Lounge Living Color",
+      "type": "Extended color light",
+      "modelid": "LCT007",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    },
+    {
+      "id": "2",
+      "name": "Right Bedside",
+      "type": "Extended color light",
+      "modelid": "LCT001",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    },
+    {
+      "id": "3",
+      "name": "Left Bedside",
+      "type": "Extended color light",
+      "modelid": "LCT001",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    }
+  ],
+  "get /api/v1/service/philips-hue/device": [
+    {
+      "id": "1",
+      "name": "Lounge Living Color",
+      "type": "Extended color light",
+      "modelid": "LCT007",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    },
+    {
+      "id": "2",
+      "name": "Right Bedside",
+      "type": "Extended color light",
+      "modelid": "LCT001",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    },
+    {
+      "id": "3",
+      "name": "Left Bedside",
+      "type": "Extended color light",
+      "modelid": "LCT001",
+      "manufacturername": "Phillips",
+      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
+      "swversion": "66013452",
+      "state": {
+        "on": true,
+        "bri": 202,
+        "hue": 11315,
+        "sat": 237,
+        "effect": "none",
+        "xy": [0.5534, 0.4239],
+        "alert": "none",
+        "colormode": "xy",
+        "reachable": true
+      }
+    }
+  ]
 }
