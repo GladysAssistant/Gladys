@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const { assert, expect } = require('chai');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const PhilipsHueClient = require('../mocks.test');
@@ -6,6 +6,10 @@ const PhilipsHueClient = require('../mocks.test');
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
   'node-hue-api': PhilipsHueClient,
 });
+
+const philipsHueError = {
+  getHueErrorType: () => 101,
+};
 
 const StateManager = require('../../../../lib/state');
 const DeviceManager = require('../../../../lib/device');
@@ -34,5 +38,19 @@ describe('PhilipsHueService', () => {
     expect(device.params[1]).to.have.property('value', 'username');
     expect(device.params[2]).to.have.property('name', 'BRIDGE_SERIAL_NUMBER');
     expect(device.params[2]).to.have.property('value', '1234');
+  });
+  it('should not configure bridge', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    const promise = philipsHueService.device.configureBridge('1234');
+    return assert.isRejected(promise);
+  });
+  it('should not configure bridge', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.getBridges();
+    philipsHueService.device.hueClient.api.create = () => {
+      throw philipsHueError;
+    };
+    const promise = philipsHueService.device.configureBridge('1234');
+    return assert.isRejected(promise, 'BRIDGE_BUTTON_NOT_PRESSED');
   });
 });

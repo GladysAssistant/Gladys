@@ -18,7 +18,9 @@ class LightState {
 
 const MockedPhilipsHueClient = {
   v3: {
-    lightStates: LightState,
+    lightStates: {
+      LightState,
+    },
     api: {
       create: () => ({
         users: {
@@ -29,6 +31,18 @@ const MockedPhilipsHueClient = {
         lights: {
           getAll: fake.resolves(lights.lights),
           setLightState: fake.resolves(null),
+          getLightState: fake.resolves({
+            on: false,
+            bri: 0,
+            hue: 38191,
+            sat: 94,
+            effect: 'none',
+            xy: [0.3321, 0.3605],
+            alert: 'select',
+            colormode: 'xy',
+            mode: 'homeautomation',
+            reachable: true,
+          }),
         },
       }),
     },

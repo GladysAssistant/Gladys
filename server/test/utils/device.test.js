@@ -1,7 +1,14 @@
 const { expect } = require('chai');
-const { getDeviceParam, setDeviceParam } = require('../../utils/device');
+const { getDeviceParam, setDeviceParam, getDeviceFeature } = require('../../utils/device');
 
 const device = {
+  features: [
+    {
+      id: 1,
+      type: 'test',
+      category: 'test',
+    },
+  ],
   params: [
     {
       name: 'MY_PARAM_1',
@@ -60,5 +67,28 @@ describe('setDeviceParam', () => {
         },
       ],
     });
+  });
+});
+
+describe('getDeviceFeature', () => {
+  it('should get a feature', () => {
+    const feature = getDeviceFeature(device, 'test', 'test');
+    expect(feature).to.deep.equal({
+      id: 1,
+      type: 'test',
+      category: 'test',
+    });
+  });
+  it('should return null', () => {
+    const value = getDeviceFeature(device, 'test', 'not-found');
+    expect(value).to.equal(null);
+  });
+  it('should return null', () => {
+    const value = getDeviceFeature(device, 'not-found', 'not-found');
+    expect(value).to.equal(null);
+  });
+  it('should return null', () => {
+    const value = getDeviceFeature({}, 'not-found', 'not-found');
+    expect(value).to.equal(null);
   });
 });

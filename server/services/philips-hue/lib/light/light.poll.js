@@ -23,7 +23,7 @@ async function poll(device) {
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
 
   // if the value is different from the value we have, save new state
-  if (binaryFeature.last_value !== currentBinaryState) {
+  if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
     logger.debug(`Polling Philips Hue ${lightId}, new value = ${currentBinaryState}`);
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${
