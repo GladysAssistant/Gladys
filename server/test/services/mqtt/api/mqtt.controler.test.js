@@ -26,6 +26,5 @@ describe('POST /api/v1/service/mqtt/connect', () => {
 
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
     assert.calledWith(mqttHandler.connect, 'url', 'username', 'password');
-    assert.calledOnce(res.json);
   });
 });
