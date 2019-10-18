@@ -19,6 +19,5 @@ describe('GET /api/v1/service/xiaomi/sensor', () => {
     const req = {};
     await xiaomiController['get /api/v1/service/xiaomi/sensor'].controller(req, res);
     assert.calledOnce(getSensors);
-    assert.calledWith(res.json, sensors);
   });
 });
