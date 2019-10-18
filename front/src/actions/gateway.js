@@ -71,7 +71,10 @@ function createActions(store) {
           displayGatewayLogin: false,
           gatewayLoginStep2: false
         });
-        await actions.getStatus(state);
+        await actions.getStatus(store.getState());
+        await actions.getKeys(store.getState());
+        await actions.getInstanceKeys(store.getState());
+        await actions.getBackupKey(store.getState());
       } catch (e) {
         store.setState({
           gatewayLoginStatus: RequestStatus.Error
@@ -281,6 +284,11 @@ function createActions(store) {
         gatewayLoginEmail: e.target.value
       });
     },
+    updateUserCardName(state, e) {
+      store.setState({
+        userCardName: e.target.value
+      });
+    },
     updateLoginPassword(state, e) {
       store.setState({
         gatewayLoginPassword: e.target.value
@@ -313,6 +321,84 @@ function createActions(store) {
         gatewayLoginPassword: null,
         gatewayLoginTwoFactorCode: null
       });
+    },
+    async refreshCard(state) {
+      try {
+        const stripeCard = await state.session.gatewayClient.getCard();
+        store.setState({ stripeCard });
+      } catch (e) {}
+    },
+    async saveBillingInformations(state, stripeToken) {
+      // if no stripe token is passed, error
+      if (!stripeToken) {
+        return store.setState({ savingBillingError: true, paymentInProgress: false });
+      }
+
+      try {
+        await state.session.gatewayClient.updateCard(stripeToken.id);
+        store.setState({
+          savingBillingError: false,
+          paymentInProgress: false,
+          billingRequestStatus: RequestStatus.Success
+        });
+        await actions.refreshCard(store.getState());
+      } catch (e) {
+        store.setState({
+          savingBillingError: true,
+          paymentInProgress: false,
+          billingRequestStatus: RequestStatus.Error
+        });
+      }
+    },
+
+    async cancelMonthlySubscription(state) {
+      store.setState({
+        billingRequestStatus: RequestStatus.Getting
+      });
+      try {
+        await state.session.gatewayClient.cancelMonthlyPlan();
+        await actions.refreshCard(store.getState());
+        store.setState({
+          cancelMonthlySubscriptionSuccess: true,
+          cancelMonthlySubscriptionError: false,
+          billingRequestStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({ cancelMonthlySubscriptionError: true, billingRequestStatus: RequestStatus.Error });
+      }
+    },
+    async reSubcribeMonthlyPlan(state) {
+      store.setState({
+        billingRequestStatus: RequestStatus.Getting,
+        cancelMonthlySubscriptionSuccess: false,
+        cancelMonthlySubscriptionError: false
+      });
+      try {
+        await state.session.gatewayClient.reSubcribeMonthlyPlan();
+        await actions.refreshCard(store.getState());
+        store.setState({ reSubscribeMonthlyPlanError: false, billingRequestStatus: RequestStatus.Success });
+      } catch (e) {
+        store.setState({ reSubscribeMonthlyPlanError: true, billingRequestStatus: RequestStatus.Error });
+      }
+    },
+    updateBillingRequestPending(state) {
+      store.setState({
+        billingRequestStatus: RequestStatus.Getting
+      });
+    },
+    loadStripe(state) {
+      if (state.stripeLoaded) {
+        return;
+      }
+
+      // we load the script script
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        store.setState({ stripeLoaded: true });
+      };
     }
   };
   return actions;

@@ -21,6 +21,5 @@ describe('GET /service/philips-hue/bridge', () => {
     const philipsHueController = PhilipsHueControllers(philipsHueLightService);
     await philipsHueController['get /api/v1/service/philips-hue/bridge'].controller({}, res);
     assert.calledOnce(philipsHueLightService.getBridges);
-    assert.calledWith(res.json, bridges);
   });
 });

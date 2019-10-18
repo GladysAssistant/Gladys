@@ -1,14 +1,18 @@
 /**
  * @description Parse the external id and return the lamp ID.
  * @param {string} externalId - External id of the device.
- * @returns {number} Return the lamp ID.
+ * @returns {Object} Return the lamp ID and bridge serial number.
  * @example
  * parseExternalId('philips-hue:1');
  */
 function parseExternalId(externalId) {
   const parsedExternalId = externalId.split(':');
-  const lightId = parsedExternalId[1];
-  return parseInt(lightId, 10);
+  const bridgeSerialNumber = parsedExternalId[1];
+  const lightId = parseInt(parsedExternalId[2], 10);
+  return {
+    bridgeSerialNumber,
+    lightId,
+  };
 }
 
 module.exports = {

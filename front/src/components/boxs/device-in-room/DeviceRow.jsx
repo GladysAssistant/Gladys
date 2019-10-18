@@ -1,4 +1,4 @@
-// import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
+import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 // import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 
@@ -15,9 +15,11 @@ const DeviceRow = ({ children, ...props }) => {
   // else, it's not a sensor
   // TODO: not working for now
   // if it's a binary
-  /*if (props.deviceFeature.type === 'binary') {
+  if (props.deviceFeature.type === 'binary') {
     return (
       <BinaryDeviceFeature
+        x={props.x}
+        y={props.y}
         device={props.device}
         deviceFeature={props.deviceFeature}
         roomIndex={props.roomIndex}
@@ -26,8 +28,7 @@ const DeviceRow = ({ children, ...props }) => {
         updateValue={props.updateValue}
       />
     );
-  }*/
-
+  }
   // if not, we return nothing
   return null;
 };

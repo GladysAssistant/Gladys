@@ -4,7 +4,8 @@ const HueController = require('./api/hue.controller');
 
 module.exports = function PhilipsHueService(gladys, serviceId) {
   // require the node-hue-api module
-  const hueClient = require('node-hue-api');
+  // @ts-ignore
+  const hueClient = require('node-hue-api').v3;
   const philipsHueLightHandler = new PhilipsHueLightHandler(gladys, hueClient, serviceId);
 
   /**
@@ -15,6 +16,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting Philips Hue service');
+    philipsHueLightHandler.init();
   }
 
   /**
@@ -30,7 +32,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    light: philipsHueLightHandler,
+    device: philipsHueLightHandler,
     controllers: HueController(philipsHueLightHandler),
   });
 };

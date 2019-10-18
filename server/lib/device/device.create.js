@@ -88,7 +88,7 @@ async function create(device) {
 
       // we delete all params which doesn't exist anymore
       await Promise.map(deviceInDb.params, async (existingParam) => {
-        if (!params.find((newParam) => newParam.id === existingParam.id)) {
+        if (!params.find((newParam) => newParam.name === existingParam.name)) {
           await existingParam.destroy({ transaction });
         }
       });

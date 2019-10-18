@@ -2,6 +2,11 @@
   {
     "label": "light.turn-on",
     "questions": ["Turn on the light in the %room%", "I want some light in the %room%"],
-    "answers": ["Turning on the light in the {{ room }}...", "I'm turning on the light in the {{ room }}!"]
+    "answers": ["Turning on the light...", "I'm turning on the light!"]
+  },
+  {
+    "label": "light.turn-off",
+    "questions": ["Turn off the light in the %room%", "Shut down the light in the %room%"],
+    "answers": ["Turning off the light...", "I'm turning off the light!"]
   }
 ]

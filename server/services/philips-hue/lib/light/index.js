@@ -1,8 +1,9 @@
 const { configureBridge } = require('./light.configureBridge');
 const { getBridges } = require('./light.getBridges');
-const { getLightsFromBridge } = require('./light.getLightsFromBridge');
-const { turnOn } = require('./light.turnOn');
-const { turnOff } = require('./light.turnOff');
+const { init } = require('./light.init');
+const { poll } = require('./light.poll');
+const { getLights } = require('./light.getLights');
+const { setValue } = require('./light.setValue');
 
 /**
  * @description Add ability to control a Philips Hue light
@@ -15,15 +16,20 @@ const { turnOff } = require('./light.turnOff');
 const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient, serviceId) {
   this.gladys = gladys;
   this.hueClient = hueClient;
-  this.lightState = hueClient.lightState;
+  this.LightState = hueClient.lightStates.LightState;
   this.serviceId = serviceId;
-  this.hueApi = null;
+  this.bridges = [];
+  this.connnectedBridges = [];
+  this.bridgesBySerialNumber = new Map();
+  this.hueApisBySerialNumber = new Map();
+  this.lights = [];
 };
 
 PhilipsHueLightHandler.prototype.configureBridge = configureBridge;
 PhilipsHueLightHandler.prototype.getBridges = getBridges;
-PhilipsHueLightHandler.prototype.getLightsFromBridge = getLightsFromBridge;
-PhilipsHueLightHandler.prototype.turnOn = turnOn;
-PhilipsHueLightHandler.prototype.turnOff = turnOff;
+PhilipsHueLightHandler.prototype.init = init;
+PhilipsHueLightHandler.prototype.poll = poll;
+PhilipsHueLightHandler.prototype.getLights = getLights;
+PhilipsHueLightHandler.prototype.setValue = setValue;
 
 module.exports = PhilipsHueLightHandler;

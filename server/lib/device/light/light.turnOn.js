@@ -10,7 +10,7 @@ const { STATE, EVENTS } = require('../../../utils/constants');
  */
 async function turnOn(device, deviceFeature) {
   logger.debug(`Turning on the light of deviceFeature "${deviceFeature.selector}"`);
-  await this.deviceManager.setValue(device, deviceFeature, 'light', 'turnOn', STATE.ON);
+  await this.deviceManager.setValue(device, deviceFeature, STATE.ON);
   this.eventManager.emit(EVENTS.LIGHT.TURNED_ON, { device, deviceFeature });
 }
 

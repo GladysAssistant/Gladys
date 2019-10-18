@@ -41,12 +41,6 @@ export const DeviceGetByRoomStatus = {
   Error: 'Error'
 };
 
-export const PhilipsHueGetBridgesStatus = {
-  Getting: 'Getting',
-  Success: 'Success',
-  Error: 'Error'
-};
-
 export const SceneGetStatus = {
   Getting: 'Getting',
   Success: 'Success',
@@ -63,7 +57,8 @@ export const RequestStatus = {
   RateLimitError: 'RateLimitError',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally'
+  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
+  PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed'
 };
 
 export const GetWeatherStatus = {
@@ -93,6 +88,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.HUE]: 'sun',
+    [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.SATURATION]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.POWER]: 'zap'
   },

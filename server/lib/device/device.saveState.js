@@ -1,5 +1,6 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Save new device feature state in DB.
@@ -14,11 +15,12 @@ const logger = require('../../utils/logger');
 async function saveState(deviceFeature, newValue) {
   logger.debug(`device.saveState of deviceFeature ${deviceFeature.selector}`);
   await db.sequelize.transaction(async (t) => {
+    const now = new Date();
     // update deviceFeature lastValue in DB
     await db.DeviceFeature.update(
       {
         last_value: newValue,
-        last_value_changed: new Date(),
+        last_value_changed: now,
       },
       {
         where: {
@@ -44,7 +46,18 @@ async function saveState(deviceFeature, newValue) {
 
     // save local state in RAM
     this.stateManager.setState('deviceFeature', deviceFeature.selector, {
-      lastValue: newValue,
+      last_value: newValue,
+      last_value_changed: now,
+    });
+
+    // send websocket event
+    this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      payload: {
+        device_feature_selector: deviceFeature.selector,
+        last_value: newValue,
+        last_value_changed: now,
+      },
     });
   });
 }

@@ -9,6 +9,7 @@ class Session {
     this.initialized = false;
     this.dispatcher = new Dispatcher();
     this.websocketConnected = false;
+    this.ws = null;
   }
 
   init() {
@@ -36,11 +37,11 @@ class Session {
   connect() {
     console.log('Trying to connect...');
     const websocketUrl = config.webSocketUrl || window.location.origin.replace('http', 'ws');
-    const ws = new WebSocket(websocketUrl);
-    ws.onopen = () => {
+    this.ws = new WebSocket(websocketUrl);
+    this.ws.onopen = () => {
       console.log('Connected!');
       this.websocketConnected = true;
-      ws.send(
+      this.ws.send(
         JSON.stringify({
           type: 'authenticate.request',
           payload: {
@@ -48,16 +49,16 @@ class Session {
           }
         })
       );
-      ws.onmessage = e => {
+      this.ws.onmessage = e => {
         const { data } = e;
         const { type, payload } = JSON.parse(data);
         this.dispatcher.dispatch(type, payload);
       };
     };
-    ws.onerror = e => {
-      console.log('Error');
+    this.ws.onerror = e => {
+      console.log('Error', e);
     };
-    ws.onclose = e => {
+    this.ws.onclose = e => {
       console.log(e);
       console.log('disconnected');
       this.websocketConnected = false;

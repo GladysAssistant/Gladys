@@ -61,7 +61,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
             <div class="form-group">
               <label class="form-label">
                 <Text id="gatewayLogin.passwordLabel" />
-                <a href="https://gateway.gladysassistant.com/forgot-password" class="float-right small">
+                <a href="/forgot-password" class="float-right small">
                   <Text id="gatewayLogin.forgotPasswordLabel" />
                 </a>
               </label>

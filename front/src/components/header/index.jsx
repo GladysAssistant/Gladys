@@ -13,7 +13,11 @@ const PAGES_WITHOUT_HEADER = [
   '/signup/success',
   '/forgot-password',
   '/reset-password',
-  '/link-gateway-user'
+  '/link-gateway-user',
+  '/signup-gateway',
+  '/subscribe-gateway',
+  '/gateway-configure-two-factor',
+  '/confirm-email'
 ];
 
 const Header = ({ ...props }) => {
@@ -85,11 +89,13 @@ const Header = ({ ...props }) => {
                     <i class="fe fe-message-square" /> <Text id="header.chat" />
                   </Link>
                 </li>
-                <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard/device" class="nav-link">
-                    <i class="fe fe-toggle-right" /> <Text id="header.devices" />
-                  </Link>
-                </li>
+                {false && (
+                  <li class="nav-item">
+                    <Link activeClassName="active" href="/dashboard/device" class="nav-link">
+                      <i class="fe fe-toggle-right" /> <Text id="header.devices" />
+                    </Link>
+                  </li>
+                )}
                 <li class="nav-item">
                   <Link
                     href="/dashboard/integration/device"

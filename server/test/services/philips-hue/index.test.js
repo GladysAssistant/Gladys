@@ -7,16 +7,18 @@ const PhilipsHueService = proxyquire('../../../services/philips-hue/index', {
 });
 
 describe('PhilipsHueService', () => {
-  const philipsHueService = PhilipsHueService();
   it('should have controllers', () => {
+    const philipsHueService = PhilipsHueService();
     expect(philipsHueService)
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
   });
   it('should start service', async () => {
+    const philipsHueService = PhilipsHueService();
     await philipsHueService.start();
   });
   it('should stop service', async () => {
+    const philipsHueService = PhilipsHueService();
     await philipsHueService.stop();
   });
 });

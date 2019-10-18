@@ -167,6 +167,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  DEVICE: {
+    SET_VALUE: 'device.set-value',
+  },
   LIGHT: {
     TURN_ON: 'light.turn-on',
   },
@@ -188,6 +191,7 @@ const ACTIONS = {
 const INTENTS = {
   LIGHT: {
     TURN_ON: 'intent.light.turn-on',
+    TURN_OFF: 'intent.light.turn-off',
   },
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
@@ -299,6 +303,9 @@ const DEVICE_POLL_FREQUENCIES = {
 const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
+  },
+  DEVICE: {
+    NEW_STATE: 'device.new-state',
   },
   MESSAGE: {
     NEW: 'message.new',
