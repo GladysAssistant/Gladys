@@ -27,7 +27,7 @@ async function setImage(selector, image) {
     throw new NotFoundError('Camera image feature not found');
   }
   logger.debug(`Camera.setImage :  New image for camera ${selector}`);
-  await this.deviceManager.saveStringState(deviceFeature, image);
+  await this.deviceManager.saveStringState(device, deviceFeature, image);
   return null;
 }
 
