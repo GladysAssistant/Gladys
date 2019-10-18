@@ -50,6 +50,7 @@ import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
+import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
@@ -112,8 +113,13 @@ const AppRouter = connect(
         )}
         {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
+        {config.gatewayMode ? (
+          <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
+        ) : (
+          <Error type="404" default />
+        )}
 
-        <SignupWelcomePage path="/signup" />
+        {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
         <SignupCreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
         <SignupPreferences path="/signup/preference" />

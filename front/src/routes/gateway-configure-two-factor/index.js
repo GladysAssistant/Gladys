@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import ConfigureTwoFactorForm from './ConfigureTwoFactorForm';
 import QRCode from 'qrcode';
-import { route } from 'preact-router';
 
 @connect(
   'session',

@@ -419,7 +419,8 @@
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
-    "billingTab": "Billing"
+    "billingTab": "Billing",
+    "gatewayUsersTab": "Users"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
