@@ -7,8 +7,8 @@
   },
   {
     "key": "rtsp-camera",
-    "name": "RTSP Camera",
-    "description": "Display your camera in Gladys.",
+    "name": "Camera",
+    "description": "HTTP/RTSP cameras in Gladys.",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"
   },
   {
