@@ -15,6 +15,12 @@ async function connect(token) {
   this.bot.on('error', (e) => {
     logger.debug(e);
   });
+  this.bot.on('polling_error', async (e) => {
+    logger.warn(`Telegram polling error, code = ${e.code}, message = ${e.message}`);
+    if (e.code === 'ETELEGRAM' && e.message === 'ETELEGRAM: 404 Not Found') {
+      await this.bot.stopPolling();
+    }
+  });
   this.bot.on('message', this.newMessage.bind(this));
 }
 

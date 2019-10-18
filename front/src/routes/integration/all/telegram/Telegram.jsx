@@ -1,4 +1,5 @@
 import { Text, MarkupText } from 'preact-i18n';
+import { RequestStatus } from '../../../../utils/consts';
 import cx from 'classnames';
 
 const TelegramPage = ({ children, ...props }) => (
@@ -23,32 +24,45 @@ const TelegramPage = ({ children, ...props }) => (
                       <p>
                         <MarkupText id="integration.telegram.introduction" />
                       </p>
-                      <div class="form-group">
-                        <div class="form-label">Telegram Bot API Key</div>
-                        <div class="input-group">
-                          <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Telegram Bot API Key"
-                            onInput={props.updateTelegramApiKey}
-                            value={props.telegramApiKey}
-                          />
-                          <span class="input-group-append">
-                            <button class="btn btn-primary" onClick={props.saveTelegramApiKey}>
-                              Save
-                            </button>
-                          </span>
+                      {props.telegramSaveApiKeyStatus === RequestStatus.Error && (
+                        <div class="alert alert-danger">
+                          <Text id="integration.telegram.configurationError" />
                         </div>
-                      </div>
-                      <p>
-                        <MarkupText
-                          id="integration.telegram.link"
-                          fields={{
-                            link: props.telegramCustomLink
-                          }}
-                        />{' '}
-                        <Text id="integration.telegram.note" />
-                      </p>
+                      )}
+                      <form onSubmit={props.saveTelegramApiKey}>
+                        <div class="form-group">
+                          <div class="form-label">Telegram Bot API Key</div>
+                          <div class="input-group">
+                            <input
+                              type="text"
+                              class="form-control"
+                              placeholder="Telegram Bot API Key"
+                              onInput={props.updateTelegramApiKey}
+                              value={props.telegramApiKey}
+                            />
+                            <span class="input-group-append">
+                              <button type="submit" class="btn btn-primary">
+                                Save
+                              </button>
+                            </span>
+                          </div>
+                        </div>
+                      </form>
+                      {props.telegramCustomLink && (
+                        <div>
+                          <p>
+                            <MarkupText
+                              id="integration.telegram.link"
+                              fields={{
+                                link: props.telegramCustomLink
+                              }}
+                            />
+                          </p>
+                          <p>
+                            <Text id="integration.telegram.note" />
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
