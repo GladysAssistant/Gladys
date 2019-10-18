@@ -22,14 +22,18 @@ const actions = store => ({
       });
     }
   },
-  async saveApiKey(state) {
+  async saveApiKey(state, e) {
+    e.preventDefault();
     store.setState({
       darkskySaveApiKeyStatus: RequestStatus.Getting
     });
     try {
+      store.setState({
+        darkSkyApiKey: state.darkSkyApiKey.trim()
+      });
       // save api key
       await state.httpClient.post('/api/v1/service/darksky/variable/DARKSKY_API_KEY', {
-        value: state.darkSkyApiKey
+        value: state.darkSkyApiKey.trim()
       });
       // start service
       await state.httpClient.post('/api/v1/service/darksky/start');
