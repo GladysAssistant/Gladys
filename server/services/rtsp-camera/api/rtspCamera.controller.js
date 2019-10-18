@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function RtspCameraController(rtspCameraHandler) {
   /**
    * @api {post} /api/v1/service/rtsp-camera/camera/test Test connection
@@ -12,7 +14,7 @@ module.exports = function RtspCameraController(rtspCameraHandler) {
   return {
     'post /api/v1/service/rtsp-camera/camera/test': {
       authenticated: true,
-      controller: testConnection,
+      controller: asyncMiddleware(testConnection),
     },
   };
 };
