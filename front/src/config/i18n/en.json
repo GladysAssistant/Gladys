@@ -476,7 +476,7 @@
     "ping": "ping",
     "disk": "Disk",
     "uptime": "Uptime",
-    "gladysVersion": "Gladys Version",
+    "gladysVersion": "Version",
     "operations": "Operations",
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
