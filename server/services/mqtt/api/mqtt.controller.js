@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function MqttController(mqttManager) {
   /**
    * @api {post} /api/v1/service/mqtt/save Save MQTT connection
@@ -15,7 +17,7 @@ module.exports = function MqttController(mqttManager) {
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
-      controller: connect,
+      controller: asyncMiddleware(connect),
     },
   };
 };
