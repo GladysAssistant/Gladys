@@ -11,7 +11,8 @@ const OPEN_PAGES = [
   '/reset-password',
   '/gateway-configure-two-factor',
   '/signup-gateway',
-  '/subscribe-gateway'
+  '/subscribe-gateway',
+  '/confirm-email'
 ];
 
 function createActions(store) {

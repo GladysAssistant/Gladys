@@ -23,6 +23,7 @@ import SubscribeGateway from '../routes/subscribe-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
+import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -109,6 +110,7 @@ const AppRouter = connect(
         ) : (
           <Error type="404" default />
         )}
+        {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
 
         <SignupWelcomePage path="/signup" />

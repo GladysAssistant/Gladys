@@ -16,7 +16,8 @@ const PAGES_WITHOUT_HEADER = [
   '/link-gateway-user',
   '/signup-gateway',
   '/subscribe-gateway',
-  '/gateway-configure-two-factor'
+  '/gateway-configure-two-factor',
+  '/confirm-email'
 ];
 
 const Header = ({ ...props }) => {
