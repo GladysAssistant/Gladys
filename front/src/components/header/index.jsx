@@ -13,7 +13,10 @@ const PAGES_WITHOUT_HEADER = [
   '/signup/success',
   '/forgot-password',
   '/reset-password',
-  '/link-gateway-user'
+  '/link-gateway-user',
+  '/signup-gateway',
+  '/subscribe-gateway',
+  '/gateway-configure-two-factor'
 ];
 
 const Header = ({ ...props }) => {

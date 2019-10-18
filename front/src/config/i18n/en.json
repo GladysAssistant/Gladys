@@ -418,7 +418,8 @@
     "sessionsTab": "Sessions",
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
-    "backupTab": "Backups"
+    "backupTab": "Backups",
+    "billingTab": "Billing"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
@@ -709,5 +710,43 @@
     "unitLabel": "Unit",
     "saveButton": "Save",
     "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API."
+  },
+  "gatewaySignup": {
+    "title": "Gladys Assistant",
+    "alreadyHaveAccount": "Already have an account?",
+    "signin": "Sign in",
+    "supportText": "Support at hello@gladysassistant.com",
+    "createAccount": "Create your Gladys Plus account",
+    "emailAlreadyExistError": "An account with that email already exist",
+    "browserNotCompatibleError": " Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API.",
+    "tokenError": "You have to subscribe to the Gladys Community Package on Gladys website first!",
+    "unknownError": "An unknown error occured. Please retry later or contact me at hello@gladysassistant.com to understand what happened.",
+    "invalidInvitationError": "We cannot retrieve your invitation. Maybe it was already used or has expired! Please contact us at hello@gladysassistant.com."
+  },
+  "gatewaySubscribe": {
+    "registerGladysPlus": "Register to Gladys Plus",
+    "emailAddress": "Email Address",
+    "emailAddressPlaceholder": "Enter Email",
+    "cardInformations": "Card Informations",
+    "paymentSecuredBy": "Payment Secured by",
+    "subscribeButton": "Subscribe (9.99€/month)",
+    "invalidEmailAddress": "Invalid Email Adress",
+    "emailAlreadyExist": "An account with this email address already exist!",
+    "paymentFailed": "Payment failed. Please try again or try with a different card.",
+    "paymentSuccess": "Congrats, you just suscribed to Gladys Plus. Check your email to get access to the Slack and the Gladys Gateway. Thanks for your support!"
+  },
+  "gatewayForgotPassword": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Forgot Password",
+    "success": "If this account exist, you've receive an email with a reset password link.",
+    "emailAddress": "Email Address",
+    "sendEmailButton": "Send reset password email",
+    "emailAddressPlaceholder": "Enter Email",
+    "dontHaveAccount": "Don't have an account yet?",
+    "signupLink": "Signup"
+  },
+  "gatewayResetPassword": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Reset Password"
   }
 }

@@ -18,6 +18,11 @@ import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
+import SignupGateway from '../routes/signup-gateway';
+import SubscribeGateway from '../routes/subscribe-gateway';
+import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
+import GatewayForgotPassword from '../routes/gateway-forgot-password';
+import GatewayResetPassword from '../routes/gateway-reset-password';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -43,6 +48,7 @@ import SettingsAdvancedPage from '../routes/settings/settings-advanced';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
+import SettingsBilling from '../routes/settings/settings-billing';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
@@ -83,12 +89,27 @@ const AppRouter = connect(
       />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
-
         {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}
         {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
-        {config.gatewayMode ? <ForgotPassword path="/forgot-password" /> : <ForgotPassword path="/forgot-password" />}
-        {config.gatewayMode ? <ResetPassword path="/reset-password" /> : <ResetPassword path="/reset-password" />}
+        {config.gatewayMode ? (
+          <GatewayForgotPassword path="/forgot-password" />
+        ) : (
+          <ForgotPassword path="/forgot-password" />
+        )}
+        {config.gatewayMode ? (
+          <GatewayResetPassword path="/reset-password" />
+        ) : (
+          <ResetPassword path="/reset-password" />
+        )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
+        {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
+        {config.gatewayMode ? <SubscribeGateway path="/subscribe-gateway" /> : <Error type="404" default />}
+        {config.gatewayMode ? (
+          <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
+        ) : (
+          <Error type="404" default />
+        )}
+        {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
 
         <SignupWelcomePage path="/signup" />
         <SignupCreateAccountLocal path="/signup/create-account-local" />
@@ -96,7 +117,6 @@ const AppRouter = connect(
         <SignupPreferences path="/signup/preference" />
         <SignupConfigureHouse path="/signup/configure-house" />
         <SignupSuccess path="/signup/success" />
-
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
@@ -107,7 +127,6 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" />
         <IntegrationPage path="/dashboard/integration/weather" />
         <IntegrationPage path="/dashboard/integration/navigation" />
-
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
         <Redirect
@@ -122,15 +141,12 @@ const AppRouter = connect(
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
-
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
-
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <CalendarPage path="/dashboard/calendar" />
@@ -138,7 +154,6 @@ const AppRouter = connect(
         <NewScenePage path="/dashboard/scene/new" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
         <TriggerPage path="/dashboard/trigger" />
-
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />

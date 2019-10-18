@@ -12,6 +12,7 @@ const GATEWAY_DEVICE_ID_KEY = 'gateway_device_id';
 const GATEWAY_SERIALIZED_KEYS_KEY = 'gateway_serialized_keys';
 const GATEWAY_RSA_PUBLIC_KEY_FINGERPRINT = 'gateway_rsa_public_key_fingerprint';
 const GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT = 'gateway_ecdsa_public_key_fingerprint';
+const GATEWAY_TWO_FACTOR_ACCESS_TOKEN = 'gateway_two_factor_access_token';
 
 class GatewaySession {
   constructor() {
@@ -122,6 +123,14 @@ class GatewaySession {
   saveProfilePicture(profilePicture) {
     this.profilePicture = profilePicture;
     keyValueStore.set(GATEWAY_PROFILE_PICTURE_KEY, profilePicture);
+  }
+
+  saveTwoFactorAccessToken(token) {
+    keyValueStore.set(GATEWAY_TWO_FACTOR_ACCESS_TOKEN, token);
+  }
+
+  getTwoFactorAccessToken() {
+    return keyValueStore.get(GATEWAY_TWO_FACTOR_ACCESS_TOKEN);
   }
 }
 

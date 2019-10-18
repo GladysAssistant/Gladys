@@ -1,1 +1,14 @@
-{}
+{
+  "gatewaySubscribe": {
+    "registerGladysPlus": "Rejoignez la communauté Gladys",
+    "emailAddress": "Adresse email",
+    "emailAddressPlaceholder": "Entrez votre adresse email",
+    "cardInformations": "Informations de paiement",
+    "paymentSecuredBy": "Paiement sécurisé par",
+    "subscribeButton": "Rejoindre (9.99€/mois)",
+    "invalidEmailAddress": "Adresse email invalide",
+    "emailAlreadyExist": "Une adresse avec ce compte existe déjà",
+    "paymentFailed": "Le paiement a échoué. Merci de réessayer ou de tenter avec une autre carte.",
+    "paymentSuccess": "Merci pour ton inscription au package communauté Gladys! Tu as du recevoir un email pour accéder au Slack et au Gladys Gateway. Encore merci pour ton soutien."
+  }
+}

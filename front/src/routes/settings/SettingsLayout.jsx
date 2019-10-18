@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import config from '../../../config';
 
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
@@ -43,6 +44,19 @@ const DashboardSettings = ({ children, ...props }) => (
                     </span>
                     <Text id="settings.gatewayTab" />
                   </Link>
+
+                  {config.gatewayMode && (
+                    <Link
+                      href="/dashboard/settings/billing"
+                      activeClassName="active"
+                      class="list-group-item list-group-item-action d-flex align-items-center"
+                    >
+                      <span class="icon mr-3">
+                        <i class="fe fe-credit-card" />
+                      </span>
+                      <Text id="settings.billingTab" />
+                    </Link>
+                  )}
 
                   <Link
                     href="/dashboard/settings/backup"
