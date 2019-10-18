@@ -27,38 +27,40 @@ const DarkSkyPage = ({ children, ...props }) => (
                         <Text id="integration.darkSky.instructions" />{' '}
                         <a href="https://darksky.net/dev">https://darksky.net/dev</a>.
                       </p>
-                      <div class="form-group">
-                        <div class="form-label">
-                          <Text id="integration.darkSky.apiKeyLabel" />
+                      <form onSubmit={props.saveApiKey}>
+                        <div class="form-group">
+                          <div class="form-label">
+                            <Text id="integration.darkSky.apiKeyLabel" />
+                          </div>
+                          <div class="input-group">
+                            <Localizer>
+                              <input
+                                type="text"
+                                class="form-control"
+                                placeholder={<Text id="integration.darkSky.apiKeyPlaceholder" />}
+                                onInput={props.updateApiKey}
+                                value={props.darkSkyApiKey}
+                              />
+                            </Localizer>
+                            <span class="input-group-append">
+                              <button
+                                class={cx('btn', 'btn-success', {
+                                  'btn-loading': props.loading
+                                })}
+                                type="submit"
+                              >
+                                <Text id="integration.darkSky.saveButton" />
+                              </button>
+                            </span>
+                          </div>
                         </div>
-                        <div class="input-group">
-                          <Localizer>
-                            <input
-                              type="text"
-                              class="form-control"
-                              placeholder={<Text id="integration.darkSky.apiKeyPlaceholder" />}
-                              onInput={props.updateApiKey}
-                              value={props.darkSkyApiKey}
-                            />
-                          </Localizer>
-                          <span class="input-group-append">
-                            <button
-                              class={cx('btn', 'btn-success', {
-                                'btn-loading': props.loading
-                              })}
-                              onClick={props.saveApiKey}
-                              type="button"
-                            >
-                              <Text id="integration.darkSky.saveButton" />
-                            </button>
-                          </span>
+
+                        <div class="form-group">
+                          <label>
+                            <Text id="integration.darkSky.instructionsToUse" />
+                          </label>
                         </div>
-                      </div>
-                      <div class="form-group">
-                        <label>
-                          <Text id="integration.darkSky.instructionsToUse" />
-                        </label>
-                      </div>
+                      </form>
                     </div>
                   </div>
                 </div>
