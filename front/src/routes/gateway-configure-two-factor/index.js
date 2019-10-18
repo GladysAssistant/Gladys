@@ -52,11 +52,11 @@ class ConfigureTwoFactorPage extends Component {
     this.props.session.gatewayClient
       .enableTwoFactor(accessToken, twoFactorCode)
       .then(data => {
-        route('/login');
+        window.location = '/login';
       })
       .catch(err => {
         if (err && err.response && err.response.status === 401) {
-          route('/login');
+          window.location = '/login';
         } else {
           this.setState({ errored: true });
         }

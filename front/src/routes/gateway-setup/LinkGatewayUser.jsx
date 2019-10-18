@@ -75,6 +75,13 @@ const SignupLayout = ({ children, ...props }) => (
                 </div>
               </div>
             </div>
+            <div class="text-center">
+              <Text id="gatewayLinkUser.manageBilling" />{' '}
+              <a href="/dashboard/settings/billing">
+                <Text id="gatewayLinkUser.here" />
+              </a>
+              .
+            </div>
           </div>
         </div>
       </div>
