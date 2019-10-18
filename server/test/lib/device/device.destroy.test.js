@@ -9,6 +9,11 @@ describe('Device.destroy', () => {
   it('should destroy device', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager, {});
+    device.devicesByPollFrequency[60000] = [
+      {
+        selector: 'test-device',
+      },
+    ];
     await device.destroy('test-device');
   });
   it('should return device not found', async () => {

@@ -67,6 +67,49 @@ describe('Device', () => {
     });
     expect(newDevice.features).to.deep.equal([]);
   });
+  it('should update device which already exist with a new poll frequency', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceByExternalId', 'test-device-external', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Test device',
+      selector: 'test-device',
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: '10',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
+      ],
+    });
+    const device = new Device(event, {}, stateManager);
+    await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      should_poll: true,
+      poll_frequency: 60000,
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+    });
+    await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      should_poll: true,
+      poll_frequency: 30000,
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+    });
+  });
   it('should update device and delete params/features', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceByExternalId', 'test-device-external', {

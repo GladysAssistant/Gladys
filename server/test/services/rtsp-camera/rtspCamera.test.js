@@ -66,4 +66,9 @@ describe('RtspCameraManager commands', () => {
     await rtspCameraManager.poll(device);
     assert.calledWith(gladys.device.camera.setImage, 'my-camera', 'image/png;base64,aW1hZ2U=');
   });
+  it('should fail to poll, but not crash', async () => {
+    const rtspCameraManagerBroken = new RtspCameraManager(gladys, FfmpegMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKI?NG');
+    await rtspCameraManagerBroken.poll(device);
+  });
 });
