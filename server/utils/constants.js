@@ -298,6 +298,10 @@ const ACTIONS_STATUS = {
 
 const DEVICE_POLL_FREQUENCIES = {
   EVERY_MINUTES: 60 * 1000,
+  EVERY_30_SECONDS: 30 * 1000,
+  EVERY_10_SECONDS: 10 * 1000,
+  EVERY_2_SECONDS: 2 * 1000,
+  EVERY_SECONDS: 1 * 1000,
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {
@@ -306,6 +310,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   DEVICE: {
     NEW_STATE: 'device.new-state',
+    NEW_STRING_STATE: 'device.new-string-state',
   },
   MESSAGE: {
     NEW: 'message.new',

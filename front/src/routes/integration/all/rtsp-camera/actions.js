@@ -82,8 +82,9 @@ function createActions(store) {
         rtspCameras
       });
     },
-    addCamera(state) {
+    async addCamera(state) {
       const uniqueId = uuid.v4();
+      await integrationActions.getIntegrationByName(state, 'rtsp-camera');
       const rtspCameras = update(state.rtspCameras, {
         $push: [
           {
@@ -92,7 +93,7 @@ function createActions(store) {
             should_poll: true,
             poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
             external_id: uniqueId,
-            service_id: state.currentIntegration.id,
+            service_id: store.getState().currentIntegration.id,
             cameraUrl: {
               name: 'CAMERA_URL',
               value: null

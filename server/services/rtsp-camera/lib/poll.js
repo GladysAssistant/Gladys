@@ -1,3 +1,5 @@
+const logger = require('../../../utils/logger');
+
 /**
  * @description Poll a camera
  * @param {Object} device - The camera to poll.
@@ -5,8 +7,13 @@
  * poll(device);
  */
 async function poll(device) {
-  const cameraImage = await this.getImage(device);
-  await this.gladys.device.camera.setImage(device.selector, cameraImage);
+  try {
+    const cameraImage = await this.getImage(device);
+    await this.gladys.device.camera.setImage(device.selector, cameraImage);
+  } catch (e) {
+    logger.warn('Unable to poll camera');
+    logger.debug(e);
+  }
 }
 
 module.exports = {

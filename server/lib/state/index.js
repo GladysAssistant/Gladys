@@ -48,6 +48,20 @@ function getKey(entity, entitySelector, key) {
   return this.state[entity][entitySelector].getKey(key);
 }
 
+/**
+ * @description Delete a state.
+ * @param {string} entity - The type of entity we should get the value from.
+ * @param {string} entitySelector - The selector to identify one entity.
+ * @example
+ * stateManager.delete('house', 'main-house');
+ */
+function deleteState(entity, entitySelector) {
+  if (!this.state[entity][entitySelector]) {
+    return null;
+  }
+  delete this.state[entity][entitySelector];
+}
+
 const StateManager = function StateManager(event) {
   this.event = event;
   this.state = {
@@ -66,6 +80,7 @@ const StateManager = function StateManager(event) {
 };
 
 StateManager.prototype.setState = setState;
+StateManager.prototype.deleteState = deleteState;
 StateManager.prototype.get = get;
 StateManager.prototype.getKey = getKey;
 

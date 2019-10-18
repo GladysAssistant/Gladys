@@ -5,7 +5,6 @@ const BOX_KEY = 'Camera';
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
-
   const actions = {
     async getCameraImage(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
@@ -16,7 +15,17 @@ function createActions(store) {
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
+        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+          image: null
+        });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
+      }
+    },
+    deviceFeatureWebsocketEvent(state, box, x, y, payload) {
+      if (box.camera === payload.device) {
+        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+          image: payload.last_value_string
+        });
       }
     }
   };

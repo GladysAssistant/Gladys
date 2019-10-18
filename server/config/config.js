@@ -2,6 +2,7 @@ module.exports = {
   development: {
     dialect: 'sqlite',
     storage: process.env.SQLITE_FILE_PATH || './gladys-development.db',
+    logging: false,
     operatorsAliases: false,
     define: {
       underscored: true,

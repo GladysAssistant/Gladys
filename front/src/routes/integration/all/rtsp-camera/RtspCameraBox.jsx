@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
+import { DEVICE_POLL_FREQUENCIES } from '../../../../../../server/utils/constants';
 
 class RtspCameraBox extends Component {
   saveCamera = async () => {
@@ -58,6 +59,9 @@ class RtspCameraBox extends Component {
   };
   updateCameraName = e => {
     this.props.updateCameraField(this.props.cameraIndex, 'name', e.target.value);
+  };
+  updatePollFrequency = e => {
+    this.props.updateCameraField(this.props.cameraIndex, 'poll_frequency', parseInt(e.target.value, 10));
   };
   updateCameraUrl = e => {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
@@ -123,6 +127,28 @@ class RtspCameraBox extends Component {
                           ))}
                         </optgroup>
                       ))}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.rtspCamera.pollFrequencyLabel" />
+                  </label>
+                  <select onChange={this.updatePollFrequency} value={props.camera.poll_frequency} class="form-control">
+                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}>
+                      <Text id="integration.rtspCamera.everyMinutes" />
+                    </option>
+                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS}>
+                      <Text id="integration.rtspCamera.every30Seconds" />
+                    </option>
+                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS}>
+                      <Text id="integration.rtspCamera.every10Seconds" />
+                    </option>
+                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_2_SECONDS}>
+                      <Text id="integration.rtspCamera.every2Seconds" />
+                    </option>
+                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_SECONDS}>
+                      <Text id="integration.rtspCamera.every1Seconds" />
+                    </option>
                   </select>
                 </div>
                 <div class="form-group">
