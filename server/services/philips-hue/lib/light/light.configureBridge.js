@@ -51,6 +51,11 @@ async function configureBridge(serialNumber) {
         },
       ],
     });
+    // if bridge is not already in array, we push it
+    const bridgeInArray = this.connnectedBridges.find((b) => b.external_id === deviceCreated.external_id);
+    if (!bridgeInArray) {
+      this.connnectedBridges.push(deviceCreated);
+    }
     return deviceCreated;
   } catch (e) {
     if (e.getHueErrorType() === 101) {
