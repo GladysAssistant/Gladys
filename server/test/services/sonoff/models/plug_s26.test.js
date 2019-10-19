@@ -14,13 +14,17 @@ describe('SonoffService - Model - Plug S2x', () => {
   });
 
   it('get features for Sonoff Plug S2x', () => {
-    const features = models[modelId].getFeatures(uuid, 'name', 'topic');
+    const features = models[modelId].getFeatures();
 
-    expect(features).to.be.lengthOf(1);
-
-    expect(features[0].name).to.be.eq('name');
-    expect(features[0].category).to.be.eq(DEVICE_FEATURE_CATEGORIES.SWITCH);
-    expect(features[0].type).to.be.eq(DEVICE_FEATURE_TYPES.SWITCH.BINARY);
-    expect(features[0].external_id).to.be.eq(`sonoff:topic:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`);
+    expect(features).to.deep.eq([
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        read_only: false,
+        has_feedback: true,
+        min: 0,
+        max: 1,
+      },
+    ]);
   });
 });
