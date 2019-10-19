@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "4.0.0-alpha",
+  "version": "4.0.0-beta",
   "description": "An open-source home assistant",
   "main": "index.js",
   "scripts": {
