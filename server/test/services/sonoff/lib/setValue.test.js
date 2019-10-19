@@ -53,7 +53,7 @@ describe('SonoffHandler - setValue', () => {
     }
   });
 
-  it('publish through valid topic', () => {
+  it('publish ON through valid topic', () => {
     const device = {
       external_id: 'sonoff:deviceTopic',
     };
@@ -63,5 +63,17 @@ describe('SonoffHandler - setValue', () => {
     sonoffHandler.setValue(device, feature, value);
 
     assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'ON');
+  });
+
+  it('publish OFF through valid topic', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = undefined;
+    const value = 0;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'OFF');
   });
 });

@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 
-const uuid = require('uuid');
 const models = require('../../../../services/sonoff/models');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 

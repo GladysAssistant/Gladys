@@ -108,6 +108,30 @@ describe('Mqtt handle message', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
+  it('should change SONOFF power state to ON (RESULT topic)', () => {
+    sonoffHandler.handleMqttMessage('stat/my_device/RESULT', '{ "POWER": "ON"}');
+
+    const expectedEvent = {
+      device_feature_external_id: `sonoff:my_device:binary`,
+      state: 1,
+    };
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('should change SONOFF power state to OFF (RESULT topic)', () => {
+    sonoffHandler.handleMqttMessage('stat/my_device/RESULT', '{ "POWER": "OFF"}');
+
+    const expectedEvent = {
+      device_feature_external_id: `sonoff:my_device:binary`,
+      state: 0,
+    };
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
   it('should ask for SONOFF status (LWT topic)', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/LWT', 'anything');
 
