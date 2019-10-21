@@ -22,7 +22,12 @@
 
 <img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
 
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGladysAssistant%2FGladys.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FGladysAssistant%2FGladys?ref=badge_large)
+
 ## The Project
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGladysAssistant%2FGladys.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FGladysAssistant%2FGladys?ref=badge_shield)
+
 
 Gladys is a home assistant who helps you in your everyday life.
 
