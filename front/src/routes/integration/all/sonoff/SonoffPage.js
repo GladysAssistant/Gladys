@@ -36,14 +36,16 @@ const SonoffPage = ({ children, user }) => (
                     <Text id="integration.sonoff.discoverTab" />
                   </Link>
 
-                  <div class="mt-5 mb-5 text-center">
-                    <DeviceConfigurationLink
-                      user={user}
-                      buttonClass="btn-light"
-                      labelKey="integration.sonoff.discover.documentation"
-                      documentKey="sonoff-configuration"
-                    />
-                  </div>
+                  <DeviceConfigurationLink
+                    user={user}
+                    documentKey="sonoff-configuration"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.sonoff.discover.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>
