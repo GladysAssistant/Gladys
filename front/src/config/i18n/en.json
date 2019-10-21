@@ -603,6 +603,7 @@
       "hue": "Light Hue",
       "color": "Light Color",
       "saturation": "Light Saturation",
+      "temperature": "Light Temperature",
       "power": "Light Power consumption"
     },
     "battery": {

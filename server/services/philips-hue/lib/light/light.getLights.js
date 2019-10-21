@@ -1,13 +1,13 @@
 const Promise = require('bluebird');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_POLL_FREQUENCIES,
-} = require('../../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 const { getDeviceParam } = require('../../../../utils/device');
+const { getPhilipsHueColorLight } = require('../models/color');
+const { getPhilipsHueColorTemperatureLight } = require('../models/colorWithTemperature');
+const { getPhilipsHueWhiteLight } = require('../models/white');
+const { getPhilipsHueWhiteTemperatureLight } = require('../models/whiteWithTemperature');
 
 const { LIGHT_EXTERNAL_ID_BASE, BRIDGE_SERIAL_NUMBER } = require('../utils/consts');
 
@@ -28,78 +28,34 @@ async function getLights() {
     const lights = await hueApi.lights.getAll();
 
     lights.forEach((philipsHueLight) => {
-      // White + Color Lights
-      if (philipsHueLight.modelid === 'LCT007') {
-        lightsToReturn.push({
-          name: philipsHueLight.name,
-          service_id: this.serviceId,
-          external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
-          selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
-          should_poll: true,
-          model: philipsHueLight.modelid,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
-          features: [
-            {
-              name: `${philipsHueLight.name} On/Off`,
-              read_only: false,
-              has_feedback: false,
-              external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.BINARY
-              }`,
-              selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.BINARY
-              }`,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-              min: 0,
-              max: 1,
-            },
-            {
-              name: `${philipsHueLight.name} Color`,
-              read_only: false,
-              has_feedback: false,
-              external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.COLOR
-              }`,
-              selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.COLOR
-              }`,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-              min: 0,
-              max: 0,
-            },
-            {
-              name: `${philipsHueLight.name} Brightness`,
-              read_only: false,
-              has_feedback: false,
-              external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
-              }`,
-              selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}:${
-                DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
-              }`,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-              min: 0,
-              max: 100,
-            },
-          ],
-        });
-      } else {
-        logger.info(`Philips Hue Light of model ${philipsHueLight.modelid} is not handled yet !`);
-        lightsToReturn.push({
-          name: philipsHueLight.name,
-          service_id: this.serviceId,
-          external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
-          selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
-          should_poll: true,
-          model: philipsHueLight.modelid,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
-          features: [],
-          not_handled: true,
-          raw_philips_hue_device: philipsHueLight,
-        });
+      switch (philipsHueLight.modelid) {
+        case 'LCT007': // hue white & color 2nd generation
+        case 'LST002': // hue lightstrip indoor 2nd generation
+        case 'LCT024': // Hue play 1
+          lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
+          break;
+        case 'LWB010': // hue white bulb with fixed warming light (2700K)
+          lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
+          break;
+        case 'LTW012': // hue White Ambiance E12
+        case 'LTW010': // hue White & Ambiance Bulb
+          lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
+          break;
+        default:
+          logger.info(`Philips Hue Light of model ${philipsHueLight.modelid} is not handled yet !`);
+          lightsToReturn.push({
+            name: philipsHueLight.name,
+            service_id: this.serviceId,
+            external_id: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
+            selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
+            should_poll: true,
+            model: philipsHueLight.modelid,
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+            features: [],
+            not_handled: true,
+            raw_philips_hue_device: philipsHueLight,
+          });
+          break;
       }
     });
   });

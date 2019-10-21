@@ -32,6 +32,28 @@ module.exports = function HueController(philipsHueLightHandler) {
     res.json(lights);
   }
 
+  /**
+   * @api {get} /api/v1/service/philips-hue/scene Get scenes
+   * @apiName GetScenes
+   * @apiGroup PhilipsHue
+   */
+  async function getScenes(req, res) {
+    const scenes = await philipsHueLightHandler.getScenes();
+    res.json(scenes);
+  }
+
+  /**
+   * @api {post} /api/v1/service/philips-hue/scene/:philipe_hue_scene_id/activate Active scene
+   * @apiName GetScenes
+   * @apiGroup PhilipsHue
+   */
+  async function activateScene(req, res) {
+    await philipsHueLightHandler.activateScene(req.body.bridge_serial_number, req.params.philipe_hue_scene_id);
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/philips-hue/bridge': {
       authenticated: true,
@@ -44,6 +66,14 @@ module.exports = function HueController(philipsHueLightHandler) {
     'get /api/v1/service/philips-hue/light': {
       authenticated: true,
       controller: asyncMiddleware(getLights),
+    },
+    'get /api/v1/service/philips-hue/scene': {
+      authenticated: true,
+      controller: asyncMiddleware(getScenes),
+    },
+    'post /api/v1/service/philips-hue/scene/:philipe_hue_scene_id/activate': {
+      authenticated: true,
+      controller: asyncMiddleware(activateScene),
     },
   };
 };

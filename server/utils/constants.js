@@ -233,6 +233,7 @@ const DEVICE_FEATURE_TYPES = {
     HUE: 'hue',
     SATURATION: 'saturation',
     COLOR: 'color',
+    TEMPERATURE: 'temperature',
     POWER: 'power',
   },
   SENSOR: {
