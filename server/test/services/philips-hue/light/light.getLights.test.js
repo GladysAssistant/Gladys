@@ -73,6 +73,9 @@ describe('PhilipsHueService', () => {
       expect(light).to.have.property('name');
       expect(light).to.have.property('selector');
       expect(light).to.have.property('features');
+      if (light.not_handled) {
+        expect(light.not_handled).to.have.property('not_handled', false);
+      }
       light.features.forEach((feature) => {
         expect(feature).to.have.property('name');
       });

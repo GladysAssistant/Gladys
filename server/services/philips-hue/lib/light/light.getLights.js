@@ -29,6 +29,7 @@ async function getLights() {
     lights.forEach((philipsHueLight) => {
       switch (philipsHueLight.modelid) {
         case 'LCT007': // hue white & color 2nd generation
+        case 'LCT015': // hue white & color 4th generation
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
