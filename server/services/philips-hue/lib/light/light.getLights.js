@@ -4,7 +4,6 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 const { getDeviceParam } = require('../../../../utils/device');
-const { getPhilipsHueColorLight } = require('../models/color');
 const { getPhilipsHueColorTemperatureLight } = require('../models/colorWithTemperature');
 const { getPhilipsHueWhiteLight } = require('../models/white');
 const { getPhilipsHueWhiteTemperatureLight } = require('../models/whiteWithTemperature');
