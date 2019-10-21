@@ -14,6 +14,6 @@
   ],
   "dependencies": {
     "bluebird": "^3.7.0",
-    "node-hue-api": "^3.2.1"
+    "node-hue-api": "^3.4.0"
   }
 }

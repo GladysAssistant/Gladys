@@ -1,8 +1,10 @@
+const { activateScene } = require('./light.activateScene');
 const { configureBridge } = require('./light.configureBridge');
 const { getBridges } = require('./light.getBridges');
 const { init } = require('./light.init');
 const { poll } = require('./light.poll');
 const { getLights } = require('./light.getLights');
+const { getScenes } = require('./light.getScenes');
 const { setValue } = require('./light.setValue');
 
 /**
@@ -25,11 +27,13 @@ const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient
   this.lights = [];
 };
 
+PhilipsHueLightHandler.prototype.activateScene = activateScene;
 PhilipsHueLightHandler.prototype.configureBridge = configureBridge;
 PhilipsHueLightHandler.prototype.getBridges = getBridges;
 PhilipsHueLightHandler.prototype.init = init;
 PhilipsHueLightHandler.prototype.poll = poll;
 PhilipsHueLightHandler.prototype.getLights = getLights;
+PhilipsHueLightHandler.prototype.getScenes = getScenes;
 PhilipsHueLightHandler.prototype.setValue = setValue;
 
 module.exports = PhilipsHueLightHandler;
