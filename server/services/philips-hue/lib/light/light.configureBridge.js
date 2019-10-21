@@ -58,7 +58,7 @@ async function configureBridge(serialNumber) {
     }
     return deviceCreated;
   } catch (e) {
-    if (e.getHueErrorType() === 101) {
+    if (e.getHueErrorType && e.getHueErrorType() === 101) {
       throw new Error403('BRIDGE_BUTTON_NOT_PRESSED');
     } else {
       throw e;

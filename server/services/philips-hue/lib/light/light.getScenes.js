@@ -20,11 +20,11 @@ async function getScenes() {
       throw new NotFoundError(`HUE_API_NOT_FOUND`);
     }
     const scenes = await hueApi.scenes.getAll();
+
     scenes.forEach((scene) => {
       scenesToReturn.push({
         id: scene._id, // eslint-disable-line no-underscore-dangle
-        name: scene.name,
-        picture: scene.picture,
+        name: scene._rawData.name, // eslint-disable-line no-underscore-dangle
         bridge_serial_number: serialNumber,
       });
     });

@@ -16,34 +16,58 @@ class LightState {
   }
 }
 
+const hueApi = {
+  users: {
+    createUser: fake.resolves({
+      username: 'username',
+    }),
+  },
+  lights: {
+    getAll: fake.resolves(lights.lights),
+    setLightState: fake.resolves(null),
+    getLightState: fake.resolves({
+      on: false,
+      bri: 0,
+      hue: 38191,
+      sat: 94,
+      effect: 'none',
+      xy: [0.3321, 0.3605],
+      alert: 'select',
+      colormode: 'xy',
+      mode: 'homeautomation',
+      reachable: true,
+    }),
+  },
+  scenes: {
+    getAll: fake.resolves([
+      {
+        _rawData: {
+          name: 'Wake Up end',
+          type: 'LightScene',
+          lights: [],
+          owner: 'e8b9a940-4b66-4145-826a-2ec6d3309bd3',
+          recycle: true,
+          locked: true,
+          appdata: {},
+          picture: '',
+          lastupdated: '2019-10-07T08:22:17',
+          version: 2,
+        },
+        _id: 'SASYlgJXVcUhTiz',
+      },
+    ]),
+    activateScene: fake.resolves(null),
+  },
+};
+
 const MockedPhilipsHueClient = {
   v3: {
     lightStates: {
       LightState,
     },
     api: {
-      create: () => ({
-        users: {
-          createUser: fake.resolves({
-            username: 'username',
-          }),
-        },
-        lights: {
-          getAll: fake.resolves(lights.lights),
-          setLightState: fake.resolves(null),
-          getLightState: fake.resolves({
-            on: false,
-            bri: 0,
-            hue: 38191,
-            sat: 94,
-            effect: 'none',
-            xy: [0.3321, 0.3605],
-            alert: 'select',
-            colormode: 'xy',
-            mode: 'homeautomation',
-            reachable: true,
-          }),
-        },
+      createLocal: () => ({
+        connect: () => hueApi,
       }),
     },
     discovery: {
