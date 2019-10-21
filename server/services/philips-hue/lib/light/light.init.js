@@ -21,7 +21,7 @@ async function init() {
     const serialNumber = getDeviceParam(device, BRIDGE_SERIAL_NUMBER);
     if (ipAddress && username && serialNumber) {
       try {
-        const authenticatedApi = await hueApi.create(ipAddress, username);
+        const authenticatedApi = await hueApi.createLocal(ipAddress).connect(username);
         this.hueApisBySerialNumber.set(serialNumber, authenticatedApi);
         logger.debug(`Connected to Philips hue bridge "${device.name}"`);
         this.connnectedBridges.push(device);

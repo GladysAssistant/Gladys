@@ -25,9 +25,9 @@ async function configureBridge(serialNumber) {
   logger.info(`Connecting to hue bridge "${serialNumber}", ip = ${bridge.ipaddress}...`);
   try {
     const hueApi = this.hueClient.api;
-    const unauthenticatedApi = await hueApi.create(bridge.ipaddress);
+    const unauthenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect();
     const user = await unauthenticatedApi.users.createUser(HUE_APP_NAME, HUE_DEVICE_NAME);
-    const authenticatedApi = await hueApi.create(bridge.ipaddress, user.username);
+    const authenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect(user.username);
     this.hueApisBySerialNumber.set(serialNumber, authenticatedApi);
     const deviceCreated = await this.gladys.device.create({
       name: bridge.name,
@@ -58,7 +58,7 @@ async function configureBridge(serialNumber) {
     }
     return deviceCreated;
   } catch (e) {
-    if (e.getHueErrorType() === 101) {
+    if (e.getHueErrorType && e.getHueErrorType() === 101) {
       throw new Error403('BRIDGE_BUTTON_NOT_PRESSED');
     } else {
       throw e;
