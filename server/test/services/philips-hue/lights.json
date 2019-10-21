@@ -368,6 +368,80 @@
       "_id": 9,
       "id": 9,
       "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2019-10-06T19:48:01"
+      },
+      "type": "Dimmable light",
+      "name": "Hue white lamp 1",
+      "modelid": "LWB010",
+      "manufacturername": "Philips",
+      "productname": "Hue white lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": { "mindimlevel": 2000, "maxlumen": 806 },
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": { "mode": "safety", "configured": true }
+        },
+        "uniqueid": "00:17:88:01:04:40:0b:53-0b",
+        "swversion": "1.46.13_r26312",
+        "swconfigid": "322BB2EC",
+        "productid": "Philips-LWB010-1-A19DLv4"
+      },
+      "_id": 10,
+      "id": 10
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2019-10-06T19:48:01"
+      },
+      "type": "Dimmable light",
+      "name": "Hue white lamp 1",
+      "modelid": "UNKWOWN-MODEL",
+      "manufacturername": "Philips",
+      "productname": "Hue white lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": { "mindimlevel": 2000, "maxlumen": 806 },
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": { "mode": "safety", "configured": true }
+        },
+        "uniqueid": "00:17:88:01:04:40:0b:53-0b",
+        "swversion": "1.46.13_r26312",
+        "swconfigid": "322BB2EC",
+        "productid": "Philips-LWB010-1-A19DLv4"
+      },
+      "_id": 11,
+      "id": 11
     }
   ]
 }
