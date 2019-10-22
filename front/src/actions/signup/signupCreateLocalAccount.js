@@ -22,7 +22,7 @@ function createActions(store) {
           lastname: '',
           email: '',
           role: 'admin',
-          language: navigator.language === 'fr' ? 'fr' : 'en',
+          language: 'en',
           password: '',
           passwordRepeat: ''
         },
