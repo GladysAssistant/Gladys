@@ -9,7 +9,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs ffmpeg
+RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs ffmpeg sqlite openssl gzip
 
 RUN mkdir /src
 WORKDIR /src
@@ -17,7 +17,7 @@ ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python git openssl libffi-dev linux-headers udev \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers udev \
     && npm install --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
