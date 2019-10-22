@@ -3,7 +3,7 @@ const { EVENTS } = require('../utils/constants');
 const jobs = [
   {
     name: 'backup-gateway',
-    frequencyInSeconds: 24 * 60 * 60,
+    frequencyInSeconds: 2 * 60 * 60, // we check every 2 hour if needed, but it will backup only once a day
     event: EVENTS.GATEWAY.CREATE_BACKUP,
   },
   {
