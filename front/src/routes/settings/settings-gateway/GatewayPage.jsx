@@ -20,7 +20,7 @@ const GatewayPage = ({ children, ...props }) => (
         </div>
         <div class="row mt-4">
           <div class="col-md-6 offset-md-3">
-            <GatewayLoginForm {...props} />
+            <GatewayLoginForm {...props} external_forgot_password />
           </div>
         </div>
       </div>
