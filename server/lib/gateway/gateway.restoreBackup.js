@@ -10,7 +10,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * restoreBackup('/backup.db');
  */
 async function restoreBackup(backupFilePath) {
-  logger.debug(`Restoring back up ${backupFilePath}`);
+  logger.info(`Restoring back up ${backupFilePath}`);
   // ensure that the file exists
   const exists = await fse.pathExists(backupFilePath);
   if (!exists) {
@@ -21,7 +21,7 @@ async function restoreBackup(backupFilePath) {
   // copy the backupFile to the new DB
   await fse.copy(backupFilePath, this.config.storage);
   // done!
-  logger.debug(`Backup restored. Need reboot now.`);
+  logger.info(`Backup restored. Need reboot now.`);
 }
 
 module.exports = {
