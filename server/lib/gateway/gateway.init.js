@@ -21,7 +21,7 @@ async function init() {
       );
       this.connected = true;
       // try to backup, if needed
-      this.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
+      this.event.emit(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED);
     }
   } catch (e) {
     logger.debug(e);
