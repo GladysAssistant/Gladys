@@ -590,7 +590,9 @@
     "restoreButton": "Restore backup",
     "confirmRestore": "Confirm",
     "cancelRestore": "Cancel",
-    "restoreInProgressTitle": "Restoring backup in progress..."
+    "restoreInProgressTitle": "Restoring backup in progress...",
+    "backupNowButton": "Backup now",
+    "backupStarted": "Backup started..."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",

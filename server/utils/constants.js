@@ -35,6 +35,7 @@ const EVENTS = {
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
+    CHECK_IF_BACKUP_NEEDED: 'gateway.check-if-backup-needed',
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
   },

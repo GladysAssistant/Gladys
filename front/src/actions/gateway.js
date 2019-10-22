@@ -130,6 +130,31 @@ function createActions(store) {
         });
       }
     },
+    async createBackup(state) {
+      store.setState({
+        gatewayCreateBackupStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/gateway/backup');
+        store.setState({
+          gatewayCreateBackupStatus: RequestStatus.Success
+        });
+        // we refresh backups
+        setTimeout(() => actions.getBackups(store.getState()), 1000);
+        setTimeout(() => actions.getBackups(store.getState()), 3000);
+        setTimeout(() => actions.getBackups(store.getState()), 8000);
+        // we remove the backup status after 1 second
+        setTimeout(() => {
+          store.setState({
+            gatewayCreateBackupStatus: null
+          });
+        }, 1000);
+      } catch (e) {
+        store.setState({
+          gatewayCreateBackupStatus: RequestStatus.Error
+        });
+      }
+    },
     async updateBackupKey(state, e) {
       store.setState({
         gatewayBackupKey: e.target.value
@@ -210,21 +235,6 @@ function createActions(store) {
       } catch (e) {
         store.setState({
           gatewayGetBackupsStatus: RequestStatus.Error
-        });
-      }
-    },
-    async createBackup(state) {
-      store.setState({
-        gatewayCreateBackupsStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/gateway/backup');
-        store.setState({
-          gatewayCreateBackupsStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          gatewayCreateBackupsStatus: RequestStatus.Error
         });
       }
     },
