@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
@@ -19,6 +20,8 @@ async function init() {
         this.handleNewMessage.bind(this),
       );
       this.connected = true;
+      // try to backup, if needed
+      this.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
     }
   } catch (e) {
     logger.debug(e);
@@ -28,32 +31,6 @@ async function init() {
   if (process.env.NODE_ENV === 'production') {
     try {
       await this.getLatestGladysVersion();
-    } catch (e) {
-      logger.debug(e);
-    }
-
-    if (!this.connected) {
-      return;
-    }
-
-    try {
-      const backups = await this.getBackups();
-      let shouldBackup = false;
-      if (backups.length === 0) {
-        shouldBackup = true;
-      } else {
-        const lastBackupTimestamp = new Date(backups[0].created_at).getTime();
-        const yesterday = new Date().getTime() - 24 * 60 * 60 * 1000;
-        if (lastBackupTimestamp <= yesterday) {
-          shouldBackup = true;
-        }
-      }
-      if (shouldBackup) {
-        logger.debug(`Trying to backup instance to Gladys Gateway`);
-        await this.backup();
-      } else {
-        logger.debug(`Not backing up instance to Gladys Gateway, last backup is recent.`);
-      }
     } catch (e) {
       logger.debug(e);
     }

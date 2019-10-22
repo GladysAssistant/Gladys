@@ -9,6 +9,7 @@ const serverUrl = getConfig().gladysGatewayServerUrl;
 const cryptoLib = new WebCrypto();
 
 const { backup } = require('./gateway.backup');
+const { checkIfBackupNeeded } = require('./gateway.checkIfBackupNeeded');
 const { handleNewMessage } = require('./gateway.handleNewMessage');
 const { login } = require('./gateway.login');
 const { loginTwoFactor } = require('./gateway.loginTwoFactor');
@@ -36,7 +37,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.restoreInProgress = false;
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
-  this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
+  this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.checkIfBackupNeeded.bind(this)));
   this.event.on(EVENTS.GATEWAY.RESTORE_BACKUP, eventFunctionWrapper(this.restoreBackupEvent.bind(this)));
   this.event.on(EVENTS.SYSTEM.CHECK_UPGRADE, eventFunctionWrapper(this.getLatestGladysVersion.bind(this)));
   this.event.on(EVENTS.WEBSOCKET.SEND_ALL, eventFunctionWrapper(this.forwardWebsockets.bind(this)));
@@ -44,6 +45,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
 };
 
 Gateway.prototype.backup = backup;
+Gateway.prototype.checkIfBackupNeeded = checkIfBackupNeeded;
 Gateway.prototype.handleNewMessage = handleNewMessage;
 Gateway.prototype.login = login;
 Gateway.prototype.loginTwoFactor = loginTwoFactor;
