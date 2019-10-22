@@ -81,7 +81,7 @@ async function create(device) {
 
       // we delete all features which doesn't exist anymore
       await Promise.map(deviceInDb.features, async (existingFeature, index) => {
-        if (!features.find((newFeature) => newFeature.id === existingFeature.id)) {
+        if (!features.find((newFeature) => newFeature.external_id === existingFeature.external_id)) {
           await existingFeature.destroy({ transaction });
         }
       });
