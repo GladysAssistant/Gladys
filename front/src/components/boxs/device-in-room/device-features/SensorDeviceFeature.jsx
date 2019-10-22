@@ -23,7 +23,7 @@ const SensorDeviceType = ({ children, ...props }) => (
       <td class="text-right">
         {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
         {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.category === 'temperature-sensor' && (
+        {props.deviceFeature.category === 'temperature-sensor' && props.deviceFeature.last_value !== null && (
           <span>{props.deviceFeature.unit === 'celsius' ? '°C' : '°F'}</span>
         )}
         {props.deviceFeature.category !== 'temperature-sensor' && props.deviceFeature.last_value !== null && (
