@@ -5,6 +5,10 @@ const logger = require('../../utils/logger');
  * checkIfBackupNeeded();
  */
 async function checkIfBackupNeeded() {
+  if (!this.connected) {
+    logger.info(`Instance not connected to Gladys Gateway, not backing up.`);
+    return;
+  }
   const backups = await this.getBackups();
   let shouldBackup = false;
   if (backups.length === 0) {
