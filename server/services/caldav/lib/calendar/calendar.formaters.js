@@ -64,6 +64,9 @@ function formatRecurringEvents(event, gladysCalendar) {
       curEvent = curEvent.recurrences[dateLookupKey];
       startDate = this.moment(curEvent.start);
       curDuration = parseInt(this.moment(curEvent.end).format('x'), 10) - parseInt(startDate.format('x'), 10);
+      if (curEvent.status === 'CANCELLED') {
+        showRecurrence = false;
+      }
     } else if (curEvent.exdate !== undefined && curEvent.exdate[dateLookupKey] !== undefined) {
       // If there's no recurrence override, check for an exception date.
       // Exception dates represent exceptions to the rule.

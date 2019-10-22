@@ -9,11 +9,26 @@ const db = require('../../models');
  * gladys.calendar.getEvents();
  */
 async function getEvents(userId, options) {
-  const oneWeekAgo = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-  // Default from date is one week ago
-  const fromDate = options.from ? new Date(options.from) : new Date(oneWeekAgo);
-  // default end date is now
-  const toDate = options.to ? new Date(options.to) : new Date();
+  const where = {};
+
+  if (options.from || options.to) {
+    const oneWeekAgo = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
+    // Default from date is one week ago
+    const fromDate = options.from ? new Date(options.from) : new Date(oneWeekAgo);
+    // default end date is now
+    const toDate = options.to ? new Date(options.to) : new Date();
+    where.start = {
+      [Op.gte]: new Date(fromDate),
+      [Op.lte]: new Date(toDate),
+    };
+  }
+
+  if (options.calendarId) {
+    where.calendar_id = {
+      [Op.eq]: options.calendarId
+    };
+  }
+
   const calendarEvents = await db.CalendarEvent.findAll({
     include: [
       {
@@ -25,12 +40,7 @@ async function getEvents(userId, options) {
         },
       },
     ],
-    where: {
-      start: {
-        [Op.gte]: new Date(fromDate),
-        [Op.lte]: new Date(toDate),
-      },
-    },
+    where
   });
 
   const plainCalendarEvents = calendarEvents.map((calendarEvent) => calendarEvent.get({ plain: true }));

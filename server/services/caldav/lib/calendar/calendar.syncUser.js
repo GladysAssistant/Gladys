@@ -15,7 +15,15 @@ async function syncUser(userId) {
   let davCalendars = gladysCalendars.filter((calendar) => calendar.service_id === this.serviceId);
 
   await Promise.all(
-    davCalendars.map((calendar) => {
+    davCalendars.map(async (calendar) => {
+      const events = await this.gladys.calendar.getEvents(userId, {
+        calendarId: calendar.id
+      });
+
+      await Promise.all(
+        events.map(event => this.gladys.calendar.destroyEvent(event.selector)),
+      );
+
       return this.gladys.calendar.destroy(calendar.selector);
     }),
   );
