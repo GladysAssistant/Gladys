@@ -2,6 +2,8 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
 
+const EXTERNAL_FORGOT_PASSWORD_LINK = 'https://plus.gladysassistant.com/forgot-password';
+
 const GatewayLoginForm = ({ children, ...props }) => (
   <form onSubmit={!props.gatewayLoginStep2 ? props.login : props.loginTwoFactor} class="card">
     <div class="card-body p-6">
@@ -61,7 +63,10 @@ const GatewayLoginForm = ({ children, ...props }) => (
             <div class="form-group">
               <label class="form-label">
                 <Text id="gatewayLogin.passwordLabel" />
-                <a href="/forgot-password" class="float-right small">
+                <a
+                  href={props.external_forgot_password ? EXTERNAL_FORGOT_PASSWORD_LINK : '/forgot-password'}
+                  class="float-right small"
+                >
                   <Text id="gatewayLogin.forgotPasswordLabel" />
                 </a>
               </label>
