@@ -4,7 +4,7 @@ import GatewayBackupPage from './GatewayBackupPage';
 import actions from '../../../actions/gateway';
 
 @connect(
-  'user,gatewayStatus,gatewayBackups,gatewayRestoreInProgress',
+  'user,gatewayStatus,gatewayBackups,gatewayRestoreInProgress,gatewayCreateBackupStatus',
   actions
 )
 class SettingsGateway extends Component {

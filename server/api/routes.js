@@ -269,7 +269,7 @@ function getRoutes(gladys) {
     },
     'post /api/v1/gateway/backup/restore': {
       authenticated: true,
-      controller: gatewayController.getStatus,
+      controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
       authenticated: true,
