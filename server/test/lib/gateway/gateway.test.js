@@ -159,7 +159,9 @@ describe('gateway', () => {
 
       return new Promise((resolve, reject) => {
         gateway.handleNewMessage(
-          {},
+          {
+            type: 'gladys-api-call',
+          },
           {
             rsaPublicKeyRaw: 'key',
             ecdsaPublicKeyRaw: 'key',
