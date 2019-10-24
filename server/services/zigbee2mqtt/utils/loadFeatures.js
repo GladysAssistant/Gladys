@@ -1,5 +1,5 @@
-const uuid = require('uuid');
 const { features } = require('./features');
+const { convertCategory } = require('./convertCategory');
 const { getFeaturesByModel } = require('../model');
 
 /**
@@ -9,7 +9,7 @@ const { getFeaturesByModel } = require('../model');
  * @param {boolean} addBattery - Add battery feature.
  * @returns {*} Device for Gladys.
  * @example
- * loadFeatures('MODEL', true);
+ * loadFeatures('MyDevice', 'MODEL', true);
  */
 function loadFeatures(name, model, addBattery) {
   const matchingFeatures = getFeaturesByModel(model);
@@ -22,8 +22,8 @@ function loadFeatures(name, model, addBattery) {
   }
 
   loadedFeatures.forEach((feature) => {
-    feature.id = uuid.v4();
-    feature.external_id = `${name}:${feature.category.split('-')[0]}`;
+    feature.external_id = `zigbee2mqtt:${name}:${convertCategory(feature.category)}`;
+    feature.selector = feature.external_id;
   });
 
   return loadedFeatures;

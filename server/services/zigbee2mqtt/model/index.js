@@ -87,6 +87,7 @@ function getFeaturesByModel(modelName) {
   if (model) {
     return model.models[modelName];
   }
+
   return [];
 }
 
