@@ -38,6 +38,7 @@ const EVENTS = {
     CHECK_IF_BACKUP_NEEDED: 'gateway.check-if-backup-needed',
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
+    NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
