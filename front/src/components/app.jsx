@@ -51,6 +51,7 @@ import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
 import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
+import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
@@ -115,6 +116,11 @@ const AppRouter = connect(
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
+        ) : (
+          <Error type="404" default />
+        )}
+        {config.gatewayMode ? (
+          <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />
         ) : (
           <Error type="404" default />
         )}

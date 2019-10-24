@@ -15,31 +15,31 @@ const { EVENTS } = require('../../utils/constants');
  * });
  */
 async function handleNewMessage(data, rawMessage, cb) {
-  // first, we verify that the user has the right to control the instance
-  const usersKeys = JSON.parse(await this.variable.getValue('GLADYS_GATEWAY_USERS_KEYS'));
-  const rsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.rsaPublicKeyRaw);
-  const ecdsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
-
-  const found = usersKeys.find(
-    (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
-  );
-
-  if ((!found || !found.accepted) && get(data, 'options.url') !== '/api/v1/user') {
-    cb({
-      status: 403,
-      error: 'USER_NOT_ACCEPTED_LOCALLY',
-      message: 'User not allowed to control this Gladys instance',
-    });
-    return;
-  }
-  if (!rawMessage.local_user_id && get(data, 'options.url') !== '/api/v1/user') {
-    cb({
-      status: 400,
-      error: 'GATEWAY_USER_NOT_LINKED',
-    });
-    return;
-  }
   if (data.type === 'gladys-api-call') {
+    // first, we verify that the user has the right to control the instance
+    const usersKeys = JSON.parse(await this.variable.getValue('GLADYS_GATEWAY_USERS_KEYS'));
+    const rsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.rsaPublicKeyRaw);
+    const ecdsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
+
+    const found = usersKeys.find(
+      (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
+    );
+
+    if ((!found || !found.accepted) && get(data, 'options.url') !== '/api/v1/user') {
+      cb({
+        status: 403,
+        error: 'USER_NOT_ACCEPTED_LOCALLY',
+        message: 'User not allowed to control this Gladys instance',
+      });
+      return;
+    }
+    if (!rawMessage.local_user_id && get(data, 'options.url') !== '/api/v1/user') {
+      cb({
+        status: 400,
+        error: 'GATEWAY_USER_NOT_LINKED',
+      });
+      return;
+    }
     try {
       const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
       this.event.emit(
@@ -61,6 +61,12 @@ async function handleNewMessage(data, rawMessage, cb) {
         cb(e);
       }
     }
+  }
+
+  // if the message is an open API message
+  if (data.type === 'gladys-open-api' && data.action === 'create-owntracks-location') {
+    this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, data.data);
+    cb({ status: 200 });
   }
 }
 
