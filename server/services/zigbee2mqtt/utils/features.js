@@ -22,7 +22,7 @@ const features = {
     max: 1,
   },
   door: {
-    category: DEVICE_FEATURE_CATEGORIES.SIREN,
+    category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     read_only: true,
     has_feedback: false,
@@ -30,7 +30,7 @@ const features = {
     max: 1,
   },
   water: {
-    category: DEVICE_FEATURE_CATEGORIES.WATER_SENSOR,
+    category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     read_only: true,
     has_feedback: false,

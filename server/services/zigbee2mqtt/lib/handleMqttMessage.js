@@ -19,7 +19,8 @@ function handleMqttMessage(topic, message) {
         .map((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', d.friendly_name);
           return existingDevice || convertDevice(d, this.serviceId);
-        });
+        })
+        .filter((d) => d);
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
@@ -30,27 +31,27 @@ function handleMqttMessage(topic, message) {
     default: {
       const splittedTopic = topic.split('/');
       if (splittedTopic.length === 2) {
-        const device = this.gladys.stateManager.get('deviceByExternalId', splittedTopic[1]);
-        if (device) {
-          const incomingFeatures = JSON.parse(message);
+        const friendlyName = splittedTopic[1];
+        const incomingFeatures = JSON.parse(message);
 
-          device.features.forEach((feature) => {
-            const featureCategory = feature.category.split('-')[0];
-            if (incomingFeatures[featureCategory]) {
-              const newState = {
-                device_feature_external_id: `${feature.external_id}`,
-                state: incomingFeatures[featureCategory],
-              };
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
-            } else {
-              logger.info(`MQTT : Zigbee2mqtt device ${splittedTopic[1]}, feature ${featureCategory} not found.`);
-            }
-          });
-        } else {
-          logger.info(`MQTT : Zigbee2mqtt device ${splittedTopic[1]} not found.`);
-        }
+        Object.keys(incomingFeatures).forEach((featureName) => {
+          const feature = this.gladys.stateManager.get(
+            'deviceFeatureByExternalId',
+            `zigbee2mqtt:${friendlyName}:${featureName}`,
+          );
+
+          if (feature) {
+            const newState = {
+              device_feature_external_id: `${feature.external_id}`,
+              state: incomingFeatures[featureName],
+            };
+            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+          } else {
+            logger.warn(`Zigbee2mqtt device ${splittedTopic[1]}, feature ${featureName} not found.`);
+          }
+        });
       } else {
-        logger.info(`MQTT : Zigbee2mqtt topic ${topic} not handled.`);
+        logger.info(`Zigbee2mqtt topic ${topic} not handled.`);
       }
     }
   }
