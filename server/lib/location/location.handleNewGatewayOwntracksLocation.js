@@ -19,7 +19,7 @@ async function handleNewGatewayOwntracksLocation(data) {
     accuracy: data.accuracy,
     altitude: data.altitude,
   };
-  await this.create(user.selector, location);
+  return this.create(user.selector, location);
 }
 
 module.exports = {
