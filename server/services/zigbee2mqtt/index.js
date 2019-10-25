@@ -30,7 +30,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    client: zigbee2mqttHandler,
+    device: zigbee2mqttHandler,
     controllers: Zigbee2mqttController(zigbee2mqttHandler),
   });
 };
