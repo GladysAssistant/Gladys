@@ -2,25 +2,35 @@ import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 
+let scanTimer;
+
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getZigbee2mqttDevices(state) {
+    async discover(state) {
       store.setState({
-        getZigbee2mqttStatus: RequestStatus.Getting
+        discoverZigbee2mqtt: true
       });
       try {
         await state.httpClient.post('/api/v1/service/zigbee2mqtt/discover');
+        scanTimer = setTimeout(store.setState, 5000, {
+          discoverZigbee2mqtt: false,
+          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.noResponse'
+        });
       } catch (e) {
         store.setState({
-          getZigbee2mqttStatus: RequestStatus.Error
+          discoverZigbee2mqtt: false,
+          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponse'
         });
       }
     },
     setDiscoveredDevices(state, zigbee2mqttDevices) {
+      clearTimeout(scanTimer);
+
       store.setState({
         zigbee2mqttDevices,
-        getZigbee2mqttStatus: RequestStatus.Success
+        discoverZigbee2mqtt: false,
+        discoverZigbee2mqttError: null
       });
     },
     updateDeviceField(state, index, field, value) {

@@ -5,18 +5,32 @@ import EmptyState from './EmptyState';
 import DiscoveredBox from './DiscoveredBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
+import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 
 const DiscoverTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
-        <Text id="integration.zigbee2mqtt.device.title" />
+        <Text id="integration.zigbee2mqtt.discover.title" />
       </h1>
+      <div class="page-options d-flex">
+        <button class="btn btn-outline-primary" onClick={props.discover} disabled={props.discoverZigbee2mqtt}>
+          <Text id="integration.zigbee2mqtt.discover.scanButton" /> <i class="fe fe-radio" />
+        </button>
+      </div>
     </div>
     <div class="card-body">
+      <CheckMqttPanel />
+
+      {props.discoverZigbee2mqttError && (
+        <div class="alert alert-danger">
+          <Text id={props.discoverZigbee2mqttError} />
+        </div>
+      )}
+
       <div
         class={cx('dimmer', {
-          active: props.getZigbee2mqttStatus === RequestStatus.Getting
+          active: props.discoverZigbee2mqtt
         })}
       >
         <div class="loader" />
@@ -26,7 +40,7 @@ const DiscoverTab = ({ children, ...props }) => (
               props.zigbee2mqttDevices.map((device, index) => (
                 <DiscoveredBox {...props} device={device} deviceIndex={index} />
               ))}
-            {props.zigbee2mqttDevices && props.zigbee2mqttDevices.length === 0 && <EmptyState />}
+            {!props.zigbee2mqttDevices || (props.zigbee2mqttDevices.length === 0 && <EmptyState />)}
           </div>
         </div>
       </div>
