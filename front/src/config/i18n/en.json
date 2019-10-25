@@ -471,7 +471,8 @@
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
     "billingTab": "Billing",
-    "gatewayUsersTab": "Users"
+    "gatewayUsersTab": "Users",
+    "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
@@ -619,6 +620,8 @@
     "invalidEmail": "Invalid email",
     "networkError": "Network Error: Are you sure your Gladys instance is connected to the internet?",
     "userNotAcceptedLocally": "Your user is not accepted locally, please go back to your Gladys instance and allow access to this user in settings.",
+    "gatewayNoInstanceFound": "No Instance found. You need to connect first your instance to Gladys.",
+    "gatewayAccessBilling": "To access billing, click here.",
     "unknownError": "An unknown error occurred. Please contact us for more informations.",
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
@@ -805,5 +808,16 @@
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Reset Password"
+  },
+  "gatewayOpenApi": {
+    "title": "Open API",
+    "description": "The Open API allows you to send informations to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
+    "moreInformations": "More informations.",
+    "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
+    "keyName": "Name",
+    "keyLastUsed": "Last used",
+    "revoke": "Revoke",
+    "generateButton": "Generate",
+    "registered": "Registered"
   }
 }
