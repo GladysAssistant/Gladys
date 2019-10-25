@@ -39,4 +39,38 @@ describe('Zigbee2mqtt handle message', () => {
     expect(lastCallLastArg.payload[0]).to.have.property('external_id', 'zigbee2mqtt:name');
     expect(lastCallLastArg.payload[0]).to.not.have.property('id');
   });
+
+  it('discover no device (no feature)', () => {
+    const message = [
+      {
+        friendly_name: 'name',
+        model: 'model',
+        powerSource: 'power',
+        type: 'EndDevice',
+      },
+    ];
+    zigbee2mqttHandler.handleMqttMessage('zigbee2mqtt/bridge/config/devices', JSON.stringify(message));
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, sinon.match.object);
+    const lastCallLastArg = gladys.event.emit.lastCall.lastArg;
+    expect(lastCallLastArg.type).to.eq(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER);
+    expect(lastCallLastArg.payload).to.be.lengthOf(0);
+  });
+
+  it('discover no device (no EndDevice)', () => {
+    const message = [
+      {
+        friendly_name: 'name',
+        model: 'model',
+        powerSource: 'Battery',
+        type: 'unknown',
+      },
+    ];
+    zigbee2mqttHandler.handleMqttMessage('zigbee2mqtt/bridge/config/devices', JSON.stringify(message));
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, sinon.match.object);
+    const lastCallLastArg = gladys.event.emit.lastCall.lastArg;
+    expect(lastCallLastArg.type).to.eq(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER);
+    expect(lastCallLastArg.payload).to.be.lengthOf(0);
+  });
 });
