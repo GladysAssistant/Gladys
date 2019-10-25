@@ -33,7 +33,7 @@ module.exports = function MqttService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    client: mqttHandler,
+    device: mqttHandler,
     controllers: MqttController(mqttHandler),
   });
 };
