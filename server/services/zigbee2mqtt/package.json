@@ -2,5 +2,14 @@
   "name": "zigbee2mqtt",
   "version": "1.0.0",
   "main": "index.js",
-  "dependencies": {}
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ]
 }
