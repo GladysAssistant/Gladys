@@ -269,8 +269,15 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "device": {
-        "title": "Zigbee2mqtt Devices",
+        "title": "Zigbee2mqtt devices",
         "search": "Search devices"
+      },
+      "discover": {
+        "title": "Zigbee2mqtt discover",
+        "noDeviceDiscovered": "No device discovered, please click on scan button.",
+        "scanButton": "Scan",
+        "noResponse": "Scan never answer, please check your network.",
+        "serverNoResponse": "Gladys server is not available."
       },
       "noDeviceFound": "No zigbee2mqtt device found.",
       "nameLabel": "Device Name",
