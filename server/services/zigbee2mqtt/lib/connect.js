@@ -8,7 +8,7 @@ function connect() {
   this.mqttService = this.gladys.service.getService('mqtt');
 
   // Subscribe to Zigbee2mqtt topics
-  this.mqttService.client.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
+  this.mqttService.device.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
 }
 
 module.exports = {
