@@ -14,10 +14,24 @@ module.exports = function MqttController(mqttManager) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/mqtt/status Get MQTT connection status.
+   * @apiName status
+   * @apiGroup Mqtt
+   */
+  async function status(req, res) {
+    const response = await mqttManager.status();
+    res.json(response);
+  }
+
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
       controller: asyncMiddleware(connect),
+    },
+    'get /api/v1/service/mqtt/status': {
+      authenticated: true,
+      controller: status,
     },
   };
 };

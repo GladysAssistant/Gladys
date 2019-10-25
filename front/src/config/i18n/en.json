@@ -223,6 +223,44 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
+    "sonoff": {
+      "title": "Sonoff",
+      "deviceTab": "Devices",
+      "discoverTab": "MQTT discover",
+      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
+      "discoverDeviceDescr": "Automatically scan MQTT devices",
+      "device": {
+        "title": "Sonoff devices in Gladys",
+        "search": "Search devices",
+        "newButton": "New",
+        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
+      },
+      "discover": {
+        "title": "Sonoff discover devices over MQTT",
+        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Sonoff devices.",
+        "noDeviceFound": "No Sonoff device discovered.",
+        "documentation": "Sonoff documentation"
+      },
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic (%topic% Sonoff MQTT)",
+      "topicPlaceholder": "Should starts with 'sonoff:'",
+      "modelLabel": "Sonoff Model",
+      "model": {
+        "sonoff-basic": "Basic",
+        "sonoff-pow": "Pow",
+        "sonoff-s2x": "S20/S26 Smart Plug"
+      },
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "conflictError": "Current topic is already in use."
+      }
+    },
     "zwave": {
       "title": "Z-Wave",
       "deviceTab": "Devices",
@@ -283,6 +321,11 @@
       "title": "MQTT",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "status": {
+        "notConfigured": "MQTT service is not configured, please go to ",
+        "notConnected": "MQTT service failed to connect to network, please go to ",
+        "setupPageLink": "MQTT configuration page"
+      },
       "device": {
         "title": "MQTT Devices",
         "search": "Search devices",

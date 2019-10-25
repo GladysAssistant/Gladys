@@ -6,7 +6,7 @@ const logger = require('../../../../utils/logger');
  * @param {string} topic - MQTT topic.
  * @param {Object} message - The message sent.
  * @example
- * handleGladysMessage(gladys.service.mqtt.client, 'gladys/device/create', '{ message: "content" }');
+ * handleGladysMessage('gladys/device/create', '{ message: "content" }');
  */
 function handleGladysMessage(topic, message) {
   switch (topic) {
