@@ -1,23 +1,28 @@
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constants');
 
 /**
- * @description Convert Gladys category into Zigbee2mqtt category.
- * @param {string} category - Device category.
+ * @description Convert Gladys feature into Zigbee2mqtt category.
+ * @param {Object} feature - Device feature.
  * @returns {*} Zigbee2mqtt category.
  * @example
- * convertCategory('temperature-sensor');
+ * convertCategory(feature);
  */
-function convertCategory(category) {
+function convertCategory(feature) {
   let result;
 
-  switch (category) {
-    case DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR: {
-      result = 'water';
-      break;
-    }
-    default: {
-      const [split] = category.split('-');
-      result = split;
+  if (!feature.read_only) {
+    result = 'state';
+  } else {
+    const { category } = feature;
+    switch (category) {
+      case DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR: {
+        result = 'water';
+        break;
+      }
+      default: {
+        const [split] = category.split('-');
+        result = split;
+      }
     }
   }
 
