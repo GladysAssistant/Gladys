@@ -22,7 +22,7 @@ function loadFeatures(name, model, addBattery) {
   }
 
   loadedFeatures.forEach((feature) => {
-    feature.external_id = `zigbee2mqtt:${name}:${convertCategory(feature.category)}`;
+    feature.external_id = `zigbee2mqtt:${name}:${convertCategory(feature)}`;
     feature.selector = feature.external_id;
   });
 

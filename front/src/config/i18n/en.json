@@ -841,10 +841,10 @@
       "decimal": "Temperature"
     },
     "humidity-sensor": {
-      "integer": "Humidity"
+      "decimal": "Humidity"
     },
     "pressure-sensor": {
-      "integer": "Pressure"
+      "decimal": "Pressure"
     },
     "presence-sensor": {
       "binary": "Presence"

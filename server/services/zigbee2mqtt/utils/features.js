@@ -56,7 +56,7 @@ const features = {
   },
   illuminance: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
     read_only: true,
     has_feedback: false,
     min: 0,
@@ -64,7 +64,7 @@ const features = {
   },
   humidity: {
     category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
     unit: DEVICE_FEATURE_UNITS.PERCENT,
     read_only: true,
     has_feedback: false,
@@ -81,7 +81,7 @@ const features = {
   },
   pressure: {
     category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
     unit: DEVICE_FEATURE_UNITS.PRESSURE_KPA,
     read_only: true,
     has_feedback: false,
@@ -146,7 +146,7 @@ const features = {
   },
   gas_density: {
     category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
     read_only: true,
     has_feedback: false,
     min: 0,
