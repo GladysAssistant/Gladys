@@ -53,7 +53,7 @@ const SensorDeviceType = ({ children, ...props }) => {
         </td>
       )}
     </tr>
-  )
+  );
 };
 
 export default SensorDeviceType;
