@@ -60,23 +60,6 @@ describe('Zigbee2mqtt handle message', () => {
     expect(lastCallLastArg.payload).to.be.lengthOf(0);
   });
 
-  it('discover no device (no EndDevice)', () => {
-    const message = [
-      {
-        friendly_name: 'name',
-        model: 'model',
-        powerSource: 'Battery',
-        type: 'unknown',
-      },
-    ];
-    zigbee2mqttHandler.handleMqttMessage('zigbee2mqtt/bridge/config/devices', JSON.stringify(message));
-
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, sinon.match.object);
-    const lastCallLastArg = gladys.event.emit.lastCall.lastArg;
-    expect(lastCallLastArg.type).to.eq(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER);
-    expect(lastCallLastArg.payload).to.be.lengthOf(0);
-  });
-
   it('discover existing device', () => {
     const gladysDevice = {
       id: '8d24d898-f26f-4885-bce7-ef1008d11d56',
