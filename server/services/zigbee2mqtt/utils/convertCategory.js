@@ -3,7 +3,7 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constant
 /**
  * @description Convert Gladys feature into Zigbee2mqtt category.
  * @param {Object} feature - Device feature.
- * @returns {*} Zigbee2mqtt category.
+ * @returns {string} Zigbee2mqtt category.
  * @example
  * convertCategory(feature);
  */

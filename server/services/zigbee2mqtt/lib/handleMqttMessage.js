@@ -15,7 +15,6 @@ function handleMqttMessage(topic, message) {
       // Keep only "final/end" devices
       const devices = JSON.parse(message);
       const convertedDevices = devices
-        .filter((d) => d.type === 'EndDevice')
         .map((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', d.friendly_name);
           return existingDevice || convertDevice(d, this.serviceId);
