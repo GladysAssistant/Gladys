@@ -35,7 +35,7 @@ jobs:
   test-server:
     working_directory: ~/gladys-test # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps: # a collection of executable commands
       - checkout:
           path: ~/gladys-test
