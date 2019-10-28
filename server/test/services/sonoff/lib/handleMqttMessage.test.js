@@ -30,7 +30,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/POWER', 'ON');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 1,
     };
 
@@ -42,7 +42,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/POWER', 'OFF');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 0,
     };
 
@@ -54,7 +54,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "Current": 125 }}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:power`,
+      device_feature_external_id: `sonoff:my_device:switch:power`,
       state: 125,
     };
 
@@ -76,7 +76,7 @@ describe('Mqtt handle message', () => {
     );
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 1,
     };
 
@@ -88,7 +88,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/STATE', '{ "POWER": "ON"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 1,
     };
 
@@ -100,7 +100,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/STATE', '{ "POWER": "OFF"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 0,
     };
 
@@ -112,7 +112,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/RESULT', '{ "POWER": "ON"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 1,
     };
 
@@ -124,7 +124,7 @@ describe('Mqtt handle message', () => {
     sonoffHandler.handleMqttMessage('stat/my_device/RESULT', '{ "POWER": "OFF"}');
 
     const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:binary`,
+      device_feature_external_id: `sonoff:my_device:switch:binary`,
       state: 0,
     };
 
