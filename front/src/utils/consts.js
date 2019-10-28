@@ -58,7 +58,8 @@ export const RequestStatus = {
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
-  PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed'
+  PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
+  RoomConflictError: 'RoomConflictError'
 };
 
 export const GetWeatherStatus = {
