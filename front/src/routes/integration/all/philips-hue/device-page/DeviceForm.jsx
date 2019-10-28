@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
 
-class MqttDeviceForm extends Component {
+class PhilipsHueDeviceForm extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
@@ -81,4 +81,4 @@ class MqttDeviceForm extends Component {
   }
 }
 
-export default MqttDeviceForm;
+export default PhilipsHueDeviceForm;
