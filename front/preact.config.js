@@ -17,4 +17,8 @@ module.exports = function(config) {
       'process.env.STRIPE_API_KEY': JSON.stringify(STRIPE_API_KEY)
     })
   );
+
+  config.resolve.alias.react = 'preact/compat';
+  config.resolve.alias['react-dom/test-utils'] = 'preact/test-utils';
+  config.resolve.alias['react-dom'] = 'preact/compat';
 };
