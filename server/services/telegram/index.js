@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const MessageHandler = require('./lib');
 const TelegramControllers = require('./api/telegram.controller');
 
@@ -18,7 +19,7 @@ module.exports = function TelegramService(gladys, serviceId) {
     logger.info('Starting telegram service');
     const token = await gladys.variable.getValue('TELEGRAM_API_KEY', serviceId);
     if (!token) {
-      throw new Error('No telegram api token found. Not starting telegram service');
+      throw new ServiceNotConfiguredError('No telegram api token found. Not starting telegram service');
     }
     await messageHandler.connect(token);
   }
