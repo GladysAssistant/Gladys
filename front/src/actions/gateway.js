@@ -57,7 +57,10 @@ function createActions(store) {
         }
       }
     },
-    async loginTwoFactor(state) {
+    async loginTwoFactor(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
       store.setState({
         gatewayLoginStatus: RequestStatus.Getting
       });
