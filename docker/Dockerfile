@@ -1,6 +1,6 @@
 ARG target
 
-FROM $target/node:10-alpine
+FROM $target/node:12-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
