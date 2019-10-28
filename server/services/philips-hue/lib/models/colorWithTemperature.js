@@ -19,12 +19,8 @@ const getPhilipsHueColorTemperatureLight = (philipsHueLight, bridgeSerialNumber,
       name: `${philipsHueLight.name} On/Off`,
       read_only: false,
       has_feedback: false,
-      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.BINARY
-      }`,
-      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.BINARY
-      }`,
+      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
+      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       min: 0,
@@ -34,12 +30,8 @@ const getPhilipsHueColorTemperatureLight = (philipsHueLight, bridgeSerialNumber,
       name: `${philipsHueLight.name} Color`,
       read_only: false,
       has_feedback: false,
-      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.COLOR
-      }`,
-      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.COLOR
-      }`,
+      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
+      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
       min: 0,
@@ -49,12 +41,8 @@ const getPhilipsHueColorTemperatureLight = (philipsHueLight, bridgeSerialNumber,
       name: `${philipsHueLight.name} Brightness`,
       read_only: false,
       has_feedback: false,
-      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
-      }`,
-      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
-      }`,
+      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
+      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       min: 0,
@@ -64,12 +52,8 @@ const getPhilipsHueColorTemperatureLight = (philipsHueLight, bridgeSerialNumber,
       name: `${philipsHueLight.name} Temperature`,
       read_only: false,
       has_feedback: false,
-      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
-      }`,
-      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${
-        DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
-      }`,
+      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
+      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
       min: philipsHueLight._rawData.capabilities.control.ct.min, // eslint-disable-line no-underscore-dangle

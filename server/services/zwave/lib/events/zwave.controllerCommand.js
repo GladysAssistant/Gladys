@@ -41,9 +41,7 @@ const CTRL_ERRORS = {
  */
 function controllerCommand(nodeId, ctrlState, ctrlError, helpMsg) {
   logger.debug(
-    `Zwave.controllerCommand : NodeId = ${nodeId}, ctrlState = ${CTRL_STATES[ctrlState]}, ctrlError = ${
-      CTRL_ERRORS[ctrlError]
-    }, helpMsg = ${helpMsg}`,
+    `Zwave.controllerCommand : NodeId = ${nodeId}, ctrlState = ${CTRL_STATES[ctrlState]}, ctrlError = ${CTRL_ERRORS[ctrlError]}, helpMsg = ${helpMsg}`,
   );
 }
 
