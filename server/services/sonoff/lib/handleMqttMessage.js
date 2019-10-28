@@ -19,9 +19,7 @@ function handleMqttMessage(topic, message) {
     // Power status
     case 'POWER': {
       event = {
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY
-        }`,
+        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         state: message === 'ON' ? 1 : 0,
       };
       break;
@@ -31,9 +29,7 @@ function handleMqttMessage(topic, message) {
       const sensorMsg = JSON.parse(message);
 
       event = {
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${
-          DEVICE_FEATURE_TYPES.SWITCH.POWER
-        }`,
+        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
         state: sensorMsg.ENERGY.Current,
       };
       break;
@@ -57,9 +53,7 @@ function handleMqttMessage(topic, message) {
         };
 
         event = {
-          device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${
-            DEVICE_FEATURE_TYPES.SWITCH.BINARY
-          }`,
+          device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
           state: statusValue,
         };
       } else {
@@ -75,9 +69,7 @@ function handleMqttMessage(topic, message) {
       const stateValue = stateMsg.POWER;
 
       event = {
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY
-        }`,
+        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         state: stateValue === 'ON' ? 1 : 0,
       };
       break;
