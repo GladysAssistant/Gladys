@@ -26,6 +26,11 @@ const EditHouse = ({ children, ...props }) => (
           <Text id="signup.configureHouse.conflictError" />
         </div>
       )}
+      {props.houseUpdateStatus === RequestStatus.RoomConflictError && (
+        <div class="alert alert-danger">
+          <Text id="signup.configureHouse.roomConflictError" />
+        </div>
+      )}
       {props.houseUpdateStatus === RequestStatus.NetworkError && (
         <div class="alert alert-danger">
           <Text id="signup.httpErrors.networkError" />
@@ -104,7 +109,6 @@ const EditHouse = ({ children, ...props }) => (
           </span>
         </div>
       </div>
-
       <div class="form-group">
         <button onClick={props.saveHouse} class="btn btn-success">
           <Text id="signup.configureHouse.saveHouse" />

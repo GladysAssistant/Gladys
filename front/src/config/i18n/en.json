@@ -100,6 +100,7 @@
       "confirmDeleteHouse": "Confirm house deletion",
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
+      "roomConflictError": "A room with the same name already exist.",
       "validationError": "Validation error: A house can't have an empty name."
     },
     "success": {
