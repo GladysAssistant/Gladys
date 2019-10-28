@@ -1,12 +1,22 @@
+import get from 'get-value';
 import integrationsConfig from '../config/integrations';
+import { AVAILABLE_LANGUAGES_LIST, AVAILABLE_LANGUAGES } from '../../../server/utils/constants';
+
+const getLanguage = state => {
+  const foundLanguageInState = get(state, 'user.language');
+  const userLanguage =
+    AVAILABLE_LANGUAGES_LIST.indexOf(foundLanguageInState) !== -1 ? foundLanguageInState : AVAILABLE_LANGUAGES.EN;
+  return userLanguage;
+};
 
 const actions = store => ({
   getIntegrations(state) {
+    const userLanguage = getLanguage(state);
     const currentIntegrationCategory = state.currentUrl.split('/').pop();
-    const integrations = integrationsConfig[state.user.language][currentIntegrationCategory] || [];
+    const integrations = integrationsConfig[userLanguage][currentIntegrationCategory] || [];
     store.setState({
       integrations,
-      totalSize: integrationsConfig[state.user.language].totalSize
+      totalSize: integrationsConfig[userLanguage].totalSize
     });
   },
   async getIntegrationByName(state, name, podId = null) {
@@ -19,7 +29,8 @@ const actions = store => ({
     });
   },
   getIntegrationByCategory(state, category) {
-    const integrations = integrationsConfig[state.user.language][category] || [];
+    const userLanguage = getLanguage(state);
+    const integrations = integrationsConfig[userLanguage][category] || [];
     store.setState({
       integrations
     });
