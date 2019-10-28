@@ -2,9 +2,9 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
-import MqttDeviceForm from './DeviceForm';
+import DeviceForm from './DeviceForm';
 
-class MqttDeviceBox extends Component {
+class PhilipsHueDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({ loading: true });
     try {
@@ -38,7 +38,7 @@ class MqttDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                <MqttDeviceForm {...props} />
+                <DeviceForm {...props} />
 
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
@@ -57,4 +57,4 @@ class MqttDeviceBox extends Component {
   }
 }
 
-export default MqttDeviceBox;
+export default PhilipsHueDeviceBox;
