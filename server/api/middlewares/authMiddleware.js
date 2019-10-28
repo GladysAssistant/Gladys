@@ -28,7 +28,6 @@ module.exports = function AuthMiddleware(scope, gladys) {
 
       next();
     } catch (e) {
-      logger.trace(e);
       if (e instanceof Error401) {
         throw e;
       }

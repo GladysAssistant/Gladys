@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-
+const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 /**
  * @public
  * @description Start one service by name
@@ -12,8 +12,12 @@ async function start(name) {
     const service = this.stateManager.get('service', name);
     await service.start();
   } catch (e) {
-    logger.warn(`Unable to start service ${name}`);
-    logger.warn(e);
+    if (e instanceof ServiceNotConfiguredError) {
+      logger.info(`Service ${name} is not configured, so it was not started.`);
+    } else {
+      logger.warn(`Unable to start service ${name}`);
+      logger.warn(e);
+    }
   }
 }
 
