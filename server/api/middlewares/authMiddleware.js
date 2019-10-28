@@ -1,6 +1,5 @@
 const asyncMiddleware = require('./asyncMiddleware');
 const { Error401 } = require('../../utils/httpErrors');
-const logger = require('../../utils/logger');
 
 module.exports = function AuthMiddleware(scope, gladys) {
   return asyncMiddleware(async (req, res, next) => {
