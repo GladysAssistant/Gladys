@@ -29,6 +29,7 @@ const DevicePanel = ({ children, ...props }) => (
               type="text"
               class="form-control w-10"
               placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
+              value={props.xiaomiDeviceSearch}
               onInput={props.debouncedSearch}
             />
           </Localizer>
