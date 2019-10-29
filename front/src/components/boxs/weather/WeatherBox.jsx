@@ -87,7 +87,7 @@ const WeatherBox = ({ children, ...props }) => (
             <i class="fe fe-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/chat">
+              <Link href="/dashboard/integration/weather/darksky">
                 <Text id="dashboard.boxes.weather.clickHere" />
               </Link>
             </span>
