@@ -380,6 +380,7 @@
         "noDevices": "No Xiaomi devices added yet.",
         "searchPlaceholder": "Search Xiaomi devices",
         "sidLabel": "Xiaomi SID",
+        "ipLabel": "IP Address",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "saveButton": "Save",
