@@ -14,8 +14,16 @@ function createActions(store) {
       });
       try {
         const xiaomiSensors = await state.httpClient.get('/api/v1/service/xiaomi/sensor');
+
+        // remove sensors which are already added
+        const xiaomiSensorsFiltered = xiaomiSensors.filter(sensor => {
+          if (!state.xiaomiDevicesMap) {
+            return true;
+          }
+          return !state.xiaomiDevicesMap.has(sensor.external_id);
+        });
         store.setState({
-          xiaomiSensors,
+          xiaomiSensors: xiaomiSensorsFiltered,
           getXiaomiSensorsStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -39,10 +47,17 @@ function createActions(store) {
           options.search = state.xiaomiDeviceSearch;
         }
         const xiaomiDevices = await state.httpClient.get('/api/v1/service/xiaomi/device', options);
+
+        const xiaomiDevicesMap = new Map();
+        xiaomiDevices.forEach(xiaomiDevice => {
+          xiaomiDevicesMap.set(xiaomiDevice.external_id, xiaomiDevice);
+        });
         store.setState({
           xiaomiDevices,
+          xiaomiDevicesMap,
           getXiaomiDevicesStatus: RequestStatus.Success
         });
+        actions.getXiaomiSensors(store.getState());
       } catch (e) {
         store.setState({
           getXiaomiDevicesStatus: RequestStatus.Error

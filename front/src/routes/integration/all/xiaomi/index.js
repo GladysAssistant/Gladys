@@ -7,7 +7,7 @@ import DevicePanel from './DevicePanel';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,xiaomiSensors,xiaomiDevices,houses,getXiaomiDevicesStatus',
+  'user,session,xiaomiSensors,xiaomiDevices,houses,getXiaomiDevicesStatus,xiaomiDeviceSearch',
   actions
 )
 class XiaomiPage extends Component {
@@ -23,7 +23,7 @@ class XiaomiPage extends Component {
   render(props, {}) {
     return (
       <XiaomiLayout>
-        <DevicePanel {...props} />
+        {props.xiaomiDevices && props.xiaomiDevices.length ? <DevicePanel {...props} /> : <div />}
         <SetupPanel {...props} />
       </XiaomiLayout>
     );
