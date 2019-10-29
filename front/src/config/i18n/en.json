@@ -642,7 +642,8 @@
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress...",
     "backupNowButton": "Backup now",
-    "backupStarted": "Backup started..."
+    "backupStarted": "Backup started...",
+    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
