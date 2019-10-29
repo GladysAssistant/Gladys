@@ -6,7 +6,7 @@ import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
 @connect(
-  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus',
+  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus',
   actions
 )
 class PhilipsHueDevicePage extends Component {
@@ -20,7 +20,7 @@ class PhilipsHueDevicePage extends Component {
   render(props, {}) {
     return (
       <PhilipsHuePage>
-        <DevicePage {...props} />
+        {props.philipsHueDevices && props.philipsHueDevices.length ? <DevicePage {...props} /> : <div />}
         <FoundDevices {...props} />
       </PhilipsHuePage>
     );

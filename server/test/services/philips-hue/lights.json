@@ -37,7 +37,7 @@
         "function": "mixed",
         "direction": "omnidirectional"
       },
-      "uniqueid": "00:17:88:01:10:42:77:4e-0b",
+      "uniqueid": "unique-id",
       "swversion": "5.50.1.19085",
       "_id": 1,
       "id": 1,
@@ -140,7 +140,7 @@
             "configured": true
           }
         },
-        "uniqueid": "00:17:88:01:04:25:4e:45-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "5E2017D8",
         "productid": "Philips-LTW012-1-E14CTv1"
@@ -193,7 +193,7 @@
             "configured": true
           }
         },
-        "uniqueid": "00:17:88:01:04:24:18:04-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "7A2E82CC",
         "productid": "Philips-LTW010-1-A19CTv2"
@@ -252,7 +252,7 @@
             "configured": true
           }
         },
-        "uniqueid": "00:17:88:01:03:a2:f2:66-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "A25796CB",
         "productid": "Philips-LST002-1-LedStripsv3"
@@ -306,7 +306,7 @@
             "customsettings": { "bri": 254, "xy": [0.309, 0.3276] }
           }
         },
-        "uniqueid": "00:17:88:01:06:40:f3:ba-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "869E2FE2",
         "productid": "3241-3127-7871-LS00"
@@ -360,7 +360,7 @@
             "customsettings": { "bri": 254, "ct": 301 }
           }
         },
-        "uniqueid": "00:17:88:01:04:3d:1f:aa-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "52E3234B",
         "productid": "Philips-LCT015-1-A19ECLv5"
@@ -398,7 +398,7 @@
           "direction": "omnidirectional",
           "startup": { "mode": "safety", "configured": true }
         },
-        "uniqueid": "00:17:88:01:04:40:0b:53-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "322BB2EC",
         "productid": "Philips-LWB010-1-A19DLv4"
@@ -435,13 +435,146 @@
           "direction": "omnidirectional",
           "startup": { "mode": "safety", "configured": true }
         },
-        "uniqueid": "00:17:88:01:04:40:0b:53-0b",
+        "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
         "swconfigid": "322BB2EC",
         "productid": "Philips-LWB010-1-A19DLv4"
       },
       "_id": 11,
       "id": 11
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 144,
+        "ct": 443,
+        "alert": "lselect",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-11T22:38:56"
+      },
+      "type": "Color temperature light",
+      "name": "Hue ambiance lamp Salon",
+      "modelid": "LTW001",
+      "manufacturername": "Philips",
+      "productname": "Hue ambiance lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 1000,
+            "maxlumen": 806,
+            "ct": { "min": 153, "max": 454 }
+          },
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "sultanbulb",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": { "mode": "powerfail", "configured": true }
+        },
+        "uniqueid": "unique-id",
+        "swversion": "version"
+      },
+      "_id": 11,
+      "id": 11,
+      "mappedColorGamut": "2200K-6500K"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 144,
+        "hue": 7676,
+        "sat": 199,
+        "effect": "none",
+        "xy": [0.5016, 0.4151],
+        "ct": 443,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-05T13:27:07"
+      },
+      "type": "Extended color light",
+      "name": "Hue color lamp Chambre",
+      "modelid": "LCT010",
+      "manufacturername": "Philips",
+      "productname": "Hue color lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 1000,
+            "maxlumen": 806,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": { "min": 153, "max": 500 }
+          },
+          "streaming": { "renderer": true, "proxy": true }
+        },
+        "config": {
+          "archetype": "sultanbulb",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": { "mode": "powerfail", "configured": true }
+        },
+        "uniqueid": "unique-id",
+        "swversion": "1.46.13_r26312",
+        "swconfigid": "0CE67A8F",
+        "productid": "Philips-LCT010-1-A19ECLv4"
+      },
+      "_id": 12,
+      "id": 12,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 246,
+        "hue": 0,
+        "sat": 0,
+        "effect": "none",
+        "xy": [0.3979, 0.3984],
+        "ct": 447,
+        "alert": "lselect",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": { "state": "notupdatable", "lastinstall": null },
+      "type": "Extended color light",
+      "name": "Led Strip bureau",
+      "modelid": "GL-C-008",
+      "manufacturername": "GLEDOPTO",
+      "productname": "Extended color light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {
+            "colorgamuttype": "other",
+            "ct": { "min": 0, "max": 65535 }
+          },
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "mixed",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "unique-id",
+        "swversion": "1.0.2"
+      },
+      "_id": 13,
+      "id": 13,
+      "mappedColorGamut": "other"
     }
   ]
 }

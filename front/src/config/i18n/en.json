@@ -192,14 +192,16 @@
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesConnected": "No bridges connected."
+        "noBridgesConnected": "No bridges connected.",
+        "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
       },
       "device": {
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
         "search": "Search devices",
-        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!"
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab."
       }
     },
     "rtspCamera": {
