@@ -27,6 +27,13 @@ const FoundDevices = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.getPhilipsHueNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
+            {props.philipsHueNewDevices && props.philipsHueNewDevices.length === 0 && (
+              <div class="col-md-12">
+                <div class="alert alert-info">
+                  <Text id="integration.philipsHue.device.noDevicesFound" />
+                </div>
+              </div>
+            )}
             {props.philipsHueNewDevices &&
               props.philipsHueNewDevices.map((device, index) => (
                 <div class="col-md-4">

@@ -32,6 +32,8 @@ async function getLights() {
         case 'LCT015': // hue white & color 4th generation
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
+        case 'LCT010': // Hue A19 White & Color w/ Richer Colors
+        case 'GL-C-008': // Non-hue LED Strip
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LWB010': // hue white bulb with fixed warming light (2700K)
@@ -39,6 +41,7 @@ async function getLights() {
           break;
         case 'LTW012': // hue White Ambiance E12
         case 'LTW010': // hue White & Ambiance Bulb
+        case 'LTW001': // Hue A19 White & Ambiance Bulb
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         default:

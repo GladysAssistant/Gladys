@@ -202,6 +202,7 @@
     "devices": [
       {
         "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+        "name": "Main Lamp",
         "selector": "main-lamp",
         "features": [
           {
@@ -219,6 +220,7 @@
       },
       {
         "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+        "name": "TV Lamp",
         "selector": "tv-lamp",
         "features": [
           {
@@ -1030,125 +1032,85 @@
   "get /api/v1/service/philips-hue/light": [
     {
       "id": "1",
-      "name": "Lounge Living Color",
-      "type": "Extended color light",
-      "modelid": "LCT007",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
+      "name": "New Lamp",
+      "model": "LCT007",
+      "external_id": "philips-hue:4"
     },
     {
       "id": "2",
-      "name": "Right Bedside",
-      "type": "Extended color light",
-      "modelid": "LCT001",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
-    },
-    {
-      "id": "3",
-      "name": "Left Bedside",
-      "type": "Extended color light",
-      "modelid": "LCT001",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
+      "name": "Living room lamp",
+      "model": "LCT007",
+      "external_id": "philips-hue:5"
     }
   ],
   "get /api/v1/service/philips-hue/device": [
     {
       "id": "1",
       "name": "Lounge Living Color",
-      "type": "Extended color light",
-      "modelid": "LCT007",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
+      "model": "LCT007",
+      "external_id": "philips-hue:1",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Color",
+          "category": "light",
+          "type": "color",
+          "min": 0,
+          "max": 1
+        }
+      ]
     },
     {
       "id": "2",
       "name": "Right Bedside",
       "type": "Extended color light",
-      "modelid": "LCT001",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
+      "model": "LCT001",
+      "external_id": "philips-hue:2",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Color",
+          "category": "light",
+          "type": "color",
+          "min": 0,
+          "max": 1
+        }
+      ]
     },
     {
       "id": "3",
       "name": "Left Bedside",
       "type": "Extended color light",
-      "modelid": "LCT001",
-      "manufacturername": "Phillips",
-      "uniqueid": "00:17:88:01:xx:xx:xx:xx-xx",
-      "swversion": "66013452",
-      "state": {
-        "on": true,
-        "bri": 202,
-        "hue": 11315,
-        "sat": 237,
-        "effect": "none",
-        "xy": [0.5534, 0.4239],
-        "alert": "none",
-        "colormode": "xy",
-        "reachable": true
-      }
+      "model": "LCT001",
+      "external_id": "philips-hue:3",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Color",
+          "category": "light",
+          "type": "color",
+          "min": 0,
+          "max": 1
+        }
+      ]
     }
   ]
 }
