@@ -1,3 +1,5 @@
+const Bottleneck = require('bottleneck/es5');
+
 const { activateScene } = require('./light.activateScene');
 const { configureBridge } = require('./light.configureBridge');
 const { getBridges } = require('./light.getBridges');
@@ -6,6 +8,17 @@ const { poll } = require('./light.poll');
 const { getLights } = require('./light.getLights');
 const { getScenes } = require('./light.getScenes');
 const { setValue } = require('./light.setValue');
+
+// we rate-limit the number of request per seconds to poll lights
+const pollLimiter = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 100, // 100 ms
+});
+
+// we rate-limit the number of request per seconds to control lights
+const setValueLimiter = new Bottleneck({
+  minTime: 100, // 100 ms
+});
 
 /**
  * @description Add ability to control a Philips Hue light
@@ -31,9 +44,9 @@ PhilipsHueLightHandler.prototype.activateScene = activateScene;
 PhilipsHueLightHandler.prototype.configureBridge = configureBridge;
 PhilipsHueLightHandler.prototype.getBridges = getBridges;
 PhilipsHueLightHandler.prototype.init = init;
-PhilipsHueLightHandler.prototype.poll = poll;
+PhilipsHueLightHandler.prototype.poll = pollLimiter.wrap(poll);
 PhilipsHueLightHandler.prototype.getLights = getLights;
 PhilipsHueLightHandler.prototype.getScenes = getScenes;
-PhilipsHueLightHandler.prototype.setValue = setValue;
+PhilipsHueLightHandler.prototype.setValue = setValueLimiter.wrap(setValue);
 
 module.exports = PhilipsHueLightHandler;
