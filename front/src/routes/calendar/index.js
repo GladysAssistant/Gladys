@@ -1,17 +1,13 @@
-import React from 'preact-compat';
-import createRef from 'create-react-ref/lib/createRef';
-React.createRef = createRef;
-
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/integration';
 
-import BigCalendar from 'react-big-calendar';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-const localizer = BigCalendar.momentLocalizer(moment);
+const localizer = momentLocalizer(moment);
 
 @connect(
   '',
@@ -31,7 +27,7 @@ class Map extends Component {
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-body">
-                      <BigCalendar
+                      <Calendar
                         localizer={localizer}
                         events={[
                           {
