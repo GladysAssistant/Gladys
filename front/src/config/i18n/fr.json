@@ -10,5 +10,22 @@
     "emailAlreadyExist": "Une adresse avec ce compte existe déjà",
     "paymentFailed": "Le paiement a échoué. Merci de réessayer ou de tenter avec une autre carte.",
     "paymentSuccess": "Merci pour ton inscription au package communauté Gladys! Tu as du recevoir un email pour accéder au Slack et au Gladys Gateway. Encore merci pour ton soutien."
+  },
+  "calendar": {
+    "date": "Date",
+    "time": "Heure",
+    "event": "Évènement",
+    "allDay": "Journée entière",
+    "week": "Semaine",
+    "work_week": "Semaine de travail",
+    "day": "Jour",
+    "month": "Mois",
+    "previous": "Avant",
+    "next": "Après",
+    "yesterday": "Hier",
+    "tomorrow": "Demain",
+    "today": "Aujourd'hui",
+    "agenda": "Agenda",
+    "noEventsInRange": "Pas d'évènements sur cette période."
   }
 }
