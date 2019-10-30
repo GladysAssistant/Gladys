@@ -24,7 +24,7 @@ module.exports = function MessageController(gladys) {
       language: req.user.language,
       source_user_id: req.user.id,
       user: req.user,
-      created_at: new Date(),
+      created_at: req.body.created_at || new Date(),
     };
     gladys.event.emit(EVENTS.MESSAGE.NEW, messageToSend);
     res.status(201).json({
@@ -32,7 +32,7 @@ module.exports = function MessageController(gladys) {
       source: 'api_client',
       language: req.user.language,
       source_user_id: req.user.id,
-      created_at: new Date(),
+      created_at: messageToSend.created_at,
     });
   }
 

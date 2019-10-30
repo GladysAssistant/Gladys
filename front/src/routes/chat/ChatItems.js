@@ -1,3 +1,4 @@
+import { Text } from 'preact-i18n';
 import style from './style.css';
 
 import dayjs from 'dayjs';
@@ -38,9 +39,13 @@ const OutGoingMessage = ({ children, ...props }) => (
       <p>{props.message.text}</p>
       <span class={style.time_date}>
         {' '}
-        {dayjs(props.message.created_at)
-          .locale(props.user.language)
-          .fromNow()}
+        {props.message.tempId ? (
+          <Text id="chat.sendingInProgress" />
+        ) : (
+          dayjs(props.message.created_at)
+            .locale(props.user.language)
+            .fromNow()
+        )}
       </span>
     </div>
   </div>
@@ -57,7 +62,11 @@ const Messages = ({ children, ...props }) => (
               return <OutGoingMessage user={props.user} message={message} />;
             })}
 
-          {props.gladysIsTyping && <p>Typing...</p>}
+          {props.gladysIsTyping && (
+            <p>
+              <Text id="chat.typingInProgress" />
+            </p>
+          )}
         </div>
       </div>
     </div>

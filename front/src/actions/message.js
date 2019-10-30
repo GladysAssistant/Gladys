@@ -1,22 +1,38 @@
 import { RequestStatus } from '../utils/consts';
 import update from 'immutability-helper';
+import uuid from 'uuid';
 
-const TYPING_MIN_TIME = 300;
+const TYPING_MIN_TIME = 400;
 const TYPING_MAX_TIME = 600;
+
+const sortMessages = messages =>
+  messages.sort((a, b) => {
+    if (a.created_at < b.created_at) {
+      return -1;
+    }
+    if (a.created_at > b.created_at) {
+      return 1;
+    }
+    return 0;
+  });
 
 function createActions(store) {
   const actions = {
     scrollToBottom() {
-      const chatWindow = document.getElementById('chat-window');
-      setTimeout(() => chatWindow.scrollTo(0, chatWindow.scrollHeight), 10);
+      setTimeout(() => {
+        const chatWindow = document.getElementById('chat-window');
+        if (chatWindow) {
+          chatWindow.scrollTo(0, chatWindow.scrollHeight);
+        }
+      }, 20);
     },
     async getMessages(state) {
       store.setState({
         MessageGetStatus: RequestStatus.Getting
       });
       try {
-        const messages = await state.httpClient.get('/api/v1/message');
-        messages.reverse();
+        let messages = await state.httpClient.get('/api/v1/message');
+        messages = sortMessages(messages);
         store.setState({
           messages,
           MessageGetStatus: RequestStatus.Success
@@ -40,9 +56,10 @@ function createActions(store) {
       actions.scrollToBottom();
       const randomWait = Math.floor(Math.random() * TYPING_MAX_TIME) + TYPING_MIN_TIME;
       setTimeout(() => {
-        const newMessages = update(store.getState().messages, {
+        let newMessages = update(store.getState().messages, {
           $push: [message]
         });
+        newMessages = sortMessages(newMessages);
         store.setState({
           gladysIsTyping: false,
           messages: newMessages
@@ -56,16 +73,42 @@ function createActions(store) {
       }
     },
     async sendMessage(state) {
+      if (!state.currentMessageTextInput || state.currentMessageTextInput.length === 0) {
+        return;
+      }
       store.setState({
         MessageSendStatus: RequestStatus.Getting
       });
+      const messageText = state.currentMessageTextInput;
       try {
-        const message = await state.httpClient.post('/api/v1/message', {
-          text: state.currentMessageTextInput
-        });
+        const newMessage = {
+          text: messageText,
+          created_at: new Date()
+        };
+        const tempId = uuid.v4();
+        // we first push the message
         const newState = update(state, {
           messages: {
-            $push: [message]
+            $push: [Object.assign({}, newMessage, { tempId })]
+          },
+          MessageSendStatus: {
+            $set: RequestStatus.Getting
+          },
+          currentMessageTextInput: {
+            $set: ''
+          }
+        });
+        newState.messages = sortMessages(newState.messages);
+        store.setState(newState);
+        actions.scrollToBottom();
+        // then we send the message
+        const createdMessage = await state.httpClient.post('/api/v1/message', newMessage);
+        const messagesWithoutTempMessage = store.getState().messages.filter(message => message.tempId !== tempId);
+        messagesWithoutTempMessage.push(createdMessage);
+        // then we remove the message loading
+        const finalState = update(state, {
+          messages: {
+            $set: sortMessages(messagesWithoutTempMessage)
           },
           MessageSendStatus: {
             $set: RequestStatus.Success
@@ -74,7 +117,7 @@ function createActions(store) {
             $set: ''
           }
         });
-        store.setState(newState);
+        store.setState(finalState);
         actions.scrollToBottom();
       } catch (e) {
         store.setState({

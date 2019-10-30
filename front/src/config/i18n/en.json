@@ -740,7 +740,11 @@
     "whatCanYouAsk": "What can I ask?",
     "whatsTheWeatherLike": "What's the weather like?",
     "whatsTheTemperatureKitchen": "What's the temperature in the kitchen?",
-    "showCameraImage": "Show me camera image in the kitchen"
+    "showCameraImage": "Show me camera image in the kitchen",
+    "emptyStateMessage": "Send me a message!",
+    "messagePlaceholder": "Type your message...",
+    "sendingInProgress": "Sending...",
+    "typingInProgress": "Typing..."
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
