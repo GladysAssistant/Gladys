@@ -26,7 +26,7 @@ const SettingsTab = ({ children, ...props }) => (
               </option>
               {props.usbPorts &&
                 props.usbPorts.map(usbPort => (
-                  <option selected={props.zwaveDriverPath === usbPort.comName}>{usbPort.comName}</option>
+                  <option value={usbPort.comPath} selected={props.zwaveDriverPath === usbPort.comPath}>{usbPort.comName}</option>
                 ))}
             </select>
           </div>

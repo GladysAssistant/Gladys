@@ -16,8 +16,10 @@ const ports = [
   },
 ];
 
-SerialPort.list = (callback) => {
-  callback(null, ports);
+SerialPort.list = () => {
+  return new Promise((resolve, reject) => {
+    resolve(ports);
+  }) 
 };
 
 module.exports = SerialPort;
