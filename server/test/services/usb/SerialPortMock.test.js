@@ -19,7 +19,7 @@ const ports = [
 SerialPort.list = () => {
   return new Promise((resolve, reject) => {
     resolve(ports);
-  }) 
+  });
 };
 
 module.exports = SerialPort;
