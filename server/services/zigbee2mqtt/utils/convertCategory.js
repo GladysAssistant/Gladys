@@ -16,7 +16,11 @@ function convertCategory(feature) {
     const { category } = feature;
     switch (category) {
       case DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR: {
-        result = 'water';
+        result = 'water_leak';
+        break;
+      }
+      case DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR: {
+        result = 'contact';
         break;
       }
       default: {
