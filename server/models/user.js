@@ -119,6 +119,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.DATE,
       },
+      slack_user_id: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        unique: true,
+      },
     },
     {},
   );

@@ -244,6 +244,13 @@
       "apiKey": "Telegram Bot API Key",
       "saveButton": "Save"
     },
+    "slack": {
+      "title": "Slack",
+      "introduction": "To connect Gladys to Slack, you first need to create a Slack bot using the this <a href=\"https://slack.com/intl/en-fr/help/articles/115005265703-create-a-bot-for-your-workspace\">documentation</a>. Then, enter the API key he gave you below.",
+      "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Slack, send this command in slack: <br/><samp> ' /start {{link}}'</samp><br/> Don't speak in Slack directly to your bot before having send this command, otherwise your bot won't be able to know that it's you who are sending a message.",
+      "note": "This command is unique to your account, do not send it to other users.",
+      "configurationError": "We were not able to configure your account. Are you sure this token is valid?"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights.",
