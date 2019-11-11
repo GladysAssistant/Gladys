@@ -1,6 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertDevice } = require('../utils/convertDevice');
+const { convertValue } = require('../utils/convertValue');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -42,7 +43,7 @@ function handleMqttMessage(topic, message) {
           if (feature) {
             const newState = {
               device_feature_external_id: `${feature.external_id}`,
-              state: incomingFeatures[featureName],
+              state: convertValue(featureName, incomingFeatures[featureName]),
             };
             this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
           } else {
