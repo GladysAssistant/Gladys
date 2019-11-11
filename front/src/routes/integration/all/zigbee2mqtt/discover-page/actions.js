@@ -24,8 +24,27 @@ function createActions(store) {
         });
       }
     },
-    setDiscoveredDevices(state, zigbee2mqttDevices) {
-      clearTimeout(scanTimer);
+    setDiscoveredDevices(state, zigbee2mqttDiscoveredDevices) {
+      clearTimeout(scanTimer); 
+
+      let zigbee2mqttDevices = state.zigbee2mqttDevices
+
+      // Si des devices ont déjà été créés
+      if ( zigbee2mqttDevices !== undefined && zigbee2mqttDevices.lentgh !== 0 ) {
+        // On établit la liste des external_ids des devices déjà créés
+        let zigbee2mqttDevicesExternalId = [];
+          zigbee2mqttDevices.forEach( item => {
+          zigbee2mqttDevicesExternalId.push(item.external_id);
+        });
+
+        // On filtre les nouveaux devices
+        let newZigbee2mqttDevices = zigbee2mqttDiscoveredDevices.filter( function (item) {
+          return !zigbee2mqttDevicesExternalId.includes(item.external_id)
+        });
+
+        // On ajoute les nouveaux devices à la liste affichée
+        zigbee2mqttDevices = zigbee2mqttDevices.concat(newZigbee2mqttDevices)
+      }
 
       store.setState({
         zigbee2mqttDevices,
