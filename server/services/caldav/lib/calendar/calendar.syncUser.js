@@ -17,12 +17,10 @@ async function syncUser(userId) {
   await Promise.all(
     davCalendars.map(async (calendar) => {
       const events = await this.gladys.calendar.getEvents(userId, {
-        calendarId: calendar.id
+        calendarId: calendar.id,
       });
 
-      await Promise.all(
-        events.map(event => this.gladys.calendar.destroyEvent(event.selector)),
-      );
+      await Promise.all(events.map((event) => this.gladys.calendar.destroyEvent(event.selector)));
 
       return this.gladys.calendar.destroy(calendar.selector);
     }),
@@ -43,9 +41,7 @@ async function syncUser(userId) {
         return result;
       } catch (err) {
         logger.warn(
-          `CalDAV - Calendar : Failed to sync calendar ${davCalendar.name} with externalid ${
-            davCalendar.external_id
-          }. ${err}`,
+          `CalDAV - Calendar : Failed to sync calendar ${davCalendar.name} with externalid ${davCalendar.external_id}. ${err}`,
         );
         return Promise.reject(err);
       }

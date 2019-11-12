@@ -26,9 +26,7 @@ async function syncCalendarEvents(gladysCalendar, calendars) {
   );
 
   logger.info(
-    `CalDAV : Successfully inserted ${formatedEvents.length} calendarEvents for ${
-      gladysCalendar.name
-    } in Gladys database.`,
+    `CalDAV : Successfully inserted ${formatedEvents.length} calendarEvents for ${gladysCalendar.name} in Gladys database.`,
   );
 
   return newEvents;

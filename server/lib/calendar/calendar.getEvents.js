@@ -25,7 +25,7 @@ async function getEvents(userId, options) {
 
   if (options.calendarId) {
     where.calendar_id = {
-      [Op.eq]: options.calendarId
+      [Op.eq]: options.calendarId,
     };
   }
 
@@ -40,7 +40,7 @@ async function getEvents(userId, options) {
         },
       },
     ],
-    where
+    where,
   });
 
   const plainCalendarEvents = calendarEvents.map((calendarEvent) => calendarEvent.get({ plain: true }));
