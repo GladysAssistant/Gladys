@@ -5,7 +5,7 @@ import CaldavPage from './CalDAV';
 import { RequestStatus } from '../../../../utils/consts';
 
 @connect(
-  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus',
+  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavSyncStatus',
   actions
 )
 class CaldavIntegration extends Component {
@@ -16,7 +16,8 @@ class CaldavIntegration extends Component {
   render(props, {}) {
     const loading =
       props.caldavSaveSettingsStatus === RequestStatus.Getting ||
-      props.caldavGetSettingsStatus === RequestStatus.Getting;
+      props.caldavGetSettingsStatus === RequestStatus.Getting ||
+      props.caldavSyncStatus === RequestStatus.Getting;
     return <CaldavPage {...props} loading={loading} />;
   }
 }

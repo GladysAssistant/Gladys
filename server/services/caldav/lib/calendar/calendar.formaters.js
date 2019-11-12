@@ -97,6 +97,11 @@ function formatRecurringEvents(event, gladysCalendar) {
         newEvent.full_day = true;
       }
 
+      if (newEvent.full_day) {
+        startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+        endDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+      }
+
       newEvent.start = startDate.toISOString();
       newEvent.end = endDate.toISOString();
 

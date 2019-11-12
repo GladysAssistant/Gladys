@@ -1,4 +1,5 @@
 import { Text, MarkupText } from 'preact-i18n';
+import { RequestStatus } from '../../../../utils/consts';
 import cx from 'classnames';
 
 const CaldavPage = ({ children, ...props }) => (
@@ -69,6 +70,26 @@ const CaldavPage = ({ children, ...props }) => (
                           value={props.caldavPassword}
                         />
                       </div>
+                      {props.caldavSaveSettingsStatus === RequestStatus.Error && (
+                        <div class="alert alert-danger">
+                          <Text id="integration.caldav.configurationError" />
+                        </div>
+                      )}
+                      {props.caldavSaveSettingsStatus === RequestStatus.Success && (
+                        <p class="alert alert-info">
+                          <Text id="integration.caldav.configurationSuccess" />
+                        </p>
+                      )}
+                      {props.caldavSyncStatus === RequestStatus.Error && (
+                        <div class="alert alert-danger">
+                          <Text id="integration.caldav.synchronizationError" />
+                        </div>
+                      )}
+                      {props.caldavSyncStatus === RequestStatus.Success && (
+                        <p class="alert alert-info">
+                          <Text id="integration.caldav.synchronizationSuccess" />
+                        </p>
+                      )}
                       <div class="form-group">
                         <span class="input-group-append">
                           <button

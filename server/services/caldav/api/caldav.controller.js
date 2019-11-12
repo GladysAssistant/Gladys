@@ -5,8 +5,12 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function config(req, res) {
-    const configuration = await caldavHandler.config(req.user.id);
-    res.json(configuration);
+    try {
+      const configuration = await caldavHandler.config(req.user.id);
+      res.json(configuration);
+    } catch (error) {
+      res.status(500).send();
+    }
   }
 
   /**
@@ -15,8 +19,12 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function sync(req, res) {
-    const events = await caldavHandler.sync(req.user.id);
-    res.json(events);
+    try {
+      await caldavHandler.sync(req.user.id);
+      res.status(200).send();
+    } catch (error) {
+      res.status(500).send();
+    }
   }
 
   return {

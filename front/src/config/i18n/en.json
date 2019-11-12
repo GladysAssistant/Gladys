@@ -440,7 +440,11 @@
           "username": "CalDAV Username",
           "password": "CalDAV Password"
         }
-      }
+      },
+      "configurationSuccess": "Configuration saved.",
+      "configurationError": "An error occured while saving configuration.",
+      "synchronizationSuccess": "Synchronization completed.",
+      "synchronizationError": "An error occured while trying synchronization."
     }
   },
   "editScene": {
