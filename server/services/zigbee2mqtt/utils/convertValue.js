@@ -14,28 +14,15 @@ function convertValue(feature, state) {
       result = state === 'ON' ? 1 : 0;
       break;
     }
-    // case 'water_leak': {
-    //   result = state === true ? 1 : 0;
-    //   break;
-    // }
-    // case 'contact': {
-    //   result = contact === true ? 1 : 0;
-    //   break;
-    // }
 
     default: {
       if (typeof state === 'string') {
         throw new Error(`Zigbee2mqqt don't handle value "${state}" for feature "${feature}".`);
       }
-      // On généralise le cas où l'état vaut true ou false => 1 ou 0
+      // General case : true or false => 1 or 0
       if (typeof state === 'boolean') {
-        if ( state === true ) { 
-          result = 1; 
-        } else if (state === false) {
-          result = 0;
-        }
+        result = state ? 1 : 0;
       }
-      // Cas des valeurs numériques comme le niveau de batterie
       if (typeof state === 'number') {
         result = state;
       }
