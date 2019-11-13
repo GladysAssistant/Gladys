@@ -9,11 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
-@connect(
-  'eventsFormated',
-  actions,
-  moment
-)
+@connect('eventsFormated', actions, moment)
 class Map extends Component {
   onRangeChange = range => {
     let from, to;
