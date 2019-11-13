@@ -42,8 +42,8 @@ describe('Zigbee2mqtt - Utils - loadFeatures', () => {
     expect(result).to.be.lengthOf(2);
     expect(result[0]).to.include(features.door);
     expect(result[0]).to.not.have.property('id');
-    expect(result[0]).to.have.property('external_id', 'zigbee2mqtt:name:opening');
-    expect(result[0]).to.have.property('selector', 'zigbee2mqtt:name:opening');
+    expect(result[0]).to.have.property('external_id', 'zigbee2mqtt:name:contact');
+    expect(result[0]).to.have.property('selector', 'zigbee2mqtt:name:contact');
     expect(result[1]).to.include(features.battery);
     expect(result[1]).to.not.have.property('id');
     expect(result[1]).to.have.property('external_id', 'zigbee2mqtt:name:battery');
