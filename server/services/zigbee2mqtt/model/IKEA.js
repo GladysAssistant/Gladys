@@ -26,7 +26,7 @@ const IKEA = {
     L1531: [features.switch, features.brightness, features.color_temperature],
     'E1603/E1702': [features.switch],
     E1524: [features.switch_sensor],
-    E1743: [features.switch_sensor],
+    E1743: [features.button],
     E1525: [features.presence],
     // E1746: [], // Signal repeater
   },

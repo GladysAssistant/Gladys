@@ -88,6 +88,14 @@ const features = {
     min: 0,
     max: 10000,
   },
+  button: {
+    category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+    type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 1,
+  },
   switch: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
