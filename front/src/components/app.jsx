@@ -62,6 +62,7 @@ import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
+import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
@@ -158,6 +159,7 @@ const AppRouter = connect(
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
+        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -188,10 +190,7 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
