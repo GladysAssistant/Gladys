@@ -9,10 +9,7 @@ import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 
-@connect(
-  'session,user,httpClient,houses,currentIntegration',
-  actions
-)
+@connect('session,user,httpClient,houses,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
   selectFeature(e) {
     this.setState({

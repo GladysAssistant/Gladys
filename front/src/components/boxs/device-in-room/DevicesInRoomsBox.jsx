@@ -74,10 +74,7 @@ const RoomCard = ({ children, ...props }) => {
   );
 };
 
-@connect(
-  'session,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom',
-  actions
-)
+@connect('session,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom', actions)
 class DevicesInRoomComponent extends Component {
   updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
 

@@ -8,10 +8,7 @@ import SignupGeneratingKeys from './SignupGeneratingKeys';
 const ACCEPTED_LANGUAGES = ['en', 'fr'];
 const DEFAULT_LANGUAGE = 'en';
 
-@connect(
-  'session',
-  {}
-)
+@connect('session', {})
 class SignupPage extends Component {
   state = {
     name: '',

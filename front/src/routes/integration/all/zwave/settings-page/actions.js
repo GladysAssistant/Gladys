@@ -41,7 +41,8 @@ const actions = store => {
     },
     async saveDriverPathAndConnect(state) {
       store.setState({
-        connectZwaveStatus: RequestStatus.Getting
+        connectZwaveStatus: RequestStatus.Getting,
+        zwaveDriverFailed: false
       });
       try {
         await state.httpClient.post('/api/v1/service/zwave/variable/ZWAVE_DRIVER_PATH', {
@@ -49,7 +50,8 @@ const actions = store => {
         });
         await state.httpClient.post('/api/v1/service/zwave/connect');
         store.setState({
-          connectZwaveStatus: RequestStatus.Success
+          connectZwaveStatus: RequestStatus.Success,
+          zwaveConnectionInProgress: true
         });
       } catch (e) {
         store.setState({
@@ -79,6 +81,7 @@ const actions = store => {
       });
       try {
         await state.httpClient.post('/api/v1/service/zwave/disconnect');
+        await actions.getStatus(store.getState());
         store.setState({
           zwaveDisconnectStatus: RequestStatus.Success
         });
@@ -87,6 +90,30 @@ const actions = store => {
           zwaveDisconnectStatus: RequestStatus.Error
         });
       }
+    },
+    async getStatus(state) {
+      store.setState({
+        zwaveGetStatusStatus: RequestStatus.Getting
+      });
+      try {
+        const zwaveStatus = await state.httpClient.get('/api/v1/service/zwave/status');
+        store.setState({
+          zwaveStatus,
+          zwaveConnectionInProgress: false,
+          zwaveGetStatusStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          zwaveGetStatusStatus: RequestStatus.Error,
+          zwaveConnectionInProgress: false
+        });
+      }
+    },
+    driverFailed(state) {
+      store.setState({
+        zwaveDriverFailed: true,
+        zwaveConnectionInProgress: false
+      });
     }
   };
 

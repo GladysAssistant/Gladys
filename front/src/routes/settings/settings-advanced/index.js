@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import SettingsAdvancedPage from './SettingsAdvancedPage';
 import actions from '../../../actions/device';
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class SettingsAdvanced extends Component {
   componentWillMount() {}
 

@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import ChatPage from './ChatPage';
 import actions from '../../actions/message';
 
-@connect(
-  'session',
-  actions
-)
+@connect('session', actions)
 class Chat extends Component {
   newChatMessage = payload => this.props.pushMessage(payload);
 

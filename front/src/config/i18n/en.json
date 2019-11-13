@@ -308,7 +308,20 @@
         "description": "To use Z-Wave in Gladys, you need to have a Z-Wave USB Stick connected to your Gladys instance.",
         "zwaveUsbDriverPathLabel": "Select the USB port where your Z-Wave stick is connected",
         "connectButton": "Connect",
-        "disconnectButton": "Disconnect"
+        "disconnectButton": "Disconnect",
+        "refreshButton": "Refresh USB list",
+        "notConnected": "Gladys is not connected to any Z-Wave USB stick.",
+        "connectedWithSuccess": "Z-Wave USB stick connected with success.",
+        "connecting": "Trying to connect to Z-Wave USB stick...",
+        "driverFailedError": "An error occured while trying to connect to Z-Wave USB stick."
+      },
+      "nodeOperation": {
+        "addNodeInstructions": "You can now include your device following instructions in your device manual.",
+        "removeNodeInstructions": "You can now exclude your device following instructions in your device manual.",
+        "addNodeTitle": "Inclusion Mode",
+        "removeNodeTitle": "Exclusion Mode",
+        "seconds": "seconds remaining",
+        "cancelButton": "Cancel"
       }
     },
     "darkSky": {

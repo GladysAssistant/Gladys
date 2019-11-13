@@ -5,10 +5,7 @@ import MqttPage from '../MqttPage';
 import DeviceTab from './DeviceTab';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect(
-  'session,user,mqttDevices,houses,getMqttDevicesStatus',
-  actions
-)
+@connect('session,user,mqttDevices,houses,getMqttDevicesStatus', actions)
 class MqttDevicePage extends Component {
   componentWillMount() {
     this.props.getMqttDevices(20, 0);

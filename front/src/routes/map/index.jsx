@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/map';
 import Map from './Map';
 
-@connect(
-  'usersWithLocation,housesWithLocation',
-  actions
-)
+@connect('usersWithLocation,housesWithLocation', actions)
 class MapPage extends Component {
   componentDidMount() {
     this.props.getUsersWithLocation();
