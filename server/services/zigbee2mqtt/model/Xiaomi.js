@@ -8,7 +8,7 @@ const Xiaomi = {
   models: {
     ZNLDP12LM: [features.switch, features.brightness, features.color_temperature],
     WXKG01LM: [features.switch_sensor],
-    WXKG11LM: [features.switch_sensor],
+    WXKG11LM: [features.button],
     WXKG12LM: [features.switch_sensor],
     WXKG03LM: [features.switch_sensor],
     WXKG02LM: [features.switch_sensor],
