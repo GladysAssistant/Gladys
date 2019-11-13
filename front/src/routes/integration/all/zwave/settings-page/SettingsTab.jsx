@@ -1,4 +1,6 @@
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+import cx from 'classnames';
 
 const SettingsTab = ({ children, ...props }) => (
   <div class="card">
@@ -6,13 +8,40 @@ const SettingsTab = ({ children, ...props }) => (
       <h2 class="card-title">
         <Text id="integration.zwave.settings.title" />
       </h2>
+      <div class="page-options d-flex">
+        <button class="btn btn-info" onClick={props.getUsbPorts}>
+          <Text id="integration.zwave.settings.refreshButton" />
+        </button>
+      </div>
     </div>
     <div class="card-body">
-      <div class="dimmer">
+      <div
+        class={cx('dimmer', {
+          active: props.loading
+        })}
+      >
+        <div class="loader" />
         <div class="dimmer-content">
-          <h3>
-            <Text id="integration.zwave.settings.ino" />
-          </h3>
+          {get(props, 'zwaveStatus.ready') && (
+            <div class="alert alert-success">
+              <Text id="integration.zwave.settings.connectedWithSuccess" />
+            </div>
+          )}
+          {!get(props, 'zwaveStatus.ready') && (
+            <div class="alert alert-warning">
+              <Text id="integration.zwave.settings.notConnected" />
+            </div>
+          )}
+          {props.zwaveConnectionInProgress && (
+            <div class="alert alert-info">
+              <Text id="integration.zwave.settings.connecting" />
+            </div>
+          )}
+          {props.zwaveDriverFailed && (
+            <div class="alert alert-danger">
+              <Text id="integration.zwave.settings.driverFailedError" />
+            </div>
+          )}
           <p>
             <Text id="integration.zwave.settings.description" />
           </p>

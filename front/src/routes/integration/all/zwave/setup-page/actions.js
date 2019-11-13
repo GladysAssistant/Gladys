@@ -91,7 +91,10 @@ const createActions = store => {
         }
       }
     },
-    async addNode(state, secure = false) {
+    async addNode(state, e, secure = false) {
+      if (e) {
+        e.preventDefault();
+      }
       store.setState({
         zwaveAddNodeStatus: RequestStatus.Getting
       });
@@ -108,6 +111,24 @@ const createActions = store => {
         });
       }
     },
+    async addNodeSecure(state, e) {
+      actions.addNode(state, e, true);
+    },
+    async stopAddNode(state) {
+      store.setState({
+        zwaveStopAddNodeStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/zwave/cancel');
+        store.setState({
+          zwaveStopAddNodeStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          zwaveStopAddNodeStatus: RequestStatus.Error
+        });
+      }
+    },
     async healNetwork(state) {
       store.setState({
         zwaveHealNetworkStatus: RequestStatus.Getting
@@ -120,24 +141,6 @@ const createActions = store => {
       } catch (e) {
         store.setState({
           zwaveHealNetworkStatus: RequestStatus.Error
-        });
-      }
-    },
-    async addNodeSecure(state) {
-      actions.addNode(state, true);
-    },
-    async removeNode(state, secure = false) {
-      store.setState({
-        zwaveRemoveNodeStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/zwave/node/remove');
-        store.setState({
-          zwaveRemoveNodeStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          zwaveRemoveNodeStatus: RequestStatus.Error
         });
       }
     },

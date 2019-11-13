@@ -18,15 +18,27 @@ const NodeTab = ({ children, ...props }) => {
           <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveNotConfigured}>
             <Text id="integration.zwave.setup.healNetworkButton" /> <i class="fe fe-radio" />
           </button>
-          <button class="btn btn-outline-success ml-2" onClick={props.addNode} disabled={zwaveNotConfigured}>
+          <a
+            class="btn btn-outline-success ml-2"
+            href="/dashboard/integration/device/zwave/node-operation?action=add"
+            disabled={zwaveNotConfigured}
+          >
             <Text id="integration.zwave.setup.addNodeButton" /> <i class="fe fe-plus" />
-          </button>
-          <button class="btn btn-outline-success ml-2" onClick={props.addNodeSecure} disabled={zwaveNotConfigured}>
+          </a>
+          <a
+            class="btn btn-outline-success ml-2"
+            href="/dashboard/integration/device/zwave/node-operation?action=add-secure"
+            disabled={zwaveNotConfigured}
+          >
             <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="fe fe-plus" />
-          </button>
-          <button class="btn btn-outline-danger ml-2" onClick={props.removeNode} disabled={zwaveNotConfigured}>
+          </a>
+          <a
+            class="btn btn-outline-danger ml-2"
+            href="/dashboard/integration/device/zwave/node-operation?action=remove"
+            disabled={zwaveNotConfigured}
+          >
             <Text id="integration.zwave.setup.removeNode" /> <i class="fe fe-trash" />
-          </button>
+          </a>
         </div>
       </div>
       <div class="card-body">
@@ -48,6 +60,7 @@ const NodeTab = ({ children, ...props }) => {
               })}
             >
               {props.zwaveNodes &&
+                !get(props, 'zwaveStatus.scanInProgress') &&
                 props.zwaveNodes.map((zwaveNode, index) => (
                   <Node node={zwaveNode} nodeIndex={index} createDevice={props.createDevice} />
                 ))}
