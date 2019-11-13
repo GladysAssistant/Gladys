@@ -14,6 +14,11 @@ function convertValue(feature, state) {
       result = state === 'ON' ? 1 : 0;
       break;
     }
+    // Case for Button devices
+    case 'click': {
+      result = state;
+      break;
+    }
 
     default: {
       if (typeof state === 'string') {

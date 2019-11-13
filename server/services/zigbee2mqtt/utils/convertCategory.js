@@ -23,6 +23,10 @@ function convertCategory(feature) {
         result = 'contact';
         break;
       }
+      case DEVICE_FEATURE_CATEGORIES.BUTTON: {
+        result = 'click';
+        break;
+      }
       default: {
         const [split] = category.split('-');
         result = split;
