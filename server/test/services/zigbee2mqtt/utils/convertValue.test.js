@@ -14,9 +14,24 @@ describe('Zigbee2mqtt - Utils - convertValue', () => {
     expect(result).to.eq(0);
   });
 
+  it('click feature, anyValue', async () => {
+    const result = convertValue('click', 'anyValue');
+    expect(result).to.eq('anyValue');
+  });
+
   it('any feature, value 12', async () => {
     const result = convertValue('any', 12);
     expect(result).to.eq(12);
+  });
+
+  it('any feature, value true', async () => {
+    const result = convertValue('any', true);
+    expect(result).to.eq(1);
+  });
+
+  it('any feature, value false', async () => {
+    const result = convertValue('any', false);
+    expect(result).to.eq(0);
   });
 
   it('any feature, value anyValue', async () => {
