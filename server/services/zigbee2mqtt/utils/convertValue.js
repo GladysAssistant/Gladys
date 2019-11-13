@@ -21,17 +21,19 @@ function convertValue(feature, state) {
     }
 
     default: {
-      if (typeof state === 'string') {
-        throw new Error(`Zigbee2mqqt don't handle value "${state}" for feature "${feature}".`);
+      switch (typeof state) {
+        case 'boolean': {
+          result = state ? 1 : 0;
+          break;
+        }
+        case 'number': {
+          result = state;
+          break;
+        }
+        default: // string
+          throw new Error(`Zigbee2mqqt don't handle value "${state}" for feature "${feature}".`);
       }
-      // General case : true or false => 1 or 0
-      if (typeof state === 'boolean') {
-        result = state ? 1 : 0;
-      }
-      if (typeof state === 'number') {
-        result = state;
-      }
-    } 
+    }
   }
 
   return result;
