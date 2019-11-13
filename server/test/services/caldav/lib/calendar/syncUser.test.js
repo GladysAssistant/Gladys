@@ -42,6 +42,15 @@ const gladysCalendars = [
   },
 ];
 
+const gladysEvents = [
+  {
+    selector: 'event-1',
+  },
+  {
+    selector: 'event-2',
+  },
+];
+
 describe('CalDAV sync user', () => {
   const sync = {
     serviceId,
@@ -59,6 +68,11 @@ describe('CalDAV sync user', () => {
           .withArgs(userId)
           .resolves(gladysCalendars),
         destroy: sinon.stub().resolves(),
+        getEvents: sinon
+          .stub()
+          .withArgs(userId)
+          .resolves(gladysEvents),
+        destroyEvent: sinon.stub().resolves(),
       },
     },
   };
@@ -69,6 +83,15 @@ describe('CalDAV sync user', () => {
 
     expect(sync.gladys.calendar.destroy.callCount).to.equal(3);
     expect(sync.gladys.calendar.destroy.args).to.eql([['perso'], ['stark-industries'], ['avengers']]);
+    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(6);
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([
+      ['event-1'],
+      ['event-2'],
+      ['event-1'],
+      ['event-2'],
+      ['event-1'],
+      ['event-2'],
+    ]);
 
     expect(sync.syncCalendars.args).to.eql([[calendars, userId]]);
 

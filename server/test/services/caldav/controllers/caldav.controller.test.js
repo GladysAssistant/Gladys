@@ -10,6 +10,9 @@ const caldavService = {
 
 const res = {
   json: fake.returns(null),
+  status: fake.returns({
+    send: fake.returns(null),
+  }),
 };
 
 describe('get /api/v1/service/caldav/config', () => {
@@ -36,6 +39,6 @@ describe('get /api/v1/service/caldav/sync', () => {
     };
     await caldavController['get /api/v1/service/caldav/sync'].controller(req, res);
     assert.calledWith(caldavService.sync, userId);
-    assert.calledWith(res.json, {});
+    assert.calledWith(res.status, 200);
   });
 });
