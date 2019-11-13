@@ -6,10 +6,7 @@ import NodeTab from './NodeTab';
 import integrationConfig from '../../../../../config/integrations';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus',
-  actions
-)
+@connect('user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus', actions)
 class ZwaveNodePage extends Component {
   nodeReadyListener = payload => this.props.addLocalNode(payload);
   scanCompleteListener = () => {

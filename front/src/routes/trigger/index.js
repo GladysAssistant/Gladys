@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import TriggerPage from './TriggerPage';
 import actions from '../../actions/device';
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class Trigger extends Component {
   componentWillMount() {}
 

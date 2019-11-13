@@ -43,25 +43,25 @@ const NodeTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.getZwaveDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
-          {props.getZwaveDevicesStatus !== RequestStatus.Getting && (
-            <div class="row">
-              {props.zwaveDevices &&
-                props.zwaveDevices.map((zwaveDevice, index) => (
-                  <Device
-                    device={zwaveDevice}
-                    deviceIndex={index}
-                    houses={props.houses}
-                    updateDeviceProperty={props.updateDeviceProperty}
-                    saveDevice={props.saveDevice}
-                    deleteDevice={props.deleteDevice}
-                  />
-                ))}
-              {props.zwaveDevices && props.zwaveDevices.length === 0 && (
-                <Text id="integration.zwave.device.noDevices" />
-              )}
+          {props.zwaveDevices && props.zwaveDevices.length === 0 && (
+            <div class="alert alert-info">
+              <Text id="integration.zwave.device.noDevices" />
             </div>
           )}
+          {props.getZwaveDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          <div class="row">
+            {props.zwaveDevices &&
+              props.zwaveDevices.map((zwaveDevice, index) => (
+                <Device
+                  device={zwaveDevice}
+                  deviceIndex={index}
+                  houses={props.houses}
+                  updateDeviceProperty={props.updateDeviceProperty}
+                  saveDevice={props.saveDevice}
+                  deleteDevice={props.deleteDevice}
+                />
+              ))}
+          </div>
         </div>
       </div>
     </div>

@@ -6,10 +6,7 @@ import SetupPanel from './SetupPanel';
 import DevicePanel from './DevicePanel';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,xiaomiSensors,xiaomiDevices,houses,getXiaomiDevicesStatus,xiaomiDeviceSearch',
-  actions
-)
+@connect('user,session,xiaomiSensors,xiaomiDevices,houses,getXiaomiDevicesStatus,xiaomiDeviceSearch', actions)
 class XiaomiPage extends Component {
   componentWillMount() {
     this.props.getHouses();

@@ -7,10 +7,7 @@ import actions from '../../actions/edit-device';
 import { RequestStatus } from '../../utils/consts';
 import UpdateDevice from './UpdateDevice';
 
-@connect(
-  'user,session',
-  actions
-)
+@connect('user,session', actions)
 class EditDevicePage extends Component {
   selectFeature(e) {
     this.setState({

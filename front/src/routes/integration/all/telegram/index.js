@@ -4,10 +4,7 @@ import actions from './actions';
 import TelegramPage from './Telegram';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect(
-  'user,telegramApiKey,telegramCustomLink,telegramGetApiKeyStatus,telegramSaveApiKeyStatus',
-  actions
-)
+@connect('user,telegramApiKey,telegramCustomLink,telegramGetApiKeyStatus,telegramSaveApiKeyStatus', actions)
 class TelegramIntegration extends Component {
   componentWillMount() {
     this.props.getTelegramApiKey();
