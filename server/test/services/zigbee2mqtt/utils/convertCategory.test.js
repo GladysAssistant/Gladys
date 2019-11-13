@@ -18,7 +18,25 @@ describe('Zigbee2mqtt - Utils - convertCategory', () => {
       category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
     };
     const result = convertCategory(feature);
-    expect(result).to.eq('water');
+    expect(result).to.eq('water_leak');
+  });
+
+  it('convert opening sensor', async () => {
+    const feature = {
+      read_only: true,
+      category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+    };
+    const result = convertCategory(feature);
+    expect(result).to.eq('contact');
+  });
+
+  it('convert Button / Switch', async () => {
+    const feature = {
+      read_only: true,
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+    };
+    const result = convertCategory(feature);
+    expect(result).to.eq('click');
   });
 
   it('default case complex', async () => {

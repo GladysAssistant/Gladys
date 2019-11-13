@@ -56,8 +56,8 @@ describe('Zigbee2mqtt - Utils - convertDevice', () => {
     expect(result.features).to.be.lengthOf(1);
     expect(result.features[0]).to.include(features.switch_sensor);
     expect(result.features[0]).to.not.have.property('id');
-    expect(result.features[0]).to.have.property('external_id', 'zigbee2mqtt:name:switch');
-    expect(result.features[0]).to.have.property('selector', 'zigbee2mqtt:name:switch');
+    expect(result.features[0]).to.have.property('external_id', 'zigbee2mqtt:name:click');
+    expect(result.features[0]).to.have.property('selector', 'zigbee2mqtt:name:click');
   });
 
   it('matching SWAN SWO-WDS1PA', async () => {
@@ -78,8 +78,8 @@ describe('Zigbee2mqtt - Utils - convertDevice', () => {
     expect(result.features).to.be.lengthOf(2);
     expect(result.features[0]).to.include(features.door);
     expect(result.features[0]).to.not.have.property('id');
-    expect(result.features[0]).to.have.property('external_id', 'zigbee2mqtt:name:opening');
-    expect(result.features[0]).to.have.property('selector', 'zigbee2mqtt:name:opening');
+    expect(result.features[0]).to.have.property('external_id', 'zigbee2mqtt:name:contact');
+    expect(result.features[0]).to.have.property('selector', 'zigbee2mqtt:name:contact');
     expect(result.features[1]).to.include(features.battery);
     expect(result.features[1]).to.not.have.property('id');
     expect(result.features[1]).to.have.property('external_id', 'zigbee2mqtt:name:battery');
