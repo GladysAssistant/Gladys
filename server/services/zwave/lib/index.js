@@ -14,6 +14,7 @@ const { controllerCommand } = require('./events/zwave.controllerCommand');
 // COMMANDS
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
+const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
 const { disconnect } = require('./commands/zwave.disconnect');
 const { healNetwork } = require('./commands/zwave.healNetwork');
 const { refreshNodeParams } = require('./commands/zwave.refreshNodeParams');
@@ -65,6 +66,7 @@ ZwaveManager.prototype.controllerCommand = controllerCommand;
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.connect = connect;
+ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
 ZwaveManager.prototype.disconnect = disconnect;
 ZwaveManager.prototype.healNetwork = healNetwork;
 ZwaveManager.prototype.refreshNodeParams = refreshNodeParams;

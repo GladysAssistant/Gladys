@@ -4,10 +4,7 @@ import actions from '../actions';
 import SonoffPage from '../SonoffPage';
 import DeviceTab from './DeviceTab';
 
-@connect(
-  'user,sonoffDevices,housesWithRooms,getSonoffStatus',
-  actions
-)
+@connect('user,sonoffDevices,housesWithRooms,getSonoffStatus', actions)
 class SonoffIntegration extends Component {
   componentWillMount() {
     this.props.getSonoffDevices(100, 0);

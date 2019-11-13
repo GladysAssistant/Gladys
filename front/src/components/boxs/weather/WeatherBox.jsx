@@ -160,10 +160,7 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect(
-  'DashboardBoxDataWeather,DashboardBoxStatusWeather',
-  actions
-)
+@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather', actions)
 class WeatherBoxComponent extends Component {
   componentDidMount() {
     // get the weather

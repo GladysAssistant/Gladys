@@ -24,10 +24,7 @@ const EditDevicesInRoom = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect(
-  'rooms',
-  actions
-)
+@connect('rooms', actions)
 class EditDeviceInRoomComponent extends Component {
   componentDidMount() {
     this.props.getRooms();

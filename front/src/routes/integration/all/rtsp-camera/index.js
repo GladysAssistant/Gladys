@@ -4,10 +4,7 @@ import actions from './actions';
 import RtspCameraPage from './RtspCamera';
 import integrationConfig from '../../../../config/integrations';
 
-@connect(
-  'user,rtspCameras,housesWithRooms,getRtspCameraStatus',
-  actions
-)
+@connect('user,rtspCameras,housesWithRooms,getRtspCameraStatus', actions)
 class RtspCameraIntegration extends Component {
   componentWillMount() {
     this.props.getRtspCameraDevices(100, 0);

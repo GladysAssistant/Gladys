@@ -9,10 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class Map extends Component {
   onSelectSlot(slotInfo) {
     console.log(slotInfo);

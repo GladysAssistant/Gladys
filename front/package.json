@@ -38,7 +38,7 @@
     "leaflet": "^1.4.0",
     "linkstate": "^1.1.1",
     "moment": "^2.24.0",
-    "preact": "^10.0.1",
+    "preact": "^10.0.5",
     "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-i18n": "^2.0.0-preactx.2",
     "preact-router": "^3.1.0",

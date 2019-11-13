@@ -4,10 +4,7 @@ import actions from '../actions';
 import SonoffPage from '../SonoffPage';
 import DiscoverTab from './DiscoverTab';
 
-@connect(
-  'user,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
-  actions
-)
+@connect('user,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', actions)
 class SonoffIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredSonoffDevices();

@@ -21,6 +21,10 @@ describe('zwaveManager commands', () => {
     zwaveManager.removeNode();
     assert.calledOnce(zwaveManager.zwave.removeNode);
   });
+  it('should cancelControllerCommand', () => {
+    zwaveManager.cancelControllerCommand();
+    assert.calledOnce(zwaveManager.zwave.cancelControllerCommand);
+  });
   it('should heal network', () => {
     zwaveManager.healNetwork();
     assert.calledOnce(zwaveManager.zwave.healNetwork);
@@ -51,6 +55,10 @@ describe('zwaveManager commands', () => {
     expect(nodes).to.be.instanceOf(Array);
   });
   it('should disconnect', () => {
+    zwaveManager.disconnect();
+    assert.calledOnce(zwaveManager.zwave.disconnect);
+  });
+  it('should disconnect again', () => {
     zwaveManager.disconnect();
     assert.calledOnce(zwaveManager.zwave.disconnect);
   });

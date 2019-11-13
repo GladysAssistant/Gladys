@@ -28,10 +28,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect(
-  'DashboardBoxDataTemperatureInRoom,DashboardBoxStatusTemperatureInRoom',
-  actions
-)
+@connect('DashboardBoxDataTemperatureInRoom,DashboardBoxStatusTemperatureInRoom', actions)
 class RoomTemperatureBoxComponent extends Component {
   componentDidMount() {
     this.props.getTemperatureInRoom(this.props.box, this.props.x, this.props.y);
