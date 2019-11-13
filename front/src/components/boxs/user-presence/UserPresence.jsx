@@ -93,10 +93,7 @@ const UserPresence = ({ children, ...props }) => (
   </div>
 );
 
-@connect(
-  'usersWithPresence,user,DashboardUserPresenceGetUsersStatus,session',
-  actions
-)
+@connect('usersWithPresence,user,DashboardUserPresenceGetUsersStatus,session', actions)
 class UserPresenceComponent extends Component {
   componentDidMount() {
     this.props.getUsersWithPresence();

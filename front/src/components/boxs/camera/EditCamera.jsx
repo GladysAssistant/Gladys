@@ -37,10 +37,7 @@ const EditCameraBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect(
-  'cameras',
-  actions
-)
+@connect('cameras', actions)
 class EditCameraBoxComponent extends Component {
   updateCamera = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {

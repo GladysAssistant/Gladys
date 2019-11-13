@@ -27,10 +27,7 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect(
-  'rooms',
-  actions
-)
+@connect('rooms', actions)
 class EditRoomTemperatureBoxComponent extends Component {
   componentDidMount() {
     this.props.getRooms();

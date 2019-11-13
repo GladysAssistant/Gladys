@@ -6,10 +6,7 @@ import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,mqttURL,mqttUsername,mqttPassword,connectMqttStatus,mqttConnected,mqttConnectionError',
-  actions
-)
+@connect('user,session,mqttURL,mqttUsername,mqttPassword,connectMqttStatus,mqttConnected,mqttConnectionError', actions)
 class MqttNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('mqtt');
