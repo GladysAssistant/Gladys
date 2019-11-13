@@ -17,7 +17,7 @@ function handleMqttMessage(topic, message) {
       const devices = JSON.parse(message);
       const convertedDevices = devices
         .map((d) => {
-          const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}` );
+          const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
           return existingDevice || convertDevice(d, this.serviceId);
         })
         .filter((d) => d);
