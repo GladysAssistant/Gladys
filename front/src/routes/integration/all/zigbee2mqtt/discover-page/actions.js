@@ -24,8 +24,8 @@ function createActions(store) {
         });
       }
     },
-    setDiscoveredDevices(state, zigbee2mqttDevices) {  
-      clearTimeout(scanTimer); 
+    setDiscoveredDevices(state, zigbee2mqttDevices) {
+      clearTimeout(scanTimer);
 
       store.setState({
         zigbee2mqttDevices,
