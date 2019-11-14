@@ -136,15 +136,25 @@ describe('gateway', () => {
     });
   });
   describe('gateway.forwardWebsockets', () => {
-    it('should forward a websocket message', async () => {
+    it('should forward a websocket message when connected', async () => {
       const gateway = new Gateway({}, event, system, sequelize, config);
-      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.connected = true;
       const websocketMessage = {
         type: 'zwave.new-node',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
       assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
+    });
+    it('should prevent forwarding a websocket message when not connected', async () => {
+      const gateway = new Gateway({}, event, system, sequelize, config);
+
+      const websocketMessage = {
+        type: 'zwave.new-node',
+        payload: {},
+      };
+      gateway.forwardWebsockets(websocketMessage);
+      assert.notCalled(gateway.gladysGatewayClient.newEventInstance);
     });
   });
 
