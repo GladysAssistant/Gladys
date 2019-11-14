@@ -18,7 +18,7 @@ class CaldavIntegration extends Component {
       props.caldavSaveSettingsStatus === RequestStatus.Getting ||
       props.caldavGetSettingsStatus === RequestStatus.Getting ||
       props.caldavSyncStatus === RequestStatus.Getting;
-    return <CaldavPage {...props} loading={loading} />;
+    return <CaldavPage {...props} loading={loading} dictionary={this.context.intl.dictionary.integration.caldav} />;
   }
 }
 

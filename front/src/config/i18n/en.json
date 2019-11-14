@@ -427,12 +427,16 @@
     "caldav": {
       "title": "CalDAV",
       "introduction": "To sync Gladys calendar using CalDAV, you first need an external calendar compatible. Then enter the configuration below.",
+      "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
         "apple": {
           "name": "iCloud Calendar",
           "url": "iCloud URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
           "username": "Apple ID",
-          "password": "Password"
+          "usernameInfo": "Enter your Apple ID.",
+          "password": "Password",
+          "passwordInfo": "<a href=https://appleid.apple.com>Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "other": {
           "name": "Other",

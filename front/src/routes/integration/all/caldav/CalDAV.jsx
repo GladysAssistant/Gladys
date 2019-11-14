@@ -22,12 +22,13 @@ const CaldavPage = ({ children, ...props }) => (
                         <Text id="integration.caldav.title" />
                       </h2>
                       <p>
-                        <MarkupText id="integration.caldav.introduction" />
+                        <Text id="integration.caldav.introduction" />
                       </p>
                       <div class="form-group">
                         <div class="form-label">CalDAV host</div>
+                        <Text id="integration.caldav.hostInfo" />
                         <select class="form-control" onChange={props.updateCaldavHost} value={props.caldavHost}>
-                          {['apple', 'other'].map(host => (
+                          {Object.keys(props.dictionary.services).map(host => (
                             <option value={host}>
                               <Text id={`integration.caldav.services.${host}.name`} />
                             </option>
@@ -38,6 +39,7 @@ const CaldavPage = ({ children, ...props }) => (
                         <div class="form-label">
                           <Text id={`integration.caldav.services.${props.caldavHost}.url`} />
                         </div>
+                        <Text id={`integration.caldav.services.${props.caldavHost}.urlInfo`} />
                         <input
                           type="text"
                           class="form-control"
@@ -50,6 +52,7 @@ const CaldavPage = ({ children, ...props }) => (
                         <div class="form-label">
                           <Text id={`integration.caldav.services.${props.caldavHost}.username`} />
                         </div>
+                        <Text id={`integration.caldav.services.${props.caldavHost}.usernameInfo`} />
                         <input
                           type="text"
                           class="form-control"
@@ -62,6 +65,7 @@ const CaldavPage = ({ children, ...props }) => (
                         <div class="form-label">
                           <Text id={`integration.caldav.services.${props.caldavHost}.password`} />
                         </div>
+                        <MarkupText id={`integration.caldav.services.${props.caldavHost}.passwordInfo`} />
                         <input
                           type="password"
                           class="form-control"
@@ -99,7 +103,7 @@ const CaldavPage = ({ children, ...props }) => (
                           >
                             Save
                           </button>
-                          <button class="btn btn-primary" onClick={props.startSync}>
+                          <button class="btn btn-success" onClick={props.startSync}>
                             Try Sync
                           </button>
                         </span>
