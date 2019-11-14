@@ -32,8 +32,8 @@ describe('Zigbee2mqtt - Utils - loadFeatures', () => {
     expect(result).to.be.lengthOf(1);
     expect(result[0]).to.include(features.water);
     expect(result[0]).to.not.have.property('id');
-    expect(result[0]).to.have.property('external_id', 'zigbee2mqtt:name:water');
-    expect(result[0]).to.have.property('selector', 'zigbee2mqtt:name:water');
+    expect(result[0]).to.have.property('external_id', 'zigbee2mqtt:name:water_leak');
+    expect(result[0]).to.have.property('selector', 'zigbee2mqtt:name:water_leak');
   });
 
   it('matching SWAN SWO-WDS1PA', async () => {
