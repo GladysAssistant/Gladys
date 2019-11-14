@@ -19,7 +19,7 @@ async function setValue(device, deviceFeature, value) {
     throw new NotFoundError(`Function device.setValue in service ${device.service.name} does not exist.`);
   }
   await service.device.setValue(device, deviceFeature, value);
-  if (!deviceFeature.has_state_feedback) {
+  if (!deviceFeature.has_feedback) {
     await this.saveState(deviceFeature, value);
   }
 }
