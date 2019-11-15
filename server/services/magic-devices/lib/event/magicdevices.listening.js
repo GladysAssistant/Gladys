@@ -4,7 +4,7 @@ const MULTICAST_ADDRESS = '224.0.0.50';
 /**
  * @description On listening event.
  * @example
- * xiaomi.listening();
+ * magicDevices.listening();
  */
 function listening() {
   this.socket.addMembership(MULTICAST_ADDRESS);
