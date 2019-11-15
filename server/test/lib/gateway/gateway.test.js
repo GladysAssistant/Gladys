@@ -136,9 +136,10 @@ describe('gateway', () => {
     });
   });
   describe('gateway.forwardWebsockets', () => {
-    it('should forward a websocket message when connected', async () => {
+    it('should forward a websocket message when connected', () => {
       const gateway = new Gateway({}, event, system, sequelize, config);
       gateway.connected = true;
+
       const websocketMessage = {
         type: 'zwave.new-node',
         payload: {},
@@ -146,7 +147,7 @@ describe('gateway', () => {
       gateway.forwardWebsockets(websocketMessage);
       assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
     });
-    it('should prevent forwarding a websocket message when not connected', async () => {
+    it('should prevent forwarding a websocket message when not connected', () => {
       const gateway = new Gateway({}, event, system, sequelize, config);
 
       const websocketMessage = {
