@@ -11,10 +11,10 @@ const logger = require('../../../../utils/logger');
 function addDevice(macAdress, device) {
   const doesntExistYet = this.devices[macAdress] === undefined;
   this.devices[macAdress] = device;
-  logger.debug('A');
+  logger.debug('A ' + JSON.stringify(doesntExistYet));
   if (doesntExistYet) {
     
-    logger.debug('B');
+    logger.debug('B ' + JSON.stringify(device));
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
       payload: device,

@@ -71,7 +71,7 @@ function onMessage(msg, rsinfo) {
 
         this.addDevice(macAdress, device);        
       } else {      
-        logger.debug('already exist: ' + JSON.stringify(this.devices[model]));      
+        logger.debug('already exist: ' + JSON.stringify(this.devices[macAdress]));      
       }
     } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
       logger.debug(rsinfo.address + ' is a "hi-flying" device, but not a bulb.');
