@@ -31,6 +31,7 @@ function onMessage(msg, rsinfo) {
 
   const data = message.split(',');
   const ip = data[0];
+  logger.error(data.length)
   const reponse = data[1];
   const model = data[2];
   
