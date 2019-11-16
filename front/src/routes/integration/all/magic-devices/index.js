@@ -20,7 +20,6 @@ class MagicDevicesPage extends Component {
     return (
       <MagicDevicesLayout>
         {props.magicDevices && props.magicDevices.length ? <DevicePanel {...props} /> : <div />}
-        <SetupPanel {...props} />
       </MagicDevicesLayout>
     );
   }
