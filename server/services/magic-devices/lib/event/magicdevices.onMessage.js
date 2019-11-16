@@ -1,3 +1,15 @@
+const DEVICES = {
+  HF_LPB100_ZJ: 'HF-LPB100-ZJ',
+  HF_LPB100_ZJ002: 'HF-LPB100-ZJ002',
+  HF_LPB100_ZJ001: 'HF-LPB100-ZJ001',
+  HF_LPB100_ZJ011: 'HF-LPB100-ZJ011',
+  HF_LPB100_ZJ00: 'HF-A11-ZJ00',
+  HF_LPB100_ZJ200: 'HF-LPB100-ZJ200',
+  HF_A11_ZJ: 'HF-A11-ZJ',
+  ZJ_VOICE001: 'ZJ-Voice001',
+  AK001_ZJ100: 'AK001-ZJ100'
+}
+
 const logger = require('../../../../utils/logger');
 /**
  * @description MagicDevices onMessage callback.
@@ -8,26 +20,18 @@ const logger = require('../../../../utils/logger');
  */
 function onMessage(msg, rsinfo) {
   
-  logger.debug(msg);
-  logger.debug(msg.toString());
-
-
-  const message = JSON.parse(msg.toString());
-  const ip = rsinfo.address;
+  const message = msg.toString();
   logger.debug(message);
-  const data = message.data ? JSON.parse(message.data) : null;
-  if (message.sid) {
-    // save gateway ip of sensor
-    this.gatewayIpBySensorSid.set(message.sid, ip);
-    // save sensor model
-    this.sensorModelBySensorSid.set(message.sid, message.model);
-  }
-  switch (message.model) {
-    case '86sw1':
-      this.newValueSingleWirelessSwitch(message, data);
-      break;
+
+  const ip = rsinfo.address;
+  logger.debug("got msg from " + ip);
+
+  switch (message) {
+    case DEVICES.HF_LPB100_ZJ200:
+      logger.debug('model: ' + DEVICES.HF_LPB100_ZJ20);
+      break;    
     default:
-      logger.info(`Xiaomi device "${message.model}" not handled yet!`);
+      logger.info(`Magic device not handled yet!`);
       break;
   }
 }

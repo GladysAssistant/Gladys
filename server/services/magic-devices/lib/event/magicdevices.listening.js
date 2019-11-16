@@ -12,11 +12,11 @@ function listening() {
 
   const adresses = getBroadcastAdresses();
   const keyByte = new Buffer(PASSWORD, "ascii");
-  
+
   const payload = keyByte;
 
-  this.socket.setBroadcast(true);
-  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '255.255.255.255');
+  //this.socket.setBroadcast(true);
+  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.27');
 }
 
 module.exports = {
