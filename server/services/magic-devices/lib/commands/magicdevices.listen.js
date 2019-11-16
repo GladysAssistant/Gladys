@@ -11,10 +11,10 @@ const PASSWORD = 'HF-A11ASSISTHREAD';
  */
 function listen() {
   this.socket = this.dgram.createSocket({ type: 'udp4', reuseAddr: true });
-  this.socket.on('listening', eventFunctionWrapper(this.listening.bind(this)));
-  this.socket.on('message', eventFunctionWrapper(this.onMessage.bind(this)));
-  //  this.socket.on('data.weather', this.addTemperatureSensor.bind(this));
   this.socket.bind(DISCOVERY_PORT);
+
+  this.socket.on('listening', eventFunctionWrapper(this.listening.bind(this)));
+  this.socket.on('message', eventFunctionWrapper(this.onMessage.bind(this)));  
 }
 
 module.exports = {

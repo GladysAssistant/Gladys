@@ -8,3 +8,4 @@ module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports.sonoff = require('./sonoff');
+module.exports['magic-devices'] = require('./magic-devices');
