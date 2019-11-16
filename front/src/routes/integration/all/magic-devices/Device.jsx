@@ -37,11 +37,11 @@ class MagicDevicesDeviceBox extends Component {
   };
   
   componentWillMount() {
-    this.refreshDeviceProperty();
+    //this.refreshDeviceProperty();
   }
 
   componentWillUpdate() {
-    this.refreshDeviceProperty();
+    //this.refreshDeviceProperty();
   }
 
   render(props, { loading, error }) {

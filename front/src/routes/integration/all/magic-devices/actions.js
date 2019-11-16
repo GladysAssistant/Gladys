@@ -40,7 +40,6 @@ function createActions(store) {
           magicDevicesMap,
           getMagicDevicesStatus: RequestStatus.Success
         });
-        actions.getMagicSensors(store.getState());
 
       } catch (e) {
         store.setState({
