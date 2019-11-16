@@ -16,7 +16,7 @@ function listening() {
   const payload = keyByte;
 
   this.socket.setBroadcast(true);
-  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '0.0.0.0'); //, DISCOVERY_PORT, '192.168.1.27');
+  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.27');
 }
 
 module.exports = {

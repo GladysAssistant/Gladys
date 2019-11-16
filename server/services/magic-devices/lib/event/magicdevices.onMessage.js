@@ -34,7 +34,7 @@ function onMessage(msg, rsinfo) {
 
   switch (model) {
     case DEVICES.HF_LPB100_ZJ200:
-      logger.debug('model: ' + DEVICES.HF_LPB100_ZJ20);
+      logger.debug('model: ' + DEVICES.HF_LPB100_ZJ200);
       break;    
     default:
       logger.info(`Magic device not handled yet!`);
