@@ -9,7 +9,7 @@ const DevicePanel = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <Text id="integration.xiaomi.device.title" />
+        <Text id="integration.magicDevices.device.title" />
       </h3>
       <div class="page-options d-flex">
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
@@ -28,7 +28,7 @@ const DevicePanel = ({ children, ...props }) => (
             <input
               type="text"
               class="form-control w-10"
-              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
+              placeholder={<Text id="integration.magicDevices.device.searchPlaceholder" />}
               value={props.xiaomiDeviceSearch}
               onInput={props.debouncedSearch}
             />
@@ -44,12 +44,12 @@ const DevicePanel = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.getXiaomiDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          {props.getMagicDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.xiaomiDevices &&
-              props.xiaomiDevices.map((xiaomiDevice, index) => (
+            {props.magicDevices &&
+              props.magicDevices.map((device, index) => (
                 <Device
-                  device={xiaomiDevice}
+                  device={device}
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
@@ -57,9 +57,9 @@ const DevicePanel = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.xiaomiDevices && props.xiaomiDevices.length === 0 && (
+            {props.magicDevices && props.magicDevices.length === 0 && (
               <p class="text-center">
-                <Text id="integration.xiaomi.device.noDevices" />
+                <Text id="integration.magicDevices.device.noDevices" />
               </p>
             )}
           </div>
