@@ -7,6 +7,10 @@ const logger = require('../../../../utils/logger');
  * magicDevices.onMessage('{"model": "motion"}');
  */
 function onMessage(msg, rsinfo) {
+  
+  logger.debug(msg);
+
+
   const message = JSON.parse(msg.toString());
   const ip = rsinfo.address;
   logger.debug(message);
