@@ -10,7 +10,7 @@ const DISCOVERY_PORT = 48899;
 function listen() {
   this.socket = this.dgram.createSocket({ type: 'udp4', reuseAddr: true });
   this.socket.bind(DISCOVERY_PORT);
-
+  this.socket.setBroadcast(true);
   this.socket.on('listening', eventFunctionWrapper(this.listening.bind(this)));
   this.socket.on('message', eventFunctionWrapper(this.onMessage.bind(this)));  
 }
