@@ -16,11 +16,15 @@ function listening() {
   this.socket.setBroadcast(true);
   
   const keyByte = new Buffer(PASSWORD, "ascii");
+  const smartlinkfindByte = new Buffer("smartlinkfind", "ascii");
+  
   const payload = keyByte;
 
-  for (let i = 0; i < 256; i++) {
-    this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.' + i);
-  }
+  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.43.1');
+
+  // for (let i = 0; i < 256; i++) {
+  //   this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.' + i);
+  // }
 }
 
 module.exports = {

@@ -10,6 +10,9 @@ const DEVICES = {
   AK001_ZJ100: 'AK001-ZJ100'
 }
 
+const MANUFACTURER_MAC_BYTES = 'ACCF23';
+const BULBS_MAC_BYTES = '5F';
+
 const logger = require('../../../../utils/logger');
 /**
  * @description MagicDevices onMessage callback.
