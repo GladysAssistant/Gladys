@@ -34,5 +34,11 @@
     "name": "Sonoff",
     "description": "Control your Sonoff devices.",
     "img": "/assets/integrations/cover/sonoff.jpg"
+  },
+  {
+    "key": "magic-devices",
+    "name": "Magic Devices",
+    "description": "Control your Magic Devices, such as Magic Home, MagicHue, ...",
+    "img": "/assets/integrations/cover/sonoff.jpg"
   }
 ]
