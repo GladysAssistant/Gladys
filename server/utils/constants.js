@@ -351,6 +351,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
+  MAGIC_DEVICES: {
+    NEW_DEVICE: 'magic-devices.new-device',
+  }
 };
 
 const DASHBOARD_TYPE = {

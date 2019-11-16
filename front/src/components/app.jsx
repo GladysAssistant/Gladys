@@ -66,6 +66,7 @@ import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operati
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import MagicDevicesPage from '../routes/integration/all/magic-devices';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -168,6 +169,7 @@ const AppRouter = connect(
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <SonoffPage path="/dashboard/integration/device/sonoff" />
+        <MagicDevicesPage path="/dashboard/integration/device/magic-devices" />
         <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
 
         <ChatPage path="/dashboard/chat" />
