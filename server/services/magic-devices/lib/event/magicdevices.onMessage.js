@@ -33,21 +33,17 @@ function onMessage(msg, rsinfo) {
   const ip = data[0];
   const reponse = data[1];
   const model = data[2];
-
-
   
-  if (reponse && reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
+  if (reponse !== undefined && reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
     logger.debug('ip: ' + ip);
     logger.debug('reponse: ' + reponse);
     logger.debug('model: ' + model);
     logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
 
-    if (this.devices[model]) {
-      logger.debug('already exist: ' + JSON.stringify(this.devices[model]));
-    } else {
+    const macAdress = reponse;
+    const doesntExistYet = this.devices[macAdress] === undefined;
 
-      const macAdress = reponse;
-
+    if (doesntExistYet) {
       const device = {
         service_id: this.serviceId,
         name: model,
@@ -71,6 +67,8 @@ function onMessage(msg, rsinfo) {
       this.addDevice(reponse, device);
 
       logger.debug('created: ' + JSON.stringify(device));
+    } else {      
+      logger.debug('already exist: ' + JSON.stringify(this.devices[model]));      
     }
 
   } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
