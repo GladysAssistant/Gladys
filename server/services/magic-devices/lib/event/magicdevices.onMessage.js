@@ -31,9 +31,13 @@ function onMessage(msg, rsinfo) {
   const reponse = data[1];
   const model = data[2];
 
-  for (let info in rsinfo) {
-    logger.debug(info + ": " + rsinfo[info]);
-  }
+  logger.debug('ip: ' + ip);
+  logger.debug('reponse: ' + reponse);
+  logger.debug('model: ' + model);
+
+  // for (let info in rsinfo) {
+  //   logger.debug(info + ": " + rsinfo[info]);
+  // }
 
   switch (model) {
     case DEVICES.HF_LPB100_ZJ200:
