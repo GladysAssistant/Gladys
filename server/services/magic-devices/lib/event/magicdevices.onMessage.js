@@ -21,7 +21,10 @@ const logger = require('../../../../utils/logger');
 function onMessage(msg, rsinfo) {
   
   const message = msg.toString();
-  logger.debug(message);
+  logger.debug('message: ' + message);
+
+  
+  logger.debug("rsinfo: " + rsinfo);
 
   const ip = rsinfo.address;
   logger.debug("got msg from " + ip);

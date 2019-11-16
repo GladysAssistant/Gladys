@@ -10,7 +10,7 @@ const PASSWORD = 'HF-A11ASSISTHREAD';
  */
 function listening() {
 
-  const adresses = getBroadcastAdresses();
+  //const adresses = getBroadcastAdresses();
   const keyByte = new Buffer(PASSWORD, "ascii");
 
   const payload = keyByte;
