@@ -5,7 +5,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  * @param {string} macAdress - hi-flying device mac adress
  * @param {Object} device - Device to add.
  * @example
- * magicDevices.addDevice(mac, device);
+ * magicDevices.addDevice(macAdress, device);
  */
 function addDevice(macAdress, device) {
   const doesntExistYet = this.devices[macAdress] === undefined;
