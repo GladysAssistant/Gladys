@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const logger = require('../../../../utils/logger');
+const logger = require('../../../utils/logger');
 
 module.exports = function magicDevicesController(magicDevicesManager) {
   /**
