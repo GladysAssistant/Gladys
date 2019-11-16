@@ -41,6 +41,14 @@ function onMessage(msg, rsinfo) {
 
     if (reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
 
+      var mac = "";
+      for(var i = 0; i < reponse.length; ++i){
+        mac += (String.fromCharCode(reponse.charCodeAt[i]));
+      }
+
+
+      logger.debug('mac: ' + mac);
+
       logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
 
       const macAdress = reponse;
