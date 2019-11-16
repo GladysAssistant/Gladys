@@ -30,53 +30,54 @@ function onMessage(msg, rsinfo) {
   logger.debug('message: ' + message);
 
   const data = message.split(',');
-  const ip = data[0];
-  logger.error(data.length)
-  const reponse = data[1];
-  const model = data[2];
-  
-  if (reponse !== undefined && reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
-    logger.debug('ip: ' + ip);
-    logger.debug('reponse: ' + reponse);
-    logger.debug('model: ' + model);
-    logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
 
-    const macAdress = reponse;
-    const doesntExistYet = this.devices[macAdress] === undefined;
+  if (data.length > 1) {
 
-    if (doesntExistYet) {
-      const device = {
-        service_id: this.serviceId,
-        name: model,
-        selector: `magic-device:${macAdress}`,
-        external_id: `magic-device:${macAdress}`,
-        model: model,
-        should_poll: false,
-        features: [
-          {
-            name: "On/Off",
-            category: "light",
-            type: "binary",
-            read_only: false,
-            has_feedback: false,
-            min: 0,
-            max: 1
-          },
-        ],
-      };  
-  
-      this.addDevice(macAdress, device);
+    const ip = data[0];
+    const reponse = data[1];
+    const model = data[2];
 
-      logger.debug('created: ' + JSON.stringify(device));
-    } else {      
-      logger.debug('already exist: ' + JSON.stringify(this.devices[model]));      
+    if (reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
+
+      logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
+
+      const macAdress = reponse;
+      const doesntExistYet = this.devices[macAdress] === undefined;
+
+      if (doesntExistYet) {
+        const device = {
+          service_id: this.serviceId,
+          name: model,
+          selector: `magic-device:${macAdress}`,
+          external_id: `magic-device:${macAdress}`,
+          model: model,
+          should_poll: false,
+          features: [
+            {
+              name: "On/Off",
+              category: "light",
+              type: "binary",
+              read_only: false,
+              has_feedback: false,
+              min: 0,
+              max: 1
+            },
+          ],
+        };  
+
+        this.addDevice(macAdress, device);
+
+        logger.debug('created: ' + JSON.stringify(device));
+      } else {      
+        logger.debug('already exist: ' + JSON.stringify(this.devices[model]));      
+      }
+    } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
+      logger.debug(rsinfo.address + ' is a "hi-flying" device, but not a bulb.');
     }
-
-  } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
-    logger.debug(rsinfo.address + ' is a "hi-flying" device, but not a bulb.');
   } else {
     logger.debug(rsinfo.address + ' is not a magic device ...');
   }
+  
 
   // for (let info in rsinfo) {
   //   logger.debug(info + ": " + rsinfo[info]);
