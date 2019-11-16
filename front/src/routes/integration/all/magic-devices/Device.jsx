@@ -61,7 +61,7 @@ class MagicDevicesDeviceBox extends Component {
               <div class="card-body">
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.device.sidLabel" />
+                    <Text id="integration.magicDevices.device.sidLabel" />
                   </label>
                   <input type="text" value={props.device.external_id.split(':')[1]} class="form-control" disabled />
                 </div>

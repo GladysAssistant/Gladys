@@ -417,6 +417,27 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "magicDevices": {
+      "device": {
+        "title": "Magic Devices in Gladys",
+        "noDevices": "No Magic Devices added yet.",
+        "searchPlaceholder": "Search a Magic Devices light",
+        "macLabel": "Mac Adress",
+        "ipLabel": "IP Address",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit details"
+      },
+      "setup": {
+        "title": "Magic Devices not in Gladys",
+        "description": "Devices detected will be added here. Most of the light bulbs that works in pair with android app such as Magic Home or Magic Hue should be compatible.",
+        "createDeviceInGladys": "Connect in Gladys",
+        "createDeviceError": "There was an error creating this device in Gladys. ",
+        "deviceCreatedSuccess": "The device was added with success."
+      }
     }
   },
   "editScene": {

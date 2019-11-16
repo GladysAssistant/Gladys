@@ -29,7 +29,7 @@ const DevicePanel = ({ children, ...props }) => (
               type="text"
               class="form-control w-10"
               placeholder={<Text id="integration.magicDevices.device.searchPlaceholder" />}
-              value={props.xiaomiDeviceSearch}
+              value={props.magicDeviceSearch}
               onInput={props.debouncedSearch}
             />
           </Localizer>
@@ -39,7 +39,7 @@ const DevicePanel = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getXiaomiDevicesStatus === RequestStatus.Getting
+          active: props.getMagicDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
