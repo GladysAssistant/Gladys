@@ -29,7 +29,7 @@ const BULBS_MAC_BYTES = '5F';
 function onMessage(msg, rsinfo) {
   
   const message = msg.toString();
-  logger.debug('message: ' + message);
+  //logger.debug('message: ' + message);
 
   const data = message.split(',');
 
@@ -40,14 +40,6 @@ function onMessage(msg, rsinfo) {
     const model = data[2];
 
     if (reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
-
-      var mac = "";
-      for(var i = 0; i < reponse.length; ++i){
-        mac += (String.fromCharCode(reponse.charCodeAt[i]));
-      }
-
-
-      logger.debug('mac: ' + mac);
 
       logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
 
