@@ -16,7 +16,7 @@ function addDevice(macAdress, device) {
       type: WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE,
       payload: device,
     });
-    logger.debug('added: ' + JSON.stringify(device));
+    logger.debug('added: ' + macAdress);
   }
 }
 
