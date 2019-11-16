@@ -2,7 +2,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function magicDevicesController(magicDevicesManager) {
   /**
-   * @api {get} /api/v1/service/magicdevices/devices Get Magic Devices devices
+   * @api {get} /api/v1/service/magic-devices/devices Get Magic Devices
    * @apiName getDevices
    * @apiGroup MagicDevices
    */
@@ -12,7 +12,7 @@ module.exports = function magicDevicesController(magicDevicesManager) {
   }
 
   return {
-    'get /api/v1/service/magicdevices/devices': {
+    'get /api/v1/service/magic-devices/devices': {
       authenticated: true,
       controller: asyncMiddleware(getDevices),
     },

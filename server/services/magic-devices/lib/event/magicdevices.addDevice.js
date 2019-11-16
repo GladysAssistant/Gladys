@@ -13,7 +13,7 @@ function addDevice(macAdress, device) {
   this.devices[macAdress] = device;
   if (doesntExistYet) {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE,
+      type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
       payload: device,
     });
     logger.debug('added: ' + macAdress);
