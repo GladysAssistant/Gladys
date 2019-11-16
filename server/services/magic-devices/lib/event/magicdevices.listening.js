@@ -11,12 +11,20 @@ const PASSWORD = 'HF-A11ASSISTHREAD';
 function listening() {
 
   //const adresses = getBroadcastAdresses();
-  const keyByte = new Buffer(PASSWORD, "ascii");
-
-  const payload = keyByte;
+  
 
   this.socket.setBroadcast(true);
-  this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.27');
+  sendToAllAdresses();
+}
+
+function sendToAllAdresses() {
+
+  const keyByte = new Buffer(PASSWORD, "ascii");
+  const payload = keyByte;
+
+  for (let i = 0; i < 256; i++) {
+    this.socket.send(payload, 0, payload.length, DISCOVERY_PORT, '192.168.1.' + i);
+  }
 }
 
 module.exports = {
