@@ -2,17 +2,17 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description Add device.
- * @param {string} sid - Xiaomi SID.
+ * @param {string} macAdress - hi-flying device mac adress
  * @param {Object} device - Device to add.
  * @example
- * xiaomi.addDevice(sid, device);
+ * magicDevices.addDevice(mac, device);
  */
-function addDevice(sid, device) {
-  const doesntExistYet = this.sensors[sid] === undefined;
-  this.sensors[sid] = device;
+function addDevice(macAdress, device) {
+  const doesntExistYet = this.devices[macAdress] === undefined;
+  this.devices[macAdress] = device;
   if (doesntExistYet) {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE,
+      type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
       payload: device,
     });
   }

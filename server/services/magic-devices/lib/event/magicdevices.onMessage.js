@@ -10,7 +10,10 @@ const DEVICES = {
   AK001_ZJ100: 'AK001-ZJ100'
 }
 
+// the manufacturer mac (hi-flying)
 const MANUFACTURER_MAC_BYTES = 'ACCF23';
+
+// bulbs product mac adress includes this after the manufacturer mac
 const BULBS_MAC_BYTES = '5F';
 
 const logger = require('../../../../utils/logger');
@@ -31,22 +34,63 @@ function onMessage(msg, rsinfo) {
   const reponse = data[1];
   const model = data[2];
 
-  logger.debug('ip: ' + ip);
-  logger.debug('reponse: ' + reponse);
-  logger.debug('model: ' + model);
+
+  
+  if (reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
+    logger.debug('ip: ' + ip);
+    logger.debug('reponse: ' + reponse);
+    logger.debug('model: ' + model);
+    logger.debug(ip + ' is a "hi-flying" bulb: [' + model + ', ' + reponse + '].');
+
+    if (this.devices[model]) {
+      logger.debug('already exist: ' + JSON.stringify(this.devices[model]));
+    } else {
+
+      const macAdress = reponse;
+
+      const device = {
+        service_id: this.serviceId,
+        name: model,
+        selector: `magic-device:${macAdress}`,
+        external_id: `magic-device:${macAdress}`,
+        model: model,
+        should_poll: false,
+        features: [
+          {
+            name: "On/Off",
+            category: "light",
+            type: "binary",
+            read_only: false,
+            has_feedback: false,
+            min: 0,
+            max: 1
+          },
+        ],
+      };  
+  
+      this.addDevice(reponse, device);
+
+      logger.debug('created: ' + JSON.stringify(device));
+    }
+
+  } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
+    logger.debug(rsinfo.address + ' is a "hi-flying" device, but not a bulb.');
+  } else {
+    logger.debug(rsinfo.address + ' is not a magic device ...');
+  }
 
   // for (let info in rsinfo) {
   //   logger.debug(info + ": " + rsinfo[info]);
   // }
 
-  switch (model) {
-    case DEVICES.HF_LPB100_ZJ200:
-      logger.debug('model: ' + DEVICES.HF_LPB100_ZJ200);
-      break;    
-    default:
-      logger.info(`Magic device not handled yet!`);
-      break;
-  }
+  // switch (model) {
+  //   case DEVICES.HF_LPB100_ZJ200:
+  //     logger.debug('model: ' + DEVICES.HF_LPB100_ZJ200);
+  //     break;    
+  //   default:
+  //     logger.info(`Magic device not handled yet!`);
+  //     break;
+  // }
 }
 
 module.exports = {
