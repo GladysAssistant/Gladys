@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import MagicDevicesLayout from './MagicDevicesLayout';
-import SetupPanel from './SetupPanel';
 import DevicePanel from './DevicePanel';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
 
