@@ -1,8 +1,6 @@
 const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
-const SERVER_PORT = 9898;
 const DISCOVERY_PORT = 48899;
-const PASSWORD = 'HF-A11ASSISTHREAD';
 // const keyByte = new Buffer(PASSWORD, "ascii");
 /**
  * @description Listen.

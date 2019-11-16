@@ -23,13 +23,16 @@ function onMessage(msg, rsinfo) {
   const message = msg.toString();
   logger.debug('message: ' + message);
 
-  
-  logger.debug("rsinfo: " + rsinfo);
+  const data = message.split(',');
+  const ip = data[0];
+  const reponse = data[1];
+  const model = data[2];
 
-  const ip = rsinfo.address;
-  logger.debug("got msg from " + ip);
+  for (let info in rsinfo) {
+    logger.debug(info + ": " + rsinfo[info]);
+  }
 
-  switch (message) {
+  switch (model) {
     case DEVICES.HF_LPB100_ZJ200:
       logger.debug('model: ' + DEVICES.HF_LPB100_ZJ20);
       break;    
