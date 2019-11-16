@@ -64,7 +64,7 @@ function onMessage(msg, rsinfo) {
         ],
       };  
   
-      this.addDevice(reponse, device);
+      this.addDevice(macAdress, device);
 
       logger.debug('created: ' + JSON.stringify(device));
     } else {      
