@@ -9,6 +9,7 @@ const logger = require('../../../../utils/logger');
 function onMessage(msg, rsinfo) {
   
   logger.debug(msg);
+  logger.debug(msg.toString);
 
 
   const message = JSON.parse(msg.toString());
