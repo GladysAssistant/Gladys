@@ -1,3 +1,5 @@
+const logger = require('../../../../utils/logger');
+
 const DEVICES = {
   HF_LPB100_ZJ: 'HF-LPB100-ZJ',
   HF_LPB100_ZJ002: 'HF-LPB100-ZJ002',
@@ -16,7 +18,7 @@ const MANUFACTURER_MAC_BYTES = 'ACCF23';
 // bulbs product mac adress includes this after the manufacturer mac
 const BULBS_MAC_BYTES = '5F';
 
-const logger = require('../../../../utils/logger');
+
 /**
  * @description MagicDevices onMessage callback.
  * @param {Buffer} msg - The message buffer.
@@ -48,8 +50,8 @@ function onMessage(msg, rsinfo) {
         const device = {
           service_id: this.serviceId,
           name: model,
-          selector: `magic-device:${macAdress}`,
-          external_id: `magic-device:${macAdress}`,
+          selector: `magic-devices:${macAdress}`,
+          external_id: `magic-devices:${macAdress}`,
           model: model,
           should_poll: false,
           features: [
@@ -63,11 +65,11 @@ function onMessage(msg, rsinfo) {
               max: 1
             },
           ],
-        };  
-
-        this.addDevice(macAdress, device);
+        };
 
         logger.debug('created: ' + JSON.stringify(device));
+
+        this.addDevice(macAdress, device);        
       } else {      
         logger.debug('already exist: ' + JSON.stringify(this.devices[model]));      
       }

@@ -1,4 +1,5 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Add device.
@@ -15,6 +16,7 @@ function addDevice(macAdress, device) {
       type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
       payload: device,
     });
+    logger.debug('added: ' + JSON.stringify(device));
   }
 }
 
