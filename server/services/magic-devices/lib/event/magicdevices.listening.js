@@ -14,11 +14,7 @@ function listening() {
   
 
   this.socket.setBroadcast(true);
-  sendToAllAdresses();
-}
-
-function sendToAllAdresses() {
-
+  
   const keyByte = new Buffer(PASSWORD, "ascii");
   const payload = keyByte;
 
