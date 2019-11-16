@@ -36,7 +36,7 @@ function onMessage(msg, rsinfo) {
 
 
   
-  if (reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
+  if (reponse && reponse.startsWith(MANUFACTURER_MAC_BYTES + BULBS_MAC_BYTES)) {
     logger.debug('ip: ' + ip);
     logger.debug('reponse: ' + reponse);
     logger.debug('model: ' + model);
