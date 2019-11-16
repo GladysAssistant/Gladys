@@ -18,6 +18,7 @@ class MagicDevicesPage extends Component {
   render(props, {}) {
     return (
       <MagicDevicesLayout>
+        zob
         {props.magicDevices && props.magicDevices.length ? <DevicePanel {...props} /> : <div />}
       </MagicDevicesLayout>
     );

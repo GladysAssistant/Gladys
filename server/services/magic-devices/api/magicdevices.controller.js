@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const logger = require('../../../../utils/logger');
 
 module.exports = function magicDevicesController(magicDevicesManager) {
   /**
@@ -8,6 +9,7 @@ module.exports = function magicDevicesController(magicDevicesManager) {
    */
   async function getDevices(req, res) {
     const devices = await magicDevicesManager.getDevices();
+    logger.debug("the front called, returning " + JSON.stringify(devices));
     res.json(devices);
   }
 
