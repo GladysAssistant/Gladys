@@ -18,8 +18,7 @@ class MagicDevicesPage extends Component {
   render(props, {}) {
     return (
       <MagicDevicesLayout>
-        {/* {props.magicDevices && props.magicDevices.length ? <DevicePanel {...props} /> : <div />} */}
-        {props.magicDevices}
+        {props.magicDevices && props.magicDevices.length ? <DevicePanel {...props} /> : <div />}
       </MagicDevicesLayout>
     );
   }

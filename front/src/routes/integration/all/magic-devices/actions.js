@@ -27,10 +27,11 @@ function createActions(store) {
           options.search = state.magicDeviceSearch;
         }
 
-        const magicDevices = await state.httpClient.get('/api/v1/service/magic-devices/device', options);
+        const magicDevices = await state.httpClient.get('/api/v1/service/magic-devices/devices', options);
 
         const magicDevicesMap = new Map();
         magicDevices.forEach(magicDevice => {
+          console.log("found " + magicDevice.external_id)
           magicDevicesMap.set(magicDevice.external_id, magicDevice);
         });
 
