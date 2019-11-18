@@ -24,33 +24,38 @@ function scan() {
 
     for (let d in devices) {
 
-      const netDevice = devices[d];
+      const device = devices[d];
 
       // device and features ids
-      const deviceId = `${SERVICE_SELECTOR}:${netDevice.id}`;
+      const deviceId = `${SERVICE_SELECTOR}:${device.id}`;
       const powerFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.POWER}`;
       const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
+      
+      const hueFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.HUE}`;
+      const saturationFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.SATURATION}`;
       const brightnessFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
+      const temperatureFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
 
       // should use gladys state devices ... ?
-      const doesntExistYet = this.devices[netDevice.id] === undefined;
+      const doesntExistYet = this.devices[device.id] === undefined;
 
       if (doesntExistYet) {
 
         console.log('\tCreating Device with id ' + deviceId);
 
         const deviceCreated = await this.gladys.device.create({
-          name: netDevice.model,
+          name: device.model,
           service_id: this.serviceId,
           external_id: deviceId,
           selector: deviceId,
-          model: netDevice.model,
+          model: device.model,
           should_poll: true,
           poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
           features: [
             {
               name: "On/Off",              
-              read_only: false,
+              read_only: false,              
+              keep_history: false,
               has_feedback: false,
               external_id: powerFeatureId,
               selector: powerFeatureId,
@@ -62,6 +67,7 @@ function scan() {
             {
               name: "Color",
               read_only: false,
+              keep_history: false,
               has_feedback: false,
               external_id: colorFeatureId,
               selector: colorFeatureId,
@@ -71,13 +77,50 @@ function scan() {
               max: 0
             },
             {
-              name: "Brightness",              
+              name: "Hue",              
               read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              external_id: hueFeatureId,
+              selector: hueFeatureId,
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+              min: 0,
+              max: 359
+            },
+            {
+              name: "Saturation",              
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              external_id: saturationFeatureId,
+              selector: saturationFeatureId,
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
+              min: 0,
+              max: 100
+            },
+            {
+              name: "Brightness / Lightness / Value",   
+              read_only: false,              
+              keep_history: false,
               has_feedback: false,
               external_id: brightnessFeatureId,
               selector: brightnessFeatureId,
               category: DEVICE_FEATURE_CATEGORIES.LIGHT,
               type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+              min: 0,
+              max: 100
+            },
+            {
+              name: "Temperature / Warm White",
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              external_id: temperatureFeatureId,
+              selector: temperatureFeatureId,
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
               min: 0,
               max: 255
             },
@@ -85,7 +128,14 @@ function scan() {
           params: [],
         });
         
-        this.deviceIpByMacAdress.set(netDevice.id, netDevice.address);
+        this.deviceIpByMacAdress.set(device.id, device.address);
+
+        this.gladys.event.emit(EVENTS.DEVICE.NEW, deviceCreated);
+        // this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        //   type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
+        //   payload: deviceCreated,
+        // });
+
         // this.addDevice(netDevice.id, device);
         // this.getStatus(deviceCreated);
       }

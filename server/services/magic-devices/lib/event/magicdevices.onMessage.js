@@ -25,7 +25,6 @@ const MANUFACTURER_MAC_BYTES = 'ACCF23';
 // bulbs product mac adress includes this after the manufacturer mac
 const BULBS_MAC_BYTES = '5F';
 
-
 /**
  * @description MagicDevices onMessage callback.
  * @param {Buffer} msg - The message buffer.
@@ -83,7 +82,27 @@ function onMessage(msg, rsinfo) {
               max: 0
             },
             {
-              name: "Brightness",
+              name: "Hue",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              min: 0,
+              max: 359
+            },
+            {
+              name: "Saturation",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              min: 0,
+              max: 100
+            },
+            {
+              name: "Brightness / Lightness / Value",
               category: DEVICE_FEATURE_CATEGORIES.LIGHT,
               type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
               read_only: false,
@@ -91,6 +110,16 @@ function onMessage(msg, rsinfo) {
               has_feedback: false,
               min: 0,
               max: 100
+            },
+            {
+              name: "Temperature / Warm White",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              min: 0,
+              max: 255
             },
           ],
         };
@@ -100,7 +129,6 @@ function onMessage(msg, rsinfo) {
         this.deviceIpByMacAdress.set(macAdress, ip);
         this.addDevice(macAdress, device);
         this.getStatus(device);
-
 
       } else {      
         logger.debug('already exists (with mac adress: ' + macAdress + ')');      

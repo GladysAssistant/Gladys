@@ -20,3 +20,12 @@ function setValue(device, deviceFeature, state) {
 module.exports = {
   setValue,
 };
+
+
+  // control.turnOff(success => {
+  //   logger.debug(success);
+  // });
+
+  // control.turnOn(success => {
+  //   logger.debug(success);
+  // });
