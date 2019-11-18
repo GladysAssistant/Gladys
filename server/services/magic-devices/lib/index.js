@@ -2,18 +2,20 @@ const dgram = require('dgram');
 
 // EVENTS
 const { addDevice } = require('./event/magicdevices.addDevice');
-const { listening } = require('./event/magicdevices.listening');
+const { scan } = require('./event/magicdevices.scan');
 const { onMessage } = require('./event/magicdevices.onMessage');
 
 // COMMANDS
 const { getDevices } = require('./commands/magicdevices.getDevices');
-const { listen } = require('./commands/magicdevices.listen');
+const { poll } = require('./commands/magicdevices.poll');
+const { start } = require('./commands/magicdevices.start');
 const { setValue } = require('./commands/magicdevices.setValue');
+// const { Control, Discovery, CustomMode, EffectInterface } = require('magic-home');
 
 /**
  * @param {Object} gladys - The gladys object.
  * @param {string} serviceId - Identification of the service.
- * @description Create all device if not exist by listening
+ * @description This is the Magic Devices service manager
  * @example
  * MagicDevicesManager(gladys, serviceId)
  */
@@ -23,19 +25,18 @@ const MagicDevicesManager = function MagicDevicesManager(gladys, serviceId) {
   this.serviceId = serviceId;
   this.devices = {};
 
-  this.gatewayIpBySensorSid = new Map();
-  this.sensorModelBySensorSid = new Map();
-  this.gatewayTokenByIp = new Map();
+  this.deviceIpByMacAdress = new Map();
 };
 
 // EVENTS
 MagicDevicesManager.prototype.addDevice = addDevice;
-MagicDevicesManager.prototype.listening = listening;
+MagicDevicesManager.prototype.scan = scan;
 MagicDevicesManager.prototype.onMessage = onMessage;
 
 // COMMANDS
-MagicDevicesManager.prototype.listen = listen;
+MagicDevicesManager.prototype.start = start;
 MagicDevicesManager.prototype.getDevices = getDevices;
+MagicDevicesManager.prototype.poll = poll;
 MagicDevicesManager.prototype.setValue = setValue;
 
 module.exports = MagicDevicesManager;

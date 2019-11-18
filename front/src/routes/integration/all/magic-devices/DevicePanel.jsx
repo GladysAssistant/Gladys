@@ -9,7 +9,7 @@ const DevicePanel = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <Text id="integration.magicDevices.device.title" />
+        <Text id="integration.xiaomi.device.title" />
       </h3>
       <div class="page-options d-flex">
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
@@ -28,8 +28,8 @@ const DevicePanel = ({ children, ...props }) => (
             <input
               type="text"
               class="form-control w-10"
-              placeholder={<Text id="integration.magicDevices.device.searchPlaceholder" />}
-              value={props.magicDeviceSearch}
+              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
+              value={props.deviceSearch}
               onInput={props.debouncedSearch}
             />
           </Localizer>
@@ -39,15 +39,15 @@ const DevicePanel = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getMagicDevicesStatus === RequestStatus.Getting
+          active: props.getDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.getMagicDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          {props.getDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.magicDevices &&
-              props.magicDevices.map((device, index) => (
+            {props.devices &&
+              props.devices.map((device, index) => (
                 <Device
                   device={device}
                   deviceIndex={index}
@@ -57,9 +57,9 @@ const DevicePanel = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.magicDevices && props.magicDevices.length === 0 && (
+            {props.devices && props.devices.length === 0 && (
               <p class="text-center">
-                <Text id="integration.magicDevices.device.noDevices" />
+                <Text id="integration.xiaomi.device.noDevices" />
               </p>
             )}
           </div>

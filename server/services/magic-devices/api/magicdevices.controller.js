@@ -9,9 +9,21 @@ module.exports = function magicDevicesController(magicDevicesManager) {
    */
   async function getDevices(req, res) {
     const devices = await magicDevicesManager.getDevices();
-    logger.debug("the front called, returning " + JSON.stringify(devices));
+
+    console.error("client called")
     res.json(devices);
   }
+
+  /**
+   * @api {post} /api/v1/service/magic-devices/set Set a Magic Devices value
+   * @apiName set
+   * @apiParam {String} serial Serial number of the bridge
+   * @apiGroup PhilipsHue
+   */
+  // async function setValue(req, res) {
+  //   const bridge = await philipsHueLightHandler.configureBridge(req.body.serial);
+  //   res.json(bridge);
+  // }
 
   return {
     'get /api/v1/service/magic-devices/devices': {

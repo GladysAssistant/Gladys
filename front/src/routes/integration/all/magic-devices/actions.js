@@ -9,41 +9,39 @@ function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
 
-    async getMagicDevices(state) {
+    async getDevices(state) {
 
       store.setState({
-        getMagicDevicesStatus: RequestStatus.Getting
+        getDevicesStatus: RequestStatus.Getting
       });
-      
+
       try {
         const options = {
           service: 'magic-devices',
-          order_dir: state.getMagicDeviceOrderDir || 'asc',
+          order_dir: state.getDeviceOrderDir || 'asc',
           take: 10000,
           skip: 0
         };
 
-        if (state.magicDeviceSearch && state.magicDeviceSearch.length) {
-          options.search = state.magicDeviceSearch;
+        if (state.deviceSearch && state.deviceSearch.length) {
+          options.search = state.deviceSearch;
         }
 
-        const magicDevices = await state.httpClient.get('/api/v1/service/magic-devices/devices', options);
-
-        const magicDevicesMap = new Map();
-        magicDevices.forEach(magicDevice => {
-          console.log("found " + magicDevice.external_id)
-          magicDevicesMap.set(magicDevice.external_id, magicDevice);
+        const devices = await state.httpClient.get('/api/v1/service/magic-devices/devices', options);
+        const devicesMap = new Map();
+        devices.forEach(device => {
+          devicesMap.set(device.external_id, device);
         });
 
         store.setState({
-          magicDevices,
-          magicDevicesMap,
-          getMagicDevicesStatus: RequestStatus.Success
+          devices,
+          devicesMap,
+          getDevicesStatus: RequestStatus.Success
         });
 
       } catch (e) {
         store.setState({
-          getMagicDevicesStatus: RequestStatus.Error
+          getDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -55,7 +53,7 @@ function createActions(store) {
     async deleteDevice(state, device, index) {
       await state.httpClient.delete('/api/v1/device/' + device.selector);
       const newState = update(state, {
-        magicDevices: {
+        devices: {
           $splice: [[index, 1]]
         }
       });
@@ -64,7 +62,7 @@ function createActions(store) {
 
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
-        magicDevices: {
+        devices: {
           [index]: {
             [property]: {
               $set: value
@@ -77,12 +75,19 @@ function createActions(store) {
 
     async search(state, e) {
       store.setState({
-        magicDeviceSearch: e.target.value
+        deviceSearch: e.target.value
       });
-      await actions.getMagicDevices(store.getState());
+      await actions.getDevices(store.getState());
+    },
+
+    async changeOrderDir(state, e) {
+      store.setState({
+        getDeviceOrderDir: e.target.value
+      });
+      await actions.getDevices(store.getState());
     }
-  
   };
+  
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
 }

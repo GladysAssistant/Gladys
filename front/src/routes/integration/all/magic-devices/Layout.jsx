@@ -1,4 +1,4 @@
-const MagicDevicesLayout = ({ children, ...props }) => (
+const Layout = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -12,4 +12,4 @@ const MagicDevicesLayout = ({ children, ...props }) => (
   </div>
 );
 
-export default MagicDevicesLayout;
+export default Layout;

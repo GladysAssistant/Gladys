@@ -11,5 +11,8 @@
     "arm64"
   ],
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "magic-home": "2.3.1",
+    "color-convert": "2.0.1"
+  }
 }

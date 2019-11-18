@@ -1,3 +1,10 @@
+const {
+  EVENTS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
+
 const logger = require('../../../../utils/logger');
 
 const DEVICES = {
@@ -24,7 +31,7 @@ const BULBS_MAC_BYTES = '5F';
  * @param {Buffer} msg - The message buffer.
  * @param {Object} rsinfo - Rs info.
  * @example
- * magicDevices.onMessage('{"model": "motion"}');
+ * magicDevices.onRouterMessage('{"msg": "rsInfo"}');
  */
 function onMessage(msg, rsinfo) {
   
@@ -57,21 +64,46 @@ function onMessage(msg, rsinfo) {
           features: [
             {
               name: "On/Off",
-              category: "light",
-              type: "binary",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
               read_only: false,
+              keep_history: false,
               has_feedback: false,
               min: 0,
               max: 1
             },
+            {
+              name: "Color",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              min: 0,
+              max: 0
+            },
+            {
+              name: "Brightness",
+              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+              type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+              read_only: false,
+              keep_history: false,
+              has_feedback: false,
+              min: 0,
+              max: 100
+            },
           ],
         };
 
-        logger.debug('created: ' + JSON.stringify(device));
+        logger.debug('created: ' + model);
+        
+        this.deviceIpByMacAdress.set(macAdress, ip);
+        this.addDevice(macAdress, device);
+        this.getStatus(device);
 
-        this.addDevice(macAdress, device);        
+
       } else {      
-        logger.debug('already exist: ' + JSON.stringify(this.devices[macAdress]));      
+        logger.debug('already exists (with mac adress: ' + macAdress + ')');      
       }
     } else if (reponse.startsWith(MANUFACTURER_MAC_BYTES)) {
       logger.debug(rsinfo.address + ' is a "hi-flying" device, but not a bulb.');
