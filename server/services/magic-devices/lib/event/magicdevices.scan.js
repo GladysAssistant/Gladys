@@ -20,26 +20,43 @@ function scan() {
   let discovery = new Discovery();
   discovery.scan(5000).then(async devices => {
 
-    console.log(devices.length + ' Magic Device(s) found !');
+    console.debug(devices.length + ' Magic Device(s) found while scanning !');
 
     for (let d in devices) {
 
       const device = devices[d];
-
-      // device and features ids
       const deviceId = `${SERVICE_SELECTOR}:${device.id}`;
-      const powerFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.POWER}`;
-      const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
       
-      const hueFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.HUE}`;
-      const saturationFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.SATURATION}`;
-      const brightnessFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
-      const temperatureFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
+      // if Gladys already knows this device
+      const alreadyInGladys = this.gladys.stateManager.get('deviceByExternalId', deviceId);
+      if (alreadyInGladys) {
+        // check if we mapped it yet
+        console.debug(device.id + ' is already in Gladys !');
+        const notMappedYet = this.deviceIpByMacAdress.get(device.id) === undefined;
+        if (notMappedYet) {          
+          console.debug(device.id + ' is now mapped with the service !');
+          this.deviceIpByMacAdress.set(device.id, device.address);
+        }
+        // skip the creation of the device in Gladys
+        continue;
+      }
 
-      // should use gladys state devices ... ?
+      // il fat ajouter this.devices
+
+      // check if we mapped it yet
       const doesntExistYet = this.devices[device.id] === undefined;
 
       if (doesntExistYet) {
+
+        console.debug(device.id + ' is new ! Creating it in Gladys');
+
+        const powerFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.POWER}`;
+        const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
+        
+        const hueFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.HUE}`;
+        const saturationFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.SATURATION}`;
+        const brightnessFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
+        const temperatureFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
 
         console.log('\tCreating Device with id ' + deviceId);
 
@@ -50,7 +67,7 @@ function scan() {
           selector: deviceId,
           model: device.model,
           should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
+          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
           features: [
             {
               name: "On/Off",              

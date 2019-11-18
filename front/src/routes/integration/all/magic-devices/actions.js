@@ -11,6 +11,8 @@ function createActions(store) {
 
     async getDevices(state) {
 
+      console.debug("calling /api/v1/service/magic-devices/devices");
+
       store.setState({
         getDevicesStatus: RequestStatus.Getting
       });
@@ -38,6 +40,8 @@ function createActions(store) {
           devicesMap,
           getDevicesStatus: RequestStatus.Success
         });
+
+        console.log(devices)
 
       } catch (e) {
         store.setState({

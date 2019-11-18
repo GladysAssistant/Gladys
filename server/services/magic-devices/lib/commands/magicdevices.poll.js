@@ -37,9 +37,10 @@ async function poll(device) {
     const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
 
     if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.POWER, currentState.on);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.POWER, currentState.on);
+      console.debug('              POWER CHANGED: ' + currentState.on);
     } else {
-      logger.debug('      POWER STAYED THE SAME: ' + currentState.on);
+      console.debug('      POWER STAYED THE SAME: ' + currentState.on);
     }
 
     // ================================================================================================================
@@ -58,33 +59,37 @@ async function poll(device) {
     
     // HUE
     if (hueFeature && hueFeature.last_value !== currentHSL[0]) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.HUE, currentHSL[0]);
+      console.debug('                HUE CHANGED: ' + currentHSL[0]);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.HUE, currentHSL[0]);
       colorChanged = true;
     } else {
-      logger.debug('        HUE STAYED THE SAME: ' + currentHSL[0]);
+      console.debug('        HUE STAYED THE SAME: ' + currentHSL[0]);
     }
 
     // SATURATION
     if (saturationFeature && saturationFeature.last_value !== currentHSL[1]) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.SATURATION, currentHSL[1]);
+      console.debug('         SATURATION CHANGED: ' + currentHSL[1]);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.SATURATION, currentHSL[1]);
       colorChanged = true;
     } else {
-      logger.debug(' SATURATION STAYED THE SAME: ' + currentHSL[1]);
+      console.debug(' SATURATION STAYED THE SAME: ' + currentHSL[1]);
     }
 
     // BRIGHTNESS / LIGHTNESS / VALUE
     if (brightnessFeature && brightnessFeature.last_value !== currentHSL[2]) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentHSL[2]);
+      console.debug('         BRIGHTNESS CHANGED: ' + currentHSL[2]);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentHSL[2]);
       colorChanged = true;
     } else {
-      logger.debug(' BRIGHTNESS STAYED THE SAME: ' + currentHSL[2]);
+      console.debug(' BRIGHTNESS STAYED THE SAME: ' + currentHSL[2]);
     }
     
     // COLOR
     if (colorChanged) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.COLOR, parseInt(`0x${currentHEX}`));
+      console.debug('              COLOR CHANGED: ' + currentHEX);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentHSL);
     } else {
-      logger.debug('      COLOR STAYED THE SAME: ' + currentHEX);
+      console.debug('      COLOR STAYED THE SAME: ' + currentHEX);
     }
 
     // ================================================================================================================
@@ -94,18 +99,19 @@ async function poll(device) {
     const temperatureFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
 
     if (temperatureFeature && temperatureFeature.last_value !== currentTemperatureState) {
-      emitNewState(macAdress, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentState.warm_white);
+      console.debug('        TEMPERATURE CHANGED: ' + currentState.warm_white);
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentState.warm_white);
     } else {
-      logger.debug('TEMPERATURE STAYED THE SAME: ' + currentState.warm_white);
+      console.debug('TEMPERATURE STAYED THE SAME: ' + currentState.warm_white);
     }
 
   }, error => {
-    console.error('error ' + error);
+    console.error('POLL ERROR: ' + error);
   });
 }
 
-function emitNewState(id, feature, value) {
-  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+function emitNewState(gladys, id, feature, value) {
+  gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: `${SERVICE_SELECTOR}:${id}:${feature}`,
     state: value,
   });
