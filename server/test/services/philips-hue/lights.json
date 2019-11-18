@@ -575,6 +575,114 @@
       "_id": 13,
       "id": 13,
       "mappedColorGamut": "other"
+    },
+    {
+      "state": {
+        "on": false,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": { "state": "notupdatable", "lastinstall": null },
+      "type": "On/Off plug-in unit",
+      "name": "Guirlande",
+      "modelid": "SP 120",
+      "manufacturername": "innr",
+      "productname": "On/Off plug",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "huelightstrip",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:15:8d:00:01:fe:54:7d-01",
+        "swversion": "2.0"
+      },
+      "_id": 14,
+      "id": 14
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 69,
+        "hue": 63054,
+        "sat": 203,
+        "effect": "none",
+        "xy": [0.6166, 0.3041],
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-13T13:12:05"
+      },
+      "type": "Color light",
+      "name": "Iris Télévison",
+      "modelid": "LLC010",
+      "manufacturername": "Philips",
+      "productname": "Hue iris",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 10000,
+            "maxlumen": 210,
+            "colorgamuttype": "A",
+            "colorgamut": [[0.704, 0.296], [0.2151, 0.7106], [0.138, 0.08]]
+          },
+          "streaming": { "renderer": true, "proxy": false }
+        },
+        "config": {
+          "archetype": "hueiris",
+          "function": "decorative",
+          "direction": "upwards",
+          "startup": { "mode": "safety", "configured": true }
+        },
+        "uniqueid": "00:17:88:01:00:0d:b3:60-0b",
+        "swversion": "5.127.1.26581"
+      },
+      "_id": 15,
+      "id": 15
+    },
+    {
+      "state": {
+        "on": true,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2019-11-16T15:51:07"
+      },
+      "type": "On/Off plug-in unit",
+      "name": "Noël",
+      "modelid": "Plug 01",
+      "manufacturername": "OSRAM",
+      "productname": "On/Off plug",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "christmastree",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "7c:b0:3e:aa:00:af:be:7a-03",
+        "swversion": "V1.04.90"
+      },
+      "_id": 16,
+      "id": 16
     }
   ]
 }
