@@ -51,12 +51,9 @@ function scan() {
         console.debug(device.id + ' is new ! Creating it in Gladys');
 
         const powerFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.POWER}`;
-        const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
-        
-        const hueFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.HUE}`;
-        const saturationFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.SATURATION}`;
+        const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;        
+        const warmWhiteFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.HUE}`;
         const brightnessFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
-        const temperatureFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
 
         console.log('\tCreating Device with id ' + deviceId);
 
@@ -94,32 +91,20 @@ function scan() {
               max: 0
             },
             {
-              name: "Hue",              
+              name: "Warm White",
               read_only: false,
               keep_history: false,
               has_feedback: false,
-              external_id: hueFeatureId,
-              selector: hueFeatureId,
+              external_id: warmWhiteFeatureId,
+              selector: warmWhiteFeatureId,
               category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+              type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
               min: 0,
-              max: 359
-            },
+              max: 255
+            },            
             {
-              name: "Saturation",              
+              name: "Brightness",
               read_only: false,
-              keep_history: false,
-              has_feedback: false,
-              external_id: saturationFeatureId,
-              selector: saturationFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
-              min: 0,
-              max: 100
-            },
-            {
-              name: "Brightness / Lightness / Value",   
-              read_only: false,              
               keep_history: false,
               has_feedback: false,
               external_id: brightnessFeatureId,
@@ -128,18 +113,6 @@ function scan() {
               type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
               min: 0,
               max: 100
-            },
-            {
-              name: "Temperature / Warm White",
-              read_only: false,
-              keep_history: false,
-              has_feedback: false,
-              external_id: temperatureFeatureId,
-              selector: temperatureFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-              min: 0,
-              max: 255
             },
           ],
           params: [],

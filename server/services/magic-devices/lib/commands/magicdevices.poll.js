@@ -30,83 +30,64 @@ async function poll(device) {
   });
 
   control.queryState(() => {}).then(currentState => {
-    // ================================================================================================================
-    // ==============================================================================================| POWER - ON/OFF |
-    // ================================================================================================================
-    const currentBinaryState = currentState.on ? 1 : 0;
+
     const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
-
-    if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.POWER, currentState.on);
-      console.debug('              POWER CHANGED: ' + currentState.on);
-    } else {
-      console.debug('      POWER STAYED THE SAME: ' + currentState.on);
-    }
-
-    // ================================================================================================================
-    // =================================================================================================| COLOR & HSL |
-    // ================================================================================================================
-    const currentRGB = [currentState.color.red, currentState.color.green, currentState.color.blue];
-    const currentHEX = convert.rgb.hex(currentRGB);
-    const currentHSL = convert.rgb.hsl(currentRGB);
-    const currentCSS = convert.rgb.keyword(currentRGB);
-
-    const hueFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.HUE);
-    const saturationFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.SATURATION);
+    const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
+    const warmWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
     const brightnessFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
 
-    let colorChanged = false;
-    
-    // HUE
-    if (hueFeature && hueFeature.last_value !== currentHSL[0]) {
-      console.debug('                HUE CHANGED: ' + currentHSL[0]);
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.HUE, currentHSL[0]);
-      colorChanged = true;
-    } else {
-      console.debug('        HUE STAYED THE SAME: ' + currentHSL[0]);
-    }
+    const currentRGB = [currentState.color.red, currentState.color.green, currentState.color.blue];
+    const currentHSL = convert.rgb.hsl(currentRGB);
+    const currentBrightness = currentHSL[2];
 
-    // SATURATION
-    if (saturationFeature && saturationFeature.last_value !== currentHSL[1]) {
-      console.debug('         SATURATION CHANGED: ' + currentHSL[1]);
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.SATURATION, currentHSL[1]);
-      colorChanged = true;
-    } else {
-      console.debug(' SATURATION STAYED THE SAME: ' + currentHSL[1]);
-    }
+    // for debug or later features ?
+    const currentHEX = convert.rgb.hex(currentRGB);
+    const currentCSS = convert.rgb.keyword(currentRGB);
 
-    // BRIGHTNESS / LIGHTNESS / VALUE
-    if (brightnessFeature && brightnessFeature.last_value !== currentHSL[2]) {
-      console.debug('         BRIGHTNESS CHANGED: ' + currentHSL[2]);
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentHSL[2]);
-      colorChanged = true;
+    let debugText = '\n################################################';
+
+    // ================================================================================================================
+    // =============================================================================================| BINARY - ON/OFF |
+    // ================================================================================================================
+    if (binaryFeature && binaryFeature.last_value !== currentState.on) {
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentState.on);
+      debugText += '\n#             BINARY CHANGED: ' + currentState.on;
     } else {
-      console.debug(' BRIGHTNESS STAYED THE SAME: ' + currentHSL[2]);
+      debugText += '\n#     BINARY STAYED THE SAME: ' + currentState.on;
     }
-    
-    // COLOR
-    if (colorChanged) {
-      console.debug('              COLOR CHANGED: ' + currentHEX);
+    // ================================================================================================================
+    // =======================================================================================================| COLOR |
+    // ================================================================================================================
+    if (colorFeature && colorFeature.last_value !== currentHSL) {
+      debugText += '\n#              COLOR CHANGED: ' + currentHSL;
       emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentHSL);
     } else {
-      console.debug('      COLOR STAYED THE SAME: ' + currentHEX);
+      debugText += '\n#      COLOR STAYED THE SAME: ' + currentHSL;
     }
-
     // ================================================================================================================
-    // =================================================================================================| TEMPERATURE |
+    // ==================================================================================================| WARM WHITE |
     // ================================================================================================================
-    const currentTemperatureState = currentState.warm_white;
-    const temperatureFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
-
-    if (temperatureFeature && temperatureFeature.last_value !== currentTemperatureState) {
-      console.debug('        TEMPERATURE CHANGED: ' + currentState.warm_white);
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentState.warm_white);
+    if (warmWhiteFeature && warmWhiteFeature.last_value !== currentState.warm_white) {
+      debugText += '\n#         WARM WHITE CHANGED: ' + currentState.warm_white;
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentState.warm_white);
     } else {
-      console.debug('TEMPERATURE STAYED THE SAME: ' + currentState.warm_white);
+      debugText += '\n# WARM WHITE STAYED THE SAME: ' + currentState.warm_white;
     }
+    // ================================================================================================================
+    // ==================================================================================================| BRIGHTNESS |
+    // ================================================================================================================
+    if (brightnessFeature && brightnessFeature.last_value !== currentBrightness) {
+      debugText += '\n#         BRIGHTNESS CHANGED: ' + currentBrightness;
+      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightness);
+    } else {
+      debugText += '\n# BRIGHTNESS STAYED THE SAME: ' + currentBrightness;
+    }
+
+    debugText += '\n################################################';
+    console.debug(debugText);
 
   }, error => {
-    console.error('POLL ERROR: ' + error);
+    console.error('MAGIC DEVICES POLL ERROR: ' + error);
   });
 }
 
