@@ -173,6 +173,17 @@
         "navigation": "navigation"
       }
     },
+    "common": {
+      "nameLabel": "Device Name",
+      "roomLabel": "Room",      
+      "modelLabel": "Model",      
+      "deviceTab": "Devices",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "scanButton": "Scan",
+      "editButton": "Edit details",
+      "featuresLabel": "Features"
+    },
     "telegram": {
       "title": "Telegram",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
@@ -422,21 +433,13 @@
       "device": {
         "title": "Magic Devices in Gladys",
         "noDevices": "No Magic Devices added yet.",
-        "searchPlaceholder": "Search a Magic Devices light",
+        "searchPlaceholder": "Search a Magic Devices",
         "macLabel": "Mac Adress",
-        "ipLabel": "IP Address",
-        "roomLabel": "Room",
-        "featuresLabel": "Features",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit details"
+        "ipLabel": "IP Address"
       },
       "setup": {
-        "title": "Magic Devices not in Gladys",
-        "description": "Devices detected will be added here. Most of the light bulbs that works in pair with android app such as Magic Home or Magic Hue should be compatible.",
-        "createDeviceInGladys": "Connect in Gladys",
-        "createDeviceError": "There was an error creating this device in Gladys. ",
-        "deviceCreatedSuccess": "The device was added with success."
+        "title": "Gladys did not find any Magic Devices ...",
+        "description": "Devices detected will be added here. Most of the low-cost lights that works in pair with android app such as Magic Home or Magic Hue should be compatible. Try to refresh. Detection can last 30 seconds."
       }
     }
   },

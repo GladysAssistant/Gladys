@@ -15,9 +15,9 @@ class Page extends Component {
       console.debug("New device: " + payload)
       //this.props.getDevices();
     });
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, payload => {
+    this.props.session.dispatcher.addListener(EVENTS.DEVICE.NEW_STATE, payload => {
       console.debug("-------------------------------------------")
-      console.debug("New state: " + payload)
+      console.debug("New state : " + JSON.stringify(payload));
       //this.props.updateDevices();
     });
   }
@@ -25,8 +25,7 @@ class Page extends Component {
   render(props, {}) {
     return (
       <Layout>
-        {props.devices && props.devices.length ? <DevicePanel {...props} /> : <div />}
-        <SetupPanel {...props} />
+        {props.devices && props.devices.length ? <DevicePanel {...props} /> : <SetupPanel />}        
       </Layout>
     );
   }

@@ -7,12 +7,12 @@ const SetupTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <Text id="integration.xiaomi.setup.title" />
+        <Text id="integration.magicDevices.setup.title" />
       </h3>
     </div>
     <div class="card-body">
       <div class="alert alert-info">
-        <MarkupText id="integration.xiaomi.setup.description" />
+        <MarkupText id="integration.magicDevices.setup.description" />
       </div>
       <div
         class={cx('dimmer', {
@@ -22,7 +22,7 @@ const SetupTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <div class="row">
-            SetupPanel.jsx
+            REFRESH BUTTON ...
           </div>
         </div>
       </div>

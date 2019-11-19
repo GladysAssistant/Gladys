@@ -1,8 +1,6 @@
+const { Control } = require('magic-home');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { hslToRgb } = require('../../../../utils/units');
-const { getDeviceParam } = require('../../../../utils/device');
-
-const SERVER_PORT = 9898;
 
 /**
  * @description Set value.
@@ -14,18 +12,63 @@ const SERVER_PORT = 9898;
  */
 function setValue(device, deviceFeature, state) {
   logger.debug(`MagicDevices.setValue : Setting value of device ${device.external_id}`);
-  // this.socket.send(msgStr, 0, msgStr.length, SERVER_PORT, ip, (cb) => {});
+  logger.debug(deviceFeature);
+  logger.debug(state);
+
+  const macAdress = device.external_id.split(':')[1];
+  const ip = this.deviceIpByMacAdress.get(macAdress);
+
+  let control = new Control(ip, {
+    wait_for_reply: true,
+    log_all_received: false,
+    apply_masks: false,
+    connect_timeout: null,
+    ack: {
+        power: true,
+        color: true,
+        pattern: true,
+        custom_pattern: true
+    }
+  });
+
+  switch(deviceFeature.type) {
+    case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
+      if (state === 0) {
+        control.turnOff(success => {
+          logger.debug("Gladys turned off the light: " + success);
+        });
+      } else if (state === 1) {
+        control.turnOn(success => {
+          logger.debug("Gladys turned on the light: " + success);
+        });
+      }
+      break;
+    case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
+      // setColor(red, green, blue, callback)
+
+      // Convenience method to only set the color values.
+      // Because the command has to include both color and warm white values,
+      // previously seen warm white values will be sent together with the color values.
+      break;
+    case DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE:
+      // setWarmWhite(ww, callback)
+
+      // Convenience method to only set the warm white value.
+      // Because the command has to include both color and warm white values,
+      // previously seen color values will be sent together with the warm white value.
+      break;
+    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
+      // setColorWithBrightness(red, green, blue, brightness, callback)
+
+      // Convenience method to automatically scale down the rgb values to match the brightness parameter (0 - 100).
+      // This method uses setColor() internally, so it could set the warm white value to something unexpected.
+      break;
+    default:
+      logger.error('Tried to setValue of an unknown feature type');
+  }
+
 }
 
 module.exports = {
   setValue,
 };
-
-
-  // control.turnOff(success => {
-  //   logger.debug(success);
-  // });
-
-  // control.turnOn(success => {
-  //   logger.debug(success);
-  // });

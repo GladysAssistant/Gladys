@@ -9,7 +9,7 @@ const DevicePanel = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <Text id="integration.xiaomi.device.title" />
+        <Text id="integration.magicDevices.device.title" />
       </h3>
       <div class="page-options d-flex">
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
@@ -28,7 +28,7 @@ const DevicePanel = ({ children, ...props }) => (
             <input
               type="text"
               class="form-control w-10"
-              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
+              placeholder={<Text id="integration.magicDevices.device.searchPlaceholder" />}
               value={props.deviceSearch}
               onInput={props.debouncedSearch}
             />
@@ -59,7 +59,7 @@ const DevicePanel = ({ children, ...props }) => (
               ))}
             {props.devices && props.devices.length === 0 && (
               <p class="text-center">
-                <Text id="integration.xiaomi.device.noDevices" />
+                <Text id="integration.magicDevices.device.noDevices" />
               </p>
             )}
           </div>

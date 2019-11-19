@@ -6,7 +6,8 @@ import get from 'get-value';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
-class XiaomiDeviceBox extends Component {
+class Device extends Component {
+
   refreshDeviceProperty = () => {
     if (!this.props.device.features) {
       return null;
@@ -19,16 +20,7 @@ class XiaomiDeviceBox extends Component {
       batteryLevel
     });
   };
-  getGatewayIp = () => {
-    if (!this.props.device.params) {
-      return '';
-    }
-    const gatewayIpParam = this.props.device.params.find(param => param.name === 'GATEWAY_IP');
-    if (gatewayIpParam) {
-      return gatewayIpParam.value;
-    }
-    return '';
-  };
+
   saveDevice = async () => {
     this.setState({ loading: true });
     try {
@@ -38,6 +30,7 @@ class XiaomiDeviceBox extends Component {
     }
     this.setState({ loading: false });
   };
+
   deleteDevice = async () => {
     this.setState({ loading: true });
     try {
@@ -47,12 +40,15 @@ class XiaomiDeviceBox extends Component {
     }
     this.setState({ loading: false });
   };
+
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
+
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
+
   componentWillMount() {
     this.refreshDeviceProperty();
   }
@@ -67,16 +63,6 @@ class XiaomiDeviceBox extends Component {
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">{props.device.name}</h3>
-            {batteryLevel && (
-              <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  {batteryLevel}%
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
           <div
             class={cx('dimmer', {
@@ -86,23 +72,38 @@ class XiaomiDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.device.sidLabel" />
+                    <Text id="integration.common.nameLabel" />
+                  </label>
+                  <input type="text" value={props.device.name} class="form-control" />
+                </div>
+
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.common.modelLabel" />
+                  </label>
+                  <input type="text" value={props.device.model} class="form-control" disabled />
+                </div>
+
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.magicDevices.device.macLabel" />
                   </label>
                   <input type="text" value={props.device.external_id.split(':')[1]} class="form-control" disabled />
                 </div>
-                {props.device.model === 'xiaomi-gateway' && (
-                  <div class="form-group">
-                    <label>
-                      <Text id="integration.xiaomi.device.ipLabel" />
-                    </label>
-                    <input type="text" value={this.getGatewayIp()} class="form-control" disabled />
-                  </div>
-                )}
+
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.device.roomLabel" />
+                    <Text id="integration.magicDevices.device.ipLabel" />
+                  </label>
+                  <input type="text" value="192.168.0.xxx" class="form-control" disabled />
+                </div>
+
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.common.roomLabel" />
                   </label>
                   <select onChange={this.updateRoom} class="form-control">
                     <option value="">-------</option>
@@ -120,7 +121,7 @@ class XiaomiDeviceBox extends Component {
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.xiaomi.device.featuresLabel" />
+                    <Text id="integration.common.featuresLabel" />
                   </label>
                   <div class="tags">
                     {props.device &&
@@ -142,16 +143,11 @@ class XiaomiDeviceBox extends Component {
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.xiaomi.device.saveButton" />
+                    <Text id="integration.common.saveButton" />
                   </button>
                   <button onClick={this.deleteDevice} class="btn btn-danger">
-                    <Text id="integration.xiaomi.device.deleteButton" />
+                    <Text id="integration.common.deleteButton" />
                   </button>
-                  <Link href={`/dashboard/integration/device/xiaomi/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
-                      <Text id="integration.xiaomi.device.editButton" />
-                    </button>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -162,4 +158,4 @@ class XiaomiDeviceBox extends Component {
   }
 }
 
-export default XiaomiDeviceBox;
+export default Device;
