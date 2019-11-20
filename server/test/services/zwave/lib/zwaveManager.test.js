@@ -87,6 +87,9 @@ describe('zwaveManager events', () => {
   it('should receive node added', () => {
     zwaveManager.nodeAdded(1);
   });
+  it('should receive node removed', () => {
+    zwaveManager.nodeRemoved(2);
+  });
   it('should receive node ready info', () => {
     zwaveManager.nodeReady(1, {
       manufacturer: 'Aeotec',

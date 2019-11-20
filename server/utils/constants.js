@@ -343,6 +343,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DRIVER_FAILED: 'zwave.driver-failed',
     NODE_READY: 'zwave.node-ready',
     SCAN_COMPLETE: 'zwave.scan-complete',
+    NODE_REMOVED: 'zwave.node-removed',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
