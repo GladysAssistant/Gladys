@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+
 import actions from './actions';
 import Layout from './Layout';
 import SetupPanel from './SetupPanel';

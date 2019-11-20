@@ -174,15 +174,24 @@
       }
     },
     "common": {
-      "nameLabel": "Device Name",
-      "roomLabel": "Room",      
-      "modelLabel": "Model",      
-      "deviceTab": "Devices",
-      "saveButton": "Save",
-      "deleteButton": "Delete",
-      "scanButton": "Scan",
-      "editButton": "Edit details",
-      "featuresLabel": "Features"
+      "buttons": {
+        "delete": "Delete",
+        "edit": "Edit details",
+        "refresh": "Refresh",
+        "save": "Save",
+        "scan": "Scan"
+      },
+      "labels": {
+        "color": "Color",
+        "features": "Features",
+        "model": "Model",
+        "name": "Device Name",
+        "room": "Room"
+      },
+      "tabs": {        
+        "devices": "Devices",
+        "setup": "Setup"
+      }      
     },
     "telegram": {
       "title": "Telegram",

@@ -22,7 +22,9 @@ const SetupTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <div class="row">
-            REFRESH BUTTON ...
+            <button onClick={this.getDevices} class="btn btn-success mr-2">
+              <Text id="integration.common.buttons.refresh" />
+            </button>
           </div>
         </div>
       </div>
