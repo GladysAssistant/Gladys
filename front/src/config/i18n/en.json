@@ -279,7 +279,8 @@
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "editButton": "Edit"
       },
       "setup": {
         "title": "Z-Wave Devices",
