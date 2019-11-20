@@ -4,10 +4,7 @@ import actions from '../../actions/oauth/authorize';
 import AuthorizePage from './AuthorizePage';
 import { RequestStatus } from '../../utils/consts';
 
-@connect(
-  'oauthStatus,oauthClient,redirectUri,oauthState',
-  actions
-)
+@connect('oauthStatus,oauthClient,redirectUri,oauthState', actions)
 class Authorize extends Component {
   constructor(props) {
     super(props);

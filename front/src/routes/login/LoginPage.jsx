@@ -4,10 +4,7 @@ import { Text, MarkupText, Localizer } from 'preact-i18n';
 import * as consts from '../../utils/consts';
 import loginActions from '../../actions/login/login';
 
-connect(
-  'loginFormEmailValue,loginFormPasswordValue,loginStatus',
-  loginActions
-);
+connect('loginFormEmailValue,loginFormPasswordValue,loginStatus', loginActions);
 class LoginPage extends Component {
   login = e => {
     this.props.login(e, this.props.matches);

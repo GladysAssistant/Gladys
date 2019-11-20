@@ -9,10 +9,7 @@ import DeniedClientPage from './DeniedClientPage';
 import UnknownClientPage from './UnknownClientPage';
 import style from './style.css';
 
-connect(
-  'oauthStatus,oauthClient,redirectUri,oauthState',
-  authorizeActions
-);
+connect('oauthStatus,oauthClient,redirectUri,oauthState', authorizeActions);
 class AuthorizePage extends Component {
   render(props) {
     return (
