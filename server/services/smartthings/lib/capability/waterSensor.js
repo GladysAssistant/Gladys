@@ -11,7 +11,7 @@ const waterSensorCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => (feature.last_value ? 'wet' : 'dry'),
+          writeValue: (feature) => (feature.last_value ? 'wet' : 'dry'),
         },
       ],
     },

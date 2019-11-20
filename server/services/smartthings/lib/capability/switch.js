@@ -11,7 +11,7 @@ const switchCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => (feature.last_value ? 'on' : 'off'),
+          writeValue: (feature) => (feature.last_value ? 'on' : 'off'),
         },
       ],
     },

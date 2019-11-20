@@ -12,7 +12,7 @@ const colorControlCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => feature.last_value,
+          writeValue: (feature) => feature.last_value,
         },
       ],
     },
@@ -22,7 +22,7 @@ const colorControlCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => feature.last_value,
+          writeValue: (feature) => feature.last_value,
         },
       ],
     },
@@ -32,7 +32,7 @@ const colorControlCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => feature.last_value,
+          writeValue: (feature) => feature.last_value,
         },
       ],
     },

@@ -11,7 +11,7 @@ const smokeDetectorCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => (feature.last_value ? 'detected' : 'clear'),
+          writeValue: (feature) => (feature.last_value ? 'detected' : 'clear'),
         },
       ],
     },

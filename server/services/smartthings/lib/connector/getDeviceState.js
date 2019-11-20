@@ -27,7 +27,7 @@ function getDeviceState(features) {
           };
 
           attribute.properties.forEach((property) => {
-            state[property.name] = property.mapper(feature);
+            state[property.name] = property.writeValue(feature);
           });
 
           states.push(state);

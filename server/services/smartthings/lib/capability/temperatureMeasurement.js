@@ -15,11 +15,11 @@ const temperatureMeasurementCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => feature.last_value,
+          writeValue: (feature) => feature.last_value,
         },
         {
           name: 'unit',
-          mapper: (feature) => (feature.unit === DEVICE_FEATURE_UNITS.CELSIUS ? 'C' : 'F'),
+          writeValue: (feature) => (feature.unit === DEVICE_FEATURE_UNITS.CELSIUS ? 'C' : 'F'),
         },
       ],
     },

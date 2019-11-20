@@ -11,7 +11,7 @@ const switchLevelCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => Math.round(((feature.last_value - feature.min) / (feature.max - feature.min)) * 100),
+          writeValue: (feature) => Math.round(((feature.last_value - feature.min) / (feature.max - feature.min)) * 100),
         },
       ],
     },

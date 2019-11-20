@@ -11,7 +11,7 @@ const motionSensorCapability = {
       properties: [
         {
           name: 'value',
-          mapper: (feature) => (feature.last_value ? 'active' : 'inactive'),
+          writeValue: (feature) => (feature.last_value ? 'active' : 'inactive'),
         },
       ],
     },
