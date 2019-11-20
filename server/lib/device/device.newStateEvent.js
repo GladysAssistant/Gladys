@@ -17,10 +17,12 @@ async function newStateEvent(event) {
     }
     await this.saveState(deviceFeature, event.state);
   } catch (e) {
-    logger.error(
-      `Unable to save new state of deviceFeature ${event.device_feature_external_id}, state = ${event.state}`,
-    );
-    logger.error(e);
+    if (!(e instanceof NotFoundError)) {
+      logger.error(
+        `Unable to save new state of deviceFeature ${event.device_feature_external_id}, state = ${event.state}`,
+      );
+      logger.error(e);
+    }
   }
 }
 
