@@ -1,6 +1,7 @@
 const { Control } = require('magic-home');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
+const convert = require('color-convert');
 
 /**
  * @description Set value.
@@ -44,7 +45,16 @@ function setValue(device, deviceFeature, state) {
       }
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
-      // setColor(red, green, blue, callback)
+
+      const color = convert.hsl.rgb([state.hsl.h, state.hsl.s, state.hsl.l]);
+
+      
+      console.log("color " + JSON.stringify(color));
+
+
+      control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
+        console.log("color setted to " + color);
+      });
 
       // Convenience method to only set the color values.
       // Because the command has to include both color and warm white values,

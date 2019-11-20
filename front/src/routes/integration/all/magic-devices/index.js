@@ -17,8 +17,8 @@ class Page extends Component {
       //this.props.getDevices();
     });
     this.props.session.dispatcher.addListener(EVENTS.DEVICE.NEW_STATE, payload => {
-      console.debug("-------------------------------------------")
-      console.debug("New state : " + JSON.stringify(payload));
+      //console.debug("-------------------------------------------")
+      //console.debug("New state : " + JSON.stringify(payload));
       //this.props.updateDevices();
     });
   }

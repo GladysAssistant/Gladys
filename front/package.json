@@ -44,6 +44,8 @@
     "preact-router": "^3.1.0",
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.22.1",
+    "react-color": "^2.17.3",
+    "reactcss": "^1.2.3",
     "react-stripe-elements": "^5.0.1",
     "set-value": "^3.0.0",
     "tabler-ui": "0.0.32",

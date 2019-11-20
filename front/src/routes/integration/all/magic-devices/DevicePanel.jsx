@@ -55,6 +55,7 @@ const DevicePanel = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  setValue={props.setValue}
                 />
               ))}
             {props.devices && props.devices.length === 0 && (

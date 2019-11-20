@@ -59,15 +59,31 @@ class Device extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  handleButtonColor = () => {
+  handleButtonColorClick = () => {
+
+    console.log("clicked color button")
+
     this.setState({ displayColorPicker: !this.state.displayColorPicker })
   };
 
   handleCloseColor = () => {
+    console.log("closed color")
     this.setState({ displayColorPicker: false })
   };
 
   handleChangeColor = (color) => {
+
+    console.log("clicked on color:", color)
+
+    const colorDeviceFeature = this.props.device.features.find(
+      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
+    );
+
+    console.log("colorDeviceFeature:", colorDeviceFeature)
+
+    this.props.setValue(colorDeviceFeature, color);
+
+
     this.setState({ color: color.hsl })
   };
 
@@ -144,12 +160,12 @@ class Device extends Component {
                     <Text id="integration.common.labels.color" />
                   </label>
                   <div>
-                    <div style={ styles.swatch } onClick={ this.handleClick }>
+                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick }>
                       <div style={ styles.color } />
                     </div>
                     { this.state.displayColorPicker ? <div style={ styles.popover }>
-                      <div style={ styles.cover } onClick={ this.handleClose }/>
-                      <SketchPicker color={ this.state.color } onChange={ this.handleChange } />
+                      <div style={ styles.cover } onClick={ this.handleCloseColor }/>
+                      <SketchPicker color={ this.state.color } onChange={ this.handleChangeColor } />
                     </div> : null }
                   </div>
                 </div>

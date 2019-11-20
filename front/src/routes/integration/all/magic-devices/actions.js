@@ -63,6 +63,18 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    
+    async setValue(state, deviceFeature, value) {
+
+      console.log("deviceFeature:", deviceFeature)
+      console.log("value:", value)
+
+
+
+      await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
+        value
+      });
+    },
 
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
