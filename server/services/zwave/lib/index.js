@@ -24,6 +24,7 @@ const { getInfos } = require('./commands/zwave.getInfos');
 const { getNodes } = require('./commands/zwave.getNodes');
 const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
 const { removeNode } = require('./commands/zwave.removeNode');
+const { setValue } = require('./commands/zwave.setValue');
 
 const DEFAULT_ZWAVE_OPTIONS = {
   Logging: false,
@@ -81,5 +82,6 @@ ZwaveManager.prototype.getInfos = getInfos;
 ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
+ZwaveManager.prototype.setValue = setValue;
 
 module.exports = ZwaveManager;
