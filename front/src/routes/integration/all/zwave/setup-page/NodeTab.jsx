@@ -8,6 +8,11 @@ import { RequestStatus } from '../../../../../utils/consts';
 
 const NodeTab = ({ children, ...props }) => {
   const zwaveNotConfigured = props.zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
+  const scanInProgress = get(props, 'zwaveStatus.scanInProgress');
+  const healInProgress = props.zwaveHealNetworkStatus === RequestStatus.Getting;
+  const gettingNodesInProgress = props.zwaveGetNodesStatus === RequestStatus.Getting;
+  const zwaveActionsDisabled = scanInProgress || healInProgress || gettingNodesInProgress;
+  const zwaveActionsEnabled = !zwaveActionsDisabled;
   return (
     <div class="card">
       <div class="card-header">
@@ -15,36 +20,30 @@ const NodeTab = ({ children, ...props }) => {
           <Text id="integration.zwave.setup.title" />
         </h3>
         <div class="page-options d-flex">
-          <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveNotConfigured}>
+          <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveActionsDisabled}>
             <Text id="integration.zwave.setup.healNetworkButton" /> <i class="fe fe-radio" />
           </button>
-          <a
-            class="btn btn-outline-success ml-2"
-            href="/dashboard/integration/device/zwave/node-operation?action=add"
-            disabled={zwaveNotConfigured}
-          >
-            <Text id="integration.zwave.setup.addNodeButton" /> <i class="fe fe-plus" />
+          <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add' : '#'}>
+            <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+              <Text id="integration.zwave.setup.addNodeButton" /> <i class="fe fe-plus" />
+            </button>
           </a>
-          <a
-            class="btn btn-outline-success ml-2"
-            href="/dashboard/integration/device/zwave/node-operation?action=add-secure"
-            disabled={zwaveNotConfigured}
-          >
-            <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="fe fe-plus" />
+          <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add-secure' : '#'}>
+            <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+              <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="fe fe-plus" />
+            </button>
           </a>
-          <a
-            class="btn btn-outline-danger ml-2"
-            href="/dashboard/integration/device/zwave/node-operation?action=remove"
-            disabled={zwaveNotConfigured}
-          >
-            <Text id="integration.zwave.setup.removeNode" /> <i class="fe fe-trash" />
+          <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=remove' : '#'}>
+            <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
+              <Text id="integration.zwave.setup.removeNode" /> <i class="fe fe-trash" />
+            </button>
           </a>
         </div>
       </div>
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: get(props, 'zwaveStatus.scanInProgress') || props.zwaveGetNodesStatus === RequestStatus.Getting
+            active: zwaveActionsDisabled
           })}
         >
           <div class="loader" />
@@ -56,7 +55,7 @@ const NodeTab = ({ children, ...props }) => {
             )}
             <div
               class={cx('row', {
-                [style.emptyDiv]: get(props, 'zwaveStatus.scanInProgress')
+                [style.emptyDiv]: zwaveActionsDisabled
               })}
             >
               {props.zwaveNodes &&

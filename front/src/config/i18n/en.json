@@ -321,7 +321,9 @@
         "addNodeTitle": "Inclusion Mode",
         "removeNodeTitle": "Exclusion Mode",
         "seconds": "seconds remaining",
-        "cancelButton": "Cancel"
+        "cancelButton": "Cancel",
+        "nodeAddedTitle": "A new node was found",
+        "nodeAddedDescription": "Wait a few seconds while we get all informations from this node..."
       }
     },
     "darkSky": {

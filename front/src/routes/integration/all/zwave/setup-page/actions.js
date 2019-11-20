@@ -64,6 +64,7 @@ const createActions = store => {
           }
         });
       }
+      console.log(newState);
       store.setState(newState);
     },
     async getNodes(state) {
@@ -72,10 +73,10 @@ const createActions = store => {
       });
       try {
         const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
-        zwaveNodes.forEach(node => addParamsAndFeatures(node));
-        console.log(zwaveNodes);
+        const zwaveNodesFiltered = zwaveNodes.filter(node => node.ready === true);
+        zwaveNodesFiltered.forEach(node => addParamsAndFeatures(node));
         store.setState({
-          zwaveNodes,
+          zwaveNodes: zwaveNodesFiltered,
           zwaveGetNodesStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -138,6 +139,7 @@ const createActions = store => {
         store.setState({
           zwaveHealNetworkStatus: RequestStatus.Success
         });
+        actions.getStatus(store.getState());
       } catch (e) {
         store.setState({
           zwaveHealNetworkStatus: RequestStatus.Error

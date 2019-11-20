@@ -19,7 +19,7 @@ class ZwaveNode extends Component {
 
   render(props, { loading, error, deviceCreated }) {
     return (
-      <div class="col-md-6">
+      <div index={props.node.id} class="col-md-6">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">{props.node.product}</h3>
