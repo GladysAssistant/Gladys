@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import EditScenePage from './EditScenePage';
 import actions from '../../../actions/scene';
 
-@connect(
-  'session,sceneParamsData,scene,highLightedActions',
-  actions
-)
+@connect('session,sceneParamsData,scene,highLightedActions', actions)
 class EditScene extends Component {
   startScene = () => {
     this.props.startScene(this.props.scene_selector);

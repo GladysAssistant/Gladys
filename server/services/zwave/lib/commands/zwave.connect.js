@@ -1,3 +1,4 @@
+const os = require('os');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -8,7 +9,14 @@ const logger = require('../../../../utils/logger');
  */
 function connect(driverPath) {
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
-  this.zwave.connect(driverPath);
+  // special case for macOS
+  if (os.platform() === 'darwin') {
+    this.driverPath = driverPath.replace('/dev/tty.', '/dev/cu.');
+  } else {
+    this.driverPath = driverPath;
+  }
+  this.ready = false;
+  this.zwave.connect(this.driverPath);
   this.connected = true;
 }
 

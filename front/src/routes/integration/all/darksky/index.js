@@ -4,10 +4,7 @@ import actions from './actions';
 import DarkSkyPage from './DarkSky';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect(
-  'user,darkSkyApiKey,darkskySaveApiKeyStatus,darkskyGetApiKeyStatus',
-  actions
-)
+@connect('user,darkSkyApiKey,darkskySaveApiKeyStatus,darkskyGetApiKeyStatus', actions)
 class TelegramIntegration extends Component {
   componentWillMount() {
     this.props.getApiKey();

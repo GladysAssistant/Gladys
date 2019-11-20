@@ -25,10 +25,7 @@ const EditWeatherBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect(
-  'houses',
-  actions
-)
+@connect('houses', actions)
 class EditWeatherBoxComponent extends Component {
   updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {

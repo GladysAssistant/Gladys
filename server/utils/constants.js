@@ -339,6 +339,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
   ZWAVE: {
+    DRIVER_READY: 'zwave.driver-ready',
+    DRIVER_FAILED: 'zwave.driver-failed',
     NODE_READY: 'zwave.node-ready',
     SCAN_COMPLETE: 'zwave.scan-complete',
   },
