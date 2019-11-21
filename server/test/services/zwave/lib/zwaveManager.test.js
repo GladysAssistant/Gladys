@@ -5,6 +5,7 @@ const EventEmitter = require('events');
 const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
+const nodesData = require('./nodesData.json');
 
 describe('zwaveManager commands', () => {
   const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
@@ -51,6 +52,7 @@ describe('zwaveManager commands', () => {
     });
   });
   it('should return array of nodes', () => {
+    zwaveManager.nodes = nodesData;
     const nodes = zwaveManager.getNodes();
     expect(nodes).to.be.instanceOf(Array);
   });
