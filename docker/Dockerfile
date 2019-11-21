@@ -11,6 +11,10 @@ COPY qemu-* /usr/bin/
 # System dependencies
 RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs openzwave ffmpeg sqlite openssl gzip
 
+# Update Open-zWave DB
+RUN rm -rf /etc/openzwave/* 
+COPY open-zwave/config/* /etc/openzwave/
+
 RUN mkdir /src
 WORKDIR /src
 ADD . /src

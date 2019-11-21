@@ -15,6 +15,12 @@ fi
 # </qemu-support>
 # ============
 
+# ============
+# <zwave-db>
+git clone https://github.com/OpenZWave/open-zwave.git open-zwave
+# </zwave-db>
+# ============
+
 # Replace the repo's Dockerfile with our own.
 docker build -f ./docker/Dockerfile \
   -t ${IMAGE_ID} \
