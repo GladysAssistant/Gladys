@@ -9,7 +9,13 @@ Object.values(CAPABILITIES).forEach((capability) => {
   });
 });
 
+const CAPABILITY_BY_ID = {};
+Object.values(CAPABILITIES).forEach((item) => {
+  CAPABILITY_BY_ID[item.capability.id] = item;
+});
+
 module.exports = {
   CAPABILITIES,
   CAPABILITY_BY_FEATURE_CATEGORY,
+  CAPABILITY_BY_ID,
 };

@@ -39,8 +39,14 @@ const colorControlCapability = {
   ],
   commands: {
     // setColor: (args) => args,
-    setHue: (args) => args.hue,
-    setSaturation: (args) => args.saturation,
+    setHue: {
+      readValue: (args) => args.hue,
+      featureType: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+    },
+    setSaturation: {
+      readValue: (args) => args.saturation,
+      featureType: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
+    },
   },
   features: [
     {

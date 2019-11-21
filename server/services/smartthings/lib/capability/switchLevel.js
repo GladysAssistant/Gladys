@@ -17,7 +17,10 @@ const switchLevelCapability = {
     },
   ],
   commands: {
-    setLevel: (args, feature) => Math.round((args.level * (feature.max - feature.min)) / 100 + feature.min),
+    setLevel: {
+      readValue: (args, feature) => Math.round((args.level * (feature.max - feature.min)) / 100 + feature.min),
+      featureType: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+    },
   },
   features: [
     {

@@ -17,8 +17,14 @@ const switchCapability = {
     },
   ],
   commands: {
-    on: () => 1,
-    off: () => 0,
+    on: {
+      readValue: () => 1,
+      featureType: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    },
+    off: {
+      readValue: () => 0,
+      featureType: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    },
   },
   features: [
     {
