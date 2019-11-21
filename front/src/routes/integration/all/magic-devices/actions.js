@@ -50,6 +50,12 @@ function createActions(store) {
       }
     },
 
+    async scan(state) {
+      console.debug("clicked on Refresh button")
+      const result = await state.httpClient.post('/api/v1/service/magic-devices/scan', "WESH");
+      console.debug("result: " + JSON.stringify(result));
+    },
+
     async saveDevice(state, device) {
       await state.httpClient.post('/api/v1/device', device);
     },
@@ -68,9 +74,7 @@ function createActions(store) {
 
       console.log("deviceFeature:", deviceFeature)
       console.log("value:", value)
-
-
-
+      
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
         value
       });

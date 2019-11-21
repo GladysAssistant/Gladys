@@ -26,7 +26,7 @@ class Page extends Component {
   render(props, {}) {
     return (
       <Layout>
-        {props.devices && props.devices.length ? <DevicePanel {...props} /> : <SetupPanel />}        
+        {props.devices && props.devices.length ? <DevicePanel {...props} /> : <SetupPanel {...props}/>}        
       </Layout>
     );
   }

@@ -60,9 +60,7 @@ class Device extends Component {
   };
 
   handleButtonColorClick = () => {
-
     console.log("clicked color button")
-
     this.setState({ displayColorPicker: !this.state.displayColorPicker })
   };
 
@@ -72,19 +70,12 @@ class Device extends Component {
   };
 
   handleChangeColor = (color) => {
-
     console.log("clicked on color:", color)
-
     const colorDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
     );
-
-    console.log("colorDeviceFeature:", colorDeviceFeature)
-
     this.props.setValue(colorDeviceFeature, color);
-
-
-    this.setState({ color: color.hsl })
+    this.setState({ color: color })
   };
 
   componentWillMount() {

@@ -12,23 +12,25 @@ const convert = require('color-convert');
  * magicDevices.setValue();
  */
 function setValue(device, deviceFeature, state) {
-  logger.debug(`MagicDevices.setValue : Setting value of device ${device.external_id}`);
-  logger.debug(deviceFeature);
-  logger.debug(state);
+  //logger.debug(`MagicDevices.setValue : Setting value of device ${device.external_id}`);
+  //logger.debug(deviceFeature);
+  //logger.debug(state);
 
   const macAdress = device.external_id.split(':')[1];
   const ip = this.deviceIpByMacAdress.get(macAdress);
 
+  console.log("TRYINGIN TO CONTACT " + ip)
+
   let control = new Control(ip, {
     wait_for_reply: true,
-    log_all_received: false,
-    apply_masks: false,
+    log_all_received: true,
+    apply_masks: true,
     connect_timeout: null,
     ack: {
-        power: true,
-        color: true,
-        pattern: true,
-        custom_pattern: true
+        power: false,
+        color: false,
+        pattern: false,
+        custom_pattern: false
     }
   });
 
@@ -48,14 +50,21 @@ function setValue(device, deviceFeature, state) {
 
       const color = convert.hsl.rgb([state.hsl.h, state.hsl.s, state.hsl.l]);
 
-      
-      console.log("color " + JSON.stringify(color));
-      control.setWarmWhite(255, () => {
-        console.log("warm white setted to " + color);
-      })
+      // console.log("state " + JSON.stringify(state));
+
+      // control.setWarmWhite(255, () => {
+      //   console.log("warm white setted to 255");
+      //   control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
+      //     console.log("color setted");
+      //   });
+      // })
+
+      // control.setColorAndWarmWhite(state.rgb.r, state.rgb.g, state.rgb.b, 255, () => {
+      //   console.log("color setted");
+      // });
 
       control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
-        console.log("color setted to " + color);
+        console.log("color setted");
       });
 
       // Convenience method to only set the color values.
