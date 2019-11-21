@@ -1,6 +1,7 @@
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
+const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
@@ -53,7 +54,7 @@ function getNodes() {
               type,
               external_id: getDeviceFeatureExternalId(values[idx]),
               read_only: values[idx].read_only,
-              unit: values[idx].units,
+              unit: getUnit(values[idx].units),
               has_feedback: true,
               min,
               max,

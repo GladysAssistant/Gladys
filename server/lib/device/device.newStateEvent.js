@@ -22,6 +22,9 @@ async function newStateEvent(event) {
         `Unable to save new state of deviceFeature ${event.device_feature_external_id}, state = ${event.state}`,
       );
       logger.error(e);
+    } else {
+      logger.debug(e);
+      logger.debug(event);
     }
   }
 }
