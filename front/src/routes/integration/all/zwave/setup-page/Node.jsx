@@ -22,7 +22,12 @@ class ZwaveNode extends Component {
       <div index={props.node.id} class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">{props.node.product}</h3>
+            <h3 class="card-title">{props.node.name}</h3>
+            <div class="card-options">
+              <span class="tag">
+                <Text id="integration.zwave.setup.nodeId" /> {props.node.rawZwaveNode.id}
+              </span>
+            </div>
           </div>
           <div
             class={cx('dimmer', {
@@ -44,15 +49,9 @@ class ZwaveNode extends Component {
               <div class="card-body">
                 <div class="form-group">
                   <label>
-                    <Text id="integration.zwave.setup.manufacturer" />
-                  </label>
-                  <input type="text" class="form-control" disabled value={props.node.manufacturer} />
-                </div>
-                <div class="form-group">
-                  <label>
                     <Text id="integration.zwave.setup.type" />
                   </label>
-                  <input type="text" class="form-control" disabled value={props.node.type} />
+                  <input type="text" class="form-control" disabled value={props.node.rawZwaveNode.type} />
                 </div>
                 {props.node.features.length > 0 && (
                   <div class="form-group">
