@@ -120,7 +120,7 @@ function scan() {
         });
         
         this.deviceIpByMacAdress.set(device.id, device.address);
-        this.devices[device.id] = device;
+        this.devices[device.id] = deviceCreated;
         this.gladys.event.emit(EVENTS.DEVICE.NEW, deviceCreated);
         // this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         //   type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,

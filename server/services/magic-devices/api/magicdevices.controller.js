@@ -22,10 +22,11 @@ module.exports = function magicDevicesController(magicDevicesManager) {
    * @apiParam {String} serial Serial number of the bridge
    * @apiGroup PhilipsHue
    */
-  // async function setValue(req, res) {
-  //   const bridge = await philipsHueLightHandler.configureBridge(req.body.serial);
-  //   res.json(bridge);
-  // }
+  async function scan(req, res) {
+    magicDevicesManager.scan();
+
+    res.json({status: "scan started"});
+  }
 
   return {
     'get /api/v1/service/magic-devices/devices': {

@@ -50,7 +50,9 @@ function setValue(device, deviceFeature, state) {
 
       
       console.log("color " + JSON.stringify(color));
-
+      control.setWarmWhite(255, () => {
+        console.log("warm white setted to " + color);
+      })
 
       control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
         console.log("color setted to " + color);
