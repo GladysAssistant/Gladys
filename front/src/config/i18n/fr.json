@@ -11,6 +11,35 @@
     "paymentFailed": "Le paiement a échoué. Merci de réessayer ou de tenter avec une autre carte.",
     "paymentSuccess": "Merci pour ton inscription au package communauté Gladys! Tu as du recevoir un email pour accéder au Slack et au Gladys Gateway. Encore merci pour ton soutien."
   },
+  "integration": {
+    "caldav": {
+      "title": "CalDAV",
+      "introduction": "Pour synchroniser Gladys calendar en utilisant CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
+      "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
+      "services": {
+        "apple": {
+          "name": "Calendrier iCloud",
+          "url": "URL iCloud",
+          "urlInfo": "Laissez l'URL par défaut, il sera paramétré automatiquement.",
+          "username": "Apple ID",
+          "usernameInfo": "Entrez votre Apple ID.",
+          "password": "Mot de passe",
+          "passwordInfo": "<a href=https://support.apple.com/fr-fr/HT204397 target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+        },
+        "other": {
+          "name": "Autre",
+          "url": "URL CalDAV",
+          "username": "Nom d'utilisateur CalDAV",
+          "password": "Mot de passe CalDAV"
+        }
+      },
+      "synchronizationInfo": "Les calendriers sont synchronisés toutes les 30 minutes.",
+      "configurationSuccess": "Configuration sauvegardée avec succès.",
+      "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration.",
+      "synchronizationSuccess": "Synchronisation terminée avec succès.",
+      "synchronizationError": "Une erreur est survenue lors de la synchronisation."
+    }
+  },
   "calendar": {
     "date": "Date",
     "time": "Heure",

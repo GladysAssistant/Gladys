@@ -426,7 +426,7 @@
     },
     "caldav": {
       "title": "CalDAV",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external calendar compatible. Then enter the configuration below.",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
         "apple": {
@@ -436,7 +436,7 @@
           "username": "Apple ID",
           "usernameInfo": "Enter your Apple ID.",
           "password": "Password",
-          "passwordInfo": "<a href=https://appleid.apple.com>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "passwordInfo": "<a href=https://support.apple.com/en-us/HT204397 target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "other": {
           "name": "Other",
@@ -445,6 +445,7 @@
           "password": "CalDAV Password"
         }
       },
+      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
       "configurationSuccess": "Configuration saved.",
       "configurationError": "An error occured while saving configuration.",
       "synchronizationSuccess": "Synchronization completed.",

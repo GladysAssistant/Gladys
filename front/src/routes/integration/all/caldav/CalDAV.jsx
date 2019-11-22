@@ -95,6 +95,9 @@ const CaldavPage = ({ children, ...props }) => (
                         </p>
                       )}
                       <div class="form-group">
+                        <div style={{ marginBottom: '10px' }}>
+                          <Text id={`integration.caldav.synchronizationInfo`} />
+                        </div>
                         <span class="input-group-append">
                           <button
                             class="btn btn-primary"
@@ -104,7 +107,7 @@ const CaldavPage = ({ children, ...props }) => (
                             Save
                           </button>
                           <button class="btn btn-success" onClick={props.startSync}>
-                            Try Sync
+                            Sync now
                           </button>
                         </span>
                       </div>
