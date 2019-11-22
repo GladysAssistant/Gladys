@@ -244,7 +244,7 @@
             "name": "Temperature",
             "selector": "temperature-living-room-celsius",
             "category": "temperature-sensor",
-            "type": "",
+            "type": "decimal",
             "unit": "celsius",
             "min": -200,
             "max": 200,
@@ -269,7 +269,7 @@
             "name": "Temperature",
             "selector": "temperature-living-room-celsius",
             "category": "temperature-sensor",
-            "type": "",
+            "type": "decimal",
             "unit": "celsius",
             "min": -200,
             "max": 200,
@@ -281,8 +281,8 @@
             "name": "Humidity",
             "selector": "temperature-living-room-celsius",
             "category": "humidity-sensor",
-            "type": "",
-            "unit": "%",
+            "type": "decimal",
+            "unit": "percent",
             "min": -200,
             "max": 200,
             "read_only": true,
@@ -292,9 +292,9 @@
           {
             "name": "Kitchen door",
             "selector": "temperature-living-room-celsius",
-            "category": "door-opening-sensor",
-            "type": "",
-            "unit": "%",
+            "category": "opening-sensor",
+            "type": "binary",
+            "unit": null,
             "min": -200,
             "max": 200,
             "read_only": true,
@@ -513,38 +513,18 @@
   },
   "get /api/v1/service/zwave/node": [
     {
-      "id": "1",
-      "manufacturer": "Z-Wave.Me",
-      "manufacturerid": "0x0115",
-      "product": "ZME_UZB1 USB Stick",
-      "producttype": "0x0400",
-      "productid": "0x0001",
-      "type": "Static PC Controller",
-      "name": "",
-      "loc": "",
-      "classes": {
-        "32": {
-          "0": {
-            "value_id": "1-32-1-0",
-            "node_id": 1,
-            "class_id": 32,
-            "type": "byte",
-            "genre": "basic",
-            "instance": 1,
-            "index": 0,
-            "label": "Basic",
-            "units": "",
-            "help": "",
-            "read_only": false,
-            "write_only": false,
-            "min": 0,
-            "max": 255,
-            "is_polled": false,
-            "value": 0
-          }
-        }
-      },
-      "ready": true
+      "name": "ZME_UZB1 USB Stick",
+      "features": [],
+      "params": [],
+      "rawZwaveNode": {
+        "id": 1,
+        "manufacturer": "Z-Wave.Me",
+        "manufacturerid": "0x0115",
+        "product": "ZME_UZB1 USB Stick",
+        "producttype": "0x0400",
+        "productid": "0x0001",
+        "type": "Static PC Controller"
+      }
     }
   ],
   "get /api/v1/service/zwave/neighbor": [
@@ -644,7 +624,7 @@
       "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "name": "Fibaro Motion Sensor",
-      "selector": "test-sensor",
+      "selector": "zwave:1234",
       "external_id": "test-sensor-external",
       "should_poll": false,
       "poll_frequency": null,
@@ -974,6 +954,60 @@
     "id": "70cb1e17-3b17-4886-83ab-45b00a9e03b1",
     "name": "Xiaomi",
     "selector": "xiaomi"
+  },
+  "get /api/v1/device/zwave:1234": {
+    "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "name": "Fibaro Motion Sensor",
+    "selector": "zwave:1234",
+    "external_id": "test-sensor-external",
+    "should_poll": false,
+    "poll_frequency": null,
+    "created_at": "2019-02-12T07:49:07.556Z",
+    "updated_at": "2019-02-12T07:49:07.556Z",
+    "features": [
+      {
+        "name": "Temperature",
+        "external_id": "zwave:1234:temperature",
+        "selector": "test-temperature",
+        "category": "temperature-sensor",
+        "unit": "celsius",
+        "type": "decimal"
+      },
+      {
+        "name": "Motion",
+        "selector": "test-motion",
+        "external_id": "zwave:1234:temperature",
+        "category": "motion-sensor",
+        "type": "binary"
+      },
+      {
+        "name": "Battery",
+        "selector": "test-battery",
+        "external_id": "zwave:1234:temperature",
+        "category": "battery",
+        "type": "integer",
+        "last_value": "92"
+      },
+      {
+        "name": "Lux",
+        "selector": "test-light",
+        "external_id": "zwave:1234:temperature",
+        "category": "light-sensor",
+        "type": "integer"
+      }
+    ],
+    "room": {
+      "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "Living Room",
+      "selector": "living-room"
+    }
+  },
+  "get /api/v1/service/zwave": {
+    "id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+    "name": "Zwave",
+    "selector": "zwave"
   },
   "get /api/v1/device/xiaomi:1234": {
     "id": "e5317b24-28e1-4839-9879-0bb7a3102e98",
