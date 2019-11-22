@@ -15,8 +15,8 @@ function createConnector(clientId, clientSecret) {
     .discoveryHandler(async (accessToken, response) => {
       this.discoveryHandler(response);
     })
-    .stateRefreshHandler(async (accessToken, response, devices) => {
-      this.stateRefreshHandler(response, devices);
+    .stateRefreshHandler(async (accessToken, response, request) => {
+      this.stateRefreshHandler(response, request.devices);
     })
     .commandHandler(async (accessToken, response, devices) => {
       this.commandHandler(response, devices);

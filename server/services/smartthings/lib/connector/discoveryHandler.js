@@ -17,7 +17,7 @@ function discoveryHandler(response) {
 
   Object.values(gladysDevices).forEach((device) => {
     try {
-      const deviceHandlerType = getDeviceHandlerType(device.features);
+      const deviceHandlerType = getDeviceHandlerType(device);
       response
         .addDevice(device.external_id, device.name, deviceHandlerType)
         .manufacturerName('Gladys')
