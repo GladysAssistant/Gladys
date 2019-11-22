@@ -52,8 +52,13 @@ function createActions(store) {
 
     async scan(state) {
       console.debug("clicked on Refresh button")
-      const result = await state.httpClient.post('/api/v1/service/magic-devices/scan', "WESH");
+      const result = await state.httpClient.post('/api/v1/service/magic-devices/scan');
       console.debug("result: " + JSON.stringify(result));
+      if (result !== undefined) {
+        console.debug("calling getDevices");
+        actions.getDevices(store.getState());
+      }
+      
     },
 
     async saveDevice(state, device) {

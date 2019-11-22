@@ -19,12 +19,17 @@ function setValue(device, deviceFeature, state) {
   const macAdress = device.external_id.split(':')[1];
   const ip = this.deviceIpByMacAdress.get(macAdress);
 
-  console.log("TRYINGIN TO CONTACT " + ip)
+  console.log("TRYING TO SETVALUE: " + ip)
+
+  if (ip === undefined) {
+    console.log("    -> NOT SETTING VALUE");
+    return
+  } 
 
   let control = new Control(ip, {
     wait_for_reply: true,
     log_all_received: true,
-    apply_masks: true,
+    apply_masks: false,
     connect_timeout: null,
     ack: {
         power: false,

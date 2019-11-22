@@ -17,6 +17,13 @@ async function poll(device) {
 
   const macAdress = device.external_id.split(':')[1];
   const ip = this.deviceIpByMacAdress.get(macAdress);
+  
+  console.log("TRYING TO POLL: " + macAdress + " - " + ip);
+
+  if (ip === undefined) {
+    console.log("    -> NOT POLLING");
+    return
+  } 
 
   let control = new Control(ip, {
     wait_for_reply: true,
