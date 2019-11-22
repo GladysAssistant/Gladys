@@ -1,5 +1,5 @@
 {
-  "name": "caldav",
+  "name": "gladys-caldav",
   "main": "index.js",
   "os": [
     "darwin",
