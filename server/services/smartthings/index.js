@@ -28,6 +28,6 @@ module.exports = function SmartThingsService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: SmartThingsController(smartthingsHandler),
+    controllers: SmartThingsController(smartthingsHandler, gladys),
   });
 };
