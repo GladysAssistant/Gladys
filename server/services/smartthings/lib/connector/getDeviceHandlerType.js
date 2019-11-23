@@ -27,13 +27,19 @@ function getDeviceHandlerType(device) {
   let selectedHandler;
   Object.values(deviceHandler).forEach((handler) => {
     let nbMatches = 0;
-    Object.keys(handler.categories).map((handlerCategory) => {
-      nbMatches += handler.categories[handlerCategory].reduce((accumulator, handlerType) => {
-        return accumulator + (featureCategoryTypes.includes(handlerType) ? 1 : 0);
-      }, 0);
+    let nbFeatures = -1;
+
+    Object.keys(handler.categories).forEach((handlerCategory) => {
+      nbFeatures += handler.categories[handlerCategory].length;
+
+      if (featureCategoryTypes[handlerCategory]) {
+        nbMatches += handler.categories[handlerCategory].reduce((accumulator, handlerType) => {
+          return accumulator + (featureCategoryTypes[handlerCategory].includes(handlerType) ? 1 : 0);
+        }, 0);
+      }
     });
 
-    if (nbMatches === handler.types.length && nbMatches > nbFeaturesMatches) {
+    if (nbMatches === nbFeatures && nbMatches > nbFeaturesMatches) {
       selectedHandler = handler.value;
       nbFeaturesMatches = nbMatches;
     }
