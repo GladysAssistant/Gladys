@@ -3,7 +3,7 @@ const deviceHandler = require('../handler_types');
 /**
  * @description Determines the SmartThings device handler according to Gladys device.
  * @param {Object} device - Gladys device.
- * @returns {string} Selected handler.
+ * @returns {Object} Selected handler.
  *
  * @see https://smartthings.developer.samsung.com/docs/devices/smartthings-schema/device-handler-types.html#Reference
  *
@@ -40,7 +40,7 @@ function getDeviceHandlerType(device) {
     });
 
     if (nbMatches === nbFeatures && nbMatches > nbFeaturesMatches) {
-      selectedHandler = handler.value;
+      selectedHandler = handler;
       nbFeaturesMatches = nbMatches;
     }
   });
