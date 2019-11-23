@@ -7,7 +7,7 @@ const getDeviceHandlerTypeMock = (features) => {
   if (!features) {
     throw new Error();
   } else {
-    return 'deviceHandlerType';
+    return { value: 'deviceHandlerType', categories: { light: {} } };
   }
 };
 
@@ -25,13 +25,16 @@ const gladys = {
     state: {
       device: {
         device_1: {
-          get: fake.returns({}),
-        },
-        device_2: {
           get: fake.returns({
             name: 'device_2',
             external_id: 'external_id_2',
             features: [],
+            room: {
+              name: 'room',
+            },
+            service: {
+              name: 'service',
+            },
           }),
         },
       },
@@ -39,8 +42,15 @@ const gladys = {
   },
 };
 
+const requestDevice = {};
+
+requestDevice.manufacturerName = fake.returns(requestDevice);
+requestDevice.modelName = fake.returns(requestDevice);
+requestDevice.roomName = fake.returns(requestDevice);
+requestDevice.addCategory = fake.returns(requestDevice);
+
 const response = {
-  addDevice: fake.returns(null),
+  addDevice: fake.returns(requestDevice),
 };
 
 describe('SmartThings service - discoveryHandler', () => {
@@ -54,8 +64,11 @@ describe('SmartThings service - discoveryHandler', () => {
     smartthingsHandler.discoveryHandler(response);
 
     assert.callCount(gladys.stateManager.state.device.device_1.get, 1);
-    assert.callCount(gladys.stateManager.state.device.device_2.get, 1);
     assert.callCount(response.addDevice, 1);
     assert.calledWith(response.addDevice, 'external_id_2', 'device_2', 'deviceHandlerType');
+    assert.called(requestDevice.addCategory);
+    assert.called(requestDevice.manufacturerName);
+    assert.called(requestDevice.modelName);
+    assert.called(requestDevice.roomName);
   });
 });

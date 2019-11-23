@@ -1,4 +1,7 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon');
+
+const { assert, fake } = sinon;
+const { expect } = require('chai');
 const SmartthingsController = require('../../../../services/smartthings/api/smartthings.controller');
 
 const smartthingsHandler = {
@@ -6,19 +9,42 @@ const smartthingsHandler = {
   init: fake.resolves(true),
 };
 
+const gladys = {
+  oauth: {
+    authenticate: fake.resolves(true),
+  },
+};
+
 describe('POST /api/v1/service/smartthings/schema', () => {
   let controller;
 
   beforeEach(() => {
-    controller = SmartthingsController(smartthingsHandler);
+    controller = SmartthingsController(smartthingsHandler, gladys);
+    sinon.reset();
   });
 
-  it('Schame test', async () => {
-    const req = 'request';
+  it('Schema test without auth', async () => {
+    const req = { body: {} };
     const res = 'response';
 
     await controller['post /api/v1/service/smartthings/schema'].controller(req, res);
+    assert.calledOnce(gladys.oauth.authenticate);
     assert.calledWith(smartthingsHandler.handleHttpCallback, req, res);
+  });
+
+  it('Schema test with auth', async () => {
+    const req = {
+      body: {
+        authentication: {},
+      },
+      headers: {},
+    };
+    const res = 'response';
+
+    await controller['post /api/v1/service/smartthings/schema'].controller(req, res);
+    expect(req.headers).to.have.property('authorization');
+    assert.calledOnce(gladys.oauth.authenticate);
+    assert.calledOnce(smartthingsHandler.handleHttpCallback);
   });
 });
 

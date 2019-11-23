@@ -8,44 +8,39 @@ describe('SmartThings service - getDeviceHandlerType', () => {
   it('get corresponding device handler type', async () => {
     const features = [
       {
-        category: DEVICE_FEATURE_CATEGORIES.CAMERA,
-        type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       },
     ];
 
-    const deviceHandlerType = getDeviceHandlerType(features);
-    expect(deviceHandlerType).to.be.a('string');
-    expect(deviceHandlerType).to.not.be.lengthOf(0);
+    const deviceHandlerType = getDeviceHandlerType({ features });
+    expect(deviceHandlerType).to.have.property('value', 'c2c-switch');
   });
 
   it('get error on empty features', async () => {
     const features = [];
 
     try {
-      getDeviceHandlerType(features);
+      getDeviceHandlerType({ features });
       assert.fail('should have fail');
     } catch (e) {
-      expect(e.message).to.eq(`SmartThings don't manage this kind of device yet.`);
+      expect(e.message).to.eq(`SmartThings don't manage this kind of device yet : "undefined" ("undefined").`);
     }
   });
 
   it('get error on multiple feature categories', async () => {
     const features = [
       {
-        category: DEVICE_FEATURE_CATEGORIES.CAMERA,
-        type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
-      },
-      {
-        category: DEVICE_FEATURE_CATEGORIES.SIREN,
-        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+        category: 'any',
+        type: 'device',
       },
     ];
 
     try {
-      getDeviceHandlerType(features);
+      getDeviceHandlerType({ name: 'name', external_id: 'id', features });
       assert.fail('should have fail');
     } catch (e) {
-      expect(e.message).to.eq(`SmartThings don't manage a device with multiple categories yet.`);
+      expect(e.message).to.eq(`SmartThings don't manage this kind of device yet : "name" ("id").`);
     }
   });
 });

@@ -6,9 +6,9 @@ module.exports = function SmartThingsController(smartThingsHandler, gladys) {
    * @see https://smartthings.developer.samsung.com/docs/devices/smartthings-schema/schema-basics.html
    */
   async function schema(req, res) {
-    if (req.body.authentication) {
-      const auth = req.body.authentication;
-      req.headers.authorization = `${auth.tokenType} ${auth.token}`;
+    const { authentication } = req.body;
+    if (authentication) {
+      req.headers.authorization = `${authentication.tokenType} ${authentication.token}`;
     }
     return gladys.oauth.authenticate(req, res).then(() => {
       smartThingsHandler.handleHttpCallback(req, res);
