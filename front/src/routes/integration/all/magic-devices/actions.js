@@ -41,7 +41,7 @@ function createActions(store) {
           getDevicesStatus: RequestStatus.Success
         });
 
-        console.log(devices)
+        // console.log(devices)
 
       } catch (e) {
         store.setState({
@@ -52,13 +52,9 @@ function createActions(store) {
 
     async scan(state) {
       console.debug("clicked on Refresh button")
-      const result = await state.httpClient.post('/api/v1/service/magic-devices/scan');
-      console.debug("result: " + JSON.stringify(result));
-      if (result !== undefined) {
-        console.debug("calling getDevices");
-        actions.getDevices(store.getState());
-      }
-      
+      const response = await state.httpClient.get('/api/v1/service/magic-devices/scan');
+      console.debug("SCAN RESULT: " + response);
+      actions.getDevices(store.getState());      
     },
 
     async saveDevice(state, device) {

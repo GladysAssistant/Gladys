@@ -151,7 +151,7 @@ class Device extends Component {
                     <Text id="integration.common.labels.color" />
                   </label>
                   <div>
-                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick }>
+                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick } class="form-control">
                       <div style={ styles.color } />
                     </div>
                     { this.state.displayColorPicker ? <div style={ styles.popover }>
@@ -179,14 +179,7 @@ class Device extends Component {
                   <label>
                     <Text id="integration.magicDevices.device.ipLabel" />
                   </label>
-                  <input type="text" value="192.168.0.xxx" class="form-control" disabled />
-                </div>
-
-                <div class="form-group">
-                  <label>
-                    <Text id="integration.magicDevices.device.ipLabel" />
-                  </label>
-                  <input type="text" value="192.168.0.xxx" class="form-control" disabled />
+                  <input type="text" value={props.device.params.find(param => param.name === 'IP_ADDRESS').value} class="form-control" disabled />
                 </div>
 
                 <div class="form-group">
