@@ -13,19 +13,16 @@ const logger = require('../../../../utils/logger');
  */
 async function poll(device) {
 
-  // console.log("POLLING: " + device.external_id);
-
-  const macAdress = device.external_id.split(':')[1];
-  const ip = this.deviceIpByMacAdress.get(macAdress);
+  const ip = device.params.find((param) => param.name === 'IP_ADDRESS')
   
-  console.log("TRYING TO POLL: " + macAdress + " - " + ip);
+  console.log("TRYING TO POLL: " + ip.value);
 
-  if (ip === undefined) {
-    console.log("    -> NOT POLLING");
+  if (ip.value === undefined) {
+    console.log("    -> NOT POLLING (IP NOT FOUND IN DEVICE PARAMS)");
     return
-  } 
+  }
 
-  let control = new Control(ip, {
+  let control = new Control(ip.value, {
     wait_for_reply: true,
     log_all_received: false,
     apply_masks: false,
@@ -40,85 +37,64 @@ async function poll(device) {
 
   control.queryState(() => {}).then(currentState => {
 
+    // Getting features here to have a lighter code later.
     const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
     const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
     const warmWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
     const brightnessFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
 
+    // the magic-home npm package returns 'true' or 'false'.
+    // converting it back to binary for easier use with Gladys lights management.
     const currentOn = currentState.on ? 1 : 0;
-    const currentRGB = [currentState.color.red, currentState.color.green, currentState.color.blue];
-    const currentHSL = convert.rgb.hsl(currentRGB);
-    const currentHSLObject = {
-      hue: currentHSL[0],
-      saturation: currentHSL[1],
-      lightness: currentHSL[2]
-    }
-    const currentHSLStringified = JSON.stringify(currentHSLObject);
-    const currentBrightness = currentHSLObject.lightness;
 
-    // for debug or later features ?
-    const currentHEX = `0x${convert.rgb.hex(currentRGB)}`;
-    const currentCSS = convert.rgb.keyword(currentRGB);
+    // the magic-home npm package returns an rgb Object.
+    // converting it to hsl to match Gladys dev guidelines.
+    const hsl = convert.rgb.hsl([currentState.color.red, currentState.color.green, currentState.color.blue]);
 
-    let debugText = '\n################################################';
+    // converting hsl to a string to be stored in DB
+    const currentHSL = JSON.stringify({
+      h: hsl[0],
+      s: hsl[1],
+      l: hsl[2]
+    });
 
-    // ================================================================================================================
+    // In Magic Home app:
+    //    In color mode, scale the rgb values to match the brightness.
+    //    In warm white mode, scale from 0 to 255 the value warm white value.
+    const currentBrightness = hsl[2];
+
     // =============================================================================================| BINARY - ON/OFF |
-    // ================================================================================================================
     if (binaryFeature && binaryFeature.last_value !== currentOn) {
-      debugText += '\n#             BINARY CHANGED: ' + binaryFeature.last_value + ' -> ' + currentOn;
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentOn);
-    } else {
-      debugText += '\n#     BINARY STAYED THE SAME: ' + currentOn;
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
+        state: currentOn,
+      });
     }
-    // ================================================================================================================
     // =======================================================================================================| COLOR |
-    // ================================================================================================================
-    if (colorFeature && colorFeature.last_value !== parseInt(currentHEX)) {
-
-      // console.log('################################################');
-      // console.log(colorFeature.last_value);
-      // console.log(currentHEX);
-      // console.log(parseInt(currentHEX));
-      // console.log('################################################');
-
-
-      debugText += '\n#              COLOR CHANGED: ' + colorFeature.last_value + ' -> ' + parseInt(currentHEX);
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.COLOR, parseInt(currentHEX));
-    } else {
-      debugText += '\n#      COLOR STAYED THE SAME: ' + parseInt(currentHEX);
+    if (colorFeature && colorFeature.last_value_string !== currentHSL) {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STRING_STATE, {
+        device: device,
+        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
+        state: currentHSL,
+      });
     }
-    // ================================================================================================================
-    // ==================================================================================================| WARM WHITE |
-    // ================================================================================================================
+    // ====================================================================================| WARM WHITE - TEMPERATURE |
     if (warmWhiteFeature && warmWhiteFeature.last_value !== currentState.warm_white) {
-      debugText += '\n#         WARM WHITE CHANGED: ' + warmWhiteFeature.last_value + ' -> ' + currentState.warm_white;
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentState.warm_white);
-    } else {
-      debugText += '\n# WARM WHITE STAYED THE SAME: ' + currentState.warm_white;
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
+        state: currentState.warm_white,
+      });
     }
-    // ================================================================================================================
-    // ==================================================================================================| BRIGHTNESS |
-    // ================================================================================================================
+    // ======================================================================================| BRIGHTNESS - LIGHTNESS |
     if (brightnessFeature && brightnessFeature.last_value !== currentBrightness) {
-      debugText += '\n#         BRIGHTNESS CHANGED: ' + brightnessFeature.last_value + ' -> ' + currentBrightness;
-      emitNewState(this.gladys, macAdress, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightness);
-    } else {
-      debugText += '\n# BRIGHTNESS STAYED THE SAME: ' + currentBrightness;
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
+        state: currentBrightness,
+      });
     }
-
-    debugText += '\n################################################';
-    // console.debug(debugText);
 
   }, error => {
     console.error('MAGIC DEVICES POLL ERROR: ' + error);
-  });
-}
-
-function emitNewState(gladys, id, feature, value) {
-  gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-    device_feature_external_id: `${SERVICE_SELECTOR}:${id}:${feature}`,
-    state: value,
   });
 }
 

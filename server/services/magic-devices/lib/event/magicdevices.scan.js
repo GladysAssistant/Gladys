@@ -9,130 +9,58 @@ const {
 const { SERVICE_SELECTOR } = require('../utils/constants');
 const { Discovery } = require('magic-home');
 const logger = require('../../../../utils/logger');
+const { Error500 } = require('../../../../utils/httpErrors');
+
+const { createDevice } = require('../utils/device');
 
 /**
  * @description Send a broadcast to find the devices
  * @example
  * magicDevices.scan();
  */
-function scan() {
+async function scan() {
 
+  let response = 'NO DEVICES FOUND WHILE SCANNING';
   let discovery = new Discovery();
-  discovery.scan(5000).then(async discoveredDevices => {
+  await discovery.scan(5000, async (error, discoveredDevices) => {
 
-    console.debug(discoveredDevices.length + ' Magic Device(s) found while scanning !');
+    console.log("SCAN RESULT: ", JSON.stringify(error), JSON.stringify(discoveredDevices))
 
-    for (let d in discoveredDevices) {
+    if (error !== null) {
+      throw new Error500(error);
+    }
 
-      const device = discoveredDevices[d];
-      const deviceId = `${SERVICE_SELECTOR}:${device.id}`;
-      
-      // if Gladys already knows this device
-      const alreadyInGladys = this.gladys.stateManager.get('deviceByExternalId', deviceId);
-      if (alreadyInGladys) {
-        // check if we mapped it yet
-        console.debug(device.id + ' is already in Gladys !');
-        const notMappedYet = this.deviceIpByMacAdress.get(device.id) === undefined;
-        if (notMappedYet) {          
-          console.debug(device.id + ' is now mapped with the service !');
-          this.devices[device.id] = alreadyInGladys;
-          this.deviceIpByMacAdress.set(device.id, device.address);
+    if (discoveredDevices.length) {      
+      console.debug(discoveredDevices.length + ' Magic Device(s) found while scanning !');
+      const unknownDevices = await this.mapKnownDevicesWithGladys(discoveredDevices);
+
+      if (unknownDevices.length) {
+
+        console.log(JSON.stringify(unknownDevices))
+
+        for (let d in unknownDevices) {
+          const scannedDevice = unknownDevices[d];
+          const newDevice = createDevice(scannedDevice, this.serviceId);
+          this.deviceIpByMacAdress.set(scannedDevice.id, scannedDevice.address);
+          this.devices[scannedDevice.id] = newDevice;
+
+          // create device in DB and stuff
+          this.gladys.device.create(newDevice);
+
+          // emit NEW DEVICE event
+          this.gladys.event.emit(EVENTS.DEVICE.NEW, newDevice);
+          
         }
-        // skip the creation of the device in Gladys
-        continue;
+
+        response = "FOUND DEVICES WHILE SCANNING";
+      } else {
+        response = "FOUND DEVICES WHILE SCANNING, GLADYS ALREADY KNOWS THEM";
       }
+    }
 
-      // il faUt ajouter this.devices
-
-      // check if we mapped it yet
-      const doesntExistYet = this.devices[device.id] === undefined;
-
-      if (doesntExistYet) {
-
-        console.debug(device.id + ' is new ! Creating it in Gladys');
-
-        const binaryFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`;
-        const colorFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;        
-        const warmWhiteFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
-        const brightnessFeatureId = `${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
-
-        console.log('\tCreating Device with id ' + deviceId);
-
-        const deviceCreated = await this.gladys.device.create({
-          name: device.model,
-          service_id: this.serviceId,
-          external_id: deviceId,
-          selector: deviceId,
-          model: device.model,
-          should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
-          features: [
-            {
-              name: "On/Off",              
-              read_only: false,              
-              keep_history: false,
-              has_feedback: false,
-              external_id: binaryFeatureId,
-              selector: binaryFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-              min: 0,
-              max: 1
-            },
-            {
-              name: "Color",
-              read_only: false,
-              keep_history: false,
-              has_feedback: false,
-              external_id: colorFeatureId,
-              selector: colorFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-              min: 0,
-              max: 0
-            },
-            {
-              name: "Warm White",
-              read_only: false,
-              keep_history: false,
-              has_feedback: false,
-              external_id: warmWhiteFeatureId,
-              selector: warmWhiteFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-              min: 0,
-              max: 255
-            },            
-            {
-              name: "Brightness",
-              read_only: false,
-              keep_history: false,
-              has_feedback: false,
-              external_id: brightnessFeatureId,
-              selector: brightnessFeatureId,
-              category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-              type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-              min: 0,
-              max: 100
-            },
-          ],
-          params: [],
-        });
-        
-        this.deviceIpByMacAdress.set(device.id, device.address);
-        this.devices[device.id] = deviceCreated;
-        this.gladys.event.emit(EVENTS.DEVICE.NEW, deviceCreated);
-        // this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        //   type: WEBSOCKET_MESSAGE_TYPES.MAGIC_DEVICES.NEW_DEVICE,
-        //   payload: deviceCreated,
-        // });
-
-        // this.addDevice(netDevice.id, device);
-        // this.getStatus(deviceCreated);
-      }
-
-    };
   });
+
+  return response;
 }
 
 module.exports = {

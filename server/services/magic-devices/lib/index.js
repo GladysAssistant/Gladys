@@ -10,6 +10,7 @@ const { getDevices } = require('./commands/magicdevices.getDevices');
 const { poll } = require('./commands/magicdevices.poll');
 const { start } = require('./commands/magicdevices.start');
 const { setValue } = require('./commands/magicdevices.setValue');
+const { mapKnownDevicesWithGladys } = require('./commands/mapKnownDevicesWithGladys');
 // const { Control, Discovery, CustomMode, EffectInterface } = require('magic-home');
 
 /**
@@ -38,5 +39,6 @@ MagicDevicesManager.prototype.start = start;
 MagicDevicesManager.prototype.getDevices = getDevices;
 MagicDevicesManager.prototype.poll = poll;
 MagicDevicesManager.prototype.setValue = setValue;
+MagicDevicesManager.prototype.mapKnownDevicesWithGladys = mapKnownDevicesWithGladys;
 
 module.exports = MagicDevicesManager;

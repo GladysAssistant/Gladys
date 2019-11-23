@@ -15,14 +15,14 @@ module.exports = function magicDevicesController(magicDevicesManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/magic-devices/scan Start a scan
+   * @api {get} /api/v1/service/magic-devices/scan Start a scan and return devices
    * @apiName scan
    * @apiGroup MagicDevices
    */
   async function scan(req, res) {
     console.error("client called scan")
-    await magicDevicesManager.scan();
-    res.json("SCAN FINISHED");
+    const result = await magicDevicesManager.scan();
+    res.json(result);
   }
 
   return {
@@ -30,7 +30,7 @@ module.exports = function magicDevicesController(magicDevicesManager) {
       authenticated: true,
       controller: asyncMiddleware(getDevices),
     },
-    'post /api/v1/service/magic-devices/scan': {
+    'get /api/v1/service/magic-devices/scan': {
       authenticated: true,
       controller: asyncMiddleware(scan),
     },

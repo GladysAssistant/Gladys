@@ -30,6 +30,7 @@ const EVENTS = {
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
+    NEW_STRING_STATE: 'device.new-string-state',
     PURGE_STATES: 'device.purge-states',
   },
   GATEWAY: {
