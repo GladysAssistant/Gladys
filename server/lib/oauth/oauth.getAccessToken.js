@@ -9,7 +9,7 @@ const db = require('../../models');
  * oauth.getAccessToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
 async function getAccessToken(accessToken) {
-  const payload = this.session.validateAccessToken(accessToken, 'dashboard:read');
+  const payload = this.session.validateAccessToken(accessToken);
   const token = await db.Session.findOne({
     where: {
       id: payload.session_id,

@@ -12,7 +12,7 @@ describe('oauth.getAccessToken', () => {
   it('should get OAuth access token', async () => {
     const token = generateAccessToken(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      ['dashboard:write', 'reset-password:write'],
+      ['dashboard:read', 'reset-password:write'],
       '1ec7c3d5-f806-4920-97b3-3e75e19b6434',
       'secret',
     );
@@ -35,7 +35,7 @@ describe('oauth.getAccessToken', () => {
   it('should get OAuth access token without client', async () => {
     const token = generateAccessToken(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      ['dashboard:write', 'reset-password:write'],
+      ['dashboard:read', 'reset-password:write'],
       'ada07710-5f25-4510-ac63-b002aca3bd32',
       'secret',
     );
@@ -55,7 +55,7 @@ describe('oauth.getAccessToken', () => {
   it('should get OAuth access token without existing session', async () => {
     const token = generateAccessToken(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      ['dashboard:write', 'reset-password:write'],
+      ['dashboard:read', 'reset-password:write'],
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       'secret',
     );

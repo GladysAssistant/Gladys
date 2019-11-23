@@ -32,6 +32,6 @@ describe('GET /oauth/authorize', () => {
         `/api/v1/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}`,
       )
       .expect('Content-Type', /json/)
-      .expect(500);
+      .expect(400);
   });
 });

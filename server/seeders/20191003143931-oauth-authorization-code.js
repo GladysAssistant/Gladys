@@ -5,7 +5,7 @@ module.exports = {
       [
         {
           code: 'd71204f44',
-          scope: 'dashboard:write',
+          scope: 'dashboard:read',
           expires_at: new Date(new Date().getTime() + 10000000),
           redirect_uri: 'http://oauth1.fr',
           client_id: 'oauth_client_1',
@@ -15,7 +15,7 @@ module.exports = {
         },
         {
           code: 'd71204f82',
-          scope: 'dashboard:write',
+          scope: 'dashboard:read',
           expires_at: new Date(new Date().getTime() + 10000000),
           redirect_uri: 'http://oauth2.fr',
           client_id: 'oauth_client_2',
