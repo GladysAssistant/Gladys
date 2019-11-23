@@ -40,7 +40,8 @@ async function poll(device) {
     // Getting features here to have a lighter code later.
     const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
     const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
-    const warmWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
+    const warmWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE);
+    const coldWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLD_WHITE);
     const brightnessFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
 
     // the magic-home npm package returns 'true' or 'false'.
@@ -63,6 +64,12 @@ async function poll(device) {
     //    In warm white mode, scale from 0 to 255 the value warm white value.
     const currentBrightness = hsl[2];
 
+    // Some models have either 0, 1 or 2 whites
+    // Cold and warm wight can be simulated to match a yellowish
+    // or blueish color
+    const currentWarmWhite = (100 * currentState.warm_white) / 255;
+    const currentColdWhite = (100 * currentState.cold_white) / 255;
+
     // =============================================================================================| BINARY - ON/OFF |
     if (binaryFeature && binaryFeature.last_value !== currentOn) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -78,11 +85,15 @@ async function poll(device) {
         state: currentHSL,
       });
     }
-    // ====================================================================================| WARM WHITE - TEMPERATURE |
-    if (warmWhiteFeature && warmWhiteFeature.last_value !== currentState.warm_white) {
+    // ==================================================================================================| WARM WHITE |
+    if (warmWhiteFeature && warmWhiteFeature.last_value !== currentWarmWhite) {
+      
+      console.log(typeof warmWhiteFeature.last_value, warmWhiteFeature.last_value)
+      console.log(typeof currentWarmWhite, currentWarmWhite)
+      console.log(warmWhiteFeature.last_value === currentWarmWhite)
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
-        state: currentState.warm_white,
+        device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`,
+        state: currentWarmWhite,
       });
     }
     // ======================================================================================| BRIGHTNESS - LIGHTNESS |
@@ -92,6 +103,8 @@ async function poll(device) {
         state: currentBrightness,
       });
     }
+
+    console.log("POLLED: " + JSON.stringify(currentState));
 
   }, error => {
     console.error('MAGIC DEVICES POLL ERROR: ' + error);

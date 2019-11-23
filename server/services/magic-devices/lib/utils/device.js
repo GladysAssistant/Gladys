@@ -14,8 +14,9 @@ function createDevice(scannedDevice, serviceId) {
   const id = `${SERVICE_SELECTOR}:${macAdress}`;
 
   const binaryFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`;
-  const colorFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;        
-  const warmWhiteFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
+  const colorFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
+  const warmWhiteFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`;
+  const coldWhiteFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.COLD_WHITE}`;
   const brightnessFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
 
   console.log('\tCreating Device with id ' + id);
@@ -61,10 +62,24 @@ function createDevice(scannedDevice, serviceId) {
         external_id: warmWhiteFeatureId,
         selector: warmWhiteFeatureId,
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+        type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,        
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
         min: 0,
-        max: 255
-      },            
+        max: 100
+      },
+      {
+        name: "Cold White",
+        read_only: false,
+        keep_history: false,
+        has_feedback: false,
+        external_id: coldWhiteFeatureId,
+        selector: coldWhiteFeatureId,
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100
+      }, 
       {
         name: "Brightness",
         read_only: false,
@@ -74,6 +89,7 @@ function createDevice(scannedDevice, serviceId) {
         selector: brightnessFeatureId,
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
         min: 0,
         max: 100
       },
