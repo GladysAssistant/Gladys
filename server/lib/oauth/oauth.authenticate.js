@@ -1,4 +1,5 @@
 const OAuthServer = require('oauth2-server');
+const UnauthorizedRequestError = require('oauth2-server/lib/errors/unauthorized-request-error');
 
 /**
  * @description Authenticates a request.
@@ -13,7 +14,18 @@ async function authenticate(req, res) {
   const request = new OAuthServer.Request(req);
   const response = new OAuthServer.Response(res);
 
-  return this.oauthServer.authenticate(request, response);
+  return this.oauthServer.authenticate(request, response).catch((e) => {
+    res.set(response.headers);
+
+    res.status(e.code);
+
+    if (e instanceof UnauthorizedRequestError) {
+      res.send();
+    } else {
+      res.send({ error: e.name, error_description: e.message });
+    }
+    throw e;
+  });
 }
 
 module.exports = {

@@ -1,4 +1,5 @@
 const OAuthServer = require('oauth2-server');
+const UnauthorizedRequestError = require('oauth2-server/lib/errors/unauthorized-request-error');
 
 /**
  * @description Authorizes a token request.
@@ -12,12 +13,26 @@ const OAuthServer = require('oauth2-server');
 async function authorize(req, res) {
   const request = new OAuthServer.Request(req);
   const response = new OAuthServer.Response(res);
+  const { oauthServer } = this;
 
-  return this.oauthServer.authorize(request, response).then(() => {
-    const { location } = response.headers;
-    delete response.headers.location;
-    return res.json({ uri: location, headers: response.headers });
-  });
+  return oauthServer
+    .authorize(request, response)
+    .then(() => {
+      const { location } = response.headers;
+      delete response.headers.location;
+      return res.json({ uri: location, headers: response.headers });
+    })
+    .catch((e) => {
+      res.set(response.headers);
+
+      res.status(e.code);
+
+      if (e instanceof UnauthorizedRequestError) {
+        return res.send();
+      }
+
+      return res.send({ error: e.name, error_description: e.message });
+    });
 }
 
 module.exports = {
