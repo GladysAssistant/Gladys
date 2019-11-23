@@ -30,6 +30,8 @@ function createActions(store) {
         }
 
         const devices = await state.httpClient.get('/api/v1/service/magic-devices/devices', options);
+
+        console.log(devices)
         const devicesMap = new Map();
         devices.forEach(device => {
           devicesMap.set(device.external_id, device);
@@ -73,8 +75,13 @@ function createActions(store) {
     
     async setValue(state, deviceFeature, value) {
 
-      console.log("deviceFeature:", deviceFeature)
-      console.log("value:", value)
+      // console.log("deviceFeature:", deviceFeature)
+      // console.log("value:", value)
+
+      // should use constants here
+      if (deviceFeature.type === 'color') {
+        value = `{ "h": ${value.h}, "s": ${value.s*100}, "l": ${value.l*100} }`;
+      }
       
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
         value

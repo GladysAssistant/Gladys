@@ -10,7 +10,7 @@ module.exports = function magicDevicesController(magicDevicesManager) {
   async function getDevices(req, res) {
     console.error("client called getDevices")
     const devices = await magicDevicesManager.getDevices();
-    //console.log("devices: " + JSON.stringify(devices))    
+    //console.log("devices: " + JSON.stringify(devices))
     res.json(devices);
   }
 

@@ -24,12 +24,12 @@ function setValue(device, deviceFeature, state) {
   if (ip === undefined) {
     console.log("    -> NOT SETTING VALUE");
     return
-  } 
+  }
 
   let control = new Control(ip, {
     wait_for_reply: true,
     log_all_received: true,
-    apply_masks: false,
+    apply_masks: true,
     connect_timeout: null,
     ack: {
         power: false,
@@ -52,29 +52,16 @@ function setValue(device, deviceFeature, state) {
       }
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
-
-      const color = convert.hsl.rgb([state.hsl.h, state.hsl.s, state.hsl.l]);
-
-      // console.log("state " + JSON.stringify(state));
-
-      // control.setWarmWhite(255, () => {
-      //   console.log("warm white setted to 255");
-      //   control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
-      //     console.log("color setted");
-      //   });
-      // })
-
-      // control.setColorAndWarmWhite(state.rgb.r, state.rgb.g, state.rgb.b, 255, () => {
-      //   console.log("color setted");
-      // });
-
-      control.setColor(state.rgb.r, state.rgb.g, state.rgb.b, () => {
-        console.log("color setted");
-      });
+      const value = JSON.parse(state)
+      const color = convert.hsl.rgb([value.h, value.s, value.l]);
 
       // Convenience method to only set the color values.
       // Because the command has to include both color and warm white values,
       // previously seen warm white values will be sent together with the color values.
+      control.setColor(color[0], color[1], color[2], () => {
+        console.log("color setted");
+      });
+      
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE:
       // setWarmWhite(ww, callback)

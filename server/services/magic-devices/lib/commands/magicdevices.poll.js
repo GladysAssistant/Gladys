@@ -2,7 +2,6 @@ const { Control } = require('magic-home');
 const convert = require('color-convert');
 const { EVENTS, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const { getDeviceFeature } = require('../../../../utils/device');
-const { SERVICE_SELECTOR } = require('../utils/constants')
 const logger = require('../../../../utils/logger');
 
 /**
@@ -38,11 +37,12 @@ async function poll(device) {
   control.queryState(() => {}).then(currentState => {
 
     // Getting features here to have a lighter code later.
-    const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
-    const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
-    const warmWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE);
-    const coldWhiteFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLD_WHITE);
-    const brightnessFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
+    // We have to get the feature with the stateManager, since saveState dosent update the device, only the feature
+    const binaryFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`);
+    const colorFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`);
+    const warmWhiteFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`);
+    const coldWhiteFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.COLD_WHITE}`);
+    const brightnessFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`);
 
     // the magic-home npm package returns 'true' or 'false'.
     // converting it back to binary for easier use with Gladys lights management.
@@ -87,10 +87,6 @@ async function poll(device) {
     }
     // ==================================================================================================| WARM WHITE |
     if (warmWhiteFeature && warmWhiteFeature.last_value !== currentWarmWhite) {
-      
-      console.log(typeof warmWhiteFeature.last_value, warmWhiteFeature.last_value)
-      console.log(typeof currentWarmWhite, currentWarmWhite)
-      console.log(warmWhiteFeature.last_value === currentWarmWhite)
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `${device.external_id}:${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`,
         state: currentWarmWhite,

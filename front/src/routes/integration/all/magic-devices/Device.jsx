@@ -1,8 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import reactCSS from 'reactcss'
-import { Github } from 'react-color';
-import { SketchPicker } from 'react-color'
+import { GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker } from 'react-color';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
@@ -16,6 +15,7 @@ class Device extends Component {
   };
 
   refreshDeviceProperty = () => {
+    console.log("refreshDeviceProperty")
     if (!this.props.device.features) {
       return null;
     }
@@ -24,8 +24,10 @@ class Device extends Component {
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
     );
 
-    const color = get(colorDeviceFeature, 'last_value');
+    const color = JSON.parse(get(colorDeviceFeature, 'last_value_string'));
 
+    
+    console.log("setting color to " + JSON.stringify(color));
     this.setState({
       color
     });
@@ -69,24 +71,38 @@ class Device extends Component {
     this.setState({ displayColorPicker: false })
   };
 
-  handleChangeColor = (color) => {
-    console.log("clicked on color:", color)
+  handleChangeColor = (colorObject) => {
     const colorDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
     );
+
+    console.log("clicked on color:", colorObject);
+
+    const color = {
+      h: colorObject.hsl.h,
+      s: colorObject.hsl.s,
+      l: colorObject.hsl.l
+    }
+
+    this.setState({
+      color
+    });
+
     this.props.setValue(colorDeviceFeature, color);
-    this.setState({ color: color })
+    //this.refreshDeviceProperty();
   };
 
   componentWillMount() {
+    console.log("from componentWillMount:");
     this.refreshDeviceProperty();
   }
 
   componentWillUpdate() {
-    this.refreshDeviceProperty();
+    console.log("from componentWillUpdate:");
+    //this.refreshDeviceProperty();
   }
 
-  render(props, { color, loading, error }) {
+  render(props, { loading }) {
 
     const styles = reactCSS({
       'default': {
@@ -94,7 +110,7 @@ class Device extends Component {
           width: '36px',
           height: '14px',
           borderRadius: '2px',
-          background: `hsl(${ this.state.color.h }, ${ this.state.color.s }, ${ this.state.color.l }, 1)`,
+          background: `hsl(${ this.state.color.h }, ${ this.state.color.s * 100 }%, ${ this.state.color.l * 100 }%)`,
         },
         swatch: {
           padding: '5px',
@@ -151,12 +167,13 @@ class Device extends Component {
                     <Text id="integration.common.labels.color" />
                   </label>
                   <div>
-                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick } class="form-control">
+                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick }>
                       <div style={ styles.color } />
                     </div>
                     { this.state.displayColorPicker ? <div style={ styles.popover }>
                       <div style={ styles.cover } onClick={ this.handleCloseColor }/>
-                      <SketchPicker color={ this.state.color } onChange={ this.handleChangeColor } />
+                      <GithubPicker color={ this.state.color } onChange={ this.handleChangeColor } />
+                      {/* GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker */}
                     </div> : null }
                   </div>
                 </div>

@@ -13,12 +13,17 @@ class Page extends Component {
     this.props.getHouses();
     this.props.getDevices();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_DEVICE, payload => {
-      console.debug("New device: " + payload)
+      console.debug("New device: " + JSON.stringify(payload));
       //this.props.getDevices();
     });
     this.props.session.dispatcher.addListener(EVENTS.DEVICE.NEW_STATE, payload => {
       //console.debug("-------------------------------------------")
-      //console.debug("New state : " + JSON.stringify(payload));
+      console.debug("New state : " + JSON.stringify(payload));
+      //this.props.updateDevices();
+    });
+    this.props.session.dispatcher.addListener(EVENTS.DEVICE.NEW_STRING_STATE, payload => {
+      //console.debug("-------------------------------------------")
+      console.debug("New string state : " + JSON.stringify(payload));
       //this.props.updateDevices();
     });
   }
