@@ -11,22 +11,24 @@ const { CAPABILITY_BY_FEATURE_CATEGORY } = require('./capabilities');
  * @example
  * generateDeviceState(device.features);
  */
-function generateDeviceState(features) {
+function generateDeviceState(features = []) {
   const states = [];
 
   features.forEach((feature) => {
-    const capability = (CAPABILITY_BY_FEATURE_CATEGORY[feature.category] || {})[feature.type];
+    const capabilityObj = (CAPABILITY_BY_FEATURE_CATEGORY[feature.category] || {})[feature.type];
 
-    if (capability) {
-      capability.attributes.forEach((attribute) => {
-        if (!attribute.type || attribute.type === feature.type) {
+    if (capabilityObj) {
+      const { attributes, capability } = capabilityObj;
+      attributes.forEach((attribute) => {
+        const { featureType, properties, name } = attribute;
+        if (!featureType || featureType === feature.type) {
           const state = {
             component: 'main',
-            capability: `st.${capability.capability.id}`,
-            attribute: attribute.name,
+            capability: capability.id,
+            attribute: name,
           };
 
-          attribute.properties.forEach((property) => {
+          properties.forEach((property) => {
             state[property.name] = property.writeValue(feature);
           });
 
@@ -38,7 +40,7 @@ function generateDeviceState(features) {
     }
   });
 
-  if (states.length > 1) {
+  if (states.length > 0) {
     states.push({
       component: 'main',
       capability: 'st.healthCheck',

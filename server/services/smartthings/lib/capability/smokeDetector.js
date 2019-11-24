@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description A device that detects the presence or absence of smoke.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Smoke-Detector
+ */
 const smokeDetectorCapability = {
   capability: {
-    id: 'smokeDetector',
+    id: 'st.smokeDetector',
     version: 1,
   },
   attributes: [

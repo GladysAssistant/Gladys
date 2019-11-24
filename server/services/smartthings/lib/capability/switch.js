@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Allows for the control of a switch device.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Switch
+ */
 const switchCapability = {
   capability: {
-    id: 'switch',
+    id: 'st.switch',
     version: 1,
   },
   attributes: [
@@ -30,14 +35,6 @@ const switchCapability = {
     {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-    },
-    {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-    },
-    {
-      category: DEVICE_FEATURE_CATEGORIES.SIREN,
-      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
     },
   ],
 };

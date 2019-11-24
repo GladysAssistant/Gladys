@@ -44,7 +44,7 @@ function commandHandler(response, requestedDevices) {
     if (internalDevice) {
       device.commands.forEach((item) => {
         try {
-          const capability = CAPABILITY_BY_ID[item.capability.substring(3)] || {};
+          const capability = CAPABILITY_BY_ID[item.capability] || {};
           const commandCapability = capability.commands[item.command];
           const feature = internalDevice.features.find((f) => f.type === commandCapability.featureType);
           const value = commandCapability.readValue(item.arguments, feature);

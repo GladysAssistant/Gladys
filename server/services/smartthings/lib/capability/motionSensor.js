@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Allows for the ability to read motion sensor device states.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Motion-Sensor
+ */
 const motionSensorCapability = {
   capability: {
-    id: 'motionSensor',
+    id: 'st.motionSensor',
     version: 1,
   },
   attributes: [

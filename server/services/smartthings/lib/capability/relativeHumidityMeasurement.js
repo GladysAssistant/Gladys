@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Allow reading the relative humidity from devices that support it.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Relative-Humidity-Measurement
+ */
 const relativeHumidityMeasurementCapability = {
   capability: {
-    id: 'relativeHumidityMeasurement',
+    id: 'st.relativeHumidityMeasurement',
     version: 1,
   },
   attributes: [

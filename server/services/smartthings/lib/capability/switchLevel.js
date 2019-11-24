@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Allows for the control of the level of a device like a light or a dimmer switch.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Switch-Level
+ */
 const switchLevelCapability = {
   capability: {
-    id: 'switchLevel',
+    id: 'st.switchLevel',
     version: 1,
   },
   attributes: [

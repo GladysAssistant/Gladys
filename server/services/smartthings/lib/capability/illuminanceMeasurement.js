@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Gives the illuminance reading from devices that support it.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Illuminance-Measurement
+ */
 const illuminanceMeasurementCapability = {
   capability: {
-    id: 'illuminanceMeasurement',
+    id: 'st.illuminanceMeasurement',
     version: 1,
   },
   attributes: [

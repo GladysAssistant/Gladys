@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Defines that the device has a battery.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Battery
+ */
 const batteryCapability = {
   capability: {
-    id: 'battery',
+    id: 'st.battery',
     version: 1,
   },
   attributes: [
@@ -11,7 +16,7 @@ const batteryCapability = {
       properties: [
         {
           name: 'value',
-          writeValue: (feature) => Math.round(((feature.last_value - feature.min) / (feature.max - feature.min)) * 100),
+          writeValue: (feature) => Math.round(feature.last_value),
         },
       ],
     },

@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Get the status off of a water sensor device.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Water-Sensor
+ */
 const waterSensorCapability = {
   capability: {
-    id: 'waterSensor',
+    id: 'st.waterSensor',
     version: 1,
   },
   attributes: [

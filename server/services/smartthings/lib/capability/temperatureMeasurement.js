@@ -4,14 +4,19 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
+/**
+ * @description Get the temperature from a Device that reports current temperature.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Temperature-Measurement
+ */
 const temperatureMeasurementCapability = {
   capability: {
-    id: 'temperatureMeasurement',
+    id: 'st.temperatureMeasurement',
     version: 1,
   },
   attributes: [
     {
-      name: 'battery',
+      name: 'temperature',
       properties: [
         {
           name: 'value',

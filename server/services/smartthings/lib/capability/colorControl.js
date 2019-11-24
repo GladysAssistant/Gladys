@@ -1,8 +1,13 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
+/**
+ * @description Allows for control of a color changing device by setting its hue, saturation, and color values.
+ *
+ * @see https://smartthings.developer.samsung.com/docs/api-ref/capabilities.html#Color-Control
+ */
 const colorControlCapability = {
   capability: {
-    id: 'colorControl',
+    id: 'st.colorControl',
     version: 1,
   },
   attributes: [
@@ -38,7 +43,6 @@ const colorControlCapability = {
     },
   ],
   commands: {
-    // setColor: (args) => args,
     setHue: {
       readValue: (args) => args.hue,
       featureType: DEVICE_FEATURE_TYPES.LIGHT.HUE,
