@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const { VARIABLES } = require('../../utils/constants');
 
 /**
@@ -32,11 +31,24 @@ const { VARIABLES } = require('../../utils/constants');
  *  });
  */
 async function callbackAccessHandler(accessToken, callbackAuthentication, callbackUrls) {
-  await this.gladys.variable.setValue(VARIABLES.SMT_TOKEN_CALLBACK_URL, callbackUrls.oauthToken, this.serviceId);
-  await this.gladys.variable.setValue(VARIABLES.SMT_STATE_CALLBACK_URL, callbackUrls.stateCallback, this.serviceId);
+  // Get current user
+  const payload = this.gladys.session.validateAccessToken(accessToken);
+  const userId = payload.user_id;
 
-  // TODO manage OAuth
-  logger.trace(`SmartThings connector: "callbackAccessHandler" not completly implemented : ${accessToken}`);
+  // Stores callback information for current user
+  const callBackInfo = {
+    callbackAuthentication,
+    callbackUrls,
+  };
+
+  await this.gladys.variable.setValue(
+    VARIABLES.SMT_CALLBACK_OAUTH,
+    JSON.stringify(callBackInfo),
+    this.serviceId,
+    userId,
+  );
+
+  this.callbackUsers[userId] = callBackInfo;
 }
 
 module.exports = {

@@ -1,12 +1,18 @@
 const sinon = require('sinon');
 
-const { assert, spy } = sinon;
+const { assert, spy, fake } = sinon;
 const SmartthingsHandler = require('../../../../services/smartthings/lib');
 const { VARIABLES } = require('../../../../services/smartthings/utils/constants');
 
+const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 const gladys = {
   variable: {
     setValue: spy(),
+  },
+  session: {
+    validateAccessToken: fake.returns({
+      user_id: userId,
+    }),
   },
 };
 
@@ -33,18 +39,16 @@ describe('SmartThings service - callbackAccessHandler', () => {
   it('should store callback URLs', async () => {
     await smartthingsHandler.callbackAccessHandler(accessToken, callbackAuthentication, callbackUrls);
 
-    assert.callCount(gladys.variable.setValue, 2);
+    assert.callCount(gladys.variable.setValue, 1);
     assert.calledWith(
       gladys.variable.setValue.getCall(0),
-      VARIABLES.SMT_TOKEN_CALLBACK_URL,
-      callbackUrls.oauthToken,
+      VARIABLES.SMT_CALLBACK_OAUTH,
+      JSON.stringify({
+        callbackAuthentication,
+        callbackUrls,
+      }),
       serviceId,
-    );
-    assert.calledWith(
-      gladys.variable.setValue.getCall(1),
-      VARIABLES.SMT_STATE_CALLBACK_URL,
-      callbackUrls.stateCallback,
-      serviceId,
+      userId,
     );
   });
 });

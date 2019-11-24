@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { VARIABLES } = require('../../utils/constants');
 
 /**
  * @description Called when the connector is removed from SmartThings. You may want clean up access
@@ -12,7 +13,16 @@ const logger = require('../../../../utils/logger');
  * await smartthingsHandler.integrationDeletedHandler('smartthings-access-token');
  */
 async function integrationDeletedHandler(accessToken) {
-  logger.trace(`SmartThings connector: "integrationDeletedHandler" not implemented : ${accessToken}`);
+  // Get current user
+  const payload = this.gladys.session.validateAccessToken(accessToken);
+  const userId = payload.user_id;
+
+  // Removes callback information for current user
+  await this.gladys.variable.destroy(VARIABLES.SMT_CALLBACK_OAUTH, this.serviceId, userId);
+
+  delete this.callbackUsers[userId];
+
+  logger.info(`SmartThings information well removed for user ${userId}`);
 }
 
 module.exports = {

@@ -38,12 +38,14 @@ function getDeviceState(features) {
     }
   });
 
-  states.push({
-    component: 'main',
-    capability: 'st.healthCheck',
-    attribute: 'healthStatus',
-    value: states.length ? 'online' : 'offline',
-  });
+  if (states.length > 1) {
+    states.push({
+      component: 'main',
+      capability: 'st.healthCheck',
+      attribute: 'healthStatus',
+      value: states.length ? 'online' : 'offline',
+    });
+  }
 
   return states;
 }

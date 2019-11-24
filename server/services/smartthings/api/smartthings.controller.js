@@ -10,9 +10,7 @@ module.exports = function SmartThingsController(smartThingsHandler, gladys) {
     if (authentication) {
       req.headers.authorization = `${authentication.tokenType} ${authentication.token}`;
     }
-    return gladys.oauth.authenticate(req, res).then(() => {
-      smartThingsHandler.handleHttpCallback(req, res);
-    });
+    return gladys.oauth.authenticate(req, res, smartThingsHandler.handleHttpCallback.bind(smartThingsHandler));
   }
 
   /**
