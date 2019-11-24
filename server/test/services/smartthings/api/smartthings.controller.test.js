@@ -29,7 +29,6 @@ describe('POST /api/v1/service/smartthings/schema', () => {
 
     await controller['post /api/v1/service/smartthings/schema'].controller(req, res);
     assert.calledOnce(gladys.oauth.authenticate);
-    assert.calledWith(smartthingsHandler.handleHttpCallback, req, res);
   });
 
   it('Schema test with auth', async () => {
@@ -44,7 +43,6 @@ describe('POST /api/v1/service/smartthings/schema', () => {
     await controller['post /api/v1/service/smartthings/schema'].controller(req, res);
     expect(req.headers).to.have.property('authorization');
     assert.calledOnce(gladys.oauth.authenticate);
-    assert.calledOnce(smartthingsHandler.handleHttpCallback);
   });
 });
 
