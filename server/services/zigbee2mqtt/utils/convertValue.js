@@ -30,6 +30,10 @@ function convertValue(feature, state) {
           result = state;
           break;
         }
+        case 'string': {
+          result = state;
+          break;
+        }
         default:
           throw new Error(`Zigbee2mqqt don't handle value "${state}" for feature "${feature}".`);
       }
