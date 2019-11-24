@@ -1,4 +1,4 @@
-const { getDeviceState } = require('./getDeviceState');
+const { generateDeviceState } = require('../utils/generateDeviceState');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -29,7 +29,7 @@ function stateRefreshHandler(response, requestedDevices = undefined) {
 
   gladysDevices.forEach((device) => {
     try {
-      const states = getDeviceState(device.features);
+      const states = generateDeviceState(device.features);
       response.addDevice(device.external_id, states);
     } catch (e) {
       logger.warn(`SmartThings device state not detected for ${device.external_id} : ${e}`);

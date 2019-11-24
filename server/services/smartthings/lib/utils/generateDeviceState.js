@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { CAPABILITY_BY_FEATURE_CATEGORY } = require('../utils/capabilities');
+const { CAPABILITY_BY_FEATURE_CATEGORY } = require('./capabilities');
 
 /**
  * @description Determines the SmartThings device handler according to Gladys device features.
@@ -9,9 +9,9 @@ const { CAPABILITY_BY_FEATURE_CATEGORY } = require('../utils/capabilities');
  * @see https://smartthings.developer.samsung.com/docs/devices/smartthings-schema/device-handler-types.html#Reference
  *
  * @example
- * getDeviceState(device.features);
+ * generateDeviceState(device.features);
  */
-function getDeviceState(features) {
+function generateDeviceState(features) {
   const states = [];
 
   features.forEach((feature) => {
@@ -51,5 +51,5 @@ function getDeviceState(features) {
 }
 
 module.exports = {
-  getDeviceState,
+  generateDeviceState,
 };

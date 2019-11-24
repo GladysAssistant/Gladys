@@ -1,4 +1,4 @@
-const { getDeviceState } = require('../connector/getDeviceState');
+const { generateDeviceState } = require('../utils/generateDeviceState');
 const logger = require('../../../../utils/logger');
 const { VARIABLES } = require('../../utils/constants');
 
@@ -15,7 +15,7 @@ async function handleDeviceState(event) {
   const device = this.gladys.stateManager.get('deviceById', deviceFeature.device_id);
   const deviceState = {
     externalDeviceId: device.external_id,
-    states: getDeviceState([deviceFeature]),
+    states: generateDeviceState([deviceFeature]),
   };
 
   if (deviceState.states.length > 0) {

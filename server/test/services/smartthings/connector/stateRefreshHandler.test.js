@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
-const getDeviceStateMock = (features) => {
+const generateDeviceStateMock = (features) => {
   if (!features) {
     throw new Error();
   } else {
@@ -12,7 +12,7 @@ const getDeviceStateMock = (features) => {
 };
 
 const stateRefreshHandler = proxyquire('../../../../services/smartthings/lib/connector/stateRefreshHandler', {
-  './getDeviceState': { getDeviceState: getDeviceStateMock },
+  '../utils/generateDeviceState': { generateDeviceState: generateDeviceStateMock },
 });
 
 const SmartthingsHandler = proxyquire('../../../../services/smartthings/lib', {
