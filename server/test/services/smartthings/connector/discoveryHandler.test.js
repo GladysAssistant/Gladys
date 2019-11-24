@@ -3,8 +3,8 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
-const getDeviceHandlerTypeMock = (features) => {
-  if (!features) {
+const getDeviceHandlerTypeMock = (device) => {
+  if (!device.features) {
     throw new Error();
   } else {
     return { value: 'deviceHandlerType', categories: { light: {} } };
@@ -25,6 +25,12 @@ const gladys = {
     state: {
       device: {
         device_1: {
+          get: fake.returns({
+            name: 'device_1',
+            external_id: 'external_id_1',
+          }),
+        },
+        device_2: {
           get: fake.returns({
             name: 'device_2',
             external_id: 'external_id_2',
@@ -63,7 +69,7 @@ describe('SmartThings service - discoveryHandler', () => {
   it('should fill response with valid devices', async () => {
     smartthingsHandler.discoveryHandler(response);
 
-    assert.callCount(gladys.stateManager.state.device.device_1.get, 1);
+    assert.callCount(gladys.stateManager.state.device.device_2.get, 1);
     assert.callCount(response.addDevice, 1);
     assert.calledWith(response.addDevice, 'external_id_2', 'device_2', 'deviceHandlerType');
     assert.called(requestDevice.addCategory);
