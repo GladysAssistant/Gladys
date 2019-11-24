@@ -32,6 +32,10 @@ describe('GET /oauth/authorize', () => {
         `/api/v1/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}`,
       )
       .expect('Content-Type', /json/)
-      .expect(400);
+      .expect(400)
+      .then((res) => {
+        expect(res.body).to.have.property('error');
+        expect(res.body).to.have.property('error_description');
+      });
   });
 });

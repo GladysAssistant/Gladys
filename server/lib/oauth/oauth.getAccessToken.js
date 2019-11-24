@@ -1,3 +1,4 @@
+const { UnauthorizedRequestError } = require('oauth2-server');
 const db = require('../../models');
 
 /**
@@ -9,33 +10,37 @@ const db = require('../../models');
  * oauth.getAccessToken('1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM');
  */
 async function getAccessToken(accessToken) {
-  const payload = this.session.validateAccessToken(accessToken);
-  const token = await db.Session.findOne({
-    where: {
-      id: payload.session_id,
-    },
-  });
+  try {
+    const payload = this.session.validateAccessToken(accessToken);
+    const token = await db.Session.findOne({
+      where: {
+        id: payload.session_id,
+      },
+    });
 
-  if (token) {
-    const user = await this.user.getById(payload.user_id);
+    if (token) {
+      const user = await this.user.getById(payload.user_id);
 
-    let client;
-    if (token.client_id) {
-      client = await db.OAuthClient.findOne({
-        where: {
-          id: token.client_id,
-        },
-      });
-      client = client.get({ plain: true });
+      let client;
+      if (token.client_id) {
+        client = await db.OAuthClient.findOne({
+          where: {
+            id: token.client_id,
+          },
+        });
+        client = client.get({ plain: true });
+      }
+
+      return {
+        accessToken,
+        accessTokenExpiresAt: new Date(token.valid_until),
+        scope: token.scope,
+        client,
+        user,
+      };
     }
-
-    return {
-      accessToken,
-      accessTokenExpiresAt: new Date(token.valid_until),
-      scope: token.scope,
-      client,
-      user,
-    };
+  } catch (e) {
+    throw new UnauthorizedRequestError(e);
   }
   return null;
 }
