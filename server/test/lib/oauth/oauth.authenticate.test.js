@@ -1,5 +1,5 @@
-const { expect } = require('chai');
 const sinon = require('sinon');
+
 const { fake, assert } = sinon;
 const { Cache } = require('../../../utils/cache');
 const OauthManager = require('../../../lib/oauth');
