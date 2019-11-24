@@ -291,7 +291,7 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
-  PRESSURE_KPA: 'kPa',
+  PRESSURE_HPA: 'hPa',
 };
 
 const ACTIONS_STATUS = {

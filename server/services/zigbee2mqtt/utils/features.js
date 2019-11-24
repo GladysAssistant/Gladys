@@ -83,7 +83,7 @@ const features = {
   pressure: {
     category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-    unit: DEVICE_FEATURE_UNITS.PRESSURE_KPA,
+    unit: DEVICE_FEATURE_UNITS.PRESSURE_HPA,
     read_only: true,
     has_feedback: false,
     min: 0,
