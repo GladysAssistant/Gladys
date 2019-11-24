@@ -309,7 +309,7 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
-  PRESSURE_KPA: 'kPa',
+  PRESSURE_HPA: 'hPa',
 };
 
 const ACTIONS_STATUS = {
