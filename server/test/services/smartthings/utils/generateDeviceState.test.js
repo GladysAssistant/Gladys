@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { generateDeviceState } = require('../../../../services/smartthings/lib/utils/generateDeviceState');
 
 describe('SmartThings service - generateDeviceState', () => {
