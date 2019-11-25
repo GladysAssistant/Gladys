@@ -45,11 +45,15 @@ const colorControlCapability = {
   commands: {
     setHue: {
       readValue: (args) => args.hue,
-      featureType: DEVICE_FEATURE_TYPES.LIGHT.HUE,
+      categories: {
+        [DEVICE_FEATURE_CATEGORIES.LIGHT]: [DEVICE_FEATURE_TYPES.LIGHT.HUE],
+      },
     },
     setSaturation: {
       readValue: (args) => args.saturation,
-      featureType: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
+      categories: {
+        [DEVICE_FEATURE_CATEGORIES.LIGHT]: [DEVICE_FEATURE_TYPES.LIGHT.SATURATION],
+      },
     },
   },
   features: [

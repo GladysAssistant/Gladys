@@ -24,11 +24,17 @@ const switchCapability = {
   commands: {
     on: {
       readValue: () => 1,
-      featureType: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      categories: {
+        [DEVICE_FEATURE_CATEGORIES.SWITCH]: [DEVICE_FEATURE_TYPES.SWITCH.BINARY],
+        [DEVICE_FEATURE_CATEGORIES.LIGHT]: [DEVICE_FEATURE_TYPES.LIGHT.BINARY],
+      },
     },
     off: {
       readValue: () => 0,
-      featureType: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      categories: {
+        [DEVICE_FEATURE_CATEGORIES.SWITCH]: [DEVICE_FEATURE_TYPES.SWITCH.BINARY],
+        [DEVICE_FEATURE_CATEGORIES.LIGHT]: [DEVICE_FEATURE_TYPES.LIGHT.BINARY],
+      },
     },
   },
   features: [

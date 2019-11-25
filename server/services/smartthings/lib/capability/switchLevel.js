@@ -24,10 +24,17 @@ const switchLevelCapability = {
   commands: {
     setLevel: {
       readValue: (args, feature) => Math.round((args.level * (feature.max - feature.min)) / 100 + feature.min),
-      featureType: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      categories: {
+        [DEVICE_FEATURE_CATEGORIES.SWITCH]: [DEVICE_FEATURE_TYPES.SWITCH.DIMMER],
+        [DEVICE_FEATURE_CATEGORIES.LIGHT]: [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS],
+      },
     },
   },
   features: [
+    {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
+    },
     {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
