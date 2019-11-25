@@ -2,6 +2,7 @@ const { connect } = require('./connect');
 const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { discoverDevices } = require('./discoverDevices');
+const { setValue } = require('./setValue');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -21,5 +22,6 @@ Zigbee2mqttHandler.prototype.connect = connect;
 Zigbee2mqttHandler.prototype.disconnect = disconnect;
 Zigbee2mqttHandler.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttHandler.prototype.discoverDevices = discoverDevices;
+Zigbee2mqttHandler.prototype.setValue = setValue;
 
 module.exports = Zigbee2mqttHandler;
