@@ -449,7 +449,9 @@
       "configurationSuccess": "Configuration saved.",
       "configurationError": "An error occured while saving configuration.",
       "synchronizationSuccess": "Synchronization completed.",
-      "synchronizationError": "An error occured while trying synchronization."
+      "synchronizationError": "An error occured while trying synchronization.",
+      "buttonSave": "Save",
+      "buttonSync": "Sync now"
     }
   },
   "editScene": {

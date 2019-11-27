@@ -104,10 +104,10 @@ const CaldavPage = ({ children, ...props }) => (
                             onClick={props.saveCaldavSettings}
                             style={{ marginRight: '10px' }}
                           >
-                            Save
+                            <Text id={`integration.caldav.buttonSave`} />
                           </button>
                           <button class="btn btn-success" onClick={props.startSync}>
-                            Sync now
+                            <Text id={`integration.caldav.buttonSync`} />
                           </button>
                         </span>
                       </div>

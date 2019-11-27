@@ -37,7 +37,9 @@
       "configurationSuccess": "Configuration sauvegardée avec succès.",
       "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration.",
       "synchronizationSuccess": "Synchronisation terminée avec succès.",
-      "synchronizationError": "Une erreur est survenue lors de la synchronisation."
+      "synchronizationError": "Une erreur est survenue lors de la synchronisation.",
+      "buttonSave": "Save",
+      "buttonSync": "Sync now"
     }
   },
   "calendar": {
