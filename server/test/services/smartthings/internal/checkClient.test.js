@@ -17,17 +17,17 @@ describe('SmartThings service - checkClient', () => {
     sinon.reset();
   });
 
-  it('checkClient with success', () => {
+  it('checkClient with success', async () => {
     gladys.oauth.getClient = fake.resolves({});
-    smartthingsHandler.checkClient();
+    await smartthingsHandler.checkClient();
 
     assert.calledWith(gladys.oauth.getClient, 'smartthings');
     assert.notCalled(gladys.oauth.createClient);
   });
 
-  it('checkClient with error', () => {
+  it('checkClient with error', async () => {
     gladys.oauth.getClient = fake.resolves(null);
-    smartthingsHandler.checkClient();
+    await smartthingsHandler.checkClient();
 
     assert.calledWith(gladys.oauth.getClient, 'smartthings');
     assert.calledWith(gladys.oauth.createClient, {

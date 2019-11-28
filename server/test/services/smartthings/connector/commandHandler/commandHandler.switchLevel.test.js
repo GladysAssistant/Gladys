@@ -1,7 +1,13 @@
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
+const {
+  EVENTS,
+  ACTIONS,
+  ACTIONS_STATUS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} = require('../../../../../utils/constants');
 const SmartthingsHandler = require('../../../../../services/smartthings/lib');
 
 const gladys = {
@@ -29,7 +35,7 @@ describe('SmartThings service - commandHandler - switchLevel', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
           min: 0,
           max: 200,
         },
@@ -46,9 +52,11 @@ describe('SmartThings service - commandHandler - switchLevel', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 50,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 50,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 
@@ -58,7 +66,7 @@ describe('SmartThings service - commandHandler - switchLevel', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
           min: 0,
           max: 100,
         },
@@ -75,9 +83,11 @@ describe('SmartThings service - commandHandler - switchLevel', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 25,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 25,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 });

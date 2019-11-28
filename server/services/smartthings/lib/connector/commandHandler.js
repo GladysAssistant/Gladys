@@ -1,5 +1,5 @@
 const { DeviceErrorTypes } = require('st-schema');
-const { EVENTS } = require('../../../../utils/constants');
+const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../../utils/constants');
 const { CAPABILITY_BY_ID } = require('../utils/capabilities');
 
 /**
@@ -51,11 +51,13 @@ function commandHandler(response, requestedDevices) {
           );
           const value = commandCapability.readValue(item.arguments, feature);
 
-          const event = {
-            device_feature_external_id: feature.external_id,
-            state: value,
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: feature.selector,
+            value,
+            status: ACTIONS_STATUS.PENDING,
           };
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
         } catch (e) {
           const deviceResponse = response.addDevice(device.externalDeviceId);
           deviceResponse.setError('Impossible to handle command', DeviceErrorTypes.CAPABILITY_NOT_SUPPORTED);

@@ -1,7 +1,13 @@
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
+const {
+  EVENTS,
+  ACTIONS,
+  ACTIONS_STATUS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} = require('../../../../../utils/constants');
 const SmartthingsHandler = require('../../../../../services/smartthings/lib');
 
 const gladys = {
@@ -29,7 +35,7 @@ describe('SmartThings service - commandHandler - switch', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
         },
       ],
     });
@@ -39,9 +45,11 @@ describe('SmartThings service - commandHandler - switch', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 1,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 1,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 
@@ -51,7 +59,7 @@ describe('SmartThings service - commandHandler - switch', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
         },
       ],
     });
@@ -63,9 +71,11 @@ describe('SmartThings service - commandHandler - switch', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 0,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 0,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 
@@ -75,7 +85,7 @@ describe('SmartThings service - commandHandler - switch', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
         },
       ],
     });
@@ -85,9 +95,11 @@ describe('SmartThings service - commandHandler - switch', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 1,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 1,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 
@@ -97,7 +109,7 @@ describe('SmartThings service - commandHandler - switch', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-          external_id: 'feature_id',
+          selector: 'feature_selector',
         },
       ],
     });
@@ -109,9 +121,11 @@ describe('SmartThings service - commandHandler - switch', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'device_1');
     assert.notCalled(response.addDevice);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'feature_id',
-      state: 0,
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device_feature: 'feature_selector',
+      value: 0,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
     });
   });
 });
