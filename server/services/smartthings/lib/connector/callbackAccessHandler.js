@@ -1,5 +1,3 @@
-const { VARIABLES } = require('../../utils/constants');
-
 /**
  * @description Create access and refresh tokens to allow SmartThings to be informed of device state
  * changes as they happen.
@@ -36,19 +34,7 @@ async function callbackAccessHandler(accessToken, callbackAuthentication, callba
   const userId = payload.user_id;
 
   // Stores callback information for current user
-  const callBackInfo = {
-    callbackAuthentication,
-    callbackUrls,
-  };
-
-  await this.gladys.variable.setValue(
-    VARIABLES.SMT_CALLBACK_OAUTH,
-    JSON.stringify(callBackInfo),
-    this.serviceId,
-    userId,
-  );
-
-  this.callbackUsers[userId] = callBackInfo;
+  this.storeCallbackInformation(callbackAuthentication, callbackUrls, userId);
 }
 
 module.exports = {

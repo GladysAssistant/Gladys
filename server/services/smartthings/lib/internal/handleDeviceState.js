@@ -1,6 +1,5 @@
 const { generateDeviceState } = require('../utils/generateDeviceState');
 const logger = require('../../../../utils/logger');
-const { VARIABLES } = require('../../utils/constants');
 
 /**
  * @description Handle new device state and send it to SmartThings.
@@ -22,23 +21,18 @@ async function handleDeviceState(event) {
     Object.keys(this.callbackUsers).forEach(async (userId) => {
       const { callbackAuthentication, callbackUrls } = this.callbackUsers[userId];
       try {
-        await this.callbackState.updateState(callbackUrls, callbackAuthentication, [deviceState], (item) => {
-          const callBackInfo = {
-            callbackUrls,
-            callbackAuthentication: item,
-          };
-          this.gladys.variable.setValue(
-            VARIABLES.SMT_CALLBACK_OAUTH,
-            JSON.stringify(callBackInfo),
-            this.serviceId,
-            userId,
-          );
-          this.callbackUsers[userId] = callBackInfo;
-        });
+        await this.callbackState.updateState(
+          callbackUrls,
+          callbackAuthentication,
+          [deviceState],
+          (newCallbackAuthentication) => {
+            this.storeCallbackInformation(newCallbackAuthentication, callbackUrls, userId);
+          },
+        );
       } catch (e) {
         logger.warn(`SmartThings failed to send callback device ${device.external_id} for user ${userId} : ${e}`);
       }
-    });
+    }, this);
   }
 }
 

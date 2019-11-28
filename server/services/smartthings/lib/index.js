@@ -2,6 +2,7 @@ const { init } = require('./internal/init');
 const { loadCallbackInformation } = require('./internal/loadCallbackInformation');
 const { handleDeviceState } = require('./internal/handleDeviceState');
 const { createConnector } = require('./internal/createConnector');
+const { storeCallbackInformation } = require('./internal/storeCallbackInformation');
 const { checkClient } = require('./internal/checkClient');
 const { discoveryHandler } = require('./connector/discoveryHandler');
 const { stateRefreshHandler } = require('./connector/stateRefreshHandler');
@@ -32,6 +33,7 @@ SmartThingsHandler.prototype.loadCallbackInformation = loadCallbackInformation;
 SmartThingsHandler.prototype.handleDeviceState = handleDeviceState;
 SmartThingsHandler.prototype.createConnector = createConnector;
 SmartThingsHandler.prototype.checkClient = checkClient;
+SmartThingsHandler.prototype.storeCallbackInformation = storeCallbackInformation;
 // SmartThings connector
 SmartThingsHandler.prototype.discoveryHandler = discoveryHandler;
 SmartThingsHandler.prototype.stateRefreshHandler = stateRefreshHandler;

@@ -31,6 +31,7 @@ async function init() {
     this.gladys.event.on(EVENTS.WEBSOCKET.SEND_ALL, handleEvent.bind(this));
   } catch (e) {
     this.connector = null;
+    this.callbackState = null;
     logger.warn('SmartThings failed to configure due to missing credentials.');
     return false;
   }
