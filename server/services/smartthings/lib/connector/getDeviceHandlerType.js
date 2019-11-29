@@ -13,6 +13,7 @@ const deviceHandler = require('../handler_types');
 function getDeviceHandlerType(device) {
   const featureCategoryTypes = {};
 
+  let nbDeviceFeatures = 0;
   device.features.forEach((feature) => {
     const { category, type } = feature;
 
@@ -21,11 +22,19 @@ function getDeviceHandlerType(device) {
     }
 
     featureCategoryTypes[category].push(type);
+    nbDeviceFeatures += 1;
   });
 
   let nbFeaturesMatches = 0;
+  let nbFeatureSelectedHandler = 0;
   let selectedHandler;
-  Object.values(deviceHandler).forEach((handler) => {
+  let exactMatch = false;
+  let i = 0;
+
+  const deviceHandlers = Object.values(deviceHandler);
+
+  while (deviceHandlers[i] && !exactMatch) {
+    const handler = deviceHandlers[i];
     let nbMatches = 0;
     let nbFeatures = 0;
 
@@ -39,11 +48,16 @@ function getDeviceHandlerType(device) {
       }
     });
 
-    if (nbMatches > 0 && nbMatches === nbFeatures && nbMatches > nbFeaturesMatches) {
+    if (nbMatches > 0 && (!selectedHandler || nbMatches > nbFeaturesMatches || nbFeatureSelectedHandler > nbFeatures)) {
+      nbFeatureSelectedHandler = nbFeatures;
       selectedHandler = handler;
       nbFeaturesMatches = nbMatches;
+
+      exactMatch = nbFeatures === nbDeviceFeatures && nbFeaturesMatches === nbDeviceFeatures;
     }
-  });
+
+    i += 1;
+  }
 
   if (!selectedHandler) {
     throw new Error(`SmartThings don't manage this kind of device yet : "${device.name}" ("${device.external_id}").`);

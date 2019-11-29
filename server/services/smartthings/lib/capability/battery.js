@@ -27,10 +27,6 @@ const batteryCapability = {
       category: DEVICE_FEATURE_CATEGORIES.BATTERY,
       type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
     },
-    {
-      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-    },
   ],
 };
 
