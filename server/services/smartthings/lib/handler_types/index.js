@@ -10,6 +10,7 @@ const { c2cDimmerEnergy } = require('./c2c-dimmer-energy');
 const { c2cDimmerPower } = require('./c2c-dimmer-power');
 const { c2cSwitch } = require('./c2c-switch');
 const { c2cSwitchPower } = require('./c2c-switch-power');
+const { c2cSwitchPowerEnergy } = require('./c2c-switch-power-energy');
 
 module.exports = {
   c2cButton,
@@ -24,4 +25,5 @@ module.exports = {
   c2cDimmerPower,
   c2cSwitch,
   c2cSwitchPower,
+  c2cSwitchPowerEnergy,
 };
