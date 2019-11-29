@@ -109,7 +109,7 @@ const features = {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     read_only: true,
-    has_feedback: true,
+    has_feedback: false,
     min: 0,
     max: 1,
   },
