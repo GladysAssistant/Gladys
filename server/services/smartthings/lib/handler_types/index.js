@@ -15,6 +15,7 @@ const { c2cSwitchPowerEnergy } = require('./c2c-switch-power-energy');
 const { c2cSwitchEnergy } = require('./c2c-switch-energy');
 const { c2cSmoke } = require('./c2c-smoke');
 const { c2cSmoke2 } = require('./c2c-smoke-2');
+const { c2cDoorbell } = require('./c2c-doorbell');
 
 module.exports = {
   c2cButton,
@@ -34,4 +35,5 @@ module.exports = {
   c2cSwitchEnergy,
   c2cSmoke,
   c2cSmoke2,
+  c2cDoorbell,
 };
