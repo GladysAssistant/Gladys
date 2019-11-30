@@ -18,6 +18,7 @@ const { c2cSmoke2 } = require('./c2c-smoke-2');
 const { c2cDoorbell } = require('./c2c-doorbell');
 const { c2cDoorbell3 } = require('./c2c-doorbell-3');
 const { c2cHumidity } = require('./c2c-humidity');
+const { c2cHumidity2 } = require('./c2c-humidity-2');
 const { c2cSiren } = require('./c2c-siren');
 const { c2cSiren2 } = require('./c2c-siren-2');
 const { c2cSiren3 } = require('./c2c-siren-3');
@@ -47,6 +48,7 @@ module.exports = {
   c2cDoorbell,
   c2cDoorbell3,
   c2cHumidity,
+  c2cHumidity2,
   c2cSiren,
   c2cSiren2,
   c2cSiren3,
