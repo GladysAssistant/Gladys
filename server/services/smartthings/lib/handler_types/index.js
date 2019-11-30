@@ -24,6 +24,7 @@ const { c2cSiren3 } = require('./c2c-siren-3');
 const { c2cMotion } = require('./c2c-motion');
 const { c2cMotion2 } = require('./c2c-motion-2');
 const { c2cLeak } = require('./c2c-leak');
+const { c2cLeak2 } = require('./c2c-leak-2');
 
 module.exports = {
   c2cButton,
@@ -52,4 +53,5 @@ module.exports = {
   c2cMotion,
   c2cMotion2,
   c2cLeak,
+  c2cLeak2,
 };
