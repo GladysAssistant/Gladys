@@ -5,7 +5,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 const { getDeviceHandlerType } = require('../../../../services/smartthings/lib/connector/getDeviceHandlerType');
 
 describe('SmartThings service - getDeviceHandlerType', () => {
-  it('get corresponding device handler type', async () => {
+  it('get corresponding device handler type', () => {
     const features = [
       {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -17,7 +17,7 @@ describe('SmartThings service - getDeviceHandlerType', () => {
     expect(deviceHandlerType).to.have.property('value', 'c2c-switch');
   });
 
-  it('get error on empty features', async () => {
+  it('get error on empty features', () => {
     const features = [];
 
     try {
@@ -28,7 +28,7 @@ describe('SmartThings service - getDeviceHandlerType', () => {
     }
   });
 
-  it('get error on multiple feature categories', async () => {
+  it('get error on multiple feature categories', () => {
     const features = [
       {
         category: 'any',

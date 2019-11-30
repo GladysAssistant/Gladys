@@ -4,7 +4,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 const { getDeviceHandlerType } = require('../../../../../services/smartthings/lib/connector/getDeviceHandlerType');
 
 describe('SmartThings service - getDeviceHandlerType', () => {
-  it('c2c-contact-3 (integer)', async () => {
+  it('c2c-contact-3 (integer)', () => {
     const features = [
       {
         category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,

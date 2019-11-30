@@ -4,7 +4,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 const { getDeviceHandlerType } = require('../../../../../services/smartthings/lib/connector/getDeviceHandlerType');
 
 describe('SmartThings service - getDeviceHandlerType', () => {
-  it('c2c-humidity-2 (integer)', async () => {
+  it('c2c-humidity-2 (integer)', () => {
     const features = [
       {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -20,7 +20,7 @@ describe('SmartThings service - getDeviceHandlerType', () => {
     expect(deviceHandlerType).to.have.property('value', 'c2c-humidity-2');
   });
 
-  it('c2c-humidity-2 (decimal)', async () => {
+  it('c2c-humidity-2 (decimal)', () => {
     const features = [
       {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
