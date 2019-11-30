@@ -42,12 +42,12 @@ async function getLights() {
           lightsToReturn.push(getPhilipsHueColorLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LWB010': // hue white bulb with fixed warming light (2700K)
+        case 'LWB006': // Hue white lamp
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LTW012': // hue White Ambiance E12
         case 'LTW010': // hue White & Ambiance Bulb
         case 'LTW001': // Hue A19 White & Ambiance Bulb
-        case 'LWB006': // Hue white lamp
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'SP 120': // Innr Smart Plug On/Off
