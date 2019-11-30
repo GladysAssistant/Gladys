@@ -1,3 +1,4 @@
+const { alarmCapability } = require('./alarm');
 const { batteryCapability } = require('./battery');
 const { colorControlCapability } = require('./colorControl');
 const { illuminanceMeasurementCapability } = require('./illuminanceMeasurement');
@@ -10,6 +11,7 @@ const { temperatureMeasurementCapability } = require('./temperatureMeasurement')
 const { waterSensorCapability } = require('./waterSensor');
 
 module.exports = {
+  alarmCapability,
   batteryCapability,
   colorControlCapability,
   illuminanceMeasurementCapability,
