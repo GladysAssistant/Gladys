@@ -19,6 +19,7 @@ const { c2cMotion6 } = require('./c2c-motion-6');
 const { c2cLeak } = require('./c2c-leak');
 const { c2cLeak2 } = require('./c2c-leak-2');
 const { c2cRgbColorBulb } = require('./c2c-rgb-color-bulb');
+const { c2cRgbwColorBulb } = require('./c2c-rgbw-color-bulb');
 const { c2cSiren } = require('./c2c-siren');
 const { c2cSiren2 } = require('./c2c-siren-2');
 const { c2cSiren3 } = require('./c2c-siren-3');
@@ -51,6 +52,7 @@ module.exports = {
   c2cLeak,
   c2cLeak2,
   c2cRgbColorBulb,
+  c2cRgbwColorBulb,
   c2cSiren,
   c2cSiren2,
   c2cSiren3,
