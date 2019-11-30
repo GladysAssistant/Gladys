@@ -16,7 +16,7 @@ describe('SmartThings service - getDeviceHandlerType', () => {
       },
       {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+        type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       },
     ];
 
