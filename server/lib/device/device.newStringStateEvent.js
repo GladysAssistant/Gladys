@@ -6,7 +6,7 @@ const logger = require('../../utils/logger');
  * @param {Object} event - The event object.
  * @param {Object} event.device - The device concerned.
  * @param {Object} event.device_feature_external_id - The deviceFeature concerned.
- * @param {number} event.state - The new state to save.
+ * @param {string} event.state - The new state to save.
  * @example
  * newStateEvent({ device_feature_external_id: 'xx', state: 'base64/image' });
  */
