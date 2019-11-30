@@ -8,6 +8,10 @@ describe('SmartThings service - getDeviceHandlerType', () => {
     const features = [
       {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      },
+      {
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       },
       {

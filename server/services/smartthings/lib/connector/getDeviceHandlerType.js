@@ -48,7 +48,12 @@ function getDeviceHandlerType(device) {
       }
     });
 
-    if (nbMatches > 0 && (!selectedHandler || nbMatches > nbFeaturesMatches || nbFeatureSelectedHandler > nbFeatures)) {
+    if (
+      nbMatches > 0 &&
+      (!selectedHandler ||
+        nbMatches > nbFeaturesMatches ||
+        (nbMatches === nbFeaturesMatches && nbFeatureSelectedHandler > nbFeatures))
+    ) {
       nbFeatureSelectedHandler = nbFeatures;
       selectedHandler = handler;
       nbFeaturesMatches = nbMatches;
