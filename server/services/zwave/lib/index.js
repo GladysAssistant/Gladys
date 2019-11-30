@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 // EVENTS
 const { driverReady } = require('./events/zwave.driverReady');
 const { driverFailed } = require('./events/zwave.driverFailed');
@@ -22,6 +24,7 @@ const { getInfos } = require('./commands/zwave.getInfos');
 const { getNodes } = require('./commands/zwave.getNodes');
 const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
 const { removeNode } = require('./commands/zwave.removeNode');
+const { setValue } = require('./commands/zwave.setValue');
 
 const DEFAULT_ZWAVE_OPTIONS = {
   Logging: false,
@@ -29,6 +32,11 @@ const DEFAULT_ZWAVE_OPTIONS = {
   SaveConfiguration: true,
   // NetworkKey: '0x49,0x43,0x1D,0xBD,0x03,0x6D,0x9D,0x8C,0x39,0x67,0x16,0x82,0xA8,0x67,0xEE,0x91',
 };
+
+// if openzwave config is installed in the etc folder
+if (fs.existsSync('/etc/openzwave')) {
+  DEFAULT_ZWAVE_OPTIONS.ConfigPath = '/etc/openzwave';
+}
 
 const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
   this.zwave = new Zwave(DEFAULT_ZWAVE_OPTIONS);
@@ -74,5 +82,6 @@ ZwaveManager.prototype.getInfos = getInfos;
 ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
+ZwaveManager.prototype.setValue = setValue;
 
 module.exports = ZwaveManager;

@@ -10,16 +10,20 @@ const logger = require('../../utils/logger');
  * });
  */
 async function forwardWebsockets(event) {
-  //logger.debug(`Gateway : Forward websocket message : ${event.type}`);
-  try {
+  if (!this.connected) {
+    logger.debug('Gateway: not connected. Prevent forwarding event.');
+
+    return;
+  }
+
+  logger.debug(`Gateway : Forward websocket message : ${event.type}`);  try {
     if (event.userId) {
       await this.gladysGatewayClient.newEventInstanceUser(event.type, event.userId, event.payload);
     } else {
       await this.gladysGatewayClient.newEventInstance(event.type, event.payload);
     }
   } catch (e) {
-    //logger.debug('Unable to forward websocket to Gladys Gateway');
-    //logger.debug(e);
+    logger.debug(e);
   }
 }
 
