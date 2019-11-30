@@ -47,6 +47,7 @@ async function getLights() {
         case 'LTW012': // hue White Ambiance E12
         case 'LTW010': // hue White & Ambiance Bulb
         case 'LTW001': // Hue A19 White & Ambiance Bulb
+        case 'LWB006': // Hue white lamp
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'SP 120': // Innr Smart Plug On/Off
