@@ -1,6 +1,7 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
+import DeviceConfigurationLink from '../../../../../components/documentation/DeviceConfigurationLink';
 
 const CloudSetupTab = ({ children, ...props }) => {
   return (
@@ -12,7 +13,9 @@ const CloudSetupTab = ({ children, ...props }) => {
       </div>
       <div class="card-body">
         <div class="alert alert-info">
-          <MarkupText id="integration.smartthings.setup.cloud.description" />
+          <DeviceConfigurationLink {...props} documentKey="samsung-smartthings-configuration">
+            <Text id="integration.smartthings.setup.cloud.documentationLink" />
+          </DeviceConfigurationLink>
         </div>
 
         <div

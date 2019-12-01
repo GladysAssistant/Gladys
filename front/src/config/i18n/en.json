@@ -410,7 +410,7 @@
       "setup": {
         "cloud": {
           "title": "SmartThings Schema Connector Credentials",
-          "description": "See user documentation",
+          "documentationLink": "See SmartThings documentation",
           "error": "An error occured while saving configuration.",
           "saved": "Configuration successfully saved.",
           "clientId": "Client ID",
