@@ -1,5 +1,6 @@
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
+import SimpleColorDeviceFeature from './device-features/SimpleColorDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 
 // import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
@@ -13,6 +14,22 @@ const DeviceRow = ({ children, ...props }) => {
   if (props.deviceFeature.read_only) {
     return <SensorDeviceFeature deviceFeature={props.deviceFeature} />;
   }
+
+  // if it's a simple color
+  // if (props.deviceFeature.type === 'color') {
+  //   return (
+  //     <SimpleColorDeviceFeature
+  //       x={props.x}
+  //       y={props.y}
+  //       device={props.device}
+  //       deviceFeature={props.deviceFeature}
+  //       roomIndex={props.roomIndex}
+  //       deviceIndex={props.deviceIndex}
+  //       deviceFeatureIndex={props.deviceFeatureIndex}
+  //       updateValue={props.updateValue}
+  //     />
+  //   );
+  // }
 
   // if it's a color
   if (props.deviceFeature.type === 'color') {

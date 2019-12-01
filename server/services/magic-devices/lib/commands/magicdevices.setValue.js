@@ -71,10 +71,19 @@ function setValue(device, deviceFeature, state) {
       // previously seen color values will be sent together with the warm white value.
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
-      // setColorWithBrightness(red, green, blue, brightness, callback)
-
-      // Convenience method to automatically scale down the rgb values to match the brightness parameter (0 - 100).
-      // This method uses setColor() internally, so it could set the warm white value to something unexpected.
+      const warmWhiteFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`);
+      if (warmWhiteFeature.last_value > 0) {
+        control.setWarmWhite(state, () => {
+          console.log("warm white brightness setted");
+        });
+      } else {
+        const colorFeature = this.gladys.stateManager.get('deviceFeature', `${device.selector}-${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`);
+        const color = JSON.parse(colorFeature.last_value_string);
+        const convertedColor = convert.hsl.rgb([color.h, color.s, color.l]);
+        control.setColorWithBrightness(convertedColor[0], convertedColor[1], convertedColor[2], state,  () => {
+          console.log("color brightness setted");
+        });
+      }
       break;
     default:
       logger.error('Tried to setValue of an unknown feature type');

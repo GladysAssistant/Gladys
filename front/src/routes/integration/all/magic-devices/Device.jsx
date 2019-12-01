@@ -23,13 +23,21 @@ class Device extends Component {
     const colorDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
     );
+    const brightnessDeviceFeature = this.props.device.features.find(
+      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+    );
 
     const color = JSON.parse(get(colorDeviceFeature, 'last_value_string'));
+    const brightness = JSON.parse(get(brightnessDeviceFeature, 'last_value'));
 
     
     console.log("setting color to " + JSON.stringify(color));
+    console.log("setting brightness to " + JSON.stringify(brightness));
+
+
     this.setState({
-      color
+      color,
+      brightness
     });
   };
 
@@ -176,6 +184,13 @@ class Device extends Component {
                       {/* GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker */}
                     </div> : null }
                   </div>
+                </div>
+
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.common.labels.brightness" /> - {this.state.brightness}
+                  </label>
+                  <input type="range" min="0" max="255" value={this.state.brightness} class="form-control slider" />
                 </div>
 
                 <div class="form-group">

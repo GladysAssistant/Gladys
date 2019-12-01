@@ -11,9 +11,6 @@ class ColorDeviceType extends Component {
 
   updateValue = () => {
 
-
-
-
     props.updateValue(
       props.x,
       props.y,
@@ -110,7 +107,7 @@ class ColorDeviceType extends Component {
               </div>
               { this.state.displayColorPicker ? <div style={ styles.popover }>
                 <div style={ styles.cover } onClick={ this.handleCloseColor }/>
-                <GithubPicker color={ this.state.color } onChange={ this.handleChangeColor } />
+                <GithubPicker color={ this.state.color } onChangeComplete={ this.handleChangeColor } />
                 {/* GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker */}
               </div> : null }
             </div>

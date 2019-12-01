@@ -183,6 +183,9 @@
       },
       "labels": {
         "color": "Color",
+        "brightness": "Brightness",
+        "warmWhite": "Warm white",
+        "coldWhite": "Cold white",
         "features": "Features",
         "model": "Model",
         "name": "Device Name",
