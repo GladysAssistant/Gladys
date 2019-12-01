@@ -1,4 +1,4 @@
-const { UnauthorizedRequestError } = require('oauth2-server');
+const { InvalidTokenError } = require('oauth2-server');
 const db = require('../../models');
 
 /**
@@ -40,7 +40,7 @@ async function getAccessToken(accessToken) {
       };
     }
   } catch (e) {
-    throw new UnauthorizedRequestError(e);
+    throw new InvalidTokenError(e);
   }
   return null;
 }
