@@ -6,11 +6,26 @@ module.exports = function SmartThingsController(smartThingsHandler, gladys) {
    * @see https://smartthings.developer.samsung.com/docs/devices/smartthings-schema/schema-basics.html
    */
   async function schema(req, res) {
-    const { authentication } = req.body;
+    const { authentication, headers } = req.body;
     if (authentication) {
       req.headers.authorization = `${authentication.tokenType} ${authentication.token}`;
     }
-    return gladys.oauth.authenticate(req, res, smartThingsHandler.handleHttpCallback.bind(smartThingsHandler));
+    return gladys.oauth.authenticate(req, res, smartThingsHandler.handleHttpCallback.bind(smartThingsHandler), (e) => {
+      const response = {
+        headers: {
+          schema: 'st-schema',
+          version: '1.0',
+          interactionType: headers.interactionType,
+          requestId: headers.requestId,
+        },
+        authentication,
+        globalError: {
+          errorEnum: 'TOKEN-EXPIRED',
+          detail: e.message,
+        },
+      };
+      return res.status(500).send(response);
+    });
   }
 
   /**
