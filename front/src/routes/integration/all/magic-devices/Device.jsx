@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
-import reactCSS from 'reactcss'
+import reactCSS from 'reactcss';
+import style from './style.css';
 import { GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker } from 'react-color';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
@@ -13,6 +14,18 @@ class Device extends Component {
   state = {
     displayColorPicker: false,
   };
+
+  // TODO - make this a constant for the whole app
+  colors = [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "lightblue",
+    "blue",
+    "deepblue",
+    "purple"
+  ];
 
   refreshDeviceProperty = () => {
     console.log("refreshDeviceProperty")
@@ -69,10 +82,7 @@ class Device extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  handleButtonColorClick = () => {
-    console.log("clicked color button")
-    this.setState({ displayColorPicker: !this.state.displayColorPicker })
-  };
+  
 
   handleCloseColor = () => {
     console.log("closed color")
@@ -110,37 +120,35 @@ class Device extends Component {
     //this.refreshDeviceProperty();
   }
 
+  handleButtonColorClick = (color) => {
+    console.log("clicked color button", color);
+  };
+
   render(props, { loading }) {
 
-    const styles = reactCSS({
-      'default': {
-        color: {
-          width: '36px',
-          height: '14px',
-          borderRadius: '2px',
-          background: `hsl(${ this.state.color.h }, ${ this.state.color.s * 100 }%, ${ this.state.color.l * 100 }%)`,
-        },
-        swatch: {
-          padding: '5px',
-          background: '#fff',
-          borderRadius: '1px',
-          boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-          display: 'inline-block',
-          cursor: 'pointer',
-        },
-        popover: {
-          position: 'absolute',
-          zIndex: '2',
-        },
-        cover: {
-          position: 'fixed',
-          top: '0px',
-          right: '0px',
-          bottom: '0px',
-          left: '0px',
-        },
-      },
-    });
+    const colorButtons = [];
+
+    // warm white
+    colorButtons.push(
+      <div className={style.colorButton + ' ' + style["warm"]} onClick={() => this.handleButtonColorClick("warm")} >
+        <i class="fe fe-loader" />
+      </div>
+    );
+
+    // cold white
+    colorButtons.push(
+      <div className={style.colorButton + ' ' + style["cold"]} onClick={() => this.handleButtonColorClick("cold")} >
+        <i class="fe fe-loader" />
+      </div>
+    );
+
+    // the defaults colors
+    for (const color of this.colors) {
+      const styles = `${style.colorButton} ${style[color]}`;
+      colorButtons.push(
+        <div className={styles} onClick={() => this.handleButtonColorClick(color)} />
+      );
+    }
 
     return (
       <div class="col-md-4">
@@ -174,15 +182,8 @@ class Device extends Component {
                   <label>
                     <Text id="integration.common.labels.color" />
                   </label>
-                  <div>
-                    <div style={ styles.swatch } onClick={ this.handleButtonColorClick }>
-                      <div style={ styles.color } />
-                    </div>
-                    { this.state.displayColorPicker ? <div style={ styles.popover }>
-                      <div style={ styles.cover } onClick={ this.handleCloseColor }/>
-                      <GithubPicker color={ this.state.color } onChange={ this.handleChangeColor } />
-                      {/* GithubPicker, SketchPicker, BlockPicker, TwitterPicker, CirclePicker */}
-                    </div> : null }
+                  <div className={style.colorContainer}>
+                    {colorButtons}
                   </div>
                 </div>
 

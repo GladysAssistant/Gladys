@@ -16,20 +16,20 @@ const DeviceRow = ({ children, ...props }) => {
   }
 
   // if it's a simple color
-  // if (props.deviceFeature.type === 'color') {
-  //   return (
-  //     <SimpleColorDeviceFeature
-  //       x={props.x}
-  //       y={props.y}
-  //       device={props.device}
-  //       deviceFeature={props.deviceFeature}
-  //       roomIndex={props.roomIndex}
-  //       deviceIndex={props.deviceIndex}
-  //       deviceFeatureIndex={props.deviceFeatureIndex}
-  //       updateValue={props.updateValue}
-  //     />
-  //   );
-  // }
+  if (props.deviceFeature.type === 'color') {
+    return (
+      <SimpleColorDeviceFeature
+        x={props.x}
+        y={props.y}
+        device={props.device}
+        deviceFeature={props.deviceFeature}
+        roomIndex={props.roomIndex}
+        deviceIndex={props.deviceIndex}
+        deviceFeatureIndex={props.deviceFeatureIndex}
+        updateValue={props.updateValue}
+      />
+    );
+  }
 
   // if it's a color
   if (props.deviceFeature.type === 'color') {

@@ -5,3 +5,55 @@
 .tagsList {
   min-height: 70px;
 }
+
+.colorContainer {
+  display: flex;
+}
+
+.colorButton {  
+  border-radius: 0.3em;
+  cursor: pointer;
+  margin: 1%;
+  border: 1px solid grey;
+  flex: auto;
+}
+
+.warm {
+  background-color: hsl(40, 100%, 70%);
+}
+
+.cold {
+  background-color: hsl(240, 100%, 95%);
+}
+
+.red {
+  background-color: hsl(0, 100%, 50%);
+}
+
+.orange {
+  background-color: hsl(17, 100%, 50%);
+}
+
+.yellow {
+  background-color: hsl(48, 100%, 50%);
+}
+
+.green {
+  background-color: hsl(121, 100%, 50%);
+}
+
+.lightblue {
+  background-color: hsl(186, 100%, 50%);
+}
+
+.blue {
+  background-color: hsl(211, 100%, 50%);
+}
+
+.deepblue {
+  background-color: hsl(218, 100%, 50%);
+}
+
+.purple {
+  background-color: hsl(261, 100%, 50%);
+}
