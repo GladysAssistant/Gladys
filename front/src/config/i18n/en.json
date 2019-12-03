@@ -279,7 +279,8 @@
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "editButton": "Edit"
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -296,6 +297,7 @@
         "features": "Features",
         "params": "Params",
         "noFeatures": "No features",
+        "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "deviceCreatedSuccess": "The device was added with success."
@@ -321,7 +323,9 @@
         "addNodeTitle": "Inclusion Mode",
         "removeNodeTitle": "Exclusion Mode",
         "seconds": "seconds remaining",
-        "cancelButton": "Cancel"
+        "cancelButton": "Cancel",
+        "nodeAddedTitle": "A new node was found",
+        "nodeAddedDescription": "Wait a few seconds while we get all informations from this node..."
       }
     },
     "darkSky": {

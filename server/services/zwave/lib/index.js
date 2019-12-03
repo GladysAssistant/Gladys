@@ -4,6 +4,7 @@ const fs = require('fs');
 const { driverReady } = require('./events/zwave.driverReady');
 const { driverFailed } = require('./events/zwave.driverFailed');
 const { nodeAdded } = require('./events/zwave.nodeAdded');
+const { nodeRemoved } = require('./events/zwave.nodeRemoved');
 const { nodeEvent } = require('./events/zwave.nodeEvent');
 const { valueAdded } = require('./events/zwave.valueAdded');
 const { valueChanged } = require('./events/zwave.valueChanged');
@@ -49,6 +50,7 @@ const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
   this.zwave.on('driver ready', this.driverReady.bind(this));
   this.zwave.on('driver failed', this.driverFailed.bind(this));
   this.zwave.on('node added', this.nodeAdded.bind(this));
+  this.zwave.on('node removed', this.nodeRemoved.bind(this));
   this.zwave.on('node event', this.nodeEvent.bind(this));
   this.zwave.on('value added', this.valueAdded.bind(this));
   this.zwave.on('value changed', this.valueChanged.bind(this));
@@ -62,6 +64,7 @@ const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
 ZwaveManager.prototype.driverReady = driverReady;
 ZwaveManager.prototype.driverFailed = driverFailed;
 ZwaveManager.prototype.nodeAdded = nodeAdded;
+ZwaveManager.prototype.nodeRemoved = nodeRemoved;
 ZwaveManager.prototype.nodeEvent = nodeEvent;
 ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueChanged = valueChanged;

@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description When a node is added.
@@ -20,6 +21,10 @@ function nodeAdded(nodeId) {
     classes: {},
     ready: false,
   };
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED,
+    payload: nodeId,
+  });
 }
 
 module.exports = {
