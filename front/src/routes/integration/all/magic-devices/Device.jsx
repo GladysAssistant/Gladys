@@ -27,6 +27,17 @@ class Device extends Component {
     "purple"
   ];
 
+  tablerColors = [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "teal",
+    "azure",
+    "indigo",
+    "purple"
+  ];
+
   refreshDeviceProperty = () => {
     console.log("refreshDeviceProperty")
     if (!this.props.device.features) {
@@ -150,6 +161,44 @@ class Device extends Component {
       );
     }
 
+    const tablerColorButtons = [];
+
+    // essayer de changer checkbox par radio btn ?
+    // https://preview.tabler.io/docs/form-components.html
+    // et icon btn
+    // https://preview.tabler.io/docs/buttons.html
+    // fusionner ?
+    tablerColorButtons.push(
+      <div class="col-auto">
+        <label class="colorinput">
+          <input name="color" type="checkbox" value="yellow-lightest" class="colorinput-input" />
+          <span className="colorinput-color bg-yellow-lightest"></span>
+        </label>
+      </div>
+    );
+
+    tablerColorButtons.push(
+      <div class="col-auto">
+        <label class="colorinput">
+          <input name="color" type="checkbox" value="blue-lightest" class="colorinput-input" />
+          <span className="colorinput-color bg-blue-lightest"></span>
+        </label>
+      </div>
+    );
+
+    // the defaults colors
+    for (const color of this.tablerColors) {
+      const classes = `colorinput-color bg-${color}`;
+      tablerColorButtons.push(
+        <div class="col-auto">
+          <label class="colorinput">
+            <input name="color" type="checkbox" value={color} class="colorinput-input" />
+            <span className={classes}></span>
+          </label>
+        </div>
+      );
+    }
+
     return (
       <div class="col-md-4">
         <div class="card">
@@ -184,6 +233,15 @@ class Device extends Component {
                   </label>
                   <div className={style.colorContainer}>
                     {colorButtons}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.common.labels.color" />
+                  </label>
+                  <div class="row gutters-xs">
+                    {tablerColorButtons}
                   </div>
                 </div>
 
