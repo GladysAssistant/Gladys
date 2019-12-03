@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const Zigbee2mqttPage = ({ children }) => (
+const Zigbee2mqttPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -34,6 +35,17 @@ const Zigbee2mqttPage = ({ children }) => (
                     </span>
                     <Text id="integration.zigbee2mqtt.discoverTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    documentKey="zigbee2mqtt-configuration"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.zigbee2mqtt.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>
