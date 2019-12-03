@@ -683,6 +683,41 @@
       },
       "_id": 16,
       "id": 16
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-14T16:33:18"
+      },
+      "type": "Dimmable light",
+      "name": "Table à manger",
+      "modelid": "LWB006",
+      "manufacturername": "Philips",
+      "productname": "Hue white lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": { "mindimlevel": 2000, "maxlumen": 800 },
+          "streaming": { "renderer": false, "proxy": false }
+        },
+        "config": {
+          "archetype": "pendantround",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": { "mode": "safety", "configured": true }
+        },
+        "uniqueid": "00:17:88:01:10:40:cb:71-0b",
+        "swversion": "5.127.1.26420"
+      },
+      "_id": 17,
+      "id": 17
     }
   ]
 }
