@@ -4,9 +4,25 @@ import { route } from 'preact-router';
 import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import NodeOperationPage from './AddRemoveNode';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveNodeOperationPage extends Component {
+  nodeAddedListener = () => {
+    this.setState({
+      nodeAdded: true
+    });
+  };
+  nodeReadyListener = () => {
+    if (this.props.action === 'add' || this.props.action === 'add-secure') {
+      route('/dashboard/integration/device/zwave/setup');
+    }
+  };
+  nodeRemovedListener = () => {
+    if (this.props.action === 'remove') {
+      route('/dashboard/integration/device/zwave/setup');
+    }
+  };
   decrementTimer = () => {
     this.setState(prevState => {
       return { remainingTimeInSeconds: prevState.remainingTimeInSeconds - 1 };
@@ -51,12 +67,26 @@ class ZwaveNodeOperationPage extends Component {
         this.removeNode();
         break;
     }
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED, this.nodeAddedListener);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_READY, this.nodeReadyListener);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_REMOVED, this.nodeRemovedListener);
   }
 
-  render(props, { remainingTimeInSeconds }) {
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED, this.nodeAddedListener);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_READY, this.nodeReadyListener);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_REMOVED, this.nodeRemovedListener);
+  }
+
+  render(props, { remainingTimeInSeconds, nodeAdded }) {
     return (
       <ZwavePage>
-        <NodeOperationPage {...props} remainingTimeInSeconds={remainingTimeInSeconds} cancel={this.cancel} />
+        <NodeOperationPage
+          {...props}
+          remainingTimeInSeconds={remainingTimeInSeconds}
+          nodeAdded={nodeAdded}
+          cancel={this.cancel}
+        />
       </ZwavePage>
     );
   }
