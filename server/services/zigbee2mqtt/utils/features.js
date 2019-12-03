@@ -57,6 +57,7 @@ const features = {
   illuminance: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    unit: DEVICE_FEATURE_UNITS.LUX,
     read_only: true,
     has_feedback: false,
     min: 0,

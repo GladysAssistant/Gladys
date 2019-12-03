@@ -23,6 +23,14 @@ function convertCategory(feature) {
         result = 'contact';
         break;
       }
+      case DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR: {
+        result = 'occupancy';
+        break;
+      }
+      case DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR: {
+        result = 'illuminance';
+        break;
+      }
       case DEVICE_FEATURE_CATEGORIES.BUTTON: {
         result = 'click';
         break;
