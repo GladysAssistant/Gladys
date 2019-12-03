@@ -17,7 +17,7 @@ class Zigbee2mqttIntegration extends Component {
 
   render(props, {}) {
     return (
-      <Zigbee2mqttPage>
+      <Zigbee2mqttPage user={props.user}>
         <DeviceTab {...props} />
       </Zigbee2mqttPage>
     );

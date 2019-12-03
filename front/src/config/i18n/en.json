@@ -287,7 +287,8 @@
       "saveButton": "Save",
       "deleteButton": "Delete",
       "alreadyExistsButton": "Already created",
-      "saveError": "There was an error saving the device."
+      "saveError": "There was an error saving the device.",
+      "documentation": "Zigbee2mqtt documentation"
     },
     "zwave": {
       "title": "Z-Wave",
