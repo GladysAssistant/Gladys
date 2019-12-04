@@ -718,6 +718,87 @@
       },
       "_id": 17,
       "id": 17
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 107,
+        "hue": 42611,
+        "sat": 94,
+        "effect": "none",
+        "xy": [
+          0.2976,
+          0.3054
+        ],
+        "ct": 153,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2019-11-30T12:41:53"
+      },
+      "type": "Extended color light",
+      "name": "plafonier",
+      "modelid": "LCA001",
+      "manufacturername": "Philips",
+      "productname": "Hue color lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 200,
+            "maxlumen": 800,
+            "colorgamuttype": "C",
+            "colorgamut": [
+              [
+                0.6915,
+                0.3083
+              ],
+              [
+                0.17,
+                0.7
+              ],
+              [
+                0.1532,
+                0.0475
+              ]
+            ],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "custom",
+            "configured": true,
+            "customsettings": {
+              "bri": 185,
+              "xy": [
+                0.4946,
+                0.3266
+              ]
+            }
+          }
+        },
+        "uniqueid": "00:17:88:01:08:36de6a-0b",
+        "swversion": "1.53.3_r27175",
+        "swconfigid": "297C5CDD",
+        "productid": "Philips-LCA001-5-A19ECLv6"
+      },
+      "_id": 18,
+      "id": 18
     }
   ]
 }
