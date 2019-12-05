@@ -31,6 +31,10 @@ function convertCategory(feature) {
         result = 'illuminance';
         break;
       }
+      case DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR: {
+        result = 'smoke';
+        break;
+      }
       case DEVICE_FEATURE_CATEGORIES.BUTTON: {
         result = 'click';
         break;

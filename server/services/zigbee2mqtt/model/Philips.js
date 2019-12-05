@@ -35,8 +35,8 @@ const Philips = {
     '046677476816': [features.switch, features.brightness],
     '7199960PH': [features.switch, features.brightness], // color xy
     '324131092621': [features.switch_sensor],
-    '9290012607': [features.temperature, features.presence, features.illuminance],
-    '9290019758': [features.temperature, features.presence, features.illuminance],
+    '9290012607': [features.temperature, features.motion, features.illuminance],
+    '9290019758': [features.temperature, features.motion, features.illuminance],
     '7099860PH': [features.switch, features.brightness], // color xy
     '3216231P5': [features.switch, features.brightness, features.color_temperature],
     '8718696170625': [features.switch, features.brightness],

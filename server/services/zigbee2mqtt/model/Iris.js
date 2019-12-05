@@ -7,7 +7,7 @@ const Iris = {
   brand: 'Iris',
   models: {
     '3210-L': [features.switch],
-    '3326-L': [features.temperature, features.presence],
+    '3326-L': [features.temperature, features.motion],
     '3320-L': [features.door],
   },
 };

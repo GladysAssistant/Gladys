@@ -25,7 +25,7 @@ const OSRAM = {
     AC0363900NJ: [features.switch, features.brightness, features.color_temperature], // color xy
     AB35996: [features.switch, features.brightness, features.color_temperature], // color xy
     AC08562: [features.switch, features.brightness],
-    AC01353010G: [features.temperature, features.presence],
+    AC01353010G: [features.temperature, features.motion],
     AC03648: [features.switch, features.brightness, features.color_temperature],
     AC0251100NJ: [features.switch_sensor],
     'ST8AU-CON': [features.switch, features.brightness],
