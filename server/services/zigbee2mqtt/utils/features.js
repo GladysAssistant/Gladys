@@ -13,6 +13,14 @@ const features = {
     min: 0,
     max: 1,
   },
+  motion: {
+    category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 1,
+  },
   siren: {
     category: DEVICE_FEATURE_CATEGORIES.SIREN,
     type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
