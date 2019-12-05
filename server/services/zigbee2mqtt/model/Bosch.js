@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Bosch = {
   brand: 'Bosch',
   models: {
-    'RADON TriTech ZB': [features.temperature, features.presence],
-    'ISW-ZPR1-WP13': [features.temperature, features.presence],
+    'RADON TriTech ZB': [features.temperature, features.motion],
+    'ISW-ZPR1-WP13': [features.temperature, features.motion],
   },
 };
 

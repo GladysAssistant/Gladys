@@ -7,7 +7,7 @@ const HEIMAN = {
   brand: 'HEIMAN',
   models: {
     'HS1CA-M': [features.smoke],
-    HS3MS: [features.presence],
+    HS3MS: [features.motion],
     HS2SK: [features.switch, features.power],
     HS1SA: [features.smoke],
     HS3SA: [features.smoke],

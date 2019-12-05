@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const TUYATEC = {
   brand: 'TUYATEC',
   models: {
-    RH3040: [features.presence],
+    RH3040: [features.motion],
   },
 };
 

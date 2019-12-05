@@ -8,7 +8,7 @@ const Trust = {
   models: {
     'ZYCT-202': [features.switch_sensor],
     'ZLED-2709': [features.switch, features.brightness],
-    'ZPIR-8000': [features.presence],
+    'ZPIR-8000': [features.motion],
     'ZCTS-808': [features.door],
   },
 };
