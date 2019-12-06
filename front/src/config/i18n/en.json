@@ -337,6 +337,19 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "deviceTab": "Netatmo Devices",
+      "settingTab": "Settings",
+      "setting": {
+        "title": "Netatmo configuration"
+      },
+      "device": {
+        "title": "Devices",
+        "search": "Search",
+        "addDeviceButton": "Add"
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "deviceTab": "Devices",

@@ -1,5 +1,4 @@
 var netatmo = require('netatmo');
-const { init } = require('./init.js');
 const { connect } = require('./commands/netatmo.connect.js');
 const { getThermostat } = require('./commands/netatmo.getThermostat.js');
 const { setTemperatureThermostat } = require('./commands/netatmo.setTemperatureThermostat.js');
@@ -20,7 +19,6 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
     this.configured = false;
 };
 
-NetatmoManager.prototype.init = init;
 NetatmoManager.prototype.connect = connect;
 NetatmoManager.prototype.getThermostat = getThermostat;
 NetatmoManager.prototype.setTemperatureThermostat = setTemperatureThermostat;
