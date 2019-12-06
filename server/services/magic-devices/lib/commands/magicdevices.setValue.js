@@ -26,27 +26,40 @@ function setValue(device, deviceFeature, state) {
     return
   }
 
+  // let control = new Control(ip, {
+  //   wait_for_reply: true,
+  //   log_all_received: true,
+  //   apply_masks: true,
+  //   connect_timeout: null,
+  //   ack: {
+  //       power: false,
+  //       color: false,
+  //       pattern: false,
+  //       custom_pattern: false
+  //   }
+  // });
+
   let control = new Control(ip, {
     wait_for_reply: true,
     log_all_received: true,
     apply_masks: true,
     connect_timeout: null,
     ack: {
-        power: false,
-        color: false,
-        pattern: false,
-        custom_pattern: false
+        power: true,
+        color: true,
+        pattern: true,
+        custom_pattern: true
     }
   });
 
   switch(deviceFeature.type) {
     case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
-      if (state === 0) {
-        control.turnOff(success => {
+      if (state) {
+        control.turnOn(success => {
           logger.debug("Gladys turned off the light: " + success);
         });
-      } else if (state === 1) {
-        control.turnOn(success => {
+      } else {
+        control.turnOff(success => {
           logger.debug("Gladys turned on the light: " + success);
         });
       }
@@ -64,6 +77,7 @@ function setValue(device, deviceFeature, state) {
       
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE:
+      console.log("temperature:", state)
       // setWarmWhite(ww, callback)
 
       // Convenience method to only set the warm white value.

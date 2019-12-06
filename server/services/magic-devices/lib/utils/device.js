@@ -15,9 +15,10 @@ function createDevice(scannedDevice, serviceId) {
 
   const binaryFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`;
   const colorFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`;
-  const warmWhiteFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.WARM_WHITE}`;
-  const coldWhiteFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.COLD_WHITE}`;
+  const temperatureFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`;
   const brightnessFeatureId = `${id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
+
+  const category = DEVICE_FEATURE_CATEGORIES.LIGHT;
 
   console.log('\tCreating Device with id ' + id);
 
@@ -31,13 +32,13 @@ function createDevice(scannedDevice, serviceId) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
     features: [
       {
-        name: "On/Off",              
-        read_only: false,              
+        name: "On/Off",
+        read_only: false,
         keep_history: false,
         has_feedback: false,
         external_id: binaryFeatureId,
         selector: binaryFeatureId,
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        category: category,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         min: 0,
         max: 1
@@ -49,37 +50,23 @@ function createDevice(scannedDevice, serviceId) {
         has_feedback: false,
         external_id: colorFeatureId,
         selector: colorFeatureId,
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        category: category,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
         min: 0,
         max: 0
       },
       {
-        name: "Warm White",
+        name: "Temperature",
         read_only: false,
         keep_history: false,
         has_feedback: false,
-        external_id: warmWhiteFeatureId,
-        selector: warmWhiteFeatureId,
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,        
-        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        external_id: temperatureFeatureId,
+        selector: temperatureFeatureId,
+        category: category,
+        type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
         min: 0,
-        max: 100
+        max: 255
       },
-      {
-        name: "Cold White",
-        read_only: false,
-        keep_history: false,
-        has_feedback: false,
-        external_id: coldWhiteFeatureId,
-        selector: coldWhiteFeatureId,
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-        unit: DEVICE_FEATURE_UNITS.PERCENT,
-        min: 0,
-        max: 100
-      }, 
       {
         name: "Brightness",
         read_only: false,
@@ -87,7 +74,7 @@ function createDevice(scannedDevice, serviceId) {
         has_feedback: false,
         external_id: brightnessFeatureId,
         selector: brightnessFeatureId,
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        category: category,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
         unit: DEVICE_FEATURE_UNITS.PERCENT,
         min: 0,

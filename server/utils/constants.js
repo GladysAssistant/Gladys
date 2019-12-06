@@ -239,6 +239,7 @@ const DEVICE_FEATURE_TYPES = {
     POWER: 'power',
     WARM_WHITE: 'warm-white',
     COLD_WHITE: 'cold-white',
+    SIMULATED_COLD_WHITE: 'simulated-cold-white',
   },
   SENSOR: {
     DECIMAL: 'decimal',

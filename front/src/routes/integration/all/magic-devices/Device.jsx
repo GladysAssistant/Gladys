@@ -8,6 +8,8 @@ import cx from 'classnames';
 import get from 'get-value';
 import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import convert from 'color-convert';
+
 
 class Device extends Component {
 
@@ -47,20 +49,29 @@ class Device extends Component {
     const colorDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
     );
+
+    const temperatureDeviceFeature = this.props.device.features.find(
+      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+    );
+
     const brightnessDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
     );
 
-    const color = JSON.parse(get(colorDeviceFeature, 'last_value_string'));
+    const colorHSL = JSON.parse(get(colorDeviceFeature, 'last_value_string'));
+    const colorKeyword = convert.hsl.keyword([colorHSL.h, colorHSL.s, colorHSL.l]);
+    const temperature = get(temperatureDeviceFeature, 'last_value_string')
     const brightness = JSON.parse(get(brightnessDeviceFeature, 'last_value'));
-
     
-    console.log("setting color to " + JSON.stringify(color));
+    console.log("setting colorHSL to " + JSON.stringify(colorHSL));
+    console.log("setting colorKeyword to " + JSON.stringify(colorKeyword));
+    console.log("setting temperature to " + JSON.stringify(temperature));
     console.log("setting brightness to " + JSON.stringify(brightness));
 
-
     this.setState({
-      color,
+      colorHSL,
+      colorKeyword,
+      temperature,
       brightness
     });
   };
@@ -93,34 +104,6 @@ class Device extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  
-
-  handleCloseColor = () => {
-    console.log("closed color")
-    this.setState({ displayColorPicker: false })
-  };
-
-  handleChangeColor = (colorObject) => {
-    const colorDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
-    );
-
-    console.log("clicked on color:", colorObject);
-
-    const color = {
-      h: colorObject.hsl.h,
-      s: colorObject.hsl.s,
-      l: colorObject.hsl.l
-    }
-
-    this.setState({
-      color
-    });
-
-    this.props.setValue(colorDeviceFeature, color);
-    //this.refreshDeviceProperty();
-  };
-
   componentWillMount() {
     console.log("from componentWillMount:");
     this.refreshDeviceProperty();
@@ -131,57 +114,87 @@ class Device extends Component {
     //this.refreshDeviceProperty();
   }
 
-  handleButtonColorClick = (color) => {
-    console.log("clicked color button", color);
+  
+
+  handleChangeColor = (event) => {
+
+    const keyword = event.target.value;
+    console.log("clicked on color:", event.target.value);
+
+    let feature;
+    let value;
+
+    if (keyword === "warm" || keyword === "cold") {
+
+      this.setState({
+        temperature: keyword,
+        mode: "temperature"
+      });
+      
+      feature = this.props.device.features.find(
+        deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+      );
+
+      value = keyword;
+      
+    } else {
+
+      this.setState({
+        color: keyword,
+        mode: "color"
+      });
+
+      feature = this.props.device.features.find(
+        deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
+      );
+
+      const colorHSL = convert.keyword.hsl(keyword);
+      value = `{ "h": ${colorHSL.h}, "s": ${colorHSL.s*100}, "l": ${colorHSL.l*100} }`;
+
+    }
+
+    this.props.setValue(feature, value);
+
+    // const color = {
+    //   h: colorObject.hsl.h,
+    //   s: colorObject.hsl.s,
+    //   l: colorObject.hsl.l
+    // }
+
+    // this.setState({
+    //   color
+    // });
+
+    // this.props.setValue(colorDeviceFeature, color);
+    //this.refreshDeviceProperty();
   };
+
+  
 
   render(props, { loading }) {
 
-    const colorButtons = [];
-
-    // warm white
-    colorButtons.push(
-      <div className={style.colorButton + ' ' + style["warm"]} onClick={() => this.handleButtonColorClick("warm")} >
-        <i class="fe fe-loader" />
-      </div>
-    );
-
-    // cold white
-    colorButtons.push(
-      <div className={style.colorButton + ' ' + style["cold"]} onClick={() => this.handleButtonColorClick("cold")} >
-        <i class="fe fe-loader" />
-      </div>
-    );
-
-    // the defaults colors
-    for (const color of this.colors) {
-      const styles = `${style.colorButton} ${style[color]}`;
-      colorButtons.push(
-        <div className={styles} onClick={() => this.handleButtonColorClick(color)} />
-      );
-    }
-
     const tablerColorButtons = [];
+    const tablerTemperatureButtons = [];
 
     // essayer de changer checkbox par radio btn ?
     // https://preview.tabler.io/docs/form-components.html
     // et icon btn
     // https://preview.tabler.io/docs/buttons.html
     // fusionner ?
-    tablerColorButtons.push(
+    tablerTemperatureButtons.push(
       <div class="col-auto">
         <label class="colorinput">
-          <input name="color" type="checkbox" value="yellow-lightest" class="colorinput-input" />
-          <span className="colorinput-color bg-yellow-lightest"></span>
+          <input name="color" type="radio" value="warm" class="colorinput-input" onChange={this.handleChangeColor} />
+          <span className="colorinput-color bg-yellow-light" />
         </label>
       </div>
     );
 
-    tablerColorButtons.push(
+    tablerTemperatureButtons.push(
       <div class="col-auto">
         <label class="colorinput">
-          <input name="color" type="checkbox" value="blue-lightest" class="colorinput-input" />
-          <span className="colorinput-color bg-blue-lightest"></span>
+          <input name="color" type="radio" value="cold" class="colorinput-input" onChange={this.handleChangeColor} />
+          <span className="colorinput-color bg-blue-light" />
         </label>
       </div>
     );
@@ -192,8 +205,8 @@ class Device extends Component {
       tablerColorButtons.push(
         <div class="col-auto">
           <label class="colorinput">
-            <input name="color" type="checkbox" value={color} class="colorinput-input" />
-            <span className={classes}></span>
+            <input name="color" type="radio" value={color} class="colorinput-input" onChange={this.handleChangeColor} />
+            <span className={classes} />
           </label>
         </div>
       );
@@ -229,10 +242,10 @@ class Device extends Component {
 
                 <div class="form-group">
                   <label>
-                    <Text id="integration.common.labels.color" />
+                    <Text id="integration.common.labels.temperature" />
                   </label>
-                  <div className={style.colorContainer}>
-                    {colorButtons}
+                  <div class="row gutters-xs">
+                    {tablerTemperatureButtons}
                   </div>
                 </div>
 

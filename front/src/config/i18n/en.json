@@ -184,6 +184,7 @@
       "labels": {
         "color": "Color",
         "brightness": "Brightness",
+        "temperature": "Temperature",
         "warmWhite": "Warm white",
         "coldWhite": "Cold white",
         "features": "Features",

@@ -77,11 +77,6 @@ function createActions(store) {
 
       // console.log("deviceFeature:", deviceFeature)
       // console.log("value:", value)
-
-      // should use constants here
-      if (deviceFeature.type === 'color') {
-        value = `{ "h": ${value.h}, "s": ${value.s*100}, "l": ${value.l*100} }`;
-      }
       
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
         value
