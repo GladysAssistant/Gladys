@@ -3,7 +3,7 @@ import debounce from 'debounce';
 import uuid from 'uuid';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
-import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { fillFeatures } from './device-page/models';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -129,14 +129,7 @@ function createActions(store) {
       const device = state[listName][index];
       device.selector = device.external_id;
 
-      device.features.forEach(feature => {
-        feature.name = device.name;
-        if (DEVICE_FEATURE_TYPES.SWITCH.BINARY !== feature.type) {
-          feature.name += ` - ${feature.type}`;
-        }
-        feature.external_id = `${device.external_id}:${feature.category}:${feature.type}`;
-        feature.selector = feature.external_id;
-      });
+      fillFeatures(device);
 
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const devices = update(state[listName], {

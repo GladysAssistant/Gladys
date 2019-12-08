@@ -17,9 +17,16 @@ function handleMqttMessage(topic, message) {
 
   switch (eventType) {
     // Power status
-    case 'POWER': {
+    case 'POWER':
+    case 'POWER1':
+    case 'POWER2': {
+      let switchNo = eventType.replace('POWER', '');
+      if (switchNo.length > 0) {
+        switchNo = `:${switchNo}`;
+      }
+
       events.push({
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
+        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}${switchNo}`,
         state: message === 'ON' ? 1 : 0,
       });
       break;

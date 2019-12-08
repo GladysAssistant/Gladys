@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { GetFeatures, Models } from './models';
+import { getFeatures, Models } from './models';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
@@ -44,10 +44,9 @@ class SonoffBox extends Component {
 
   updateModel = e => {
     const selectedModel = e.target.value;
-    console.log(GetFeatures(selectedModel));
 
     this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'model', selectedModel);
-    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'features', GetFeatures(selectedModel));
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'features', getFeatures(selectedModel));
 
     this.setState({
       loading: false

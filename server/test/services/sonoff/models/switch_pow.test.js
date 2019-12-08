@@ -57,4 +57,8 @@ describe('SonoffService - Model - Pow', () => {
       },
     ]);
   });
+
+  it('no fill features for Sonoff Pow', () => {
+    expect(models[modelId].fillFeatures).to.eq(undefined);
+  });
 });

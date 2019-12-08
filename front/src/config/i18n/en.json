@@ -254,6 +254,7 @@
       "modelLabel": "Sonoff Model",
       "model": {
         "sonoff-basic": "Basic",
+        "sonoff-dual-r2": "Dual R2",
         "sonoff-pow": "Pow",
         "sonoff-s2x": "S20/S26 Smart Plug"
       },

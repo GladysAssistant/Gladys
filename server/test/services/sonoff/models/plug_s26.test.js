@@ -26,4 +26,8 @@ describe('SonoffService - Model - Plug S2x', () => {
       },
     ]);
   });
+
+  it('no fill features for Sonoff Plug S2x', () => {
+    expect(models[modelId].fillFeatures).to.eq(undefined);
+  });
 });

@@ -26,4 +26,8 @@ describe('SonoffService - Model - Basic', () => {
       },
     ]);
   });
+
+  it('no fill features for Sonoff Basic', () => {
+    expect(models[modelId].fillFeatures).to.eq(undefined);
+  });
 });
