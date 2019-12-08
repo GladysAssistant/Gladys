@@ -301,6 +301,8 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
+  AMPERE: 'ampere',
+  VOLT: 'volt',
 };
 
 const ACTIONS_STATUS = {

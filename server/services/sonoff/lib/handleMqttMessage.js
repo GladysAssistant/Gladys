@@ -13,25 +13,44 @@ function handleMqttMessage(topic, message) {
   const splittedTopic = topic.split('/');
   const eventType = splittedTopic[2];
   const deviceExternalId = splittedTopic[1];
-  let event;
+  const events = [];
 
   switch (eventType) {
     // Power status
     case 'POWER': {
-      event = {
+      events.push({
         device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         state: message === 'ON' ? 1 : 0,
-      };
+      });
       break;
     }
     // Sensor status
     case 'SENSOR': {
       const sensorMsg = JSON.parse(message);
 
-      event = {
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
-        state: sensorMsg.ENERGY.Current,
-      };
+      const energyMsg = sensorMsg.ENERGY;
+      if (energyMsg) {
+        if (energyMsg.Current) {
+          events.push({
+            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.ENERGY}`,
+            state: energyMsg.Current,
+          });
+        }
+
+        if (energyMsg.Power) {
+          events.push({
+            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
+            state: energyMsg.Power / 1000,
+          });
+        }
+
+        if (energyMsg.Voltage) {
+          events.push({
+            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE}`,
+            state: energyMsg.Voltage,
+          });
+        }
+      }
       break;
     }
     // Device global status
@@ -52,10 +71,10 @@ function handleMqttMessage(topic, message) {
           should_poll: false,
         };
 
-        event = {
+        events.push({
           device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
           state: statusValue,
-        };
+        });
       } else {
         logger.warn(`MQTT : Sonoff model ${moduleId} (${friendlyName}) not managed`);
       }
@@ -68,10 +87,10 @@ function handleMqttMessage(topic, message) {
       const stateMsg = JSON.parse(message);
       const stateValue = stateMsg.POWER;
 
-      event = {
+      events.push({
         device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         state: stateValue === 'ON' ? 1 : 0,
-      };
+      });
       break;
     }
     // Online status
@@ -84,9 +103,8 @@ function handleMqttMessage(topic, message) {
     }
   }
 
-  if (event) {
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
-  }
+  events.forEach((event) => this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event));
+  return null;
 }
 
 module.exports = {

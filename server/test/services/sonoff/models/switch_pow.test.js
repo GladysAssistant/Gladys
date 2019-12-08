@@ -1,7 +1,11 @@
 const { expect } = require('chai');
 
 const models = require('../../../../services/sonoff/models');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
 
 const modelId = 6;
 
@@ -26,12 +30,30 @@ describe('SonoffService - Model - Pow', () => {
       },
       {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+        read_only: true,
+        has_feedback: false,
+        min: 0,
+        max: 10000,
+        unit: DEVICE_FEATURE_UNITS.VOLT,
+      },
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        read_only: true,
+        has_feedback: false,
+        min: 0,
+        max: 10000,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
         read_only: true,
         has_feedback: false,
         min: 0,
         max: 10000,
-        unit: 'A',
+        unit: DEVICE_FEATURE_UNITS.KILOWATT,
       },
     ]);
   });

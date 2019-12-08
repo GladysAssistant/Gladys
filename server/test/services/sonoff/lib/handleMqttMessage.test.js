@@ -50,11 +50,49 @@ describe('Mqtt handle message', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
-  it('should change SONOFF sensor state to 125 (SENSOR topic)', () => {
+  it('should change SONOFF sensor state not handled (SENSOR topic)', () => {
+    sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "HELLO": { "anything": 125 }}');
+
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should change SONOFF sensor state not handled energy (SENSOR topic)', () => {
+    sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "anything": 125 }}');
+
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should change SONOFF sensor state energy current to 125 (SENSOR topic)', () => {
     sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "Current": 125 }}');
 
     const expectedEvent = {
+      device_feature_external_id: `sonoff:my_device:switch:energy`,
+      state: 125,
+    };
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('should change SONOFF sensor state energy power to 125 (SENSOR topic)', () => {
+    sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "Power": 125 }}');
+
+    const expectedEvent = {
       device_feature_external_id: `sonoff:my_device:switch:power`,
+      state: 0.125,
+    };
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('should change SONOFF sensor state energy voltage to 125 (SENSOR topic)', () => {
+    sonoffHandler.handleMqttMessage('tele/my_device/SENSOR', '{ "ENERGY": { "Voltage": 125 }}');
+
+    const expectedEvent = {
+      device_feature_external_id: `sonoff:my_device:switch:voltage`,
       state: 125,
     };
 
