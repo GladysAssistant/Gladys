@@ -4,6 +4,9 @@ set -eu
 
 export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
 
+# Login to Docker Hub.
+echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+
 # ============
 # <qemu-support>
 if [ $QEMU_ARCH == 'amd64' ]; then
@@ -22,9 +25,6 @@ docker build -f ./docker/Dockerfile \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VERSION=$VERSION \
   .
-
-# Login to Docker Hub.
-echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
 
 # Push push push
 docker push ${IMAGE_ID}
