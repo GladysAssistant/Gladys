@@ -39,6 +39,10 @@ function convertCategory(feature) {
         result = 'click';
         break;
       }
+      case DEVICE_FEATURE_CATEGORIES.SWITCH: {
+        result = 'action';
+        break;
+      }
       default: {
         const [split] = category.split('-');
         result = split;
