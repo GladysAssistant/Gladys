@@ -35,6 +35,7 @@ async function getLights() {
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
         case 'LCT010': // Hue A19 White & Color w/ Richer Colors
+        case 'LCA001': // Hue color lamp
         case 'GL-C-008': // Non-hue LED Strip
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
