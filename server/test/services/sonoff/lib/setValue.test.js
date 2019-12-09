@@ -57,7 +57,9 @@ describe('SonoffHandler - setValue', () => {
     const device = {
       external_id: 'sonoff:deviceTopic',
     };
-    const feature = undefined;
+    const feature = {
+      external_id: 'sonoff:deviceTopic:switch:binary',
+    };
     const value = 1;
 
     sonoffHandler.setValue(device, feature, value);
@@ -65,11 +67,41 @@ describe('SonoffHandler - setValue', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'ON');
   });
 
+  it('publish ON through valid topic POWER1', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:switch:binary:1',
+    };
+    const value = 1;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power1', 'ON');
+  });
+
+  it('publish ON through valid topic POWER2', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:switch:binary:2',
+    };
+    const value = 1;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power2', 'ON');
+  });
+
   it('publish OFF through valid topic', () => {
     const device = {
       external_id: 'sonoff:deviceTopic',
     };
-    const feature = undefined;
+    const feature = {
+      external_id: 'sonoff:deviceTopic:switch:binary',
+    };
     const value = 0;
 
     sonoffHandler.setValue(device, feature, value);

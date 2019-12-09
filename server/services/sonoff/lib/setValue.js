@@ -20,8 +20,14 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Sonoff device external_id is invalid : "${externalId}" have no MQTT topic`);
   }
 
+  let powerId = '';
+  const splittedPowerId = deviceFeature.external_id.split(':');
+  if (splittedPowerId.length > 4) {
+    [, , , , powerId] = splittedPowerId;
+  }
+
   // Send message to Sonoff topics
-  this.mqttService.device.publish(`cmnd/${topic}/power`, value ? 'ON' : 'OFF');
+  this.mqttService.device.publish(`cmnd/${topic}/power${powerId}`, value ? 'ON' : 'OFF');
 }
 
 module.exports = {
