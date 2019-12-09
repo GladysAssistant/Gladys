@@ -54,6 +54,6 @@ describe('Zigbee2mqtt - Utils - convertCategory', () => {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     };
     const result = convertCategory(feature);
-    expect(result).to.eq('switch');
+    expect(result).to.eq('action');
   });
 });
