@@ -4,7 +4,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 /**
  * @description Connect.
  * @example
- * xiaomi.connect();
+ * netatmo.connect();
  */
 async function connect() {
     const netatmo_Client_Id = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_ID, this.serviceId);
@@ -23,7 +23,10 @@ async function connect() {
         "username": netatmo_Username,
         "password": netatmo_Password,
     }
-    this.api = new this.netatmo(auth)
+    this.api = new this.netatmo(auth);
+    this.api.on("error", function (error) {
+      console.error('NETATMO threw an error: ' + error);
+    });
 }
 
 module.exports = {

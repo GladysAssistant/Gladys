@@ -3,7 +3,7 @@ const NetatmoManager = require('./lib');
 const NetatmoController = require('./api/netatmo.controller');
 
 module.exports = function NetatmoService(gladys, serviceId) {
-    const netatmoManager = new NetatmoManager(gladys, NetatmoController, serviceId);
+    const netatmoManager = new NetatmoManager(gladys, serviceId);
     /**
      * @public
      * @description This function listen event on Netatmo service

@@ -24,6 +24,17 @@ module.exports = function NetatmoController(netatmoManager) {
     }
 
     /**
+     * @api {get} /api/v1/service/netatmo/new-thermostat Get NETATMO thermostat information
+     * @apiName thermostat
+     * @apiGroup Netatmo
+     */
+    async function getNewThermostat(req, res) {
+        const response = await netatmoManager.getNewThermostat();
+        console.log(response)
+        res.json(response);
+    }
+
+    /**
      * @api {post} /api/v1/service/netatmo/thermostat Post NETATMO thermostat temperature
      * @apiName thermostat
      * @apiGroup Netatmo
@@ -40,6 +51,10 @@ module.exports = function NetatmoController(netatmoManager) {
         'get /api/v1/service/netatmo/thermostat': {
             authenticated: true,
             controller: asyncMiddleware(getThermostat),
+        },
+        'get /api/v1/service/netatmo/new-thermostat': {
+            authenticated: true,
+            controller: asyncMiddleware(getNewThermostat),
         },
         'post /api/v1/service/netatmo/thermostat/temperature': {
             authenticated: true,

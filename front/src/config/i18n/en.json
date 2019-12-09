@@ -342,12 +342,23 @@
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
       "setting": {
-        "title": "Netatmo configuration"
+        "title": "Netatmo configuration",
+        "usernamePlaceholder": "Username",
+        "passwordPlaceholder": "Password",
+        "clientIdPlaceholder": "Client ID",
+        "clientSecretPlaceholder": "Client Secret",
+        "saveLabel": "Save",
+        "connectLabel": "Connect"
       },
       "device": {
-        "title": "Devices",
+        "title": "Netatmo Devices",
+        "addTitle": "Add new devices",
         "search": "Search",
-        "addDeviceButton": "Add"
+        "foundDevice": "Getting new devices",
+        "noDevicesFound": "No device found",
+        "addDeviceButton": "Add",
+        "noDevices": "No devices found",
+        "deviceNotHandled": "Device is not handled"
       }
     },
     "mqtt": {

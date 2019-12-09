@@ -38,6 +38,6 @@
         "key": "netatmo",
         "name": "Netatmo",
         "description": "Control your Netatmo devices.",
-        "img": "/assets/integrations/cover/sonoff.jpg"
+        "img": "/assets/integrations/cover/netatmo.jpg"
     }
 ]
