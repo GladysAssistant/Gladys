@@ -54,6 +54,26 @@ describe('SonoffHandler - setValue', () => {
     }
   });
 
+  it('not managed switch type', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:unknow:unknow',
+      category: 'unknow',
+      type: 'unknow',
+    };
+    const value = 72;
+
+    try {
+      sonoffHandler.setValue(device, feature, value);
+      assert.fail('Should ends on error');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+      expect(e.message).to.eq('Sonoff device category not managed to set value on "sonoff:deviceTopic:unknow:unknow"');
+    }
+  });
+
   it('publish ON through valid topic', () => {
     const device = {
       external_id: 'sonoff:deviceTopic',
@@ -116,6 +136,26 @@ describe('SonoffHandler - setValue', () => {
     sonoffHandler.setValue(device, feature, value);
 
     assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'OFF');
+  });
+
+  it('not managed switch type', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:switch:unknow',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: 'unknow',
+    };
+    const value = 72;
+
+    try {
+      sonoffHandler.setValue(device, feature, value);
+      assert.fail('Should ends on error');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+      expect(e.message).to.eq('Sonoff device type not managed to set value on "sonoff:deviceTopic:switch:unknow"');
+    }
   });
 
   it('publish ON through valid topic: light', () => {
@@ -196,5 +236,25 @@ describe('SonoffHandler - setValue', () => {
     sonoffHandler.setValue(device, feature, value);
 
     assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/dimmer', 72);
+  });
+
+  it('not managed light type', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:unknow',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: 'unknow',
+    };
+    const value = 72;
+
+    try {
+      sonoffHandler.setValue(device, feature, value);
+      assert.fail('Should ends on error');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+      expect(e.message).to.eq('Sonoff device type not managed to set value on "sonoff:deviceTopic:light:unknow"');
+    }
   });
 });
