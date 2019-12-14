@@ -1,7 +1,6 @@
 const logger = require('../../../utils/logger');
-const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
-const models = require('../models');
-
+const { EVENTS } = require('../../../utils/constants');
+const { status, state, sensor, power } = require('./mqttStat');
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -20,84 +19,23 @@ function handleMqttMessage(topic, message) {
     case 'POWER':
     case 'POWER1':
     case 'POWER2': {
-      let switchNo = eventType.replace('POWER', '');
-      if (switchNo.length > 0) {
-        switchNo = `:${switchNo}`;
-      }
-
-      events.push({
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}${switchNo}`,
-        state: message === 'ON' ? 1 : 0,
-      });
+      power(deviceExternalId, message, eventType, events);
       break;
     }
     // Sensor status
     case 'SENSOR': {
-      const sensorMsg = JSON.parse(message);
-
-      const energyMsg = sensorMsg.ENERGY;
-      if (energyMsg) {
-        if (energyMsg.Current) {
-          events.push({
-            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.ENERGY}`,
-            state: energyMsg.Current,
-          });
-        }
-
-        if (energyMsg.Power) {
-          events.push({
-            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
-            state: energyMsg.Power / 1000,
-          });
-        }
-
-        if (energyMsg.Voltage) {
-          events.push({
-            device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE}`,
-            state: energyMsg.Voltage,
-          });
-        }
-      }
+      sensor(deviceExternalId, message, events);
       break;
     }
     // Device global status
     case 'STATUS': {
-      const statusMsg = JSON.parse(message);
-      const statusValue = statusMsg.Status.Power;
-      const friendlyName = statusMsg.Status.FriendlyName[0];
-      const moduleId = statusMsg.Status.Module;
-
-      const model = models[moduleId];
-      if (model) {
-        this.mqttDevices[deviceExternalId] = {
-          name: friendlyName,
-          external_id: `sonoff:${deviceExternalId}`,
-          features: model.getFeatures(),
-          model: model.getModel(),
-          service_id: this.serviceId,
-          should_poll: false,
-        };
-
-        events.push({
-          device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
-          state: statusValue,
-        });
-      } else {
-        logger.warn(`MQTT : Sonoff model ${moduleId} (${friendlyName}) not managed`);
-      }
-
+      status(deviceExternalId, message, events, this);
       break;
     }
     // Device state topic
     case 'RESULT':
     case 'STATE': {
-      const stateMsg = JSON.parse(message);
-      const stateValue = stateMsg.POWER;
-
-      events.push({
-        device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
-        state: stateValue === 'ON' ? 1 : 0,
-      });
+      state(deviceExternalId, message, events);
       break;
     }
     // Online status

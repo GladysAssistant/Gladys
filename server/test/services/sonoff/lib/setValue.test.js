@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const { fake, assert } = sinon;
 const { expect } = require('chai');
 const SonoffHandler = require('../../../../services/sonoff/lib');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 const mqttService = {
   device: {
@@ -20,10 +21,10 @@ describe('SonoffHandler - setValue', () => {
   });
 
   it('publish through invalid topic', () => {
-    const device = {
+    const device = undefined;
+    const feature = {
       external_id: 'deviceInvalidTopic',
     };
-    const feature = undefined;
     const value = 1;
 
     try {
@@ -32,16 +33,16 @@ describe('SonoffHandler - setValue', () => {
     } catch (e) {
       assert.notCalled(mqttService.device.publish);
       expect(e.message).to.eq(
-        'Sonoff device external_id is invalid : "deviceInvalidTopic" should starts with "sonoff:"',
+        'Sonoff device external_id is invalid: "deviceInvalidTopic" should starts with "sonoff:"',
       );
     }
   });
 
   it('publish through null topic', () => {
-    const device = {
+    const device = undefined;
+    const feature = {
       external_id: 'sonoff:',
     };
-    const feature = undefined;
     const value = 1;
 
     try {
@@ -49,7 +50,7 @@ describe('SonoffHandler - setValue', () => {
       assert.fail('Should ends on error');
     } catch (e) {
       assert.notCalled(mqttService.device.publish);
-      expect(e.message).to.eq('Sonoff device external_id is invalid : "sonoff:" have no MQTT topic');
+      expect(e.message).to.eq('Sonoff device external_id is invalid: "sonoff:" have no MQTT topic');
     }
   });
 
@@ -59,6 +60,8 @@ describe('SonoffHandler - setValue', () => {
     };
     const feature = {
       external_id: 'sonoff:deviceTopic:switch:binary',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     };
     const value = 1;
 
@@ -73,6 +76,8 @@ describe('SonoffHandler - setValue', () => {
     };
     const feature = {
       external_id: 'sonoff:deviceTopic:switch:binary:1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     };
     const value = 1;
 
@@ -87,6 +92,8 @@ describe('SonoffHandler - setValue', () => {
     };
     const feature = {
       external_id: 'sonoff:deviceTopic:switch:binary:2',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     };
     const value = 1;
 
@@ -101,11 +108,93 @@ describe('SonoffHandler - setValue', () => {
     };
     const feature = {
       external_id: 'sonoff:deviceTopic:switch:binary',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     };
     const value = 0;
 
     sonoffHandler.setValue(device, feature, value);
 
     assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'OFF');
+  });
+
+  it('publish ON through valid topic: light', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:binary',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+    };
+    const value = 1;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'ON');
+  });
+
+  it('publish OFF through valid topic: light', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:binary',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+    };
+    const value = 0;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/power', 'OFF');
+  });
+
+  it('publish black color through valid topic', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:color',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+    const value = 0;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/color', '#000000');
+  });
+
+  it('publish white color through valid topic', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:color',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+    const value = 16777215;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/color', '#ffffff');
+  });
+
+  it('publish brightness through valid topic', () => {
+    const device = {
+      external_id: 'sonoff:deviceTopic',
+    };
+    const feature = {
+      external_id: 'sonoff:deviceTopic:light:brightness',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+    };
+    const value = 72;
+
+    sonoffHandler.setValue(device, feature, value);
+
+    assert.calledWith(mqttService.device.publish, 'cmnd/deviceTopic/dimmer', 72);
   });
 });

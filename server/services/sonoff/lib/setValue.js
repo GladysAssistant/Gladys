@@ -1,4 +1,6 @@
 const { BadParameters } = require('../../../utils/coreErrors');
+const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { setSwitchValue, setLightValue } = require('./cmdValue');
 
 /**
  * @description Send the new device value over MQTT.
@@ -9,25 +11,35 @@ const { BadParameters } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, 0);
  */
 function setValue(device, deviceFeature, value) {
-  // Remove first 'sonoff:' substring
-  const externalId = device.external_id;
-
-  if (!externalId.startsWith('sonoff:')) {
-    throw new BadParameters(`Sonoff device external_id is invalid : "${externalId}" should starts with "sonoff:"`);
-  }
-  const topic = externalId.substring(7);
-  if (topic.length === 0) {
-    throw new BadParameters(`Sonoff device external_id is invalid : "${externalId}" have no MQTT topic`);
-  }
-
-  let powerId = '';
+  const externalId = deviceFeature.external_id;
   const splittedPowerId = deviceFeature.external_id.split(':');
-  if (splittedPowerId.length > 4) {
-    [, , , , powerId] = splittedPowerId;
+  const [prefix, topic, , , relayId] = splittedPowerId;
+
+  if (prefix !== 'sonoff') {
+    throw new BadParameters(`Sonoff device external_id is invalid: "${externalId}" should starts with "sonoff:"`);
+  }
+  if (!topic || topic.length === 0) {
+    throw new BadParameters(`Sonoff device external_id is invalid: "${externalId}" have no MQTT topic`);
+  }
+
+  let cmnd;
+  const { category } = deviceFeature;
+
+  switch (category) {
+    case DEVICE_FEATURE_CATEGORIES.LIGHT: {
+      cmnd = setLightValue(deviceFeature, value);
+      break;
+    }
+    case DEVICE_FEATURE_CATEGORIES.SWITCH: {
+      cmnd = setSwitchValue(deviceFeature, value);
+      break;
+    }
+    default:
+      throw new BadParameters(`Sonoff device category not managed to set value on "${externalId}"`);
   }
 
   // Send message to Sonoff topics
-  this.mqttService.device.publish(`cmnd/${topic}/power${powerId}`, value ? 'ON' : 'OFF');
+  this.mqttService.device.publish(`cmnd/${topic}/${cmnd.topic}${relayId || ''}`, cmnd.value);
 }
 
 module.exports = {
