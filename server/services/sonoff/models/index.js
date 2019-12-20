@@ -1,19 +1,20 @@
-const basic = require('./switch_basic');
-const s2x = require('./plug_s2x');
-const pow = require('./switch_pow');
-const dualR2 = require('./switch_dual_r2');
-const alLC01 = require('./light_al_lc01');
-const sv = require('./switch_sv');
-const dual = require('./switch_dual');
-const sonoff4ch = require('./switch_4ch');
+const sonoffBasic = require('./switch_sonoff_basic');
+const sonoffSV = require('./switch_sonoff_sv');
+const sonoffDual = require('./switch_sonoff_dual');
+const sonoffPow = require('./switch_sonoff_pow');
+const sonoff4ch = require('./switch_sonoff_4ch');
+const sonoffS2x = require('./plug_sonoff_s2x');
+const sonoffDualR2 = require('./switch_sonoff_dual_r2');
+
+const ariluxLC01 = require('./light_arilux_lc01');
 
 module.exports = {
-  1: basic,
-  3: sv,
-  5: dual,
-  6: pow,
+  1: sonoffBasic,
+  3: sonoffSV,
+  5: sonoffDual,
+  6: sonoffPow,
   7: sonoff4ch,
-  8: s2x,
-  37: alLC01,
-  39: dualR2,
+  8: sonoffS2x,
+  37: ariluxLC01,
+  39: sonoffDualR2,
 };
