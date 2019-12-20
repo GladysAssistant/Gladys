@@ -12,6 +12,12 @@ describe('SonoffService - Model - Plug S2x', () => {
     expect(model).to.eq('sonoff-s2x');
   });
 
+  it('get label for Sonoff S20/S26 Smart Plug', () => {
+    const label = models[modelId].getLabel();
+
+    expect(label).to.eq('Sonoff S20/S26 Smart Plug');
+  });
+
   it('get features for Sonoff Plug S2x', () => {
     const features = models[modelId].getFeatures();
 

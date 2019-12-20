@@ -4,6 +4,10 @@ const getModel = () => {
   return 'arilux-lc01';
 };
 
+const getLabel = () => {
+  return 'Arilux LC01';
+};
+
 const getFeatures = () => {
   return [
     {
@@ -36,4 +40,5 @@ const getFeatures = () => {
 module.exports = {
   getFeatures,
   getModel,
+  getLabel,
 };

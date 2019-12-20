@@ -16,6 +16,12 @@ describe('SonoffService - Model - Pow', () => {
     expect(model).to.eq('sonoff-pow');
   });
 
+  it('get label for Sonoff Pow', () => {
+    const label = models[modelId].getLabel();
+
+    expect(label).to.eq('Sonoff Pow');
+  });
+
   it('get features for Sonoff Pow', () => {
     const features = models[modelId].getFeatures();
 

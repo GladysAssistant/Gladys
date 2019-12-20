@@ -4,6 +4,10 @@ const getModel = () => {
   return 'sonoff-pow';
 };
 
+const getLabel = () => {
+  return 'Sonoff Pow';
+};
+
 const getFeatures = () => {
   return [
     {
@@ -47,4 +51,5 @@ const getFeatures = () => {
 module.exports = {
   getFeatures,
   getModel,
+  getLabel,
 };

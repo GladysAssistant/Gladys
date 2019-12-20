@@ -1,24 +1,24 @@
-import models from '../../../../../../../server/services/sonoff/models';
-import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import models from '../../../../../../server/services/sonoff/models';
+import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 export const Models = {};
 Object.keys(models).forEach(modelKey => {
-  Models[models[modelKey].getModel()] = modelKey;
+  Models[models[modelKey].getModel()] = models[modelKey];
 });
 
 export const getFeatures = modelName => {
-  const modelKey = Models[modelName];
-  if (modelKey && models[modelKey]) {
-    return models[modelKey].getFeatures();
+  const model = Models[modelName];
+  if (model) {
+    return model.getFeatures();
   }
 
   return [];
 };
 
 export const fillFeatures = device => {
-  const modelKey = Models[device.model];
-  if (modelKey && models[modelKey] && models[modelKey].fillFeatures) {
-    models[modelKey].fillFeatures(device);
+  const model = Models[device.model];
+  if (model && model.fillFeatures) {
+    model.fillFeatures(device);
   } else {
     device.features.forEach(feature => {
       feature.name = device.name;

@@ -4,6 +4,10 @@ const getModel = () => {
   return 'sonoff-s2x';
 };
 
+const getLabel = () => {
+  return 'Sonoff S20/S26 Smart Plug';
+};
+
 const getFeatures = () => {
   return [
     {
@@ -20,4 +24,5 @@ const getFeatures = () => {
 module.exports = {
   getFeatures,
   getModel,
+  getLabel,
 };

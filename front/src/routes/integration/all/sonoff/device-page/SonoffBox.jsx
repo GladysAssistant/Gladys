@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { getFeatures, Models } from './models';
+import { getFeatures, Models } from '../models';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
@@ -25,12 +25,9 @@ class SonoffBox extends Component {
   updateTopic = e => {
     let { value } = e.target;
     if (!value.startsWith('sonoff:')) {
-      console.log('dont starts with sonoff:', value);
       if (value.length < 7) {
-        console.log('< 7', value);
         value = 'sonoff:';
       } else {
-        console.log('>= 7', value);
         value = `sonoff:${value}`;
       }
     }
@@ -172,9 +169,9 @@ class SonoffBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {Models &&
-                      Object.keys(Models).map(model => (
-                        <option selected={model === props.device.model} value={model}>
-                          <Text id={`integration.sonoff.model.${model}`}>{model}</Text>
+                      Object.keys(Models).map(modelKey => (
+                        <option selected={modelKey === props.device.model} value={modelKey}>
+                          {Models[modelKey].getLabel()}
                         </option>
                       ))}
                   </select>

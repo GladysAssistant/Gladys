@@ -4,6 +4,10 @@ const getModel = () => {
   return 'sonoff-basic';
 };
 
+const getLabel = () => {
+  return 'Sonoff Basic';
+};
+
 const getFeatures = () => {
   return [
     {
@@ -20,4 +24,5 @@ const getFeatures = () => {
 module.exports = {
   getFeatures,
   getModel,
+  getLabel,
 };

@@ -252,13 +252,6 @@
       "topicLabel": "Topic (%topic% Sonoff MQTT)",
       "topicPlaceholder": "Should starts with 'sonoff:'",
       "modelLabel": "Sonoff Model",
-      "model": {
-        "arilux-lc01": "Arilux LC01",
-        "sonoff-basic": "Basic",
-        "sonoff-dual-r2": "Dual R2",
-        "sonoff-pow": "Pow",
-        "sonoff-s2x": "S20/S26 Smart Plug"
-      },
       "saveButton": "Save",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",

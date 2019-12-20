@@ -12,6 +12,12 @@ describe('SonoffService - Model - Arilux LC01', () => {
     expect(model).to.eq('arilux-lc01');
   });
 
+  it('get label for Arilux LC01', () => {
+    const label = models[modelId].getLabel();
+
+    expect(label).to.eq('Arilux LC01');
+  });
+
   it('get features for Arilux LC01', () => {
     const features = models[modelId].getFeatures();
 

@@ -12,6 +12,12 @@ describe('SonoffService - Model - Basic', () => {
     expect(model).to.eq('sonoff-basic');
   });
 
+  it('get label for Sonoff Basic', () => {
+    const label = models[modelId].getLabel();
+
+    expect(label).to.eq('Sonoff Basic');
+  });
+
   it('get features for Sonoff Basic', () => {
     const features = models[modelId].getFeatures();
 

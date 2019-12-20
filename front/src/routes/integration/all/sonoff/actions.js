@@ -3,7 +3,7 @@ import debounce from 'debounce';
 import uuid from 'uuid';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
-import { fillFeatures } from './device-page/models';
+import { fillFeatures } from './models';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);

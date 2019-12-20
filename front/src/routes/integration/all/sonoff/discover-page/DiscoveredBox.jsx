@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
+import { Models } from '../models';
 
 class SonoffBox extends Component {
   updateName = e => {
@@ -127,9 +128,7 @@ class SonoffBox extends Component {
                     <Text id="integration.sonoff.modelLabel" />
                   </label>
                   <select disabled="true" class="form-control" id={`model_${props.deviceIndex}`}>
-                    <option value={props.device.model}>
-                      <Text id={`integration.sonoff.model.${props.device.model}`}>{props.device.model}</Text>
-                    </option>
+                    <option value={props.device.model}>{Models[props.device.model].getLabel()}</option>
                   </select>
                 </div>
 

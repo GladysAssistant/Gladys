@@ -4,6 +4,10 @@ const getModel = () => {
   return 'sonoff-dual-r2';
 };
 
+const getLabel = () => {
+  return 'Sonoff Dual R2';
+};
+
 const getFeatures = () => {
   return [
     {
@@ -37,5 +41,6 @@ const fillFeatures = (device) => {
 module.exports = {
   getFeatures,
   getModel,
+  getLabel,
   fillFeatures,
 };

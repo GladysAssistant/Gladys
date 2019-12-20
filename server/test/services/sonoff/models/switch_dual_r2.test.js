@@ -12,6 +12,12 @@ describe('SonoffService - Model - Dual R2', () => {
     expect(model).to.eq('sonoff-dual-r2');
   });
 
+  it('get label for Sonoff Dual R2', () => {
+    const label = models[modelId].getLabel();
+
+    expect(label).to.eq('Sonoff Dual R2');
+  });
+
   it('get features for Sonoff Dual R2', () => {
     const features = models[modelId].getFeatures();
 
