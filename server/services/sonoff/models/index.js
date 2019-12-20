@@ -5,12 +5,14 @@ const dualR2 = require('./switch_dual_r2');
 const alLC01 = require('./light_al_lc01');
 const sv = require('./switch_sv');
 const dual = require('./switch_dual');
+const sonoff4ch = require('./switch_4ch');
 
 module.exports = {
   1: basic,
   3: sv,
   5: dual,
   6: pow,
+  7: sonoff4ch,
   8: s2x,
   37: alLC01,
   39: dualR2,
