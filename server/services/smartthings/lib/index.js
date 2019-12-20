@@ -17,7 +17,7 @@ const { getDevices } = require('./connector/getDevices');
  * @param {Object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
- * const smartThingsHandler = new SmartThingsHandler(gladys, ffmpeg, serviceId);
+ * const smartThingsHandler = new SmartThingsHandler(gladys, serviceId);
  */
 const SmartThingsHandler = function SmartThingsHandler(gladys, serviceId) {
   this.gladys = gladys;
