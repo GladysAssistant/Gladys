@@ -14,26 +14,19 @@ describe('POST /api/v1/reset_password', () => {
         expect(res.body).to.have.property('id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
       });
   });
-  it('should return error 422, password too short', async () => {
+  it('should return error 400, password too short', async () => {
     await authenticatedRequest
       .post('/api/v1/reset_password')
       .send({
         password: 'short',
       })
       .expect('Content-Type', /json/)
-      .expect(422)
+      .expect(400)
       .then((res) => {
         expect(res.body).to.deep.equal({
-          status: 422,
-          code: 'UNPROCESSABLE_ENTITY',
-          properties: [
-            {
-              message: 'Validation len on password failed',
-              attribute: 'password',
-              value: 'short',
-              type: 'Validation error',
-            },
-          ],
+          status: 400,
+          code: 'BAD_REQUEST',
+          message: 'Password is too short',
         });
       });
   });
