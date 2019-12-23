@@ -124,19 +124,12 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // ensure email is in lowercase
-  User.beforeValidate((user) => {
+  User.beforeValidate((user, options) => {
     user.email = String(user.email).toLowerCase();
     if (!user.selector) {
       user.name = user.firstname;
       addSelector(user);
       delete user.name;
-    }
-  });
-
-  // hash password after validating
-  User.afterValidate(async (user, options) => {
-    if (user.password) {
-      user.password = await passwordUtils.hash(user.password);
     }
   });
 
