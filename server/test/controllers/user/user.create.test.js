@@ -10,7 +10,7 @@ describe('POST /user', () => {
         lastname: 'Stark',
         email: 'tony.stark@gladysassistant.com',
         password: 'testststs',
-        birthdate: '01/01/2019',
+        birthdate: new Date('01/01/2019'),
         language: 'en',
         role: 'admin',
       })
@@ -27,7 +27,7 @@ describe('POST /user', () => {
         firstname: 'Tony',
         lastname: 'Stark',
         password: 'testststs',
-        birthdate: '01/01/2019',
+        birthdate: new Date('01/01/2019'),
         language: 'en',
         role: 'admin',
       })
@@ -42,7 +42,7 @@ describe('POST /user', () => {
         lastname: 'Stark',
         password: 'testststs',
         email: 'demo@demo.com',
-        birthdate: '01/01/2019',
+        birthdate: new Date('01/01/2019'),
         language: 'en',
         role: 'admin',
       })
@@ -60,7 +60,7 @@ describe('POST /signup', () => {
         lastname: 'Stark',
         email: 'tony.stark@gladysassistant.com',
         password: 'testststs',
-        birthdate: '01/01/2019',
+        birthdate: new Date('01/01/2019'),
         language: 'en',
         role: 'admin',
       })
