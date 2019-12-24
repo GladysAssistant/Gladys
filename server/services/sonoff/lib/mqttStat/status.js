@@ -19,7 +19,7 @@ function status(deviceExternalId, message, events, sonoffHandler) {
 
   const model = models[moduleId];
   if (model) {
-    sonoffHandler[deviceExternalId] = {
+    sonoffHandler.mqttDevices[deviceExternalId] = {
       name: friendlyName,
       external_id: `sonoff:${deviceExternalId}`,
       features: model.getFeatures(),
