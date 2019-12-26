@@ -6,7 +6,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * @description Save new device feature string state in DB.
  * @param {Object} device - A Device object.
  * @param {Object} deviceFeature - A DeviceFeature object.
- * @param {number} newValue - The new value of the deviceFeature to save.
+ * @param {string} newValue - The new value of the deviceFeature to save.
  * @example
  * saveState({
  *   id: 'fc235c88-b10d-4706-8b59-fef92a7119b2',

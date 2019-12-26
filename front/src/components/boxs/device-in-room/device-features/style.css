@@ -1,0 +1,50 @@
+.hidden {
+    /* display: hidden;
+    width: 0 !important; */
+}
+
+.featureContainer {
+    display: inline-block;
+    border-top: 1px solid #dee2e6;
+    padding: 0.75rem;
+}
+
+.colorsContainer {
+    display: flex;
+}
+
+.colorButton {
+    flex: auto;
+}
+
+.color1 {
+    background-color: hsl(0, 100%, 50%);
+}
+
+.color2 {
+    background-color: hsl(17, 100%, 50%);
+}
+
+.color3 {
+    background-color: hsl(48, 100%, 50%);
+}
+
+.color4 {
+    background-color: hsl(121, 100%, 50%);
+}
+
+.color5 {
+    background-color: hsl(186, 100%, 50%);
+}
+
+.color6 {
+    background-color: hsl(211, 100%, 50%);
+}
+
+.color7 {
+    background-color: hsl(218, 100%, 50%);
+}
+
+.color8 {
+    background-color: hsl(261, 100%, 50%);
+}

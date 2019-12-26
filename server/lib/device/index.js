@@ -24,6 +24,7 @@ const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
 const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
+const { newStringStateEvent } = require('./device.newStringStateEvent');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -48,6 +49,7 @@ const DeviceManager = function DeviceManager(
   this.devicesByPollFrequency = {};
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
+  this.eventManager.on(EVENTS.DEVICE.NEW_STRING_STATE, this.newStringStateEvent.bind(this));
   this.eventManager.on(EVENTS.DEVICE.NEW, eventFunctionWrapper(this.create.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_FEATURE, eventFunctionWrapper(this.addFeature.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
@@ -66,6 +68,7 @@ DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;
+DeviceManager.prototype.newStringStateEvent = newStringStateEvent;
 DeviceManager.prototype.saveState = saveState;
 DeviceManager.prototype.saveStringState = saveStringState;
 DeviceManager.prototype.setParam = setParam;

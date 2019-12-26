@@ -16,15 +16,13 @@ async function forwardWebsockets(event) {
     return;
   }
 
-  logger.debug(`Gateway : Forward websocket message : ${event.type}`);
-  try {
+  logger.debug(`Gateway : Forward websocket message : ${event.type}`);  try {
     if (event.userId) {
       await this.gladysGatewayClient.newEventInstanceUser(event.type, event.userId, event.payload);
     } else {
       await this.gladysGatewayClient.newEventInstance(event.type, event.payload);
     }
   } catch (e) {
-    logger.debug('Unable to forward websocket to Gladys Gateway');
     logger.debug(e);
   }
 }

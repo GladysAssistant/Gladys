@@ -30,6 +30,7 @@ const EVENTS = {
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
+    NEW_STRING_STATE: 'device.new-string-state',
     PURGE_STATES: 'device.purge-states',
   },
   GATEWAY: {
@@ -236,6 +237,9 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
+    WARM_WHITE: 'warm-white',
+    COLD_WHITE: 'cold-white',
+    SIMULATED_COLD_WHITE: 'simulated-cold-white',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -353,6 +357,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
+  MAGIC_DEVICES: {
+    NEW_DEVICE: 'magic-devices.new-device',
+  }
 };
 
 const DASHBOARD_TYPE = {
