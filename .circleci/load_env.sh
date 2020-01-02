@@ -2,7 +2,7 @@
 
 echo 'export GITHUB_REPO=vonox/Gladys' >>$BASH_ENV
 echo 'export IMAGE=gladys' >>$BASH_ENV
-echo 'export REGISTRY=gladysassistant' >>$BASH_ENV
+echo 'export REGISTRY=vonox' >>$BASH_ENV
 
 echo 'export VERSION=4.0.0-beta' >>$BASH_ENV
 echo 'export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"' >>$BASH_ENV
