@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo 'export GITHUB_REPO=gladysassistant/gladys-4-playground' >>$BASH_ENV
+echo 'export GITHUB_REPO=gladysassistant/Gladys' >>$BASH_ENV
 echo 'export IMAGE=gladys' >>$BASH_ENV
 echo 'export REGISTRY=gladysassistant' >>$BASH_ENV
 
