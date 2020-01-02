@@ -169,7 +169,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              only: master
+              only: ci
       - build-amd64:
           requires:
             - build-front
@@ -177,7 +177,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              only: master
+              only: ci
       - build-i386:
           requires:
             - build-front
@@ -185,7 +185,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              only: master
+              only: ci
       - build-arm64v8:
           requires:
             - build-front
@@ -193,7 +193,7 @@ workflows:
             tags:
               only: /v*/
             branches:
-              only: master
+              only: ci
       - manifest_tag:
           requires:
             - build-amd64
