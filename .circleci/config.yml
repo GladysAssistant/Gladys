@@ -126,7 +126,7 @@ jobs:
             echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin
             sudo docker manifest create --amend $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-amd64 $DOCKERHUB_REPO:$VERSION-i386 $DOCKERHUB_REPO:$VERSION-arm32v6 $DOCKERHUB_REPO:$VERSION-arm64v8
             sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-amd64 --os linux --arch amd64
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-i386 --os linux --arch i386
+            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-i386 --os linux --arch 386
             sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm32v6 --os linux --arch arm --variant v6
             sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm64v8 --os linux --arch arm64 --variant v8
             sudo docker manifest push $DOCKERHUB_REPO:$VERSION -p
