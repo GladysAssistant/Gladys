@@ -112,10 +112,11 @@ jobs:
       enabled: true
       image: circleci/classic:201808-01
     steps:
+      - checkout
       - run:
           name: Add dynamic shared vars to env.
           command: |
-          .circleci/load_env.sh
+            .circleci/load_env.sh
       - run:
           name: Creating manifest
           command: |
