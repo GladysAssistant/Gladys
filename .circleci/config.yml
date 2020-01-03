@@ -33,10 +33,10 @@ shared: &shared
 
 jobs:
   test-server:
-    working_directory: ~/gladys-test # directory where steps will run
-    docker: # run the steps with Docker
-      - image: circleci/node:10
-    steps: # a collection of executable commands
+    working_directory: ~/gladys-test
+    docker:
+      - image: circleci/node:lts
+    steps:
       - checkout:
           path: ~/gladys-test
       - run:
@@ -71,7 +71,7 @@ jobs:
   test-front:
     working_directory: ~/gladys-test/front
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:lts
     steps:
       - checkout:
           path: ~/gladys-test
@@ -97,7 +97,7 @@ jobs:
   build-front:
     working_directory: ~/gladys-build
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:lts
     steps:
       - checkout
       - run:
