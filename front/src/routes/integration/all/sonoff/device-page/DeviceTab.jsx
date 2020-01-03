@@ -2,10 +2,10 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
-import SonoffBox from './SonoffBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
+import SonoffDeviceBox from '../SonoffDeviceBox';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -50,7 +50,17 @@ const DeviceTab = ({ children, ...props }) => (
           <div class="row">
             {props.sonoffDevices &&
               props.sonoffDevices.length > 0 &&
-              props.sonoffDevices.map((device, index) => <SonoffBox {...props} device={device} deviceIndex={index} />)}
+              props.sonoffDevices.map((device, index) => (
+                <SonoffDeviceBox
+                  {...props}
+                  editable
+                  saveButton
+                  deleteButton
+                  editButton
+                  device={device}
+                  deviceIndex={index}
+                />
+              ))}
             {!props.sonoffDevices || (props.sonoffDevices.length === 0 && <EmptyState />)}
           </div>
         </div>

@@ -1,31 +1,42 @@
-import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
+import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import get from 'get-value';
-import { Models } from '../models';
+import { Models } from './models';
+import { Link } from 'preact-router';
 
-class SonoffBox extends Component {
+class SonoffDeviceBox extends Component {
   updateName = e => {
-    this.props.updateDeviceField('discoveredDevices', this.props.deviceIndex, 'name', e.target.value);
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'name', e.target.value);
+
+    this.setState({
+      loading: false
+    });
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField('discoveredDevices', this.props.deviceIndex, 'room_id', e.target.value);
+    this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'room_id', e.target.value);
+
+    this.setState({
+      loading: false
+    });
   };
 
   saveDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      errorMessage: null
     });
     try {
-      await this.props.saveDevice('discoveredDevices', this.props.deviceIndex);
-      this.setState({
-        saveError: null
-      });
+      await this.props.saveDevice('sonoffDevices', this.props.deviceIndex);
     } catch (e) {
+      let errorMessage = 'integration.sonoff.error.defaultError';
+      if (e.response.status === 409) {
+        errorMessage = 'integration.sonoff.error.conflictError';
+      }
       this.setState({
-        saveError: e
+        errorMessage
       });
     }
     this.setState({
@@ -35,13 +46,14 @@ class SonoffBox extends Component {
 
   deleteDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      errorMessage: null
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        deleteError: RequestStatus.Error
+        errorMessage: 'integration.sonoff.error.defaultDeletionError'
       });
     }
     this.setState({
@@ -49,15 +61,11 @@ class SonoffBox extends Component {
     });
   };
 
-  render(props, { loading, saveError }) {
-    let errorMessage = 'integration.sonoff.error.defaultError';
-    if (saveError && saveError.response && saveError.response.status === 409) {
-      errorMessage = 'integration.sonoff.error.conflictError';
-    }
-
+  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
     return (
       <div class="col-md-6">
         <div class="card">
+          <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
               active: loading
@@ -66,40 +74,46 @@ class SonoffBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {saveError && (
+                {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />
                   </div>
                 )}
                 <div class="form-group">
-                  <label class="form-label" for={`name_${props.deviceIndex}`}>
+                  <label class="form-label" for={`name_${deviceIndex}`}>
                     <Text id="integration.sonoff.nameLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`name_${props.deviceIndex}`}
+                      id={`name_${deviceIndex}`}
                       type="text"
-                      value={props.device.name}
+                      value={device.name}
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.sonoff.namePlaceholder" />}
+                      disabled={!editable}
                     />
                   </Localizer>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`room_${props.deviceIndex}`}>
+                  <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.sonoff.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control" id={`room_${props.deviceIndex}`}>
+                  <select
+                    onChange={this.updateRoom}
+                    class="form-control"
+                    id={`room_${deviceIndex}`}
+                    disabled={!editable}
+                  >
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {props.housesWithRooms &&
-                      props.housesWithRooms.map(house => (
+                    {housesWithRooms &&
+                      housesWithRooms.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
+                            <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>
                           ))}
@@ -109,14 +123,14 @@ class SonoffBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`topic_${props.deviceIndex}`}>
+                  <label class="form-label" for={`topic_${deviceIndex}`}>
                     <Text id="integration.sonoff.topicLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`topic_${props.deviceIndex}`}
+                      id={`topic_${deviceIndex}`}
                       type="text"
-                      value={props.device.external_id}
+                      value={device.external_id.substring(7)}
                       class="form-control"
                       disabled="true"
                     />
@@ -124,12 +138,16 @@ class SonoffBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`model_${props.deviceIndex}`}>
+                  <label class="form-label" for={`model_${deviceIndex}`}>
                     <Text id="integration.sonoff.modelLabel" />
                   </label>
-                  <select disabled="true" class="form-control" id={`model_${props.deviceIndex}`}>
-                    <option value={props.device.model}>{Models[props.device.model].getLabel()}</option>
-                  </select>
+                  <input
+                    id={`model_${deviceIndex}`}
+                    type="text"
+                    value={Models[device.model].getLabel()}
+                    class="form-control"
+                    disabled="true"
+                  />
                 </div>
 
                 <div class="form-group">
@@ -137,9 +155,8 @@ class SonoffBox extends Component {
                     <Text id="integration.sonoff.device.featuresLabel" />
                   </label>
                   <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
+                    {device.features &&
+                      device.features.map(feature => (
                         <span class="tag">
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
@@ -153,15 +170,30 @@ class SonoffBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  {props.device.created_at && (
+                  {props.alreadyCreatedButton && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.sonoff.alreadyCreatedButton" />
                     </button>
                   )}
-                  {!props.device.created_at && (
+
+                  {props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.sonoff.saveButton" />
                     </button>
+                  )}
+
+                  {props.deleteButton && (
+                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                      <Text id="integration.sonoff.deleteButton" />
+                    </button>
+                  )}
+
+                  {props.editButton && (
+                    <Link href={`/dashboard/integration/device/sonoff/edit/${device.selector}`}>
+                      <button class="btn btn-secondary float-right">
+                        <Text id="integration.sonoff.device.editButton" />
+                      </button>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -173,4 +205,4 @@ class SonoffBox extends Component {
   }
 }
 
-export default SonoffBox;
+export default SonoffDeviceBox;

@@ -2,9 +2,9 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
-import DiscoveredBox from './DiscoveredBox';
 import style from './style.css';
 import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
+import SonoffDeviceBox from '../SonoffDeviceBox';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -34,7 +34,14 @@ const DeviceTab = ({ children, ...props }) => (
           <div class="row">
             {props.discoveredDevices &&
               props.discoveredDevices.map((device, index) => (
-                <DiscoveredBox {...props} device={device} deviceIndex={index} />
+                <SonoffDeviceBox
+                  {...props}
+                  modifiable={!device.created_at}
+                  alreadyCreatedButton={device.created_at}
+                  saveButton={!device.created_at}
+                  device={device}
+                  deviceIndex={index}
+                />
               ))}
             {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}
           </div>
