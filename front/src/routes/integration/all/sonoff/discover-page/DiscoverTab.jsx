@@ -36,7 +36,7 @@ const DeviceTab = ({ children, ...props }) => (
               props.discoveredDevices.map((device, index) => (
                 <SonoffDeviceBox
                   {...props}
-                  modifiable={!device.created_at}
+                  editable={!device.created_at}
                   alreadyCreatedButton={device.created_at}
                   saveButton={!device.created_at}
                   device={device}

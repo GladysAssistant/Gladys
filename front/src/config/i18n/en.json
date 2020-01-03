@@ -236,7 +236,7 @@
         "title": "Sonoff devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
-        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:",
+        "noDeviceFound": "No Sonoff device found.",
         "featuresLabel": "Features"
       },
       "discover": {
@@ -250,7 +250,6 @@
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
       "topicLabel": "Sonoff MQTT Topic",
-      "topicPlaceholder": "Should starts with 'sonoff:'",
       "modelLabel": "Sonoff Model",
       "saveButton": "Save",
       "alreadyCreatedButton": "Already created",
