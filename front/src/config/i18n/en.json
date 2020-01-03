@@ -237,6 +237,7 @@
         "title": "Sonoff devices in Gladys",
         "search": "Search devices",
         "newButton": "New",
+        "editButton": "Edit",
         "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
       },
       "discover": {

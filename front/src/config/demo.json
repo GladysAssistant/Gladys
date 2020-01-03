@@ -682,6 +682,7 @@
     {
       "name": "Switch",
       "external_id": "sonoff:sonoff-basic",
+      "selector": "sonoff-basic",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "model": "sonoff-basic",
       "features": [
@@ -692,6 +693,20 @@
       ]
     }
   ],
+  "get /api/v1/device/sonoff-basic": {
+    "name": "Switch",
+    "external_id": "sonoff:sonoff-basic",
+    "selector": "sonoff-basic",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "model": "sonoff-basic",
+    "features": [
+      {
+        "category": "switch",
+        "type": "binary",
+        "name": "Switch"
+      }
+    ]
+  },
   "get /api/v1/service/sonoff/discover": [
     {
       "name": "Sonoff Basic Kitchen",

@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { getFeatures, Models } from '../models';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
+import { Link } from 'preact-router';
 
 class SonoffBox extends Component {
   updateName = e => {
@@ -204,6 +205,12 @@ class SonoffBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.sonoff.deleteButton" />
                   </button>
+
+                  <Link href={`/dashboard/integration/device/sonoff/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.sonoff.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
