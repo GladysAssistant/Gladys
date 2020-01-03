@@ -79,23 +79,6 @@ function createActions(store) {
         });
       }
     },
-    addDevice(state) {
-      const uniqueId = uuid.v4();
-      const sonoffDevices = update(state.sonoffDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            should_poll: false,
-            service_id: state.currentIntegration.id,
-            external_id: 'sonoff:'
-          }
-        ]
-      });
-      store.setState({
-        sonoffDevices
-      });
-    },
     updateDeviceField(state, listName, index, field, value) {
       const devices = update(state[listName], {
         [index]: {

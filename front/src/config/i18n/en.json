@@ -231,12 +231,10 @@
       "title": "Sonoff",
       "deviceTab": "Devices",
       "discoverTab": "MQTT discover",
-      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
         "title": "Sonoff devices in Gladys",
         "search": "Search devices",
-        "newButton": "New",
         "editButton": "Edit",
         "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
       },

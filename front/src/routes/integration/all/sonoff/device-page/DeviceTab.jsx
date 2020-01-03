@@ -35,9 +35,6 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        <button onClick={props.addDevice} class="btn btn-outline-primary ml-2">
-          <Text id="integration.sonoff.device.newButton" /> <i class="fe fe-plus" />
-        </button>
       </div>
     </div>
     <div class="card-body">
@@ -54,7 +51,7 @@ const DeviceTab = ({ children, ...props }) => (
             {props.sonoffDevices &&
               props.sonoffDevices.length > 0 &&
               props.sonoffDevices.map((device, index) => <SonoffBox {...props} device={device} deviceIndex={index} />)}
-            {!props.sonoffDevices || (props.sonoffDevices.length === 0 && <EmptyState addDevice={props.addDevice} />)}
+            {!props.sonoffDevices || (props.sonoffDevices.length === 0 && <EmptyState />)}
           </div>
         </div>
       </div>
