@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.2.2",
-    "bcrypt": "^3.0.3",
+    "bcrypt": "^3.0.7",
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",
     "cross-env": "^5.2.0",
