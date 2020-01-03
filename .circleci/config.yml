@@ -129,7 +129,6 @@ jobs:
             sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm32v6 --os linux --arch arm --variant v6
             sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm64v8 --os linux --arch arm64 --variant v8
             sudo docker manifest push $DOCKERHUB_REPO:$VERSION -p
-
   build-armhf:
     <<: *shared
     environment:
