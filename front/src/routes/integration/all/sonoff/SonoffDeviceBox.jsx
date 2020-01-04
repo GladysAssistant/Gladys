@@ -29,7 +29,7 @@ class SonoffDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      await this.props.saveDevice('sonoffDevices', this.props.deviceIndex);
+      await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
     } catch (e) {
       let errorMessage = 'integration.sonoff.error.defaultError';
       if (e.response.status === 409) {

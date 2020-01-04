@@ -42,6 +42,7 @@ const DeviceTab = ({ children, ...props }) => (
                   saveButton={!device.created_at}
                   device={device}
                   deviceIndex={index}
+                  listName="discoveredDevices"
                 />
               ))}
             {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}

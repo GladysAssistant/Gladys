@@ -109,6 +109,7 @@ function createActions(store) {
       });
     },
     async saveDevice(state, listName, index) {
+      console.log('into saveDevice', listName, index);
       const device = state[listName][index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const devices = update(state[listName], {

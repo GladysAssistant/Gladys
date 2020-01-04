@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const models = require('../../models');
 
 /**
@@ -13,7 +12,6 @@ const models = require('../../models');
  */
 function status(deviceExternalId, message, events, sonoffHandler) {
   const statusMsg = JSON.parse(message);
-  const statusValue = statusMsg.Status.Power;
   const friendlyName = statusMsg.Status.FriendlyName[0];
   const moduleId = statusMsg.Status.Module;
 
@@ -25,16 +23,11 @@ function status(deviceExternalId, message, events, sonoffHandler) {
       external_id: externalId,
       features: model.getFeatures(externalId),
       model: model.getModel(),
-      service_id: this.serviceId,
+      service_id: sonoffHandler.serviceId,
       should_poll: false,
     };
 
     sonoffHandler.mqttDevices[deviceExternalId] = device;
-
-    events.push({
-      device_feature_external_id: `sonoff:${deviceExternalId}:${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
-      state: statusValue,
-    });
   } else {
     logger.warn(`MQTT : Sonoff model ${moduleId} (${friendlyName}) not managed`);
   }

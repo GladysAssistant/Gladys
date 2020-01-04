@@ -59,6 +59,7 @@ const DeviceTab = ({ children, ...props }) => (
                   editButton
                   device={device}
                   deviceIndex={index}
+                  listName="sonoffDevices"
                 />
               ))}
             {!props.sonoffDevices || (props.sonoffDevices.length === 0 && <EmptyState />)}
