@@ -1,14 +1,14 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Sync user calendars.
+ * @description Update Gladys calendars.
  * @param {Array} calendars - External calendars.
  * @param {Object} userId - Gladys calendar owner.
  * @returns {Promise} Resolving with all calendars sync.
  * @example
- * syncCalendars(calendars, userId)
+ * updateCalendars(calendars, userId)
  */
-async function syncCalendars(calendars, userId) {
+async function updateCalendars(calendars, userId) {
   logger.info(`CalDAV : Performing full sync of calendars.`);
 
   logger.info(`CalDAV : Syncing calendars, received ${calendars.length} calendars.`);
@@ -27,5 +27,5 @@ async function syncCalendars(calendars, userId) {
 }
 
 module.exports = {
-  syncCalendars,
+  updateCalendars,
 };

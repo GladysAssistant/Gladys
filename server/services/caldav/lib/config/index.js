@@ -1,5 +1,5 @@
 /**
- * @description Start config.
+ * @description Start configuration depending on host.
  * @param {Object} userId - Gladys user to connect.
  * @returns {Promise} Resolving with client connected.
  * @example

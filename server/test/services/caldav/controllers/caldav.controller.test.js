@@ -5,7 +5,7 @@ const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 
 const caldavService = {
   config: fake.resolves({ url: 'https://p01-caldav.icloud.com' }),
-  sync: fake.resolves({}),
+  syncUserCalendars: fake.resolves({}),
 };
 
 const res = {
@@ -38,7 +38,7 @@ describe('get /api/v1/service/caldav/sync', () => {
       },
     };
     await caldavController['get /api/v1/service/caldav/sync'].controller(req, res);
-    assert.calledWith(caldavService.sync, userId);
+    assert.calledWith(caldavService.syncUserCalendars, userId);
     assert.calledWith(res.status, 200);
   });
 });

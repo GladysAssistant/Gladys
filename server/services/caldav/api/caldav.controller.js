@@ -20,7 +20,7 @@ module.exports = function CalDAVController(caldavHandler) {
    */
   async function sync(req, res) {
     try {
-      await caldavHandler.sync(req.user.id);
+      await caldavHandler.syncUserCalendars(req.user.id);
       res.status(200).send();
     } catch (error) {
       res.status(500).send();

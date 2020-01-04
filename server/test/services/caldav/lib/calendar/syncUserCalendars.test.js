@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-const { syncUser } = require('../../../../../services/caldav/lib/calendar/calendar.syncUser');
+const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -54,13 +54,13 @@ const gladysEvents = [
 describe('CalDAV sync user', () => {
   const sync = {
     serviceId,
-    syncUser,
+    syncUserCalendars,
     connect: sinon.stub().resolves({ calendars }),
-    syncCalendars: sinon
+    updateCalendars: sinon
       .stub()
       .withArgs(calendars)
       .resolves(),
-    syncCalendarEvents: sinon.stub(),
+    updateCalendarEvents: sinon.stub(),
     gladys: {
       calendar: {
         get: sinon
@@ -78,8 +78,8 @@ describe('CalDAV sync user', () => {
   };
 
   it('should start user sync', async () => {
-    sync.syncCalendarEvents.resolves();
-    await sync.syncUser(userId);
+    sync.updateCalendarEvents.resolves();
+    await sync.syncUserCalendars(userId);
 
     expect(sync.gladys.calendar.destroy.callCount).to.equal(3);
     expect(sync.gladys.calendar.destroy.args).to.eql([['perso'], ['stark-industries'], ['avengers']]);
@@ -93,11 +93,11 @@ describe('CalDAV sync user', () => {
       ['event-2'],
     ]);
 
-    expect(sync.syncCalendars.args).to.eql([[calendars, userId]]);
+    expect(sync.updateCalendars.args).to.eql([[calendars, userId]]);
 
-    expect(sync.syncCalendarEvents.callCount).to.equal(3);
+    expect(sync.updateCalendarEvents.callCount).to.equal(3);
 
-    expect(sync.syncCalendarEvents.args).to.eql([
+    expect(sync.updateCalendarEvents.args).to.eql([
       [gladysCalendars[0], [calendars[0]]],
       [gladysCalendars[2], [calendars[1]]],
       [gladysCalendars[3], [calendars[2]]],
@@ -105,7 +105,7 @@ describe('CalDAV sync user', () => {
   });
 
   it('should fail start user sync', async () => {
-    sync.syncCalendarEvents.rejects(Error('Fail sync calendar events'));
-    expect(sync.syncUser(userId)).to.be.rejectedWith(Error, 'Fail sync calendar events');
+    sync.updateCalendarEvents.rejects(Error('Fail sync calendar events'));
+    expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'Fail sync calendar events');
   });
 });

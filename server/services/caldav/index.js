@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const logger = require('../../utils/logger');
 const CalDAVHandler = require('./lib');
 const CalDAVController = require('./api/caldav.controller');
@@ -22,8 +23,25 @@ module.exports = function CalDAVService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting CalDAV service');
-    interval = setInterval(() => {
-      calDavHandler.syncAllUsers();
+    interval = setInterval(async () => {
+      try {
+        const users = await gladys.user.get();
+        const service = await gladys.service.getLocalServiceByName('caldav');
+
+        await Promise.map(
+          users,
+          async (user) => {
+            const caldavUrl = await gladys.variable.getValue('CALDAV_URL', service.dataValues.id, user.id);
+            if (caldavUrl) {
+              await calDavHandler.syncUserCalendars(user.id);
+            }
+            return null;
+          },
+          { concurrency: 2 },
+        );
+      } catch (e) {
+        logger.error(e);
+      }
     }, 1000 * 60 * 15);
   }
 
@@ -43,7 +61,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
     start,
     stop,
     calendar: {
-      sync: calDavHandler.sync,
+      syncUserCalendars: calDavHandler.syncUserCalendars,
     },
     controllers: CalDAVController(calDavHandler),
   });

@@ -1,5 +1,5 @@
 /**
- * @description Start connection with calDAV server.
+ * @description Init connection with calDAV server.
  * @param {Object} userId - Gladys user to connect.
  * @returns {Promise} Resolving with client connected.
  * @example

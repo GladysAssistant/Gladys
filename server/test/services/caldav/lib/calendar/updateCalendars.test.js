@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { syncCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncCalendars');
+const { updateCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.updateCalendars');
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 
@@ -32,7 +32,7 @@ const formatedCalendars = [
 
 describe('CalDAV sync calendars', () => {
   const sync = {
-    syncCalendars,
+    updateCalendars,
     formatCalendars: sinon.stub().returns(formatedCalendars),
     gladys: {
       calendar: {
@@ -42,7 +42,7 @@ describe('CalDAV sync calendars', () => {
   };
 
   it('should sync calendars', async () => {
-    await sync.syncCalendars(calendars, userId);
+    await sync.updateCalendars(calendars, userId);
     expect(sync.gladys.calendar.create.callCount).to.equal(3);
     expect(sync.gladys.calendar.create.args).to.eql([
       [formatedCalendars[0]],

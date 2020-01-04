@@ -1,5 +1,5 @@
 /**
- * @description Request iCloud.
+ * @description Execute request for iCloud.
  * @param {*} request - Module request.
  * @param {string} path - Request path.
  * @param {Object} auth - User account credentials.
@@ -7,10 +7,10 @@
  * @returns {Promise} Resolving with request response.
  * @example
  * iCloudRequest(request, '/', {
- *         appleId: 'tony.stark@icloud.com',
- *         password: '12345'
- *     },
- *     '<propfind xmlns=\'DAV:\'>...</propfind>'
+ *     appleId: 'tony.stark@icloud.com',
+ *     password: '12345'
+ *   },
+ *   '<propfind xmlns=\'DAV:\'>...</propfind>'
  * )
  */
 function iCloudRequest(request, path, auth, postData) {

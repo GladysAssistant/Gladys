@@ -1,13 +1,13 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Start user sync.
- * @param {Object} userId - Gladys user to connect & sync.
+ * @description Start user's calendars synchronization.
+ * @param {Object} userId - Gladys user to connect & synchronize.
  * @returns {Promise} Resolving.
  * @example
- * syncUser(user.id)
+ * syncUserCalendars(user.id)
  */
-async function syncUser(userId) {
+async function syncUserCalendars(userId) {
   const account = await this.connect(userId);
 
   // Clean all dav Calendar for full Sync
@@ -26,7 +26,7 @@ async function syncUser(userId) {
     }),
   );
 
-  await this.syncCalendars(account.calendars, userId);
+  await this.updateCalendars(account.calendars, userId);
 
   gladysCalendars = await this.gladys.calendar.get(userId);
   davCalendars = gladysCalendars.filter((calendar) => calendar.service_id === this.serviceId);
@@ -34,7 +34,7 @@ async function syncUser(userId) {
   return Promise.all(
     davCalendars.map(async (davCalendar) => {
       try {
-        const result = await this.syncCalendarEvents(
+        const result = await this.updateCalendarEvents(
           davCalendar,
           account.calendars.filter((calendar) => davCalendar.external_id === calendar.url),
         );
@@ -50,5 +50,5 @@ async function syncUser(userId) {
 }
 
 module.exports = {
-  syncUser,
+  syncUserCalendars,
 };

@@ -1,14 +1,14 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Sync Gladys calendar to external calendar.
- * @param {Object} gladysCalendar - Gladys calendar to sync.
+ * @description Update Gladys calendars with the external calendars.
+ * @param {Object} gladysCalendar - Gladys calendar to update.
  * @param {Object} calendars - Array of one calendar, containing calendar form caldav server.
  * @returns {Promise} Resolving with new events.
  * @example
- * syncCalendarEvents();
+ * updateCalendarEvents();
  */
-async function syncCalendarEvents(gladysCalendar, calendars) {
+async function updateCalendarEvents(gladysCalendar, calendars) {
   if (calendars.length !== 1) {
     return Promise.reject();
   }
@@ -33,5 +33,5 @@ async function syncCalendarEvents(gladysCalendar, calendars) {
 }
 
 module.exports = {
-  syncCalendarEvents,
+  updateCalendarEvents,
 };

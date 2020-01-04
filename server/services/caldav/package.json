@@ -13,6 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
+    "bluebird": "^3.7.0",
     "dav": "^1.8.0",
     "ical": "^0.6.0",
     "moment": "^2.24.0",
