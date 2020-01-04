@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const models = require('../../models');
 
 /**
@@ -16,21 +15,22 @@ function status(deviceExternalId, message, events, sonoffHandler) {
   const moduleId = statusMsg.Status.Module;
 
   const model = models[moduleId];
-  if (model) {
-    const externalId = `sonoff:${deviceExternalId}`;
-    const device = {
-      name: friendlyName,
-      external_id: externalId,
-      features: model.getFeatures(externalId),
-      model: model.getModel(),
-      service_id: sonoffHandler.serviceId,
-      should_poll: false,
-    };
+  const externalId = `sonoff:${deviceExternalId}`;
+  const device = {
+    name: friendlyName,
+    external_id: externalId,
+    features: [],
+    model: moduleId,
+    service_id: sonoffHandler.serviceId,
+    should_poll: false,
+  };
 
-    sonoffHandler.mqttDevices[deviceExternalId] = device;
-  } else {
-    logger.warn(`MQTT : Sonoff model ${moduleId} (${friendlyName}) not managed`);
+  if (model) {
+    device.model = model.getModel();
+    device.features = model.getFeatures(externalId);
   }
+
+  sonoffHandler.mqttDevices[deviceExternalId] = device;
 }
 
 module.exports = {

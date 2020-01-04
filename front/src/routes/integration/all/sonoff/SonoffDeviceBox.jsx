@@ -3,7 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import get from 'get-value';
-import { Models } from './models';
+import { Models, getLabel } from './models';
 import { Link } from 'preact-router';
 
 class SonoffDeviceBox extends Component {
@@ -62,6 +62,8 @@ class SonoffDeviceBox extends Component {
   };
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
+    const validModel = Models[device.model];
+
     return (
       <div class="col-md-6">
         <div class="card">
@@ -91,7 +93,7 @@ class SonoffDeviceBox extends Component {
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.sonoff.namePlaceholder" />}
-                      disabled={!editable}
+                      disabled={!editable || !validModel}
                     />
                   </Localizer>
                 </div>
@@ -104,7 +106,7 @@ class SonoffDeviceBox extends Component {
                     onChange={this.updateRoom}
                     class="form-control"
                     id={`room_${deviceIndex}`}
-                    disabled={!editable}
+                    disabled={!editable || !validModel}
                   >
                     <option value="">
                       <Text id="global.emptySelectOption" />
@@ -144,7 +146,7 @@ class SonoffDeviceBox extends Component {
                   <input
                     id={`model_${deviceIndex}`}
                     type="text"
-                    value={Models[device.model].getLabel()}
+                    value={getLabel(device.model)}
                     class="form-control"
                     disabled="true"
                   />
@@ -170,31 +172,37 @@ class SonoffDeviceBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  {props.alreadyCreatedButton && (
+                  {validModel && props.alreadyCreatedButton && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.sonoff.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {props.updateButton && (
+                  {validModel && props.updateButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.sonoff.updateButton" />
                     </button>
                   )}
 
-                  {props.saveButton && (
+                  {validModel && props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.sonoff.saveButton" />
                     </button>
                   )}
 
-                  {props.deleteButton && (
+                  {validModel && props.deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.sonoff.deleteButton" />
                     </button>
                   )}
 
-                  {props.editButton && (
+                  {!validModel && (
+                    <button class="btn btn-dark" disabled>
+                      <Text id="integration.sonoff.unmanagedModelButton" />
+                    </button>
+                  )}
+
+                  {validModel && props.editButton && (
                     <Link href={`/dashboard/integration/device/sonoff/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.sonoff.device.editButton" />

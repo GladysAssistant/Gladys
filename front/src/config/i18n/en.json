@@ -255,6 +255,7 @@
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
       "error": {
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",

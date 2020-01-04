@@ -1,9 +1,7 @@
 import update from 'immutability-helper';
 import debounce from 'debounce';
-import uuid from 'uuid';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
-import { fillFeatures } from './models';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -109,7 +107,6 @@ function createActions(store) {
       });
     },
     async saveDevice(state, listName, index) {
-      console.log('into saveDevice', listName, index);
       const device = state[listName][index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const devices = update(state[listName], {
