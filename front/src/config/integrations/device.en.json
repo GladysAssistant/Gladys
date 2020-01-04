@@ -30,9 +30,9 @@
     "img": "/assets/integrations/cover/philips-hue.jpg"
   },
   {
-    "key": "sonoff",
-    "name": "Sonoff",
-    "description": "Control your Sonoff devices.",
-    "img": "/assets/integrations/cover/sonoff.jpg"
+    "key": "tasmota",
+    "name": "Tasmota",
+    "description": "Control your Tasmota devices.",
+    "img": "/assets/integrations/cover/tasmota.jpg"
   }
 ]

@@ -227,30 +227,30 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
-    "sonoff": {
-      "title": "Sonoff",
+    "tasmota": {
+      "title": "Tasmota",
       "deviceTab": "Devices",
       "discoverTab": "MQTT discover",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
-        "title": "Sonoff devices in Gladys",
+        "title": "Tasmota devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
-        "noDeviceFound": "No Sonoff device found.",
+        "noDeviceFound": "No Tasmota device found.",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Sonoff discover devices over MQTT",
-        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Sonoff devices.",
-        "noDeviceFound": "No Sonoff device discovered.",
-        "documentation": "Sonoff documentation"
+        "title": "Tasmota discover devices over MQTT",
+        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Tasmota devices.",
+        "noDeviceFound": "No Tasmota device discovered.",
+        "documentation": "Tasmota documentation"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Sonoff MQTT Topic",
-      "modelLabel": "Sonoff Model",
+      "topicLabel": "Tasmota MQTT Topic",
+      "modelLabel": "Tasmota Model",
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",

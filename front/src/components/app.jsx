@@ -73,10 +73,10 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
-// Sonoff
-import SonoffPage from '../routes/integration/all/sonoff/device-page';
-import SonoffEditPage from '../routes/integration/all/sonoff/edit-page';
-import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
+// Tasmota
+import TasmotaPage from '../routes/integration/all/tasmota/device-page';
+import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
+import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -170,9 +170,9 @@ const AppRouter = connect(
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-        <SonoffPage path="/dashboard/integration/device/sonoff" />
-        <SonoffEditPage path="/dashboard/integration/device/sonoff/edit/:deviceSelector" />
-        <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+        <TasmotaPage path="/dashboard/integration/device/tasmota" />
+        <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
+        <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
