@@ -137,13 +137,8 @@ describe('Mqtt handle message', () => {
       '{ "Status": {"Module": 1, "Power": 1, "FriendlyName": ["name"] }}',
     );
 
-    const expectedEvent = {
-      device_feature_external_id: `sonoff:my_device:switch:binary`,
-      state: 1,
-    };
-
     assert.notCalled(mqttService.device.publish);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+    assert.notCalled(gladys.event.emit);
   });
 
   it('should change SONOFF power state to ON (STATE topic)', () => {
