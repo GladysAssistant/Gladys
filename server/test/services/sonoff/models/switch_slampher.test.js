@@ -19,10 +19,13 @@ describe('SonoffService - Model - Slampher', () => {
   });
 
   it('get features for Slampher', () => {
-    const features = models[modelId].getFeatures();
+    const features = models[modelId].getFeatures('device_external_id');
 
     expect(features).to.deep.eq([
       {
+        name: 'Switch',
+        external_id: 'device_external_id:light:binary',
+        selector: 'device-external-id-light-binary',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         read_only: false,
@@ -31,9 +34,5 @@ describe('SonoffService - Model - Slampher', () => {
         max: 1,
       },
     ]);
-  });
-
-  it('no fill features for Slampher', () => {
-    expect(models[modelId].fillFeatures).to.eq(undefined);
   });
 });

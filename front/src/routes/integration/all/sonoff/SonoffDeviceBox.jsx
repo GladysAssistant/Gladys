@@ -176,6 +176,12 @@ class SonoffDeviceBox extends Component {
                     </button>
                   )}
 
+                  {props.updateButton && (
+                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                      <Text id="integration.sonoff.updateButton" />
+                    </button>
+                  )}
+
                   {props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.sonoff.saveButton" />

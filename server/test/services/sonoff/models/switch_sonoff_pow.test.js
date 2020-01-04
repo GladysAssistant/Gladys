@@ -23,10 +23,13 @@ describe('SonoffService - Model - Pow', () => {
   });
 
   it('get features for Sonoff Pow', () => {
-    const features = models[modelId].getFeatures();
+    const features = models[modelId].getFeatures('device_external_id');
 
     expect(features).to.deep.eq([
       {
+        name: 'Switch',
+        external_id: 'device_external_id:switch:binary',
+        selector: 'device-external-id-switch-binary',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -35,6 +38,9 @@ describe('SonoffService - Model - Pow', () => {
         max: 1,
       },
       {
+        name: 'Voltage',
+        external_id: 'device_external_id:switch:voltage',
+        selector: 'device-external-id-switch-voltage',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
         read_only: true,
@@ -44,6 +50,9 @@ describe('SonoffService - Model - Pow', () => {
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
       {
+        name: 'Energy',
+        external_id: 'device_external_id:switch:energy',
+        selector: 'device-external-id-switch-energy',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
         read_only: true,
@@ -53,6 +62,9 @@ describe('SonoffService - Model - Pow', () => {
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
       {
+        name: 'Power',
+        external_id: 'device_external_id:switch:power',
+        selector: 'device-external-id-switch-power',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
         read_only: true,
@@ -62,9 +74,5 @@ describe('SonoffService - Model - Pow', () => {
         unit: DEVICE_FEATURE_UNITS.KILOWATT,
       },
     ]);
-  });
-
-  it('no fill features for Sonoff Pow', () => {
-    expect(models[modelId].fillFeatures).to.eq(undefined);
   });
 });

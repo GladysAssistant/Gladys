@@ -19,10 +19,13 @@ describe('SonoffService - Model - Arilux LC01', () => {
   });
 
   it('get features for Arilux LC01', () => {
-    const features = models[modelId].getFeatures();
+    const features = models[modelId].getFeatures('device_external_id');
 
     expect(features).to.deep.eq([
       {
+        name: 'Switch',
+        external_id: 'device_external_id:light:binary',
+        selector: 'device-external-id-light-binary',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         read_only: false,
@@ -31,6 +34,9 @@ describe('SonoffService - Model - Arilux LC01', () => {
         max: 1,
       },
       {
+        name: 'Brightness',
+        external_id: 'device_external_id:light:brightness',
+        selector: 'device-external-id-light-brightness',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
         read_only: false,
@@ -39,6 +45,9 @@ describe('SonoffService - Model - Arilux LC01', () => {
         max: 100,
       },
       {
+        name: 'Color',
+        external_id: 'device_external_id:light:color',
+        selector: 'device-external-id-light-color',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
         read_only: false,
@@ -47,9 +56,5 @@ describe('SonoffService - Model - Arilux LC01', () => {
         max: 16777215,
       },
     ]);
-  });
-
-  it('no fill features for Arilux LC01', () => {
-    expect(models[modelId].fillFeatures).to.eq(undefined);
   });
 });

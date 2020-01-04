@@ -6,15 +6,6 @@ Object.keys(models).forEach(modelKey => {
   Models[models[modelKey].getModel()] = models[modelKey];
 });
 
-export const getFeatures = modelName => {
-  const model = Models[modelName];
-  if (model) {
-    return model.getFeatures();
-  }
-
-  return [];
-};
-
 export const fillFeatures = device => {
   const model = Models[device.model];
   if (model && model.fillFeatures) {

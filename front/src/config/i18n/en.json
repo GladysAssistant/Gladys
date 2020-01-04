@@ -252,6 +252,7 @@
       "topicLabel": "Sonoff MQTT Topic",
       "modelLabel": "Sonoff Model",
       "saveButton": "Save",
+      "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "error": {

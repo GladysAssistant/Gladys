@@ -19,10 +19,13 @@ describe('SonoffService - Model - 4 Channel', () => {
   });
 
   it('get features for Sonoff 4 Channel', () => {
-    const features = models[modelId].getFeatures();
+    const features = models[modelId].getFeatures('device_external_id');
 
     expect(features).to.deep.eq([
       {
+        name: 'Switch 1',
+        external_id: 'device_external_id:switch:binary:1',
+        selector: 'device-external-id-switch-binary-1',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -31,6 +34,9 @@ describe('SonoffService - Model - 4 Channel', () => {
         max: 1,
       },
       {
+        name: 'Switch 2',
+        external_id: 'device_external_id:switch:binary:2',
+        selector: 'device-external-id-switch-binary-2',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -39,6 +45,9 @@ describe('SonoffService - Model - 4 Channel', () => {
         max: 1,
       },
       {
+        name: 'Switch 3',
+        external_id: 'device_external_id:switch:binary:3',
+        selector: 'device-external-id-switch-binary-3',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -47,6 +56,9 @@ describe('SonoffService - Model - 4 Channel', () => {
         max: 1,
       },
       {
+        name: 'Switch 4',
+        external_id: 'device_external_id:switch:binary:4',
+        selector: 'device-external-id-switch-binary-4',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -55,23 +67,5 @@ describe('SonoffService - Model - 4 Channel', () => {
         max: 1,
       },
     ]);
-  });
-
-  it('fill features for Sonoff 4 Channel', () => {
-    const name = 'deviceName';
-    const features = models[modelId].getFeatures();
-    const device = {
-      name,
-      features,
-      external_id: 'device_external_id',
-    };
-
-    models[modelId].fillFeatures(device);
-
-    for (let i = 0; i < 4; i += 1) {
-      const feature = features[i];
-      expect(feature.name).to.eq(`deviceName - switch ${i + 1}`);
-      expect(feature.external_id).to.eq(`device_external_id:switch:binary:${i + 1}`);
-    }
   });
 });

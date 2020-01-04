@@ -19,10 +19,13 @@ describe('SonoffService - Model - Basic', () => {
   });
 
   it('get features for Sonoff Basic', () => {
-    const features = models[modelId].getFeatures();
+    const features = models[modelId].getFeatures('device_external_id');
 
     expect(features).to.deep.eq([
       {
+        name: 'Switch',
+        external_id: 'device_external_id:switch:binary',
+        selector: 'device-external-id-switch-binary',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         read_only: false,
@@ -31,9 +34,5 @@ describe('SonoffService - Model - Basic', () => {
         max: 1,
       },
     ]);
-  });
-
-  it('no fill features for Sonoff Basic', () => {
-    expect(models[modelId].fillFeatures).to.eq(undefined);
   });
 });
