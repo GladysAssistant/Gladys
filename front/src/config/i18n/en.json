@@ -201,6 +201,31 @@
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!"
       }
     },
+    "miLight": {
+      "title": "Mi-light",
+      "deviceTab": "Devices",
+      "setupTab": "Setup Bridges",
+      "setup": {
+        "connectedBridgesTitle": "Connected bridges",
+        "disconnectButton": "Disconnect",
+        "bridgesOnNetwork": "Bridges on network",
+        "connectButton": "Connect/Reconnect",
+        "scanButton": "Scan network",
+        "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
+        "noBridgesConnected": "No bridges connected."
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "connectButton": "Connect/Reconnect",
+        "search": "Search devices",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "iplabel" : "IP Address",
+        "modellabel" : "Model"
+      }
+    },
     "rtspCamera": {
       "title": "Cameras",
       "search": "Search cameras",

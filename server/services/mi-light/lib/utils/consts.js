@@ -1,0 +1,20 @@
+const BRIDGE_MODEL = 'mi-light-bridge';
+const BRIDGE_EXTERNAL_ID_BASE = 'mi-light:bridge';
+const BRIDGE_IP_ADDRESS = 'BRIDGE_IP_ADDRESS';
+const BRIDGE_TYPE = 'BRIDGE-TYPE';
+const BRIDGE_NAME = 'BRIDGE_NAME';
+const BRIDGE_MAC = 'BRIDGE_MAC';
+const LIGHT_MODEL = 'mi-light-light';
+
+const LIGHT_EXTERNAL_ID_BASE = 'mi-light-light';
+
+module.exports = {
+  BRIDGE_MODEL,
+  BRIDGE_EXTERNAL_ID_BASE,
+  BRIDGE_IP_ADDRESS,
+  BRIDGE_NAME,
+  BRIDGE_MAC,
+  BRIDGE_TYPE,
+  LIGHT_MODEL,
+  LIGHT_EXTERNAL_ID_BASE,
+};

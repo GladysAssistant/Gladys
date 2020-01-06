@@ -57,6 +57,8 @@ import TelegramPage from '../routes/integration/all/telegram';
 import DarkSkyPage from '../routes/integration/all/darksky';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
+import MiLightSetupPage from '../routes/integration/all/mi-light/setup-page';
+import MiLightDevicePage from '../routes/integration/all/mi-light/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
@@ -141,6 +143,12 @@ const AppRouter = connect(
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
+        <Redirect
+          path="/dashboard/integration/device/mi-light"
+          to="/dashboard/integration/device/mi-light/device"
+        />
+        <MiLightSetupPage path="/dashboard/integration/device/mi-light/setup" />
+        <MiLightDevicePage path="/dashboard/integration/device/mi-light/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />

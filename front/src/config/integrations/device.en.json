@@ -28,5 +28,11 @@
     "name": "Philips Hue",
     "description": "Control Philips Hue Lights.",
     "img": "/assets/integrations/cover/philips-hue.jpg"
+  },
+  {
+    "key": "mi-light",
+    "name": "Mi Light",
+    "description": "Control Mi-Light Lights.",
+    "img": "/assets/integrations/cover/milight.jpg"
   }
 ]

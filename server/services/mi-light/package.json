@@ -1,0 +1,20 @@
+{
+  "name": "gladys-milight",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "bluebird": "^3.7.0",
+    "node-milight-api": "^3.4.0",
+    "node-milight-promise": "^0.3.2"
+  }
+}
