@@ -73,6 +73,11 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
+// Arduino integration
+import ArduinoDevicePage from '../routes/integration/all/arduino/device-page';
+import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
+import ArduinoSetupPage from '../routes/integration/all/arduino/setup-page';
+
 // Sonoff
 import SonoffPage from '../routes/integration/all/sonoff/device-page';
 import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
@@ -103,33 +108,33 @@ const AppRouter = connect(
         {config.gatewayMode ? (
           <GatewayForgotPassword path="/forgot-password" />
         ) : (
-          <ForgotPassword path="/forgot-password" />
-        )}
+            <ForgotPassword path="/forgot-password" />
+          )}
         {config.gatewayMode ? (
           <GatewayResetPassword path="/reset-password" />
         ) : (
-          <ResetPassword path="/reset-password" />
-        )}
+            <ResetPassword path="/reset-password" />
+          )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? <SubscribeGateway path="/subscribe-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
         {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
         {config.gatewayMode ? (
           <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
@@ -167,6 +172,10 @@ const AppRouter = connect(
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
+        <ArduinoDevicePage path="/dashboard/integration/device/arduino" />
+        <ArduinoDeviceSetupPage path="/dashboard/integration/device/arduino/edit" />
+        <ArduinoDeviceSetupPage path="/dashboard/integration/device/arduino/edit/:deviceSelector" />
+        <ArduinoSetupPage path="/dashboard/integration/device/arduino/setup" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <SonoffPage path="/dashboard/integration/device/sonoff" />

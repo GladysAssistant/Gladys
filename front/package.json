@@ -19,7 +19,7 @@
     "eslint-config-synacor": "^2.0.2",
     "eslint-plugin-json": "^1.4.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^21.2.1",
+    "jest": "^25.0.0",
     "per-env": "^1.0.2",
     "preact-cli": "^2.1.0",
     "preact-render-spy": "^1.2.1",
