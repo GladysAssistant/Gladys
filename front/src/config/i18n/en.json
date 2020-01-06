@@ -399,8 +399,8 @@
       "setupTab": "Setup",
       "status": {
         "notConfigured": "Arduino service is not configured, please go to ",
-        "notConnected": "MQTT service failed to connect to network, please go to ",
-        "setupPageLink": "MQTT configuration page"
+        "notConnected": "Arduino card is not connected, please connect a card.",
+        "setupPageLink": "Arduino configuration page"
       },
       "device": {
         "title": "Arduino Devices",
