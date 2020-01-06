@@ -43,52 +43,6 @@ const SetupTab = ({ children, ...props }) => {
                 </p>
               )}
               <form>
-                <div class="form-group">
-                  <label for="arduinoURL" class="form-label">
-                    <Text id={`integration.arduino.setup.urlLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="arduinoURL"
-                      placeholder={<Text id="integration.arduino.setup.urlPlaceholder" />}
-                      value={props.arduinoURL}
-                      class="form-control"
-                      onInput={props.updateConfigration}
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label for="arduinoUsername" class="form-label">
-                    <Text id={`integration.arduino.setup.userLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="arduinoUsername"
-                      placeholder={<Text id="integration.arduino.setup.userPlaceholder" />}
-                      value={props.arduinoUsername}
-                      class="form-control"
-                      onInput={props.updateConfigration}
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label for="arduinoPassword" class="form-label">
-                    <Text id={`integration.arduino.setup.passwordLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="arduinoPassword"
-                      type="password"
-                      placeholder={<Text id="integration.arduino.setup.passwordPlaceholder" />}
-                      value={props.arduinoPassword}
-                      class="form-control"
-                      onInput={props.updateConfigration}
-                    />
-                  </Localizer>
-                </div>
-
                 <div class="row mt-5">
                   <div class="col">
                     <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>

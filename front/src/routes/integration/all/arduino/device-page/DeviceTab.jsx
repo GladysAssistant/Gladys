@@ -34,11 +34,13 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
+        {/*
         <Link href="/dashboard/integration/device/arduino/edit">
           <button class="btn btn-outline-primary ml-2">
             <Text id="scene.newButton" /> <i class="fe fe-plus" />
           </button>
         </Link>
+        */}
       </div>
     </div>
     <div class="card-body">

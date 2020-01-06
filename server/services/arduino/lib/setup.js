@@ -1,6 +1,6 @@
-/*var SerialPort = require('serialport');
+var SerialPort = require('serialport');
 var Promise = require('bluebird');
-var connect = require('./connect.js');
+var connect = require('./connect');
 
 module.exports = function() {
 
@@ -46,7 +46,7 @@ function filterArduino(ports) {
 
   // foreach port we test if it is an arduino
   ports.forEach(function(port) {
-    if (port.manufacturer && port.manufacturer.toLowerCase().search("arduino") != -1) {
+    if (port.manufacturer && (port.manufacturer.toLowerCase().search("arduino") != -1 || port.manufacturer.toLowerCase().search("1a86") != -1)) {
       arduinos.push(port);
     }
   });
@@ -62,4 +62,4 @@ function listUsbDevices() {
       return resolve(ports);
     });
   });
-}*/
+}
