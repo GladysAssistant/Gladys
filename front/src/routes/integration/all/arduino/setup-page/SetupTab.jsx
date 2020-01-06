@@ -1,5 +1,6 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupTab = ({ children, ...props }) => {
@@ -19,9 +20,6 @@ const SetupTab = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <p>
-                <MarkupText id="integration.arduino.setup.arduinoDescription" />
-              </p>
               {props.connectArduinoStatus === RequestStatus.Error && (
                 <p class="alert alert-danger">
                   <Text id="integration.arduino.setup.error" />
@@ -42,9 +40,35 @@ const SetupTab = ({ children, ...props }) => {
                   <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
                 </p>
               )}
+              {!get(props, 'arduinoStatus.ready') && (
+                <div class="alert alert-warning">
+                  <Text id="integration.arduino.setup.notConnected" />
+                </div>
+              )}
+              <p>
+                <MarkupText id="integration.arduino.setup.arduinoDescription" />
+              </p>
               <form>
                 <div class="row mt-5">
                   <div class="col">
+
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
+                      </label>
+                      <select class="form-control" onChange={props.updateArduinoDriverPath}>
+                        <option>
+                          <Text id="global.emptySelectOption" />
+                        </option>
+                        {props.usbPorts &&
+                          props.usbPorts.map(usbPort => (
+                            <option value={usbPort.comPath} selected={props.arduinoDriverPath === usbPort.comPath}>
+                              {usbPort.comName}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+
                     <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
                       <Text id="integration.arduino.setup.detectionLabel" />
                     </button>

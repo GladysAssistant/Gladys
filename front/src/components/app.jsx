@@ -67,16 +67,14 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import ArduinoDevicePage from '../routes/integration/all/arduino/device-page';
+import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
+import ArduinoSetupPage from '../routes/integration/all/arduino/setup-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
-
-// Arduino integration
-import ArduinoDevicePage from '../routes/integration/all/arduino/device-page';
-import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
-import ArduinoSetupPage from '../routes/integration/all/arduino/setup-page';
 
 // Sonoff
 import SonoffPage from '../routes/integration/all/sonoff/device-page';

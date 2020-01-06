@@ -4,7 +4,6 @@ import cx from 'classnames';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
-import { Link } from 'preact-router/match';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -34,13 +33,11 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        {/*
-        <Link href="/dashboard/integration/device/arduino/edit">
-          <button class="btn btn-outline-primary ml-2">
-            <Text id="scene.newButton" /> <i class="fe fe-plus" />
+        <div class="page-options d-flex">
+          <button class="btn btn-info" onClick={props.getUsbPorts}>
+            <Text id="integration.arduino.device.refreshButton" />
           </button>
-        </Link>
-        */}
+        </div>
       </div>
     </div>
     <div class="card-body">
@@ -64,7 +61,9 @@ const DeviceTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.arduinoDevices && props.arduinoDevices.length === 0 && <Text id="integration.arduino.device.noDevices" />}
+            <div class="dimmer-content alert alert-info">
+              {props.arduinoDevices && props.arduinoDevices.length === 0 && <Text id="integration.arduino.device.noDevices" />}
+            </div>
           </div>
         </div>
       </div>
