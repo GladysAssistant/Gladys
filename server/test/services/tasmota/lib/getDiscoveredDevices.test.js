@@ -55,7 +55,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
     };
     const result = tasmotaHandler.getDiscoveredDevices();
     expect(result).to.be.lengthOf(1);
-    expect(result).deep.eq([existingDevice]);
+    expect(result).deep.eq([{ ...existingDevice, updatable: false }]);
   });
 
   it('discovered already in Gladys, but updated (basic to pow)', () => {
@@ -98,7 +98,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
           external_id: 'external_id:1',
         },
         {
-          name: 'feature 2',
+          name: 'feature 2 bis',
           type: 'type 2',
           category: 'category 2',
           external_id: 'external_id:2',

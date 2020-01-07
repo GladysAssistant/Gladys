@@ -3,7 +3,6 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import get from 'get-value';
-import { Models, getLabel } from './models';
 import { Link } from 'preact-router';
 
 class TasmotaDeviceBox extends Component {
@@ -62,7 +61,7 @@ class TasmotaDeviceBox extends Component {
   };
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
-    const validModel = Models[device.model];
+    const validModel = device.features.length > 0;
 
     return (
       <div class="col-md-6">
@@ -137,19 +136,6 @@ class TasmotaDeviceBox extends Component {
                       disabled="true"
                     />
                   </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`model_${deviceIndex}`}>
-                    <Text id="integration.tasmota.modelLabel" />
-                  </label>
-                  <input
-                    id={`model_${deviceIndex}`}
-                    type="text"
-                    value={getLabel(device.model)}
-                    class="form-control"
-                    disabled="true"
-                  />
                 </div>
 
                 <div class="form-group">

@@ -16,6 +16,7 @@ const TasmotaHandler = function TasmotaHandler(gladys, serviceId) {
   this.serviceId = serviceId;
   this.mqttService = null;
   this.mqttDevices = {};
+  this.pendingMqttDevices = {};
 };
 
 TasmotaHandler.prototype.connect = connect;

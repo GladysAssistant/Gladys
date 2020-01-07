@@ -1,6 +1,5 @@
 const { BadParameters } = require('../../../utils/coreErrors');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
-const { setSwitchValue, setLightValue } = require('./cmdValue');
+const { FEATURE_TEMPLATES } = require('./features');
 
 /**
  * @description Send the new device value over MQTT.
@@ -12,8 +11,7 @@ const { setSwitchValue, setLightValue } = require('./cmdValue');
  */
 function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
-  const splittedPowerId = deviceFeature.external_id.split(':');
-  const [prefix, topic, , , relayId] = splittedPowerId;
+  const [prefix, topic, command] = deviceFeature.external_id.split(':');
 
   if (prefix !== 'tasmota') {
     throw new BadParameters(`Tasmota device external_id is invalid: "${externalId}" should starts with "tasmota:"`);
@@ -22,24 +20,19 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tasmota device external_id is invalid: "${externalId}" have no MQTT topic`);
   }
 
-  let cmnd;
-  const { category } = deviceFeature;
+  const gladysKey = `Gladys.${command}`;
+  const featureTemplate = FEATURE_TEMPLATES.find((template) => {
+    return template.keyMatcher.test(gladysKey);
+  });
 
-  switch (category) {
-    case DEVICE_FEATURE_CATEGORIES.LIGHT: {
-      cmnd = setLightValue(deviceFeature, value);
-      break;
-    }
-    case DEVICE_FEATURE_CATEGORIES.SWITCH: {
-      cmnd = setSwitchValue(deviceFeature, value);
-      break;
-    }
-    default:
-      throw new BadParameters(`Tasmota device category not managed to set value on "${externalId}"`);
+  if (featureTemplate) {
+    const mqttValue = typeof featureTemplate.writeValue === 'function' ? featureTemplate.writeValue(value) : value;
+
+    // Send message to Tasmota topics
+    this.mqttService.device.publish(`cmnd/${topic}/${command}`, `${mqttValue}`);
+  } else {
+    throw new BadParameters(`Tasmota device external_id is not managed: "${externalId}" have no MQTT topic`);
   }
-
-  // Send message to Tasmota topics
-  this.mqttService.device.publish(`cmnd/${topic}/${cmnd.topic}${relayId || ''}`, cmnd.value);
 }
 
 module.exports = {

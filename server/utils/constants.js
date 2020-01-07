@@ -247,6 +247,8 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
+    EFFECT_MODE: 'effect-mode',
+    EFFECT_SPEED: 'effect-speed',
   },
   SENSOR: {
     DECIMAL: 'decimal',

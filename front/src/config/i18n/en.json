@@ -250,7 +250,6 @@
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
       "topicLabel": "Tasmota MQTT Topic",
-      "modelLabel": "Tasmota Model",
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",

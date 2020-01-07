@@ -1,6 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');
-const { status, state, sensor, power } = require('./mqttStat');
+const { status, featureStatus, subStatus } = require('./mqtt');
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -15,27 +16,42 @@ function handleMqttMessage(topic, message) {
   const events = [];
 
   switch (eventType) {
-    // Power status
-    case 'POWER':
-    case 'POWER1':
-    case 'POWER2': {
-      power(deviceExternalId, message, eventType, events);
-      break;
-    }
     // Sensor status
     case 'SENSOR': {
-      sensor(deviceExternalId, message, events);
+      featureStatus(deviceExternalId, message, this.gladys.event, 'StatusSNS');
       break;
     }
     // Device global status
     case 'STATUS': {
-      status(deviceExternalId, message, events, this);
+      delete this.mqttDevices[deviceExternalId];
+      const device = status(deviceExternalId, message, this.serviceId);
+      this.pendingMqttDevices[deviceExternalId] = device;
+      this.mqttService.device.publish(`cmnd/${deviceExternalId}/STATUS`, '11');
       break;
     }
-    // Device state topic
+    // Device secondary features
+    case 'STATUS8': {
+      const device = this.pendingMqttDevices[deviceExternalId];
+      if (device) {
+        subStatus(device, message, this.gladys.event);
+        this.mqttDevices[deviceExternalId] = device;
+        delete this.pendingMqttDevices[deviceExternalId];
+      }
+      break;
+    }
+    // Device primary features
+    case 'STATUS11': {
+      const device = this.pendingMqttDevices[deviceExternalId];
+      if (device) {
+        subStatus(device, message, this.gladys.event);
+        // Ask for secondary features
+        this.mqttService.device.publish(`cmnd/${deviceExternalId}/STATUS`, '8');
+      }
+      break;
+    }
     case 'RESULT':
     case 'STATE': {
-      state(deviceExternalId, message, events);
+      featureStatus(deviceExternalId, message, this.gladys.event, 'StatusSTS');
       break;
     }
     // Online status
@@ -44,7 +60,7 @@ function handleMqttMessage(topic, message) {
       break;
     }
     default: {
-      logger.info(`MQTT : Tasmota topic ${topic} not handled.`);
+      logger.debug(`MQTT : Tasmota topic "${topic}" not handled.`);
     }
   }
 
