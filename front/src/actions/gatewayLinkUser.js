@@ -15,9 +15,13 @@ function createActions(store) {
         });
       } catch (e) {
         console.log(e);
+        const error = get(e, 'response.error');
         const errorMessage = get(e, 'response.error_message');
         const errorMessageOtherFormat = get(e, 'response.message');
-        if (errorMessage === 'NO_INSTANCE_FOUND' || errorMessageOtherFormat === 'NO_INSTANCE_DETECTED') {
+        if (error === 'LINKED_USER_NOT_FOUND') {
+          await state.session.gatewayClient.updateUserIdInGladys(null);
+          window.location = '/link-gateway-user';
+        } else if (errorMessage === 'NO_INSTANCE_FOUND' || errorMessageOtherFormat === 'NO_INSTANCE_DETECTED') {
           store.setState({
             usersGetStatus: RequestStatus.GatewayNoInstanceFound
           });

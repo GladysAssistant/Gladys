@@ -43,6 +43,11 @@ const NodeTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
+          {props.zwaveDevices && props.zwaveDevices.length === 0 && (
+            <div class="alert alert-info">
+              <Text id="integration.zwave.device.noDevices" />
+            </div>
+          )}
           {props.getZwaveDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.zwaveDevices &&
@@ -56,7 +61,6 @@ const NodeTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.zwaveDevices && props.zwaveDevices.length === 0 && <Text id="integration.zwave.device.noDevices" />}
           </div>
         </div>
       </div>

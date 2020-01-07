@@ -7,6 +7,7 @@ ZwaveMock.prototype = Object.create(new EventEmitter());
 
 ZwaveMock.prototype.addNode = fake.returns(null);
 ZwaveMock.prototype.removeNode = fake.returns(null);
+ZwaveMock.prototype.cancelControllerCommand = fake.returns(null);
 ZwaveMock.prototype.connect = fake.returns(null);
 ZwaveMock.prototype.disconnect = fake.returns(null);
 ZwaveMock.prototype.setValue = fake.returns(null);

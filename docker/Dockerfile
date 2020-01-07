@@ -1,6 +1,6 @@
 ARG target
 
-FROM $target/node:10-alpine
+FROM $target/node:12-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
@@ -9,7 +9,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs ffmpeg sqlite openssl gzip
+RUN apk add --no-cache tzdata nmap openzwave-dev openzwave-libs openzwave ffmpeg sqlite openssl gzip
 
 RUN mkdir /src
 WORKDIR /src

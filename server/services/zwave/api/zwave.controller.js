@@ -69,6 +69,7 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
     res.json({
       connected: zwaveManager.connected,
       scanInProgress: zwaveManager.scanInProgress,
+      ready: zwaveManager.ready,
     });
   }
 
@@ -102,6 +103,18 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
    */
   async function removeNode(req, res) {
     zwaveManager.removeNode(req.body.secure);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/zwave/cancel Cancel ZWave command
+   * @apiName cancelCommand
+   * @apiGroup Zwave
+   */
+  async function cancelControllerCommand(req, res) {
+    zwaveManager.cancelControllerCommand();
     res.json({
       success: true,
     });
@@ -159,6 +172,10 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
     'post /api/v1/service/zwave/node/remove': {
       authenticated: true,
       controller: asyncMiddleware(removeNode),
+    },
+    'post /api/v1/service/zwave/cancel': {
+      authenticated: true,
+      controller: asyncMiddleware(cancelControllerCommand),
     },
   };
 };

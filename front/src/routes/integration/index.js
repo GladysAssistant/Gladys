@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import IntegrationPage from './IntegrationPage';
 import actions from '../../actions/integration';
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class Integration extends Component {
   componentWillMount() {
     this.props.getIntegrations();

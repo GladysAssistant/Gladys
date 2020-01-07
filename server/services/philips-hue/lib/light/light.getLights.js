@@ -4,9 +4,11 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 const { getDeviceParam } = require('../../../../utils/device');
+const { getPhilipsHueColorLight } = require('../models/color');
 const { getPhilipsHueColorTemperatureLight } = require('../models/colorWithTemperature');
 const { getPhilipsHueWhiteLight } = require('../models/white');
 const { getPhilipsHueWhiteTemperatureLight } = require('../models/whiteWithTemperature');
+const { getPlugOnOff } = require('../models/plugOnOff');
 
 const { LIGHT_EXTERNAL_ID_BASE, BRIDGE_SERIAL_NUMBER } = require('../utils/consts');
 
@@ -32,14 +34,27 @@ async function getLights() {
         case 'LCT015': // hue white & color 4th generation
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
+        case 'LCT010': // Hue A19 White & Color w/ Richer Colors
+        case 'LCA001': // Hue color lamp
+        case 'GL-C-008': // Non-hue LED Strip
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LLC010': // Hue iris
+          lightsToReturn.push(getPhilipsHueColorLight(philipsHueLight, serialNumber, this.serviceId));
+          break;
         case 'LWB010': // hue white bulb with fixed warming light (2700K)
+        case 'LWB006': // Hue white lamp
+        case 'LWG004': // Hue white spot
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LTW012': // hue White Ambiance E12
         case 'LTW010': // hue White & Ambiance Bulb
+        case 'LTW001': // Hue A19 White & Ambiance Bulb
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
+          break;
+        case 'SP 120': // Innr Smart Plug On/Off
+        case 'Plug 01': // OSRAM Plug
+          lightsToReturn.push(getPlugOnOff(philipsHueLight, serialNumber, this.serviceId));
           break;
         default:
           logger.info(`Philips Hue Light of model ${philipsHueLight.modelid} is not handled yet !`);

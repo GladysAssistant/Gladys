@@ -26,6 +26,18 @@ describe('user.create', () => {
     });
     expect(createdUser).not.to.have.property('password');
   });
+  it('should create user and login with the same email/password', async () => {
+    await user.create({
+      firstname: 'Tony',
+      lastname: 'Stark',
+      email: 'tony.stark@gladysassistant.com',
+      password: 'testststs',
+      birthdate: '01/01/2019',
+      language: 'en',
+      role: 'admin',
+    });
+    await user.login('tony.stark@gladysassistant.com', 'testststs');
+  });
   it('should not create user, wrong email', async () => {
     const promise = user.create({
       firstname: 'Tony',
@@ -48,6 +60,6 @@ describe('user.create', () => {
       language: 'en',
       role: 'admin',
     });
-    return assert.isRejected(promise, 'Validation error: Validation len on password failed');
+    return assert.isRejected(promise, 'Password is too short');
   });
 });

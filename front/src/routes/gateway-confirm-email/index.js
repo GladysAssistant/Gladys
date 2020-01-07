@@ -2,10 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import ConfirmEmail from './ConfirmEmail';
 
-@connect(
-  'session',
-  {}
-)
+@connect('session', {})
 class ConfirmEmailPage extends Component {
   state = {
     emailConfirmed: false,

@@ -100,6 +100,7 @@
       "confirmDeleteHouse": "Confirm house deletion",
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
+      "roomConflictError": "A room with the same name already exist.",
       "validationError": "Validation error: A house can't have an empty name."
     },
     "success": {
@@ -191,14 +192,16 @@
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesConnected": "No bridges connected."
+        "noBridgesConnected": "No bridges connected.",
+        "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
       },
       "device": {
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
         "search": "Search devices",
-        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!"
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab."
       }
     },
     "miLight": {
@@ -248,6 +251,44 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
+    "sonoff": {
+      "title": "Sonoff",
+      "deviceTab": "Devices",
+      "discoverTab": "MQTT discover",
+      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
+      "discoverDeviceDescr": "Automatically scan MQTT devices",
+      "device": {
+        "title": "Sonoff devices in Gladys",
+        "search": "Search devices",
+        "newButton": "New",
+        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
+      },
+      "discover": {
+        "title": "Sonoff discover devices over MQTT",
+        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Sonoff devices.",
+        "noDeviceFound": "No Sonoff device discovered.",
+        "documentation": "Sonoff documentation"
+      },
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic (%topic% Sonoff MQTT)",
+      "topicPlaceholder": "Should starts with 'sonoff:'",
+      "modelLabel": "Sonoff Model",
+      "model": {
+        "sonoff-basic": "Basic",
+        "sonoff-pow": "Pow",
+        "sonoff-s2x": "S20/S26 Smart Plug"
+      },
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "conflictError": "Current topic is already in use."
+      }
+    },
     "zwave": {
       "title": "Z-Wave",
       "deviceTab": "Devices",
@@ -263,7 +304,8 @@
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "editButton": "Edit"
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -280,6 +322,7 @@
         "features": "Features",
         "params": "Params",
         "noFeatures": "No features",
+        "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "deviceCreatedSuccess": "The device was added with success."
@@ -292,7 +335,22 @@
         "description": "To use Z-Wave in Gladys, you need to have a Z-Wave USB Stick connected to your Gladys instance.",
         "zwaveUsbDriverPathLabel": "Select the USB port where your Z-Wave stick is connected",
         "connectButton": "Connect",
-        "disconnectButton": "Disconnect"
+        "disconnectButton": "Disconnect",
+        "refreshButton": "Refresh USB list",
+        "notConnected": "Gladys is not connected to any Z-Wave USB stick.",
+        "connectedWithSuccess": "Z-Wave USB stick connected with success.",
+        "connecting": "Trying to connect to Z-Wave USB stick...",
+        "driverFailedError": "An error occured while trying to connect to Z-Wave USB stick."
+      },
+      "nodeOperation": {
+        "addNodeInstructions": "You can now include your device following instructions in your device manual.",
+        "removeNodeInstructions": "You can now exclude your device following instructions in your device manual.",
+        "addNodeTitle": "Inclusion Mode",
+        "removeNodeTitle": "Exclusion Mode",
+        "seconds": "seconds remaining",
+        "cancelButton": "Cancel",
+        "nodeAddedTitle": "A new node was found",
+        "nodeAddedDescription": "Wait a few seconds while we get all informations from this node..."
       }
     },
     "darkSky": {
@@ -308,6 +366,11 @@
       "title": "MQTT",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "status": {
+        "notConfigured": "MQTT service is not configured, please go to ",
+        "notConnected": "MQTT service failed to connect to network, please go to ",
+        "setupPageLink": "MQTT configuration page"
+      },
       "device": {
         "title": "MQTT Devices",
         "search": "Search devices",
@@ -361,6 +424,7 @@
         "noDevices": "No Xiaomi devices added yet.",
         "searchPlaceholder": "Search Xiaomi devices",
         "sidLabel": "Xiaomi SID",
+        "ipLabel": "IP Address",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "saveButton": "Save",
@@ -370,7 +434,9 @@
       "setup": {
         "title": "Xiaomi devices not in Gladys",
         "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
-        "createDeviceInGladys": "Connect in Gladys"
+        "createDeviceInGladys": "Connect in Gladys",
+        "createDeviceError": "There was an error creating this device in Gladys. ",
+        "deviceCreatedSuccess": "The device was added with success."
       },
       "models": {
         "motion": "Motion Sensor",
@@ -453,7 +519,8 @@
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
     "billingTab": "Billing",
-    "gatewayUsersTab": "Users"
+    "gatewayUsersTab": "Users",
+    "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
@@ -601,6 +668,8 @@
     "invalidEmail": "Invalid email",
     "networkError": "Network Error: Are you sure your Gladys instance is connected to the internet?",
     "userNotAcceptedLocally": "Your user is not accepted locally, please go back to your Gladys instance and allow access to this user in settings.",
+    "gatewayNoInstanceFound": "No Instance found. You need to connect first your instance to Gladys.",
+    "gatewayAccessBilling": "To access billing, click here.",
     "unknownError": "An unknown error occurred. Please contact us for more informations.",
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
@@ -617,7 +686,8 @@
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress...",
     "backupNowButton": "Backup now",
-    "backupStarted": "Backup started..."
+    "backupStarted": "Backup started...",
+    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
@@ -712,7 +782,11 @@
     "whatCanYouAsk": "What can I ask?",
     "whatsTheWeatherLike": "What's the weather like?",
     "whatsTheTemperatureKitchen": "What's the temperature in the kitchen?",
-    "showCameraImage": "Show me camera image in the kitchen"
+    "showCameraImage": "Show me camera image in the kitchen",
+    "emptyStateMessage": "Send me a message!",
+    "messagePlaceholder": "Type your message...",
+    "sendingInProgress": "Sending...",
+    "typingInProgress": "Typing..."
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
@@ -787,5 +861,16 @@
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Reset Password"
+  },
+  "gatewayOpenApi": {
+    "title": "Open API",
+    "description": "The Open API allows you to send informations to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
+    "moreInformations": "More informations.",
+    "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
+    "keyName": "Name",
+    "keyLastUsed": "Last used",
+    "revoke": "Revoke",
+    "generateButton": "Generate",
+    "registered": "Registered"
   }
 }

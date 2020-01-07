@@ -6,6 +6,8 @@ const logger = require('../../../utils/logger');
  * disconnect();
  */
 function disconnect() {
+  this.connected = false;
+
   if (this.mqttClient && !this.mqttClient.disconnected) {
     logger.debug(`Disconnecting existing MQTT server...`);
     this.mqttClient.end();

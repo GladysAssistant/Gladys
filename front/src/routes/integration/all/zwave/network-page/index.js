@@ -5,10 +5,7 @@ import ZwavePage from '../ZwavePage';
 import NetworkTab from './NetworkTab';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect(
-  'user,zwaveNodesNeighbors,zwaveGetNeighborsStatus',
-  actions
-)
+@connect('user,zwaveNodesNeighbors,zwaveGetNeighborsStatus', actions)
 class ZwaveNodePage extends Component {
   componentWillMount() {}
 

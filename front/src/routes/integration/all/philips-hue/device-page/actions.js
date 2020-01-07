@@ -25,10 +25,14 @@ function createActions(store) {
         }
         const philipsHueDevicesReceived = await state.httpClient.get('/api/v1/service/philips-hue/device', options);
         const philipsHueDevices = philipsHueDevicesReceived.filter(device => device.model !== BRIDGE_MODEL);
+        const philipsHueDevicesMap = new Map();
+        philipsHueDevices.forEach(device => philipsHueDevicesMap.set(device.external_id, device));
         store.setState({
           philipsHueDevices,
+          philipsHueDevicesMap,
           getPhilipsHueDevicesStatus: RequestStatus.Success
         });
+        actions.getPhilipsHueNewDevices(store.getState());
       } catch (e) {
         store.setState({
           getPhilipsHueDevicesStatus: RequestStatus.Error
@@ -41,8 +45,14 @@ function createActions(store) {
       });
       try {
         const philipsHueNewDevices = await state.httpClient.get('/api/v1/service/philips-hue/light');
+        const philipsHueNewDevicesFiltered = philipsHueNewDevices.filter(device => {
+          if (!state.philipsHueDevicesMap) {
+            return true;
+          }
+          return !state.philipsHueDevicesMap.has(device.external_id);
+        });
         store.setState({
-          philipsHueNewDevices,
+          philipsHueNewDevices: philipsHueNewDevicesFiltered,
           getPhilipsHueNewDevicesStatus: RequestStatus.Success
         });
       } catch (e) {

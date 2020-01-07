@@ -136,7 +136,7 @@ const Profile = ({ children, ...props }) => {
                 <Text id="profile.year" />
               </option>
               {props.years.map(year => (
-                <option>{year}</option>
+                <option value={year}>{year}</option>
               ))}
             </select>
           </div>
@@ -173,7 +173,7 @@ const Profile = ({ children, ...props }) => {
                 <Text id="profile.day" />
               </option>
               {props.days.map(day => (
-                <option>{day}</option>
+                <option value={day}>{day}</option>
               ))}
             </select>
           </div>

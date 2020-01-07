@@ -8,3 +8,4 @@ module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports['mi-light'] = require('./mi-light');
+module.exports.sonoff = require('./sonoff');

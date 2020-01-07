@@ -35,7 +35,7 @@ jobs:
   test-server:
     working_directory: ~/gladys-test # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps: # a collection of executable commands
       - checkout:
           path: ~/gladys-test
@@ -48,12 +48,12 @@ jobs:
           command: 'sudo npm install typescript node-gyp npm@latest -g'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dependency-cache-{{ checksum "server/package.json" }}
+          key: dependency-cache-{{ checksum "server/package.json" }}-node-12
       - run:
           name: Install NPM dependencies
           command: cd server && npm install
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "server/package.json" }}
+          key: dependency-cache-{{ checksum "server/package.json" }}-node-12
           paths:
             - ./server/node_modules
       - run:
@@ -71,7 +71,7 @@ jobs:
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps: # a collection of executable commands
       - checkout:
           path: ~/gladys-test
@@ -80,12 +80,12 @@ jobs:
           command: 'sudo npm install codecov npm@latest -g'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}-node-12
       - run:
           name: Install NPM dependencies
           command: npm install
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}-node-12
           paths:
             - ./node_modules
       - run:

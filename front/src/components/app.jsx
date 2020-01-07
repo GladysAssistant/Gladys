@@ -51,6 +51,7 @@ import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
 import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
+import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
@@ -63,6 +64,8 @@ import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
 import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
+import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
+import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
@@ -71,6 +74,10 @@ import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
+
+// Sonoff
+import SonoffPage from '../routes/integration/all/sonoff/device-page';
+import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -120,6 +127,11 @@ const AppRouter = connect(
         ) : (
           <Error type="404" default />
         )}
+        {config.gatewayMode ? (
+          <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />
+        ) : (
+          <Error type="404" default />
+        )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
@@ -156,6 +168,8 @@ const AppRouter = connect(
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
         <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
+        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
+        <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -163,6 +177,9 @@ const AppRouter = connect(
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
+        <SonoffPage path="/dashboard/integration/device/sonoff" />
+        <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <CalendarPage path="/dashboard/calendar" />
@@ -183,10 +200,7 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();

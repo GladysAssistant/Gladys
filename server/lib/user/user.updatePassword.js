@@ -1,5 +1,6 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
+const passwordUtils = require('../../utils/password');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @description Update a user password.
@@ -18,7 +19,13 @@ async function updatePassword(userId, newPassword) {
     throw new NotFoundError(`User not found`);
   }
 
-  await user.update({ password: newPassword });
+  if (newPassword.length < 8) {
+    throw new BadParameters('Password is too short');
+  }
+
+  const hashedPassword = await passwordUtils.hash(newPassword);
+
+  await user.update({ password: hashedPassword });
 
   this.stateManager.setState('user', user.selector, user.get({ plain: true }));
 
