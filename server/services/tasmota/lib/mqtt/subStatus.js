@@ -3,8 +3,8 @@ const { addSelector } = require('../../../../utils/addSelector');
 const logger = require('../../../../utils/logger');
 const { recursiveSearch, generateExternalId, generateValue } = require('../features');
 
-const addFeature = (device, featureTemplate, command, value) => {
-  const featureExternalId = generateExternalId(featureTemplate, command);
+const addFeature = (device, featureTemplate, fullKey, command, value) => {
+  const featureExternalId = generateExternalId(featureTemplate, command, fullKey);
   const externalId = `${device.external_id}:${featureExternalId}`;
   const existingFeature = device.features.find((f) => f.external_id === externalId);
 
@@ -45,8 +45,8 @@ const addFeature = (device, featureTemplate, command, value) => {
 function subStatus(device, message, gladysEvent) {
   const statusMsg = JSON.parse(message);
 
-  recursiveSearch(statusMsg, (featureTemplate, command, value) => {
-    const feature = addFeature(device, featureTemplate, command, value);
+  recursiveSearch(statusMsg, (featureTemplate, fullKey, command, value) => {
+    const feature = addFeature(device, featureTemplate, fullKey, command, value);
     if (feature) {
       gladysEvent.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: feature.external_id,

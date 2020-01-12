@@ -228,6 +228,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
+  COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
