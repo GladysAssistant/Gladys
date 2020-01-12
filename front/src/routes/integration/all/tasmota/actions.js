@@ -139,6 +139,50 @@ function createActions(store) {
         getTasmotaOrderDir: e.target.value
       });
       await actions.getTasmotaDevices(store.getState(), 20, 0);
+    },
+    async forceScan(state) {
+      store.setState({
+        loading: true
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/tasmota/discover');
+        store.setState({
+          discoveredDevices: [],
+          errorLoading: false
+        });
+
+        setTimeout(store.setState, 5000, {
+          loading: false
+        });
+      } catch (e) {
+        store.setState({
+          loading: false,
+          errorLoading: true
+        });
+      }
+    },
+    addDiscoveredDevice(state, newDevice) {
+      const existingDevices = state.discoveredDevices || [];
+      const newDevices = [];
+
+      let added = false;
+      existingDevices.forEach(device => {
+        if (device.external_id === newDevice.external_id) {
+          newDevices.push(newDevice);
+          added = true;
+        } else {
+          newDevices.push(device);
+        }
+      });
+
+      if (!added) {
+        newDevices.push(newDevice);
+      }
+
+      store.setState({
+        discoveredDevices: newDevices,
+        loading: false
+      });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

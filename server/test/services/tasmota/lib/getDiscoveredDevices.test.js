@@ -55,7 +55,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
     };
     const result = tasmotaHandler.getDiscoveredDevices();
     expect(result).to.be.lengthOf(1);
-    expect(result).deep.eq([{ ...existingDevice, updatable: false }]);
+    expect(result).deep.eq([existingDevice]);
   });
 
   it('discovered already in Gladys, but updated (basic to pow)', () => {

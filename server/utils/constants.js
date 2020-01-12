@@ -368,6 +368,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
+  TASMOTA: {
+    NEW_DEVICE: 'tasmota.new-device',
+  },
 };
 
 const DASHBOARD_TYPE = {

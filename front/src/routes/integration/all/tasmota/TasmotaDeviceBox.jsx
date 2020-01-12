@@ -138,13 +138,13 @@ class TasmotaDeviceBox extends Component {
                   </Localizer>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="integration.tasmota.device.featuresLabel" />
-                  </label>
-                  <div class="tags">
-                    {device.features &&
-                      device.features.map(feature => (
+                {device.features && device.features.length > 0 && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.tasmota.device.featuresLabel" />
+                    </label>
+                    <div class="tags">
+                      {device.features.map(feature => (
                         <span class="tag">
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
@@ -154,8 +154,9 @@ class TasmotaDeviceBox extends Component {
                           </div>
                         </span>
                       ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div class="form-group">
                   {validModel && props.alreadyCreatedButton && (

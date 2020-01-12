@@ -12,6 +12,11 @@ const DeviceTab = ({ children, ...props }) => (
       <h1 class="card-title">
         <Text id="integration.tasmota.discover.title" />
       </h1>
+      <div class="page-options d-flex">
+        <button onClick={props.forceScan} class="btn btn-outline-primary ml-2">
+          <Text id="integration.tasmota.discover.scan" /> <i class="fe fe-radio" />
+        </button>
+      </div>
     </div>
     <div class="card-body">
       <CheckMqttPanel />

@@ -3,6 +3,9 @@ const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { getDiscoveredDevices } = require('./getDiscoveredDevices');
 const { setValue } = require('./setValue');
+const { forceScan } = require('./forceScan');
+const { mergeWithExistingDevice } = require('./mergeWithExistingDevice');
+const { notifyNewDevice } = require('./notifyNewDevice');
 
 /**
  * @description Add ability to connect to Tasmota devices.
@@ -24,5 +27,8 @@ TasmotaHandler.prototype.disconnect = disconnect;
 TasmotaHandler.prototype.handleMqttMessage = handleMqttMessage;
 TasmotaHandler.prototype.getDiscoveredDevices = getDiscoveredDevices;
 TasmotaHandler.prototype.setValue = setValue;
+TasmotaHandler.prototype.forceScan = forceScan;
+TasmotaHandler.prototype.mergeWithExistingDevice = mergeWithExistingDevice;
+TasmotaHandler.prototype.notifyNewDevice = notifyNewDevice;
 
 module.exports = TasmotaHandler;

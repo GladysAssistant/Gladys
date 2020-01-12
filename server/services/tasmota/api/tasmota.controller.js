@@ -8,10 +8,26 @@ module.exports = function MqttController(mqttManager) {
     res.json(mqttManager.getDiscoveredDevices());
   }
 
+  /**
+   * @api {post} /api/v1/service/tasmota/discover Force to discover Tasmota devices
+   * @apiName scan
+   * @apiGroup Tasmota
+   */
+  function scan(req, res) {
+    mqttManager.forceScan();
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/tasmota/discover': {
       authenticated: true,
       controller: discover,
+    },
+    'post /api/v1/service/tasmota/discover': {
+      authenticated: true,
+      controller: scan,
     },
   };
 };

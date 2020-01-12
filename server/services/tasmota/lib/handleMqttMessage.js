@@ -31,11 +31,15 @@ function handleMqttMessage(topic, message) {
     }
     // Device secondary features
     case 'STATUS8': {
-      const device = this.pendingMqttDevices[deviceExternalId];
+      let device = this.pendingMqttDevices[deviceExternalId];
       if (device) {
         subStatus(device, message, this.gladys.event);
+        device = this.mergeWithExistingDevice(device);
+
         this.mqttDevices[deviceExternalId] = device;
         delete this.pendingMqttDevices[deviceExternalId];
+
+        this.notifyNewDevice(device);
       }
       break;
     }

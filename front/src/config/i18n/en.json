@@ -244,7 +244,8 @@
         "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
         "error": "Error discovering Tasmota devices.",
         "noDeviceFound": "No Tasmota device discovered.",
-        "documentation": "Tasmota documentation"
+        "documentation": "Tasmota documentation",
+        "scan": "Scan"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
