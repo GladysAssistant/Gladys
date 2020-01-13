@@ -10,7 +10,9 @@ const actionSchema = Joi.array().items(
         .valid(ACTION_LIST)
         .required(),
       deviceFeature: Joi.string(),
+      deviceFeatures: Joi.array().items(Joi.string()),
       device: Joi.string(),
+      devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       text: Joi.string(),
       milliseconds: Joi.number(),

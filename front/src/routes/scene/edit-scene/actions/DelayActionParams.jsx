@@ -24,12 +24,21 @@ const convertTime = action => {
 };
 
 const WaitActionParams = ({ children, ...props }) => (
-  <input
-    class="form-control"
-    type="time"
-    value={convertTime(props.action)}
-    onChange={updateTime(props.updateActionProperty, props.columnIndex, props.index)}
-  />
+  <div>
+    <p>This block will wait the specified duration.</p>
+    <div class="row">
+      <div class="col-md-6">
+        <input type="text" class="form-control" value={props.action.text} placeholder="Duration" />
+      </div>
+      <div class="col-md-6">
+        <select class="custom-select" value={props.action.user}>
+          <option>seconds</option>
+          <option>minutes</option>
+          <option>hours</option>
+        </select>
+      </div>
+    </div>
+  </div>
 );
 
 export default WaitActionParams;

@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import ActionColumn from './ActionColumn';
+import ActionGroup from './ActionGroup';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -31,28 +31,31 @@ const EditScenePage = ({ children, ...props }) => (
               </button>
             </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row flex-nowrap" style="overflow-x: auto;">
-                    {props.scene.actions.map((parallelActions, index) => (
-                      <ActionColumn
-                        addAction={props.addAction}
-                        actions={parallelActions}
-                        deleteAction={props.deleteAction}
-                        updateSelectedNewAction={props.updateSelectedNewAction}
-                        updateActionProperty={props.updateActionProperty}
-                        highLightedActions={props.highLightedActions}
-                        sceneParamsData={props.sceneParamsData}
-                        index={index}
-                      />
-                    ))}
+          {props.scene.actions.map((parallelActions, index) => (
+            <div>
+              <div class="row">
+                <ActionGroup
+                  addAction={props.addAction}
+                  actions={parallelActions}
+                  deleteAction={props.deleteAction}
+                  updateSelectedNewAction={props.updateSelectedNewAction}
+                  updateActionProperty={props.updateActionProperty}
+                  highLightedActions={props.highLightedActions}
+                  sceneParamsData={props.sceneParamsData}
+                  index={index}
+                />
+              </div>
+              {index + 1 < props.scene.actions.length && (
+                <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+                  <div class="col-lg-12">
+                    <div class="text-center">
+                      <i class="fe fe-arrow-down" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

@@ -4,7 +4,6 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const DEFAULT_OPTIONS = {
-  take: 20,
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
@@ -41,10 +40,31 @@ async function get(options) {
         as: 'service',
       },
     ],
-    limit: optionsWithDefault.take,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
+
+  // search by device feature category
+  if (optionsWithDefault.device_feature_category) {
+    queryParams.include[0].where = {
+      category: optionsWithDefault.device_feature_category,
+    };
+  }
+
+  // search by device feature type
+  if (optionsWithDefault.device_feature_type) {
+    const condition = {
+      type: optionsWithDefault.device_feature_type,
+    };
+    queryParams.include[0].where = queryParams.include[0].where
+      ? Sequelize.and(queryParams.include[0].where, condition)
+      : condition;
+  }
+
+  // take is not a default
+  if (optionsWithDefault.take) {
+    queryParams.limit = optionsWithDefault.take;
+  }
 
   if (optionsWithDefault.search) {
     queryParams.where = {

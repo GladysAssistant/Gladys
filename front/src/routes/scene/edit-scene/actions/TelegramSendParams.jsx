@@ -1,20 +1,38 @@
+import Select from 'react-select';
+
 const TelegramSendParams = ({ children, ...props }) => (
   <div>
     <div class="form-group">
       <label class="form-label">
         User <span class="form-required">*</span>
       </label>
-      <select class="custom-select" value={props.action.user}>
-        {props.sceneParamsData &&
-          props.sceneParamsData.users &&
-          props.sceneParamsData.users.map(user => <option value={user.selector}>{user.firstname}</option>)}
-      </select>
+      <Select
+        options={
+          props.sceneParamsData &&
+          props.sceneParamsData.users.map(user => ({
+            value: user.selector,
+            label: user.firstname
+          }))
+        }
+      />
     </div>
     <div class="form-group">
       <label class="form-label">
         Telegram message <span class="form-required">*</span>
       </label>
-      <input type="text" class="form-control" value={props.action.text} placeholder="Text" />
+      <textarea class="form-control" value={props.action.text} placeholder="Text" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Join file</label>
+      <Select
+        isClearable
+        options={[
+          {
+            value: 'camera',
+            label: `Kitchen's camera`
+          }
+        ]}
+      />
     </div>
   </div>
 );

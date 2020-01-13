@@ -5,6 +5,7 @@ import ArmHomeActionParams from './actions/ArmHomeActionParam';
 import LockActionParams from './actions/LockActionParam';
 import TurnOnLightParams from './actions/TurnOnLightParams';
 import TelegramSendParams from './actions/TelegramSendParams';
+import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -18,6 +19,8 @@ const ActionCard = ({ children, ...props }) => (
     }}
   >
     <div class="card-header">
+      {props.action.type === 'light.turn-on' && <i class="fe fe-sun" />}
+      {props.action.type === 'telegram.send' && <i class="fe fe-message-square" />}
       <div class="card-title">
         <i
           class={props.action.icon}
@@ -31,9 +34,11 @@ const ActionCard = ({ children, ...props }) => (
         <div class="card-status bg-blue" />
       )}
       <div class="card-options">
-        <a class="card-options-collapse">
-          <i class="fe fe-chevron-down" />
-        </a>
+        {false && (
+          <a class="card-options-collapse">
+            <i class="fe fe-chevron-down" />
+          </a>
+        )}
         <a
           onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
           class="card-options-remove"
@@ -54,13 +59,19 @@ const ActionCard = ({ children, ...props }) => (
       {props.action.type === 'Arm Home' && <ArmHomeActionParams />}
       {props.action.type === 'Lock the door' && <LockActionParams />}
       {props.action.type === 'Lock the windows' && <LockActionParams />}
+      {props.action.type === null && (
+        <ChooseActionTypeParams
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
+        />
+      )}
       {props.action.type === 'light.turn-on' && (
         <TurnOnLightParams
-          lightDevices={[
-            {
-              name: 'Main Lamp'
-            }
-          ]}
+          action={props.action}
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
         />
       )}
       {props.action.type === 'telegram.send' && (

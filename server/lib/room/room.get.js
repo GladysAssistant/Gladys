@@ -2,7 +2,6 @@ const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
   expand: [],
-  take: 20,
   skip: 0,
   order_by: 'name',
   order_dir: 'asc',
@@ -43,12 +42,17 @@ async function get(options) {
       },
     });
   }
-  const rooms = await db.Room.findAll({
+  const queryParams = {
     include,
-    limit: optionsWithDefault.take,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
-  });
+  };
+
+  if (optionsWithDefault.take) {
+    queryParams.limit = optionsWithDefault.take;
+  }
+
+  const rooms = await db.Room.findAll(queryParams);
   const roomsPlain = rooms.map((room) => room.get({ plain: true }));
   return roomsPlain;
 }

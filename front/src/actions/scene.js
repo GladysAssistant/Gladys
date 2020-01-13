@@ -90,16 +90,13 @@ function createActions(store) {
       }
     },
     addAction(state, columnIndex) {
-      if (!state.selectedNewAction) {
-        return null;
-      }
       let newState = update(state, {
         scene: {
           actions: {
             [columnIndex]: {
               $push: [
                 {
-                  type: state.selectedNewAction
+                  type: null
                 }
               ]
             }
@@ -144,11 +141,6 @@ function createActions(store) {
         }
       });
       store.setState(newState);
-    },
-    updateSelectedNewAction(state, e) {
-      store.setState({
-        selectedNewAction: e.target.value
-      });
     },
     highlighCurrentlyExecutedAction(state, { columnIndex, rowIndex }) {
       store.setState({
