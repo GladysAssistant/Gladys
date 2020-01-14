@@ -14,7 +14,6 @@
   ],
   "dependencies": {
     "bluebird": "^3.7.0",
-    "node-milight-api": "^3.4.0",
     "node-milight-promise": "^0.3.2"
   }
 }
