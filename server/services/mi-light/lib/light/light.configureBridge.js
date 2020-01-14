@@ -6,7 +6,7 @@ const {
   BRIDGE_IP_ADDRESS,
   BRIDGE_MAC,
   BRIDGE_NAME,
-  BRIDGE_TYPE
+  BRIDGE_TYPE,
 } = require('../utils/consts');
 
 /**

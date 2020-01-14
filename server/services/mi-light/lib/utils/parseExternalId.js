@@ -11,7 +11,7 @@ function parseExternalId(externalId) {
   const zoneId = parsedExternalId[2];
   return {
     bridgeMac,
-    zoneId
+    zoneId,
   };
 }
 

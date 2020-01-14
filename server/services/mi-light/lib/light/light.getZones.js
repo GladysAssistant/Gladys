@@ -1,8 +1,7 @@
-
 const Promise = require('bluebird');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES  } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { getDeviceParam } = require('../../../../utils/device');
-const { LIGHT_EXTERNAL_ID_BASE, BRIDGE_MAC} = require('../utils/consts');
+const { LIGHT_EXTERNAL_ID_BASE, BRIDGE_MAC } = require('../utils/consts');
 
 /**
  * @description Get light zones from all connected bridges.
@@ -12,11 +11,11 @@ const { LIGHT_EXTERNAL_ID_BASE, BRIDGE_MAC} = require('../utils/consts');
  */
 async function getZones() {
   const lightsToReturn = [];
-  
+
   await Promise.map(this.connectedBridges, async (device) => {
     // get bridge Mac and remove ":" to store it as reference in the light object
-    const bridgeMacWithoutColomn = getDeviceParam(device, BRIDGE_MAC).replace(/:/g, '');;
-    for(let x=0;x<5;x+=1) {
+    const bridgeMacWithoutColomn = getDeviceParam(device, BRIDGE_MAC).replace(/:/g, '');
+    for (let x = 0; x < 5; x += 1) {
       lightsToReturn.push({
         name: `Zone:${x}`,
         zone: x,
@@ -45,8 +44,6 @@ async function getZones() {
   });
   return lightsToReturn;
 }
-
-  
 
 module.exports = {
   getZones,
