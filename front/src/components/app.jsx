@@ -155,10 +155,7 @@ const AppRouter = connect(
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
-        <Redirect
-          path="/dashboard/integration/device/mi-light"
-          to="/dashboard/integration/device/mi-light/device"
-        />
+        <Redirect path="/dashboard/integration/device/mi-light" to="/dashboard/integration/device/mi-light/device" />
         <MiLightSetupPage path="/dashboard/integration/device/mi-light/setup" />
         <MiLightDevicePage path="/dashboard/integration/device/mi-light/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />

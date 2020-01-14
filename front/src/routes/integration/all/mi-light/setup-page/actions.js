@@ -59,7 +59,7 @@ const actions = store => ({
       });
     }
   },
-  
+
   async connectBridge(state, bridge) {
     store.setState({
       miLightCreateDeviceStatus: RequestStatus.Getting

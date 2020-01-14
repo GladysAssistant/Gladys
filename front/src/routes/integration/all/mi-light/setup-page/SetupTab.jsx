@@ -106,23 +106,23 @@ const SetupTab = ({ children, ...props }) => {
                         <h3 class="card-title">{bridge.name}</h3>
                       </div>
                       <div class="card-body">
-                      <div class="form-group">
-                            <label>
-                              <Text id="integration.miLight.device.iplabel" />
-                            </label>
-                            <input type="text" value={bridge.ip} class="form-control" disabled />
-                          </div>
-                          <div class="form-group">
-                            <label>
-                              <Text id="integration.miLight.device.modellabel" />
-                            </label>
-                            <input type="text" value={bridge.type} class="form-control" disabled />
-                          </div>
-                      <div class="card-body">
-                        <button class="btn btn-success" onClick={connectBridge(props, bridge)}>
-                          <Text id="integration.miLight.setup.connectButton" />
-                        </button>
-                      </div>
+                        <div class="form-group">
+                          <label>
+                            <Text id="integration.miLight.device.iplabel" />
+                          </label>
+                          <input type="text" value={bridge.ip} class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                          <label>
+                            <Text id="integration.miLight.device.modellabel" />
+                          </label>
+                          <input type="text" value={bridge.type} class="form-control" disabled />
+                        </div>
+                        <div class="card-body">
+                          <button class="btn btn-success" onClick={connectBridge(props, bridge)}>
+                            <Text id="integration.miLight.setup.connectButton" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

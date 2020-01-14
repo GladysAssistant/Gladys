@@ -225,8 +225,8 @@
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "iplabel" : "IP Address",
-        "modellabel" : "Model"
+        "iplabel": "IP Address",
+        "modellabel": "Model"
       }
     },
     "rtspCamera": {

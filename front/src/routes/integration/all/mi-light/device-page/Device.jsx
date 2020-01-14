@@ -39,7 +39,7 @@ class MiLightDeviceBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 <MqttDeviceForm {...props} />
-                
+
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.miLight.device.saveButton" />
