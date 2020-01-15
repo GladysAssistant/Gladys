@@ -785,7 +785,9 @@
       "color": "Light Color",
       "saturation": "Light Saturation",
       "temperature": "Light Temperature",
-      "power": "Light Power consumption"
+      "power": "Light Power consumption",
+      "effect-mode": "Effect mode",
+      "effect-speed": "Effect speed"
     },
     "battery": {
       "integer": "Battery"
@@ -806,6 +808,9 @@
     },
     "camera": {
       "image": "Camera"
+    },
+    "counter-sensor": {
+      "integer": "Counter"
     },
     "access-control": {
       "mode": "Access Control Mode"
