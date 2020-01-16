@@ -780,6 +780,52 @@
       },
       "_id": 18,
       "id": 18
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2019-12-08T10:01:06"
+      },
+      "type": "Dimmable light",
+      "name": "spot évier 1",
+      "modelid": "LWG004",
+      "manufacturername": "Philips",
+      "productname": "Hue white spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 400
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "functional",
+          "direction": "downwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:3c:6e:b7-0b",
+        "swversion": "1.55.7_r28193",
+        "swconfigid": "A7C27E3B",
+        "productid": "Philips-LWG004-1-GU10DLv2"
+      },
+      "_id": 19,
+      "id": 19
     }
   ]
 }
