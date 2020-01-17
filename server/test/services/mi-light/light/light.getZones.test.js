@@ -19,9 +19,9 @@ const deviceManager = {
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       room_id: null,
       name: 'Mi Light Bridge',
-      selector: 'mi-light-bridge-00:1B:44:11:3A:B7',
+      selector: 'mi-light-bridge-001b44113ab7',
       model: 'mi-light-bridge',
-      external_id: 'mi-light:bridge:00:1B:44:11:3A:B7',
+      external_id: 'mi-light:bridge:001b44113ab7',
       should_poll: false,
       poll_frequency: null,
       features: [],
@@ -36,7 +36,7 @@ const deviceManager = {
           id: '5d9f76db-e23b-46c0-9d93-36c7f9b494b4',
           device_id: '87d03a3e-5540-4dd1-85cc-be86578118c4',
           name: 'BRIDGE_MAC',
-          value: '00:1B:44:11:3A:B7',
+          value: '00:1b:44:11:3a:b7',
         },
         {
           id: '5cfc35c3-06a0-493e-955a-d3854b0c649d',
@@ -45,10 +45,10 @@ const deviceManager = {
           value: 'v6',
         },
         {
-          id: '5cfc35c3-06a0-493e-955a-d3854b0c649d',
+          id: '5cfc35c3-06a0-493e-955a-d3854b0c6ji4',
           device_id: '87d03a3e-5540-4dd1-85cc-be86578118c4',
           name: 'BRIDGE_NAME',
-          value: 'My bridge',
+          value: 'Mi Light Bridge',
         },
       ],
       room: null,
@@ -71,10 +71,10 @@ const gladys = {
 };
 
 describe('MiLightService', () => {
-  it('should get lights from bridge', async () => {
+  it('should get zone from bridge', async () => {
     const miLightService = MiLightService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await miLightService.device.init();
-    const lights = await miLightService.device.getLights();
+    const lights = await miLightService.device.getZones();
     lights.forEach((light) => {
       expect(light).to.have.property('name');
       expect(light).to.have.property('selector');

@@ -1,14 +1,14 @@
 const { assert, fake } = require('sinon');
 const MiLightControllers = require('../../../../services/mi-light/api/milight.controller');
 
-const lights = [
+const zones = [
   {
     name: 'Zone 1',
   },
 ];
 
 const miLightLightService = {
-  getLights: fake.resolves(lights),
+  getZones: fake.resolves(zones),
 };
 
 const res = {
@@ -16,9 +16,9 @@ const res = {
 };
 
 describe('GET /service/mi-light/light', () => {
-  it('should get lights', async () => {
+  it('should get zones', async () => {
     const miLightController = MiLightControllers(miLightLightService);
     await miLightController['get /api/v1/service/mi-light/light'].controller({}, res);
-    assert.called(miLightLightService.getLights);
+    assert.called(miLightLightService.getZones);
   });
 });

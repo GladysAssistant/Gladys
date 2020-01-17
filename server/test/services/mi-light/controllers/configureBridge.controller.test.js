@@ -14,10 +14,10 @@ describe('POST /service/mi-light/bridge/configure', () => {
     const miLightController = MiLightControllers(miLightLightService);
     const req = {
       body: {
-        mac: '00:1B:44:11:3A:B7',
+        mac: '00:1b:44:11:3a:b7',
       },
     };
     await miLightController['post /api/v1/service/mi-light/bridge/configure'].controller(req, res);
-    assert.calledWith(miLightLightService.configureBridge, '00:1B:44:11:3A:B7');
+    assert.calledWith(miLightLightService.configureBridge, '00:1b:44:11:3a:b7');
   });
 });

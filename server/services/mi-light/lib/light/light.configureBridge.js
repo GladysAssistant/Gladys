@@ -22,11 +22,12 @@ async function configureBridge(Mac) {
   }
   logger.info(`Connecting to milight bridge "${Mac}", ip = ${bridge.ip}, name = ${bridge.name}`);
   try {
+    const bridgeMacWithoutColomn = Mac.replace(/:/g, '');
     const deviceCreated = await this.gladys.device.create({
       name: bridge.name,
       service_id: this.serviceId,
-      external_id: `${BRIDGE_EXTERNAL_ID_BASE}:${bridge.name}`,
-      selector: `${BRIDGE_EXTERNAL_ID_BASE}:${bridge.name}`,
+      external_id: `${BRIDGE_EXTERNAL_ID_BASE}:${bridgeMacWithoutColomn}`,
+      selector: `${BRIDGE_EXTERNAL_ID_BASE}:${bridgeMacWithoutColomn}`,
       model: BRIDGE_MODEL,
       features: [],
       params: [

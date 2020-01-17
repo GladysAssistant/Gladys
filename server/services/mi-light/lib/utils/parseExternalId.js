@@ -1,7 +1,7 @@
 /**
- * @description Parse the external id and return the lamp ID.
+ * @description Parse the external id and return the zone ID.
  * @param {string} externalId - External id of the device.
- * @returns {Object} Return the lamp ID and bridge serial number.
+ * @returns {Object} Return the zone ID and bridge mac.
  * @example
  * parseExternalId('mi-light:1');
  */

@@ -13,7 +13,6 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
  */
 async function setValue(device, deviceFeature, value) {
   const { zoneId, bridgeMac } = parseExternalId(device.external_id);
-
   // transform mac : adding ":"
   let macAddressStdFormat = '';
   for (let i = 0; i < 11; i += 2) {
@@ -22,7 +21,6 @@ async function setValue(device, deviceFeature, value) {
       macAddressStdFormat += ':';
     }
   }
-
   const bridge = this.bridgesByMac.get(macAddressStdFormat.trim());
 
   if (!bridge) {

@@ -1,9 +1,9 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
-const MiLightClient = require('../mocks.test');
+const milightClient = require('../mocks.test');
 
 const MiLightService = proxyquire('../../../../services/mi-light/index', {
-  'node-hue-api': MiLightClient,
+  'node-milight-promise': milightClient,
 });
 
 describe('MiLightService', () => {
@@ -13,10 +13,9 @@ describe('MiLightService', () => {
     expect(bridges).to.deep.equal([
       {
         name: 'Mi Light Bridge',
-        ipaddress: '192.168.10.245',
-        model: {
-          mac: '00:1B:44:11:3A:B7',
-        },
+        ip: '192.168.10.245',
+        mac: '00:1b:44:11:3a:b7', 
+        type: 'v6',
       },
     ]);
   });
