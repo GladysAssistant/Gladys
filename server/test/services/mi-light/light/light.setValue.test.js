@@ -74,7 +74,7 @@ describe('MiLightService', () => {
   it('should set value', async () => {
     const miLightService = MiLightService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await miLightService.device.init();
-    await miLightService.device.setValue(
+    miLightService.device.setValue(
       {
         external_id: 'mi-light-light:001b44113ab7:1',
         features: [

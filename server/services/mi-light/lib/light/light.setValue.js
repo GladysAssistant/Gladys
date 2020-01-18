@@ -29,8 +29,10 @@ async function setValue(device, deviceFeature, value) {
   logger.info(`Connecting to milight bridge "${bridgeMac}", ip = ${bridge.ip}, name = ${bridge.name}`);
   logger.debug(`Changing state of light ${device.external_id} with IP ${bridge.ip} . New value = ${value}`);
 
-  const commands = await this.milightClient.commandsV6;
-  const MiLight = await this.milightClient.MilightController;
+  // const commands = await this.milightClient.commandsV6;
+  // const MiLight = await this.milightClient.MilightController;
+  const commands = require('node-milight-promise').commandsV6;
+  const MiLight = require('node-milight-promise').MilightController;
 
   const light = new MiLight({
     ip: bridge.ip,
