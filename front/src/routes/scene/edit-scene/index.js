@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import EditScenePage from './EditScenePage';
 import actions from '../../../actions/scene';
 
-@connect('session,sceneParamsData,scene,highLightedActions', actions)
+@connect('session,sceneParamsData,scene,highLightedActions,triggers', actions)
 class EditScene extends Component {
   startScene = () => {
     this.props.startScene(this.props.scene_selector);
@@ -13,6 +13,7 @@ class EditScene extends Component {
   };
   componentWillMount() {
     this.props.getSceneBySelector(this.props.scene_selector);
+    this.props.getTriggers(this.props.scene_selector);
     this.props.getUsers();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.props.highlighCurrentlyExecutedAction(payload)

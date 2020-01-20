@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ActionGroup from './ActionGroup';
+import TriggerGroup from './TriggerGroup';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -29,6 +30,23 @@ const EditScenePage = ({ children, ...props }) => (
               <button onClick={props.deleteScene} class="btn btn-sm btn-danger ml-2">
                 <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
               </button>
+            </div>
+          </div>
+          <div>
+            <div class="row">
+              <TriggerGroup
+                triggers={props.triggers}
+                addTrigger={props.addTrigger}
+                deleteTrigger={props.deleteTrigger}
+                updateTriggerProperty={props.updateTriggerProperty}
+              />
+            </div>
+            <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+              <div class="col-lg-12">
+                <div class="text-center">
+                  <i class="fe fe-arrow-down" />
+                </div>
+              </div>
             </div>
           </div>
           {props.scene.actions.map((parallelActions, index) => (

@@ -192,6 +192,44 @@ function createActions(store) {
           GetUsersStatus: RequestStatus.Error
         });
       }
+    },
+    async getTriggers(state, sceneSelector) {
+      store.setState({
+        triggers: []
+      });
+    },
+    addTrigger(state) {
+      const newState = update(state, {
+        triggers: {
+          $push: [
+            {
+              type: null
+            }
+          ]
+        }
+      });
+      store.setState(newState);
+    },
+    deleteTrigger(state, index) {
+      const newState = update(state, {
+        triggers: {
+          $splice: [[index, 1]]
+        }
+      });
+      store.setState(newState);
+    },
+    updateTriggerProperty(state, index, property, value) {
+      console.log({ index, property, value });
+      const newState = update(state, {
+        triggers: {
+          [index]: {
+            [property]: {
+              $set: value
+            }
+          }
+        }
+      });
+      store.setState(newState);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

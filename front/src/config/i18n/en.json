@@ -445,6 +445,11 @@
         "start": "Start service",
         "stop": "Stop service"
       }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      }
     }
   },
   "profile": {

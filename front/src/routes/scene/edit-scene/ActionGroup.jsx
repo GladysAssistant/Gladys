@@ -9,6 +9,7 @@ const addActionToColumn = (columnIndex, addAction) => () => {
 const ActionGroup = ({ children, ...props }) => (
   <div class="col">
     <div class="card">
+      <div class="card-status bg-green" />
       <div class="card-header">
         <h4 class="text-center card-title ">{props.index + 1}.</h4>
         <div class="card-options">
