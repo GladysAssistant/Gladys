@@ -673,6 +673,10 @@
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)"
   },
+  "deviceFeatureUnitShort": {
+    "celsius": "°C",
+    "fahrenheit": "°F"
+  },
   "deviceFeatureCategory": {
     "light": {
       "binary": "Light On/Off",

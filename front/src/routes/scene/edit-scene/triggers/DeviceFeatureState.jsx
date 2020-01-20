@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { Text } from 'preact-i18n';
 import Select from 'react-select';
 import cx from 'classnames';
 
@@ -14,7 +15,8 @@ class TurnOnLight extends Component {
           deviceOptions.push({
             value: feature.selector,
             label: feature.name,
-            type: feature.type
+            type: feature.type,
+            unit: feature.unit
           });
         })
       );
@@ -28,8 +30,12 @@ class TurnOnLight extends Component {
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'deviceFeature', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'value', null);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'deviceFeature', null);
+    }
+    if (selectedOption && selectedOption.type === 'binary') {
+      this.props.updateTriggerProperty(this.props.index, 'operator', '=');
     }
   };
   handleOperatorChange = e => {
@@ -126,12 +132,12 @@ class TurnOnLight extends Component {
               <div class="form-group">
                 <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
                   <option value="">-----</option>
-                  <option value="=">=</option>
-                  <option value=">=">>=</option>
-                  <option value=">">></option>
-                  <option value="!=">!=</option>
-                  <option value="<=">{'<='}</option>
-                  <option value="<">{'<'}</option>
+                  <option value="=">equal</option>
+                  <option value=">=">superior or equal</option>
+                  <option value=">">superior</option>
+                  <option value="!=">different</option>
+                  <option value="<=">less or equal</option>
+                  <option value="<">less</option>
                 </select>
               </div>
             </div>
@@ -140,10 +146,18 @@ class TurnOnLight extends Component {
             <div class="col-md-4">
               <div class="form-group">
                 <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Value" onChange={this.handleValueChange} />
-                  {false && (
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Value"
+                    value={props.trigger.value}
+                    onChange={this.handleValueChange}
+                  />
+                  {selectedOption && selectedOption.unit && (
                     <span class="input-group-append" id="basic-addon2">
-                      <span class="input-group-text">°C</span>
+                      <span class="input-group-text">
+                        <Text id={`deviceFeatureUnitShort.${selectedOption.unit}`} />
+                      </span>
                     </span>
                   )}
                 </div>
