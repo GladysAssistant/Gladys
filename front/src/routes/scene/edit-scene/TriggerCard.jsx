@@ -16,6 +16,7 @@ const TriggerCard = ({ children, ...props }) => (
   >
     <div class="card-header">
       {props.trigger.type === 'device.new-state' && <i class="fe fe-activity" />}
+      {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
           class={props.trigger.icon}
@@ -24,6 +25,7 @@ const TriggerCard = ({ children, ...props }) => (
           }}
         />{' '}
         <Text id={`editScene.triggers.${props.trigger.type}`} />
+        {props.trigger.type === null && <Text id="editScene.newTrigger" />}
       </div>
       <div class="card-options">
         {false && (

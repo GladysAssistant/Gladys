@@ -430,6 +430,9 @@
     "deleteButton": "Delete",
     "first": "First",
     "then": "Then",
+    "newTrigger": "New trigger",
+    "selectTriggerLabel": "Select a trigger type",
+    "addTriggerButton": "Add trigger",
     "actions": {
       "telegram": {
         "send": "Send Telegram Message"
