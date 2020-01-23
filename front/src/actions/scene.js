@@ -1,7 +1,11 @@
 import { RequestStatus } from '../utils/consts';
-import update from 'immutability-helper';
+import update, { extend } from 'immutability-helper';
 import debounce from 'debounce';
 import { route } from 'preact-router';
+
+extend('$auto', function(value, object) {
+  return object ? update(object, value) : update({}, value);
+});
 
 function createActions(store) {
   const actions = {
@@ -48,6 +52,9 @@ function createActions(store) {
         const scene = await state.httpClient.get(`/api/v1/scene/${sceneSelector}`);
         if (scene.actions[scene.actions.length - 1].length > 0) {
           scene.actions.push([]);
+        }
+        if (!scene.triggers) {
+          scene.triggers = [];
         }
         store.setState({
           scene,
@@ -193,27 +200,26 @@ function createActions(store) {
         });
       }
     },
-    async getTriggers(state, sceneSelector) {
-      store.setState({
-        triggers: []
-      });
-    },
     addTrigger(state) {
       const newState = update(state, {
-        triggers: {
-          $push: [
-            {
-              type: null
-            }
-          ]
+        scene: {
+          triggers: {
+            $push: [
+              {
+                type: null
+              }
+            ]
+          }
         }
       });
       store.setState(newState);
     },
     deleteTrigger(state, index) {
       const newState = update(state, {
-        triggers: {
-          $splice: [[index, 1]]
+        scene: {
+          triggers: {
+            $splice: [[index, 1]]
+          }
         }
       });
       store.setState(newState);
@@ -221,10 +227,12 @@ function createActions(store) {
     updateTriggerProperty(state, index, property, value) {
       console.log({ index, property, value });
       const newState = update(state, {
-        triggers: {
-          [index]: {
-            [property]: {
-              $set: value
+        scene: {
+          triggers: {
+            [index]: {
+              [property]: {
+                $set: value
+              }
             }
           }
         }

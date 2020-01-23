@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { ACTION_LIST } = require('../utils/constants');
+const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -21,6 +21,20 @@ const actionSchema = Joi.array().items(
       hours: Joi.number(),
     }),
   ),
+);
+
+const triggersSchema = Joi.array().items(
+  Joi.object().keys({
+    type: Joi.string()
+      .valid(EVENT_LIST)
+      .required(),
+    house: Joi.string(),
+    device: Joi.string(),
+    deviceFeature: Joi.string(),
+    operator: Joi.string().valid(['=', '!=', '>', '>=', '<', '<=']),
+    value: Joi.number(),
+    user: Joi.string(),
+  }),
 );
 
 module.exports = (sequelize, DataTypes) => {
@@ -60,6 +74,17 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      triggers: {
+        type: DataTypes.JSON,
+        validate: {
+          isEven(value) {
+            const result = Joi.validate(value, triggersSchema);
+            if (result.error) {
+              throw new Error(result.error.details[0].message);
+            }
+          },
+        },
+      },
       last_executed: {
         type: DataTypes.DATE,
       },
@@ -69,17 +94,6 @@ module.exports = (sequelize, DataTypes) => {
 
   // add slug if needed
   scene.beforeValidate(addSelector);
-
-  scene.associate = (models) => {
-    scene.belongsToMany(models.Trigger, {
-      through: {
-        model: models.TriggerScene,
-        unique: true,
-      },
-      foreignKey: 'scene_id',
-      as: 'triggers',
-    });
-  };
 
   return scene;
 };

@@ -7,20 +7,19 @@ const db = require('../../models');
  * trigger.init();
  */
 async function init() {
-  const triggers = await db.Trigger.findAll({
-    where: {
-      active: true,
-    },
-    include: [
-      {
-        model: db.Scene,
-        as: 'scenes',
-      },
-    ],
+  const scenes = await db.Scene.findAll();
+  const triggers = [];
+  scenes.forEach((scene) => {
+    const plainScene = scene.get({ plain: true });
+
+    if (plainScene.triggers && plainScene.triggers instanceof Array) {
+      plainScene.triggers.forEach((trigger) => {
+        triggers.push(trigger);
+      });
+    }
   });
-  const plainTriggers = triggers.map((trigger) => trigger.get({ plain: true }));
-  plainTriggers.forEach((trigger) => this.addToListeners(trigger));
-  return plainTriggers;
+  triggers.forEach((trigger) => this.addToListeners(trigger));
+  return triggers;
 }
 
 module.exports = {

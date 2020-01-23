@@ -35,7 +35,7 @@ const EditScenePage = ({ children, ...props }) => (
           <div>
             <div class="row">
               <TriggerGroup
-                triggers={props.triggers}
+                triggers={props.scene.triggers}
                 addTrigger={props.addTrigger}
                 deleteTrigger={props.deleteTrigger}
                 updateTriggerProperty={props.updateTriggerProperty}
