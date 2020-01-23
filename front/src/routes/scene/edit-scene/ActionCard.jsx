@@ -11,6 +11,12 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
 };
 
+const ACTION_ICON = {
+  'light.turn-on': 'fe fe-sun',
+  delay: 'fe fe-clock',
+  'telegram.send': 'fe fe-message-square'
+};
+
 const ActionCard = ({ children, ...props }) => (
   <div
     class="card"
@@ -19,8 +25,7 @@ const ActionCard = ({ children, ...props }) => (
     }}
   >
     <div class="card-header">
-      {props.action.type === 'light.turn-on' && <i class="fe fe-sun" />}
-      {props.action.type === 'telegram.send' && <i class="fe fe-message-square" />}
+      {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
       {props.action.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
