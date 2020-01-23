@@ -8,18 +8,27 @@ import cx from 'classnames';
 class TurnOnLight extends Component {
   getOptions = async () => {
     try {
-      const devices = await this.props.httpClient.get('/api/v1/device');
+      const rooms = await this.props.httpClient.get('/api/v1/room?expand=devices');
       const deviceOptions = [];
-      devices.forEach(device =>
-        device.features.forEach(feature => {
-          deviceOptions.push({
-            value: feature.selector,
-            label: feature.name,
-            type: feature.type,
-            unit: feature.unit
+      rooms.forEach(room => {
+        const roomDeviceFeatures = [];
+        room.devices.forEach(device => {
+          device.features.forEach(feature => {
+            roomDeviceFeatures.push({
+              value: feature.selector,
+              label: feature.name,
+              type: feature.type,
+              unit: feature.unit
+            });
           });
-        })
-      );
+        });
+        if (roomDeviceFeatures.length > 0) {
+          deviceOptions.push({
+            label: room.name,
+            options: roomDeviceFeatures
+          });
+        }
+      });
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
@@ -54,9 +63,15 @@ class TurnOnLight extends Component {
   refreshSelectedOptions = nextProps => {
     let selectedOption = '';
     if (nextProps.trigger.deviceFeature && this.state.deviceOptions) {
-      const deviceOption = this.state.deviceOptions.find(
-        deviceOption => deviceOption.value === nextProps.trigger.deviceFeature
-      );
+      let deviceOption;
+      let i = 0;
+      while (i < this.state.deviceOptions.length && deviceOption === undefined) {
+        deviceOption = this.state.deviceOptions[i].options.find(
+          option => option.value === nextProps.trigger.deviceFeature
+        );
+        i++;
+      }
+
       if (deviceOption) {
         selectedOption = deviceOption;
       }
