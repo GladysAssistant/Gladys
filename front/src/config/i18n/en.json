@@ -433,6 +433,9 @@
     "newTrigger": "New trigger",
     "selectTriggerLabel": "Select a trigger type",
     "addTriggerButton": "Add trigger",
+    "newAction": "New action",
+    "selectActionType": "Select an action type",
+    "addActionButton": "Add action",
     "actions": {
       "telegram": {
         "send": "Send Telegram Message"

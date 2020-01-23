@@ -21,6 +21,7 @@ const ActionCard = ({ children, ...props }) => (
     <div class="card-header">
       {props.action.type === 'light.turn-on' && <i class="fe fe-sun" />}
       {props.action.type === 'telegram.send' && <i class="fe fe-message-square" />}
+      {props.action.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
           class={props.action.icon}
@@ -29,6 +30,7 @@ const ActionCard = ({ children, ...props }) => (
           }}
         />{' '}
         <Text id={`editScene.actions.${props.action.type}`} />
+        {props.action.type === null && <Text id="editScene.newAction" />}
       </div>
       {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
         <div class="card-status bg-blue" />
