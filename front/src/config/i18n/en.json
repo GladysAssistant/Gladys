@@ -412,7 +412,7 @@
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
-        "refreshButton":"Refresh Arduino list",
+        "refreshButton": "Refresh Arduino list",
         "saveButton": "Save",
         "deleteButton": "Delete",
         "returnButton": "Return back",
@@ -439,18 +439,12 @@
       "setup": {
         "title": "Arduino configuration",
         "arduinoDescription": "You can connect your Arduino card to an USB port.",
-        "urlLabel": "Broker URL",
-        "urlPlaceholder": "lol mdr ptdr",
         "arduinoUsbDriverPathLabel": "Select the USB port where your Arduino card is connected",
-        "userLabel": "Username",
-        "userPlaceholder": "Enter MQTT broker username",
-        "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter MQTT broker password",
-        "detectionLabel": "Detect Configuration",
+        "detectionLabel": "Connect",
         "error": "An error occured while detection of Arduino card.",
         "notConnected": "Gladys is not connected to any Arduino card.",
-        "connecting": "Configuration saved. Now connecting to your MQTT broker...",
-        "connected": "Connected to the MQTT broker with success !"
+        "connecting": "Configuration saved. Now connecting to your Arduino card...",
+        "connected": "Connected to the Arduino card with success !"
       }
     },
     "xiaomi": {

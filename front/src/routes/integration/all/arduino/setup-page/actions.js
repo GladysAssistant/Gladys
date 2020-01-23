@@ -1,89 +1,78 @@
-import createActionsIntegration from '../../../../../actions/integration';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const createActions = store => {
-  const integrationActions = createActionsIntegration(store);
+const actions = store => {
   const actions = {
-    async loadProps(state) {
-      let arduinoURL;
-      let arduinoUsername;
-      let arduinoPassword;
-      try {
-        arduinoURL = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_URL');
-        arduinoUsername = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_USERNAME');
-        if (arduinoUsername.value) {
-          arduinoPassword = '*********'; // this is just used so that the field is filled
-        }
-      } finally {
-        store.setState({
-          arduinoURL: (arduinoURL || {}).value,
-          arduinoUsername: (arduinoUsername || { value: '' }).value,
-          arduinoPassword,
-          passwordChanges: false,
-          connected: false
-        });
-      }
-    },
-    updateConfigration(state, e) {
-      const data = {};
-      data[e.target.name] = e.target.value;
-      if (e.target.name === 'arduinoPassword') {
-        data.passwordChanges = true;
-      }
-      store.setState(data);
-    },
-    async saveConfiguration(state) {
-      event.preventDefault();
+    async getUsbPorts(state) {
       store.setState({
-        connectArduinoStatus: RequestStatus.Getting,
-        arduinoConnected: false
+        getArduinoUsbPortStatus: RequestStatus.Getting
       });
       try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_URL', {
-          value: state.arduinoURL
-        });
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_USERNAME', {
-          value: state.arduinoUsername
-        });
-        if (state.passwordChanges) {
-          await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PASSWORD', {
-            value: state.arduinoPassword
-          });
-        }
-        await state.httpClient.post(`/api/v1/service/arduino/connect`);
-
+        const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
         store.setState({
-          connectArduinoStatus: RequestStatus.Success
+          usbPorts,
+          getArduinoUsbPortStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          connectArduinoStatus: RequestStatus.Error,
-          passwordChanges: false
+          getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
     },
-    displayConnectedMessage(state) {
-      // display 3 seconds a message "Arduino connected"
+    async saveDriverPathAndConnect(state) {
       store.setState({
-        arduinoConnected: true
+        connectArduinoStatus: RequestStatus.Getting,
+        arduinoDriverFailed: false
       });
-      setTimeout(
-        () =>
-          store.ArduinosetState({
-            arduinoConnected: false,
-            connectArduinoStatus: undefined
-          }),
-        3000
-      );
+      try {
+        await state.httpClient.post('/api/v1/service/arduino/variable/ZWAVE_DRIVER_PATH', {
+          value: state.zwaveDriverPath
+        });
+        await state.httpClient.post('/api/v1/service/arduino/connect');
+        store.setState({
+          connectZwaveStatus: RequestStatus.Success,
+          zwaveConnectionInProgress: true
+        });
+      } catch (e) {
+        store.setState({
+          connectZwaveStatus: RequestStatus.Error
+        });
+      }
     },
-    displayArduinoError(state, error) {
+    async getInfos(state) {
       store.setState({
-        arduinoConnected: false,
-        arduinoConnectionError: error
+        getZwaveInfos: RequestStatus.Getting
       });
+      try {
+        const zwaveInfos = await state.httpClient.get('/api/v1/service/arduino/info');
+        store.setState({
+          zwaveInfos,
+          getZwaveInfos: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getZwaveInfos: RequestStatus.Error
+        });
+      }
+    },
+    async disconnect(state) {
+      store.setState({
+        zwaveDisconnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/arduino/disconnect');
+        await actions.getStatus(store.getState());
+        store.setState({
+          arduinoDisconnectStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          zwaveDisconnectStatus: RequestStatus.Error
+        });
+      }
     }
   };
-  return Object.assign({}, actions, integrationActions);
+
+  return actions;
 };
 
-export default createActions;
+export default actions;

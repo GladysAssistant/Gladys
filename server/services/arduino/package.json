@@ -12,7 +12,5 @@
     "arm64"
   ],
   "scripts": {},
-  "dependencies": {
-    "serialport": "^8.0.6"
-  }
+  "dependencies": {}
 }

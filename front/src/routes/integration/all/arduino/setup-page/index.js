@@ -10,17 +10,9 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
   'user,session,arduinoURL,arduinoUsername,arduinoPassword,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
   actions
 )
-class ArduinoNodePage extends Component {
-  componentWillMount() {
-    this.props.getIntegrationByName('arduino');
-    //this.props.loadProps();
-    //this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ARDUINO.CONNECTED, () =>
-    //  this.props.displayConnectedMessage()
-   // );
-   // this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ARDUINO.ERROR, payload =>
-   //   this.props.displayArduinoError(payload)
-    //);
-  }
+class ArduinoSetupPage extends Component {
+  
+  
 
   render(props, {}) {
     return (
@@ -31,4 +23,4 @@ class ArduinoNodePage extends Component {
   }
 }
 
-export default ArduinoNodePage;
+export default ArduinoSetupPage;
