@@ -18,12 +18,7 @@ const ACTION_ICON = {
 };
 
 const ActionCard = ({ children, ...props }) => (
-  <div
-    class="card"
-    style={{
-      minWidth: '350px'
-    }}
-  >
+  <div class="card">
     <div class="card-header">
       {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
       {props.action.type === null && <i class="fe fe-plus-circle" />}

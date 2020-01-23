@@ -8,12 +8,7 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 };
 
 const TriggerCard = ({ children, ...props }) => (
-  <div
-    class="card"
-    style={{
-      minWidth: '350px'
-    }}
-  >
+  <div class="card">
     <div class="card-header">
       {props.trigger.type === 'device.new-state' && <i class="fe fe-activity" />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}

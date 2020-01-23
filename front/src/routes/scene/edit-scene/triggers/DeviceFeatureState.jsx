@@ -23,6 +23,14 @@ class TurnOnLight extends Component {
           });
         });
         if (roomDeviceFeatures.length > 0) {
+          roomDeviceFeatures.sort((a, b) => {
+            if (a.label < b.label) {
+              return -1;
+            } else if (a.label > b.label) {
+              return 1;
+            }
+            return 0;
+          });
           deviceOptions.push({
             label: room.name,
             options: roomDeviceFeatures
@@ -79,7 +87,7 @@ class TurnOnLight extends Component {
     this.setState({ selectedOption });
   };
   getBinaryOperator = () => (
-    <div class="col-3">
+    <div class="col-2">
       <div class="text-center" style={{ marginTop: '10px' }}>
         <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
       </div>
@@ -135,7 +143,7 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-5">
+          <div class="col-6">
             <div class="form-group">
               <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />
             </div>
@@ -158,7 +166,7 @@ class TurnOnLight extends Component {
             </div>
           )}
           {selectedOption && selectedOption.type !== 'binary' && (
-            <div class="col-4">
+            <div class="col-3">
               <div class="form-group">
                 <div class="input-group">
                   <input
