@@ -69,10 +69,10 @@ async function get(options) {
   if (optionsWithDefault.search) {
     queryParams.where = {
       [Op.or]: [
-        Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_device.name')), {
           [Op.like]: `%${optionsWithDefault.search}%`,
         }),
-        Sequelize.where(Sequelize.fn('lower', Sequelize.col('external_id')), {
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_device.external_id')), {
           [Op.like]: `%${optionsWithDefault.search}%`,
         }),
       ],
