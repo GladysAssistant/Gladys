@@ -64,17 +64,17 @@ class TurnOnLight extends Component {
     this.setState({ selectedOption });
   };
   getBinaryOperator = () => (
-    <div class="col-md-3">
+    <div class="col-3">
       <div class="text-center" style={{ marginTop: '10px' }}>
         <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
       </div>
     </div>
   );
   getBinaryButtons = () => (
-    <div class="col-md-4">
+    <div class="col-4">
       <div class="form-group">
         <div class="row">
-          <div class="col">
+          <div class="col-6">
             <button
               class={cx('btn btn-block', {
                 'btn-primary': this.props.trigger.value === 1,
@@ -86,7 +86,7 @@ class TurnOnLight extends Component {
               On
             </button>
           </div>
-          <div class="col">
+          <div class="col-6">
             <button
               class={cx('btn btn-block', {
                 'btn-primary': this.props.trigger.value === 0,
@@ -120,7 +120,7 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-md-5">
+          <div class="col-5">
             <div class="form-group">
               <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />
             </div>
@@ -128,7 +128,7 @@ class TurnOnLight extends Component {
           {selectedOption && selectedOption.type === 'binary' && this.getBinaryOperator()}
           {selectedOption && selectedOption.type === 'binary' && this.getBinaryButtons()}
           {selectedOption && selectedOption.type !== 'binary' && (
-            <div class="col-md-3">
+            <div class="col-3">
               <div class="form-group">
                 <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
                   <option value="">-----</option>
@@ -143,7 +143,7 @@ class TurnOnLight extends Component {
             </div>
           )}
           {selectedOption && selectedOption.type !== 'binary' && (
-            <div class="col-md-4">
+            <div class="col-4">
               <div class="form-group">
                 <div class="input-group">
                   <input
