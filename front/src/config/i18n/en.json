@@ -215,7 +215,9 @@
         "connectButton": "Connect/Reconnect",
         "scanButton": "Scan network",
         "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesConnected": "No bridges connected."
+        "noBridgesConnected": "No bridges connected.",
+        "noBridgesFound": "We didn't find any Mi Light bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
+
       },
       "device": {
         "title": "Devices in Gladys",

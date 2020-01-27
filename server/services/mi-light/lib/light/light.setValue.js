@@ -26,8 +26,8 @@ async function setValue(device, deviceFeature, value) {
   if (!bridge) {
     throw new NotFoundError(`BRIDGE_NOT_FOUND`);
   }
-  logger.info(`Connecting to milight bridge "${bridgeMac}", ip = ${bridge.ip}, name = ${bridge.name}`);
-  logger.debug(`Changing state of light ${device.external_id} with IP ${bridge.ip} . New value = ${value}`);
+  logger.info(`Connecting to milight bridge : Mac = "${bridgeMac}", ip = ${bridge.ip}, type = ${bridge.type}, name = ${bridge.name}`);
+  logger.debug(`Changing state of light ${device.external_id} with IP ${bridge.ip} . Zone = ${zoneId}. New value = ${value}`);
 
   // const commands = await this.milightClient.commandsV6;
   // const MiLight = await this.milightClient.MilightController;
@@ -38,17 +38,16 @@ async function setValue(device, deviceFeature, value) {
     ip: bridge.ip,
     type: bridge.type,
   });
-
   switch (deviceFeature.type) {
     case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
-      value === 1 ? light.sendCommands(commands.rgbw.on(zoneId)) : light.sendCommands(commands.rgbw.off(zoneId));
+      value ? light.sendCommands(commands.rgbw.on(zoneId)) : light.sendCommands(commands.rgbw.off(zoneId));
       break;
     default:
       logger.debug(`Mi Light : Feature type = "${deviceFeature.type}" not handled`);
       break;
   }
 
-  light.pause(500);
+  light.pause(100);
   return light.close();
 }
 

@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
 
-class MqttDeviceForm extends Component {
+class MiLightDeviceForm extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
@@ -21,7 +21,7 @@ class MqttDeviceForm extends Component {
       <div>
         <div class="form-group">
           <label class="form-label" for="deviceName">
-            <Text id="integration.mqtt.device.nameLabel" />
+            <Text id="integration.miLight.device.nameLabel" />
           </label>
           <Localizer>
             <input
@@ -30,14 +30,14 @@ class MqttDeviceForm extends Component {
               value={props.device.name}
               onInput={this.updateName}
               class="form-control"
-              placeholder={<Text id="integration.mqtt.device.nameLabel" />}
+              placeholder={<Text id="integration.miLight.device.nameLabel" />}
             />
           </Localizer>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="room">
-            <Text id="integration.mqtt.device.roomLabel" />
+            <Text id="integration.miLight.device.roomLabel" />
           </label>
           <select onChange={this.updateRoom} class="form-control" id="room">
             <option value="">
@@ -58,7 +58,7 @@ class MqttDeviceForm extends Component {
 
         <div class="form-group">
           <label class="form-label">
-            <Text id="integration.mqtt.device.featuresLabel" />
+            <Text id="integration.miLight.device.featuresLabel" />
           </label>
           <div class="tags">
             {props.device &&
@@ -72,7 +72,7 @@ class MqttDeviceForm extends Component {
                 </span>
               ))}
             {(!props.device.features || props.device.features.length === 0) && (
-              <Text id="integration.mqtt.device.noFeatures" />
+              <Text id="integration.miLight.device.noFeatures" />
             )}
           </div>
         </div>
@@ -81,4 +81,4 @@ class MqttDeviceForm extends Component {
   }
 }
 
-export default MqttDeviceForm;
+export default MiLightDeviceForm;

@@ -27,6 +27,13 @@ const FoundDevices = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.getMiLightNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
+            {props.miLightNewDevices && props.miLightNewDevices.length === 0 && (
+              <div class="col-md-12">
+                <div class="alert alert-info">
+                  <Text id="integration.miLight.device.noDevicesFound" />
+                </div>
+              </div>
+            )}
             {props.miLightNewDevices &&
               props.miLightNewDevices.map((device, index) => (
                 <div class="col-md-4">

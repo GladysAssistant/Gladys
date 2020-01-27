@@ -55,7 +55,6 @@ async function configureBridge(Mac) {
       this.connectedBridges.push(deviceCreated);
       logger.debug('Device created');
     }
-    logger.debug(this.connectedBridges);
     return deviceCreated;
   } catch (e) {
     throw e;

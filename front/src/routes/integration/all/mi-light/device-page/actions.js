@@ -15,7 +15,7 @@ function createActions(store) {
       });
       try {
         const options = {
-          service: 'mqtt',
+          service: 'milight',
           order_dir: state.getMiLightDeviceOrderDir || 'asc',
           take: 10000,
           skip: 0
@@ -25,10 +25,14 @@ function createActions(store) {
         }
         const miLightDevicesReceived = await state.httpClient.get('/api/v1/service/mi-light/device', options);
         const miLightDevices = miLightDevicesReceived.filter(device => device.model !== BRIDGE_MODEL);
+        const miLightDevicesMap = new Map();
+        miLightDevices.forEach(device => miLightDevicesMap.set(device.external_id, device));
         store.setState({
           miLightDevices,
+          miLightDevicesMap,
           getMiLightDevicesStatus: RequestStatus.Success
         });
+        actions.getMiLightNewDevices(store.getState());
       } catch (e) {
         store.setState({
           getMiLightDevicesStatus: RequestStatus.Error
@@ -41,8 +45,14 @@ function createActions(store) {
       });
       try {
         const miLightNewDevices = await state.httpClient.get('/api/v1/service/mi-light/light');
+        const miLightNewDevicesFiltered = miLightNewDevices.filter(device => {
+          if (!state.miLightDevicesMap) {
+            return true;
+          }
+          return !state.miLightDevicesMap.has(device.external_id);
+        });
         store.setState({
-          miLightNewDevices,
+          miLightNewDevices: miLightNewDevicesFiltered,
           getMiLightNewDevicesStatus: RequestStatus.Success
         });
       } catch (e) {

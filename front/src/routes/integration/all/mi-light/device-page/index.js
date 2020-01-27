@@ -6,7 +6,7 @@ import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
 @connect(
-  'session,user,miLightDevices,houses,getMiLightDevicesStatus,miLightNewDevices,getMiLightCreateDeviceStatus',
+  'session,user,miLightDevices,houses,getMiLightDevicesStatus,miLightNewDevices,getMiLightCreateDeviceStatus,getMiLightNewDevicesStatus',
   actions
 )
 class MiLightDevicePage extends Component {
@@ -20,7 +20,7 @@ class MiLightDevicePage extends Component {
   render(props, {}) {
     return (
       <MiLightPage>
-        <DevicePage {...props} />
+         {props.miLightDevices && props.miLightDevices.length ? <DevicePage {...props} /> : <div />}
         <FoundDevices {...props} />
       </MiLightPage>
     );
