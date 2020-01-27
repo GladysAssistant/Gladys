@@ -10,7 +10,7 @@
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
     "push-coverage": "codecov -F server",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
-    "prettier": "prettier --write \"**/*.js\" \"**/*.json\"",
+    "prettier": "prettier --write '**/*.js' '**/*.json'",
     "eslint-fix": "eslint . --fix",
     "eslint": "eslint .",
     "start": "cross-env NODE_ENV=development nodemon index.js",

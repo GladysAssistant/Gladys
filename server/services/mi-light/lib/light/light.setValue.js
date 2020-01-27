@@ -26,8 +26,12 @@ async function setValue(device, deviceFeature, value) {
   if (!bridge) {
     throw new NotFoundError(`BRIDGE_NOT_FOUND`);
   }
-  logger.info(`Connecting to milight bridge : Mac = "${bridgeMac}", ip = ${bridge.ip}, type = ${bridge.type}, name = ${bridge.name}`);
-  logger.debug(`Changing state of light ${device.external_id} with IP ${bridge.ip} . Zone = ${zoneId}. New value = ${value}`);
+  logger.info(
+    `Connecting to milight bridge : Mac = "${bridgeMac}", ip = ${bridge.ip}, type = ${bridge.type}, name = ${bridge.name}`,
+  );
+  logger.debug(
+    `Changing state of light ${device.external_id} with IP ${bridge.ip} . Zone = ${zoneId}. New value = ${value}`,
+  );
 
   // const commands = await this.milightClient.commandsV6;
   // const MiLight = await this.milightClient.MilightController;
