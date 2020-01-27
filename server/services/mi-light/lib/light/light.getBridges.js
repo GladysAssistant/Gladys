@@ -14,8 +14,7 @@ async function getBridges() {
   // If you want to use a broadcast address though, use a network-specific address,
   // e.g. for 192.168.0.1/24 use 192.168.0.255.
   // this.bridges = await this.milightClient.discoverBridges({address: '192.168.x.x', type: 'all'});
-  // this.bridges = await this.milightClient.discoverBridges({ address: '255.255.255.255', type: 'all' });
-  this.bridges = await this.milightClient.discoverBridges({address: '192.168.10.104', type: 'all'});
+  this.bridges = await this.milightClient.discoverBridges({ address: '255.255.255.255', type: 'all' });
   logger.info(`MiLightService: Found ${this.bridges.length} bridges`);
   this.bridges.forEach((bridge) => {
     this.bridgesByMac.set(bridge.mac, bridge);

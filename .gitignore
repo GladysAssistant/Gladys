@@ -14,4 +14,3 @@ coverage
 # VSCode
 .vscode
 .tmp
-server/services/mi-light/lib/light/light.getBridges.js
