@@ -16,11 +16,10 @@ class MiLightDevicePage extends Component {
     this.props.getMiLightNewDevices();
     this.props.getIntegrationByName('mi-light');
   }
-
   render(props, {}) {
     return (
       <MiLightPage>
-         {props.miLightDevices && props.miLightDevices.length ? <DevicePage {...props} /> : <div />}
+        {props.miLightDevices && props.miLightDevices.length ? <DevicePage {...props} /> : <div />}
         <FoundDevices {...props} />
       </MiLightPage>
     );
