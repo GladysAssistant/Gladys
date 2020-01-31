@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import DelayActionParams from './actions/DelayActionParams';
 import ArmHomeActionParams from './actions/ArmHomeActionParam';
-import LockActionParams from './actions/LockActionParam';
 import TurnOnLightParams from './actions/TurnOnLightParams';
 import TelegramSendParams from './actions/TelegramSendParams';
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
@@ -59,8 +58,6 @@ const ActionCard = ({ children, ...props }) => (
         />
       )}
       {props.action.type === 'Arm Home' && <ArmHomeActionParams />}
-      {props.action.type === 'Lock the door' && <LockActionParams />}
-      {props.action.type === 'Lock the windows' && <LockActionParams />}
       {props.action.type === null && (
         <ChooseActionTypeParams
           columnIndex={props.columnIndex}

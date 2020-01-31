@@ -1,44 +1,47 @@
-const updateTime = (updateActionProperty, columnIndex, rowIndex) => e => {
-  const time = e.target.value;
-  const timeSplitted = time.split(':');
-  const minutes = parseInt(timeSplitted[0], 10);
-  let seconds = parseInt(timeSplitted[1], 10);
-  if (minutes > 0) {
-    seconds += minutes * 60;
-  }
-  updateActionProperty(columnIndex, rowIndex, 'seconds', seconds);
-};
+import { Component } from 'preact';
+import { connect } from 'unistore/preact';
+import { Text } from 'preact-i18n';
 
-const convertTime = action => {
-  const secNum = parseInt(action.seconds, 10); // don't forget the second param
-  let minutes = Math.floor(secNum / 60);
-  let seconds = secNum - minutes * 60;
-
-  if (minutes < 10) {
-    minutes = '0' + minutes;
+@connect('', {})
+class WaitActionParams extends Component {
+  handleChangeDuration = e => {
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'value', e.target.value);
+  };
+  handleChangeUnit = e => {
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', e.target.value);
+  };
+  componentDidMount() {
+    if (!this.props.unit) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
+    }
   }
-  if (seconds < 10) {
-    seconds = '0' + seconds;
-  }
-  return minutes + ':' + seconds;
-};
-
-const WaitActionParams = ({ children, ...props }) => (
-  <div>
-    <p>This block will wait the specified duration.</p>
-    <div class="row">
-      <div class="col-md-6">
-        <input type="text" class="form-control" value={props.action.text} placeholder="Duration" />
+  render(props, {}) {
+    return (
+      <div>
+        <p>This block will wait the specified duration.</p>
+        <div class="row">
+          <div class="col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              value={props.action.value}
+              onChange={this.handleChangeDuration}
+              placeholder="Duration"
+            />
+          </div>
+          <div class="col-md-6">
+            <select class="custom-select" value={props.action.unit} onChange={this.handleChangeUnit}>
+              <option value="seconds">
+                <Text id="" />
+              </option>
+              <option value="minutes">minutes</option>
+              <option value="hours">hours</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="col-md-6">
-        <select class="custom-select" value={props.action.user}>
-          <option>seconds</option>
-          <option>minutes</option>
-          <option>hours</option>
-        </select>
-      </div>
-    </div>
-  </div>
-);
+    );
+  }
+}
 
 export default WaitActionParams;

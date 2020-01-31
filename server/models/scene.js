@@ -15,10 +15,8 @@ const actionSchema = Joi.array().items(
       devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       text: Joi.string(),
-      milliseconds: Joi.number(),
-      seconds: Joi.number(),
-      minutes: Joi.number(),
-      hours: Joi.number(),
+      value: Joi.number(),
+      unit: Joi.string(),
     }),
   ),
 );
