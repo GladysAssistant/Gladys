@@ -56,7 +56,7 @@ const actions = store => {
     },
     async disconnect(state) {
       store.setState({
-        zwaveDisconnectStatus: RequestStatus.Getting
+        arduinoDisconnectStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/service/arduino/disconnect');
@@ -66,7 +66,7 @@ const actions = store => {
         });
       } catch (e) {
         store.setState({
-          zwaveDisconnectStatus: RequestStatus.Error
+          arduinoDisconnectStatus: RequestStatus.Error
         });
       }
     }
