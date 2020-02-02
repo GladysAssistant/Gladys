@@ -4,6 +4,7 @@ import actions from './actions';
 import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
+import { RequestStatus } from '../../../../../utils/consts';
 
 @connect(
   'user,session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
