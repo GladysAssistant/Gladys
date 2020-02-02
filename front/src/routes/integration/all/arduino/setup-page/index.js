@@ -16,9 +16,12 @@ class ArduinoSetupPage extends Component {
   }
 
   render(props, { }) {
+    const loading =
+      props.getArduinoUsbPortStatus === RequestStatus.Getting;
+
     return (
       <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
-        <SetupTab {...props} />
+        <SetupTab {...props} loading={loading} />
       </ArduinoPage>
     );
   }
