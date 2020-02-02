@@ -4,7 +4,6 @@ import actions from './actions';
 import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
-import { RequestStatus } from '../../../../../utils/consts';
 
 @connect(
   'user,session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
@@ -17,12 +16,9 @@ class ArduinoSetupPage extends Component {
   }
 
   render(props, { }) {
-    const loading =
-      props.getArduinoUsbPortStatus === RequestStatus.Getting;
-
     return (
       <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
-        <SetupTab {...props} loading={loading} />
+        <SetupTab {...props}/>
       </ArduinoPage>
     );
   }

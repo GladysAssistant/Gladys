@@ -17,58 +17,6 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
-    },
-    async saveDriverPathAndConnect(state) {
-      store.setState({
-        connectArduinoStatus: RequestStatus.Getting,
-        arduinoDriverFailed: false
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ZWAVE_DRIVER_PATH', {
-          value: state.arduinoDriverPath
-        });
-        await state.httpClient.post('/api/v1/service/arduino/connect');
-        store.setState({
-          connectArduinoStatus: RequestStatus.Success,
-          arduinoConnectionInProgress: true
-        });
-      } catch (e) {
-        store.setState({
-          connectArduinoStatus: RequestStatus.Error
-        });
-      }
-    },
-    async getInfos(state) {
-      store.setState({
-        getArduinoInfos: RequestStatus.Getting
-      });
-      try {
-        const arduinoInfos = await state.httpClient.get('/api/v1/service/arduino/info');
-        store.setState({
-          arduinoInfos,
-          getArduinoInfos: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getArduinoInfos: RequestStatus.Error
-        });
-      }
-    },
-    async disconnect(state) {
-      store.setState({
-        arduinoDisconnectStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/disconnect');
-        await actions.getStatus(store.getState());
-        store.setState({
-          arduinoDisconnectStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          arduinoDisconnectStatus: RequestStatus.Error
-        });
-      }
     }
   };
 
