@@ -5,20 +5,21 @@ import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect(
-  'user,session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
-  actions
-)
+@connect('user,session,connectArduinoStatus,arduinoConnected,arduinoConnectionError', actions)
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
     this.props.getUsbPorts();
+    this.props.getIntegrationByName('arduino');
+  }
+
+  componentWillUnmount() {
   }
 
   render(props, { }) {
     return (
       <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
-        <SetupTab {...props}/>
+        <SetupTab {...props} />
       </ArduinoPage>
     );
   }
