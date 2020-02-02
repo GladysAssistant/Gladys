@@ -6,7 +6,7 @@ import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 
 @connect(
-  'session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
+  'user,session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
   actions
 )
 class ArduinoSetupPage extends Component {
