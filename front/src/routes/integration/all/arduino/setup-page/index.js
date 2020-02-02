@@ -10,10 +10,12 @@ import integrationConfig from '../../../../../config/integrations';
   actions
 )
 class ArduinoSetupPage extends Component {
-  
-  
 
-  render(props, {}) {
+  componentWillMount() {
+    this.props.getUsbPorts();
+  }
+
+  render(props, { }) {
     return (
       <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
         <SetupTab {...props} />
