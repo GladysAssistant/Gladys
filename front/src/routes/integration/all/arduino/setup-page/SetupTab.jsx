@@ -61,7 +61,7 @@ const SetupTab = ({ children, ...props }) => {
                       <label class="form-label">
                         <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                       </label>
-                      <select class="form-control" onChange={props.updateArduinoDriverPath}>
+                      <select class="form-control">
                         <option>
                           <Text id="global.emptySelectOption" />
                         </option>
