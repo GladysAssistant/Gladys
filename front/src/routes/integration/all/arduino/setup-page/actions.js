@@ -25,32 +25,32 @@ const actions = store => {
       });
       try {
         await state.httpClient.post('/api/v1/service/arduino/variable/ZWAVE_DRIVER_PATH', {
-          value: state.zwaveDriverPath
+          value: state.arduinoDriverPath
         });
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({
-          connectZwaveStatus: RequestStatus.Success,
-          zwaveConnectionInProgress: true
+          connectArduinoStatus: RequestStatus.Success,
+          arduinoConnectionInProgress: true
         });
       } catch (e) {
         store.setState({
-          connectZwaveStatus: RequestStatus.Error
+          connectArduinoStatus: RequestStatus.Error
         });
       }
     },
     async getInfos(state) {
       store.setState({
-        getZwaveInfos: RequestStatus.Getting
+        getArduinoInfos: RequestStatus.Getting
       });
       try {
-        const zwaveInfos = await state.httpClient.get('/api/v1/service/arduino/info');
+        const arduinoInfos = await state.httpClient.get('/api/v1/service/arduino/info');
         store.setState({
-          zwaveInfos,
-          getZwaveInfos: RequestStatus.Success
+          arduinoInfos,
+          getArduinoInfos: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getZwaveInfos: RequestStatus.Error
+          getArduinoInfos: RequestStatus.Error
         });
       }
     },

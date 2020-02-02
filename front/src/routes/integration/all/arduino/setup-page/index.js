@@ -4,10 +4,9 @@ import actions from './actions';
 import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,arduinoURL,arduinoUsername,arduinoPassword,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
+  'session,connectArduinoStatus,arduinoConnected,arduinoConnectionError',
   actions
 )
 class ArduinoSetupPage extends Component {
