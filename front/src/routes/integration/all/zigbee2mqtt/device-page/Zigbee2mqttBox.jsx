@@ -1,8 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
+import { Link } from 'preact-router/match';
+import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -148,6 +149,11 @@ class Zigbee2mqttBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.zigbee2mqtt.deleteButton" />
                   </button>
+                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.zigbee2mqtt.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
