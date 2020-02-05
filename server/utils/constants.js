@@ -224,6 +224,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROl: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  ULTRASONIC_SENSOR: 'ultrasonic-sensor',
   UNKNOWN: 'unknown',
 };
 
@@ -242,6 +243,8 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
     BINARY: 'binary',
     PUSH: 'push',
+    DISTANCE: 'distance',
+    VOLUME: 'volume',
     UNKNOWN: 'unknown',
   },
   SWITCH: {
@@ -290,6 +293,9 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
+  LITER: 'liter',
+  CENTIMETER: 'centimeter',
+  METER: 'meter',
 };
 
 const ACTIONS_STATUS = {

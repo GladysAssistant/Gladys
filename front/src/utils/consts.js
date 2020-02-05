@@ -1,4 +1,4 @@
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } from '../../../server/utils/constants';
 
 export const LoginStatus = {
   Processing: 'Processing',
@@ -146,6 +146,10 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.BUTTON]: {
     [DEVICE_FEATURE_TYPES.BUTTON.CLICK]: 'circle'
+  },
+  [DEVICE_FEATURE_CATEGORIES.ULTRASONIC_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.VOLUME]: 'droplet',
+    [DEVICE_FEATURE_TYPES.SENSOR.DISTANCE]: 'minimize-2'
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
     [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'

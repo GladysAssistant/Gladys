@@ -1,6 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import get from 'get-value';
 
@@ -71,6 +71,56 @@ const MqttFeatureBox = ({ children, ...props }) => {
                   </option>
                 </select>
               </Localizer>
+            </div>
+          )}
+
+          {props.feature.category === DEVICE_FEATURE_CATEGORIES.ULTRASONIC_SENSOR && (
+            <div class="form-group">
+              <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.unitLabel" />
+              </label>
+            {props.feature.type === DEVICE_FEATURE_TYPES.SENSOR.VOLUME && (
+              <Localizer>
+                <select
+                  id={`unit_${props.featureIndex}`}
+                  type="text"
+                  value={props.feature.unit}
+                  onChange={props.updateUnit}
+                  class="form-control"
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.PERCENT}>
+                    <Text id="deviceFeatureUnit.percent" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.LITER}>
+                    <Text id="deviceFeatureUnit.liter" />
+                  </option>
+                </select>
+              </Localizer>
+            )}
+            {props.feature.type === DEVICE_FEATURE_TYPES.SENSOR.DISTANCE && (
+              <Localizer>
+                <select
+                  id={`unit_${props.featureIndex}`}
+                  type="text"
+                  value={props.feature.unit}
+                  onChange={props.updateUnit}
+                  class="form-control"
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.CENTIMETER}>
+                    <Text id="deviceFeatureUnit.centimeter" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.METER}>
+                    <Text id="deviceFeatureUnit.meter" />
+                  </option>
+                </select>
+              </Localizer>
+            )}
             </div>
           )}
 

@@ -666,7 +666,11 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "Percent (%)",
+    "liter": "Liter (l)",
+    "centimeter": "Centimeter (cm)",
+    "meter": "Meter (m)"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -743,6 +747,10 @@
       "acceleration-y": "Acceleration Y",
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
+    },
+    "ultrasonic-sensor": {
+      "volume": "Ultrasonic Volume",
+      "distance": "Ultrasonic Distance"
     },
     "unknown": {
       "unknown": "Unknown"
