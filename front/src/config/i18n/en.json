@@ -270,7 +270,8 @@
       "discoverTab": "Discover",
       "device": {
         "title": "Zigbee2mqtt devices",
-        "search": "Search devices"
+        "search": "Search devices",
+        "editButton": "Edit"
       },
       "discover": {
         "title": "Zigbee2mqtt discover",
