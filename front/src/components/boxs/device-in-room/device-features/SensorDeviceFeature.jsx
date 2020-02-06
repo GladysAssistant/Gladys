@@ -39,6 +39,8 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LITER && 'l'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CENTIMETER && 'cm'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.METER && 'm'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CUBIC_DECIMETER && 'dm³'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CUBIC_METER && 'm³'}
           </span>
         )}
       </td>

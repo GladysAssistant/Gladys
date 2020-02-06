@@ -296,6 +296,8 @@ const DEVICE_FEATURE_UNITS = {
   LITER: 'liter',
   CENTIMETER: 'centimeter',
   METER: 'meter',
+  CUBIC_DECIMETER: 'cubic-decimeter',
+  CUBIC_METER: 'cubic-meter',
 };
 
 const ACTIONS_STATUS = {

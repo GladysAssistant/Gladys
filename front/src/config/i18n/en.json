@@ -670,7 +670,9 @@
     "percent": "Percent (%)",
     "liter": "Liter (l)",
     "centimeter": "Centimeter (cm)",
-    "meter": "Meter (m)"
+    "meter": "Meter (m)",
+    "cubicDecimeter": "Cubic Decimeter (dm³)",
+    "cubicMeter": "Cubic Meter (m³)"
   },
   "deviceFeatureCategory": {
     "light": {

@@ -101,6 +101,12 @@ const MqttFeatureBox = ({ children, ...props }) => {
                     <option value={DEVICE_FEATURE_UNITS.LITER}>
                       <Text id="deviceFeatureUnit.liter" />
                     </option>
+                    <option value={DEVICE_FEATURE_UNITS.CUBIC_DECIMETER}>
+                      <Text id="deviceFeatureUnit.cubicDecimeter" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.CUBIC_METER}>
+                      <Text id="deviceFeatureUnit.cubicMeter" />
+                    </option>
                   </select>
                 </Localizer>
               )}
