@@ -26,11 +26,18 @@ module.exports = function RfLink(gladys, serviceId) {
       const readline = new Readline();
       port.pipe(readline);
       rfLinkManager = new RfLinkManager(readline, gladys, serviceId);
+
       if (rfLinkManager === undefined)  {
         throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
       } else {
         rfLinkManager.connect(RflinkPath);
+        return Object.freeze({
+          device : rfLinkManager,
+          controllers : RflinkController(gladys, rfLinkManager, serviceId), 
+        });
       }
+
+
       
     }
 
@@ -48,10 +55,7 @@ module.exports = function RfLink(gladys, serviceId) {
 
     return Object.freeze({
       start,
-      stop,
-      device : rfLinkManager,
-      controllers : RflinkController(gladys, rfLinkManager, serviceId), 
-            
+      stop, 
     }) 
     ;
 };

@@ -232,8 +232,8 @@ function message(msgRF) {
                                 read_only : false,
                                 keep_history: true,
                                 has_feedback: false,
-                                min: 'OFF',
-                                max: 'ON',
+                                min: 0,
+                                max: 1,
 
 
                         });
