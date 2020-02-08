@@ -1,4 +1,6 @@
 const os = require('os');
+const Serialport = require('serialport');
+const Readline = require('@serialport/parser-readline');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -8,13 +10,22 @@ const logger = require('../../../../utils/logger');
  * rflink.connect(Path);
  */
 function connect(Path) {
-    logger.debug(`Rflink : Connecting to USB = ${Path}`);
     // special case for macOS
     if (os.platform() === 'darwin') {
       this.Path = Path.replace('/dev/tty.', '/dev/cu.');
     } else {
       this.Path = Path;
     }
+
+
+    const port = new Serialport(this.Path, {baudRate : 57600});
+    const readline = new Readline();
+    port.pipe(readline);
+    this.usb = readline;
+
+
+    logger.debug(`Rflink : Connecting to USB = ${Path}`);
+
     this.connected = true;
     this.listen();
     

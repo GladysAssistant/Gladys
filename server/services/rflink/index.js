@@ -4,28 +4,33 @@ const RflinkController = require('./api/rflink.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 
-let rfLinkManager;
-
 module.exports = function RfLink(gladys, serviceId) {
-    
-    const Serialport = require('serialport');
-    const Readline = require('@serialport/parser-readline');
+
+
+/**
+ * @description function to solve problems with rflinkpath = undefined
+ * @example
+ * init()
+ */
+
+  const rfLinkManager = new RfLinkManager(gladys, serviceId);
+
+
 /**
  * @description start rflink module
  * @example
  * gladys.services.rflink.start();
  */
     async function start() {
-      logger.log('Starting Rflink service');
       const RflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
-      
-      if (!RflinkPath) {
+      if (RflinkPath === undefined || !RflinkPath) {
+        logger.log('rflink service cannot start because the usb path is undefined');
         throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
+      } else {
+        logger.log('Starting Rflink service');
       }
-      const port = new Serialport(RflinkPath, {baudRate : 57600});
-      const readline = new Readline();
-      port.pipe(readline);
-      rfLinkManager = new RfLinkManager(readline, gladys, serviceId);
+      
+
       if (rfLinkManager === undefined)  {
         throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
       } else {
@@ -45,14 +50,13 @@ module.exports = function RfLink(gladys, serviceId) {
       logger.log('Stopping Rflink service');
       rfLinkManager.disconnect();
     }
-
     return Object.freeze({
       start,
       stop,
       device : rfLinkManager,
       controllers : RflinkController(gladys, rfLinkManager, serviceId), 
-            
-    }) 
-    ;
+    });
+  
+
 };
 
