@@ -21,7 +21,7 @@ class RflinkDeviceForm extends Component {
       <div>
         <div class="form-group">
           <label class="form-label" for="deviceName">
-            <Text id="integration.mqtt.device.nameLabel" />
+            <Text id="integration.rflink.device.nameLabel" />
           </label>
           <Localizer>
             <input
@@ -30,14 +30,14 @@ class RflinkDeviceForm extends Component {
               value={props.device.name}
               onInput={this.updateName}
               class="form-control"
-              placeholder={<Text id="integration.mqtt.device.nameLabel" />}
+              placeholder={<Text id="integration.rflink.device.nameLabel" />}
             />
           </Localizer>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="room">
-            <Text id="integration.mqtt.device.roomLabel" />
+            <Text id="integration.rflink.device.roomLabel" />
           </label>
           <select onChange={this.updateRoom} class="form-control" id="room">
             <option value="">
@@ -58,7 +58,7 @@ class RflinkDeviceForm extends Component {
 
         <div class="form-group">
           <label class="form-label">
-            <Text id="integration.mqtt.device.featuresLabel" />
+            <Text id="integration.rflink.device.featuresLabel" />
           </label>
           <div class="tags">
             {props.device &&
@@ -72,7 +72,7 @@ class RflinkDeviceForm extends Component {
                 </span>
               ))}
             {(!props.device.features || props.device.features.length === 0) && (
-              <Text id="integration.mqtt.device.noFeatures" />
+              <Text id="integration.rflink.device.noFeatures" />
             )}
           </div>
         </div>

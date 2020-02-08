@@ -13,6 +13,7 @@ class RflinkDevicePage extends Component {
   componentWillMount() {
     this.props.getRflinkDevices();
     this.props.getHouses();
+    this.props.getRflinkNewDevices();
     this.props.getIntegrationByName('rflink');
   }
 

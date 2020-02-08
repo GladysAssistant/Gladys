@@ -29,7 +29,7 @@ class RflinkDeviceBox extends Component {
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">{props.device.name || <Text id="integration.mqtt.device.noNameLabel" />}</div>
+          <div class="card-header">{props.device.name || <Text id="integration.rflink.device.noNameLabel" />}</div>
           <div
             class={cx('dimmer', {
               active: loading
@@ -42,10 +42,10 @@ class RflinkDeviceBox extends Component {
 
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.mqtt.device.saveButton" />
+                    <Text id="integration.rflink.device.saveButton" />
                   </button>
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
-                    <Text id="integration.mqtt.device.deleteButton" />
+                    <Text id="integration.rflink.device.deleteButton" />
                   </button>
                 </div>
               </div>

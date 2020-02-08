@@ -75,12 +75,29 @@ const actions = store => {
         });
       }
     },
+    async pair(state) {
+      try {
+        await state.httpClient.post('/api/v1/service/rflink/pair');
+
+      } catch (e) {
+
+      }
+    },
+    async unpair(state) {
+      try {
+        await state.httpClient.post('/api/v1/service/rflink/unpair');
+
+      } catch (e) {
+
+      }
+    },
     async getStatus(state) {
       store.setState({
         rflinkGetStatusStatus: RequestStatus.Getting
       });
       try {
         const rflinkStatus = await state.httpClient.get('/api/v1/service/rflink/status');
+
         store.setState({
           rflinkStatus,
           rflinkConnectionInProgress: false,

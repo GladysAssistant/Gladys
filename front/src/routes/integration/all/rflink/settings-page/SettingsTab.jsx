@@ -3,6 +3,7 @@ import get from 'get-value';
 import cx from 'classnames';
 
 const SettingsTab = ({ children, ...props }) => (
+<div class="page">
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">
@@ -73,6 +74,28 @@ const SettingsTab = ({ children, ...props }) => (
       </div>
     </div>
   </div>
+
+
+
+
+
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">
+        <Text id="integration.rflink.settings.milight.title" />
+      </h2>
+      <div class="page-options d-flex">
+        <button class="btn btn-success" onClick={props.pair}>
+        <Text id="integration.rflink.settings.milight.pairButton" />
+      </button>
+      <button class="btn btn-danger ml-2" onClick={props.unpair}>
+        <Text id="integration.rflink.settings.milight.unpairButton" />
+      </button>
+    </div>
+    </div>
+  </div>
+</div>
 );
 
 export default SettingsTab;

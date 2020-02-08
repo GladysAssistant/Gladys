@@ -10,7 +10,7 @@ function createActions(store) {
   const actions = {
     async getRflinkDevices(state) {
       store.setState({
-        getrflinkDevicesStatus: RequestStatus.Getting
+        getRflinkDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
@@ -42,7 +42,7 @@ function createActions(store) {
         getRflinkNewDevicesStatus: RequestStatus.Getting
       });
       try {
-        const rflinkNewDevices = await state.httpClient.get('/api/v1/service/philips-hue/devices');
+        const rflinkNewDevices = await state.httpClient.get('/api/v1/service/rflink/devices');
         const rflinkNewDevicesFiltered = rflinkNewDevices.filter(device => {
           if (!state.rflinkDevicesMap) {
             return true;
