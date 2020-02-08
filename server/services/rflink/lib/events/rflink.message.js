@@ -33,6 +33,7 @@ function message(msgRF) {
                     selector : `rflink:${msg.id}`,
                     external_id: `rflink:${msg.id}`,
                     model : `${msg.protocol}`,
+                    should_poll : false,
                     features : []
                 };
 

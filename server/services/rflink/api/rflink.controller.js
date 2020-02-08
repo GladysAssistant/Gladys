@@ -9,7 +9,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
     async function getDevices(req, res) {
-        logger.log('getting devices ...');
         res.json(RFlinkManager.getDevices());
     }
 
@@ -50,7 +49,34 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     });
   }
 
+    /**
+     * @api {get} /api/v1/service/rflink/pair send a milight pairing comand
+     * @apiName pair
+     * @apiGroup RFlink
+     */
+  async function pair(req, res) {
+      RFlinkManager.pair();
+  }
+
+    /**
+     * @api {get} /api/v1/service/rflink/pair send a milight unpairing comand
+     * @apiName unpair
+     * @apiGroup RFlink
+     */
+  async function unpair(req, res) {
+    RFlinkManager.unpair();
+}
+
     return {
+        'get /api/v1/service/rflink/pair' : {
+            authenticated: true,
+            controller: asyncMiddleware(pair)
+        },
+        'get /api/v1/service/rflink/unpair' : {
+            authenticated: true,
+            controller: asyncMiddleware(unpair)
+        },
+
         'get /api/v1/service/rflink/devices' : {
             authenticated: true,
             controller: asyncMiddleware(getDevices)

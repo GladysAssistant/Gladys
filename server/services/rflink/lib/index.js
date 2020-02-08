@@ -14,6 +14,8 @@ const { connect } = require('./commands/rflink.connect');
 const { disconnect } = require('./commands/rflink.disconnect');
 const { listen } = require('./commands/rflink.listen');
 const { getDevices } = require('./commands/rflink.getDevices');
+const { pair } = require('./commands/rflink.milight.pair');
+const { unpair } = require('./commands/rflink.milight.unpair');
 
 
 
@@ -45,6 +47,8 @@ RFlinkManager.prototype.connect = connect;
 RFlinkManager.prototype.disconnect = disconnect;
 RFlinkManager.prototype.listen = listen;
 RFlinkManager.prototype.getDevices = getDevices;
+RFlinkManager.prototype.pair = pair;
+RFlinkManager.prototype.unpair = unpair;
 
 
 
