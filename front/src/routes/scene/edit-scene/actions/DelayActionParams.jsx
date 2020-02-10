@@ -36,6 +36,9 @@ class WaitActionParams extends Component {
           </div>
           <div class="col-md-6">
             <select class="custom-select" value={props.action.unit} onChange={this.handleChangeUnit}>
+              <option value="milliseconds">
+                <Text id="editScene.actionsCard.delay.milliseconds" />
+              </option>
               <option value="seconds">
                 <Text id="editScene.actionsCard.delay.seconds" />
               </option>

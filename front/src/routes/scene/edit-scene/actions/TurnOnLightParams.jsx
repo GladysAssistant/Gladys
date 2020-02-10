@@ -24,15 +24,15 @@ class TurnOnLight extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const lights = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'deviceFeatures', lights);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'deviceFeatures', []);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
-    if (nextProps.action.deviceFeatures && this.state.deviceOptions) {
-      nextProps.action.deviceFeatures.forEach(light => {
+    if (nextProps.action.devices && this.state.deviceOptions) {
+      nextProps.action.devices.forEach(light => {
         const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
         if (deviceOption) {
           selectedOptions.push(deviceOption);

@@ -445,6 +445,7 @@
       "delay": {
         "label": " This block will wait the specified duration.",
         "inputPlaceholder": "Duration",
+        "milliseconds": "milliseconds",
         "seconds": "seconds",
         "minutes": "minutes",
         "hours": "hours"
