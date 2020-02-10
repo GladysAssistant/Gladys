@@ -36,10 +36,13 @@
       "synchronizationInfo": "Les calendriers sont synchronisés toutes les 30 minutes.",
       "configurationSuccess": "Configuration sauvegardée avec succès.",
       "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration.",
+      "cleanUpSuccess": "Suppression des données terminée.",
+      "cleanUpError": "Une erreur est survenue lors de la suppression des données.",
       "synchronizationSuccess": "Synchronisation terminée avec succès.",
       "synchronizationError": "Une erreur est survenue lors de la synchronisation.",
-      "buttonSave": "Save",
-      "buttonSync": "Sync now"
+      "buttonSave": "Sauvegarder",
+      "buttonCleanUp": "Reset",
+      "buttonSync": "Synchroniser"
     }
   },
   "calendar": {

@@ -84,6 +84,16 @@ const CaldavPage = ({ children, ...props }) => (
                           <Text id="integration.caldav.configurationSuccess" />
                         </p>
                       )}
+                      {props.caldavCleanUpStatus === RequestStatus.Error && (
+                        <div class="alert alert-danger">
+                          <Text id="integration.caldav.cleanUpError" />
+                        </div>
+                      )}
+                      {props.caldavCleanUpStatus === RequestStatus.Success && (
+                        <p class="alert alert-info">
+                          <Text id="integration.caldav.cleanUpSuccess" />
+                        </p>
+                      )}
                       {props.caldavSyncStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.synchronizationError" />
@@ -102,9 +112,15 @@ const CaldavPage = ({ children, ...props }) => (
                           <button
                             class="btn btn-primary"
                             onClick={props.saveCaldavSettings}
-                            style={{ marginRight: '10px' }}
                           >
                             <Text id={`integration.caldav.buttonSave`} />
+                          </button>
+                          <button
+                            class="btn btn-danger"
+                            onClick={props.cleanUp}
+                            style={{ marginLeft: '10px', marginRight: '10px' }}
+                          >
+                            <Text id={`integration.caldav.buttonCleanUp`} />
                           </button>
                           <button class="btn btn-success" onClick={props.startSync}>
                             <Text id={`integration.caldav.buttonSync`} />

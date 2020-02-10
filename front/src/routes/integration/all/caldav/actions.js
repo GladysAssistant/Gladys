@@ -84,6 +84,7 @@ const actions = store => ({
   async saveCaldavSettings(state) {
     store.setState({
       caldavSaveSettingsStatus: RequestStatus.Getting,
+      caldavCleanUpStatus: null,
       caldavSyncStatus: null
     });
     try {
@@ -121,10 +122,29 @@ const actions = store => ({
       });
     }
   },
+  async cleanUp(state) {
+    store.setState({
+      caldavCleanUpStatus: RequestStatus.Getting,
+      caldavSaveSettingsStatus: null,
+      caldavSyncStatus: null
+    });
+
+    try {
+      await state.httpClient.get('/api/v1/service/caldav/cleanup');
+      store.setState({
+        caldavCleanUpStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      store.setState({
+        caldavCleanUpStatus: RequestStatus.Error
+      });
+    }
+  },
   async startSync(state) {
     store.setState({
       caldavSyncStatus: RequestStatus.Getting,
-      caldavSaveSettingsStatus: null
+      caldavSaveSettingsStatus: null,
+      caldavCleanUpStatus: null
     });
     try {
       await state.httpClient.get('/api/v1/service/caldav/sync');

@@ -448,9 +448,12 @@
       "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
       "configurationSuccess": "Configuration saved.",
       "configurationError": "An error occured while saving configuration.",
+      "cleanUpSuccess": "Clean up completed.",
+      "cleanUpError": "An error occured while trying clean up.",
       "synchronizationSuccess": "Synchronization completed.",
       "synchronizationError": "An error occured while trying synchronization.",
       "buttonSave": "Save",
+      "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
     }
   },
