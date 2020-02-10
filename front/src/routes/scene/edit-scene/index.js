@@ -9,8 +9,13 @@ class EditScene extends Component {
     this.props.startScene(this.props.scene_selector);
   };
   saveScene = async () => {
-    this.setState({ saving: true });
-    await this.props.saveScene();
+    this.setState({ saving: true, error: false });
+    try {
+      await this.props.saveScene();
+    } catch (e) {
+      console.log(e);
+      this.setState({ error: true });
+    }
     this.setState({ saving: false });
   };
   deleteScene = () => {
@@ -29,7 +34,7 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving }) {
+  render(props, { saving, error }) {
     return (
       props.scene && (
         <EditScenePage
@@ -38,6 +43,7 @@ class EditScene extends Component {
           deleteScene={this.deleteScene}
           saveScene={this.saveScene}
           saving={saving}
+          error={error}
         />
       )
     );

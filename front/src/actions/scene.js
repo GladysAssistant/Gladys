@@ -82,19 +82,7 @@ function createActions(store) {
       }
     },
     async saveScene(state) {
-      store.setState({
-        SceneSaveStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.patch(`/api/v1/scene/${state.scene.selector}`, state.scene);
-        store.setState({
-          SceneSaveStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          SceneSaveStatus: RequestStatus.Error
-        });
-      }
+      await state.httpClient.patch(`/api/v1/scene/${state.scene.selector}`, state.scene);
     },
     addAction(state, columnIndex) {
       let newState = update(state, {

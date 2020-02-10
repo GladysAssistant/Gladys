@@ -33,6 +33,11 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
           </div>
           <div>
+            {props.error && (
+              <div class="alert alert-danger">
+                <Text id="editScene.saveSceneError" />
+              </div>
+            )}
             <div class="row">
               <TriggerGroup
                 triggers={props.scene.triggers}
