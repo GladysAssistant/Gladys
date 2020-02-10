@@ -436,6 +436,15 @@
     "newAction": "New action",
     "selectActionType": "Select an action type",
     "addActionButton": "Add action",
+    "actionsCard": {
+      "delay": {
+        "label": " This block will wait the specified duration.",
+        "inputPlaceholder": "Duration",
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours"
+      }
+    },
     "actions": {
       "telegram": {
         "send": "Send Telegram Message"

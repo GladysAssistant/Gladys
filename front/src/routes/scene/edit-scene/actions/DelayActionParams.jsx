@@ -1,41 +1,50 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 
 @connect('', {})
 class WaitActionParams extends Component {
   handleChangeDuration = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'value', e.target.value);
+    let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'value', newValue);
   };
   handleChangeUnit = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', e.target.value);
   };
   componentDidMount() {
-    if (!this.props.unit) {
+    if (!this.props.action.unit) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
     }
   }
   render(props, {}) {
     return (
       <div>
-        <p>This block will wait the specified duration.</p>
+        <p>
+          <Text id="editScene.actionsCard.delay.label" />
+        </p>
         <div class="row">
           <div class="col-md-6">
-            <input
-              type="text"
-              class="form-control"
-              value={props.action.value}
-              onChange={this.handleChangeDuration}
-              placeholder="Duration"
-            />
+            <Localizer>
+              <input
+                type="text"
+                class="form-control"
+                value={props.action.value}
+                onChange={this.handleChangeDuration}
+                placeholder={<Text id="editScene.actionsCard.delay.inputPlaceholder" />}
+              />
+            </Localizer>
           </div>
           <div class="col-md-6">
             <select class="custom-select" value={props.action.unit} onChange={this.handleChangeUnit}>
               <option value="seconds">
-                <Text id="" />
+                <Text id="editScene.actionsCard.delay.seconds" />
               </option>
-              <option value="minutes">minutes</option>
-              <option value="hours">hours</option>
+              <option value="minutes">
+                <Text id="editScene.actionsCard.delay.minutes" />
+              </option>
+              <option value="hours">
+                <Text id="editScene.actionsCard.delay.hours" />
+              </option>
             </select>
           </div>
         </div>
