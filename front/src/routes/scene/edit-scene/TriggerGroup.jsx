@@ -11,7 +11,7 @@ const TriggerGroup = ({ children, ...props }) => (
         <h4 class="text-center card-title ">Triggers</h4>
         <div class="card-options">
           <button class="btn btn-outline-primary" onClick={props.addTrigger}>
-            Add new trigger <i class="fe fe-plus" />
+            <Text id="editScene.addNewTriggerButton" /> <i class="fe fe-plus" />
           </button>
         </div>
       </div>
@@ -23,8 +23,13 @@ const TriggerGroup = ({ children, ...props }) => (
         >
           <div class="loader" />
           <div class="dimmer-content">
+            <div class="alert alert-info">
+              <Text id="editScene.triggersDescription" />
+            </div>
             {props.triggers && props.triggers.length === 0 && (
-              <div class="text-center">No trigger added yet. It's not mandatory to have a trigger in a scene.</div>
+              <div class="text-center">
+                <Text id="editScene.noTriggersYet" />
+              </div>
             )}
             <div class="row">
               {props.triggers &&

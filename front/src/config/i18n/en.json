@@ -432,10 +432,14 @@
     "then": "Then",
     "newTrigger": "New trigger",
     "selectTriggerLabel": "Select a trigger type",
-    "addTriggerButton": "Add trigger",
     "newAction": "New action",
     "selectActionType": "Select an action type",
-    "addActionButton": "Add action",
+    "addActionButton": "Add new action",
+    "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
+    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
+    "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
+    "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
+    "addNewTriggerButton": "Add new trigger",
     "actionsCard": {
       "delay": {
         "label": " This block will wait the specified duration.",

@@ -15,7 +15,7 @@ const ActionGroup = ({ children, ...props }) => (
         <h4 class="text-center card-title ">{props.index + 1}.</h4>
         <div class="card-options">
           <button onClick={addActionToColumn(props.index, props.addAction)} class="btn btn-outline-primary">
-            Add new action <i class="fe fe-plus" />
+            <Text id="editScene.addActionButton" /> <i class="fe fe-plus" />
           </button>
         </div>
       </div>
@@ -27,6 +27,16 @@ const ActionGroup = ({ children, ...props }) => (
         >
           <div class="loader" />
           <div class="dimmer-content">
+            {props.actions && props.actions.length > 0 && (
+              <div class="alert alert-info">
+                <Text id="editScene.actionsDescription" />
+              </div>
+            )}
+            {props.actions && props.actions.length === 0 && (
+              <div class="text-center">
+                <Text id="editScene.noActionsYet" />
+              </div>
+            )}
             <div class="row">
               {props.actions.map((action, index) => (
                 <div class="col-lg-4">
