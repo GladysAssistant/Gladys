@@ -184,8 +184,8 @@ const ACTIONS = {
   SCENE: {
     START: 'scene.start',
   },
-  TELEGRAM: {
-    SEND: 'telegram.send',
+  MESSAGE: {
+    SEND: 'message.send',
   },
 };
 

@@ -443,11 +443,16 @@
         "seconds": "seconds",
         "minutes": "minutes",
         "hours": "hours"
+      },
+      "messageSend": {
+        "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text"
       }
     },
     "actions": {
-      "telegram": {
-        "send": "Send Telegram Message"
+      "message": {
+        "send": "Send Message"
       },
       "delay": "Wait",
       "light": {

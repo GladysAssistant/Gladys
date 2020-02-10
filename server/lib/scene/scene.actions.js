@@ -35,7 +35,7 @@ const actionsFunc = {
   [ACTIONS.SERVICE.START]: async (self, action, scope) => self.stateManager.get('service', action.service).start(),
   [ACTIONS.SERVICE.STOP]: async (self, action, scope) => self.stateManager.get('service', action.service).stop(),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
-  [ACTIONS.TELEGRAM.SEND]: async (self, action, scope) => {
+  [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const user = self.stateManager.get('user', action.user);
     await self.stateManager.get('service', 'telegram').message.send(user.telegram_user_id, action.text);
   },

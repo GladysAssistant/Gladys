@@ -1,9 +1,8 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import DelayActionParams from './actions/DelayActionParams';
-import ArmHomeActionParams from './actions/ArmHomeActionParam';
 import TurnOnLightParams from './actions/TurnOnLightParams';
-import TelegramSendParams from './actions/TelegramSendParams';
+import SendMessageParams from './actions/SendMessageParams';
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
@@ -13,7 +12,7 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 const ACTION_ICON = {
   'light.turn-on': 'fe fe-sun',
   delay: 'fe fe-clock',
-  'telegram.send': 'fe fe-message-square'
+  'message.send': 'fe fe-message-square'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -57,7 +56,6 @@ const ActionCard = ({ children, ...props }) => (
           updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'Arm Home' && <ArmHomeActionParams />}
       {props.action.type === null && (
         <ChooseActionTypeParams
           columnIndex={props.columnIndex}
@@ -73,8 +71,13 @@ const ActionCard = ({ children, ...props }) => (
           updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'telegram.send' && (
-        <TelegramSendParams action={props.action} sceneParamsData={props.sceneParamsData} />
+      {props.action.type === 'message.send' && (
+        <SendMessageParams
+          action={props.action}
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
+        />
       )}
     </div>
   </div>
