@@ -122,7 +122,7 @@ function createActions(store) {
       store.setState(newState);
     },
     deleteAction(state, columnIndex, rowIndex) {
-      const newState = update(state, {
+      let newState = update(state, {
         scene: {
           actions: {
             [columnIndex]: {
@@ -131,6 +131,21 @@ function createActions(store) {
           }
         }
       });
+      // if necessary, we remove the last action group
+      if (newState.scene.actions.length >= 2) {
+        if (
+          newState.scene.actions[newState.scene.actions.length - 1].length === 0 &&
+          newState.scene.actions[newState.scene.actions.length - 2].length === 0
+        ) {
+          newState = update(newState, {
+            scene: {
+              actions: {
+                $splice: [[newState.scene.actions.length - 1, 1]]
+              }
+            }
+          });
+        }
+      }
       store.setState(newState);
     },
     updateActionProperty(state, columnIndex, rowIndex, property, value) {
