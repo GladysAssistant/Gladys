@@ -428,9 +428,9 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
-    "first": "First",
-    "then": "Then",
+    "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
+    "addTriggerButton": "Add trigger",
     "selectTriggerLabel": "Select a trigger type",
     "newAction": "New action",
     "selectActionType": "Select an action type",
@@ -474,6 +474,19 @@
     "triggers": {
       "device": {
         "new-state": "Device state change"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
       }
     }
   },

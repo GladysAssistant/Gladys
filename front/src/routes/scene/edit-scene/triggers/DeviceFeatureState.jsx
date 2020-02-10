@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import cx from 'classnames';
 
@@ -106,7 +106,7 @@ class TurnOnLight extends Component {
               })}
               onClick={this.handleValueChangeBinary(1)}
             >
-              On
+              <Text id="editScene.triggersCard.newState.on" />
             </button>
           </div>
           <div class="col-6">
@@ -118,7 +118,7 @@ class TurnOnLight extends Component {
               })}
               onClick={this.handleValueChangeBinary(0)}
             >
-              Off
+              <Text id="editScene.triggersCard.newState.off" />
             </button>
           </div>
         </div>
@@ -155,12 +155,24 @@ class TurnOnLight extends Component {
               <div class="form-group">
                 <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
                   <option value="">-----</option>
-                  <option value="=">equal</option>
-                  <option value=">=">superior or equal</option>
-                  <option value=">">superior</option>
-                  <option value="!=">different</option>
-                  <option value="<=">less or equal</option>
-                  <option value="<">less</option>
+                  <option value="=">
+                    <Text id="editScene.triggersCard.newState.equal" />
+                  </option>
+                  <option value=">=">
+                    <Text id="editScene.triggersCard.newState.superiorOrEqual" />
+                  </option>
+                  <option value=">">
+                    <Text id="editScene.triggersCard.newState.superior" />
+                  </option>
+                  <option value="!=">
+                    <Text id="editScene.triggersCard.newState.different" />
+                  </option>
+                  <option value="<=">
+                    <Text id="editScene.triggersCard.newState.lessOrEqual" />
+                  </option>
+                  <option value="<">
+                    <Text id="editScene.triggersCard.newState.less" />
+                  </option>
                 </select>
               </div>
             </div>
@@ -169,13 +181,15 @@ class TurnOnLight extends Component {
             <div class="col-3">
               <div class="form-group">
                 <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Value"
-                    value={props.trigger.value}
-                    onChange={this.handleValueChange}
-                  />
+                  <Localizer>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
+                      value={props.trigger.value}
+                      onChange={this.handleValueChange}
+                    />
+                  </Localizer>
                   {selectedOption && selectedOption.unit && (
                     <span class="input-group-append" id="basic-addon2">
                       <span class="input-group-text">
