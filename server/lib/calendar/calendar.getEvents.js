@@ -23,6 +23,18 @@ async function getEvents(userId, options) {
     };
   }
 
+  if (options.selector) {
+    where.selector = {
+      [Op.eq]: options.selector,
+    };
+  }
+
+  if (options.url) {
+    where.url = {
+      [Op.eq]: options.url,
+    };
+  }
+
   if (options.calendarId) {
     where.calendar_id = {
       [Op.eq]: options.calendarId,

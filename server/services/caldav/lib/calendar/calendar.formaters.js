@@ -1,3 +1,5 @@
+const { slugify } = require('../../../../utils/slugify');
+
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
@@ -86,10 +88,11 @@ function formatRecurringEvents(event, gladysCalendar) {
 
     if (showRecurrence === true) {
       const newEvent = {
-        external_id: `${event.uid}${i}`,
-        selector: `${recurrenceTitle} ${startDate.format('YYYY-MM-DD-HHmm')}`,
+        external_id: `${event.uid}${startDate.format('YYYY-MM-DD')}`,
+        selector: slugify(`${recurrenceTitle} ${startDate.format('YYYY-MM-DD')}`),
         name: recurrenceTitle,
         location: event.location,
+        url: event.href,
         calendar_id: gladysCalendar.id,
       };
 
@@ -124,41 +127,39 @@ function formatEvents(caldavEvents, gladysCalendar) {
   let events = [];
 
   caldavEvents.forEach((caldavEvent) => {
-    let icsEvent = this.ical.parseICS(caldavEvent.calendarData);
-    icsEvent = icsEvent[Object.keys(icsEvent)[0]];
-
-    if (icsEvent.type !== 'VEVENT') {
+    if (caldavEvent.type !== 'VEVENT') {
       return;
     }
 
-    if (typeof icsEvent.rrule === 'undefined') {
+    if (typeof caldavEvent.rrule === 'undefined') {
       const newEvent = {
-        external_id: icsEvent.uid,
-        selector: `${icsEvent.summary} ${this.moment(icsEvent.start).format('YYYY-MM-DD-HHmm')}`,
-        name: icsEvent.summary,
-        location: icsEvent.location,
+        external_id: caldavEvent.uid,
+        selector: slugify(`${caldavEvent.summary} ${this.moment(caldavEvent.start).format('YYYY-MM-DD')}`),
+        name: caldavEvent.summary,
+        location: caldavEvent.location,
+        url: caldavEvent.href,
         calendar_id: gladysCalendar.id,
       };
 
-      if (icsEvent.start) {
-        newEvent.start = icsEvent.start.toISOString();
+      if (caldavEvent.start) {
+        newEvent.start = caldavEvent.start.toISOString();
       }
 
-      if (icsEvent.end) {
-        newEvent.end = icsEvent.end.toISOString();
+      if (caldavEvent.end) {
+        newEvent.end = caldavEvent.end.toISOString();
       }
 
       if (
-        icsEvent.start &&
-        icsEvent.start.tz === undefined &&
-        Number.isInteger(this.moment(icsEvent.end).diff(this.moment(icsEvent.start), 'days', true))
+        caldavEvent.start &&
+        caldavEvent.start.tz === undefined &&
+        Number.isInteger(this.moment(caldavEvent.end).diff(this.moment(caldavEvent.start), 'days', true))
       ) {
         newEvent.full_day = true;
       }
 
       events.push(newEvent);
     } else {
-      events = events.concat(this.formatRecurringEvents(icsEvent, gladysCalendar).filter((e) => e !== null));
+      events = events.concat(this.formatRecurringEvents(caldavEvent, gladysCalendar).filter((e) => e !== null));
     }
   });
 
@@ -182,6 +183,8 @@ function formatCalendars(caldavCalendars, userId) {
       description: caldavCalendar.description || `Calendar ${caldavCalendar.displayName}`,
       service_id: this.serviceId,
       user_id: userId,
+      ctag: caldavCalendar.ctag,
+      sync_token: caldavCalendar.syncToken,
     };
 
     calendars.push(newCalendar);

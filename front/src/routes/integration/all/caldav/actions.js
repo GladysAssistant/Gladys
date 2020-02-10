@@ -8,7 +8,7 @@ const actions = store => ({
 
     if (e.target.value === 'apple') {
       store.setState({
-        caldavUrl: 'icloud.com'
+        caldavUrl: 'https://caldav.icloud.com'
       });
     }
   },

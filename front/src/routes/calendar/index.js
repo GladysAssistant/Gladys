@@ -16,17 +16,17 @@ class Map extends Component {
 
     if (Array.isArray(range)) {
       from = moment(range[0])
-        .subtract(1, 'day')
+        .subtract(7, 'day')
         .toDate();
       to = moment(range[range.length - 1])
-        .add(1, 'day')
+        .add(7, 'day')
         .toDate();
     } else {
       from = moment(range.start)
-        .subtract(1, 'day')
+        .subtract(7, 'day')
         .toDate();
       to = moment(range.end)
-        .add(1, 'day')
+        .add(7, 'day')
         .toDate();
     }
     this.props.getEventsInRange(from, to);
@@ -34,11 +34,11 @@ class Map extends Component {
 
   componentWillMount() {
     const from = moment()
-      .startOf('month')
+      .startOf('week')
       .subtract(7, 'day')
       .toDate();
     const to = moment()
-      .endOf('month')
+      .endOf('week')
       .add(7, 'day')
       .toDate();
     this.props.getEventsInRange(from, to);
@@ -64,6 +64,7 @@ class Map extends Component {
                         defaultView="week"
                         culture={navigator.language}
                         messages={this.context.intl.dictionary.calendar}
+                        scrollToTime={moment().subtract(2, 'hours')}
                       />
                     </div>
                   </div>
