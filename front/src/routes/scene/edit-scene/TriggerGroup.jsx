@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import TriggerCard from './TriggerCard';
 
 const TriggerGroup = ({ children, ...props }) => (
@@ -15,21 +16,30 @@ const TriggerGroup = ({ children, ...props }) => (
         </div>
       </div>
       <div class="card-body">
-        {props.triggers && props.triggers.length === 0 && (
-          <div class="text-center">No trigger added yet. It's not mandatory to have a trigger in a scene.</div>
-        )}
-        <div class="row">
-          {props.triggers &&
-            props.triggers.map((trigger, index) => (
-              <div class="col-lg-6">
-                <TriggerCard
-                  trigger={trigger}
-                  deleteTrigger={props.deleteTrigger}
-                  index={index}
-                  updateTriggerProperty={props.updateTriggerProperty}
-                />
-              </div>
-            ))}
+        <div
+          class={cx('dimmer', {
+            active: props.saving
+          })}
+        >
+          <div class="loader" />
+          <div class="dimmer-content">
+            {props.triggers && props.triggers.length === 0 && (
+              <div class="text-center">No trigger added yet. It's not mandatory to have a trigger in a scene.</div>
+            )}
+            <div class="row">
+              {props.triggers &&
+                props.triggers.map((trigger, index) => (
+                  <div class="col-lg-6">
+                    <TriggerCard
+                      trigger={trigger}
+                      deleteTrigger={props.deleteTrigger}
+                      index={index}
+                      updateTriggerProperty={props.updateTriggerProperty}
+                    />
+                  </div>
+                ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

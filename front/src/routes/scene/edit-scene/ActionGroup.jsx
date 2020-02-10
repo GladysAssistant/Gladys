@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import ActionCard from './ActionCard';
 
 const addActionToColumn = (columnIndex, addAction) => () => {
@@ -19,20 +20,29 @@ const ActionGroup = ({ children, ...props }) => (
         </div>
       </div>
       <div class="card-body">
-        <div class="row">
-          {props.actions.map((action, index) => (
-            <div class="col-lg-4">
-              <ActionCard
-                sceneParamsData={props.sceneParamsData}
-                action={action}
-                columnIndex={props.index}
-                index={index}
-                updateActionProperty={props.updateActionProperty}
-                highLightedActions={props.highLightedActions}
-                deleteAction={props.deleteAction}
-              />
+        <div
+          class={cx('dimmer', {
+            active: props.saving
+          })}
+        >
+          <div class="loader" />
+          <div class="dimmer-content">
+            <div class="row">
+              {props.actions.map((action, index) => (
+                <div class="col-lg-4">
+                  <ActionCard
+                    sceneParamsData={props.sceneParamsData}
+                    action={action}
+                    columnIndex={props.index}
+                    index={index}
+                    updateActionProperty={props.updateActionProperty}
+                    highLightedActions={props.highLightedActions}
+                    deleteAction={props.deleteAction}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

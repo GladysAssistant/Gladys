@@ -8,8 +8,15 @@ class EditScene extends Component {
   startScene = () => {
     this.props.startScene(this.props.scene_selector);
   };
+  saveScene = async () => {
+    this.setState({ saving: true });
+    await this.props.saveScene();
+    this.setState({ saving: false });
+  };
   deleteScene = () => {
+    this.setState({ saving: true });
     this.props.deleteScene(this.props.scene_selector);
+    this.setState({ saving: false });
   };
   componentWillMount() {
     this.props.getSceneBySelector(this.props.scene_selector);
@@ -22,8 +29,18 @@ class EditScene extends Component {
     );
   }
 
-  render(props, {}) {
-    return props.scene && <EditScenePage {...props} startScene={this.startScene} deleteScene={this.deleteScene} />;
+  render(props, { saving }) {
+    return (
+      props.scene && (
+        <EditScenePage
+          {...props}
+          startScene={this.startScene}
+          deleteScene={this.deleteScene}
+          saveScene={this.saveScene}
+          saving={saving}
+        />
+      )
+    );
   }
 }
 

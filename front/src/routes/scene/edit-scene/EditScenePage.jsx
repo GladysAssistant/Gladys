@@ -24,7 +24,7 @@ const EditScenePage = ({ children, ...props }) => (
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
                 <Text id="editScene.startButton" /> <i class="fe fe-play" />
               </button>
-              <button onClick={props.saveScene} class="btn btn-sm btn-success ml-2">
+              <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>
               <button onClick={props.deleteScene} class="btn btn-sm btn-danger ml-2">
@@ -39,6 +39,7 @@ const EditScenePage = ({ children, ...props }) => (
                 addTrigger={props.addTrigger}
                 deleteTrigger={props.deleteTrigger}
                 updateTriggerProperty={props.updateTriggerProperty}
+                saving={props.saving}
               />
             </div>
             <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
@@ -61,6 +62,7 @@ const EditScenePage = ({ children, ...props }) => (
                   highLightedActions={props.highLightedActions}
                   sceneParamsData={props.sceneParamsData}
                   index={index}
+                  saving={props.saving}
                 />
               </div>
               {index + 1 < props.scene.actions.length && (
