@@ -109,10 +109,7 @@ const CaldavPage = ({ children, ...props }) => (
                           <Text id={`integration.caldav.synchronizationInfo`} />
                         </div>
                         <span class="input-group-append">
-                          <button
-                            class="btn btn-primary"
-                            onClick={props.saveCaldavSettings}
-                          >
+                          <button class="btn btn-primary" onClick={props.saveCaldavSettings}>
                             <Text id={`integration.caldav.buttonSave`} />
                           </button>
                           <button

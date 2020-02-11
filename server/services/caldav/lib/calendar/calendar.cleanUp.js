@@ -18,7 +18,7 @@ async function cleanUp(userId) {
       });
       await Promise.all(events.map((event) => this.gladys.calendar.destroyEvent(event.selector)));
       return this.gladys.calendar.destroy(calendar.selector);
-    })
+    }),
   );
 }
 

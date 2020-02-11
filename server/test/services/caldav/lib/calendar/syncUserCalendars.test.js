@@ -2,6 +2,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
+const { formatCalendars, formatEvents } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -9,103 +10,214 @@ const { expect } = chai;
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 const serviceId = '5d6c666f-56be-4929-9104-718a78556844';
 
+const namespace = {
+  CALENDAR_SERVER: 'http://calendarserver.org/ns/',
+  CALDAV_APPLE: 'http://apple.com/ns/ical/',
+  CALDAV: 'urn:ietf:params:xml:ns:caldav',
+  CARDDAV: 'urn:ietf:params:xml:ns:carddav',
+  DAV: 'DAV:',
+};
+
 const calendars = [
   { url: 'https://caldav.tonystark.com/perso' },
   { url: 'https://caldav.tonystark.com/stark-industries' },
   { url: 'https://caldav.tonystark.com/avengers' },
 ];
 
-const gladysCalendars = [
-  {
-    service_id: serviceId,
-    external_id: calendars[0].url,
-    name: 'Perso',
-    selector: 'perso',
-  },
-  {
-    service_id: 'eb2f2d97-5fca-43d7-84d9-77d3ab2f7954',
-    external_id: 'https://service-calendar.com',
-    name: 'Other service calendar',
-    selector: 'other-service-calendar',
-  },
-  {
-    service_id: serviceId,
-    external_id: calendars[1].url,
-    name: 'Stark Industries',
-    selector: 'stark-industries',
-  },
-  {
-    service_id: serviceId,
-    external_id: calendars[2].url,
-    name: 'Avengers',
-    selector: 'avengers',
-  },
-];
-
-const gladysEvents = [
-  {
-    selector: 'event-1',
-  },
-  {
-    selector: 'event-2',
-  },
-];
-
-describe('CalDAV sync user', () => {
+describe('CalDAV sync', () => {
+  const send = sinon.stub();
   const sync = {
     serviceId,
     syncUserCalendars,
     connect: sinon.stub().resolves({ calendars }),
-    updateCalendars: sinon
-      .stub()
-      .withArgs(calendars)
-      .resolves(),
-    updateCalendarEvents: sinon.stub(),
+    formatCalendars,
+    formatEvents,
     gladys: {
       calendar: {
-        get: sinon
-          .stub()
-          .withArgs(userId)
-          .resolves(gladysCalendars),
+        create: sinon.stub(),
+        createEvent: sinon.stub(),
+        get: sinon.stub(),
         destroy: sinon.stub().resolves(),
-        getEvents: sinon
-          .stub()
-          .withArgs(userId)
-          .resolves(gladysEvents),
+        getEvents: sinon.stub(),
         destroyEvent: sinon.stub().resolves(),
       },
+      variable: {
+        getValue: sinon.stub(),
+      },
+    },
+    dav: {
+      ns: namespace,
+      transport: {
+        Basic: sinon.stub().returns({
+          send,
+        }),
+      },
+      Credentials: sinon.stub(),
+      request: {
+        propfind: sinon.stub(),
+        syncCollection: sinon.stub(),
+      },
+      Request: sinon.stub().returns({ requestDate: 'request3' }),
+    },
+    ical: {
+      parseICS: sinon.stub().returns({
+        type: 'VEVENT',
+        uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+        summary: 'Evenement 1',
+        start: new Date('2018-06-08'),
+        end: new Date('2018-06-09'),
+      }),
+    },
+    xmlDom: {
+      DOMParser: sinon.stub().returns({
+        parseFromString: sinon.stub().returns({
+          getElementsByTagName: sinon.stub().returns({
+            '1': {
+              getElementsByTagName: [
+                sinon.stub().returns([
+                  {
+                    childNodes: [
+                      {
+                        data: `
+              BEGIN:VCALENDAR
+              VERSION:2.0
+              PRODID:+//IDN bitfire.at//DAVdroid/1.11.2-ose ical4j/2.2.0
+              BEGIN:VEVENT
+              DTSTAMP:20180609T234355Z
+              UID:49193db9-f666-4947-8ce6-3357ce3b7166
+              SUMMARY:Evenement 1
+              DESCRIPTION:Description Evenement 1
+              DTSTART;VALUE=DATE:20180608
+              DURATION:P1D
+              STATUS:CONFIRMED
+              BEGIN:VALARM
+              TRIGGER:-PT10M
+              ACTION:DISPLAY
+              DESCRIPTION:Evenement 1
+              END:VALARM
+              END:VEVENT
+              END:VCALENDAR
+              `,
+                      },
+                    ],
+                  },
+                ]),
+              ],
+            },
+          }),
+        }),
+      }),
     },
   };
 
-  it('should start user sync', async () => {
-    sync.updateCalendarEvents.resolves();
+  it('should start sync', async () => {
+    sync.gladys.variable.getValue
+      .withArgs('CALDAV_HOST', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('other');
+    sync.gladys.variable.getValue
+      .withArgs('CALDAV_HOME_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('https://caldav.host.com/home');
+    sync.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    sync.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    sync.dav.request.propfind
+      .withArgs({
+        props: [
+          { name: 'calendar-description', namespace: sync.dav.ns.CALDAV },
+          { name: 'calendar-timezone', namespace: sync.dav.ns.CALDAV },
+          { name: 'displayname', namespace: sync.dav.ns.DAV },
+          { name: 'getctag', namespace: sync.dav.ns.CALENDAR_SERVER },
+          { name: 'resourcetype', namespace: sync.dav.ns.DAV },
+          { name: 'supported-calendar-component-set', namespace: sync.dav.ns.CALDAV },
+          { name: 'sync-token', namespace: sync.dav.ns.DAV },
+        ],
+        depth: 1,
+      })
+      .returns('request1');
+
+    send
+      .withArgs('request1', 'https://caldav.host.com/home')
+      .resolves([
+        {
+          props: {
+            resourcetype: 'calendar',
+            supportedCalendarComponentSet: ['VEVENT'],
+            displayname: 'Calendrier 1',
+            calendarDescription: 'Description 1',
+            timezone: 'Europe/Paris',
+            getctag: 'ctag1',
+            syncToken: 'sync-token-1',
+          },
+          href: '/home/personal',
+        },
+      ])
+      .withArgs('request-collection', 'https://caldav.host.com/home/personal')
+      .resolves({
+        responses: [
+          {
+            href: 'https://caldav.host.com/home/personal/event-1.ics',
+            props: {
+              etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
+            },
+          },
+        ],
+      })
+      .withArgs({ requestDate: 'request3' }, 'https://caldav.host.com/home/personal')
+      .resolves({ request: { responseText: '<xml></xml>' } });
+
+    sync.gladys.calendar.get.withArgs(userId, { externalId: 'https://caldav.host.com/home/personal' }).resolves([]);
+
+    sync.gladys.calendar.create.onFirstCall().resolves({
+      dataValues: {
+        id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
+        user_id: userId,
+        service_id: serviceId,
+        name: 'Calendrier 1',
+        selector: 'calendrier-1',
+        external_id: 'https://caldav.host.com/home/personal',
+        description: 'Description 1',
+        ctag: 'ctag1',
+        sync_token: 'sync-token-1',
+        sync: '1',
+        notify: '0',
+        created_at: '2020-02-11 21:04:51.318 +00:00',
+        updated_at: '2020-02-11 21:04:51.318 +00:00',
+      },
+    });
+
+    sync.dav.request.syncCollection
+      .withArgs({
+        syncLevel: 1,
+        syncToken: '',
+        props: [{ name: 'getetag', namespace: sync.dav.ns.DAV }],
+      })
+      .returns('request-collection');
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { selector: 'evenement-1-2018-06-08' }).resolves([]);
+
+    sync.gladys.calendar.createEvent.resolves({
+      dataValues: {
+        id: '22396073-3fe6-49a6-bcd7-566281862b02',
+        calendar_id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
+        name: 'Evenement 1',
+        selector: 'evenement-1-2018-06-08',
+        external_id: '49193db9-f666-4947-8ce6-3357ce3b7166',
+        location: null,
+        start: '2018-06-08 00:00:00.000 +00:00',
+        end: '2018-06-09 00:00:00.000 +00:00',
+        url: 'https://caldav.host.com/home/personal/event-1.ics',
+        full_day: '1',
+        created_at: '2020-02-11 21:04:56.090 +00:00',
+        updated_at: '2020-02-11 21:04:56.090 +00:00',
+      },
+    });
+
     await sync.syncUserCalendars(userId);
 
-    expect(sync.gladys.calendar.destroy.callCount).to.equal(3);
-    expect(sync.gladys.calendar.destroy.args).to.eql([['perso'], ['stark-industries'], ['avengers']]);
-    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(6);
-    expect(sync.gladys.calendar.destroyEvent.args).to.eql([
-      ['event-1'],
-      ['event-2'],
-      ['event-1'],
-      ['event-2'],
-      ['event-1'],
-      ['event-2'],
-    ]);
-
-    expect(sync.updateCalendars.args).to.eql([[calendars, userId]]);
-
-    expect(sync.updateCalendarEvents.callCount).to.equal(3);
-
-    expect(sync.updateCalendarEvents.args).to.eql([
-      [gladysCalendars[0], [calendars[0]]],
-      [gladysCalendars[2], [calendars[1]]],
-      [gladysCalendars[3], [calendars[2]]],
-    ]);
-  });
-
-  it('should fail start user sync', async () => {
-    sync.updateCalendarEvents.rejects(Error('Fail sync calendar events'));
-    expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'Fail sync calendar events');
+    expect(send.callCount).to.equal(3);
   });
 });

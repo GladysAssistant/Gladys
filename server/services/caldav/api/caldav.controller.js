@@ -7,6 +7,7 @@ module.exports = function CalDAVController(caldavHandler) {
   async function config(req, res) {
     try {
       const configuration = await caldavHandler.config(req.user.id);
+      await caldavHandler.cleanUp(req.user.id);
       res.json(configuration);
     } catch (error) {
       res.status(500).send();

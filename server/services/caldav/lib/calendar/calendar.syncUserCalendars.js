@@ -50,7 +50,7 @@ async function syncUserCalendars(userId) {
     })
     .map((res) => {
       logger.info(`CalDAV : Found calendar ${res.props.displayname}`);
-      return new this.dav.Calendar({
+      return {
         data: res,
         description: res.props.calendarDescription,
         timezone: res.props.calendarTimezone,
@@ -60,7 +60,7 @@ async function syncUserCalendars(userId) {
         components: res.props.supportedCalendarComponentSet,
         resourcetype: res.props.resourcetype,
         syncToken: res.props.syncToken,
-      });
+      };
     });
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);

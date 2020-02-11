@@ -5,6 +5,7 @@ const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 
 const caldavService = {
   config: fake.resolves({ url: 'https://p01-caldav.icloud.com' }),
+  cleanUp: fake.resolves({}),
   syncUserCalendars: fake.resolves({}),
 };
 

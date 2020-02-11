@@ -12,10 +12,14 @@ const caldavCalendars = [
     url: 'https://caldav.com/calendar1/',
     displayName: 'Calendar 1',
     description: 'Description calendar 1',
+    ctag: 'ctag1',
+    syncToken: 'syncToken1',
   },
   {
     url: 'https://caldav.com/calendar2/',
     displayName: 'Calendar 2',
+    ctag: 'ctag2',
+    syncToken: 'syncToken2',
   },
 ];
 
@@ -26,6 +30,8 @@ const expectedCalendars = [
     description: 'Description calendar 1',
     service_id: '5d6c666f-56be-4929-9104-718a78556844',
     user_id: '745d3ccc-ddc6-4dc5-a776-5d2ac7682d25',
+    ctag: 'ctag1',
+    sync_token: 'syncToken1',
   },
   {
     external_id: 'https://caldav.com/calendar2/',
@@ -33,28 +39,60 @@ const expectedCalendars = [
     description: 'Calendar Calendar 2',
     service_id: '5d6c666f-56be-4929-9104-718a78556844',
     user_id: '745d3ccc-ddc6-4dc5-a776-5d2ac7682d25',
+    ctag: 'ctag2',
+    sync_token: 'syncToken2',
+  },
+];
+
+const events = [
+  {
+    type: 'VEVENT',
+    uid: 'e52c11e3-af8a-48c7-9f54-de7aba373c46',
+    summary: 'Event 1',
+    start: new Date('2019-02-25T10:00:00Z'),
+    end: new Date('2019-02-25T12:00:00Z'),
+    location: 'Paris',
+    href: 'https://caldav.host/home/event1.ics',
+  },
+  {
+    type: 'VEVENT',
+    uid: '71c01038-2231-4dee-a230-6820fdb1136e',
+    summary: 'Event 2',
+    start: new Date('2019-04-01T00:00:00Z'),
+    end: new Date('2019-04-02T00:00:00Z'),
+    location: 'Toulouse',
+    href: 'https://caldav.host/home/event2.ics',
+  },
+  {
+    type: 'BAD_TYPE',
+    uid: '932394cb-80ec-4871-bce3-4bebe28ac1e0',
+    summary: 'Event 3',
+    start: new Date('2019-05-08T15:00:00Z'),
+    location: 'Lyon',
   },
 ];
 
 const expectedEvents = [
   {
     external_id: 'e52c11e3-af8a-48c7-9f54-de7aba373c46',
-    selector: 'Event 1 2019-02-25-1000',
+    selector: 'event-1-2019-02-25',
     name: 'Event 1',
     location: 'Paris',
     start: '2019-02-25T10:00:00.000Z',
     end: '2019-02-25T12:00:00.000Z',
     calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    url: 'https://caldav.host/home/event1.ics',
   },
   {
     external_id: '71c01038-2231-4dee-a230-6820fdb1136e',
-    selector: 'Event 2 2019-04-01-0000',
+    selector: 'event-2-2019-04-01',
     name: 'Event 2',
     location: 'Toulouse',
     start: '2019-04-01T00:00:00.000Z',
     end: '2019-04-02T00:00:00.000Z',
     full_day: true,
     calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    url: 'https://caldav.host/home/event2.ics',
   },
 ];
 
@@ -85,6 +123,7 @@ const recurrEvents = [
         message: 'Cours de tennis annulé',
       },
     },
+    href: 'https://caldav.host.com/home/recur-event1',
   },
   {
     uid: '29f76a08-5439-4e04-bc1f-a67c32b47c80',
@@ -100,43 +139,47 @@ const recurrEvents = [
           new Date('2021-09-27T00:00:00Z'),
         ]),
     },
+    href: 'https://caldav.host.com/home/recur-event2',
   },
 ];
 
 const expectedRecurrEvents = [
   [
     {
-      external_id: 'fdc2bf57-0adb-4300-8287-4a9b34dc37860',
-      selector: 'Cours de tennis 2019-06-01-0900',
+      external_id: 'fdc2bf57-0adb-4300-8287-4a9b34dc37862019-06-01',
+      selector: 'cours-de-tennis-2019-06-01',
       name: 'Cours de tennis',
       location: 'Stade Roland-Garros',
       calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
       start: '2019-06-01T09:00:00.000Z',
       end: '2019-06-01T12:00:00.000Z',
+      url: 'https://caldav.host.com/home/recur-event1',
     },
     null,
     null,
   ],
   [
     {
-      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c800',
-      selector: 'Anniversaire Pepper 2019-09-27-0000',
+      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27',
+      selector: 'anniversaire-pepper-2019-09-27',
       name: 'Anniversaire Pepper',
       location: 'Paris',
       calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
       full_day: true,
       start: '2019-09-27T00:00:00.000Z',
       end: '2019-09-28T00:00:00.000Z',
+      url: 'https://caldav.host.com/home/recur-event2',
     },
     {
-      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c801',
-      selector: 'Anniversaire Pepper 2020-09-27-0000',
+      external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27',
+      selector: 'anniversaire-pepper-2020-09-27',
       name: 'Anniversaire Pepper',
       location: 'Paris',
       calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
       full_day: true,
       start: '2020-09-27T00:00:00.000Z',
       end: '2020-09-28T00:00:00.000Z',
+      url: 'https://caldav.host.com/home/recur-event2',
     },
     null,
   ],
@@ -149,43 +192,9 @@ describe('CalDAV formaters', () => {
     formatEvents,
     formatRecurringEvents,
     moment: moment.utc,
-    ical: { parseICS: sinon.stub() },
   };
   const start = new Date('2019-02-25T10:00:00Z');
   Object.defineProperty(start, 'tz', { value: 'Europe/London' });
-  formatter.ical.parseICS
-    .onFirstCall()
-    .returns({
-      event: {
-        type: 'VEVENT',
-        uid: 'e52c11e3-af8a-48c7-9f54-de7aba373c46',
-        summary: 'Event 1',
-        start,
-        end: new Date('2019-02-25T12:00:00Z'),
-        location: 'Paris',
-      },
-    })
-    .onSecondCall()
-    .returns({
-      event: {
-        type: 'VEVENT',
-        uid: '71c01038-2231-4dee-a230-6820fdb1136e',
-        summary: 'Event 2',
-        start: new Date('2019-04-01T00:00:00Z'),
-        end: new Date('2019-04-02T00:00:00Z'),
-        location: 'Toulouse',
-      },
-    })
-    .onThirdCall()
-    .returns({
-      event: {
-        type: 'BAD_TYPE',
-        uid: '932394cb-80ec-4871-bce3-4bebe28ac1e0',
-        summary: 'Event 3',
-        start: new Date('2019-05-08T15:00:00Z'),
-        location: 'Lyon',
-      },
-    });
 
   it('should format calendars', () => {
     const formattedCalendars = formatter.formatCalendars(caldavCalendars, '745d3ccc-ddc6-4dc5-a776-5d2ac7682d25');
@@ -193,7 +202,7 @@ describe('CalDAV formaters', () => {
   });
 
   it('should format events', () => {
-    const formattedEvents = formatter.formatEvents(['event1', 'event2', 'event3'], {
+    const formattedEvents = formatter.formatEvents(events, {
       id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
     });
     expect(formattedEvents).to.eql(expectedEvents);
