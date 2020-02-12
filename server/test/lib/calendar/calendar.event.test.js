@@ -66,6 +66,7 @@ describe('calendar.getEvents', () => {
         location: null,
         start: new Date('2019-02-12T07:49:07.556Z'),
         end: new Date('2019-02-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
         full_day: false,
         created_at: new Date('2019-02-12T07:49:07.556Z'),
         updated_at: new Date('2019-02-12T07:49:07.556Z'),

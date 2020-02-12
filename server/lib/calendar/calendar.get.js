@@ -7,7 +7,7 @@ const db = require('../../models');
  * @example
  * gladys.calendar.get('f6cc6e0c-1b48-4b59-8ac7-9a0ad2e0ed3c');
  */
-async function get(userId, options) {
+async function get(userId, options = {}) {
   const where = {
     user_id: userId,
   };

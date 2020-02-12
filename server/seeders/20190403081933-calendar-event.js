@@ -9,6 +9,7 @@ module.exports = {
           selector: 'test-calendar-event',
           start: '2019-02-12 07:49:07.556 +00:00',
           end: '2019-02-12 08:49:07.556 +00:00',
+          url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
           calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
