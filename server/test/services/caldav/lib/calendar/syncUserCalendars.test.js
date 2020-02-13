@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
+const moment = require('moment');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
 const { formatCalendars, formatEvents } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
 
@@ -45,6 +46,7 @@ describe('CalDAV sync', () => {
         getValue: sinon.stub(),
       },
     },
+    moment,
     dav: {
       ns: namespace,
       transport: {
@@ -61,20 +63,24 @@ describe('CalDAV sync', () => {
     },
     ical: {
       parseICS: sinon.stub().returns({
-        type: 'VEVENT',
-        uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
-        summary: 'Evenement 1',
-        start: new Date('2018-06-08'),
-        end: new Date('2018-06-09'),
+        data: {
+          type: 'VEVENT',
+          uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+          summary: 'Evenement 1',
+          start: new Date('2018-06-08'),
+          end: new Date('2018-06-09'),
+        },
       }),
     },
     xmlDom: {
       DOMParser: sinon.stub().returns({
         parseFromString: sinon.stub().returns({
-          getElementsByTagName: sinon.stub().returns({
-            '1': {
-              getElementsByTagName: [
-                sinon.stub().returns([
+          getElementsByTagName: sinon.stub().returns([
+            {
+              getElementsByTagName: sinon
+                .stub()
+                .onFirstCall()
+                .returns([
                   {
                     childNodes: [
                       {
@@ -101,10 +107,11 @@ describe('CalDAV sync', () => {
                       },
                     ],
                   },
-                ]),
-              ],
+                ])
+                .onSecondCall()
+                .returns([{ childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] }]),
             },
-          }),
+          ]),
         }),
       }),
     },
