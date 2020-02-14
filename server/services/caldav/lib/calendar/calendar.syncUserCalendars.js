@@ -106,6 +106,13 @@ async function syncUserCalendars(userId) {
         }),
       );
 
+      if (
+        eventsToUpdate.filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({})).length ===
+        0
+      ) {
+        return;
+      }
+
       const requestEventsData = new this.dav.Request({
         method: 'REPORT',
         requestData: `
@@ -164,12 +171,10 @@ async function syncUserCalendars(userId) {
         formatedEvents.map(async (formatedEvent) => {
           const gladysEvents = await this.gladys.calendar.getEvents(userId, { selector: formatedEvent.selector });
           if (gladysEvents.length === 0) {
-            const savedEvent = await this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
-            return savedEvent;
+            return this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
           }
 
-          const savedEvent = await this.gladys.calendar.updateEvent(formatedEvent.selector, formatedEvent);
-          return savedEvent;
+          return this.gladys.calendar.updateEvent(formatedEvent.selector, formatedEvent);
         }),
       );
 

@@ -19,18 +19,11 @@ const namespace = {
   DAV: 'DAV:',
 };
 
-const calendars = [
-  { url: 'https://caldav.tonystark.com/perso' },
-  { url: 'https://caldav.tonystark.com/stark-industries' },
-  { url: 'https://caldav.tonystark.com/avengers' },
-];
-
 describe('CalDAV sync', () => {
   const send = sinon.stub();
   const sync = {
     serviceId,
     syncUserCalendars,
-    connect: sinon.stub().resolves({ calendars }),
     formatCalendars,
     formatEvents,
     gladys: {
@@ -38,9 +31,13 @@ describe('CalDAV sync', () => {
         create: sinon.stub(),
         createEvent: sinon.stub(),
         get: sinon.stub(),
+        update: sinon.stub().resolves(),
         destroy: sinon.stub().resolves(),
         getEvents: sinon.stub(),
-        destroyEvent: sinon.stub().resolves(),
+        destroyEvent: sinon
+          .stub()
+          .withArgs('event-to-delete')
+          .resolves(),
       },
       variable: {
         getValue: sinon.stub(),
@@ -161,6 +158,30 @@ describe('CalDAV sync', () => {
           },
           href: '/home/personal',
         },
+        {
+          props: {
+            resourcetype: 'calendar',
+            supportedCalendarComponentSet: ['VEVENT'],
+            displayname: 'Calendrier 2',
+            calendarDescription: 'Description 2',
+            timezone: 'Europe/Paris',
+            getctag: 'ctag22',
+            syncToken: 'sync-token-22',
+          },
+          href: '/home/professional',
+        },
+        {
+          props: {
+            resourcetype: 'calendar',
+            supportedCalendarComponentSet: ['VEVENT'],
+            displayname: 'Calendrier 3',
+            calendarDescription: 'Description 3',
+            timezone: 'Europe/Paris',
+            getctag: 'ctag3',
+            syncToken: 'sync-token-3',
+          },
+          href: '/home/avengers',
+        },
       ])
       .withArgs('request-collection', 'https://caldav.host.com/home/personal')
       .resolves({
@@ -171,12 +192,39 @@ describe('CalDAV sync', () => {
               etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
             },
           },
+          {
+            href: 'https://caldav.host.com/home/personal/',
+            props: {
+              etag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
+            },
+          },
+        ],
+      })
+      .withArgs('request-collection2', 'https://caldav.host.com/home/professional')
+      .resolves({
+        responses: [
+          {
+            href: 'https://caldav.host.com/home/professional/event-3.ics',
+            props: {},
+          },
         ],
       })
       .withArgs({ requestDate: 'request3' }, 'https://caldav.host.com/home/personal')
       .resolves({ request: { responseText: '<xml></xml>' } });
 
-    sync.gladys.calendar.get.withArgs(userId, { externalId: 'https://caldav.host.com/home/personal' }).resolves([]);
+    sync.gladys.calendar.get
+      .withArgs(userId, { externalId: 'https://caldav.host.com/home/personal' })
+      .resolves([])
+      .withArgs(userId, { externalId: 'https://caldav.host.com/home/professional' })
+      .resolves([
+        {
+          ctag: 'ctag21',
+          sync_token: 'syncToken21',
+          external_id: 'https://caldav.host.com/home/professional',
+        },
+      ])
+      .withArgs(userId, { externalId: 'https://caldav.host.com/home/avengers' })
+      .resolves([{ ctag: 'ctag3' }]);
 
     sync.gladys.calendar.create.onFirstCall().resolves({
       dataValues: {
@@ -202,9 +250,23 @@ describe('CalDAV sync', () => {
         syncToken: '',
         props: [{ name: 'getetag', namespace: sync.dav.ns.DAV }],
       })
-      .returns('request-collection');
+      .returns('request-collection')
+      .withArgs({
+        syncLevel: 1,
+        syncToken: 'syncToken21',
+        props: [{ name: 'getetag', namespace: sync.dav.ns.DAV }],
+      })
+      .returns('request-collection2');
 
-    sync.gladys.calendar.getEvents.withArgs(userId, { selector: 'evenement-1-2018-06-08' }).resolves([]);
+    sync.gladys.calendar.getEvents
+      .withArgs(userId, { selector: 'evenement-1-2018-06-08' })
+      .resolves([])
+      .withArgs(userId, { url: 'https://caldav.host.com/home/professional/event-3.ics' })
+      .resolves([
+        {
+          selector: 'event-to-delete',
+        },
+      ]);
 
     sync.gladys.calendar.createEvent.resolves({
       dataValues: {
@@ -225,6 +287,6 @@ describe('CalDAV sync', () => {
 
     await sync.syncUserCalendars(userId);
 
-    expect(send.callCount).to.equal(3);
+    expect(send.callCount).to.equal(4);
   });
 });
