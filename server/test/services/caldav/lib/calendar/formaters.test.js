@@ -70,6 +70,23 @@ const events = [
     start: new Date('2019-05-08T15:00:00Z'),
     location: 'Lyon',
   },
+  {
+    type: 'VEVENT',
+    uid: '29f76a08-5439-4e04-bc1f-a67c32b47c80',
+    start: new Date('2019-09-27T00:00:00Z'),
+    summary: 'Anniversaire Pepper',
+    location: 'Paris',
+    rrule: {
+      between: sinon
+        .stub()
+        .returns([
+          new Date('2019-09-27T00:00:00Z'),
+          new Date('2020-09-27T00:00:00Z'),
+          new Date('2021-09-27T00:00:00Z'),
+        ]),
+    },
+    href: 'https://caldav.host.com/home/recur-event2',
+  },
 ];
 
 const expectedEvents = [
@@ -93,6 +110,39 @@ const expectedEvents = [
     full_day: true,
     calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
     url: 'https://caldav.host/home/event2.ics',
+  },
+  {
+    external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27',
+    selector: 'anniversaire-pepper-2019-09-27',
+    name: 'Anniversaire Pepper',
+    location: 'Paris',
+    calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    full_day: true,
+    start: '2019-09-27T00:00:00.000Z',
+    end: '2019-09-28T00:00:00.000Z',
+    url: 'https://caldav.host.com/home/recur-event2',
+  },
+  {
+    external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27',
+    selector: 'anniversaire-pepper-2020-09-27',
+    name: 'Anniversaire Pepper',
+    location: 'Paris',
+    calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    full_day: true,
+    start: '2020-09-27T00:00:00.000Z',
+    end: '2020-09-28T00:00:00.000Z',
+    url: 'https://caldav.host.com/home/recur-event2',
+  },
+  {
+    calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    end: '2021-09-28T00:00:00.000Z',
+    external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802021-09-27',
+    full_day: true,
+    location: 'Paris',
+    name: 'Anniversaire Pepper',
+    selector: 'anniversaire-pepper-2021-09-27',
+    start: '2021-09-27T00:00:00.000Z',
+    url: 'https://caldav.host.com/home/recur-event2',
   },
 ];
 

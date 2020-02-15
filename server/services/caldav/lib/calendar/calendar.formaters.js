@@ -29,9 +29,7 @@ function formatRecurringEvents(event, gladysCalendar) {
 
   // For recurring events, get the set of event start dates that fall within the range
   // of dates we're looking for.
-  const dates = event.rrule.between(rangeStart.toDate(), rangeEnd.toDate(), true, (date, i) => {
-    return true;
-  });
+  const dates = event.rrule.between(rangeStart.toDate(), rangeEnd.toDate(), true, (date, i) => true);
 
   // The "dates" array contains the set of dates within our desired date range range that are valid
   // for the recurrence rule.  *However*, it's possible for us to have a specific recurrence that
