@@ -1,27 +1,21 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
+import RflinkPage from '../RflinkPage';
 import DevicePage from './DevicePage';
-import FoundDevices from './FoundDevices';
-import RflinkPage from '../RflinkPage.jsx';
+import integrationConfig from '../../../../../config/integrations';
 
-@connect(
-  'session,user,rflinksDevices,houses,getRflinkDevicesStatus,rflinkNewDevices,getRflinkCreateDeviceStatus,getRflinkNewDevicesStatus',
-  actions
-)
+@connect('session,user,rflinkDevices,houses,getRflinkDevicesStatus', actions)
 class RflinkDevicePage extends Component {
   componentWillMount() {
-    this.props.getRflinkDevices();
+    this.props.getRflinkDevices(20, 0);
     this.props.getHouses();
-    this.props.getRflinkNewDevices();
-    this.props.getIntegrationByName('rflink');
   }
 
   render(props, {}) {
     return (
-      <RflinkPage>
-        {props.rflinkDevices && props.rflinkDevices.length ? <DevicePage {...props} /> : <div />}
-        <FoundDevices {...props} />
+      <RflinkPage integration={integrationConfig[props.user.language].rflink}>
+        <DevicePage {...props} />
       </RflinkPage>
     );
   }

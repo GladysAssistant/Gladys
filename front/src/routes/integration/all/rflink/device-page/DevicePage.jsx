@@ -1,11 +1,11 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
+import style from './style.css';
 
-const DeviceTab = ({ children, ...props }) => (
+const NodeTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
@@ -33,6 +33,9 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
+        <button onClick={props.addDevice} class="btn btn-outline-primary ml-2">
+          <Text id="integration.rflink.device.newButton" /> <i class="fe fe-plus" />
+        </button>
       </div>
     </div>
     <div class="card-body">
@@ -43,12 +46,17 @@ const DeviceTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
+          {props.rflinkDevices && props.rflinkDevices.length === 0 && (
+            <div class="alert alert-info">
+              <Text id="integration.rflink.device.noDevices" />
+            </div>
+          )}
           {props.getRflinkDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.rflink &&
-              props.rflink.map((device, index) => (
+            {props.rflinkDevices &&
+              props.rflinkDevices.map((rflinkDevice, index) => (
                 <Device
-                  device={device}
+                  device={rflinkDevice}
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
@@ -56,9 +64,6 @@ const DeviceTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.rflink && props.rflink.length === 0 && (
-              <Text id="integration.rflink.device.noDevices" />
-            )}
           </div>
         </div>
       </div>
@@ -66,4 +71,4 @@ const DeviceTab = ({ children, ...props }) => (
   </div>
 );
 
-export default DeviceTab;
+export default NodeTab;

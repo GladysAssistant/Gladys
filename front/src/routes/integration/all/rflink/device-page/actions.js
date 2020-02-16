@@ -1,14 +1,13 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
+import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
-import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
-  const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getRflinkDevices(state) {
+    async getRflinkDevices(state, take, skip) {
       store.setState({
         getRflinkDevicesStatus: RequestStatus.Getting
       });
@@ -16,73 +15,50 @@ function createActions(store) {
         const options = {
           service: 'rflink',
           order_dir: state.getRflinkDeviceOrderDir || 'asc',
-          take: 10000,
-          skip: 0
+          take,
+          skip
         };
         if (state.rflinkDeviceSearch && state.rflinkDeviceSearch.length) {
           options.search = state.rflinkDeviceSearch;
         }
-        const rflinkDevices = await state.httpClient.get('/api/v1/service/rflink/device', options);
-        const rflinkDevicesMap = new Map();
-        rflinkDevices.forEach(device => rflinkDevicesMap.set(device.external_id, device));
+        const rflinkDevicesReceived = await state.httpClient.get('/api/v1/service/rflink/device', options);
+        let rflinkDevices;
+        if (skip === 0) {
+          rflinkDevices = rflinkDevicesReceived;
+        } else {
+          rflinkDevices = update(state.rflinkDevices, {
+            $push: rflinkDevicesReceived
+          });
+        }
         store.setState({
           rflinkDevices,
-          rflinkDevicesMap,
           getRflinkDevicesStatus: RequestStatus.Success
         });
-        actions.getRflinkNewDevices(store.getState());
       } catch (e) {
         store.setState({
           getRflinkDevicesStatus: RequestStatus.Error
         });
       }
     },
-    async getRflinkNewDevices(state) {
-      store.setState({
-        getRflinkNewDevicesStatus: RequestStatus.Getting
-      });
-      try {
-        const rflinkNewDevices = await state.httpClient.get('/api/v1/service/rflink/devices');
-        const rflinkNewDevicesFiltered = rflinkNewDevices.filter(device => {
-          if (!state.rflinkDevicesMap) {
-            return true;
+    addDevice(state) {
+      const uniqueId = uuid.v4();
+      const rflinkDevices = update(state.rflinkDevices, {
+        $push: [
+          {
+            id: uniqueId,
+            name: null,
+            should_poll: false,
+            service_id: state.currentIntegration.id,
+            external_id: 'rflink:'
           }
-          return !state.rflinkDevicesMap.has(device.external_id);
-        });
-        store.setState({
-          rflinkNewDevices: rflinkNewDevicesFiltered,
-          getRflinkNewDevicesStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getRflinkNewDevicesStatus: RequestStatus.Error
-        });
-      }
-    },
-    async saveDevice(state, device, index) {
-      const savedDevice = await state.httpClient.post('/api/v1/device', device);
-      const newState = update(state, {
-        rflinkDevices: {
-          $splice: [[index, 1, savedDevice]]
-        }
+        ]
       });
-      store.setState(newState);
-    },
-    async createDevice(state, device) {
       store.setState({
-        getRflinkCreateDeviceStatus: RequestStatus.Getting
+        rflinkDevices
       });
-      try {
-        await state.httpClient.post('/api/v1/device', device);
-        store.setState({
-          getRflinkCreateDeviceStatus: RequestStatus.Success
-        });
-        actions.getRflinkDevices(store.getState());
-      } catch (e) {
-        store.setState({
-          getRflinkCreateDeviceStatus: RequestStatus.Error
-        });
-      }
+    },
+    async saveDevice(state, device) {
+      await state.httpClient.post('/api/v1/device', device);
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
@@ -109,17 +85,17 @@ function createActions(store) {
       store.setState({
         rflinkDeviceSearch: e.target.value
       });
-      await actions.getRflinkDevices(store.getState());
+      await actions.getRflinkDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
         getRflinkDeviceOrderDir: e.target.value
       });
-      await actions.getRflinkDevices(store.getState());
+      await actions.getRflinkDevices(store.getState(), 20, 0);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, integrationActions, actions);
+  return Object.assign({}, houseActions, actions);
 }
 
 export default createActions;

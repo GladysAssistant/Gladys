@@ -90,6 +90,7 @@ const actions = store => {
       } catch (e) {
 
       }
+      
     },
     async getStatus(state) {
       store.setState({
@@ -97,12 +98,15 @@ const actions = store => {
       });
       try {
         const rflinkStatus = await state.httpClient.get('/api/v1/service/rflink/status');
-
+        if (rflinkStatus.currentMilightGateway.name === undefined) {
+          rflinkStatus.currentMilightGateway.name = 'error';
+        }
         store.setState({
           rflinkStatus,
           rflinkConnectionInProgress: false,
           rflinkGetStatusStatus: RequestStatus.Success
         });
+        return rflinkStatus;
       } catch (e) {
         store.setState({
           rflinkGetStatusStatus: RequestStatus.Error,

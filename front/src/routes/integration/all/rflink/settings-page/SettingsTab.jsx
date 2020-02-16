@@ -1,8 +1,10 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
+import { STATE } from '../../../../../../../server/utils/constants';
 
 const SettingsTab = ({ children, ...props }) => (
+
 <div class="page">
   <div class="card">
     <div class="card-header">
@@ -85,7 +87,23 @@ const SettingsTab = ({ children, ...props }) => (
       <h2 class="card-title">
         <Text id="integration.rflink.settings.milight.title" />
       </h2>
+      </div>
+      <div class="card-body">
+
       <div class="page-options d-flex">
+      <div class="form-group">
+      <div class="gatewayBar mb-2">
+        <Text id="integration.rflink.settings.milight.gatewayBarinfo" />
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder={get(props, 'rflinkStatus.currentMilightGateway.name')}
+              onInput={props.debouncedSearch}
+            />
+            <Text id="integration.rflink.settings.milight.about" />
+
+          </div>
+        
         <button class="btn btn-success" onClick={props.pair}>
         <Text id="integration.rflink.settings.milight.pairButton" />
       </button>
@@ -94,8 +112,9 @@ const SettingsTab = ({ children, ...props }) => (
       </button>
     </div>
     </div>
+    </div>
+    </div>
   </div>
-</div>
 );
 
 export default SettingsTab;

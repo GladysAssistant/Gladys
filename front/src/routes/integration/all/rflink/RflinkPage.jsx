@@ -23,7 +23,6 @@ const RflinkPage = ({ children, ...props }) => (
                     </span>
                     <Text id="integration.rflink.deviceTab" />
                   </Link>
-
                   <Link
                     href="/dashboard/integration/device/rflink/setup"
                     activeClassName="active"
