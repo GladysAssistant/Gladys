@@ -33,6 +33,7 @@ function message(msgRF) {
                     selector : `rflink:${msg.id}`,
                     external_id: `rflink:${msg.id}`,
                     model : `${msg.protocol}`,
+                    channel : msg.switch,
                     should_poll : false,
                     features : []
                 };
@@ -246,7 +247,10 @@ function message(msgRF) {
                             name : 'color',
                             selector : `rflink:${msg.id}:color`,
                             external_id : `rflink:${msg.id}:color`,
-                            rfcode : 'RGBW',
+                            rfcode : {
+                                value : 'RGBW',
+                                cmd : 'COLOR',
+                            },
                             category : DEVICE_FEATURE_CATEGORIES.LIGHT,
                             type : DEVICE_FEATURE_TYPES.LIGHT.COLOR,
                             read_only : false,
@@ -261,7 +265,10 @@ function message(msgRF) {
                             name : 'brightness',
                             selector : `rflink:${msg.id}:brightness`,
                             external_id : `rflink:${msg.id}:brightness`,
-                            rfcode : 'RGBW',
+                            rfcode : {
+                                value : 'RGBW',
+                                cmd : 'BRIGHT',
+                            },
                             category : DEVICE_FEATURE_CATEGORIES.LIGHT,
                             type : DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
                             read_only : false,

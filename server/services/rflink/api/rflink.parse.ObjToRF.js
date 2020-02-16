@@ -1,25 +1,32 @@
+const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 // eslint-disable-next-line jsdoc/check-alignment
 /** 
 * @description convert a rflink device object to a string that can be sent to rflink
 * @param {Object} device - Secure node.
+* @param {string} deviceFeature - The devicce feature.
+* @param state - The state of the device.
 * @example
 * rflink.ObjToRF(device);
 */
-function ObjToRF(device) {
-    const id = device.external_id.slit(':')[1];
+function ObjToRF(device, deviceFeature, state) {
+    const id = device.external_id.split(':')[1];
 
-    let Rfcode = `10;${device.model};${id};`;
-
-    for (let i = 0;i<device.features.length;i += 1) {
-        Rfcode += `${device.features[i].rfcode};`;
+    let Rfcode = `10;${device.protocol};${id};`;
+    if (device.channel !== undefined) {
+        Rfcode += `${device.channel};`;
     }
+
+    if (state !== undefined) {
+        Rfcode += `${state};`;
+    } else {
+       this.error('NoState');
+    };
+
 
         
     
     return Rfcode;
 };
 
-module.exports = {
-    ObjToRF,
-};
+module.exports = ObjToRF;

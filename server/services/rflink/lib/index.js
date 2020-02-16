@@ -7,8 +7,7 @@ const { message } = require('./events/rflink.message.js');
 const { error } = require('./events/rflink.error');
 
 
-// Commands
-
+// COMMANDS
 const { setValue } = require('./commands/rflink.setValue');
 const { connect } = require('./commands/rflink.connect');
 const { disconnect } = require('./commands/rflink.disconnect');
@@ -28,6 +27,7 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
     this.connected = false;
     this.scanInProgress = false;
     this.device = {};
+    this.currentMilightGateway = {};
 
 
 };

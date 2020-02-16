@@ -44,6 +44,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     async function getStatus(req, res) {
     logger.log('getting status');
     res.json({
+        currentMilightGateway : RFlinkManager.currentMilightGateway,
       connected: RFlinkManager.connected,
       scanInProgress: RFlinkManager.scanInProgress,
     });
@@ -76,7 +77,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
             authenticated: true,
             controller: asyncMiddleware(unpair)
         },
-
         'get /api/v1/service/rflink/devices' : {
             authenticated: true,
             controller: asyncMiddleware(getDevices)
@@ -92,7 +92,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
         'get /api/v1/sevice/rflink/status' : {
             authenticated: true,
             controller: asyncMiddleware(getStatus)
-        }
+        },
 
     };
 };

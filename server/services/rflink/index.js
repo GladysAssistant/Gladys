@@ -36,6 +36,8 @@ module.exports = function RfLink(gladys, serviceId) {
       } else {
         rfLinkManager.connect(RflinkPath);
       }
+      const milightGateway = await gladys.variable.getValue('MILIGHT_GATEWAY', serviceId);
+      rfLinkManager.currentMilightGateway.name = milightGateway;
       
     }
 
