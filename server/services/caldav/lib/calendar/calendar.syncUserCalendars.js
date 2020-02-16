@@ -169,12 +169,12 @@ async function syncUserCalendars(userId) {
 
       const savedEvents = await Promise.all(
         formatedEvents.map(async (formatedEvent) => {
-          const gladysEvents = await this.gladys.calendar.getEvents(userId, { selector: formatedEvent.selector });
+          const gladysEvents = await this.gladys.calendar.getEvents(userId, { externalId: formatedEvent.external_id });
           if (gladysEvents.length === 0) {
             return this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
           }
 
-          return this.gladys.calendar.updateEvent(formatedEvent.selector, formatedEvent);
+          return this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
         }),
       );
 

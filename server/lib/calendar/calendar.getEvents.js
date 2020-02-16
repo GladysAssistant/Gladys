@@ -35,6 +35,12 @@ async function getEvents(userId, options) {
     };
   }
 
+  if (options.externalId) {
+    where.external_id = {
+      [Op.eq]: options.externalId,
+    };
+  }
+
   if (options.calendarId) {
     where.calendar_id = {
       [Op.eq]: options.calendarId,

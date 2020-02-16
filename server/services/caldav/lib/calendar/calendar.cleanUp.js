@@ -5,7 +5,7 @@ const logger = require('../../../../utils/logger');
  * @param {Object} userId - Gladys user to clean up.
  * @returns {Promise} Resolving with client connected.
  * @example
- * config(user.id)
+ * cleanUp(user.id)
  */
 async function cleanUp(userId) {
   logger.info(`Start cleaning CalDAV data for user: ${userId}`);

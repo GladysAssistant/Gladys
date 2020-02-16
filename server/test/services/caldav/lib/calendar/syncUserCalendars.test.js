@@ -259,7 +259,7 @@ describe('CalDAV sync', () => {
       .returns('request-collection2');
 
     sync.gladys.calendar.getEvents
-      .withArgs(userId, { selector: 'evenement-1-2018-06-08' })
+      .withArgs(userId, { externalId: '49193db9-f666-4947-8ce6-3357ce3b7166' })
       .resolves([])
       .withArgs(userId, { url: 'https://caldav.host.com/home/professional/event-3.ics' })
       .resolves([
