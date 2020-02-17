@@ -62,7 +62,7 @@ async function get(options) {
   }
 
   // take is not a default
-  if (optionsWithDefault.take) {
+  if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
   }
 
