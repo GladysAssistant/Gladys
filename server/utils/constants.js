@@ -88,6 +88,9 @@ const EVENTS = {
     HUE_CHANGED: 'light.hue-changed',
     SATURATION_CHANGED: 'light.saturation-changed',
   },
+  TRIGGERS: {
+    CHECK: 'trigger.check',
+  },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
   },

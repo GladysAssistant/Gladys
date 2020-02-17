@@ -46,10 +46,10 @@ class TurnOnLight extends Component {
   };
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateTriggerProperty(this.props.index, 'deviceFeature', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature', selectedOption.value);
       this.props.updateTriggerProperty(this.props.index, 'value', null);
     } else {
-      this.props.updateTriggerProperty(this.props.index, 'deviceFeature', null);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
     }
     if (selectedOption && selectedOption.type === 'binary') {
       this.props.updateTriggerProperty(this.props.index, 'operator', '=');
@@ -70,12 +70,12 @@ class TurnOnLight extends Component {
   };
   refreshSelectedOptions = nextProps => {
     let selectedOption = '';
-    if (nextProps.trigger.deviceFeature && this.state.deviceOptions) {
+    if (nextProps.trigger.device_feature && this.state.deviceOptions) {
       let deviceOption;
       let i = 0;
       while (i < this.state.deviceOptions.length && deviceOption === undefined) {
         deviceOption = this.state.deviceOptions[i].options.find(
-          option => option.value === nextProps.trigger.deviceFeature
+          option => option.value === nextProps.trigger.device_feature
         );
         i++;
       }
