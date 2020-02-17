@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -11,15 +12,7 @@ async function cleanUp(userId) {
   logger.info(`Start cleaning CalDAV data for user: ${userId}`);
   const gladysCalendars = await this.gladys.calendar.get(userId, { serviceId: this.serviceId });
   logger.info(`${gladysCalendars.length} calendars to clean`);
-  await Promise.all(
-    gladysCalendars.map(async (calendar) => {
-      const events = await this.gladys.calendar.getEvents(userId, {
-        calendarId: calendar.id,
-      });
-      await Promise.all(events.map((event) => this.gladys.calendar.destroyEvent(event.selector)));
-      return this.gladys.calendar.destroy(calendar.selector);
-    }),
-  );
+  await Promise.map(gladysCalendars, (calendar) => this.gladys.calendar.destroy(calendar.selector), { concurrency: 2 });
 }
 
 module.exports = {

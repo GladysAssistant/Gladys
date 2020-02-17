@@ -29,23 +29,10 @@ describe('Clean up CalDAV calendar', () => {
         selector: 'calendar-2',
       },
     ]);
-    configEnv.gladys.calendar.getEvents
-      .onFirstCall()
-      .resolves([{ selector: 'event-1' }, { selector: 'event-2' }])
-      .onSecondCall()
-      .resolves([]);
-    configEnv.gladys.calendar.destroyEvent.resolves({});
     configEnv.gladys.calendar.destroy.resolves({});
 
     await configEnv.cleanUp(userId);
 
-    expect(configEnv.gladys.calendar.getEvents.callCount).to.equal(2);
-    expect(configEnv.gladys.calendar.getEvents.args).to.eql([
-      [userId, { calendarId: 'd60ca4e5-3e91-4747-81e4-b397b21d70c5' }],
-      [userId, { calendarId: '586acdb4-6a52-4ee9-abf7-80dd2bb122c5' }],
-    ]);
-    expect(configEnv.gladys.calendar.destroyEvent.callCount).to.equal(2);
-    expect(configEnv.gladys.calendar.destroyEvent.args).to.eql([['event-1'], ['event-2']]);
     expect(configEnv.gladys.calendar.destroy.callCount).to.equal(2);
     expect(configEnv.gladys.calendar.destroy.args).to.have.deep.members([['calendar-1'], ['calendar-2']]);
   });

@@ -227,21 +227,19 @@ describe('CalDAV sync', () => {
       .resolves([{ ctag: 'ctag3' }]);
 
     sync.gladys.calendar.create.onFirstCall().resolves({
-      dataValues: {
-        id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
-        user_id: userId,
-        service_id: serviceId,
-        name: 'Calendrier 1',
-        selector: 'calendrier-1',
-        external_id: 'https://caldav.host.com/home/personal',
-        description: 'Description 1',
-        ctag: 'ctag1',
-        sync_token: 'sync-token-1',
-        sync: '1',
-        notify: '0',
-        created_at: '2020-02-11 21:04:51.318 +00:00',
-        updated_at: '2020-02-11 21:04:51.318 +00:00',
-      },
+      id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
+      user_id: userId,
+      service_id: serviceId,
+      name: 'Calendrier 1',
+      selector: 'calendrier-1',
+      external_id: 'https://caldav.host.com/home/personal',
+      description: 'Description 1',
+      ctag: 'ctag1',
+      sync_token: 'sync-token-1',
+      sync: '1',
+      notify: '0',
+      created_at: '2020-02-11 21:04:51.318 +00:00',
+      updated_at: '2020-02-11 21:04:51.318 +00:00',
     });
 
     sync.dav.request.syncCollection

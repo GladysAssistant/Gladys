@@ -46,8 +46,6 @@ async function config(userId) {
   const CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
   logger.info(`CalDAV : Home URL found: ${CALDAV_HOME_URL}`);
   await this.gladys.variable.setValue('CALDAV_HOME_URL', CALDAV_HOME_URL, this.serviceId, userId);
-
-  return Promise.resolve({});
 }
 
 module.exports = {

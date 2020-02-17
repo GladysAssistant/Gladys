@@ -3,14 +3,13 @@ const { syncUserCalendars } = require('./calendar/calendar.syncUserCalendars');
 const { cleanUp } = require('./calendar/calendar.cleanUp');
 const { config } = require('./config/index');
 
-const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, request) {
+const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.ical = ical;
   this.dav = dav;
   this.moment = moment;
   this.xmlDom = xmlDom;
-  this.request = request;
 };
 
 CalDAVHandler.prototype.formatRecurringEvents = formatRecurringEvents;

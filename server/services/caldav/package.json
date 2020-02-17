@@ -14,11 +14,9 @@
   "scripts": {},
   "dependencies": {
     "bluebird": "^3.7.0",
-    "dav": "git+https://github.com/bertrandda/dav.git#gladys-custom",
+    "dav-request": "^1.8.0",
     "ical": "^0.6.0",
     "moment": "^2.24.0",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "xmldom": "^0.1.27"
   }
 }

@@ -24,6 +24,7 @@ async function syncUserCalendars(userId) {
     }),
   );
 
+  // Create request to list calendars
   const req = this.dav.request.propfind({
     props: [
       { name: 'calendar-description', namespace: this.dav.ns.CALDAV },
@@ -65,16 +66,19 @@ async function syncUserCalendars(userId) {
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
 
+  // Format all fetched calendars
   const formatedCalendars = this.formatCalendars(davCalendars, userId);
   const calendarsToUpdate = await Promise.all(
     formatedCalendars.map(async (formatedCalendar) => {
       const gladysCalendar = await this.gladys.calendar.get(userId, { externalId: formatedCalendar.external_id });
+      // Create calendar if it does not already exist in database
       if (gladysCalendar.length === 0) {
         const savedCalendar = await this.gladys.calendar.create(formatedCalendar);
-        delete savedCalendar.dataValues.sync_token;
-        return savedCalendar.dataValues;
+        delete savedCalendar.sync_token;
+        return savedCalendar;
       }
 
+      // Else update it if events change
       if (formatedCalendar.ctag !== gladysCalendar[0].ctag) {
         await this.gladys.calendar.update(gladysCalendar[0].selector, formatedCalendar);
         return gladysCalendar[0];
@@ -86,6 +90,7 @@ async function syncUserCalendars(userId) {
   await Promise.map(
     calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null),
     async (calendarToUpdate) => {
+      // Create request to get events that have changed
       const requestChanges = this.dav.request.syncCollection({
         syncLevel: 1,
         syncToken: calendarToUpdate.sync_token || '',
@@ -95,6 +100,7 @@ async function syncUserCalendars(userId) {
       const { responses: eventsToUpdate } = await xhr.send(requestChanges, calendarToUpdate.external_id);
       await Promise.all(
         eventsToUpdate.map(async (eventToUpdate) => {
+          // Delete existing event if pops is empty
           if (JSON.stringify(eventToUpdate.props) === JSON.stringify({})) {
             const eventToDelete = await this.gladys.calendar.getEvents(userId, { url: eventToUpdate.href });
             if (eventToDelete.length === 1) {
@@ -113,6 +119,7 @@ async function syncUserCalendars(userId) {
         return;
       }
 
+      // Create request to get event updates
       const requestEventsData = new this.dav.Request({
         method: 'REPORT',
         requestData: `
@@ -152,6 +159,7 @@ async function syncUserCalendars(userId) {
           tags.href = 'd:href';
           break;
       }
+      // Extract events data from XML response
       const xmlEvents = new this.xmlDom.DOMParser().parseFromString(eventsData.request.responseText);
       let jsonEvents = Array.from(xmlEvents.getElementsByTagName(tags.response)).map((xmlEvent) => {
         const event = this.ical.parseICS(xmlEvent.getElementsByTagName(tags.calendarData)[0].childNodes[0].data);
@@ -170,10 +178,12 @@ async function syncUserCalendars(userId) {
       const savedEvents = await Promise.all(
         formatedEvents.map(async (formatedEvent) => {
           const gladysEvents = await this.gladys.calendar.getEvents(userId, { externalId: formatedEvent.external_id });
+          // Create event if it does not already exist in database
           if (gladysEvents.length === 0) {
             return this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
           }
 
+          // Else update existing event
           return this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
         }),
       );

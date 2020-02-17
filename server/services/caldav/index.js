@@ -5,12 +5,11 @@ const CalDAVController = require('./api/caldav.controller');
 
 module.exports = function CalDAVService(gladys, serviceId) {
   const ical = require('ical');
-  const dav = require('dav');
+  const dav = require('dav-request');
   const moment = require('moment');
   const xmlDom = require('xmldom');
-  const request = require('request-promise-native');
 
-  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom, request);
+  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom);
 
   let interval;
 

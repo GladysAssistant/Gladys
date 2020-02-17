@@ -68,8 +68,7 @@ describe('CalDAV config', () => {
       })
       .returns('request2');
 
-    const result = await configEnv.config(userId);
-    expect(result).to.deep.equal({});
+    await configEnv.config(userId);
     expect(configEnv.gladys.variable.setValue.callCount).to.equal(2);
     expect(configEnv.gladys.variable.setValue.args[0]).to.eql([
       'CALDAV_PRINCIPAL_URL',
