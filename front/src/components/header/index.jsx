@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import classnames from 'classnames';
 import { h } from 'preact';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
@@ -80,22 +81,25 @@ const Header = ({ ...props }) => {
             <div class="col-lg order-lg-first">
               <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
                 <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard" class="nav-link">
+                  <Link
+                    href="/dashboard"
+                    class={classnames('nav-link', {
+                      active: props.currentUrl === '/dashboard'
+                    })}
+                  >
                     <i class="fe fe-home" /> <Text id="header.home" />
                   </Link>
                 </li>
                 <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard/chat" class="nav-link">
+                  <Link
+                    href="/dashboard/chat"
+                    class={classnames('nav-link', {
+                      active: props.currentUrl === '/dashboard/chat'
+                    })}
+                  >
                     <i class="fe fe-message-square" /> <Text id="header.chat" />
                   </Link>
                 </li>
-                {false && (
-                  <li class="nav-item">
-                    <Link activeClassName="active" href="/dashboard/device" class="nav-link">
-                      <i class="fe fe-toggle-right" /> <Text id="header.devices" />
-                    </Link>
-                  </li>
-                )}
                 <li class="nav-item">
                   <Link
                     href="/dashboard/integration/device"
@@ -105,12 +109,23 @@ const Header = ({ ...props }) => {
                   </Link>
                 </li>
                 <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard/calendar" class="nav-link">
+                  <Link
+                    href="/dashboard/calendar"
+                    class={classnames('nav-link', {
+                      active: props.currentUrl === '/dashboard/calendar'
+                    })}
+                  >
                     <i class="fe fe-calendar" /> <Text id="header.calendar" />
                   </Link>
                 </li>
                 <li class="nav-item">
-                  <Link activeClassName="active" href="/dashboard/maps" class="nav-link">
+                  <Link
+                    activeClassName="active"
+                    href="/dashboard/maps"
+                    class={classnames('nav-link', {
+                      active: props.currentUrl === '/dashboard/maps'
+                    })}
+                  >
                     <i class="fe fe-map" /> <Text id="header.maps" />
                   </Link>
                 </li>

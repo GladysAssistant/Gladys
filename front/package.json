@@ -41,7 +41,7 @@
     "preact": "^10.2.1",
     "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-i18n": "^2.0.0-preactx.2",
-    "preact-router": "^3.1.0",
+    "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.22.1",
     "react-select": "^3.0.8",
