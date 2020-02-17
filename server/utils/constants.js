@@ -88,6 +88,9 @@ const EVENTS = {
     HUE_CHANGED: 'light.hue-changed',
     SATURATION_CHANGED: 'light.saturation-changed',
   },
+  TRIGGERS: {
+    CHECK: 'trigger.check',
+  },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
   },
@@ -184,8 +187,8 @@ const ACTIONS = {
   SCENE: {
     START: 'scene.start',
   },
-  TELEGRAM: {
-    SEND: 'telegram.send',
+  MESSAGE: {
+    SEND: 'message.send',
   },
 };
 

@@ -1,7 +1,11 @@
 import { RequestStatus } from '../utils/consts';
-import update from 'immutability-helper';
+import update, { extend } from 'immutability-helper';
 import debounce from 'debounce';
 import { route } from 'preact-router';
+
+extend('$auto', function(value, object) {
+  return object ? update(object, value) : update({}, value);
+});
 
 function createActions(store) {
   const actions = {
@@ -49,6 +53,9 @@ function createActions(store) {
         if (scene.actions[scene.actions.length - 1].length > 0) {
           scene.actions.push([]);
         }
+        if (!scene.triggers) {
+          scene.triggers = [];
+        }
         store.setState({
           scene,
           SceneGetStatus: RequestStatus.Success
@@ -75,31 +82,16 @@ function createActions(store) {
       }
     },
     async saveScene(state) {
-      store.setState({
-        SceneSaveStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.patch(`/api/v1/scene/${state.scene.selector}`, state.scene);
-        store.setState({
-          SceneSaveStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          SceneSaveStatus: RequestStatus.Error
-        });
-      }
+      await state.httpClient.patch(`/api/v1/scene/${state.scene.selector}`, state.scene);
     },
     addAction(state, columnIndex) {
-      if (!state.selectedNewAction) {
-        return null;
-      }
       let newState = update(state, {
         scene: {
           actions: {
             [columnIndex]: {
               $push: [
                 {
-                  type: state.selectedNewAction
+                  type: null
                 }
               ]
             }
@@ -118,7 +110,7 @@ function createActions(store) {
       store.setState(newState);
     },
     deleteAction(state, columnIndex, rowIndex) {
-      const newState = update(state, {
+      let newState = update(state, {
         scene: {
           actions: {
             [columnIndex]: {
@@ -127,6 +119,21 @@ function createActions(store) {
           }
         }
       });
+      // if necessary, we remove the last action group
+      if (newState.scene.actions.length >= 2) {
+        if (
+          newState.scene.actions[newState.scene.actions.length - 1].length === 0 &&
+          newState.scene.actions[newState.scene.actions.length - 2].length === 0
+        ) {
+          newState = update(newState, {
+            scene: {
+              actions: {
+                $splice: [[newState.scene.actions.length - 1, 1]]
+              }
+            }
+          });
+        }
+      }
       store.setState(newState);
     },
     updateActionProperty(state, columnIndex, rowIndex, property, value) {
@@ -144,11 +151,6 @@ function createActions(store) {
         }
       });
       store.setState(newState);
-    },
-    updateSelectedNewAction(state, e) {
-      store.setState({
-        selectedNewAction: e.target.value
-      });
     },
     highlighCurrentlyExecutedAction(state, { columnIndex, rowIndex }) {
       store.setState({
@@ -200,6 +202,45 @@ function createActions(store) {
           GetUsersStatus: RequestStatus.Error
         });
       }
+    },
+    addTrigger(state) {
+      const newState = update(state, {
+        scene: {
+          triggers: {
+            $push: [
+              {
+                type: null
+              }
+            ]
+          }
+        }
+      });
+      store.setState(newState);
+    },
+    deleteTrigger(state, index) {
+      const newState = update(state, {
+        scene: {
+          triggers: {
+            $splice: [[index, 1]]
+          }
+        }
+      });
+      store.setState(newState);
+    },
+    updateTriggerProperty(state, index, property, value) {
+      console.log({ index, property, value });
+      const newState = update(state, {
+        scene: {
+          triggers: {
+            [index]: {
+              [property]: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+      store.setState(newState);
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

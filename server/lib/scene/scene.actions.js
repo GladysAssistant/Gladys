@@ -1,4 +1,5 @@
-const { ACTIONS } = require('../../utils/constants');
+const Promise = require('bluebird');
+const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const logger = require('../../utils/logger');
 
@@ -16,28 +17,46 @@ const actionsFunc = {
     return self.device.setValue(device, deviceFeature, action.value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
-    const light = self.stateManager.get('device', action.device);
-    return light.turnOn();
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
+        await self.device.setValue(device, deviceFeature, 1);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
   },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
-      if (action.milliseconds) {
-        setTimeout(resolve, action.milliseconds);
-      } else if (action.seconds) {
-        logger.debug(`Waiting ${action.seconds} seconds...`);
-        setTimeout(resolve, action.seconds * 1000);
-      } else if (action.minutes) {
-        setTimeout(resolve, action.minutes * 1000 * 60);
-      } else if (action.hours) {
-        setTimeout(resolve, action.hours * 1000 * 60 * 60);
+      let timeToWaitMilliseconds;
+      switch (action.unit) {
+        case 'milliseconds':
+          timeToWaitMilliseconds = action.value;
+          break;
+        case 'seconds':
+          timeToWaitMilliseconds = action.value * 1000;
+          break;
+        case 'minutes':
+          timeToWaitMilliseconds = action.value * 1000 * 60;
+          break;
+        case 'hours':
+          timeToWaitMilliseconds = action.value * 1000 * 60 * 60;
+          break;
+        default:
+          throw new Error(`Unit ${action.unit} not recognized`);
       }
+      setTimeout(resolve, timeToWaitMilliseconds);
     }),
   [ACTIONS.SERVICE.START]: async (self, action, scope) => self.stateManager.get('service', action.service).start(),
   [ACTIONS.SERVICE.STOP]: async (self, action, scope) => self.stateManager.get('service', action.service).stop(),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
-  [ACTIONS.TELEGRAM.SEND]: async (self, action, scope) => {
-    const user = self.stateManager.get('user', action.user);
-    await self.stateManager.get('service', 'telegram').message.send(user.telegram_user_id, action.text);
+  [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
+    await self.message.sendToUser(action.user, action.text);
   },
 };
 

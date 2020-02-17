@@ -18,7 +18,6 @@ before(async function before() {
   const config = {
     disableService: true,
     disableBrainLoading: true,
-    disableTriggerLoading: true,
     disableSchedulerLoading: true,
     jwtSecret: 'secret',
   };

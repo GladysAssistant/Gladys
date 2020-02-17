@@ -13,25 +13,31 @@ const light = {
 describe('SceneManager', () => {
   it('should execute one scene', async () => {
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', light);
-    const sceneManager = new SceneManager(stateManager, event);
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-scene',
       actions: [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
       ],
     };
     sceneManager.addScene(scene);
     await sceneManager.execute('my-scene');
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
-        assert.calledOnce(light.turnOn);
-        resolve();
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
       });
     });
   });

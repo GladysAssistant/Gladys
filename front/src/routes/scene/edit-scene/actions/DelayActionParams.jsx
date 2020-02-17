@@ -1,35 +1,59 @@
-const updateTime = (updateActionProperty, columnIndex, rowIndex) => e => {
-  const time = e.target.value;
-  const timeSplitted = time.split(':');
-  const minutes = parseInt(timeSplitted[0], 10);
-  let seconds = parseInt(timeSplitted[1], 10);
-  if (minutes > 0) {
-    seconds += minutes * 60;
-  }
-  updateActionProperty(columnIndex, rowIndex, 'seconds', seconds);
-};
+import { Component } from 'preact';
+import { connect } from 'unistore/preact';
+import { Text, Localizer } from 'preact-i18n';
 
-const convertTime = action => {
-  const secNum = parseInt(action.seconds, 10); // don't forget the second param
-  let minutes = Math.floor(secNum / 60);
-  let seconds = secNum - minutes * 60;
-
-  if (minutes < 10) {
-    minutes = '0' + minutes;
+@connect('', {})
+class WaitActionParams extends Component {
+  handleChangeDuration = e => {
+    let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'value', newValue);
+  };
+  handleChangeUnit = e => {
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', e.target.value);
+  };
+  componentDidMount() {
+    if (!this.props.action.unit) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
+    }
   }
-  if (seconds < 10) {
-    seconds = '0' + seconds;
+  render(props, {}) {
+    return (
+      <div>
+        <p>
+          <Text id="editScene.actionsCard.delay.label" />
+        </p>
+        <div class="row">
+          <div class="col-md-6">
+            <Localizer>
+              <input
+                type="text"
+                class="form-control"
+                value={props.action.value}
+                onChange={this.handleChangeDuration}
+                placeholder={<Text id="editScene.actionsCard.delay.inputPlaceholder" />}
+              />
+            </Localizer>
+          </div>
+          <div class="col-md-6">
+            <select class="custom-select" value={props.action.unit} onChange={this.handleChangeUnit}>
+              <option value="milliseconds">
+                <Text id="editScene.actionsCard.delay.milliseconds" />
+              </option>
+              <option value="seconds">
+                <Text id="editScene.actionsCard.delay.seconds" />
+              </option>
+              <option value="minutes">
+                <Text id="editScene.actionsCard.delay.minutes" />
+              </option>
+              <option value="hours">
+                <Text id="editScene.actionsCard.delay.hours" />
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    );
   }
-  return minutes + ':' + seconds;
-};
-
-const WaitActionParams = ({ children, ...props }) => (
-  <input
-    class="form-control"
-    type="time"
-    value={convertTime(props.action)}
-    onChange={updateTime(props.updateActionProperty, props.columnIndex, props.index)}
-  />
-);
+}
 
 export default WaitActionParams;

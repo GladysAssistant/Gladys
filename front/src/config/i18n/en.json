@@ -428,11 +428,37 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
-    "first": "First",
-    "then": "Then",
+    "triggersTitle": "Triggers",
+    "newTrigger": "New trigger",
+    "addTriggerButton": "Add trigger",
+    "selectTriggerLabel": "Select a trigger type",
+    "newAction": "New action",
+    "selectActionType": "Select an action type",
+    "addActionButton": "Add new action",
+    "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
+    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
+    "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
+    "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
+    "addNewTriggerButton": "Add new trigger",
+    "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
+    "actionsCard": {
+      "delay": {
+        "label": " This block will wait the specified duration.",
+        "inputPlaceholder": "Duration",
+        "milliseconds": "milliseconds",
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours"
+      },
+      "messageSend": {
+        "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text"
+      }
+    },
     "actions": {
-      "telegram": {
-        "send": "Send Telegram Message"
+      "message": {
+        "send": "Send Message"
       },
       "delay": "Wait",
       "light": {
@@ -444,6 +470,24 @@
       "service": {
         "start": "Start service",
         "stop": "Stop service"
+      }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
       }
     }
   },
@@ -667,6 +711,10 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)"
+  },
+  "deviceFeatureUnitShort": {
+    "celsius": "°C",
+    "fahrenheit": "°F"
   },
   "deviceFeatureCategory": {
     "light": {
