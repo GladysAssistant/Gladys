@@ -61,7 +61,6 @@
     "nyc": "^13.3.0",
     "prettier": "^1.17.1",
     "proxyquire": "^2.1.0",
-    "sequelize-cli": "^5.5.1",
     "shx": "^0.3.2",
     "sinon": "^7.2.4",
     "supertest": "^3.4.2"
@@ -87,6 +86,7 @@
     "queue": "^6.0.0",
     "semver": "^6.1.1",
     "sequelize": "^4.42.0",
+    "sequelize-cli": "^5.5.1",
     "sqlite3": "^4.0.6",
     "tracer": "^0.9.8",
     "uuid": "^3.3.2",
