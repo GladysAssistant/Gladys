@@ -1,9 +1,12 @@
 const { expect } = require('chai');
+const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
+
+const event = new EventEmitter();
 
 describe('SceneManager.get', () => {
   it('should get scenes', async () => {
-    const sceneManager = new SceneManager();
+    const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get();
     expect(scenes).to.be.instanceOf(Array);
     scenes.forEach((oneScene) => {
@@ -15,7 +18,7 @@ describe('SceneManager.get', () => {
     });
   });
   it('should search scene, even in lowercase', async () => {
-    const sceneManager = new SceneManager();
+    const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get({
       search: 'test',
     });
@@ -32,7 +35,7 @@ describe('SceneManager.get', () => {
     ]);
   });
   it('should return 0 result in search', async () => {
-    const sceneManager = new SceneManager();
+    const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get({
       search: 'UNKNOWN SCENE',
     });
