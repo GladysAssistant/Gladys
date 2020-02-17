@@ -24,6 +24,7 @@ const SceneManager = function SceneManager(stateManager, event, device) {
     concurrency: 1,
   });
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
+  this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;
