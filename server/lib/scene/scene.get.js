@@ -27,7 +27,7 @@ async function get(options) {
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
-  if (optionsWithDefault.take) {
+  if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
   }
 

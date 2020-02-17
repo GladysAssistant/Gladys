@@ -42,4 +42,12 @@ describe('SceneManager.get', () => {
     expect(scenes).to.be.instanceOf(Array);
     expect(scenes).to.deep.equal([]);
   });
+  it('should return 0 scenes (take=0)', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      take: 0,
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([]);
+  });
 });
