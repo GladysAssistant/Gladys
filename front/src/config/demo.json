@@ -338,7 +338,7 @@
           "features": [
             {
               "name": "Temperature",
-              "selector": "main-lamp-binary",
+              "selector": "temperature-sensor",
               "category": "temperature-sensor",
               "type": "",
               "min": -20,
@@ -350,7 +350,7 @@
             },
             {
               "name": "Humidity",
-              "selector": "main-lamp-binary",
+              "selector": "humidity-sensor",
               "category": "humidity-sensor",
               "type": "",
               "min": 0,
@@ -362,7 +362,7 @@
             },
             {
               "name": "Door",
-              "selector": "main-lamp-binary",
+              "selector": "door-opening-sensor",
               "category": "door-opening-sensor",
               "type": "",
               "min": 0,
@@ -387,7 +387,7 @@
           "features": [
             {
               "name": "Humidity",
-              "selector": "main-lamp-binary",
+              "selector": "kitchen-humidity-sensor",
               "category": "humidity-sensor",
               "type": "",
               "min": 0,
@@ -400,8 +400,8 @@
             {
               "name": "Light",
               "selector": "main-lamp-binary",
-              "category": "light-sensor",
-              "type": "",
+              "category": "light",
+              "type": "binary",
               "min": 0,
               "max": 100,
               "read_only": true,
@@ -495,18 +495,26 @@
     "selector": "wake-up",
     "icon": "fe fe-bell",
     "name": "Wake Up",
+    "triggers": [
+      {
+        "type": "device.new-state",
+        "device_feature": "main-lamp-binary",
+        "operator": "=",
+        "value": 1
+      }
+    ],
     "actions": [
       [
         {
           "type": "delay",
-          "seconds": 2
+          "value": 2,
+          "unit": "seconds"
         }
       ],
       [
         {
-          "type": "telegram.send",
-          "user": "tony",
-          "text": "Time to wake up!"
+          "type": "light.turn-on",
+          "devices": ["light"]
         }
       ]
     ]
@@ -946,6 +954,21 @@
           "has_feedback": true,
           "min": 0,
           "max": 100
+        }
+      ]
+    }
+  ],
+  "get /api/v1/device": [
+    {
+      "id": "06e735a3-ac62-4a05-85b6-855f2c556d7b",
+      "name": "Living room lamp",
+      "selector": "light",
+      "features": [
+        {
+          "name": "Living room lamp",
+          "type": "binary",
+          "selector": "light.binary",
+          "category": "light"
         }
       ]
     }

@@ -4,7 +4,6 @@ const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
   fields: ['id', 'name', 'icon', 'selector', 'last_executed', 'updated_at'],
-  take: 20,
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
@@ -24,10 +23,13 @@ async function get(options) {
 
   const queryParams = {
     attributes: optionsWithDefault.fields,
-    limit: optionsWithDefault.take,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
+
+  if (optionsWithDefault.take !== undefined) {
+    queryParams.limit = optionsWithDefault.take;
+  }
 
   if (optionsWithDefault.search) {
     queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {

@@ -10,24 +10,23 @@ const event = new EventEmitter();
 
 describe('scene.executeActions', () => {
   it('should execute light turn on', async () => {
-    const light = {
-      turnOn: fake.resolves(null),
+    const device = {
+      setValue: fake.resolves(null),
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', light);
     await executeActions(
-      { stateManager, event },
+      { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
       ],
       {},
     );
-    assert.calledOnce(light.turnOn);
+    assert.calledOnce(device.setValue);
   });
   it('should execute wait 5 ms', async () => {
     await executeActions(
@@ -36,7 +35,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            milliseconds: 5,
+            unit: 'milliseconds',
+            value: 5,
           },
         ],
       ],
@@ -48,7 +48,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            seconds: 5 / 1000,
+            unit: 'seconds',
+            value: 5 / 1000,
           },
         ],
       ],
@@ -60,7 +61,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            minutes: 5 / 1000 / 60,
+            unit: 'minutes',
+            value: 5 / 1000 / 60,
           },
         ],
       ],
@@ -72,7 +74,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            hours: 5 / 1000 / 60 / 60,
+            unit: 'hours',
+            value: 5 / 1000 / 60 / 60,
           },
         ],
       ],
@@ -120,30 +123,29 @@ describe('scene.executeActions', () => {
     assert.calledOnce(example.stop);
   });
   it('should execute sequential actions', async () => {
-    const light = {
-      turnOn: fake.resolves(null),
+    const device = {
+      setValue: fake.resolves(null),
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', light);
     await executeActions(
-      { stateManager, event },
+      { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
       ],
       {},
     );
-    assert.calledTwice(light.turnOn);
+    assert.calledTwice(device.setValue);
   });
   it('should throw error, action type does not exist', async () => {
     const light = {

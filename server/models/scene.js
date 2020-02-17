@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { ACTION_LIST } = require('../utils/constants');
+const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -10,15 +10,29 @@ const actionSchema = Joi.array().items(
         .valid(ACTION_LIST)
         .required(),
       deviceFeature: Joi.string(),
+      deviceFeatures: Joi.array().items(Joi.string()),
       device: Joi.string(),
+      devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       text: Joi.string(),
-      milliseconds: Joi.number(),
-      seconds: Joi.number(),
-      minutes: Joi.number(),
-      hours: Joi.number(),
+      value: Joi.number(),
+      unit: Joi.string(),
     }),
   ),
+);
+
+const triggersSchema = Joi.array().items(
+  Joi.object().keys({
+    type: Joi.string()
+      .valid(EVENT_LIST)
+      .required(),
+    house: Joi.string(),
+    device: Joi.string(),
+    device_feature: Joi.string(),
+    operator: Joi.string().valid(['=', '!=', '>', '>=', '<', '<=']),
+    value: Joi.number(),
+    user: Joi.string(),
+  }),
 );
 
 module.exports = (sequelize, DataTypes) => {
@@ -58,6 +72,17 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      triggers: {
+        type: DataTypes.JSON,
+        validate: {
+          isEven(value) {
+            const result = Joi.validate(value, triggersSchema);
+            if (result.error) {
+              throw new Error(result.error.details[0].message);
+            }
+          },
+        },
+      },
       last_executed: {
         type: DataTypes.DATE,
       },
@@ -67,17 +92,6 @@ module.exports = (sequelize, DataTypes) => {
 
   // add slug if needed
   scene.beforeValidate(addSelector);
-
-  scene.associate = (models) => {
-    scene.belongsToMany(models.Trigger, {
-      through: {
-        model: models.TriggerScene,
-        unique: true,
-      },
-      foreignKey: 'scene_id',
-      as: 'triggers',
-    });
-  };
 
   return scene;
 };

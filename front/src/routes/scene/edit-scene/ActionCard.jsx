@@ -1,23 +1,25 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import DelayActionParams from './actions/DelayActionParams';
-import ArmHomeActionParams from './actions/ArmHomeActionParam';
-import LockActionParams from './actions/LockActionParam';
 import TurnOnLightParams from './actions/TurnOnLightParams';
-import TelegramSendParams from './actions/TelegramSendParams';
+import SendMessageParams from './actions/SendMessageParams';
+import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
 };
 
+const ACTION_ICON = {
+  'light.turn-on': 'fe fe-sun',
+  delay: 'fe fe-clock',
+  'message.send': 'fe fe-message-square'
+};
+
 const ActionCard = ({ children, ...props }) => (
-  <div
-    class="card"
-    style={{
-      minWidth: '350px'
-    }}
-  >
+  <div class="card">
     <div class="card-header">
+      {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
+      {props.action.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
           class={props.action.icon}
@@ -26,14 +28,17 @@ const ActionCard = ({ children, ...props }) => (
           }}
         />{' '}
         <Text id={`editScene.actions.${props.action.type}`} />
+        {props.action.type === null && <Text id="editScene.newAction" />}
       </div>
       {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
         <div class="card-status bg-blue" />
       )}
       <div class="card-options">
-        <a class="card-options-collapse">
-          <i class="fe fe-chevron-down" />
-        </a>
+        {false && (
+          <a class="card-options-collapse">
+            <i class="fe fe-chevron-down" />
+          </a>
+        )}
         <a
           onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
           class="card-options-remove"
@@ -51,20 +56,28 @@ const ActionCard = ({ children, ...props }) => (
           updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'Arm Home' && <ArmHomeActionParams />}
-      {props.action.type === 'Lock the door' && <LockActionParams />}
-      {props.action.type === 'Lock the windows' && <LockActionParams />}
-      {props.action.type === 'light.turn-on' && (
-        <TurnOnLightParams
-          lightDevices={[
-            {
-              name: 'Main Lamp'
-            }
-          ]}
+      {props.action.type === null && (
+        <ChooseActionTypeParams
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'telegram.send' && (
-        <TelegramSendParams action={props.action} sceneParamsData={props.sceneParamsData} />
+      {props.action.type === 'light.turn-on' && (
+        <TurnOnLightParams
+          action={props.action}
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
+        />
+      )}
+      {props.action.type === 'message.send' && (
+        <SendMessageParams
+          action={props.action}
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
+        />
       )}
     </div>
   </div>
