@@ -18,6 +18,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
     async function connect(req, res) {
+        logger.log('Rflink connect');
         const rflinkPath = await gladys.variable.getValue('RFLINK_PATH');
         if (!rflinkPath) {
             throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
@@ -47,26 +48,49 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
         currentMilightGateway : RFlinkManager.currentMilightGateway,
       connected: RFlinkManager.connected,
       scanInProgress: RFlinkManager.scanInProgress,
+      ready: RFlinkManager.ready,
     });
   }
+  
 
     /**
-     * @api {get} /api/v1/service/rflink/pair send a milight pairing comand
+     * @api {get} /api/v1/service/rflink/pair send a milight pairing command
      * @apiName pair
      * @apiGroup RFlink
      */
   async function pair(req, res) {
-      RFlinkManager.pair();
+    logger.log('Milight pair');
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY');
+    if (currentMilightGateway === null) {
+        currentMilightGateway = 'F746';
+    }
+      RFlinkManager.pair(currentMilightGateway);
   }
 
     /**
-     * @api {get} /api/v1/service/rflink/pair send a milight unpairing comand
+     * @api {get} /api/v1/service/rflink/pair send a milight unpairing command
      * @apiName unpair
      * @apiGroup RFlink
      */
-  async function unpair(req, res) {
-    RFlinkManager.unpair();
+async function unpair(req, res) {
+    logger.log('Milight unpair');
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY');
+    if (currentMilightGateway === null) {
+        currentMilightGateway = 'F746';
+    }
+    RFlinkManager.unpair(currentMilightGateway);
 }
+    /** 
+     * @apiName unpair
+     * @apiGroup RFlink
+     * @api {post} /api/v1/service/rflink/remove remove a device from the device list
+     */
+  async function remove(req, res) {
+        logger.log(req);
+        res.json({
+            success : true,
+        });
+   }
 
     return {
         'get /api/v1/service/rflink/pair' : {
@@ -92,6 +116,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
         'get /api/v1/sevice/rflink/status' : {
             authenticated: true,
             controller: asyncMiddleware(getStatus)
+        },
+        'get /api/v1/sevice/rflink/remove/' : {
+            authenticated: true,
+            controller: asyncMiddleware(remove)
         },
 
     };

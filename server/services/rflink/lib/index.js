@@ -25,6 +25,7 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
     this.scanInProgress = false;
     this.serviceId = serviceId;
     this.connected = false;
+    this.ready = false;
     this.scanInProgress = false;
     this.device = {};
     this.currentMilightGateway = {};

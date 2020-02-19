@@ -2,11 +2,13 @@
 
 /**
  * @description pair a milight device
+ * @param {string} currentMilightGateway - Milight gateway.
  * @example
  * rflink.pair()
  */
-function pair() {
+function pair(currentMilightGateway) {
     let number = '01';
+    this.currentMilightGateway.name = currentMilightGateway;
     if (this.currentMilightGateway.name !== undefined && this.currentMilightGateway.number !==undefined) {
         
         if (this.currentMilightGateway.number < 10) {
@@ -14,8 +16,8 @@ function pair() {
         } else {
             number = `${this.currentMilightGateway.number}`;
         }
-
-        this.usb.write(`10;MiLightv1;${this.currentMilightGateway};${number};34BC;PAIR;`);
+        const msg = `10;MiLightv1;${this.currentMilightGateway};${number};34BC;PAIR;`;
+        this.usb.write(msg);
     }
 }
 

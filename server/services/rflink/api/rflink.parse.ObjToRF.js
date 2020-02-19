@@ -11,10 +11,12 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 */
 function ObjToRF(device, deviceFeature, state) {
     const id = device.external_id.split(':')[1];
+    const channel = device.external_id.split(':')[2];
 
-    let Rfcode = `10;${device.protocol};${id};`;
-    if (device.channel !== undefined) {
-        Rfcode += `${device.channel};`;
+    let Rfcode = `10;${device.model};${id};`;
+
+    if (channel !== undefined) {
+        Rfcode += `${channel};`;
     }
 
     if (state !== undefined) {

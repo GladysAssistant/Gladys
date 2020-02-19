@@ -27,6 +27,7 @@ function connect(Path) {
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
 
     this.connected = true;
+    this.ready = true;
     this.listen();
     
   }
