@@ -24,14 +24,14 @@ const RflinkPage = ({ children, ...props }) => (
                     <Text id="integration.rflink.deviceTab" />
                   </Link>
                   <Link
-                    href="/dashboard/integration/device/rflink/setup"
+                    href="/dashboard/integration/device/rflink/settings"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.rflink.setupTab" />
+                    <Text id="integration.rflink.settingsTab" />
                   </Link>
                 </div>
               </div>

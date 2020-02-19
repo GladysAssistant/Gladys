@@ -1,6 +1,5 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
-import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import debounce from 'debounce';
 
@@ -40,23 +39,6 @@ function createActions(store) {
         });
       }
     },
-    addDevice(state) {
-      const uniqueId = uuid.v4();
-      const rflinkDevices = update(state.rflinkDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            should_poll: false,
-            service_id: state.currentIntegration.id,
-            external_id: 'rflink:'
-          }
-        ]
-      });
-      store.setState({
-        rflinkDevices
-      });
-    },
     async saveDevice(state, device) {
       await state.httpClient.post('/api/v1/device', device);
     },
@@ -74,6 +56,9 @@ function createActions(store) {
     },
     async deleteDevice(state, device, index) {
       await state.httpClient.delete('/api/v1/device/' + device.selector);
+      await state.httpClient.post('/api/v1/service/rflink/remove/', {
+        external_id : device.selector,
+      });
       const newState = update(state, {
         rflinkDevices: {
           $splice: [[index, 1]]

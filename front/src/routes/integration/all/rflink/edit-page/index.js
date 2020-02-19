@@ -11,7 +11,7 @@ class EditRflinkDevice extends Component {
   render(props, {}) {
     return (
       <RflinkPage>
-        <UpdateDevice {...props} integrationName="rflink" allowModifyFeatures={false} previousPage={RFLINK_PAGE_PATH} />
+        <UpdateDevice {...props} integrationName="rflink" allowModifyFeatures previousPage={RFLINK_PAGE_PATH} />
       </RflinkPage>
     );
   }

@@ -5,7 +5,7 @@ import RflinkPage from '../RflinkPage';
 import DevicePage from './DevicePage';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect('session,user,rflinkDevices,houses,getRflinkDevicesStatus', actions)
+@connect('session,user,rflinkDevices,houses,getRflinkDevicesStatus,currentIntegration', actions)
 class RflinkDevicePage extends Component {
   componentWillMount() {
     this.props.getRflinkDevices(20, 0);

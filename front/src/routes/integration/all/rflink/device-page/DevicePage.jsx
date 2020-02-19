@@ -33,9 +33,6 @@ const NodeTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        <button onClick={props.addDevice} class="btn btn-outline-primary ml-2">
-          <Text id="integration.rflink.device.newButton" /> <i class="fe fe-plus" />
-        </button>
       </div>
     </div>
     <div class="card-body">

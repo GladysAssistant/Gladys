@@ -59,6 +59,17 @@ const actions = store => {
         });
       }
     },
+    async getMilightInput(state) {
+      try {
+        const currentMilightGateway = await state.httpClient.get('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY');
+        store.setState({
+          currentMilightGateway : currentMilightGateway.value,
+        });
+      } catch (e) {
+
+      }
+
+    },
     async disconnect(state) {
       store.setState({
         rflinkDisconnectStatus: RequestStatus.Getting
@@ -77,6 +88,9 @@ const actions = store => {
     },
     async pair(state) {
       try {
+        await state.httpClient.post('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY', {
+          value: state.currentMilightGateway
+        });
         await state.httpClient.post('/api/v1/service/rflink/pair');
 
       } catch (e) {
@@ -85,6 +99,9 @@ const actions = store => {
     },
     async unpair(state) {
       try {
+        await state.httpClient.post('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY', {
+          value: state.currentMilightGateway
+        });
         await state.httpClient.post('/api/v1/service/rflink/unpair');
 
       } catch (e) {
@@ -99,7 +116,7 @@ const actions = store => {
       try {
         const rflinkStatus = await state.httpClient.get('/api/v1/service/rflink/status');
         if (rflinkStatus.currentMilightGateway.name === undefined) {
-          rflinkStatus.currentMilightGateway.name = 'error';
+          rflinkStatus.currentMilightGateway = 'error';
         }
         store.setState({
           rflinkStatus,
