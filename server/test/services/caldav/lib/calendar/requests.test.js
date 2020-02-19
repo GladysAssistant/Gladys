@@ -247,7 +247,20 @@ describe('CalDAV requests', () => {
       send: sinon.stub(),
     };
     xhr.send.resolves({ request: { responseText: '<xml></xml>' } });
-    const eventsData = await requests.requestEventsData(xhr, 'https://caldav.host.com/home/personal', [], 'other');
+    const eventsData = await requests.requestEventsData(xhr, 'https://caldav.host.com/home/personal', [
+      {
+        href:'https://caldav.host.com/home/personal/',
+        props: {
+          key: 'value'
+        }
+      },
+      {
+        href:'https://caldav.host.com/home/personal/event-1.ics',
+        props: {
+          key: 'value'
+        }
+      }
+    ], 'other');
 
     expect(eventsData).to.eql([
       {

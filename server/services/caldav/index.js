@@ -15,6 +15,33 @@ module.exports = function CalDAVService(gladys, serviceId) {
 
   /**
    * @public
+   * @description This function sync calendars for all users
+   * @example
+   * gladys.services.caldav.syncAllUsers();
+   */
+  async function syncAllUsers() {
+    try {
+      const users = await gladys.user.get();
+      const service = await gladys.service.getLocalServiceByName('caldav');
+
+      await Promise.map(
+        users,
+        async (user) => {
+          const caldavUrl = await gladys.variable.getValue('CALDAV_URL', service.id, user.id);
+          if (caldavUrl) {
+            await calDavHandler.syncUserCalendars(user.id);
+          }
+          return null;
+        },
+        { concurrency: 2 },
+      );
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  /**
+   * @public
    * @description This function starts the CalDAV service
    * and start interval to sync all users every 30mn
    * @example
@@ -22,26 +49,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting CalDAV service');
-    interval = setInterval(async () => {
-      try {
-        const users = await gladys.user.get();
-        const service = await gladys.service.getLocalServiceByName('caldav');
-
-        await Promise.map(
-          users,
-          async (user) => {
-            const caldavUrl = await gladys.variable.getValue('CALDAV_URL', service.dataValues.id, user.id);
-            if (caldavUrl) {
-              await calDavHandler.syncUserCalendars(user.id);
-            }
-            return null;
-          },
-          { concurrency: 2 },
-        );
-      } catch (e) {
-        logger.error(e);
-      }
-    }, 1000 * 60 * 15);
+    interval = setInterval(syncAllUsers, 1000 * 60 * 30);
   }
 
   /**
@@ -59,6 +67,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    syncAllUsers,
     calendar: {
       syncUserCalendars: calDavHandler.syncUserCalendars,
     },
