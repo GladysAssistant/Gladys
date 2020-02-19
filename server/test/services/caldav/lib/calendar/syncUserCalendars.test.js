@@ -11,28 +11,21 @@ const { expect } = chai;
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 const serviceId = '5d6c666f-56be-4929-9104-718a78556844';
 
-const namespace = {
-  CALENDAR_SERVER: 'http://calendarserver.org/ns/',
-  CALDAV_APPLE: 'http://apple.com/ns/ical/',
-  CALDAV: 'urn:ietf:params:xml:ns:caldav',
-  CARDDAV: 'urn:ietf:params:xml:ns:carddav',
-  DAV: 'DAV:',
-};
-
 describe('CalDAV sync', () => {
-  const send = sinon.stub();
   const sync = {
     serviceId,
     syncUserCalendars,
     formatCalendars,
     formatEvents,
+    requestCalendars: sinon.stub(),
+    requestChanges: sinon.stub(),
+    requestEventsData: sinon.stub(),
     gladys: {
       calendar: {
         create: sinon.stub(),
         createEvent: sinon.stub(),
         get: sinon.stub(),
         update: sinon.stub().resolves(),
-        destroy: sinon.stub().resolves(),
         getEvents: sinon.stub(),
         destroyEvent: sinon
           .stub()
@@ -45,72 +38,10 @@ describe('CalDAV sync', () => {
     },
     moment,
     dav: {
-      ns: namespace,
       transport: {
-        Basic: sinon.stub().returns({
-          send,
-        }),
+        Basic: sinon.stub(),
       },
       Credentials: sinon.stub(),
-      request: {
-        propfind: sinon.stub(),
-        syncCollection: sinon.stub(),
-      },
-      Request: sinon.stub().returns({ requestDate: 'request3' }),
-    },
-    ical: {
-      parseICS: sinon.stub().returns({
-        data: {
-          type: 'VEVENT',
-          uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
-          summary: 'Evenement 1',
-          start: new Date('2018-06-08'),
-          end: new Date('2018-06-09'),
-        },
-      }),
-    },
-    xmlDom: {
-      DOMParser: sinon.stub().returns({
-        parseFromString: sinon.stub().returns({
-          getElementsByTagName: sinon.stub().returns([
-            {
-              getElementsByTagName: sinon
-                .stub()
-                .onFirstCall()
-                .returns([
-                  {
-                    childNodes: [
-                      {
-                        data: `
-              BEGIN:VCALENDAR
-              VERSION:2.0
-              PRODID:+//IDN bitfire.at//DAVdroid/1.11.2-ose ical4j/2.2.0
-              BEGIN:VEVENT
-              DTSTAMP:20180609T234355Z
-              UID:49193db9-f666-4947-8ce6-3357ce3b7166
-              SUMMARY:Evenement 1
-              DESCRIPTION:Description Evenement 1
-              DTSTART;VALUE=DATE:20180608
-              DURATION:P1D
-              STATUS:CONFIRMED
-              BEGIN:VALARM
-              TRIGGER:-PT10M
-              ACTION:DISPLAY
-              DESCRIPTION:Evenement 1
-              END:VALARM
-              END:VEVENT
-              END:VCALENDAR
-              `,
-                      },
-                    ],
-                  },
-                ])
-                .onSecondCall()
-                .returns([{ childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] }]),
-            },
-          ]),
-        }),
-      }),
     },
   };
 
@@ -128,89 +59,41 @@ describe('CalDAV sync', () => {
       .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
       .returns('12345');
 
-    sync.dav.request.propfind
-      .withArgs({
-        props: [
-          { name: 'calendar-description', namespace: sync.dav.ns.CALDAV },
-          { name: 'calendar-timezone', namespace: sync.dav.ns.CALDAV },
-          { name: 'displayname', namespace: sync.dav.ns.DAV },
-          { name: 'getctag', namespace: sync.dav.ns.CALENDAR_SERVER },
-          { name: 'resourcetype', namespace: sync.dav.ns.DAV },
-          { name: 'supported-calendar-component-set', namespace: sync.dav.ns.CALDAV },
-          { name: 'sync-token', namespace: sync.dav.ns.DAV },
-        ],
-        depth: 1,
-      })
-      .returns('request1');
-
-    send
-      .withArgs('request1', 'https://caldav.host.com/home')
-      .resolves([
-        {
-          props: {
-            resourcetype: 'calendar',
-            supportedCalendarComponentSet: ['VEVENT'],
-            displayname: 'Calendrier 1',
-            calendarDescription: 'Description 1',
-            timezone: 'Europe/Paris',
-            getctag: 'ctag1',
-            syncToken: 'sync-token-1',
-          },
-          href: '/home/personal',
-        },
-        {
-          props: {
-            resourcetype: 'calendar',
-            supportedCalendarComponentSet: ['VEVENT'],
-            displayname: 'Calendrier 2',
-            calendarDescription: 'Description 2',
-            timezone: 'Europe/Paris',
-            getctag: 'ctag22',
-            syncToken: 'sync-token-22',
-          },
-          href: '/home/professional',
-        },
-        {
-          props: {
-            resourcetype: 'calendar',
-            supportedCalendarComponentSet: ['VEVENT'],
-            displayname: 'Calendrier 3',
-            calendarDescription: 'Description 3',
-            timezone: 'Europe/Paris',
-            getctag: 'ctag3',
-            syncToken: 'sync-token-3',
-          },
-          href: '/home/avengers',
-        },
-      ])
-      .withArgs('request-collection', 'https://caldav.host.com/home/personal')
-      .resolves({
-        responses: [
-          {
-            href: 'https://caldav.host.com/home/personal/event-1.ics',
-            props: {
-              etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
-            },
-          },
-          {
-            href: 'https://caldav.host.com/home/personal/',
-            props: {
-              etag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
-            },
-          },
-        ],
-      })
-      .withArgs('request-collection2', 'https://caldav.host.com/home/professional')
-      .resolves({
-        responses: [
-          {
-            href: 'https://caldav.host.com/home/professional/event-3.ics',
-            props: {},
-          },
-        ],
-      })
-      .withArgs({ requestDate: 'request3' }, 'https://caldav.host.com/home/personal')
-      .resolves({ request: { responseText: '<xml></xml>' } });
+    sync.requestCalendars.resolves([
+      {
+        data: {},
+        description: 'Description 1',
+        timezone: 'Europe/Paris',
+        url: 'https://caldav.host.com/home/personal',
+        ctag: 'ctag1',
+        displayName: 'Calendrier 1',
+        components: ['VEVENT'],
+        resourcetype: 'calendar',
+        syncToken: 'sync-token-1',
+      },
+      {
+        data: {},
+        description: 'Description 2',
+        timezone: 'Europe/Paris',
+        url: 'https://caldav.host.com/home/professional',
+        ctag: 'ctag22',
+        displayName: 'Calendrier 2',
+        components: ['VEVENT'],
+        resourcetype: 'calendar',
+        syncToken: 'sync-token-22',
+      },
+      {
+        data: {},
+        description: 'Description 3',
+        timezone: 'Europe/Paris',
+        url: 'https://caldav.host.com/home/avengers',
+        ctag: 'ctag3',
+        displayName: 'Calendrier 3',
+        components: ['VEVENT'],
+        resourcetype: 'calendar',
+        syncToken: 'sync-token-3',
+      },
+    ]);
 
     sync.gladys.calendar.get
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/personal' })
@@ -242,19 +125,39 @@ describe('CalDAV sync', () => {
       updated_at: '2020-02-11 21:04:51.318 +00:00',
     });
 
-    sync.dav.request.syncCollection
-      .withArgs({
-        syncLevel: 1,
-        syncToken: '',
-        props: [{ name: 'getetag', namespace: sync.dav.ns.DAV }],
-      })
-      .returns('request-collection')
-      .withArgs({
-        syncLevel: 1,
-        syncToken: 'syncToken21',
-        props: [{ name: 'getetag', namespace: sync.dav.ns.DAV }],
-      })
-      .returns('request-collection2');
+    sync.requestChanges
+      .onFirstCall()
+      .resolves([
+        {
+          href: 'https://caldav.host.com/home/personal/event-1.ics',
+          props: {
+            etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
+          },
+        },
+        {
+          href: 'https://caldav.host.com/home/personal/',
+          props: {
+            etag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
+          },
+        },
+      ])
+      .onSecondCall()
+      .resolves([
+        {
+          href: 'https://caldav.host.com/home/professional/event-3.ics',
+          props: {},
+        },
+      ]);
+
+    sync.requestEventsData.resolves([
+      {
+        type: 'VEVENT',
+        uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+        summary: 'Evenement 1',
+        start: new Date('2018-06-08 00:00:00.000 +00:00'),
+        location: null,
+      },
+    ]);
 
     sync.gladys.calendar.getEvents
       .withArgs(userId, { externalId: '49193db9-f666-4947-8ce6-3357ce3b7166' })
@@ -285,6 +188,17 @@ describe('CalDAV sync', () => {
 
     await sync.syncUserCalendars(userId);
 
-    expect(send.callCount).to.equal(4);
+    expect(sync.gladys.variable.getValue.callCount).to.equal(4);
+
+    expect(sync.requestCalendars.callCount).to.equal(1);
+    expect(sync.requestChanges.callCount).to.equal(2);
+    expect(sync.requestEventsData.callCount).to.equal(1);
+
+    expect(sync.gladys.calendar.create.callCount).to.equal(1);
+    expect(sync.gladys.calendar.createEvent.callCount).to.equal(1);
+    expect(sync.gladys.calendar.get.callCount).to.equal(3);
+    expect(sync.gladys.calendar.update.callCount).to.equal(1);
+    expect(sync.gladys.calendar.getEvents.callCount).to.equal(2);
+    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(1);
   });
 });

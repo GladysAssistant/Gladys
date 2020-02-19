@@ -1,5 +1,4 @@
 const Promise = require('bluebird');
-const url = require('url');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -10,8 +9,6 @@ const logger = require('../../../../utils/logger');
  * syncUserCalendars(user.id)
  */
 async function syncUserCalendars(userId) {
-  const ICAL_OBJS = new Set(['VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY', 'VTIMEZONE', 'VALARM']);
-
   const CALDAV_HOST = await this.gladys.variable.getValue('CALDAV_HOST', this.serviceId, userId);
   const CALDAV_HOME_URL = await this.gladys.variable.getValue('CALDAV_HOME_URL', this.serviceId, userId);
   const CALDAV_USERNAME = await this.gladys.variable.getValue('CALDAV_USERNAME', this.serviceId, userId);
@@ -24,45 +21,8 @@ async function syncUserCalendars(userId) {
     }),
   );
 
-  // Create request to list calendars
-  const req = this.dav.request.propfind({
-    props: [
-      { name: 'calendar-description', namespace: this.dav.ns.CALDAV },
-      { name: 'calendar-timezone', namespace: this.dav.ns.CALDAV },
-      { name: 'displayname', namespace: this.dav.ns.DAV },
-      { name: 'getctag', namespace: this.dav.ns.CALENDAR_SERVER },
-      { name: 'resourcetype', namespace: this.dav.ns.DAV },
-      { name: 'supported-calendar-component-set', namespace: this.dav.ns.CALDAV },
-      { name: 'sync-token', namespace: this.dav.ns.DAV },
-    ],
-    depth: 1,
-  });
-
-  const listCalendars = await xhr.send(req, CALDAV_HOME_URL);
-
-  const davCalendars = listCalendars
-    .filter((res) => res.props.resourcetype.includes('calendar'))
-    .filter((res) => {
-      // We only want the calendar if it contains iCalendar objects.
-      const components = res.props.supportedCalendarComponentSet || [];
-      return components.reduce((hasObjs, component) => {
-        return hasObjs || ICAL_OBJS.has(component);
-      }, false);
-    })
-    .map((res) => {
-      logger.info(`CalDAV : Found calendar ${res.props.displayname}`);
-      return {
-        data: res,
-        description: res.props.calendarDescription,
-        timezone: res.props.calendarTimezone,
-        url: url.resolve(CALDAV_HOME_URL, res.href),
-        ctag: res.props.getctag,
-        displayName: res.props.displayname,
-        components: res.props.supportedCalendarComponentSet,
-        resourcetype: res.props.resourcetype,
-        syncToken: res.props.syncToken,
-      };
-    });
+  // Get list of calendars
+  const davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
 
@@ -90,14 +50,8 @@ async function syncUserCalendars(userId) {
   await Promise.map(
     calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null),
     async (calendarToUpdate) => {
-      // Create request to get events that have changed
-      const requestChanges = this.dav.request.syncCollection({
-        syncLevel: 1,
-        syncToken: calendarToUpdate.sync_token || '',
-        props: [{ name: 'getetag', namespace: this.dav.ns.DAV }],
-      });
-
-      const { responses: eventsToUpdate } = await xhr.send(requestChanges, calendarToUpdate.external_id);
+      // Get events that have changed
+      const eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
       await Promise.all(
         eventsToUpdate.map(async (eventToUpdate) => {
           // Delete existing event if pops is empty
@@ -119,59 +73,8 @@ async function syncUserCalendars(userId) {
         return;
       }
 
-      // Create request to get event updates
-      const requestEventsData = new this.dav.Request({
-        method: 'REPORT',
-        requestData: `
-              <c:calendar-multiget xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
-                  <d:prop>
-                      <d:getetag />
-                      <c:calendar-data />
-                  </d:prop>
-                  ${eventsToUpdate
-                    .filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({}))
-                    .map((eventToUpdate) => {
-                      if (!eventToUpdate.href.endsWith('.ics')) {
-                        return '';
-                      }
-                      return `<d:href>${eventToUpdate.href}</d:href>`;
-                    })
-                    .join('\n')}
-                  <c:filter>
-                      <c:comp-filter name="VCALENDAR">
-                          <c:comp-filter name="VEVENT" />
-                      </c:comp-filter>
-                  </c:filter>
-              </c:calendar-multiget>`,
-      });
-
-      const eventsData = await xhr.send(requestEventsData, calendarToUpdate.external_id);
-      const tags = {};
-      switch (CALDAV_HOST) {
-        case 'apple':
-          tags.response = 'response';
-          tags.calendarData = 'calendar-data';
-          tags.href = 'href';
-          break;
-        default:
-          tags.response = 'd:response';
-          tags.calendarData = 'cal:calendar-data';
-          tags.href = 'd:href';
-          break;
-      }
-      // Extract events data from XML response
-      const xmlEvents = new this.xmlDom.DOMParser().parseFromString(eventsData.request.responseText);
-      let jsonEvents = Array.from(xmlEvents.getElementsByTagName(tags.response)).map((xmlEvent) => {
-        const event = this.ical.parseICS(xmlEvent.getElementsByTagName(tags.calendarData)[0].childNodes[0].data);
-        return {
-          href: xmlEvent.getElementsByTagName(tags.href)[0].childNodes[0].data,
-          ...event[Object.keys(event)[0]],
-        };
-      });
-
-      jsonEvents = jsonEvents.filter((jsonEvent) => {
-        return jsonEvent.type === 'VEVENT';
-      });
+      // Get event updates
+      const jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);
 
