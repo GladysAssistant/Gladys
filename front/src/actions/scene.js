@@ -228,7 +228,6 @@ function createActions(store) {
       store.setState(newState);
     },
     updateTriggerProperty(state, index, property, value) {
-      console.log({ index, property, value });
       const newState = update(state, {
         scene: {
           triggers: {
