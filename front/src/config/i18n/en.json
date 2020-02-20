@@ -454,6 +454,12 @@
         "userLabel": "User",
         "textLabel": "Message",
         "textPlaceholder": "Message text"
+      },
+      "turnOnLights": {
+        "label": "Select the lights you want to turn on"
+      },
+      "turnOffLights": {
+        "label": "Select the lights you want to turn off"
       }
     },
     "actions": {
@@ -462,7 +468,8 @@
       },
       "delay": "Wait",
       "light": {
-        "turn-on": "Turn On the Lights"
+        "turn-on": "Turn On the Lights",
+        "turn-off": "Turn Off the Lights"
       },
       "scene": {
         "start": "Start scene"

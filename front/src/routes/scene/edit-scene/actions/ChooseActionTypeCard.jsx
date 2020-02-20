@@ -3,7 +3,9 @@ import { connect } from 'unistore/preact';
 import Select from 'react-select';
 import { Text } from 'preact-i18n';
 
-const ACTION_LIST = ['light.turn-on', 'delay', 'message.send'];
+import { ACTIONS } from '../../../../../../server/utils/constants';
+
+const ACTION_LIST = [ACTIONS.LIGHT.TURN_ON, ACTIONS.LIGHT.TURN_OFF, ACTIONS.TIME.DELAY, ACTIONS.MESSAGE.SEND];
 
 @connect('httpClient', {})
 class ChooseActionType extends Component {

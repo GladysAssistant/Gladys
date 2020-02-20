@@ -1,7 +1,8 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
+import { ACTIONS } from '../../../../../server/utils/constants';
 import DelayActionParams from './actions/DelayActionParams';
-import TurnOnLightParams from './actions/TurnOnLightParams';
+import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
 import SendMessageParams from './actions/SendMessageParams';
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 
@@ -10,9 +11,10 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 };
 
 const ACTION_ICON = {
-  'light.turn-on': 'fe fe-sun',
-  delay: 'fe fe-clock',
-  'message.send': 'fe fe-message-square'
+  [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
+  [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.TIME.DELAY]: 'fe fe-clock',
+  [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -48,7 +50,7 @@ const ActionCard = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      {props.action.type === 'delay' && (
+      {props.action.type === ACTIONS.TIME.DELAY && (
         <DelayActionParams
           action={props.action}
           columnIndex={props.columnIndex}
@@ -63,15 +65,23 @@ const ActionCard = ({ children, ...props }) => (
           updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'light.turn-on' && (
-        <TurnOnLightParams
+      {props.action.type === ACTIONS.LIGHT.TURN_ON && (
+        <TurnOnOffLightParams
           action={props.action}
           columnIndex={props.columnIndex}
           index={props.index}
           updateActionProperty={props.updateActionProperty}
         />
       )}
-      {props.action.type === 'message.send' && (
+      {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
+        <TurnOnOffLightParams
+          action={props.action}
+          columnIndex={props.columnIndex}
+          index={props.index}
+          updateActionProperty={props.updateActionProperty}
+        />
+      )}
+      {props.action.type === ACTIONS.MESSAGE.SEND && (
         <SendMessageParams
           action={props.action}
           columnIndex={props.columnIndex}
