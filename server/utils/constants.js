@@ -176,6 +176,7 @@ const ACTIONS = {
   },
   LIGHT: {
     TURN_ON: 'light.turn-on',
+    TURN_OFF: 'light.turn-off',
   },
   TIME: {
     DELAY: 'delay',

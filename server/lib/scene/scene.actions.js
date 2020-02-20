@@ -31,6 +31,21 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.LIGHT.TURN_OFF]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
+        await self.device.setValue(device, deviceFeature, 0);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
       let timeToWaitMilliseconds;
