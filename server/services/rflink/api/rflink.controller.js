@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
@@ -18,7 +19,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
     async function connect(req, res) {
-        logger.log('Rflink connect');
         const rflinkPath = await gladys.variable.getValue('RFLINK_PATH');
         if (!rflinkPath) {
             throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
@@ -43,9 +43,8 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
     async function getStatus(req, res) {
-    logger.log('getting status');
     res.json({
-        currentMilightGateway : RFlinkManager.currentMilightGateway,
+      currentMilightGateway : RFlinkManager.currentMilightGateway,
       connected: RFlinkManager.connected,
       scanInProgress: RFlinkManager.scanInProgress,
       ready: RFlinkManager.ready,
@@ -59,12 +58,20 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
   async function pair(req, res) {
-    logger.log('Milight pair');
-    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY');
+    const milightZone =  req.body.zone;
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
     if (currentMilightGateway === null) {
-        currentMilightGateway = 'F746';
+        currentMilightGateway = RFlinkManager.currentMilightGateway;
     }
-      RFlinkManager.pair(currentMilightGateway);
+    RFlinkManager.currentMilightGateway = currentMilightGateway;
+
+      RFlinkManager.pair(currentMilightGateway , milightZone);
+
+      res.json({
+          succes : true,
+          currentMilightGateway,
+          milightZone
+      });
   }
 
     /**
@@ -73,12 +80,19 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
 async function unpair(req, res) {
-    logger.log('Milight unpair');
-    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY');
+    const milightZone =  req.body.zone;
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
     if (currentMilightGateway === null) {
-        currentMilightGateway = 'F746';
+        currentMilightGateway = RFlinkManager.currentMilightGateway;
     }
-    RFlinkManager.unpair(currentMilightGateway);
+    RFlinkManager.currentMilightGateway = currentMilightGateway;
+
+    RFlinkManager.unpair(currentMilightGateway, milightZone);
+          res.json({
+          succes : true,
+          currentMilightGateway,
+          milightZone
+      });
 }
     /** 
      * @apiName unpair
@@ -93,11 +107,11 @@ async function unpair(req, res) {
    }
 
     return {
-        'get /api/v1/service/rflink/pair' : {
+        'post /api/v1/service/rflink/pair' : {
             authenticated: true,
             controller: asyncMiddleware(pair)
         },
-        'get /api/v1/service/rflink/unpair' : {
+        'post /api/v1/service/rflink/unpair' : {
             authenticated: true,
             controller: asyncMiddleware(unpair)
         },
@@ -113,11 +127,11 @@ async function unpair(req, res) {
             authenticated: true,
             controller: asyncMiddleware(disconnect)
         },
-        'get /api/v1/sevice/rflink/status' : {
+        'get /api/v1/service/rflink/status' : {
             authenticated: true,
             controller: asyncMiddleware(getStatus)
         },
-        'get /api/v1/sevice/rflink/remove/' : {
+        'get /api/v1/service/rflink/remove' : {
             authenticated: true,
             controller: asyncMiddleware(remove)
         },

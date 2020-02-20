@@ -1,4 +1,4 @@
-const logger = require('../../../../utils/logger');
+
 /**
  * @description listen
  * @example

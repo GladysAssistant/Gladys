@@ -18,6 +18,7 @@ module.exports = function RfLink(gladys, serviceId) {
  */
     async function start() {
       const RflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
+      
       if (RflinkPath === undefined || !RflinkPath) {
         throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
       } else {
@@ -30,13 +31,10 @@ module.exports = function RfLink(gladys, serviceId) {
       } else {
         rfLinkManager.connect(RflinkPath);
       }
-      let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
-      if (currentMilightGateway === null) {
-        currentMilightGateway = 'F746';
-     }
-     if (rfLinkManager.currentMilightGateway.name === null || rfLinkManager.currentMilightGateway.name === undefined) {
-       currentMilightGateway = rfLinkManager.currentMilightGateway.name;
-      rfLinkManager.currentMilightGateway.name = currentMilightGateway;
+      const currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
+      rfLinkManager.currentMilightGateway = currentMilightGateway;
+      if (rfLinkManager.currentMilightGateway === null) {
+        rfLinkManager.currentMilightGateway = 'F746';
      }
       
       

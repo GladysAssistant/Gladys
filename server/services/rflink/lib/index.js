@@ -28,7 +28,8 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
     this.ready = false;
     this.scanInProgress = false;
     this.device = {};
-    this.currentMilightGateway = {};
+    this.currentMilightGateway = 'F746';
+    this.milightBridges = {};
 
 
 };
