@@ -48,6 +48,7 @@ const ActionGroup = ({ children, ...props }) => (
                     updateActionProperty={props.updateActionProperty}
                     highLightedActions={props.highLightedActions}
                     deleteAction={props.deleteAction}
+                    actionsGroupsBefore={props.actionsGroupsBefore}
                   />
                 </div>
               ))}

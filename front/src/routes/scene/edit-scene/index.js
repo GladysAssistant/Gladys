@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+
 import EditScenePage from './EditScenePage';
 import actions from '../../../actions/scene';
 
@@ -23,7 +24,8 @@ class EditScene extends Component {
     this.props.deleteScene(this.props.scene_selector);
     this.setState({ saving: false });
   };
-  componentWillMount() {
+
+  componentDidMount() {
     this.props.getSceneBySelector(this.props.scene_selector);
     this.props.getUsers();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>

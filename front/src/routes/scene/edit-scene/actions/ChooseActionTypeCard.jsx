@@ -5,7 +5,14 @@ import { Text } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-const ACTION_LIST = [ACTIONS.LIGHT.TURN_ON, ACTIONS.LIGHT.TURN_OFF, ACTIONS.TIME.DELAY, ACTIONS.MESSAGE.SEND];
+const ACTION_LIST = [
+  ACTIONS.LIGHT.TURN_ON,
+  ACTIONS.LIGHT.TURN_OFF,
+  ACTIONS.TIME.DELAY,
+  ACTIONS.MESSAGE.SEND,
+  ACTIONS.DEVICE.GET_VALUE,
+  ACTIONS.CONDITION.ONLY_CONTINUE_IF
+];
 
 @connect('httpClient', {})
 class ChooseActionType extends Component {

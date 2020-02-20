@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
+import update from 'immutability-helper';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -68,6 +69,9 @@ const EditScenePage = ({ children, ...props }) => (
                   sceneParamsData={props.sceneParamsData}
                   index={index}
                   saving={props.saving}
+                  actionsGroupsBefore={update(props.scene.actions, {
+                    $splice: [[index, props.scene.actions.length - index]]
+                  })}
                 />
               </div>
               {index + 1 < props.scene.actions.length && (

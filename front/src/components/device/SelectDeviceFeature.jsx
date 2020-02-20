@@ -45,7 +45,9 @@ class SelectDeviceFeature extends Component {
       });
       await this.setState({ deviceOptions, deviceFeaturesDictionnary });
       await this.refreshSelectedOptions(this.props);
-      this.props.onDeviceFeatureChange(this.state.deviceFeaturesDictionnary[this.state.selectedOption.value]);
+      if (this.state.selectedOption && this.state.selectedOption.value) {
+        this.props.onDeviceFeatureChange(this.state.deviceFeaturesDictionnary[this.state.selectedOption.value]);
+      }
       return deviceOptions;
     } catch (e) {
       console.log(e);
@@ -92,6 +94,9 @@ class SelectDeviceFeature extends Component {
   }
 
   render(props, { selectedOption, deviceOptions }) {
+    if (!deviceOptions) {
+      return null;
+    }
     return <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />;
   }
 }

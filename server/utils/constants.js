@@ -173,6 +173,7 @@ const CONDITIONS = {
 const ACTIONS = {
   DEVICE: {
     SET_VALUE: 'device.set-value',
+    GET_VALUE: 'device.get-value',
   },
   LIGHT: {
     TURN_ON: 'light.turn-on',
@@ -190,6 +191,9 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+  },
+  CONDITION: {
+    ONLY_CONTINUE_IF: 'condition.only-continue-if',
   },
 };
 
