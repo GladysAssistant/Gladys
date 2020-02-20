@@ -13,7 +13,7 @@ const ACTIONS_VARIABLES = {
 class Condition extends Component {
   handleChange = selectedOption => {
     const newCondition = update(this.props.condition, {
-      value: {
+      variable: {
         $set: selectedOption && selectedOption.value ? selectedOption.value : null
       }
     });
@@ -31,7 +31,7 @@ class Condition extends Component {
 
   handleValueChange = e => {
     const newCondition = update(this.props.condition, {
-      operator: {
+      value: {
         $set: e.target.value
       }
     });
