@@ -39,6 +39,16 @@ const actions = store => {
         RflinkPath: e.target.value
       });
     },
+    updateMilight(state, e) {
+      store.setState({
+        currentMilightGateway: e.target.value
+      });
+    },
+    updateZone(state, e) {
+      store.setState({
+        currentMilightZone: e.target.value
+      });
+    },
     async saveDriverPathAndConnect(state) {
       store.setState({
         connectRflinkStatus: RequestStatus.Getting,
@@ -58,17 +68,6 @@ const actions = store => {
           connectRflinkStatus: RequestStatus.Error
         });
       }
-    },
-    async getMilightInput(state) {
-      try {
-        const currentMilightGateway = await state.httpClient.get('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY');
-        store.setState({
-          currentMilightGateway : currentMilightGateway.value,
-        });
-      } catch (e) {
-
-      }
-
     },
     async disconnect(state) {
       store.setState({
@@ -91,7 +90,10 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY', {
           value: state.currentMilightGateway
         });
-        await state.httpClient.post('/api/v1/service/rflink/pair');
+        await state.httpClient.post('/api/v1/service/rflink/pair', {
+          zone : state.currentMilightZone,
+        });
+        
 
       } catch (e) {
 
@@ -102,7 +104,9 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/rflink/variable/CURRENT_MILIGHT_GATEWAY', {
           value: state.currentMilightGateway
         });
-        await state.httpClient.post('/api/v1/service/rflink/unpair');
+        await state.httpClient.post('/api/v1/service/rflink/unpair', {
+          zone : state.currentMilightZone,
+        });
 
       } catch (e) {
 
@@ -115,11 +119,14 @@ const actions = store => {
       });
       try {
         const rflinkStatus = await state.httpClient.get('/api/v1/service/rflink/status');
-        if (rflinkStatus.currentMilightGateway.name === undefined) {
-          rflinkStatus.currentMilightGateway = 'error';
+        let currentMilightGateway = rflinkStatus.currentMilightGateway;
+        if (currentMilightGateway === undefined || currentMilightGateway === null) {
+          currentMilightGateway = 'error';
         }
+        
         store.setState({
           rflinkStatus,
+          currentMilightGateway,
           rflinkConnectionInProgress: false,
           rflinkGetStatusStatus: RequestStatus.Success
         });

@@ -92,17 +92,27 @@ const SettingsTab = ({ children, ...props }) => (
 
       <div class="page-options d-flex">
       <div class="form-group">
-      <div class="gatewayBar mb-2">
+      <Text id="integration.rflink.settings.milight.about" />
+      <div class="gatewayBar mb-2 mt-2">
         <Text id="integration.rflink.settings.milight.gatewayBarinfo" />
             <input
               type="text"
               class="form-control mb-2"
-              placeholder={get(props, 'rflinkStatus.currentMilightGateway.name')}
-              onInput={props.debouncedSearch}
+              value={props.currentMilightGateway}
+              placeholder={props.currentMilightGateway}
+              onInput={props.updateMilight}
             />
-            <Text id="integration.rflink.settings.milight.about" />
-
+            <Text id="integration.rflink.settings.milight.zoneInfo" />
+            <select class="form-control" onChange={props.updateZone}> 
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+            
+            </select>
+              
           </div>
+          
         
         <button class="btn btn-success" onClick={props.pair}>
         <Text id="integration.rflink.settings.milight.pairButton" />
