@@ -826,6 +826,80 @@
       },
       "_id": 19,
       "id": 19
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 1,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": null
+      },
+      "type": "Dimmable light",
+      "name": "Couloir 1",
+      "modelid": "TRADFRI bulb E27 W opal 1000lm",
+      "manufacturername": "IKEA of Sweden",
+      "productname": "Dimmable light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:0b:57:ff:fe:b7:e9:fd-01",
+        "swversion": "1.2.214"
+      },
+      "_id": 20,
+      "id": 20
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 86,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2019-07-13T18:43:10"
+      },
+      "type": "Dimmable light",
+      "name": "E14 1 sdb",
+      "modelid": "TRADFRI bulb E14 W op/ch 400lm",
+      "manufacturername": "IKEA of Sweden",
+      "productname": "Dimmable light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "candlebulb",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:0d:6f:ff:fe:a9:33:90-01",
+        "swversion": "1.2.214"
+      },
+      "_id": 21,
+      "id": 21
     }
   ]
 }
