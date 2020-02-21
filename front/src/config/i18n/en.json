@@ -648,7 +648,7 @@
     "namePlaceholder": "Enter the name of your scene",
     "iconLabel": "Select an icon for you scene",
     "createSceneButton": "Create scene",
-    "invalidName": "Name is required",
+    "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },
