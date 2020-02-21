@@ -187,8 +187,6 @@ class EditScene extends Component {
       });
       return newState;
     });
-
-    this.setState(newState);
   };
   deleteTrigger = index => {
     this.setState(prevState => {
