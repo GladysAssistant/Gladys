@@ -434,12 +434,12 @@
     "selectTriggerLabel": "Select a trigger type",
     "newAction": "New action",
     "selectActionType": "Select an action type",
-    "addActionButton": "Add new action",
+    "addActionButton": "Add action",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
-    "addNewTriggerButton": "Add new trigger",
+    "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
       "delay": {
@@ -454,15 +454,37 @@
         "userLabel": "User",
         "textLabel": "Message",
         "textPlaceholder": "Message text"
+      },
+      "turnOnLights": {
+        "label": "Select the lights you want to turn on"
+      },
+      "turnOffLights": {
+        "label": "Select the lights you want to turn off"
+      },
+      "deviceGetValue": {
+        "description": "This will get the last value of the selected device, so you can use it later in the scene.",
+        "deviceLabel": "Select a device"
+      },
+      "onlyContinueIf": {
+        "variableLabel": "Variable",
+        "operatorLabel": "Operator",
+        "valueLabel": "Value",
+        "removeLabel": "Remove",
+        "orText": "OR",
+        "orButton": "OR"
       }
     },
     "actions": {
+      "device": {
+        "get-value": "Get device value"
+      },
       "message": {
         "send": "Send Message"
       },
       "delay": "Wait",
       "light": {
-        "turn-on": "Turn On the Lights"
+        "turn-on": "Turn On the Lights",
+        "turn-off": "Turn Off the Lights"
       },
       "scene": {
         "start": "Start scene"
@@ -470,6 +492,16 @@
       "service": {
         "start": "Start service",
         "stop": "Stop service"
+      },
+      "condition": {
+        "only-continue-if": "Only continue if"
+      }
+    },
+    "variables": {
+      "device": {
+        "get-value": {
+          "last_value": "Device last value"
+        }
       }
     },
     "triggers": {
@@ -624,7 +656,7 @@
     "namePlaceholder": "Enter the name of your scene",
     "iconLabel": "Select an icon for you scene",
     "createSceneButton": "Create scene",
-    "invalidName": "Name is required",
+    "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },

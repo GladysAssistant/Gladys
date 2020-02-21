@@ -1,6 +1,8 @@
 const Promise = require('bluebird');
 const { actionsFunc } = require('./scene.actions');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { AbortScene } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 /**
  * @description Execute one action.
@@ -25,8 +27,16 @@ async function executeAction(self, action, scope, columnIndex, rowIndex) {
       payload: { columnIndex, rowIndex },
     });
   }
-  // execute action
-  await actionsFunc[action.type](self, action, scope);
+  try {
+    // execute action
+    await actionsFunc[action.type](self, action, scope, columnIndex, rowIndex);
+  } catch (e) {
+    if (e instanceof AbortScene) {
+      throw e;
+    } else {
+      logger.warn(e);
+    }
+  }
 
   // send message to tell the UI the action has finished being executed
   if (columnIndex !== undefined && rowIndex !== undefined) {

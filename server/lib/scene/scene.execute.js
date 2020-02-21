@@ -13,7 +13,13 @@ function execute(sceneSelector, scope) {
     if (!this.scenes[sceneSelector]) {
       throw new Error(`Scene with selector ${sceneSelector} not found.`);
     }
-    this.queue.push(() => executeActions(this, this.scenes[sceneSelector].actions, scope));
+    this.queue.push(async () => {
+      try {
+        await executeActions(this, this.scenes[sceneSelector].actions, scope);
+      } catch (e) {
+        logger.error(e);
+      }
+    });
   } catch (e) {
     logger.error(e);
   }

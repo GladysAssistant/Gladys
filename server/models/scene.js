@@ -9,14 +9,21 @@ const actionSchema = Joi.array().items(
       type: Joi.string()
         .valid(ACTION_LIST)
         .required(),
-      deviceFeature: Joi.string(),
-      deviceFeatures: Joi.array().items(Joi.string()),
+      device_feature: Joi.string(),
+      device_features: Joi.array().items(Joi.string()),
       device: Joi.string(),
       devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
       unit: Joi.string(),
+      conditions: Joi.array().items({
+        variable: Joi.string().required(),
+        operator: Joi.string()
+          .valid(['=', '!=', '>', '>=', '<', '<='])
+          .required(),
+        value: Joi.number(),
+      }),
     }),
   ),
 );

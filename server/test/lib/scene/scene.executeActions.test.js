@@ -1,7 +1,9 @@
 const { assert, fake } = require('sinon');
 const chaiAssert = require('chai').assert;
+const { expect } = require('chai');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
+const { AbortScene } = require('../../../utils/coreErrors');
 const { executeActions } = require('../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../lib/state');
@@ -255,6 +257,104 @@ describe('scene.executeActions', () => {
         type: 'binary',
       },
       1,
+    );
+  });
+  it('should execute action device.getValue', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+      ],
+      scope,
+    );
+    expect(scope).to.deep.equal({ '0.0.last_value': 15 });
+  });
+  it('should abort scene, condition is not verified', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 20,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish scene, condition is verified', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 15,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
     );
   });
 });

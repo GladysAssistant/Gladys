@@ -10,6 +10,9 @@ function createActions(store) {
       if (!state.newScene.name) {
         newSceneErrors.name = true;
       }
+      if (state.newScene.name === 'new') {
+        newSceneErrors.name = true;
+      }
       if (!state.newScene.icon) {
         newSceneErrors.icon = true;
       }
