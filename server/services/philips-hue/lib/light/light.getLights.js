@@ -45,6 +45,8 @@ async function getLights() {
         case 'LWB010': // hue white bulb with fixed warming light (2700K)
         case 'LWB006': // Hue white lamp
         case 'LWG004': // Hue white spot
+        case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
+        case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LTW012': // hue White Ambiance E12
