@@ -49,6 +49,8 @@ const ActionGroup = ({ children, ...props }) => (
                     highLightedActions={props.highLightedActions}
                     deleteAction={props.deleteAction}
                     actionsGroupsBefore={props.actionsGroupsBefore}
+                    variables={props.variables}
+                    setVariables={props.setVariables}
                   />
                 </div>
               ))}

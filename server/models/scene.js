@@ -17,8 +17,13 @@ const actionSchema = Joi.array().items(
       text: Joi.string(),
       value: Joi.number(),
       unit: Joi.string(),
-      variable: Joi.string(),
-      operator: Joi.string().valid(['=', '!=', '>', '>=', '<', '<=']),
+      conditions: Joi.array().items({
+        variable: Joi.string().required(),
+        operator: Joi.string()
+          .valid(['=', '!=', '>', '>=', '<', '<='])
+          .required(),
+        value: Joi.string().required(),
+      }),
     }),
   ),
 );

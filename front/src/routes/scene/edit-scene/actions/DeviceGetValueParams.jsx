@@ -1,19 +1,48 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
+import { getDeviceFeatureName } from '../../../../utils/device';
 
 @connect('httpClient', {})
 class DeviceGetValue extends Component {
-  onDeviceFeatureChange = deviceFeature => {
+  onDeviceFeatureChange = (deviceFeature, device) => {
     const { columnIndex, index } = this.props;
     if (deviceFeature) {
       this.props.updateActionProperty(columnIndex, index, 'device_feature', deviceFeature.selector);
+      this.setVariables(device, deviceFeature);
     } else {
       this.props.updateActionProperty(columnIndex, index, 'device_feature', null);
+      this.setVariables();
     }
+    this.setState({ deviceFeature, device });
   };
+
+  setVariables = (device, deviceFeature) => {
+    const { columnIndex, index } = this.props;
+    const DEFAULT_VARIABLE_NAME = get(this.context.intl.dictionary, 'editScene.variables.device.get-value.last_value');
+    this.props.setVariables(columnIndex, index, [
+      {
+        name: 'last_value',
+        type: 'device_feature',
+        label:
+          device && deviceFeature
+            ? getDeviceFeatureName(this.context.intl.dictionary, device, deviceFeature)
+            : DEFAULT_VARIABLE_NAME,
+        data: {
+          device,
+          deviceFeature
+        }
+      }
+    ]);
+  };
+
+  componentDidMount() {
+    const { device, deviceFeature } = this.state;
+    this.setVariables(device, deviceFeature);
+  }
 
   render(props, {}) {
     const { action } = props;

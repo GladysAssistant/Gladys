@@ -5,12 +5,6 @@ import get from 'get-value';
 
 import Condition from './Condition';
 
-import { ACTIONS } from '../../../../../../../server/utils/constants';
-
-const ACTIONS_VARIABLES = {
-  [ACTIONS.DEVICE.GET_VALUE]: ['last_value']
-};
-
 @connect('httpClient', {})
 class OnlyContinueIf extends Component {
   handleConditionChange = (conditionIndex, condition) => {
@@ -37,16 +31,15 @@ class OnlyContinueIf extends Component {
 
     props.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
       actionGroup.forEach((action, index) => {
-        if (ACTIONS_VARIABLES[action.type]) {
+        if (this.props.variables[groupIndex][index]) {
           variableOptions.push({
             label: `${groupIndex + 1}. ${get(this, `context.intl.dictionary.editScene.actions.${action.type}`)}`,
-            options: ACTIONS_VARIABLES[action.type].map(variable => {
-              const option = {
-                label: get(this, `context.intl.dictionary.editScene.variables.${action.type}.${variable}`),
-                value: `${groupIndex}.${index}.${variable}`
-              };
-              return option;
-            })
+            options: this.props.variables[groupIndex][index].map(option => ({
+              label: option.label,
+              value: `${groupIndex}.${index}.${option.name}`,
+              type: option.type,
+              data: option.data
+            }))
           });
         }
       });

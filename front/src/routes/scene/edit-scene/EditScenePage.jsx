@@ -72,6 +72,8 @@ const EditScenePage = ({ children, ...props }) => (
                   actionsGroupsBefore={update(props.scene.actions, {
                     $splice: [[index, props.scene.actions.length - index]]
                   })}
+                  variables={props.variables}
+                  setVariables={props.setVariables}
                 />
               </div>
               {index + 1 < props.scene.actions.length && (

@@ -102,6 +102,8 @@ const ActionCard = ({ children, ...props }) => (
           index={props.index}
           updateActionProperty={props.updateActionProperty}
           actionsGroupsBefore={props.actionsGroupsBefore}
+          variables={props.variables}
+          setVariables={props.setVariables}
         />
       )}
       {props.action.type === ACTIONS.DEVICE.GET_VALUE && (
@@ -110,6 +112,8 @@ const ActionCard = ({ children, ...props }) => (
           columnIndex={props.columnIndex}
           index={props.index}
           updateActionProperty={props.updateActionProperty}
+          variables={props.variables}
+          setVariables={props.setVariables}
         />
       )}
     </div>

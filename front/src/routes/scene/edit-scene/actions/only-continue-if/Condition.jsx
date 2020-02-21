@@ -4,12 +4,6 @@ import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
 
-import { ACTIONS } from '../../../../../../../server/utils/constants';
-
-const ACTIONS_VARIABLES = {
-  [ACTIONS.DEVICE.GET_VALUE]: ['last_value']
-};
-
 class Condition extends Component {
   handleChange = selectedOption => {
     const newCondition = update(this.props.condition, {
@@ -38,8 +32,21 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
+  getSelectedOption = () => {
+    let selectedOption = null;
+
+    this.props.variableOptions.forEach(variableOption => {
+      const foundOption = variableOption.options.find(option => this.props.condition.variable === option.value);
+      if (foundOption) {
+        selectedOption = foundOption;
+      }
+    });
+
+    return selectedOption;
+  };
+
   render(props, {}) {
-    let selectedOption = props.variableOptions.find(option => props.condition.variable === option);
+    const selectedOption = this.getSelectedOption();
     return (
       <div>
         <div class="form-group">

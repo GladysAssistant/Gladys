@@ -1,7 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import get from 'get-value';
+
+import { getDeviceFeatureName } from '../../utils/device';
 
 @connect('httpClient', {})
 class SelectDeviceFeature extends Component {
@@ -11,6 +12,7 @@ class SelectDeviceFeature extends Component {
       const rooms = await this.props.httpClient.get('/api/v1/room?expand=devices');
       const deviceOptions = [];
 
+      const deviceDictionnary = {};
       const deviceFeaturesDictionnary = {};
 
       // and compose the multi-level options
@@ -18,13 +20,13 @@ class SelectDeviceFeature extends Component {
         const roomDeviceFeatures = [];
         room.devices.forEach(device => {
           device.features.forEach(feature => {
+            // keep device / deviceFeature in dictionnary
             deviceFeaturesDictionnary[feature.selector] = feature;
+            deviceDictionnary[feature.selector] = device;
+
             roomDeviceFeatures.push({
               value: feature.selector,
-              label: `${device.name} (${get(
-                this,
-                `context.intl.dictionary.deviceFeatureCategory.${feature.category}.${feature.type}`
-              )}) `
+              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
             });
           });
         });
@@ -43,10 +45,13 @@ class SelectDeviceFeature extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, deviceFeaturesDictionnary });
+      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
       if (this.state.selectedOption && this.state.selectedOption.value) {
-        this.props.onDeviceFeatureChange(this.state.deviceFeaturesDictionnary[this.state.selectedOption.value]);
+        this.props.onDeviceFeatureChange(
+          deviceFeaturesDictionnary[this.state.selectedOption.value],
+          deviceDictionnary[this.state.selectedOption.value]
+        );
       }
       return deviceOptions;
     } catch (e) {
@@ -54,9 +59,12 @@ class SelectDeviceFeature extends Component {
     }
   };
   handleChange = selectedOption => {
-    const { deviceFeaturesDictionnary } = this.state;
+    const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
     if (selectedOption && selectedOption.value) {
-      this.props.onDeviceFeatureChange(deviceFeaturesDictionnary[selectedOption.value]);
+      this.props.onDeviceFeatureChange(
+        deviceFeaturesDictionnary[selectedOption.value],
+        deviceDictionnary[selectedOption.value]
+      );
     } else {
       this.props.onDeviceFeatureChange(null);
     }
