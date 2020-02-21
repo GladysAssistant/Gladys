@@ -39,20 +39,18 @@ const ActionGroup = ({ children, ...props }) => (
             )}
             <div class="row">
               {props.actions.map((action, index) => (
-                <div class="col-lg-4">
-                  <ActionCard
-                    sceneParamsData={props.sceneParamsData}
-                    action={action}
-                    columnIndex={props.index}
-                    index={index}
-                    updateActionProperty={props.updateActionProperty}
-                    highLightedActions={props.highLightedActions}
-                    deleteAction={props.deleteAction}
-                    actionsGroupsBefore={props.actionsGroupsBefore}
-                    variables={props.variables}
-                    setVariables={props.setVariables}
-                  />
-                </div>
+                <ActionCard
+                  sceneParamsData={props.sceneParamsData}
+                  action={action}
+                  columnIndex={props.index}
+                  index={index}
+                  updateActionProperty={props.updateActionProperty}
+                  highLightedActions={props.highLightedActions}
+                  deleteAction={props.deleteAction}
+                  actionsGroupsBefore={props.actionsGroupsBefore}
+                  variables={props.variables}
+                  setVariables={props.setVariables}
+                />
               ))}
             </div>
           </div>

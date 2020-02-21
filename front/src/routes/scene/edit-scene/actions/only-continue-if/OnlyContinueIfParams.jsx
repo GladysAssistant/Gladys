@@ -17,7 +17,21 @@ class OnlyContinueIf extends Component {
     this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
   };
 
-  deleteCondition = index => {};
+  addCondition = () => {
+    const { columnIndex, index } = this.props;
+    const newConditions = update(this.props.action.conditions, {
+      $push: [{}]
+    });
+    this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
+  };
+
+  deleteCondition = conditionIndex => {
+    const { columnIndex, index } = this.props;
+    const newConditions = update(this.props.action.conditions, {
+      $splice: [[conditionIndex, 1]]
+    });
+    this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
+  };
 
   componentDidMount() {
     const { columnIndex, index } = this.props;
@@ -54,6 +68,9 @@ class OnlyContinueIf extends Component {
               index={index}
               variableOptions={variableOptions}
               handleConditionChange={this.handleConditionChange}
+              addCondition={this.addCondition}
+              deleteCondition={this.deleteCondition}
+              lastOne={index + 1 === props.action.conditions.length}
             />
           ))}
       </div>

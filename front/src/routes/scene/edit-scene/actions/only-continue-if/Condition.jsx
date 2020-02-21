@@ -32,6 +32,10 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
+  deleteCondition = () => {
+    this.props.deleteCondition(this.props.index);
+  };
+
   getSelectedOption = () => {
     let selectedOption = null;
 
@@ -49,54 +53,87 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
-        <div class="form-group">
-          <label class="form-label">
-            Variable
-            <span class="form-required">*</span>
-          </label>
-          <Select
-            defaultValue={''}
-            value={selectedOption}
-            onChange={this.handleChange}
-            options={props.variableOptions}
-          />
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label">
+                Variable
+                <span class="form-required">*</span>
+              </label>
+              <Select
+                defaultValue={''}
+                value={selectedOption}
+                onChange={this.handleChange}
+                options={props.variableOptions}
+              />
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label class="form-label">
+                Operator
+                <span class="form-required">*</span>
+              </label>
+              <select class="form-control" value={props.condition.operator} onChange={this.handleOperatorChange}>
+                <option value="">-----</option>
+                <option value="=">
+                  <Text id="editScene.triggersCard.newState.equal" />
+                </option>
+                <option value=">=">
+                  <Text id="editScene.triggersCard.newState.superiorOrEqual" />
+                </option>
+                <option value=">">
+                  <Text id="editScene.triggersCard.newState.superior" />
+                </option>
+                <option value="!=">
+                  <Text id="editScene.triggersCard.newState.different" />
+                </option>
+                <option value="<=">
+                  <Text id="editScene.triggersCard.newState.lessOrEqual" />
+                </option>
+                <option value="<">
+                  <Text id="editScene.triggersCard.newState.less" />
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label">
+                Value
+                <span class="form-required">*</span>
+              </label>
+              <Localizer>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
+                  value={props.condition.value}
+                  onChange={this.handleValueChange}
+                />
+              </Localizer>
+            </div>
+          </div>
+          <div class="col-md-2">
+            {props.index > 0 && (
+              <div class="form-group">
+                <label class="form-label">Remove</label>
+                <button class="btn btn-danger" onClick={this.deleteCondition}>
+                  <i class="fe fe-x" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <div class="form-group">
-          <select class="form-control" value={props.condition.operator} onChange={this.handleOperatorChange}>
-            <option value="">-----</option>
-            <option value="=">
-              <Text id="editScene.triggersCard.newState.equal" />
-            </option>
-            <option value=">=">
-              <Text id="editScene.triggersCard.newState.superiorOrEqual" />
-            </option>
-            <option value=">">
-              <Text id="editScene.triggersCard.newState.superior" />
-            </option>
-            <option value="!=">
-              <Text id="editScene.triggersCard.newState.different" />
-            </option>
-            <option value="<=">
-              <Text id="editScene.triggersCard.newState.lessOrEqual" />
-            </option>
-            <option value="<">
-              <Text id="editScene.triggersCard.newState.less" />
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <Localizer>
-            <input
-              type="text"
-              class="form-control"
-              placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
-              value={props.condition.value}
-              onChange={this.handleValueChange}
-            />
-          </Localizer>
-        </div>
-        <div class="form-group">
-          <button class="btn btn-secondary btn-sm">+ OR</button>
+        <div class="row">
+          <div class="col">
+            {props.lastOne && (
+              <button onClick={this.props.addCondition} class="btn btn-secondary btn-sm">
+                + OR
+              </button>
+            )}
+            {!props.lastOne && <p>OR</p>}
+          </div>
         </div>
       </div>
     );
