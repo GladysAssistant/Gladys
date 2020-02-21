@@ -1,10 +1,12 @@
 const Promise = require('bluebird');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
+const { AbortScene } = require('../../utils/coreErrors');
+const { compare } = require('../../utils/compare');
 const logger = require('../../utils/logger');
 
 const actionsFunc = {
-  [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
+  [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     let device;
     let deviceFeature;
     if (action.device_feature) {
@@ -72,6 +74,26 @@ const actionsFunc = {
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     await self.message.sendToUser(action.user, action.text);
+  },
+  [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
+    const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
+    scope[`${columnIndex}.${rowIndex}.last_value`] = deviceFeature.last_value;
+  },
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
+    let oneConditionVerified = false;
+    action.conditions.forEach((condition) => {
+      const conditionVerified = compare(condition.operator, scope[condition.variable], condition.value);
+      if (conditionVerified) {
+        oneConditionVerified = true;
+      } else {
+        logger.debug(
+          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+        );
+      }
+    });
+    if (oneConditionVerified === false) {
+      throw new AbortScene(`Actions.condition.only_continue_if: Condition not verified.`);
+    }
   },
 };
 

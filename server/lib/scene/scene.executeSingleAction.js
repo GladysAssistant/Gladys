@@ -13,7 +13,7 @@ const { executeAction } = require('./scene.executeActions');
 async function executeSingleAction(action) {
   logger.debug(`Executing action of type ${action.type}`);
   try {
-    await executeAction(this, action, action.scope);
+    await executeAction(this, action, {});
   } catch (e) {
     logger.warn(`There was an error executing action ${action.type}`);
     logger.warn(e);

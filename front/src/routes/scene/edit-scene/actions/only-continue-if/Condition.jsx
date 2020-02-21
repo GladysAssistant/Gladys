@@ -24,9 +24,10 @@ class Condition extends Component {
   };
 
   handleValueChange = e => {
+    const newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : null;
     const newCondition = update(this.props.condition, {
       value: {
-        $set: e.target.value
+        $set: newValue
       }
     });
     this.props.handleConditionChange(this.props.index, newCondition);

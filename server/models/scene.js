@@ -22,7 +22,7 @@ const actionSchema = Joi.array().items(
         operator: Joi.string()
           .valid(['=', '!=', '>', '>=', '<', '<='])
           .required(),
-        value: Joi.string().required(),
+        value: Joi.number(),
       }),
     }),
   ),
