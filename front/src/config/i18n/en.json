@@ -464,6 +464,14 @@
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
+      },
+      "onlyContinueIf": {
+        "variableLabel": "Variable",
+        "operatorLabel": "Operator",
+        "valueLabel": "Value",
+        "removeLabel": "Remove",
+        "orText": "OR",
+        "orButton": "OR"
       }
     },
     "actions": {

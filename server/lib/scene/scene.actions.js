@@ -92,7 +92,7 @@ const actionsFunc = {
       }
     });
     if (oneConditionVerified === false) {
-      throw new AbortScene(`Actions.condition.only_continue_if: Condition not verified.`);
+      throw new AbortScene('CONDITION_NOT_VERIFIED');
     }
   },
 };

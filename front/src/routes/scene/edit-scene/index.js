@@ -142,7 +142,6 @@ class EditScene extends Component {
           }
         }
       });
-      console.log(newState);
       return newState;
     });
   };

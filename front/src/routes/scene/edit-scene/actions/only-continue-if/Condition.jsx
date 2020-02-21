@@ -58,7 +58,7 @@ class Condition extends Component {
           <div class="col-md-4">
             <div class="form-group">
               <label class="form-label">
-                Variable
+                <Text id="editScene.actionsCard.onlyContinueIf.variableLabel" />
                 <span class="form-required">*</span>
               </label>
               <Select
@@ -72,7 +72,7 @@ class Condition extends Component {
           <div class="col-md-2">
             <div class="form-group">
               <label class="form-label">
-                Operator
+                <Text id="editScene.actionsCard.onlyContinueIf.operatorLabel" />
                 <span class="form-required">*</span>
               </label>
               <select class="form-control" value={props.condition.operator} onChange={this.handleOperatorChange}>
@@ -101,7 +101,7 @@ class Condition extends Component {
           <div class="col-md-4">
             <div class="form-group">
               <label class="form-label">
-                Value
+                <Text id="editScene.actionsCard.onlyContinueIf.valueLabel" />
                 <span class="form-required">*</span>
               </label>
               <Localizer>
@@ -118,7 +118,9 @@ class Condition extends Component {
           <div class="col-md-2">
             {props.index > 0 && (
               <div class="form-group">
-                <label class="form-label">Remove</label>
+                <label class="form-label">
+                  <Text id="editScene.actionsCard.onlyContinueIf.removeLabel" />
+                </label>
                 <button class="btn btn-danger" onClick={this.deleteCondition}>
                   <i class="fe fe-x" />
                 </button>
@@ -130,10 +132,14 @@ class Condition extends Component {
           <div class="col">
             {props.lastOne && (
               <button onClick={this.props.addCondition} class="btn btn-secondary btn-sm">
-                + OR
+                + <Text id="editScene.actionsCard.onlyContinueIf.orButton" />
               </button>
             )}
-            {!props.lastOne && <p>OR</p>}
+            {!props.lastOne && (
+              <p>
+                <Text id="editScene.actionsCard.onlyContinueIf.orText" />
+              </p>
+            )}
           </div>
         </div>
       </div>
