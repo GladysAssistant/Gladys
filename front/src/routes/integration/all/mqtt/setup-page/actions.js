@@ -36,7 +36,8 @@ const createActions = store => {
       event.preventDefault();
       store.setState({
         connectMqttStatus: RequestStatus.Getting,
-        mqttConnected: false
+        mqttConnected: false,
+        mqttConnectionError: undefined
       });
       try {
         await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_URL', {
@@ -65,7 +66,8 @@ const createActions = store => {
     displayConnectedMessage(state) {
       // display 3 seconds a message "MQTT connected"
       store.setState({
-        mqttConnected: true
+        mqttConnected: true,
+        mqttConnectionError: undefined
       });
       setTimeout(
         () =>
@@ -79,6 +81,7 @@ const createActions = store => {
     displayMqttError(state, error) {
       store.setState({
         mqttConnected: false,
+        connectMqttStatus: undefined,
         mqttConnectionError: error
       });
     }
