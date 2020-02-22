@@ -1,3 +1,4 @@
+import { Text } from 'preact-i18n';
 import EditWeatherBox from '../../components/boxs/weather/EditWeatherBox';
 import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditCameraBox from '../../components/boxs/camera/EditCamera';
@@ -31,7 +32,9 @@ const EditBoxWithDragAndDrop = ({ children, ...props }) => (
           marginBottom: '1.5rem'
         }}
       >
-        <p class="text-center">Drag and drop me here</p>
+        <p class="text-center">
+          <Text id="dashboard.boxes.dragAndDrop" />
+        </p>
       </div>
     )}
     <div>

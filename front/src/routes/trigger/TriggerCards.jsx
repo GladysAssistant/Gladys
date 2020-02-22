@@ -1,3 +1,4 @@
+import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import style from './style.css';
 
@@ -22,7 +23,7 @@ const TriggerCards = ({ children, ...props }) => (
             <div class="btn-list text-center">
               <Link href={`${props.currentUrl}/${scene.id}`} class="btn btn-outline-primary btn-sm">
                 <i class="fe fe-edit" />
-                Edit
+                <Text id="scene.editButton" />
               </Link>
             </div>
           </div>

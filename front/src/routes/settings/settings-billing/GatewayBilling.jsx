@@ -1,3 +1,4 @@
+import { Text } from 'preact-i18n';
 import { StripeProvider, Elements } from 'react-stripe-elements';
 import MyStoreCheckout from './MyStoreCheckout';
 const dateDisplayOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -5,7 +6,9 @@ const dateDisplayOptions = { weekday: 'long', year: 'numeric', month: 'long', da
 const Billing = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Billing</h3>
+      <h3 class="card-title">
+        <Text id="gatewayBilling.title" />
+      </h3>
     </div>
     <div class="card-body">
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
@@ -13,22 +16,32 @@ const Billing = ({ children, ...props }) => (
         <div class="dimmer-content">
           <div class="row">
             <div class="col-md-8">
-              <h3>Your billing informations</h3>
-              <p>Billing is handled by Stripe. We never see you credit card.</p>
+              <h3>
+                <Text id="gatewayBilling.informationTitle" />
+              </h3>
+              <p>
+                <Text id="gatewayBilling.stripeDescription" />
+              </p>
               {props.stripeCard && (
                 <div class="row">
                   <div class="col-md-4">
-                    <label>Type</label>
+                    <label>
+                      <Text id="gatewayBilling.cardTypeLabel" />
+                    </label>
                     <input type="text" class="form-control" disabled="disabled" value={props.stripeCard.brand} />
                   </div>
 
                   <div class="col-md-4">
-                    <label>Last 4 digits</label>
+                    <label>
+                      <Text id="gatewayBilling.cardLastDigitsLabel" />
+                    </label>
                     <input type="text" class="form-control" disabled="disabled" value={props.stripeCard.last4} />
                   </div>
 
                   <div class="col-md-4">
-                    <label>Expiration date</label>
+                    <label>
+                      <Text id="gatewayBilling.cardExpirationLabel" />
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -43,9 +56,11 @@ const Billing = ({ children, ...props }) => (
           <hr />
           <div class="row">
             <div class="col-md-8">
-              <h3>Update Card Informations</h3>
+              <h3>
+                <Text id="gatewayBilling.updateInformationTitle" />
+              </h3>
               <p>
-                If your card has expired, or you want to change credit card, you can update here your card information.
+                <Text id="gatewayBilling.updateInformationDescription" />
               </p>
 
               {props.stripeLoaded && (
@@ -65,25 +80,29 @@ const Billing = ({ children, ...props }) => (
           <hr />
           <div class="row">
             <div class="col-md-8">
-              <h3>Cancel subscription</h3>
+              <h3>
+                <Text id="gatewayBilling.cancelSubscriptionTitle" />
+              </h3>
 
               {props.cancelMonthlySubscriptionError && (
                 <div class="alert alert-warning" role="alert">
-                  Warning: There was an error while trying to cancel your account. Please retry again later.
+                  <Text id="gatewayBilling.cancelSubscriptionError" />
                 </div>
               )}
 
               {props.cancelMonthlySubscriptionSuccess && (
                 <div class="alert alert-success" role="alert">
-                  Your subscription was canceled with success!
+                  <Text id="gatewayBilling.cancelSubscriptionSuccess" />
                 </div>
               )}
 
               {props.stripeCard && props.stripeCard.canceled_at === null && (
                 <div>
-                  <p>If you want to cancel your account, click here:</p>
+                  <p>
+                    <Text id="gatewayBilling.cancelSubscriptionDescription" />
+                  </p>
                   <button onClick={props.cancelMonthlySubscription} class="btn btn-danger">
-                    Cancel subscription
+                    <Text id="gatewayBilling.cancelSubscriptionButton" />
                   </button>
                 </div>
               )}
@@ -91,11 +110,15 @@ const Billing = ({ children, ...props }) => (
               {props.stripeCard && props.stripeCard.canceled_at && (
                 <div>
                   <p>
-                    Your account was cancelled on{' '}
-                    {new Date(props.stripeCard.canceled_at).toLocaleDateString('en-US', dateDisplayOptions)}
+                    <Text
+                      id="gatewayBilling.accountCancelled"
+                      fields={{
+                        date: new Date(props.stripeCard.canceled_at).toLocaleDateString('en-US', dateDisplayOptions)
+                      }}
+                    />
                   </p>
                   <button onClick={props.reSubcribeMonthlyPlan} class="btn btn-success">
-                    Subscribe again
+                    <Text id="gatewayBilling.subscriptionButton" />
                   </button>
                 </div>
               )}

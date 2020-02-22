@@ -1,3 +1,5 @@
+import { Text } from 'preact-i18n';
+
 const MultiLevelDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValue(
@@ -17,7 +19,10 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
       {props.deviceFeature.deviceFeatureName && <td>{props.deviceFeature.deviceFeatureName}</td>}
       {!props.deviceFeature.deviceFeatureName && (
         <td>
-          {props.deviceFeature.name} - {props.deviceFeature.type}
+          <Text
+            id="dashboard.boxes.devicesInRoom.deviceTitle"
+            fields={{ name: props.deviceFeature.name, type: props.deviceFeature.type }}
+          />
         </td>
       )}
 

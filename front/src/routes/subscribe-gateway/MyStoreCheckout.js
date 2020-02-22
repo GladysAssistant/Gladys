@@ -1,6 +1,6 @@
 import { CardElement, injectStripe } from 'react-stripe-elements';
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 
 class MyStoreCheckout extends Component {
   submitCard = ev => {
@@ -37,10 +37,7 @@ class MyStoreCheckout extends Component {
         />
         <br />
         <label>
-          🔒 <Text id="gatewaySubscribe.paymentSecuredBy" />{' '}
-          <a href="https://stripe.com/docs/security/stripe" target="_blank" rel="noopener noreferrer">
-            Stripe
-          </a>
+          <MarkupText id="gatewaySubscribe.paymentSecuredByStripe" />
         </label>
         <button
           className="btn btn-primary btn-block"

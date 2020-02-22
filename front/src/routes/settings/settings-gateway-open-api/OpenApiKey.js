@@ -20,11 +20,11 @@ const OpenApiKey = ({ children, ...props }) => {
         <div style="max-width: 400px; overflow: hidden">{props.apiKey.name}</div>
         {props.apiKey.api_key && (
           <div class="small">
-            <Text id="gatewayOpenApi.keyName" />: {props.apiKey.api_key}
+            <Text id="gatewayOpenApi.keyNameLabel" /> {props.apiKey.api_key}
           </div>
         )}
         <div class="small text-muted">
-          <Text id="gatewayOpenApi.registered" />: {createdAt}
+          <Text id="gatewayOpenApi.registeredLabel" /> {createdAt}
         </div>
       </td>
       <td>

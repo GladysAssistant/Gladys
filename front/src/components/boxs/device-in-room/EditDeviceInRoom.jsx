@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 
 import BaseEditBox from '../baseEditBox';
