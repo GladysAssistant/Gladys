@@ -42,7 +42,7 @@ function createActions(store) {
       }
       await state.session.init();
       if (!state.session.isConnected()) {
-        route('/login');
+        route(`/login${window.location.search}`);
       }
       try {
         const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
@@ -54,9 +54,9 @@ function createActions(store) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.error');
         if (status === 401) {
-          route('/login');
+          route(`/login${window.location.search}`);
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
-          route('/link-gateway-user');
+          route(`/link-gateway-user${window.location.search}`);
         } else {
           console.log(e);
         }

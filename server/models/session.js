@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      client_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {},
   );

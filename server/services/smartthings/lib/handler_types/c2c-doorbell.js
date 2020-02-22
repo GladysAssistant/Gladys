@@ -1,0 +1,12 @@
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+
+const c2cDoorbell = {
+  value: 'c2c-doorbell',
+  categories: {
+    [DEVICE_FEATURE_CATEGORIES.BUTTON]: [DEVICE_FEATURE_TYPES.BUTTON.CLICK],
+    [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: [DEVICE_FEATURE_TYPES.SENSOR.BINARY],
+    [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_TYPES.SENSOR.INTEGER],
+  },
+};
+
+module.exports = { c2cDoorbell };

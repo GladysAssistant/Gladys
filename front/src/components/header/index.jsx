@@ -6,6 +6,7 @@ import { isUrlInArray } from '../../utils/url';
 
 const PAGES_WITHOUT_HEADER = [
   '/login',
+  '/authorize',
   '/signup',
   '/signup/create-account-local',
   '/signup/create-account-gladys-gateway',

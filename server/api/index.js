@@ -27,6 +27,8 @@ function start(gladys, port, options) {
 
   // parse json
   app.use(express.json());
+  // parse form-urlencoded
+  app.use(express.urlencoded({ extended: true }));
 
   if (options.serveFront) {
     // serving static app

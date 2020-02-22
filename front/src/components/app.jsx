@@ -24,6 +24,7 @@ import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
+import Authorize from '../routes/oauth';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -67,6 +68,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import SmartthingsSetupPage from '../routes/integration/all/smartthings/setup-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -132,6 +134,9 @@ const AppRouter = connect(
         )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
+
+        <Authorize path="/authorize" />
+
         <SignupCreateAccountLocal path="/signup/create-account-local" />
         <SignupCreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
         <SignupPreferences path="/signup/preference" />
@@ -147,6 +152,8 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" />
         <IntegrationPage path="/dashboard/integration/weather" />
         <IntegrationPage path="/dashboard/integration/navigation" />
+        <IntegrationPage path="/dashboard/integration/third-party" />
+
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
         <Redirect
@@ -171,6 +178,8 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <SonoffPage path="/dashboard/integration/device/sonoff" />
         <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+
+        <SmartthingsSetupPage path="/dashboard/integration/third-party/smartthings" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

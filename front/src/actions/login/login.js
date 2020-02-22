@@ -7,7 +7,7 @@ function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
 
   const actions = {
-    async login(state, e) {
+    async login(state, e, queryParams) {
       if (e) {
         e.preventDefault();
       }
@@ -33,7 +33,14 @@ function createActions(store) {
         state.session.saveUser(user);
         state.session.init();
         actionsProfilePicture.loadProfilePicture(state);
-        route('/dashboard');
+
+        if (queryParams && queryParams.client_id) {
+          const otherParams = Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`);
+
+          route(`/authorize?${otherParams.join('&')}`);
+        } else {
+          route('/dashboard');
+        }
       } catch (e) {
         store.setState({
           loginStatus: LoginStatus.WrongCredentialsError
