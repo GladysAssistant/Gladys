@@ -1,3 +1,5 @@
+const commands = require('node-milight-promise').commandsV6;
+const MiLight = require('node-milight-promise').MilightController;
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/parseExternalId');
@@ -24,7 +26,7 @@ async function setValue(device, deviceFeature, value) {
   const bridge = this.bridgesByMac.get(macAddressStdFormat.trim());
 
   if (!bridge) {
-    throw new NotFoundError(`BRIDGE_NOT_FOUND`);
+    throw new NotFoundError(`No bridge saved in Gladys with the following mac address : ${macAddressStdFormat.trim()}`);
   }
   logger.info(
     `Connecting to milight bridge : Mac = "${bridgeMac}", ip = ${bridge.ip}, type = ${bridge.type}, name = ${bridge.name}`,
@@ -32,11 +34,6 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(
     `Changing state of light ${device.external_id} with IP ${bridge.ip} . Zone = ${zoneId}. New value = ${value}`,
   );
-
-  // const commands = await this.milightClient.commandsV6;
-  // const MiLight = await this.milightClient.MilightController;
-  const commands = require('node-milight-promise').commandsV6;
-  const MiLight = require('node-milight-promise').MilightController;
 
   const light = new MiLight({
     ip: bridge.ip,

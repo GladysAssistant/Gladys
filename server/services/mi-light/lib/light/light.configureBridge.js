@@ -18,7 +18,7 @@ const {
 async function configureBridge(Mac) {
   const bridge = this.bridgesByMac.get(Mac);
   if (!bridge) {
-    throw new NotFoundError(`BRIDGE_NOT_FOUND`);
+    throw new NotFoundError(`No bridge discovered on the network with the following mac address : ${Mac}`);
   }
   logger.info(`Connecting to milight bridge "${Mac}", ip = ${bridge.ip}, name = ${bridge.name}`);
   try {

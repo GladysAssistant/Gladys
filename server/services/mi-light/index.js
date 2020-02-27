@@ -3,8 +3,6 @@ const MiLightLightHandler = require('./lib/light');
 const MilightController = require('./api/milight.controller');
 
 module.exports = function MiLightService(gladys, serviceId) {
-  // require the node-milight-api module
-  // @ts-ignore
   const milightClient = require('node-milight-promise');
   const miLightLightHandler = new MiLightLightHandler(gladys, milightClient, serviceId);
 
