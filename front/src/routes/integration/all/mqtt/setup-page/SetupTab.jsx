@@ -38,7 +38,7 @@ const SetupTab = ({ children, ...props }) => {
             )}
             {props.mqttConnectionError && (
               <p class="alert alert-danger">
-                <Text id="integration.mqtt.setup.connectionError" fields={{ error: props.mqttConnectionError }} />
+                <Text id="integration.mqtt.setup.connectionError" />
               </p>
             )}
             <form>

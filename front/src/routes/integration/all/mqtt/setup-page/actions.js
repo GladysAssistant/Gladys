@@ -56,6 +56,8 @@ const createActions = store => {
         store.setState({
           connectMqttStatus: RequestStatus.Success
         });
+
+        setTimeout(() => store.setState({ connectMqttStatus: undefined }), 3000);
       } catch (e) {
         store.setState({
           connectMqttStatus: RequestStatus.Error,

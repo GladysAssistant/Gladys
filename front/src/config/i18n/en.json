@@ -391,7 +391,7 @@
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
         "connected": "Connected to the MQTT broker with success !",
-        "connectionError": "Error while connecting, please check your configuration ({{error}})."
+        "connectionError": "Error while connecting, please check your configuration."
       }
     },
     "xiaomi": {
