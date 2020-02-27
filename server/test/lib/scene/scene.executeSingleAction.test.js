@@ -15,6 +15,15 @@ const lightDevice = {
   features: [deviceFeatureLightBinary],
 };
 
+const deviceFeatureSwitchBinary = {
+  category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+  type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+};
+
+const switchDevice = {
+  features: [deviceFeatureSwitchBinary],
+};
+
 describe('scene.executeSingleAction', () => {
   it('should execute one action', async () => {
     const device = {
@@ -41,5 +50,31 @@ describe('scene.executeSingleAction', () => {
       devices: ['light-1'],
     });
     assert.calledWith(device.setValue, lightDevice, deviceFeatureLightBinary, 0);
+  });
+  it('should execute one action', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const stateManager = new StateManager();
+    stateManager.setState('device', 'switch-1', switchDevice);
+    const sceneManager = new SceneManager(stateManager, event, device);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_OFF,
+      devices: ['switch-1'],
+    });
+    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 0);
+  });
+  it('should execute one action', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const stateManager = new StateManager();
+    stateManager.setState('device', 'switch-1', switchDevice);
+    const sceneManager = new SceneManager(stateManager, event, device);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_OFF,
+      devices: ['switch-1'],
+    });
+    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 0);
   });
 });
