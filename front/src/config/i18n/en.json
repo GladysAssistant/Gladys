@@ -493,8 +493,8 @@
         "turn-off": "Turn Off the Lights"
       },
       "switch": {
-        "turn-on": "Turn On the Switch",
-        "turn-off": "Turn Off the Switch"
+        "turn-on": "Turn On the Switchs",
+        "turn-off": "Turn Off the Switchs"
       },
       "scene": {
         "start": "Start scene"
