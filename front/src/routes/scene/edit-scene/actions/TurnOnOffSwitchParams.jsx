@@ -26,8 +26,8 @@ class TurnOnOffSwitch extends Component {
   };
   handleChange = selectedOptions => {
     if (selectedOptions) {
-      const switchs = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', switchs);
+      const switches = selectedOptions.map(selectedOption => selectedOption.value);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', switches);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
@@ -35,8 +35,8 @@ class TurnOnOffSwitch extends Component {
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(switchs => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === switchs);
+      nextProps.action.devices.forEach(switches => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === switches);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -63,8 +63,8 @@ class TurnOnOffSwitch extends Component {
     return (
       <div class="form-group">
         <label class="form-label">
-          {props.action.type === ACTIONS.SWITCH.TURN_ON && <Text id="editScene.actionsCard.turnOnSwitchs.label" />}
-          {props.action.type === ACTIONS.SWITCH.TURN_OFF && <Text id="editScene.actionsCard.turnOffSwitchs.label" />}
+          {props.action.type === ACTIONS.SWITCH.TURN_ON && <Text id="editScene.actionsCard.turnOnSwitches.label" />}
+          {props.action.type === ACTIONS.SWITCH.TURN_OFF && <Text id="editScene.actionsCard.turnOffSwitches.label" />}
         </label>
         <Select
           defaultValue={[]}
