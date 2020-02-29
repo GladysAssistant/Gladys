@@ -178,7 +178,7 @@ describe('scene.executeActions', () => {
       ],
       {},
     );
-    assert.calledTwice(device.setValue);
+    assert.callCount(device.setValue, 4);
   });
   it('should throw error, action type does not exist', async () => {
     const light = {
