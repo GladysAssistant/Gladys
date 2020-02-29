@@ -59,10 +59,10 @@ describe('scene.executeSingleAction', () => {
     stateManager.setState('device', 'switch-1', switchDevice);
     const sceneManager = new SceneManager(stateManager, event, device);
     await sceneManager.executeSingleAction({
-      type: ACTIONS.SWITCH.TURN_OFF,
+      type: ACTIONS.SWITCH.TURN_ON,
       devices: ['switch-1'],
     });
-    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 0);
+    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 1);
   });
   it('should execute one action', async () => {
     const device = {
