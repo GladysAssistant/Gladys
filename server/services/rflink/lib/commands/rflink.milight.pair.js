@@ -1,3 +1,7 @@
+const {
+    DEVICE_FEATURE_CATEGORIES,
+    DEVICE_FEATURE_TYPES,
+  } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -32,6 +36,24 @@ function pair(currentMilightGateway, milightZone) {
             should_poll : false,
             features : [
                 {
+                    name : 'Power',
+                    selector : `rflink:milight:${currentMilightGateway}:${number}:power`,
+                    external_id : `rflink:milight:${currentMilightGateway}:${number}:power`,
+                    rfcode : {
+                        value : 'CMD',
+                        cmd : 'ON',
+                    },
+                    category : DEVICE_FEATURE_CATEGORIES.LIGHT,
+                    type : DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+                    read_only : false,
+                    keep_history: true,
+                    has_feedback: false,
+                    min: 0,
+                    max: 1,
+
+
+                },
+                {
                     name : 'color',
                     selector : `rflink:milight:${currentMilightGateway}:${number}:color`,
                     external_id : `rflink:milight:${currentMilightGateway}:${number}:color`,
@@ -51,8 +73,8 @@ function pair(currentMilightGateway, milightZone) {
                 },
                 {
                     name : 'brightness',
-                    selector : `rflink:${msg.id}:brightness`,
-                    external_id : `rflink:${msg.id}:brightness`,
+                    selector : `rflink:milight:${currentMilightGateway}:${number}:brightness`,
+                    external_id : `rflink:milight:${currentMilightGateway}:${number}:brightness`,
                     rfcode : {
                         value : 'RGBW',
                         cmd : 'BRIGHT',
@@ -69,8 +91,8 @@ function pair(currentMilightGateway, milightZone) {
                 },
                 {
                     name : 'milight-mode',
-                    selector : `rflink:${msg.id}:milight-mode`,
-                    external_id : `rflink:${msg.id}:milight-mode`,
+                    selector : `rflink:milight:${currentMilightGateway}:${number}:milight-mode`,
+                    external_id : `rflink:milight:${currentMilightGateway}:${number}:milight-mode`,
                     rfcode : 'CMD',
                     category : DEVICE_FEATURE_CATEGORIES.LIGHT,
                     type : DEVICE_FEATURE_TYPES.LIGHT.MODE,
@@ -85,16 +107,9 @@ function pair(currentMilightGateway, milightZone) {
 
             ]
         };
-
-
-
-
-                });
+                this.addDevice(newLight);
+                };
             }
-
-
-    }
-}
 
 module.exports = {
     pair,

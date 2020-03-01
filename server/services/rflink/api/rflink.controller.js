@@ -58,7 +58,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
   async function pair(req, res) {
-    const milightZone =  req.body.zone;
+    let milightZone =  req.body.zone;
+    if (milightZone === undefined || milightZone === null) {
+        milightZone = 1;
+    }
     let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
     if (currentMilightGateway === null) {
         currentMilightGateway = RFlinkManager.currentMilightGateway;
@@ -80,7 +83,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
      * @apiGroup RFlink
      */
 async function unpair(req, res) {
-    const milightZone =  req.body.zone;
+    let milightZone =  req.body.zone;
+    if (milightZone === undefined || milightZone === null) {
+        milightZone = 1;
+    }
     let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
     if (currentMilightGateway === null) {
         currentMilightGateway = RFlinkManager.currentMilightGateway;

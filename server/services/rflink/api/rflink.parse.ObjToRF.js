@@ -1,4 +1,4 @@
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
 
 // eslint-disable-next-line jsdoc/check-alignment
 /** 
@@ -17,6 +17,8 @@ function ObjToRF(device, deviceFeature, state) {
 
     if (channel !== undefined) {
         Rfcode += `${channel};`;
+    } else {
+        logger.log('channel undefined');
     }
 
     if (state !== undefined) {
@@ -24,6 +26,8 @@ function ObjToRF(device, deviceFeature, state) {
     } else {
        this.error('NoState');
     };
+
+    Rfcode += '\n';
 
 
         

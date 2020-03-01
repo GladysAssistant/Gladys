@@ -15,7 +15,7 @@ const {
  * rflink.message(msg);
  */
 function message(msgRF) {
-    
+    logger.log(msgRF);
     const msg = RFtoObj(msgRF);
     let newDevice;
     
@@ -30,10 +30,9 @@ function message(msgRF) {
                 newDevice = {
                     service_id : this.serviceId,
                     name : `${msg.protocol} `,
-                    selector : `rflink:${msg.id}`,
-                    external_id: `rflink:${msg.id}`,
+                    selector : `rflink:${msg.id}:${msg.switch}`,
+                    external_id: `rflink:${msg.id}:${msg.switch}`,
                     model : `${msg.protocol}`,
-                    channel : msg.switch,
                     should_poll : false,
                     features : []
                 };
@@ -43,8 +42,8 @@ function message(msgRF) {
                         newDevice.name += 'temperature sensor';
                         newDevice.features.push({
                                 name : 'temperature',
-                                selector : `rflink:${msg.id}:temperature`,
-                                external_id : `rflink:${msg.id}:temperature`,
+                                selector : `rflink:${msg.id}:temperature:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:temperature:${msg.switch}`,
                                 rfcode : 'TEMP',
                                 category : DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -61,8 +60,8 @@ function message(msgRF) {
                     if (msg.hum !== undefined) {
                         newDevice.features.push({
                                 name : 'humidity',
-                                selector : `rflink:${msg.id}:humidity`,
-                                external_id : `rflink:${msg.id}:humidity`,
+                                selector : `rflink:${msg.id}:humidity:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:humidity:${msg.switch}`,
                                 rfcode : 'HUM',
                                 category : DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -80,8 +79,8 @@ function message(msgRF) {
                         newDevice.name += 'pressure sensor';
                         newDevice.features.push({
                                 name : 'pressure',
-                                selector : `rflink:${msg.id}:pressure`,
-                                external_id : `rflink:${msg.id}:pressure`,
+                                selector : `rflink:${msg.id}:pressure:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:pressure:${msg.switch}`,
                                 rfcode : 'BARO',
                                 category : DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -99,8 +98,8 @@ function message(msgRF) {
                         newDevice.name += 'uv sensor';
                         newDevice.features.push({
                                 name : 'uv intensity',
-                                selector : `rflink:${msg.id}:uv`,
-                                external_id : `rflink:${msg.id}:uv`,
+                                selector : `rflink:${msg.id}:uv:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:uv:${msg.switch}`,
                                 rfcode : 'UV',
                                 category : DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -117,8 +116,8 @@ function message(msgRF) {
                         newDevice.name += 'light sensor';
                         newDevice.features.push({
                                 name : 'light intensity',
-                                selector : `rflink:${msg.id}:light-intensity`,
-                                external_id : `rflink:${msg.id}:light-intensity`,
+                                selector : `rflink:${msg.id}:light-intensity:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:light-intensity:${msg.switch}`,
                                 rfcode : 'LUX',
                                 category : DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -135,8 +134,8 @@ function message(msgRF) {
                     if (msg.bat !== undefined) {
                         newDevice.features.push({
                                 name : 'battery',
-                                selector : `rflink:${msg.id}:battery`,
-                                external_id : `rflink:${msg.id}:battery`,
+                                selector : `rflink:${msg.id}:battery:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:battery:${msg.switch}`,
                                 rfcode : 'BAT',
                                 category : DEVICE_FEATURE_CATEGORIES.BATTERY,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -154,8 +153,8 @@ function message(msgRF) {
                         newDevice.name += 'rain sensor';
                         newDevice.features.push({
                                 name : 'rain',
-                                selector : `rflink:${msg.id}:rain`,
-                                external_id : `rflink:${msg.id}:rain`,
+                                selector : `rflink:${msg.id}:rain:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:rain:${msg.switch}`,
                                 rfcode : 'RAIN',
                                 category : DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -172,8 +171,8 @@ function message(msgRF) {
                         newDevice.name += 'wind speed sensor';
                         newDevice.features.push({
                                 name : 'wind speed',
-                                selector : `rflink:${msg.id}:wind-speed`,
-                                external_id : `rflink:${msg.id}:wind-speed`,
+                                selector : `rflink:${msg.id}:wind-speed:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:wind-speed:${msg.switch}`,
                                 rfcode : 'WINSP',
                                 category : DEVICE_FEATURE_CATEGORIES.WIND_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -190,8 +189,8 @@ function message(msgRF) {
                         newDevice.name += 'wind direction sensor';
                         newDevice.features.push({
                                 name : 'wind direction',
-                                selector : `rflink:${msg.id}:wind-dir`,
-                                external_id : `rflink:${msg.id}:wind-dir`,
+                                selector : `rflink:${msg.id}:wind-dir:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:wind-dir:${msg.switch}`,
                                 rfcode : 'WINDIR',
                                 category : DEVICE_FEATURE_CATEGORIES.WIND_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -208,8 +207,8 @@ function message(msgRF) {
                         newDevice.name += 'co2 sensor';
                         newDevice.features.push({
                                 name : 'co2',
-                                selector : `rflink:${msg.id}:co2`,
-                                external_id : `rflink:${msg.id}:co2`,
+                                selector : `rflink:${msg.id}:co2:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:co2:${msg.switch}`,
                                 rfcode : 'CO2',
                                 category : DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -222,12 +221,12 @@ function message(msgRF) {
 
                         });
                     }
-                    if (msg.switch !== undefined && msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF') {
+                    if (msg.switch !== undefined && msg.rgwb === undefined &&(msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF')) {
                         newDevice.name += 'switch';
                         newDevice.features.push({
                                 name : 'switch',
-                                selector : `rflink:${msg.id}:switch`,
-                                external_id : `rflink:${msg.id}:switch`,
+                                selector : `rflink:${msg.id}:switch:${msg.switch}`,
+                                external_id : `rflink:${msg.id}:switch:${msg.switch}`,
                                 rfcode : 'CMD',
                                 category : DEVICE_FEATURE_CATEGORIES.SWITCH,
                                 type : DEVICE_FEATURE_TYPES.SENSOR.BINARY,
@@ -243,10 +242,29 @@ function message(msgRF) {
                     
                     
                     if (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true) {
-                        newDevice.features.push({
+                        newDevice.features.push(
+                            {
+                                name : 'Power',
+                                selector : `rflink:milight:${msg.id}:${msg.switch}:power`,
+                                external_id : `rflink:milight:${msg.id}:${msg.switch}:power`,
+                                rfcode : {
+                                    value : 'CMD',
+                                    cmd : 'ON',
+                                },
+                                category : DEVICE_FEATURE_CATEGORIES.LIGHT,
+                                type : DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+                                read_only : false,
+                                keep_history: true,
+                                has_feedback: false,
+                                min: 0,
+                                max: 1,
+            
+            
+                            },
+                        {
                             name : 'color',
-                            selector : `rflink:${msg.id}:color`,
-                            external_id : `rflink:${msg.id}:color`,
+                            selector : `rflink:milight:${msg.id}:${msg.switch}:color`,
+                            external_id : `rflink:milight:${msg.id}:${msg.switch}:color`,
                             rfcode : {
                                 value : 'RGBW',
                                 cmd : 'COLOR',
@@ -263,8 +281,8 @@ function message(msgRF) {
                         });
                         newDevice.features.push({
                             name : 'brightness',
-                            selector : `rflink:${msg.id}:brightness`,
-                            external_id : `rflink:${msg.id}:brightness`,
+                            selector : `rflink:milight:${msg.id}:${msg.switch}:brightness`,
+                            external_id : `rflink:milight:${msg.id}:${msg.switch}:brightness`,
                             rfcode : {
                                 value : 'RGBW',
                                 cmd : 'BRIGHT',
@@ -281,8 +299,8 @@ function message(msgRF) {
                         });
                         newDevice.features.push({
                             name : 'milight-mode',
-                            selector : `rflink:${msg.id}:milight-mode`,
-                            external_id : `rflink:${msg.id}:milight-mode`,
+                            selector : `rflink:milight:${msg.id}:${msg.switch}:milight-mode`,
+                            external_id : `rflink:milight:${msg.id}:${msg.switch}:milight-mode`,
                             rfcode : 'CMD',
                             category : DEVICE_FEATURE_CATEGORIES.LIGHT,
                             type : DEVICE_FEATURE_TYPES.LIGHT.MODE,

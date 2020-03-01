@@ -18,10 +18,21 @@ function connect(Path) {
     }
 
 
-    const port = new Serialport(this.Path, {baudRate : 57600});
-    const readline = new Readline();
+    const port = new Serialport(this.Path, {
+      baudRate : 57600,
+      dataBits : 8,
+      parity : 'none',
+      autoOpen : true,
+      
+    });
+    
+    const readline = new Readline({
+      baudRate : 57600,
+    });
+    logger.log(readline);
     port.pipe(readline);
     this.usb = readline;
+    this.sendUsb = port;
 
 
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
