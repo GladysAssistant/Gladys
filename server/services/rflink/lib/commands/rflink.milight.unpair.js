@@ -1,3 +1,4 @@
+const logger = require('../../../../utils/logger');
 /**
  * @description unpair a milight device
  * @param {string} currentMilightGateway - Milight gateway.
@@ -7,16 +8,13 @@
  */
 function unpair(currentMilightGateway, milightZone) {
     const number = milightZone;
-    if (this.currentMilightGateway !== undefined && this.currentMilightGateway.number !==undefined) {
-        
-        // if (this.currentMilightGateway.number < 10) {
-        //     number = `0${this.currentMilightGateway.number}`;
-        // } else {
-        //     number = `${this.currentMilightGateway.number}`;
-        // }
+    if (this.currentMilightGateway !== undefined) {
 
         const msg = `10;MiLightv1;${this.currentMilightGateway};0${number};34BC;UNPAIR;`;
-        this.usb.write(msg);
+        logger.log(msg);
+        this.sendUsb.write(msg, error => {
+            logger.log(error);
+        });
     } // else {
     // show a message in setup tab to tell user that gatewa y is undefined
    // }

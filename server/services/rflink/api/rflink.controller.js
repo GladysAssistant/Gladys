@@ -68,7 +68,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     }
     RFlinkManager.currentMilightGateway = currentMilightGateway;
 
-      RFlinkManager.pair(currentMilightGateway , milightZone);
+      RFlinkManager.pair(currentMilightGateway, milightZone);
 
       res.json({
           succes : true,

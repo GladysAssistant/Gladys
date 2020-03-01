@@ -3,15 +3,17 @@ const logger = require('../../../../utils/logger');
 /**
  * @description send a message to change a device's value
  * @param {Object} device - The device to control.
- * @param {string} deviceFeature - The name of feature to control.
+ * @param {Object} deviceFeature - The name of feature to control.
  * @param {any} state - The new state.
  * @example 
  * rflink.SetValue();
  */
 function setValue(device, deviceFeature, state)  {
+    logger.log(deviceFeature);
     let msg;
     let value;
     logger.log(device.external_id);
+
 
     if (state === 0 || state === false) {
         value = 'OFF';
@@ -37,7 +39,22 @@ function setValue(device, deviceFeature, state)  {
 
 
     if (device.external_id.split(':')[1] === 'milight') {
-        // Send a milight rflink message
+        const id = device.external_id.split(':')[2];
+        const channel = `0${device.external_id.split(':')[3]}`;
+        if (deviceFeature.name.toLowerCase() === 'color') {
+            msg = `10;MiLightv1;${id};${channel};${value};COLOR;`;
+        } else if (deviceFeature.name.toLowerCase() === 'brightness') {
+            msg = `10;MiLightv1;${id};${channel};${value};BRIGHT;`;
+        } else if (deviceFeature.name.toLowerCase() === 'power') {
+            msg = `10;MiLightv1;${id};${channel};34BC;${value};`;
+        } else if (deviceFeature.name.toLowerCase() === 'milight-mode') {
+            msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};`;
+        }
+        
+       
+
+        
+
 
     } else {
         
@@ -47,7 +64,13 @@ function setValue(device, deviceFeature, state)  {
     logger.log(msg);
     
     this.sendUsb.write(msg, error => {
-        console.log(error);
+        logger.log(error);
+    });
+    this.sendUsb.write(msg, error => {
+        logger.log(error);
+    });
+    this.sendUsb.write(msg, error => {
+        logger.log(error);
     });
     
 
