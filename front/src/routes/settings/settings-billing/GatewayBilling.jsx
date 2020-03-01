@@ -113,7 +113,10 @@ const Billing = ({ children, ...props }) => (
                     <Text
                       id="gatewayBilling.accountCancelled"
                       fields={{
-                        date: new Date(props.stripeCard.canceled_at).toLocaleDateString('en-US', dateDisplayOptions)
+                        date: new Date(props.stripeCard.canceled_at).toLocaleDateString(
+                          props.user.language,
+                          dateDisplayOptions
+                        )
                       }}
                     />
                   </p>

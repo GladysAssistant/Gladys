@@ -667,6 +667,8 @@
     "editYourProfileTitle": "Edit your profile",
     "userRole": "User",
     "adminRole": "Administrator",
+    "invitationPending": "Pending",
+    "invitationSuccess": "Accepted",
     "firstnameLabel": "Firstname",
     "firstnamePlaceholder": "Enter your firstname",
     "lastnameLabel": "Lastname",

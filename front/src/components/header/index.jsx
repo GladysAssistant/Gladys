@@ -48,7 +48,8 @@ const Header = ({ ...props }) => {
                   <span class="ml-2 d-none d-lg-block">
                     <span class="text-default">{props.user.firstname}</span>
                     <small class="text-muted d-block mt-1">
-                      {props.user.role === 'admin' ? 'Administrator' : 'User'}
+                      {props.user.role === 'admin' && <Text id="profile.adminRole" />}
+                      {props.user.role !== 'admin' && <Text id="profile.userRole" />}
                     </small>
                   </span>
                 </a>

@@ -8,11 +8,11 @@ const OpenApiKey = ({ children, ...props }) => {
     props.revokeOpenApiKey(props.apiKey.id, props.index);
   };
 
-  let createdAt = new Date(props.apiKey.created_at).toLocaleDateString('en-US', dateDisplayOptions);
+  let createdAt = new Date(props.apiKey.created_at).toLocaleDateString(props.user.language, dateDisplayOptions);
   let lastUsed =
     props.apiKey.last_used === null
       ? 'never'
-      : new Date(props.apiKey.last_used).toLocaleDateString('en-US', dateDisplayOptions);
+      : new Date(props.apiKey.last_used).toLocaleDateString(props.user.language, dateDisplayOptions);
 
   return (
     <tr>

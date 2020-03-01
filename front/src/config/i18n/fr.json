@@ -607,6 +607,8 @@
     "editYourProfileTitle": "Editez votre profil",
     "userRole": "Utilisateur",
     "adminRole": "Administrateur",
+    "invitationPending": "En attente",
+    "invitationSuccess": "Acceptée",
     "firstnameLabel": "Prénom",
     "firstnamePlaceholder": "Entrez votre prénom",
     "lastnameLabel": "Nom de famille",
