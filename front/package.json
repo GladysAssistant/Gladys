@@ -8,11 +8,16 @@
     "serve": "npm run build && preact serve",
     "dev": "preact watch -p 1444 --template src/template.html",
     "eslint": "eslint src --ext .json --ext .js --ext .jsx",
+    "compare-integrations": "npm run compare-device-integrations && npm run compare-communication-integrations && npm run compare-weather-integrations",
+    "compare-device-integrations": "comparejson -e ./src/config/integrations/device.*.json",
+    "compare-communication-integrations": "comparejson -e ./src/config/integrations/communication.*.json",
+    "compare-weather-integrations": "comparejson -e ./src/config/integrations/weather.*.json",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
     "test": "jest --coverage"
   },
   "devDependencies": {
+    "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^4.0.0",
@@ -59,22 +64,12 @@
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
     "verbose": true,
-    "setupFiles": [
-      "<rootDir>/tests/__mocks__/browserMocks.js"
-    ],
+    "setupFiles": ["<rootDir>/tests/__mocks__/browserMocks.js"],
     "testRegex": "(/(__tests__|tests)/.*|(\\.|/)(test|spec))\\.jsx?$",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/tests/__mocks__/*"
-    ],
+    "testPathIgnorePatterns": ["/node_modules/", "<rootDir>/tests/__mocks__/*"],
     "testURL": "http://localhost:8080",
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
+    "moduleFileExtensions": ["js", "jsx"],
+    "moduleDirectories": ["node_modules"],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/__mocks__/fileMock.js",
       "\\.(css|less|scss)$": "identity-obj-proxy",
