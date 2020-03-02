@@ -5,13 +5,13 @@ const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
 
 const nodeScheduleDaysOfWeek = {
-  monday: 6,
-  tuesday: 1,
-  wednesday: 2,
-  thursday: 3,
-  friday: 4,
-  saturday: 5,
   sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
 };
 
 /**
@@ -23,7 +23,7 @@ const nodeScheduleDaysOfWeek = {
  *  selector: 'test'
  * });
  */
-async function addScene(sceneRaw) {
+function addScene(sceneRaw) {
   // deep clone the scene so that we don't modify the same object which will be returned to the client
   const scene = cloneDeep(sceneRaw);
   // first, if the scene actually exist, we cancel all triggers
@@ -40,13 +40,12 @@ async function addScene(sceneRaw) {
           rule.second = 0;
           break;
         case 'every-week':
-          rule.dayOfWeek = trigger.days_of_week.map((day) => nodeScheduleDaysOfWeek[day]);
+          rule.dayOfWeek = trigger.days_of_the_week.map((day) => nodeScheduleDaysOfWeek[day]);
           rule.hour = parseInt(trigger.time.substr(0, 2), 10);
           rule.minute = parseInt(trigger.time.substr(3, 2), 10);
           rule.second = 0;
           break;
         case 'every-day':
-          rule.dayOfWeek = trigger.days_of_week.map((day) => nodeScheduleDaysOfWeek[day]);
           rule.hour = parseInt(trigger.time.substr(0, 2), 10);
           rule.minute = parseInt(trigger.time.substr(3, 2), 10);
           rule.second = 0;
@@ -62,6 +61,7 @@ async function addScene(sceneRaw) {
         default:
           throw new BadParameters(`${trigger.scheduler_type} not supported`);
       }
+      console.log(rule);
       trigger.nodeScheduleJob = schedule.scheduleJob(rule, () => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger));
     } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
       let intervalMilliseconds;

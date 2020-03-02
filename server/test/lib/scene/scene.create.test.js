@@ -11,6 +11,7 @@ describe('SceneManager', () => {
     const scene = await sceneManager.create({
       name: 'My living room',
       icon: 'bell',
+      triggers: [],
       actions: [
         [
           {
@@ -27,6 +28,7 @@ describe('SceneManager', () => {
       name: 'My living room',
       icon: 'bell',
       selector: 'my-custom-selector',
+      triggers: [],
       actions: [
         [
           {
@@ -42,6 +44,7 @@ describe('SceneManager', () => {
     const promise = sceneManager.create({
       name: 'My living room',
       icon: 'bell',
+      triggers: [],
       actions: [
         {
           type: ACTIONS.LIGHT.TURN_ON,
