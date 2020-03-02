@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
@@ -7,7 +7,7 @@ const actionSchema = Joi.array().items(
   Joi.array().items(
     Joi.object().keys({
       type: Joi.string()
-        .valid(ACTION_LIST)
+        .valid(...ACTION_LIST)
         .required(),
       device_feature: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
@@ -20,7 +20,7 @@ const actionSchema = Joi.array().items(
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
-          .valid(['=', '!=', '>', '>=', '<', '<='])
+          .valid('=', '!=', '>', '>=', '<', '<=')
           .required(),
         value: Joi.number(),
       }),
@@ -31,14 +31,23 @@ const actionSchema = Joi.array().items(
 const triggersSchema = Joi.array().items(
   Joi.object().keys({
     type: Joi.string()
-      .valid(EVENT_LIST)
+      .valid(...EVENT_LIST)
       .required(),
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
-    operator: Joi.string().valid(['=', '!=', '>', '>=', '<', '<=']),
+    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.number(),
     user: Joi.string(),
+    scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
+    date: Joi.date().format('YYYY-MM-DD'),
+    time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+    interval: Joi.number(),
+    unit: Joi.string(),
+    day_of_the_week: Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+    day_of_the_month: Joi.number()
+      .min(1)
+      .max(31),
   }),
 );
 
@@ -72,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = Joi.validate(value, actionSchema);
+            const result = actionSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }
@@ -83,7 +92,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = Joi.validate(value, triggersSchema);
+            const result = triggersSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }

@@ -1,8 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-const TRIGGER_LIST = ['device.new-state'];
 import Select from 'react-select';
+
+import { EVENTS } from '../../../../../../server/utils/constants';
+
+const TRIGGER_LIST = [EVENTS.DEVICE.NEW_STATE, EVENTS.TIME.CHANGED];
 
 @connect('httpClient', {})
 class ChooseTriggerType extends Component {

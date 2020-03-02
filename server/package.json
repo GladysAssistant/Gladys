@@ -67,6 +67,8 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.2.2",
+    "@hapi/joi": "^17.1.0",
+    "@hapi/joi-date": "^2.0.1",
     "bcrypt": "^3.0.3",
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",
