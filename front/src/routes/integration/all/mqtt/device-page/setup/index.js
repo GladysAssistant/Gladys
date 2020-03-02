@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from '../actions';
 import FeatureTab from './FeatureTab';
 import MqttPage from '../../MqttPage';
-import integrationConfig from '../../../../../../config/integrations';
 import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
@@ -169,7 +168,7 @@ class MqttDeviceSetupPage extends Component {
 
   render(props, state) {
     return (
-      <MqttPage integration={integrationConfig[props.user.language].mqtt}>
+      <MqttPage>
         <FeatureTab
           {...props}
           {...state}
