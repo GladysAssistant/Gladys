@@ -29,6 +29,8 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', 1);
     } else if (schedulerType === 'every-week') {
       this.props.updateTriggerProperty(this.props.index, 'day_of_the_week', 'monday');
+    } else if (schedulerType === 'interval') {
+      this.props.updateTriggerProperty(this.props.index, 'unit', 'second');
     }
   };
   handleDateChange = date => {
@@ -123,7 +125,7 @@ class TurnOnLight extends Component {
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={15}
+                    timeIntervals={5}
                     timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     dateFormat="HH:mm"
                   />
@@ -184,7 +186,7 @@ class TurnOnLight extends Component {
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={15}
+                    timeIntervals={5}
                     timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     dateFormat="HH:mm"
                   />
@@ -243,7 +245,7 @@ class TurnOnLight extends Component {
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={15}
+                    timeIntervals={5}
                     timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     dateFormat="HH:mm"
                   />
@@ -284,7 +286,7 @@ class TurnOnLight extends Component {
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={15}
+                    timeIntervals={5}
                     timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
                     dateFormat="HH:mm"
                   />
