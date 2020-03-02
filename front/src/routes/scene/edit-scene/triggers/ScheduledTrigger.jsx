@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { format } from 'date-fns';
+import Select from 'react-select';
 
 import fr from 'date-fns/locale/fr';
 
@@ -18,7 +19,7 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'time', undefined);
     this.props.updateTriggerProperty(this.props.index, 'interval', undefined);
     this.props.updateTriggerProperty(this.props.index, 'unit', undefined);
-    this.props.updateTriggerProperty(this.props.index, 'day_of_the_week', undefined);
+    this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', undefined);
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', undefined);
   };
   handleTypeChange = e => {
@@ -28,7 +29,7 @@ class TurnOnLight extends Component {
     if (schedulerType === 'every-month') {
       this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', 1);
     } else if (schedulerType === 'every-week') {
-      this.props.updateTriggerProperty(this.props.index, 'day_of_the_week', 'monday');
+      this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', []);
     } else if (schedulerType === 'interval') {
       this.props.updateTriggerProperty(this.props.index, 'unit', 'second');
     }
@@ -49,8 +50,9 @@ class TurnOnLight extends Component {
   handleUnitChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'unit', e.target.value);
   };
-  handleDayOfTheWeekChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'day_of_the_week', e.target.value);
+  handleDayOfTheWeekChange = options => {
+    const values = options ? options.map(option => option.value) : [];
+    this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', values);
   };
   handleDayOfTheMonthChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', e.target.value);
@@ -62,6 +64,12 @@ class TurnOnLight extends Component {
     const time = this.props.trigger.time
       ? new Date().setHours(this.props.trigger.time.substr(0, 2), this.props.trigger.time.substr(3, 2))
       : null;
+    const selectedWeekDaysOptions = this.props.trigger.days_of_the_week
+      ? this.props.trigger.days_of_the_week.map(day => ({
+          value: day,
+          label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${day}`} />
+        }))
+      : [];
     const date = this.props.trigger.date ? new Date(this.props.trigger.date) : null;
     return (
       <div>
@@ -195,43 +203,52 @@ class TurnOnLight extends Component {
             </div>
           )}
           {this.props.trigger.scheduler_type === 'every-week' && (
-            <div class="col-sm-4">
+            <div class="col-sm-12">
               <div class="form-group">
                 <div class="form-label">
-                  <Text id="editScene.triggersCard.scheduledTrigger.dayOfTheWeekLabel" />
+                  <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeekLabel" />
                 </div>
-                <select
-                  class="form-control"
-                  value={this.props.trigger.day_of_the_week}
+                <Select
+                  defaultValue={[]}
+                  isMulti
+                  value={selectedWeekDaysOptions}
                   onChange={this.handleDayOfTheWeekChange}
-                >
-                  <option value="monday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
-                  </option>
-                  <option value="tuesday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
-                  </option>
-                  <option value="wednesday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
-                  </option>
-                  <option value="thursday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
-                  </option>
-                  <option value="friday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
-                  </option>
-                  <option value="Saturday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
-                  </option>
-                  <option value="Sunday">
-                    <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
-                  </option>
-                </select>
+                  options={[
+                    {
+                      value: 'monday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
+                    },
+                    {
+                      value: 'tuesday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
+                    },
+                    {
+                      value: 'wednesday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
+                    },
+                    {
+                      value: 'thursday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
+                    },
+                    {
+                      value: 'friday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
+                    },
+                    {
+                      value: 'saturday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
+                    },
+                    {
+                      value: 'sunday',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
+                    }
+                  ]}
+                />
               </div>
             </div>
           )}
           {this.props.trigger.scheduler_type === 'every-week' && (
-            <div class="col-sm-4">
+            <div class="col-sm-2">
               <div class="form-group">
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />

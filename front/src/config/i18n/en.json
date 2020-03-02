@@ -535,7 +535,7 @@
         "timeLabel": "Time",
         "unitLabel": "Unit",
         "intervalLabel": "Interval",
-        "dayOfTheWeekLabel": "Day of the week",
+        "daysOfTheWeekLabel": "Days of the week",
         "dayOfTheMonthLabel": "Day of the month",
         "dateFormat": "MM-dd-yyyy",
         "timeCaption": "Time",
