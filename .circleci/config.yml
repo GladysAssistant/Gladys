@@ -52,6 +52,8 @@ jobs:
             git checkout e89d2a1677f5afe74e836d8c75d7f33d784ea790
             sudo make
             sudo make install
+            sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openzwave.conf"
+            sudo ldconfig
       - run:
           name: Install global dependencies
           command: 'sudo npm install typescript node-gyp npm@latest -g'
