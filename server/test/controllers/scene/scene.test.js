@@ -9,6 +9,7 @@ describe('POST /api/v1/scene', () => {
       .send({
         name: 'New Scene',
         icon: 'bell',
+        triggers: [],
         actions: [
           [
             {
