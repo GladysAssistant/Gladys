@@ -4,6 +4,8 @@ const cloneDeep = require('lodash.clonedeep');
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
 
+const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
+
 const nodeScheduleDaysOfWeek = {
   sunday: 0,
   monday: 1,
@@ -17,7 +19,7 @@ const nodeScheduleDaysOfWeek = {
 /**
  * @description Add a scene to the scene manager.
  * @param {Object} sceneRaw - Scene object from DB.
- * @returns {Promise} Resolve.
+ * @returns {Object} Return the scene.
  * @example
  * addScene({
  *  selector: 'test'
@@ -61,7 +63,6 @@ function addScene(sceneRaw) {
         default:
           throw new BadParameters(`${trigger.scheduler_type} not supported`);
       }
-      console.log(rule);
       trigger.nodeScheduleJob = schedule.scheduleJob(rule, () => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger));
     } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
       let intervalMilliseconds;
@@ -77,6 +78,9 @@ function addScene(sceneRaw) {
           break;
         default:
           throw new BadParameters(`${trigger.unit} not supported`);
+      }
+      if (intervalMilliseconds > MAX_VALUE_SET_INTERVAL) {
+        throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
       }
       trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
     }
