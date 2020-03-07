@@ -1,7 +1,10 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import DeviceFeatureState from './triggers/DeviceFeatureState';
+import ScheduledTrigger from './triggers/ScheduledTrigger';
 import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
+
+import { EVENTS } from '../../../../../server/utils/constants';
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
   deleteTrigger(index);
@@ -10,7 +13,8 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {props.trigger.type === 'device.new-state' && <i class="fe fe-activity" />}
+      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="fe fe-activity" />}
+      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="fe fe-watch" />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
@@ -37,8 +41,15 @@ const TriggerCard = ({ children, ...props }) => (
       {props.trigger.type === null && (
         <ChooseTriggerType updateTriggerProperty={props.updateTriggerProperty} index={props.index} />
       )}
-      {props.trigger.type === 'device.new-state' && (
+      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && (
         <DeviceFeatureState
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.TIME.CHANGED && (
+        <ScheduledTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

@@ -50,6 +50,45 @@ describe('scene.checkTrigger', () => {
       });
     });
   });
+  it('should execute scene', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'custom-time',
+          date: '01-01-1990',
+          time: '12:00',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.CHANGED,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should not execute scene, condition not verified', async () => {
     const stateManager = new StateManager();
     const device = {

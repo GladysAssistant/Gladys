@@ -508,6 +508,9 @@
     "triggers": {
       "device": {
         "new-state": "Device state change"
+      },
+      "time": {
+        "changed": "Scheduled trigger"
       }
     },
     "triggersCard": {
@@ -521,6 +524,35 @@
         "valuePlaceholder": "Value",
         "on": "On",
         "off": "Off"
+      },
+      "scheduledTrigger": {
+        "everyMonth": "Every month",
+        "everyWeek": "Every week",
+        "everyDay": "Every day",
+        "interval": "Interval",
+        "customTime": "On a specific day",
+        "dateLabel": "Date",
+        "timeLabel": "Time",
+        "unitLabel": "Unit",
+        "intervalLabel": "Interval",
+        "daysOfTheWeekLabel": "Days of the week",
+        "dayOfTheMonthLabel": "Day of the month",
+        "dateFormat": "MM-dd-yyyy",
+        "timeCaption": "Time",
+        "units": {
+          "second": "seconds",
+          "minute": "minutes",
+          "hour": "hours"
+        },
+        "daysOfTheWeek": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        }
       }
     }
   },

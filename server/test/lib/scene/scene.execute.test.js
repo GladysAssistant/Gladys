@@ -19,6 +19,7 @@ describe('SceneManager', () => {
     const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-scene',
+      triggers: [],
       actions: [
         [
           {
