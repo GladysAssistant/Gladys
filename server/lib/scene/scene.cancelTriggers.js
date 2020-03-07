@@ -5,7 +5,7 @@
  * this.cancelTriggers('test-scene');
  */
 function cancelTriggers(sceneSelector) {
-  if (this.scenes[sceneSelector]) {
+  if (this.scenes[sceneSelector] && this.scenes[sceneSelector].triggers) {
     this.scenes[sceneSelector].triggers.forEach((trigger) => {
       if (trigger.nodeScheduleJob) {
         trigger.nodeScheduleJob.cancel();
