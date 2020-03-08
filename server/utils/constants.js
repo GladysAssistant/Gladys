@@ -88,6 +88,9 @@ const EVENTS = {
     HUE_CHANGED: 'light.hue-changed',
     SATURATION_CHANGED: 'light.saturation-changed',
   },
+  TRIGGERS: {
+    CHECK: 'trigger.check',
+  },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
   },
@@ -184,8 +187,8 @@ const ACTIONS = {
   SCENE: {
     START: 'scene.start',
   },
-  TELEGRAM: {
-    SEND: 'telegram.send',
+  MESSAGE: {
+    SEND: 'message.send',
   },
 };
 
@@ -236,6 +239,7 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
+    MODE: 'mode',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -349,6 +353,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
+  },
+  RFLINK : {
+    DRIVER_READY: 'rflink.driver-ready',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
