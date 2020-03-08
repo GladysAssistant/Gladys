@@ -173,6 +173,69 @@
         "navigation": "navigation"
       }
     },
+    "rflink": {
+      "title": "RFlink",
+      "settingsTab": "Settings",
+      "deviceTab": "devices",
+      "settings": {
+        "title": "Rflink Usb Settings",
+        "description": "To use Rflink in Gladys, you need to have a Rflink gateway connected to your Gladys instance.",
+        "zwaveUsbDriverPathLabel": "Select the USB port where your Rflink is connected",
+        "connectButton": "Connect",
+        "disconnectButton": "Disconnect",
+        "refreshButton": "Refresh USB list",
+        "notConnected": "Gladys is not connected to any Rflink Gateway.",
+        "connectedWithSuccess": "Rflink Gateway connected with success.",
+        "connecting": "Trying to connect to Rflink Gateway ...",
+        "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
+        "milight" : {
+          "title" : "Rflink Milight settings",
+          "gatewayBarinfo" : "Gateway number: ",
+          "zoneInfo" : "Gateway zone: ",
+          "about" : " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway . For the moment you can use unlimited milight but with one bridge",
+          "pairButton" : "Pair",
+          "unpairButton" : "Unpair"
+        }
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter feature name",
+        "externalIdLabel": "Feature external ID",
+        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a Rflink message. It musts start with \"rflink:\". Read the Rflink API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdPlaceholder": "Feature RFlink message key",
+        "unitLabel": "Unit",
+        "minLabel": "Minimum value",
+        "minPlaceholder": "Enter feature minimum value",
+        "maxLabel": "Maximum value",
+        "maxPlaceholder": "Enter feature maximum value",
+        "addButton": "Add feature",
+        "deleteLabel": "Delete feature"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "deviceOnNetworkTitle": "Devices detected by the gateway",
+        "connectButton": "Connect/Reconnect",
+        "search": "Search devices",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "noDevices": "No devices found. Make sure you have a connected Rflink gateway in the setup tab.",
+        "scanButton": "Scan",
+        "nameLabel": "Name",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "newButton": "New",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "noNameLabel": "No name",
+        "roomLabel": "Room",
+        "returnButton": "Return back",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      }
+      
+    },
     "telegram": {
       "title": "Telegram",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
@@ -428,11 +491,37 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
-    "first": "First",
-    "then": "Then",
+    "triggersTitle": "Triggers",
+    "newTrigger": "New trigger",
+    "addTriggerButton": "Add trigger",
+    "selectTriggerLabel": "Select a trigger type",
+    "newAction": "New action",
+    "selectActionType": "Select an action type",
+    "addActionButton": "Add new action",
+    "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
+    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
+    "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
+    "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
+    "addNewTriggerButton": "Add new trigger",
+    "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
+    "actionsCard": {
+      "delay": {
+        "label": " This block will wait the specified duration.",
+        "inputPlaceholder": "Duration",
+        "milliseconds": "milliseconds",
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours"
+      },
+      "messageSend": {
+        "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text"
+      }
+    },
     "actions": {
-      "telegram": {
-        "send": "Send Telegram Message"
+      "message": {
+        "send": "Send Message"
       },
       "delay": "Wait",
       "light": {
@@ -444,6 +533,24 @@
       "service": {
         "start": "Start service",
         "stop": "Stop service"
+      }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
       }
     }
   },
@@ -667,6 +774,10 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)"
+  },
+  "deviceFeatureUnitShort": {
+    "celsius": "°C",
+    "fahrenheit": "°F"
   },
   "deviceFeatureCategory": {
     "light": {
