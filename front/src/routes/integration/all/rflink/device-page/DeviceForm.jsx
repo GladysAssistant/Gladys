@@ -60,6 +60,7 @@ class RflinkDeviceForm extends Component {
               ))}
           </select>
         </div>
+        {props.device.model !== 'milight' &&
         <div class="form-group">
           <label class="form-label" for="model">
             <Text id="integration.rflink.feature.model" />
@@ -67,6 +68,7 @@ class RflinkDeviceForm extends Component {
           <select onChange={this.updateModel} class="form-control" id="room">
             <option value="">
               <Text id="global.emptySelectOption" />
+            
             </option>
             {DEVICE_MODELS_LIST.map(model => (
                     <option selected={model === props.device.model} value={model}>
@@ -75,7 +77,7 @@ class RflinkDeviceForm extends Component {
               ))}
           </select>
         </div>
-
+            }
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.rflink.device.featuresLabel" />

@@ -43,6 +43,7 @@ function createActions(store) {
       }
     },
     async saveDevice(state, device) {
+      console.log(device);
       await state.httpClient.post('/api/v1/device', device);
     },
     updateDeviceProperty(state, index, property, value) {

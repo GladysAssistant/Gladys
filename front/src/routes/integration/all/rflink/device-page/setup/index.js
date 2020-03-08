@@ -23,6 +23,7 @@ class RflinkDeviceSetupPage extends Component {
   
 
     const device = update(this.state.device, {
+      
       features: {
         $push: [
           {
@@ -97,6 +98,10 @@ class RflinkDeviceSetupPage extends Component {
       loading: true
     });
     try {
+      console.log(this.state.device.features[0].external_id);   //// Mauvais chemin ?
+      const id = this.state.device.features[0].external_id.split(':');
+      this.state.device.external_id = `rflink:${id[1]}:${id[3]}`;
+      console.log(this.state.device);
       const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
       this.setState({
         saveStatus: RequestStatus.Success,
@@ -147,7 +152,7 @@ class RflinkDeviceSetupPage extends Component {
         id: uniqueId,
         name: null,
         should_poll: false,
-        external_id: uniqueId,
+        external_id: 'rflink:',
         service_id: this.props.currentIntegration.id,
         features: []
       };
