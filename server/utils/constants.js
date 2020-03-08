@@ -230,6 +230,34 @@ const DEVICE_FEATURE_CATEGORIES = {
   UNKNOWN: 'unknown',
 };
 
+const DEVICE_MODELS = {
+  TRISTATE: 'Tristate',
+  KAKU: 'Kaku',
+  NEWKAKU:  'NewKaku',
+  HOMEEASY: 'HomeEasy',
+  CONRAD: 'Conrad RSL2',
+  BLYSS: 'Blyss',
+  RTS: 'RTS',
+  AB400D: 'AB400D',
+  IMPULS: 'Impuls',
+  EURODOMEST: 'EuroDomest',
+  X10: 'X10',
+  HOMECOMFORT: 'HomeConfort',
+  KOPPLA: 'IKEA Koppla',
+  CHUANGO: 'Chuango',
+  SELECTPLUS: 'Selectplus',
+  DELTRONIC: 'Deltronic',
+  MERTIK: 'Mertik',
+  EV1527 : 'EV1527',
+
+
+
+
+
+
+
+};
+
 const DEVICE_FEATURE_TYPES = {
   LIGHT: {
     BINARY: 'binary',
@@ -409,6 +437,7 @@ const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_MODELS_LIST = createList(DEVICE_MODELS);
 
 module.exports.STATE = STATE;
 module.exports.EVENTS = EVENTS;
@@ -433,6 +462,7 @@ module.exports.DEVICE_FEATURE_TYPES_LIST = DEVICE_FEATURE_TYPES_LIST;
 module.exports.USER_ROLE_LIST = USER_ROLE_LIST;
 module.exports.AVAILABLE_LANGUAGES_LIST = AVAILABLE_LANGUAGES_LIST;
 module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
+module.exports.DEVICE_MODELS_LIST = DEVICE_MODELS_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
