@@ -26,6 +26,12 @@ function pair(currentMilightGateway, milightZone) {
         this.sendUsb.write(msg, error => {
             logger.log(error);
         });
+        this.sendUsb.write(msg, error => {
+            logger.log(error);
+        });
+        this.sendUsb.write(msg, error => {
+            logger.log(error);
+        });
         
 
         newLight = {

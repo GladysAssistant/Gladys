@@ -15,6 +15,12 @@ function unpair(currentMilightGateway, milightZone) {
         this.sendUsb.write(msg, error => {
             logger.log(error);
         });
+        this.sendUsb.write(msg, error => {
+            logger.log(error);
+        });
+        this.sendUsb.write(msg, error => {
+            logger.log(error);
+        });
     } // else {
     // show a message in setup tab to tell user that gatewa y is undefined
    // }
