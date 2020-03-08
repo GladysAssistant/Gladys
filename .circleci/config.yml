@@ -44,12 +44,12 @@ jobs:
           command: |
             sudo apt-get install -y libudev-dev sqlite3 openssl
       - run:
-          name: Install Openzwave 1.6 Revision 974 # Install the same version as in alpine-3.11
+          name: Install Openzwave 1.6 # Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
           command: |
             cd /tmp
             git clone https://github.com/OpenZWave/open-zwave.git 
             cd open-zwave
-            git checkout e89d2a1677f5afe74e836d8c75d7f33d784ea790
+            git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5
             sudo make
             sudo make install
             sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openzwave.conf"
