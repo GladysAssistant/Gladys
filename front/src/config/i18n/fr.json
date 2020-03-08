@@ -599,6 +599,36 @@
         "valuePlaceholder": "Valeur",
         "on": "On",
         "off": "Off"
+      },
+      "scheduledTrigger": {
+        "typeLabel": "Type",
+        "everyMonth": "Tous les mois",
+        "everyWeek": "Toutes les semaines",
+        "everyDay": "Tous les jours",
+        "interval": "Intervalle",
+        "customTime": "Un jour spécifique",
+        "dateLabel": "Date",
+        "timeLabel": "Heure",
+        "unitLabel": "Unité",
+        "intervalLabel": "Intervalle",
+        "daysOfTheWeekLabel": "Jour de la semaine",
+        "dayOfTheMonthLabel": "Jour du mois",
+        "dateFormat": "MM-dd-yyyy",
+        "timeCaption": "Heure",
+        "units": {
+          "second": "seconde(s)",
+          "minute": "minute(s)",
+          "hour": "heure(s)"
+        },
+        "daysOfTheWeek": {
+          "monday": "Lundi",
+          "tuesday": "Mardi",
+          "wednesday": "Mercredi",
+          "thursday": "Jeudi",
+          "friday": "Vendredi",
+          "saturday": "Samedi",
+          "sunday": "Dimanche"
+        }
       }
     }
   },
@@ -624,7 +654,6 @@
     "emailLabel": "E-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "languageLabel": "Langage",
-    "frenchComingSoon": "(le Français arrivera dans une future mise à jour)",
     "english": "English",
     "french": "Français",
     "passwordLabel": "Mot de passe (min 8 caractères)",

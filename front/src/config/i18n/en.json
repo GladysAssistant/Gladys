@@ -632,6 +632,7 @@
         "off": "Off"
       },
       "scheduledTrigger": {
+        "typeLabel": "Type",
         "everyMonth": "Every month",
         "everyWeek": "Every week",
         "everyDay": "Every day",
@@ -684,7 +685,6 @@
     "emailLabel": "Email",
     "emailPlaceholder": "Enter your email",
     "languageLabel": "Language",
-    "frenchComingSoon": "(French coming soon for release)",
     "english": "English",
     "french": "Français",
     "passwordLabel": "Password (min 8 characters)",
