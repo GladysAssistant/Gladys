@@ -2,8 +2,11 @@ import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import createActionsHouse from '../../../../../actions/house';
 import debounce from 'debounce';
+import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
+  const integrationActions = createActionsIntegration(store);
+  store.setState({integrationActions});
   const houseActions = createActionsHouse(store);
   const actions = {
     async getRflinkDevices(state, take, skip) {
@@ -80,7 +83,7 @@ function createActions(store) {
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, actions);
+  return Object.assign({}, houseActions, integrationActions ,actions);
 }
 
 export default createActions;

@@ -3,6 +3,7 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
+import { Link } from 'preact-router/match';
 import style from './style.css';
 
 const NodeTab = ({ children, ...props }) => (
@@ -33,6 +34,11 @@ const NodeTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
+        <Link href="/dashboard/integration/device/rflink/edit">
+          <button class="btn btn-outline-primary ml-2">
+            <Text id="integration.rflink.device.newButton" /> <i class="fe fe-plus" />
+          </button>
+        </Link>
       </div>
     </div>
     <div class="card-body">
