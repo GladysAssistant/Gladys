@@ -77,6 +77,16 @@ const FeatureTab = ({ children, ...props }) => (
                 </button>
               </div>
 
+
+
+
+
+
+
+
+
+
+
               <div class="row">
                 {props.device &&
                   props.device.features.map((feature, index) => (
