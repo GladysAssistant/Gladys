@@ -2,10 +2,15 @@
 
 set -eu
 
-if [ "${CIRCLE_BRANCH}" == "master" ];
+if [ "${CIRCLE_BRANCH}" == "master" ] && [[ -z $VERSION]];
   then
     export IMAGE_ID="${REGISTRY}/${IMAGE}:dev-${TAG}"
-  else
+fi
+if [ "${CIRCLE_BRANCH}" != "master" ] && [[ -z $VERSION]];
+  then
+    export IMAGE_ID="${REGISTRY}/${IMAGE}:${CIRCLE_BRANCH}-${TAG}"
+fi
+if [[ -n $VERSION]];
     export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
 fi
 
