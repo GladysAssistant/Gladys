@@ -107,7 +107,7 @@ jobs:
           root: ~/gladys-build
           paths:
             - front/build
-  manifest_tag:
+  manifest_release:
     machine:
       enabled: true
       image: circleci/classic:201808-01
@@ -137,7 +137,7 @@ jobs:
             sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm32v7 --os linux --arch arm --variant v7
             sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm64v8 --os linux --arch arm64 --variant v8
             sudo docker manifest push $DOCKERHUB_REPO:latest -p
-    manifest_tag_dev:
+  manifest_dev:
     machine:
       enabled: true
       image: circleci/classic:201808-01
@@ -217,7 +217,7 @@ workflows:
       - build-arm32v7:
           requires:
             - build-front
-      - manifest_tag:
+      - manifest_release:
           requires:
             - build-amd64
             - build-arm64v8
@@ -227,7 +227,7 @@ workflows:
           filters:
             tags:
               only: /v*/
-      - manifest_tag_dev:
+      - manifest_dev:
           requires:
             - build-amd64
             - build-arm64v8
