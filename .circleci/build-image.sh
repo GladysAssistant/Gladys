@@ -2,13 +2,13 @@
 
 set -eu
 # Conditions for image tag
-if [ "${CIRCLE_BRANCH}" == "master" ] && [[ -z $VERSION]];
+if [ "${CIRCLE_BRANCH}" == "master" ] && [[ -z $VERSION]]; then
     export IMAGE_ID="${REGISTRY}/${IMAGE}:dev-${TAG}"
 fi
-if [ "${CIRCLE_BRANCH}" != "master" ] && [[ -z $VERSION]];
+if [ "${CIRCLE_BRANCH}" != "master" ] && [[ -z $VERSION]]; then
     export IMAGE_ID="${REGISTRY}/${IMAGE}:${CIRCLE_BRANCH}-${TAG}"
 fi
-if [[ -n $VERSION]];
+if [[ -n $VERSION]]; then
     export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
 fi
 
