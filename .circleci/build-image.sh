@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -eu
-
+# Conditions for image tag
 if [ "${CIRCLE_BRANCH}" == "master" ] && [[ -z $VERSION]];
     export IMAGE_ID="${REGISTRY}/${IMAGE}:dev-${TAG}"
 fi
