@@ -2,7 +2,12 @@
 
 set -eu
 
-export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
+if [ "${CIRCLE_BRANCH}" == "master" ];
+  then
+    export IMAGE_ID="${REGISTRY}/${IMAGE}:dev-${TAG}"
+  else
+    export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
+fi
 
 # ============
 # <qemu-support>

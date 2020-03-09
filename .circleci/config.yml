@@ -137,6 +137,30 @@ jobs:
             sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm32v7 --os linux --arch arm --variant v7
             sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm64v8 --os linux --arch arm64 --variant v8
             sudo docker manifest push $DOCKERHUB_REPO:latest -p
+    manifest_tag_dev:
+    machine:
+      enabled: true
+      image: circleci/classic:201808-01
+    steps:
+      - checkout
+      - run:
+          name: Add dynamic shared vars to env.
+          command: |
+            .circleci/load_env.sh
+      - run:
+          name: Creating manifest for releases tag
+          command: |
+            # Turn on Experimental features
+            sudo mkdir $HOME/.docker
+            sudo sh -c 'echo "{ \"experimental\": \"enabled\" }" >> $HOME/.docker/config.json'
+            echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin
+            sudo docker manifest create --amend $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-amd64 $DOCKERHUB_REPO:dev-i386 $DOCKERHUB_REPO:dev-arm $DOCKERHUB_REPO:dev-arm32v7 $DOCKERHUB_REPO:dev-arm64v8
+            sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-amd64 --os linux --arch amd64
+            sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-i386 --os linux --arch 386
+            sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm --os linux --arch arm --variant v6
+            sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm32v7 --os linux --arch arm --variant v7
+            sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm64v8 --os linux --arch arm64 --variant v8
+            sudo docker manifest push $DOCKERHUB_REPO:dev -p
   build-armhf:
     <<: *shared
     environment:
@@ -203,4 +227,13 @@ workflows:
           filters:
             tags:
               only: /v*/
-      
+      - manifest_tag_dev:
+          requires:
+            - build-amd64
+            - build-arm64v8
+            - build-i386
+            - build-armhf
+            - build-arm32v7
+          filters:
+            branches:
+              only: master   
