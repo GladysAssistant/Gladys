@@ -13,19 +13,14 @@ function handleNewMessage(topic, message) {
   try {
     let forwardedMessage = false;
 
-    const extactMatch = this.topicBinds[topic];
-    if (extactMatch) {
-      forwardedMessage = true;
-      extactMatch(this, topic, message);
-    } else {
-      Object.keys(this.topicBinds).forEach((key) => {
-        const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
-        if (topic.match(regexKey)) {
-          forwardedMessage = true;
-          this.topicBinds[key](topic, message);
-        }
-      }, this);
-    }
+    // foreach topic, we see if it matches
+    Object.keys(this.topicBinds).forEach((key) => {
+      const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
+      if (topic.match(regexKey)) {
+        forwardedMessage = true;
+        this.topicBinds[key](topic, message);
+      }
+    }, this);
 
     if (!forwardedMessage) {
       logger.warn(`No subscription found for MQTT topic ${topic}`);
