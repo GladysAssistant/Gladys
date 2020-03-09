@@ -10,7 +10,7 @@ const triggersFunc = {
     // we compare the value with the expected value
     return compare(trigger.operator, event.last_value, trigger.value);
   },
-  [EVENTS.TIME.CHANGED]: (event, trigger) => true,
+  [EVENTS.TIME.CHANGED]: (event, trigger) => event.key === trigger.key,
 };
 
 module.exports = {
