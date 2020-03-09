@@ -8,7 +8,7 @@ const logger = require('../../../utils/logger');
  * handleNewMessage('/gladys/master/heartbeat', '{}');
  */
 function handleNewMessage(topic, message) {
-  logger.trace(`Receives MQTT message from ${topic} : ${message}`);
+  logger.debug(`Receives MQTT message from ${topic} : ${message}`);
 
   try {
     let forwardedMessage = false;
@@ -20,7 +20,6 @@ function handleNewMessage(topic, message) {
     } else {
       Object.keys(this.topicBinds).forEach((key) => {
         const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
-
         if (topic.match(regexKey)) {
           forwardedMessage = true;
           this.topicBinds[key](topic, message);

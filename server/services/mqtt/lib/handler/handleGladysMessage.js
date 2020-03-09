@@ -9,16 +9,16 @@ const logger = require('../../../../utils/logger');
  * handleGladysMessage('gladys/device/create', '{ message: "content" }');
  */
 function handleGladysMessage(topic, message) {
-  switch (topic) {
-    case 'gladys/master/device/create':
-      this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
-      break;
-    case 'gladys/master/device/state/update':
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, JSON.parse(message));
-      break;
-    default:
-      logger.info(`MQTT : Gladys topic ${topic} not handled.`);
-      break;
+  const parsedTopic = topic.split('/');
+  // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
+  if (topic.startsWith('gladys/master/device/')) {
+    const event = {
+      device_feature_external_id: parsedTopic[5],
+      state: message,
+    };
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+  } else {
+    logger.warn(`MQTT : Gladys topic ${topic} not handled.`);
   }
 }
 
