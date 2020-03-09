@@ -1,5 +1,6 @@
 const schedule = require('node-schedule');
 const cloneDeep = require('lodash.clonedeep');
+const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
@@ -33,6 +34,8 @@ function addScene(sceneRaw) {
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled
   if (scene.triggers) {
     scene.triggers.forEach((trigger) => {
+      // First, we had a trigger key, import to uniquely identify this trigger
+      trigger.key = uuid.v4();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = new schedule.RecurrenceRule();
         switch (trigger.scheduler_type) {
