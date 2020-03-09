@@ -46,6 +46,12 @@ describe('Mqtt handle message', () => {
     });
   });
 
+  it('should fail to update device state, but not crash', () => {
+    mqttHandler.handleNewMessage('gladys/master/device/my_device_external_id/', '19.8');
+
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('handle strict topic', () => {
     mqttHandler.handleNewMessage('gladys/master/random-topic', '{}');
 

@@ -1,4 +1,5 @@
 const { EVENTS } = require('../../../../utils/constants');
+const { BadParameters } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -12,6 +13,9 @@ function handleGladysMessage(topic, message) {
   const parsedTopic = topic.split('/');
   // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
   if (topic.startsWith('gladys/master/device/')) {
+    if (!parsedTopic[5]) {
+      throw new BadParameters('Device feature external_id is required');
+    }
     const event = {
       device_feature_external_id: parsedTopic[5],
       state: message,
