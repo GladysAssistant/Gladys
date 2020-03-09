@@ -7,7 +7,7 @@ import DeviceTab from './DeviceTab';
 @connect('user,tasmotaDevices,housesWithRooms,getTasmotaStatus', actions)
 class TasmotaIntegration extends Component {
   componentWillMount() {
-    this.props.getTasmotaDevices(100, 0);
+    this.props.getTasmotaDevices();
     this.props.getHouses();
     this.props.getIntegrationByName('tasmota');
   }

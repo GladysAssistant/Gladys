@@ -6,29 +6,19 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getTasmotaDevices(state, take, skip) {
+    async getTasmotaDevices(state) {
       store.setState({
         getTasmotaStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getTasmotaOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getTasmotaOrderDir || 'asc'
         };
         if (state.tasmotaSearch && state.tasmotaSearch.length) {
           options.search = state.tasmotaSearch;
         }
 
-        const tasmotasReceived = await state.httpClient.get('/api/v1/service/tasmota/device', options);
-        let tasmotaDevices;
-        if (skip === 0) {
-          tasmotaDevices = tasmotasReceived;
-        } else {
-          tasmotaDevices = update(state.tasmotaDevices, {
-            $push: tasmotasReceived
-          });
-        }
+        const tasmotaDevices = await state.httpClient.get('/api/v1/service/tasmota/device', options);
         store.setState({
           tasmotaDevices,
           getTasmotaStatus: RequestStatus.Success
@@ -132,13 +122,13 @@ function createActions(store) {
       store.setState({
         tasmotaSearch: e.target.value
       });
-      await actions.getTasmotaDevices(store.getState(), 20, 0);
+      await actions.getTasmotaDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
         getTasmotaOrderDir: e.target.value
       });
-      await actions.getTasmotaDevices(store.getState(), 20, 0);
+      await actions.getTasmotaDevices(store.getState());
     },
     async forceScan(state) {
       store.setState({
