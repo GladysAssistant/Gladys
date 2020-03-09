@@ -48,12 +48,12 @@ jobs:
           command: 'sudo npm install typescript node-gyp npm@latest -g'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dependency-cache-{{ checksum "server/package.json" }}-node-12
+          key: dependency-cache-{{ checksum "server/package.json" }}-node-lts
       - run:
           name: Install NPM dependencies
           command: cd server && npm install
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "server/package.json" }}-node-12
+          key: dependency-cache-{{ checksum "server/package.json" }}-node-lts
           paths:
             - ./server/node_modules
       - run:
@@ -80,12 +80,12 @@ jobs:
           command: 'sudo npm install codecov npm@latest -g'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dependency-cache-{{ checksum "package.json" }}-node-12
+          key: dependency-cache-{{ checksum "package.json" }}-node-lts
       - run:
           name: Install NPM dependencies
           command: npm install
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "package.json" }}-node-12
+          key: dependency-cache-{{ checksum "package.json" }}-node-lts
           paths:
             - ./node_modules
       - run:
@@ -118,19 +118,25 @@ jobs:
           command: |
             .circleci/load_env.sh
       - run:
-          name: Creating manifest
+          name: Creating manifest for releases tag
           command: |
             # Turn on Experimental features
             sudo mkdir $HOME/.docker
             sudo sh -c 'echo "{ \"experimental\": \"enabled\" }" >> $HOME/.docker/config.json'
             echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin
-            sudo docker manifest create --amend $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-amd64 $DOCKERHUB_REPO:$VERSION-i386 $DOCKERHUB_REPO:$VERSION-arm $DOCKERHUB_REPO:$VERSION-arm32v7 $DOCKERHUB_REPO:$VERSION-arm64v8
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-amd64 --os linux --arch amd64
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-i386 --os linux --arch 386
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm --os linux --arch arm --variant v6
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm32v7 --os linux --arch arm --variant v7
-            sudo docker manifest annotate $DOCKERHUB_REPO:$VERSION $DOCKERHUB_REPO:$VERSION-arm64v8 --os linux --arch arm64 --variant v8
-            sudo docker manifest push $DOCKERHUB_REPO:$VERSION -p
+            sudo docker manifest create --amend $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 $DOCKERHUB_REPO:$CIRCLE_TAG-i386 $DOCKERHUB_REPO:$CIRCLE_TAG-arm $DOCKERHUB_REPO:$CIRCLE_TAG-arm32v7 $DOCKERHUB_REPO:$CIRCLE_TAG-arm64v8
+            sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 --os linux --arch amd64
+            sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-i386 --os linux --arch 386
+            sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm --os linux --arch arm --variant v6
+            sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm32v7 --os linux --arch arm --variant v7
+            sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm64v8 --os linux --arch arm64 --variant v8
+            sudo docker manifest create --amend $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-amd64 $DOCKERHUB_REPO:latest-i386 $DOCKERHUB_REPO:latest-arm $DOCKERHUB_REPO:latest-arm32v7 $DOCKERHUB_REPO:latest-arm64v8
+            sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-amd64 --os linux --arch amd64
+            sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-i386 --os linux --arch 386
+            sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm --os linux --arch arm --variant v6
+            sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm32v7 --os linux --arch arm --variant v7
+            sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm64v8 --os linux --arch arm64 --variant v8
+            sudo docker manifest push $DOCKERHUB_REPO:latest -p
   build-armhf:
     <<: *shared
     environment:
@@ -175,43 +181,18 @@ workflows:
       - build-armhf:
           requires:
             - build-front
-          filters:
-            tags:
-              only: /v*/
-            branches:
-              only: ci
       - build-amd64:
           requires:
             - build-front
-          filters:
-            tags:
-              only: /v*/
-            branches:
-              only: ci
       - build-i386:
           requires:
             - build-front
-          filters:
-            tags:
-              only: /v*/
-            branches:
-              only: ci
       - build-arm64v8:
           requires:
             - build-front
-          filters:
-            tags:
-              only: /v*/
-            branches:
-              only: ci
       - build-arm32v7:
           requires:
             - build-front
-          filters:
-            tags:
-              only: /v*/
-            branches:
-              only: ci
       - manifest_tag:
           requires:
             - build-amd64
@@ -219,4 +200,7 @@ workflows:
             - build-i386
             - build-armhf
             - build-arm32v7
+          filters:
+            tags:
+              only: /v*/
       
