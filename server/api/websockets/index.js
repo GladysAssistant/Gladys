@@ -92,7 +92,6 @@ function userDisconnected(user, client) {
  */
 function init() {
   this.wss.on('connection', (ws) => {
-    logger.debug(`New user connected in websocket, ${ws}`);
     let user;
     let authenticated = false;
     ws.on('close', () => {
@@ -114,7 +113,6 @@ function init() {
             authenticated = true;
             this.userConnected(user, ws);
           } catch (e) {
-            logger.warn(e);
             ws.close(4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
           }
           break;

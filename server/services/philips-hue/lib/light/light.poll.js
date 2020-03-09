@@ -26,9 +26,7 @@ async function poll(device) {
   if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
     logger.debug(`Polling Philips Hue ${lightId}, new value = ${currentBinaryState}`);
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${
-        DEVICE_FEATURE_TYPES.LIGHT.BINARY
-      }`,
+      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
       state: currentBinaryState,
     });
   }

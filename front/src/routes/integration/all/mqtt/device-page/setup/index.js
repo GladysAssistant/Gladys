@@ -3,16 +3,12 @@ import { connect } from 'unistore/preact';
 import actions from '../actions';
 import FeatureTab from './FeatureTab';
 import MqttPage from '../../MqttPage';
-import integrationConfig from '../../../../../../config/integrations';
 import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 
-@connect(
-  'session,user,httpClient,houses,currentIntegration',
-  actions
-)
+@connect('session,user,httpClient,houses,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
   selectFeature(e) {
     this.setState({
@@ -172,7 +168,7 @@ class MqttDeviceSetupPage extends Component {
 
   render(props, state) {
     return (
-      <MqttPage integration={integrationConfig[props.user.language].mqtt}>
+      <MqttPage>
         <FeatureTab
           {...props}
           {...state}

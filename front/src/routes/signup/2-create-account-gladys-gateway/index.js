@@ -4,10 +4,7 @@ import SignupLayout from '../layout';
 import CreateAccountGladysGatewayTab from './CreateAccountGladysGatewayTab';
 import actions from '../../../actions/signup/signupCreateLocalAccount';
 
-@connect(
-  '',
-  actions
-)
+@connect('', actions)
 class CreateAccountGladysGateway extends Component {
   componentWillMount() {
     this.props.checkIfInstanceIsConfigured();

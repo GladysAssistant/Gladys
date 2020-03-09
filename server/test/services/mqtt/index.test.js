@@ -25,26 +25,26 @@ describe('MqttService', () => {
     await mqttService.start();
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);
-    expect(mqttService.client.mqttClient.disconnected).to.eq(false);
+    expect(mqttService.device.mqttClient.disconnected).to.eq(false);
   });
 
   it('should start service while already started', async () => {
     await mqttService.start();
     assert.callCount(gladys.variable.getValue, 3);
-    assert.calledOnce(mqttService.client.mqttClient.internalEnd);
+    assert.calledOnce(mqttService.device.mqttClient.internalEnd);
     assert.calledOnce(MockedMqttClient.internalConnect);
-    expect(mqttService.client.mqttClient.disconnected).to.eq(false);
+    expect(mqttService.device.mqttClient.disconnected).to.eq(false);
   });
 
   it('should stop service', async () => {
     mqttService.stop();
-    assert.calledOnce(mqttService.client.mqttClient.internalEnd);
-    expect(mqttService.client.mqttClient.disconnected).to.eq(true);
+    assert.calledOnce(mqttService.device.mqttClient.internalEnd);
+    expect(mqttService.device.mqttClient.disconnected).to.eq(true);
   });
 
   it('should stop service while already stopped', async () => {
     mqttService.stop();
-    assert.notCalled(mqttService.client.mqttClient.internalEnd);
-    expect(mqttService.client.mqttClient.disconnected).to.eq(true);
+    assert.notCalled(mqttService.device.mqttClient.internalEnd);
+    expect(mqttService.device.mqttClient.disconnected).to.eq(true);
   });
 });

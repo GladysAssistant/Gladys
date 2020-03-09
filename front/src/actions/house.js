@@ -78,7 +78,7 @@ function createActions(store) {
       if (name.length === 0) {
         return null;
       }
-      if (state.houses[houseIndex].rooms.find(room => room.name === name)) {
+      if (state.houses[houseIndex].rooms.find(room => room.name.toLowerCase() === name.toLowerCase())) {
         return null;
       }
       const newRoom = {
@@ -193,7 +193,14 @@ function createActions(store) {
         store.setState(newState);
       } catch (e) {
         const status = get(e, 'response.status');
-        if (status === 409) {
+        const errorValue = get(e, 'response.data.error.value');
+        if (status === 409 && errorValue === 'room') {
+          store.setState({
+            houseUpdateStatus: {
+              [house.id]: RequestStatus.RoomConflictError
+            }
+          });
+        } else if (status === 409) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.ConflictError

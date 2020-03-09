@@ -1,5 +1,7 @@
 const uuid = require('uuid');
 const db = require('../../models');
+const passwordUtils = require('../../utils/password');
+const { BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @public
@@ -21,6 +23,10 @@ const db = require('../../models');
  *
  */
 async function create(user) {
+  if (!user.password || user.password.length < 8) {
+    throw new BadParameters('Password is too short');
+  }
+  user.password = await passwordUtils.hash(user.password);
   const createdUser = await db.User.create(user);
   const plainUser = createdUser.get({ plain: true });
   delete plainUser.password;

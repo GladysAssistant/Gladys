@@ -56,6 +56,7 @@ const RoomCard = ({ children, ...props }) => {
               props.devices.map((device, deviceIndex) =>
                 device.features.map((deviceFeature, deviceFeatureIndex) => (
                   <DeviceRow
+                    user={props.user}
                     x={props.x}
                     y={props.y}
                     device={device}
@@ -74,10 +75,7 @@ const RoomCard = ({ children, ...props }) => {
   );
 };
 
-@connect(
-  'session,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom',
-  actions
-)
+@connect('session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom', actions)
 class DevicesInRoomComponent extends Component {
   updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
 

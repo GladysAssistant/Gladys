@@ -10,6 +10,12 @@ const logger = require('../../utils/logger');
  * });
  */
 async function forwardWebsockets(event) {
+  if (!this.connected) {
+    logger.debug('Gateway: not connected. Prevent forwarding event.');
+
+    return;
+  }
+
   logger.debug(`Gateway : Forward websocket message : ${event.type}`);
   try {
     if (event.userId) {

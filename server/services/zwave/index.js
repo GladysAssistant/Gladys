@@ -35,6 +35,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    device: zwaveManager,
     controllers: ZwaveController(gladys, zwaveManager, serviceId),
   });
 };

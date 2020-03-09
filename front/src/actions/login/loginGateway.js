@@ -57,7 +57,10 @@ function createActions(store) {
         }
       }
     },
-    async loginTwoFactor(state) {
+    async loginTwoFactor(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
       store.setState({
         gatewayLoginStatus: RequestStatus.Getting
       });
@@ -85,7 +88,9 @@ function createActions(store) {
           route('/link-gateway-user');
         }
       } catch (e) {
+        console.log(e);
         const error = get(e, 'response.error');
+        const errorMessage = get(e, 'response.error_message');
         // if user was previously linked to another instance, we reset the user id
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);
@@ -93,6 +98,10 @@ function createActions(store) {
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           store.setState({
             gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
+          });
+        } else if (errorMessage === 'NO_INSTANCE_FOUND') {
+          store.setState({
+            gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
           });
         } else {
           store.setState({

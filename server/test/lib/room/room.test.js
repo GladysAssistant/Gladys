@@ -131,6 +131,7 @@ describe('room.get', () => {
   it('should get rooms with expanded devices + features', async () => {
     const rooms = await room.get({
       expand: ['devices'],
+      take: 100,
     });
     expect(rooms).to.be.instanceOf(Array);
     rooms.forEach((oneRoom) => {
@@ -158,5 +159,13 @@ describe('room.get', () => {
         });
       });
     });
+  });
+  it('should get 0 rooms (take = 0)', async () => {
+    const rooms = await room.get({
+      expand: ['devices'],
+      take: 0,
+    });
+    expect(rooms).to.be.instanceOf(Array);
+    expect(rooms).to.have.lengthOf(0);
   });
 });

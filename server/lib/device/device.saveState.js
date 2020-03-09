@@ -59,6 +59,14 @@ async function saveState(deviceFeature, newValue) {
         last_value_changed: now,
       },
     });
+
+    // check if there is a trigger matching
+    this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: deviceFeature.selector,
+      last_value: newValue,
+      last_value_changed: now,
+    });
   });
 }
 

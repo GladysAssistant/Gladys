@@ -15,8 +15,10 @@ async function connect() {
 
   const variablesFound = mqttUrl;
   if (!variablesFound) {
+    this.configured = false;
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }
+  this.configured = true;
 
   if (this.mqttClient) {
     this.disconnect();
@@ -35,6 +37,7 @@ async function connect() {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
     });
+    this.connected = true;
   });
   this.mqttClient.on('error', (err) => {
     logger.warn(`Error while connecting to MQTT - ${err}`);
@@ -42,6 +45,14 @@ async function connect() {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
       payload: err,
     });
+  });
+  this.mqttClient.on('offline', () => {
+    logger.warn(`Disconnected from MQTT server`);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+      payload: 'DISCONNECTED',
+    });
+    this.connected = false;
   });
   this.mqttClient.on('message', (topic, message) => {
     this.handleNewMessage(topic, message.toString());

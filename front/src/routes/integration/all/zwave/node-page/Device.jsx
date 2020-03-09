@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
+import { Link } from 'preact-router/match';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
@@ -136,6 +137,11 @@ class ZWaveDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.zwave.device.deleteButton" />
                   </button>
+                  <Link href={`/dashboard/integration/device/zwave/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.zwave.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

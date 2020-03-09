@@ -5,6 +5,7 @@ import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 import { Link } from 'preact-router/match';
+import CheckMqttPanel from '../commons/CheckMqttPanel';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -42,6 +43,8 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
+      <CheckMqttPanel />
+
       <div
         class={cx('dimmer', {
           active: props.getMqttDevicesStatus === RequestStatus.Getting

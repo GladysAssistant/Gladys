@@ -5,10 +5,7 @@ import ZwavePage from '../ZwavePage';
 import NodeTab from './NodeTab';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect(
-  'session,user,zwaveDevices,houses,getZwaveDevicesStatus',
-  actions
-)
+@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveNodePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices(20, 0);

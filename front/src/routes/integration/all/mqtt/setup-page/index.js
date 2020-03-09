@@ -3,13 +3,9 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import MqttPage from '../MqttPage';
 import SetupTab from './SetupTab';
-import integrationConfig from '../../../../../config/integrations';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,mqttURL,mqttUsername,mqttPassword,connectMqttStatus,mqttConnected,mqttConnectionError',
-  actions
-)
+@connect('user,session,mqttURL,mqttUsername,mqttPassword,connectMqttStatus,mqttConnected,mqttConnectionError', actions)
 class MqttNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('mqtt');
@@ -24,7 +20,7 @@ class MqttNodePage extends Component {
 
   render(props, {}) {
     return (
-      <MqttPage integration={integrationConfig[props.user.language].mqtt}>
+      <MqttPage>
         <SetupTab {...props} />
       </MqttPage>
     );

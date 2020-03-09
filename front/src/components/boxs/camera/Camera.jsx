@@ -31,10 +31,7 @@ const CameraBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect(
-  'session,DashboardBoxDataCamera,DashboardBoxStatusCamera',
-  actions
-)
+@connect('session,DashboardBoxDataCamera,DashboardBoxStatusCamera', actions)
 class CameraBoxComponent extends Component {
   updateDeviceStateWebsocket = payload =>
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);

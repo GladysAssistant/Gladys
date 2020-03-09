@@ -27,6 +27,14 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Text id="gatewayLogin.userNotAcceptedLocally" />
             </div>
           )}
+          {props.gatewayLoginStatus === RequestStatus.GatewayNoInstanceFound && (
+            <div class="alert alert-danger" role="alert">
+              <Text id="gatewayLogin.gatewayNoInstanceFound" />{' '}
+              <a href="/dashboard/settings/billing">
+                <Text id="gatewayLogin.gatewayAccessBilling" />
+              </a>
+            </div>
+          )}
           {props.gatewayLoginStatus === RequestStatus.NetworkError && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.networkError" />

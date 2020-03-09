@@ -1,7 +1,10 @@
+const fs = require('fs');
+
 // EVENTS
 const { driverReady } = require('./events/zwave.driverReady');
 const { driverFailed } = require('./events/zwave.driverFailed');
 const { nodeAdded } = require('./events/zwave.nodeAdded');
+const { nodeRemoved } = require('./events/zwave.nodeRemoved');
 const { nodeEvent } = require('./events/zwave.nodeEvent');
 const { valueAdded } = require('./events/zwave.valueAdded');
 const { valueChanged } = require('./events/zwave.valueChanged');
@@ -14,6 +17,7 @@ const { controllerCommand } = require('./events/zwave.controllerCommand');
 // COMMANDS
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
+const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
 const { disconnect } = require('./commands/zwave.disconnect');
 const { healNetwork } = require('./commands/zwave.healNetwork');
 const { refreshNodeParams } = require('./commands/zwave.refreshNodeParams');
@@ -21,6 +25,7 @@ const { getInfos } = require('./commands/zwave.getInfos');
 const { getNodes } = require('./commands/zwave.getNodes');
 const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
 const { removeNode } = require('./commands/zwave.removeNode');
+const { setValue } = require('./commands/zwave.setValue');
 
 const DEFAULT_ZWAVE_OPTIONS = {
   Logging: false,
@@ -28,6 +33,11 @@ const DEFAULT_ZWAVE_OPTIONS = {
   SaveConfiguration: true,
   // NetworkKey: '0x49,0x43,0x1D,0xBD,0x03,0x6D,0x9D,0x8C,0x39,0x67,0x16,0x82,0xA8,0x67,0xEE,0x91',
 };
+
+// if openzwave config is installed in the etc folder
+if (fs.existsSync('/etc/openzwave')) {
+  DEFAULT_ZWAVE_OPTIONS.ConfigPath = '/etc/openzwave';
+}
 
 const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
   this.zwave = new Zwave(DEFAULT_ZWAVE_OPTIONS);
@@ -40,6 +50,7 @@ const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
   this.zwave.on('driver ready', this.driverReady.bind(this));
   this.zwave.on('driver failed', this.driverFailed.bind(this));
   this.zwave.on('node added', this.nodeAdded.bind(this));
+  this.zwave.on('node removed', this.nodeRemoved.bind(this));
   this.zwave.on('node event', this.nodeEvent.bind(this));
   this.zwave.on('value added', this.valueAdded.bind(this));
   this.zwave.on('value changed', this.valueChanged.bind(this));
@@ -53,6 +64,7 @@ const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
 ZwaveManager.prototype.driverReady = driverReady;
 ZwaveManager.prototype.driverFailed = driverFailed;
 ZwaveManager.prototype.nodeAdded = nodeAdded;
+ZwaveManager.prototype.nodeRemoved = nodeRemoved;
 ZwaveManager.prototype.nodeEvent = nodeEvent;
 ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueChanged = valueChanged;
@@ -65,6 +77,7 @@ ZwaveManager.prototype.controllerCommand = controllerCommand;
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.connect = connect;
+ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
 ZwaveManager.prototype.disconnect = disconnect;
 ZwaveManager.prototype.healNetwork = healNetwork;
 ZwaveManager.prototype.refreshNodeParams = refreshNodeParams;
@@ -72,5 +85,6 @@ ZwaveManager.prototype.getInfos = getInfos;
 ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
+ZwaveManager.prototype.setValue = setValue;
 
 module.exports = ZwaveManager;

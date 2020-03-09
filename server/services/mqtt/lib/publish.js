@@ -9,6 +9,7 @@ const logger = require('../../../utils/logger');
  */
 function publish(topic, message = undefined) {
   if (this.mqttClient) {
+    logger.trace(`Publish MQTT message over ${topic}`);
     this.mqttClient.publish(topic, message, undefined, (err) => {
       if (err) {
         logger.warn(`MQTT - Error publishing to ${topic} : ${err}`);

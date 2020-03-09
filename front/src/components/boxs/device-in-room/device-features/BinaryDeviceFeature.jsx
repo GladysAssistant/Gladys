@@ -7,7 +7,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
       props.deviceFeature,
       props.deviceIndex,
       props.deviceFeatureIndex,
-      props.deviceFeature.last_value === 1 ? 0 : 1
+      props.deviceFeature.last_value === 0 ? 1 : 0
     );
   }
 

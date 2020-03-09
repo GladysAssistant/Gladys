@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import ConfigureTwoFactorForm from './ConfigureTwoFactorForm';
 import QRCode from 'qrcode';
 
-@connect(
-  'session',
-  {}
-)
+@connect('session', {})
 class ConfigureTwoFactorPage extends Component {
   state = {
     dataUrl: null,

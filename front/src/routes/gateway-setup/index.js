@@ -5,10 +5,7 @@ import actions from '../../actions/gatewayLinkUser';
 import { route } from 'preact-router';
 import { RequestStatus } from '../../utils/consts';
 
-@connect(
-  'users,usersGetStatus',
-  actions
-)
+@connect('users,usersGetStatus', actions)
 class LinkGatewayUser extends Component {
   selectUser = e => {
     this.setState({

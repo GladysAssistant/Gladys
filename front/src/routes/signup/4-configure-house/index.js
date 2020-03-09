@@ -5,10 +5,7 @@ import ConfigureHouseTab from './ConfigureHouseTab';
 import actions from '../../../actions/signup/signupConfigureHouse';
 import 'leaflet/dist/leaflet.css';
 
-@connect(
-  'signupRooms,signupNewHouseName,signupNewRoomName,signupConfigureHouseErrors',
-  actions
-)
+@connect('signupRooms,signupNewHouseName,signupNewRoomName,signupConfigureHouseErrors', actions)
 class ConfigureHouse extends Component {
   componentWillMount() {
     this.props.initRoomList();

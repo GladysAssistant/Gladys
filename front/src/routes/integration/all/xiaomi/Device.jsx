@@ -19,6 +19,16 @@ class XiaomiDeviceBox extends Component {
       batteryLevel
     });
   };
+  getGatewayIp = () => {
+    if (!this.props.device.params) {
+      return '';
+    }
+    const gatewayIpParam = this.props.device.params.find(param => param.name === 'GATEWAY_IP');
+    if (gatewayIpParam) {
+      return gatewayIpParam.value;
+    }
+    return '';
+  };
   saveDevice = async () => {
     this.setState({ loading: true });
     try {
@@ -82,6 +92,14 @@ class XiaomiDeviceBox extends Component {
                   </label>
                   <input type="text" value={props.device.external_id.split(':')[1]} class="form-control" disabled />
                 </div>
+                {props.device.model === 'xiaomi-gateway' && (
+                  <div class="form-group">
+                    <label>
+                      <Text id="integration.xiaomi.device.ipLabel" />
+                    </label>
+                    <input type="text" value={this.getGatewayIp()} class="form-control" disabled />
+                  </div>
+                )}
                 <div class="form-group">
                   <label>
                     <Text id="integration.xiaomi.device.roomLabel" />

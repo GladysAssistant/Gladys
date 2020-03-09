@@ -1,79 +1,19 @@
 import get from 'get-value';
-import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import { getCategory } from '../../../../../../../server/services/zwave/lib/utils/getCategory';
-import { getDeviceFeatureExternalId } from '../../../../../../../server/services/zwave/lib/utils/externalId';
 import { ERROR_MESSAGES } from '../../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../../actions/integration';
-
-const addParamsAndFeatures = node => {
-  node.features = [];
-  node.params = [];
-  const comclasses = Object.keys(node.classes);
-  comclasses.forEach(comclass => {
-    const values = node.classes[comclass];
-    const indexes = Object.keys(values);
-    indexes.forEach(idx => {
-      const { min, max } = values[idx];
-
-      if (values[idx].genre === 'user') {
-        const { category, type } = getCategory(node, values[idx]);
-        if (category !== 'unknown') {
-          node.features.push({
-            name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-            category,
-            type,
-            external_id: getDeviceFeatureExternalId(values[idx]),
-            read_only: values[idx].read_only,
-            unit: values[idx].units,
-            has_feedback: true,
-            min,
-            max
-          });
-        }
-      } else {
-        node.params.push({
-          name: `${values[idx].label}-${values[idx].value_id}`,
-          value: values[idx].value || ''
-        });
-      }
-    });
-  });
-};
 
 const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    addLocalNode(state, node) {
-      addParamsAndFeatures(node);
-      const nodeInArrayIndex = state.zwaveNodes.findIndex(n => n.id === node.id);
-      let newState;
-      if (nodeInArrayIndex !== -1) {
-        newState = update(state, {
-          zwaveNodes: {
-            $push: [node]
-          }
-        });
-      } else {
-        newState = update(state, {
-          zwaveNodes: {
-            [nodeInArrayIndex]: {
-              $set: node
-            }
-          }
-        });
-      }
-      store.setState(newState);
-    },
     async getNodes(state) {
       store.setState({
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
         const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave/node');
-        zwaveNodes.forEach(node => addParamsAndFeatures(node));
-        console.log(zwaveNodes);
+
         store.setState({
           zwaveNodes,
           zwaveGetNodesStatus: RequestStatus.Success
@@ -91,7 +31,10 @@ const createActions = store => {
         }
       }
     },
-    async addNode(state, secure = false) {
+    async addNode(state, e, secure = false) {
+      if (e) {
+        e.preventDefault();
+      }
       store.setState({
         zwaveAddNodeStatus: RequestStatus.Getting
       });
@@ -108,6 +51,24 @@ const createActions = store => {
         });
       }
     },
+    async addNodeSecure(state, e) {
+      actions.addNode(state, e, true);
+    },
+    async stopAddNode(state) {
+      store.setState({
+        zwaveStopAddNodeStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/zwave/cancel');
+        store.setState({
+          zwaveStopAddNodeStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          zwaveStopAddNodeStatus: RequestStatus.Error
+        });
+      }
+    },
     async healNetwork(state) {
       store.setState({
         zwaveHealNetworkStatus: RequestStatus.Getting
@@ -117,27 +78,10 @@ const createActions = store => {
         store.setState({
           zwaveHealNetworkStatus: RequestStatus.Success
         });
+        actions.getStatus(store.getState());
       } catch (e) {
         store.setState({
           zwaveHealNetworkStatus: RequestStatus.Error
-        });
-      }
-    },
-    async addNodeSecure(state) {
-      actions.addNode(state, true);
-    },
-    async removeNode(state, secure = false) {
-      store.setState({
-        zwaveRemoveNodeStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/zwave/node/remove');
-        store.setState({
-          zwaveRemoveNodeStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          zwaveRemoveNodeStatus: RequestStatus.Error
         });
       }
     },
@@ -157,44 +101,7 @@ const createActions = store => {
         });
       }
     },
-    async createDevice(state, node) {
-      const newDevice = {
-        name: node.product,
-        service_id: state.currentIntegration.id,
-        external_id: `zwave:node_id:${node.id}`,
-        features: [],
-        params: []
-      };
-      const comclasses = Object.keys(node.classes);
-      comclasses.forEach(comclass => {
-        const values = node.classes[comclass];
-        const indexes = Object.keys(values);
-        indexes.forEach(idx => {
-          const { min, max } = values[idx];
-
-          if (values[idx].genre === 'user') {
-            const { category, type } = getCategory(node, values[idx]);
-            if (category !== 'unknown') {
-              newDevice.features.push({
-                name: `${values[idx].label} - ${node.product} -  Node ${node.id}`,
-                category,
-                type,
-                external_id: getDeviceFeatureExternalId(values[idx]),
-                read_only: values[idx].read_only,
-                unit: values[idx].units,
-                has_feedback: true,
-                min,
-                max
-              });
-            }
-          } else {
-            newDevice.params.push({
-              name: `${values[idx].label}-${values[idx].value_id}`,
-              value: values[idx].value || ''
-            });
-          }
-        });
-      });
+    async createDevice(state, newDevice) {
       await state.httpClient.post('/api/v1/device', newDevice);
     }
   };

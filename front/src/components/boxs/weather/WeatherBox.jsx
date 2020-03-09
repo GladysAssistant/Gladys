@@ -87,7 +87,7 @@ const WeatherBox = ({ children, ...props }) => (
             <i class="fe fe-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/chat">
+              <Link href="/dashboard/integration/weather/darksky">
                 <Text id="dashboard.boxes.weather.clickHere" />
               </Link>
             </span>
@@ -160,10 +160,7 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect(
-  'DashboardBoxDataWeather,DashboardBoxStatusWeather',
-  actions
-)
+@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather', actions)
 class WeatherBoxComponent extends Component {
   componentDidMount() {
     // get the weather

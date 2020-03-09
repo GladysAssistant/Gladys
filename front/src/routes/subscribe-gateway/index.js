@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 import linkState from 'linkstate';
 import SignupForm from './SignupForm';
 
-@connect(
-  'session',
-  {}
-)
+@connect('session', {})
 class SignupPage extends Component {
   state = {
     email: '',

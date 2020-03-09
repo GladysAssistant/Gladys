@@ -11,7 +11,6 @@ const USER_ROLE = {
 
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
-  FR: 'fr',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -38,6 +37,7 @@ const EVENTS = {
     CHECK_IF_BACKUP_NEEDED: 'gateway.check-if-backup-needed',
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
+    NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
@@ -87,6 +87,12 @@ const EVENTS = {
     BRIGHTNESS_CHANGED: 'light.brightness-changed',
     HUE_CHANGED: 'light.hue-changed',
     SATURATION_CHANGED: 'light.saturation-changed',
+  },
+  TIME: {
+    CHANGED: 'time.changed',
+  },
+  TRIGGERS: {
+    CHECK: 'trigger.check',
   },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
@@ -170,9 +176,11 @@ const CONDITIONS = {
 const ACTIONS = {
   DEVICE: {
     SET_VALUE: 'device.set-value',
+    GET_VALUE: 'device.get-value',
   },
   LIGHT: {
     TURN_ON: 'light.turn-on',
+    TURN_OFF: 'light.turn-off',
   },
   TIME: {
     DELAY: 'delay',
@@ -184,8 +192,11 @@ const ACTIONS = {
   SCENE: {
     START: 'scene.start',
   },
-  TELEGRAM: {
-    SEND: 'telegram.send',
+  MESSAGE: {
+    SEND: 'message.send',
+  },
+  CONDITION: {
+    ONLY_CONTINUE_IF: 'condition.only-continue-if',
   },
 };
 
@@ -339,8 +350,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
   ZWAVE: {
+    DRIVER_READY: 'zwave.driver-ready',
+    DRIVER_FAILED: 'zwave.driver-failed',
     NODE_READY: 'zwave.node-ready',
     SCAN_COMPLETE: 'zwave.scan-complete',
+    NODE_ADDED: 'zwave.node-added',
+    NODE_REMOVED: 'zwave.node-removed',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
