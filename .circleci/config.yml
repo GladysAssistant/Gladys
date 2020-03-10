@@ -27,7 +27,7 @@ shared: &shared
     - run:
         name: Build and push Docker image.
         command: |
-          if git log -1 --pretty=%B | grep "^[v]\+[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
+          if git log -1 --pretty=%B | grep "^[v]\+[0-9]*\+\.[0-9]*\+\.[0-9]*\+$"; then
             MAJOR_VERSION=$(echo $CIRCLE_TAG | cut -d'.' -f 1)
             VERSION=$CIRCLE_TAG
           fi
@@ -131,7 +131,7 @@ jobs:
             sudo mkdir $HOME/.docker
             sudo sh -c 'echo "{ \"experimental\": \"enabled\" }" >> $HOME/.docker/config.json'
             echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin
-            if git log -1 --pretty=%B | grep "^[v]\+[0-9]\+\.[0-9]\+\.[0-9]\+$";
+            if git log -1 --pretty=%B | grep "^[v]\+[0-9]*\+\.[0-9]*\+\.[0-9]*\+$";
             then
               sudo docker manifest create --amend $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 $DOCKERHUB_REPO:$CIRCLE_TAG-i386 $DOCKERHUB_REPO:$CIRCLE_TAG-arm $DOCKERHUB_REPO:$CIRCLE_TAG-arm32v7 $DOCKERHUB_REPO:$CIRCLE_TAG-arm64v8
               sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 --os linux --arch amd64
@@ -208,7 +208,7 @@ workflows:
             - test-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - build-armhf:
@@ -216,7 +216,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - build-amd64:
@@ -224,7 +224,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - build-i386:
@@ -232,7 +232,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - build-arm64v8:
@@ -240,7 +240,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - build-arm32v7:
@@ -248,7 +248,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
       - docker_manifest:
@@ -260,6 +260,6 @@ workflows:
             - build-arm32v7
           filters:
             tags:
-              only: /^v.*/
+              only: /^v\d+.\d+.\d+$/
             branches:
               only: master
