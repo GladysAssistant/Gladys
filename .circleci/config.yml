@@ -200,8 +200,18 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - test-server
-      - test-front
+      - test-server:
+          filters:
+            tags:
+              only: /^v\d+.\d+.\d+$/
+            branches:
+              only: master
+      - test-front:
+          filters:
+            tags:
+              only: /^v\d+.\d+.\d+$/
+            branches:
+              only: master
       - build-front:
           requires:
             - test-server
