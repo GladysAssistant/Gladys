@@ -208,7 +208,7 @@ workflows:
             - test-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - build-armhf:
@@ -216,7 +216,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - build-amd64:
@@ -224,7 +224,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - build-i386:
@@ -232,7 +232,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - build-arm64v8:
@@ -240,7 +240,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - build-arm32v7:
@@ -248,7 +248,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
       - docker_manifest:
@@ -260,6 +260,6 @@ workflows:
             - build-arm32v7
           filters:
             tags:
-              only: /v*/
+              only: /^v.*/
             branches:
               only: master
