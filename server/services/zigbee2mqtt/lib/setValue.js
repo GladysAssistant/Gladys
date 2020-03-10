@@ -23,7 +23,7 @@ function setValue(device, deviceFeature, value) {
   }
 
   // Send message to Zigbee2mqtt topics
-  this.mqttService.device.publish(`zigbee2mqtt/${topic}/set`, value ? '{ "state" : "ON"}' : '{ "state" : "OFF"}');
+  this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, value ? '{ "state" : "ON"}' : '{ "state" : "OFF"}');
 }
 
 module.exports = {

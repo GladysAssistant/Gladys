@@ -5,7 +5,7 @@ import EmptyState from './EmptyState';
 import Zigbee2mqttBox from './Zigbee2mqttBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
-import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
+import CheckStatus from '../commons/CheckStatus';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -38,7 +38,7 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      <CheckMqttPanel />
+      <CheckStatus />
 
       <div
         class={cx('dimmer', {

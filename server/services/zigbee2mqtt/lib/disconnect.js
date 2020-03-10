@@ -1,3 +1,5 @@
+const logger = require('../../../utils/logger');
+
 /**
  * @description Disconnect service from dependencies.
  * @example
@@ -5,7 +7,9 @@
  */
 function disconnect() {
   // Unsubscribe to Zigbee2mqtt topics
-  this.mqttService.device.unsubscribe('zigbee2mqtt/#');
+  logger.log('stopping MQTT service for Zigbee2mqtt');
+
+  this.mqttClient.unsubscribe('zigbee2mqtt/#');
 }
 
 module.exports = {

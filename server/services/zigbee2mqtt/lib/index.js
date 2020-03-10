@@ -3,6 +3,7 @@ const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { discoverDevices } = require('./discoverDevices');
 const { setValue } = require('./setValue');
+const { status } = require('./status');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -14,8 +15,11 @@ const { setValue } = require('./setValue');
 const Zigbee2mqttHandler = function Zigbee2mqttHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.mqttService = null;
+  this.mqttClient = null;
   this.mqttDevices = {};
+
+  this.configured = false;
+  this.connected = false;
 };
 
 Zigbee2mqttHandler.prototype.connect = connect;
@@ -23,5 +27,6 @@ Zigbee2mqttHandler.prototype.disconnect = disconnect;
 Zigbee2mqttHandler.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttHandler.prototype.discoverDevices = discoverDevices;
 Zigbee2mqttHandler.prototype.setValue = setValue;
+Zigbee2mqttHandler.prototype.status = status;
 
 module.exports = Zigbee2mqttHandler;
