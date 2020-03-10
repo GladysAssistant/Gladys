@@ -5,7 +5,7 @@ import EmptyState from './EmptyState';
 import DiscoveredBox from './DiscoveredBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
-import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
+import CheckStatus from '../commons/CheckStatus';
 
 const DiscoverTab = ({ children, ...props }) => (
   <div class="card">
@@ -20,7 +20,7 @@ const DiscoverTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      <CheckMqttPanel />
+      <CheckStatus />
 
       {props.discoverZigbee2mqttError && (
         <div class="alert alert-danger">

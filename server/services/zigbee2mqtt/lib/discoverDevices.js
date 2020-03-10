@@ -4,7 +4,7 @@
  * discoverDevices();
  */
 function discoverDevices() {
-  this.mqttService.device.publish('zigbee2mqtt/bridge/config/devices/get');
+  this.mqttClient.publish('zigbee2mqtt/bridge/config/devices/get');
 }
 
 module.exports = {
