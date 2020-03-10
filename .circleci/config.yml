@@ -206,21 +206,51 @@ workflows:
           requires:
             - test-server
             - test-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - build-armhf:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - build-amd64:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - build-i386:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - build-arm64v8:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - build-arm32v7:
           requires:
             - build-front
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
       - docker_manifest:
           requires:
             - build-amd64
@@ -228,3 +258,8 @@ workflows:
             - build-i386
             - build-armhf
             - build-arm32v7
+          filters:
+            tags:
+              only: /v*/
+            branches:
+              only: master
