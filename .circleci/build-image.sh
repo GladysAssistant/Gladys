@@ -1,16 +1,15 @@
 #!/bin/sh
 
 set -eu
-# Conditions for image tag
-if [ "${CIRCLE_BRANCH}" == "master" ] && [[ -z $VERSION]]; then
-    export IMAGE_ID="${REGISTRY}/${IMAGE}:dev-${TAG}"
-fi
-if [ "${CIRCLE_BRANCH}" != "master" ] && [[ -z $VERSION]]; then
-    export IMAGE_ID="${REGISTRY}/${IMAGE}:${CIRCLE_BRANCH}-${TAG}"
-fi
-if [[ -n $VERSION]]; then
-    export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
-fi
+
+echo $GITHUB_REPO
+echo $IMAGE
+echo $REGISTRY
+echo $IMAGE_ID
+echo $TARGET
+echo $QEMU_ARCH
+echo $QEMU_VERSION
+
 
 # ============
 # <qemu-support>
