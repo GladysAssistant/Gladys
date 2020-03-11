@@ -11,7 +11,12 @@ class EditZigbee2mqttDevice extends Component {
   render(props, {}) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <UpdateDevice {...props} integrationName="zigbee2mqtt" allowModifyFeatures={false} previousPage={ZIGBEE2MQTT_PAGE_PATH} />
+        <UpdateDevice
+          {...props}
+          integrationName="zigbee2mqtt"
+          allowModifyFeatures={false}
+          previousPage={ZIGBEE2MQTT_PAGE_PATH}
+        />
       </Zigbee2mqttPage>
     );
   }
