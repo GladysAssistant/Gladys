@@ -10,8 +10,8 @@ const createActions = store => {
       } finally {
         store.setState({
           zigbee2mqttStatusConfigured: zigbee2mqttStatus.configured,
-          zigbee2mqttStatusConnected: zigbee2mqttStatus.connected,
-//          mqttStatusLoaded: true
+          zigbee2mqttStatusConnected: zigbee2mqttStatus.connected
+          //          mqttStatusLoaded: true
         });
       }
     }

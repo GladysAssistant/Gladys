@@ -5,10 +5,7 @@ import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError',
-  actions
-)
+@connect('user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError', actions)
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER, payload => {
