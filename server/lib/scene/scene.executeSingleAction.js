@@ -16,8 +16,7 @@ async function executeSingleAction(action, scope = {}) {
   try {
     await executeAction(this, action, scope);
   } catch (e) {
-    logger.warn(`There was an error executing action ${action.type}`);
-    logger.warn(e);
+    throw new Error(`There was an error executing action ${action.type}`);
   }
 }
 
