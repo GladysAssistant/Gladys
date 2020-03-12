@@ -27,7 +27,7 @@ describe('get /api/v1/service/caldav/config', () => {
     };
     await caldavController['get /api/v1/service/caldav/config'].controller(req, res);
     assert.calledWith(caldavService.config, userId);
-    assert.calledWith(res.json, { url: 'https://p01-caldav.icloud.com' });
+    assert.calledWith(res.status, 200);
   });
 
   it('should return fail config', async () => {

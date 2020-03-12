@@ -6,11 +6,11 @@ module.exports = function CalDAVController(caldavHandler) {
    */
   async function config(req, res) {
     try {
-      const configuration = await caldavHandler.config(req.user.id);
+      await caldavHandler.config(req.user.id);
       await caldavHandler.cleanUp(req.user.id);
-      res.json(configuration);
+      res.status(200).send();
     } catch (error) {
-      res.status(500).send();
+      res.status(500).send({ error: error.toString() });
     }
   }
 
@@ -38,7 +38,7 @@ module.exports = function CalDAVController(caldavHandler) {
       await caldavHandler.syncUserCalendars(req.user.id);
       res.status(200).send();
     } catch (error) {
-      res.status(500).send();
+      res.status(500).send({ error: error.toString() });
     }
   }
 

@@ -13,6 +13,9 @@ async function config(userId) {
   const CALDAV_USERNAME = await this.gladys.variable.getValue('CALDAV_USERNAME', this.serviceId, userId);
   const CALDAV_PASSWORD = await this.gladys.variable.getValue('CALDAV_PASSWORD', this.serviceId, userId);
 
+  if (!CALDAV_URL || !CALDAV_USERNAME || !CALDAV_PASSWORD) {
+    throw new Error('All CalDAV parameters are not setted');
+  }
   const xhr = new this.dav.transport.Basic(
     new this.dav.Credentials({
       username: CALDAV_USERNAME,
@@ -26,10 +29,19 @@ async function config(userId) {
     depth: 0,
     mergeResponses: true,
   });
-  const {
-    props: { currentUserPrincipal },
-  } = await xhr.send(req, CALDAV_URL);
-  const CALDAV_PRINCIPAL_URL = url.resolve(CALDAV_URL, currentUserPrincipal);
+
+  let CALDAV_PRINCIPAL_URL;
+
+  try {
+    const {
+      props: { currentUserPrincipal },
+    } = await xhr.send(req, CALDAV_URL);
+    CALDAV_PRINCIPAL_URL = url.resolve(CALDAV_URL, currentUserPrincipal);
+  } catch (e) {
+    logger.error(e);
+    throw new Error('Bad CalDAV settings');
+  }
+
   logger.info(`CalDAV : Principal URL found: ${CALDAV_PRINCIPAL_URL}`);
   await this.gladys.variable.setValue('CALDAV_PRINCIPAL_URL', CALDAV_PRINCIPAL_URL, this.serviceId, userId);
 
@@ -40,10 +52,17 @@ async function config(userId) {
   });
 
   // Get Home URL
-  const {
-    props: { calendarHomeSet },
-  } = await xhr.send(req, CALDAV_PRINCIPAL_URL);
-  const CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
+  let CALDAV_HOME_URL;
+  try {
+    const {
+      props: { calendarHomeSet },
+    } = await xhr.send(req, CALDAV_PRINCIPAL_URL);
+    CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
+  } catch (e) {
+    logger.error(e);
+    throw new Error('Bad CalDAV settings');
+  }
+
   logger.info(`CalDAV : Home URL found: ${CALDAV_HOME_URL}`);
   await this.gladys.variable.setValue('CALDAV_HOME_URL', CALDAV_HOME_URL, this.serviceId, userId);
 }

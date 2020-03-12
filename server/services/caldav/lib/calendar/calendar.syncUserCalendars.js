@@ -14,6 +14,10 @@ async function syncUserCalendars(userId) {
   const CALDAV_USERNAME = await this.gladys.variable.getValue('CALDAV_USERNAME', this.serviceId, userId);
   const CALDAV_PASSWORD = await this.gladys.variable.getValue('CALDAV_PASSWORD', this.serviceId, userId);
 
+  if (!CALDAV_HOST || !CALDAV_HOME_URL || !CALDAV_USERNAME || !CALDAV_PASSWORD) {
+    throw new Error('CalDAV parameters must be setted and saved');
+  }
+
   const xhr = new this.dav.transport.Basic(
     new this.dav.Credentials({
       username: CALDAV_USERNAME,
@@ -22,7 +26,13 @@ async function syncUserCalendars(userId) {
   );
 
   // Get list of calendars
-  const davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
+  let davCalendars;
+  try {
+    davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
+  } catch (e) {
+    logger.error(e);
+    throw new Error('Can\'t fetch calendars');
+  }
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
 
@@ -51,7 +61,13 @@ async function syncUserCalendars(userId) {
     calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null),
     async (calendarToUpdate) => {
       // Get events that have changed
-      const eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
+      let eventsToUpdate;
+      try {
+        eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
+      } catch (e) {
+        logger.error(e);
+        throw new Error('Can\'t fetch changes');
+      }
       await Promise.all(
         eventsToUpdate.map(async (eventToUpdate) => {
           // Delete existing event if pops is empty
@@ -74,7 +90,13 @@ async function syncUserCalendars(userId) {
       }
 
       // Get event updates
-      const jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
+      let jsonEvents;
+      try {
+        jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
+      } catch (e) {
+        logger.error(e);
+        throw new Error('Can\'t get events data');
+      }
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);
 

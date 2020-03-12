@@ -77,6 +77,11 @@ const CaldavPage = ({ children, ...props }) => (
                       {props.caldavSaveSettingsStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.configurationError" />
+                          {props.caldavErrorMessage && (
+                            <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                              <Text id="caldavErrorMessage">{props.caldavErrorMessage}</Text>
+                            </p>
+                          )}
                         </div>
                       )}
                       {props.caldavSaveSettingsStatus === RequestStatus.Success && (
@@ -97,6 +102,11 @@ const CaldavPage = ({ children, ...props }) => (
                       {props.caldavSyncStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.synchronizationError" />
+                          {props.caldavErrorMessage && (
+                            <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                              <Text id="caldavErrorMessage">{props.caldavErrorMessage}</Text>
+                            </p>
+                          )}
                         </div>
                       )}
                       {props.caldavSyncStatus === RequestStatus.Success && (

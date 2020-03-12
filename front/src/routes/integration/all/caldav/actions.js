@@ -85,7 +85,8 @@ const actions = store => ({
     store.setState({
       caldavSaveSettingsStatus: RequestStatus.Getting,
       caldavCleanUpStatus: null,
-      caldavSyncStatus: null
+      caldavSyncStatus: null,
+      caldavErrorMessage: null
     });
     try {
       // save caldav host
@@ -111,14 +112,14 @@ const actions = store => ({
       // start service
       await state.httpClient.post('/api/v1/service/caldav/start');
 
-      const { url = state.caldavUrl } = await state.httpClient.get('/api/v1/service/caldav/config');
+      await state.httpClient.get('/api/v1/service/caldav/config');
       store.setState({
-        caldavUrl: url,
         caldavSaveSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavSaveSettingsStatus: RequestStatus.Error
+        caldavSaveSettingsStatus: RequestStatus.Error,
+        caldavErrorMessage: e.response.data.error
       });
     }
   },
@@ -144,7 +145,8 @@ const actions = store => ({
     store.setState({
       caldavSyncStatus: RequestStatus.Getting,
       caldavSaveSettingsStatus: null,
-      caldavCleanUpStatus: null
+      caldavCleanUpStatus: null,
+      caldavErrorMessage: null
     });
     try {
       await state.httpClient.get('/api/v1/service/caldav/sync');
@@ -153,7 +155,8 @@ const actions = store => ({
       });
     } catch (e) {
       store.setState({
-        caldavSyncStatus: RequestStatus.Error
+        caldavSyncStatus: RequestStatus.Error,
+        caldavErrorMessage: e.response.data.error
       });
     }
   }
