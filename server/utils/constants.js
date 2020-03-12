@@ -394,7 +394,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'xiaomi.new-device',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',

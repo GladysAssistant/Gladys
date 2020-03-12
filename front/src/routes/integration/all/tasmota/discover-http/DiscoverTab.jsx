@@ -1,29 +1,19 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import EmptyState from './EmptyState';
-import style from './style.css';
-import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
+import EmptyState from '../EmptyState';
+import style from '../style.css';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
+import SearchForm from './SearchForm';
 
-const DeviceTab = ({ children, ...props }) => (
+const DeviceTab = props => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
-        <Text id="integration.tasmota.discover.title" />
+        <Text id="integration.tasmota.discover.http.title" />
       </h1>
-      <div class="page-options d-flex">
-        <button onClick={props.forceScan} class="btn btn-outline-primary ml-2" disabled={props.loading}>
-          <Text id="integration.tasmota.discover.scan" /> <i class="fe fe-radio" />
-        </button>
-      </div>
     </div>
     <div class="card-body">
-      <CheckMqttPanel />
-
-      <div class="alert alert-secondary">
-        <Text id="integration.tasmota.discover.description" />
-      </div>
       <div
         class={cx('dimmer', {
           active: props.loading
@@ -36,6 +26,8 @@ const DeviceTab = ({ children, ...props }) => (
               <Text id="integration.tasmota.discover.error" />
             </p>
           )}
+          <SearchForm {...props} />
+          <hr />
           <div class="row">
             {props.discoveredDevices &&
               props.discoveredDevices.map((device, index) => (

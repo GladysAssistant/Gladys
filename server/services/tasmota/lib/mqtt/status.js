@@ -22,6 +22,12 @@ function status(deviceExternalId, message, serviceId) {
     model: moduleId,
     service_id: serviceId,
     should_poll: false,
+    params: [
+      {
+        name: 'interface',
+        value: 'mqtt',
+      },
+    ],
   };
 
   addSelector(device);

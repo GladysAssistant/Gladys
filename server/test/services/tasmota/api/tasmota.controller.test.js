@@ -6,19 +6,19 @@ const tasmotaHandler = {
   getDiscoveredDevices: fake.returns(discoveredDevices),
 };
 
-describe('GET /api/v1/service/tasmota/discover', () => {
+describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
   let controller;
 
   beforeEach(() => {
     controller = TasmotaController(tasmotaHandler);
   });
 
-  it('Discover', () => {
+  it('Get discovered MQTT devices', () => {
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/tasmota/discover'].controller(undefined, res);
+    controller['get /api/v1/service/tasmota/discover/mqtt'].controller(undefined, res);
     assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
     assert.calledWith(res.json, discoveredDevices);
   });

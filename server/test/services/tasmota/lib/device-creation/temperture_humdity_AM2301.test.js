@@ -134,7 +134,7 @@ describe('TasmotaHandler - create device with AM2301 temp/humidity features', ()
       state: 65,
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_DEVICE,
+      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
       payload: expectedDevice,
     });
   });

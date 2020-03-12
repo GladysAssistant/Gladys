@@ -298,27 +298,48 @@
       "title": "Tasmota",
       "description": "Control your Tasmota devices.",
       "deviceTab": "Devices",
-      "discoverTab": "MQTT discover",
+      "mqttDiscoverTab": "MQTT discover",
+      "httpDiscoverTab": "HTTP discover",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
+        "interfaceLabel": "Interface",
+        "interfaceMQTT": "MQTT",
+        "interfaceHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Tasmota discover devices over MQTT",
-        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Tasmota devices.",
         "noDeviceFound": "No Tasmota device discovered.",
-        "documentation": "Tasmota documentation",
-        "scan": "Scan"
+        "error": "Error discovering Tasmota devices.",
+        "mqtt": {
+          "title": "Tasmota discover devices over MQTT",
+          "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+          "documentation": "Tasmota documentation",
+          "scan": "Scan"
+        },
+        "http": {
+          "title": "Tasmota discover devices over HTTP",
+          "singleModeButton": "Single address scan",
+          "rangeModeButton": "Scan over IP range",
+          "singleAddressLabel": "IP address or hostname:",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "From:",
+          "lastAddressLabel": "To:",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Discover"
+        }
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Tasmota MQTT Topic",
+      "interfaceLabels": {
+        "mqtt": "MQTT Topic",
+        "http": "HTTP identifier"
+      },
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",

@@ -8,7 +8,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  */
 function notifyNewDevice(mqttDevice) {
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_DEVICE,
+    type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
     payload: mqttDevice,
   });
 }

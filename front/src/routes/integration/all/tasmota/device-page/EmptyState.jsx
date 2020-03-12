@@ -10,7 +10,7 @@ const EmptyState = () => (
 
       <div class="mt-5">
         <Text id="integration.tasmota.discoverDeviceDescr" />
-        <Link href="/dashboard/integration/device/tasmota/discover">
+        <Link href="/dashboard/integration/device/tasmota/mqtt">
           <button class="btn btn-outline-primary ml-2">
             <Text id="integration.tasmota.discoverTab" /> <i class="fe fe-radio" />
           </button>

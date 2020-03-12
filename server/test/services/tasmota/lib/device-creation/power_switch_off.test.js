@@ -127,7 +127,7 @@ describe('TasmotaHandler - create device with switch POWER OFF feature', () => {
 
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'tasmota:tasmota-device-topic');
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_DEVICE,
+      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
       payload: expectedDevice,
     });
   });

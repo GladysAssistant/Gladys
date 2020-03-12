@@ -1,19 +1,19 @@
 module.exports = function MqttController(mqttManager) {
   /**
-   * @api {get} /api/v1/service/tasmota/discover Get discovered Tasmota devices
-   * @apiName discover
+   * @api {get} /api/v1/service/tasmota/discover/mqtt Get discovered Tasmota devices over MQTT
+   * @apiName discoverMqtt
    * @apiGroup Tasmota
    */
-  function discover(req, res) {
+  function discoverMqtt(req, res) {
     res.json(mqttManager.getDiscoveredDevices());
   }
 
   /**
-   * @api {post} /api/v1/service/tasmota/discover Force to discover Tasmota devices
-   * @apiName scan
+   * @api {post} /api/v1/service/tasmota/discover/mqtt Force to discover Tasmota devices over MQTT
+   * @apiName scanMqtt
    * @apiGroup Tasmota
    */
-  function scan(req, res) {
+  function scanMqtt(req, res) {
     mqttManager.forceScan();
     res.json({
       success: true,
@@ -21,13 +21,13 @@ module.exports = function MqttController(mqttManager) {
   }
 
   return {
-    'get /api/v1/service/tasmota/discover': {
+    'get /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
-      controller: discover,
+      controller: discoverMqtt,
     },
-    'post /api/v1/service/tasmota/discover': {
+    'post /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
-      controller: scan,
+      controller: scanMqtt,
     },
   };
 };

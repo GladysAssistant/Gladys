@@ -62,6 +62,8 @@ class TasmotaDeviceBox extends Component {
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
     const validModel = device.features.length > 0;
+    // default value is 'mqtt'
+    const deviceInterface = ((device.params || []).find(p => p.name === 'interface') || { value: 'mqtt' }).value;
 
     return (
       <div class="col-md-6">
@@ -125,18 +127,54 @@ class TasmotaDeviceBox extends Component {
 
                 <div class="form-group">
                   <label class="form-label" for={`topic_${deviceIndex}`}>
-                    <Text id="integration.tasmota.topicLabel" />
+                    <Text id={`integration.tasmota.interfaceLabels.${deviceInterface}`} />
                   </label>
-                  <Localizer>
-                    <input
-                      id={`topic_${deviceIndex}`}
-                      type="text"
-                      value={device.external_id.substring(8)}
-                      class="form-control"
-                      disabled="true"
-                    />
-                  </Localizer>
+                  <input
+                    id={`topic_${deviceIndex}`}
+                    type="text"
+                    value={device.external_id.substring(8)}
+                    class="form-control"
+                    disabled="true"
+                  />
                 </div>
+
+                {props.editButton && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.tasmota.device.interfaceLabel" />
+                    </label>
+                    <div class="form-check form-check-inline">
+                      <label class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          name={`device-interface-${deviceIndex}`}
+                          value="mqtt"
+                          checked={deviceInterface === 'mqtt'}
+                          disabled
+                        />
+                        <div class="custom-control-label">
+                          <Text id="integration.tasmota.device.interfaceMQTT" />
+                        </div>
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <label class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          name={`device-interface-${deviceIndex}`}
+                          value="http"
+                          checked={deviceInterface === 'http'}
+                          disabled
+                        />
+                        <div class="custom-control-label">
+                          <Text id="integration.tasmota.device.interfaceHTTP" />
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 {device.features && device.features.length > 0 && (
                   <div class="form-group">
