@@ -1,5 +1,5 @@
 const Store = function Store() {
-  this.state = {};
+  this.state = null;
 };
 
 /**
@@ -13,10 +13,10 @@ const Store = function Store() {
 function setState(update) {
   if (typeof update === 'string') {
     this.state = update;
+  } else if (this.state === null) {
+    this.state = update;
   } else {
-    Object.keys(update).forEach((key) => {
-      this.state[key] = update[key];
-    });
+    Object.assign(this.state, update);
   }
 }
 /**
