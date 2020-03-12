@@ -31,7 +31,7 @@ async function syncUserCalendars(userId) {
     davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
   } catch (e) {
     logger.error(e);
-    throw new Error('Can\'t fetch calendars');
+    throw new Error("Can't fetch calendars");
   }
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
@@ -66,7 +66,7 @@ async function syncUserCalendars(userId) {
         eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
       } catch (e) {
         logger.error(e);
-        throw new Error('Can\'t fetch changes');
+        throw new Error("Can't fetch changes");
       }
       await Promise.all(
         eventsToUpdate.map(async (eventToUpdate) => {
@@ -95,7 +95,7 @@ async function syncUserCalendars(userId) {
         jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
       } catch (e) {
         logger.error(e);
-        throw new Error('Can\'t get events data');
+        throw new Error("Can't get events data");
       }
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);
