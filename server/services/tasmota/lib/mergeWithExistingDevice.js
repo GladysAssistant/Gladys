@@ -2,17 +2,21 @@ const matchFeature = (device, feature) => {
   return device.features.findIndex((f) => f.external_id === feature.external_id);
 };
 
+const matchParam = (device, param) => {
+  return device.features.findIndex((p) => p.name === param.name && p.value === param.value);
+};
+
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
- * @param {Object} mqttDevice - Discovered device.
+ * @param {Object} tasmotaDevice - Discovered device.
  * @returns {Object} Device merged with Gladys existing one.
  * @example
  * mergeWithExistingDevice(discorveredDevice)
  */
-function mergeWithExistingDevice(mqttDevice) {
-  const existing = this.gladys.stateManager.get('deviceByExternalId', mqttDevice.external_id);
+function mergeWithExistingDevice(tasmotaDevice) {
+  const existing = this.gladys.stateManager.get('deviceByExternalId', tasmotaDevice.external_id);
   if (existing) {
-    const device = { ...existing, ...mqttDevice };
+    const device = { ...existing, ...tasmotaDevice };
     const { features } = device;
     const featureLength = features.length;
 
@@ -23,6 +27,13 @@ function mergeWithExistingDevice(mqttDevice) {
       i += 1;
     }
 
+    const { params } = device;
+    i = 0;
+    while (!updatable && params[i]) {
+      updatable = matchParam(existing, params[i]) < 0;
+      i += 1;
+    }
+
     if (updatable) {
       device.updatable = updatable;
     }
@@ -30,7 +41,7 @@ function mergeWithExistingDevice(mqttDevice) {
     return device;
   }
 
-  return mqttDevice;
+  return tasmotaDevice;
 }
 
 module.exports = {
