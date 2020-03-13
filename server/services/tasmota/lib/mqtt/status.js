@@ -4,7 +4,7 @@ const { addSelector } = require('../../../../utils/addSelector');
  * @description Handle Tasmota 'stat/+/STATUS' topics.
  * @param {string} deviceExternalId - Device external id.
  * @param {string} message - MQTT message.
- * @param {Object} serviceId - Service ID.
+ * @param {string} serviceId - Service ID.
  * @example
  * status('tasmota:tasmota-plug', '{"key": "value"}', 'service-id');
  */

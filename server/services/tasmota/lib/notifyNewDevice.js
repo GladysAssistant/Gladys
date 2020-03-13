@@ -1,15 +1,16 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
- * @param {Object} mqttDevice - Discovered device.
+ * @param {Object} device - Discovered device.
+ * @param {string} event - The vent to publish to.
  * @example
  * notifyNewDevice(discorveredDevice)
  */
-function notifyNewDevice(mqttDevice) {
+function notifyNewDevice(device, event) {
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
-    payload: mqttDevice,
+    type: event,
+    payload: device,
   });
 }
 

@@ -1,5 +1,6 @@
 const { BadParameters } = require('../../../utils/coreErrors');
 const { FEATURE_TEMPLATES } = require('./features');
+const { setHttpValue } = require('./http/tasmota.http.setHttpValue');
 
 /**
  * @description Send the new device value over MQTT.
@@ -26,10 +27,15 @@ function setValue(device, deviceFeature, value) {
   });
 
   if (featureTemplate) {
-    const mqttValue = typeof featureTemplate.writeValue === 'function' ? featureTemplate.writeValue(value) : value;
+    const tasmotaValue = typeof featureTemplate.writeValue === 'function' ? featureTemplate.writeValue(value) : value;
 
-    // Send message to Tasmota topics
-    this.mqttService.device.publish(`cmnd/${topic}/${command}`, `${mqttValue}`);
+    const httpInterface = device.params.findIndex((p) => p.name === 'interface' && p.value === 'http');
+    if (httpInterface >= 0) {
+      setHttpValue(topic, command, tasmotaValue, this);
+    } else {
+      // Send message to Tasmota topics
+      this.mqttService.device.publish(`cmnd/${topic}/${command}`, `${tasmotaValue}`);
+    }
   } else {
     throw new BadParameters(`Tasmota device external_id is not managed: "${externalId}" have no MQTT topic`);
   }

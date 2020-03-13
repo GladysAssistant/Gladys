@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { status, featureStatus, subStatus } = require('./mqtt');
 
 /**
@@ -39,7 +39,7 @@ function handleMqttMessage(topic, message) {
         this.mqttDevices[deviceExternalId] = device;
         delete this.pendingMqttDevices[deviceExternalId];
 
-        this.notifyNewDevice(device);
+        this.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
       }
       break;
     }

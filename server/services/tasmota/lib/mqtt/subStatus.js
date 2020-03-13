@@ -1,37 +1,5 @@
 const { EVENTS } = require('../../../../utils/constants');
-const { addSelector } = require('../../../../utils/addSelector');
-const logger = require('../../../../utils/logger');
-const { recursiveSearch, generateExternalId, generateValue } = require('../features');
-
-const addFeature = (device, featureTemplate, fullKey, command, value) => {
-  const featureExternalId = generateExternalId(featureTemplate, command, fullKey);
-  const externalId = `${device.external_id}:${featureExternalId}`;
-  const existingFeature = device.features.find((f) => f.external_id === externalId);
-
-  if (existingFeature) {
-    logger.debug(`Tasmota: duplicated feature handled for ${externalId}`);
-  } else {
-    const generatedFeature = featureTemplate.generateFeature(device, command, value);
-
-    if (generatedFeature) {
-      const convertedValue = generateValue(featureTemplate, value);
-
-      const feature = {
-        ...generatedFeature,
-        external_id: externalId,
-        selector: externalId,
-        last_value: convertedValue,
-      };
-
-      addSelector(feature);
-
-      device.features.push(feature);
-      return feature;
-    }
-  }
-
-  return null;
-};
+const { recursiveSearch, addFeature } = require('../features');
 
 /**
  * @description Handle Tasmota 'stat/+/STATUS' topics to create device features.

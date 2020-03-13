@@ -20,7 +20,7 @@ const sendEvent = (gladysEvent, deviceExternalId, featureTemplate, fullKey, comm
  * @example
  * sensor('tasmota:sonoff-plug', '{"key": "value"}', gladysEvent);
  */
-function featureStatus(deviceExternalId, message, gladysEvent, key) {
+function featureStatus(deviceExternalId, message, gladysEvent, key = undefined) {
   const sensorMsg = JSON.parse(message);
 
   recursiveSearch(
