@@ -3,7 +3,7 @@ const TasmotaController = require('../../../../services/tasmota/api/tasmota.cont
 
 const discoveredDevices = [{ device: 'first' }, { device: 'second' }];
 const tasmotaHandler = {
-  getDiscoveredDevices: fake.returns(discoveredDevices),
+  getMqttDiscoveredDevices: fake.returns(discoveredDevices),
 };
 
 describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
@@ -19,7 +19,7 @@ describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
     };
 
     controller['get /api/v1/service/tasmota/discover/mqtt'].controller(undefined, res);
-    assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
+    assert.calledOnce(tasmotaHandler.getMqttDiscoveredDevices);
     assert.calledWith(res.json, discoveredDevices);
   });
 });

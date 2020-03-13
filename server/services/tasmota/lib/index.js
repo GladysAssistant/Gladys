@@ -1,7 +1,7 @@
 const { connect } = require('./connect');
 const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
-const { getDiscoveredDevices } = require('./getDiscoveredDevices');
+const { getMqttDiscoveredDevices } = require('./getMqttDiscoveredDevices');
 const { setValue } = require('./setValue');
 const { forceScan } = require('./forceScan');
 const { mergeWithExistingDevice } = require('./mergeWithExistingDevice');
@@ -25,7 +25,7 @@ const TasmotaHandler = function TasmotaHandler(gladys, serviceId) {
 TasmotaHandler.prototype.connect = connect;
 TasmotaHandler.prototype.disconnect = disconnect;
 TasmotaHandler.prototype.handleMqttMessage = handleMqttMessage;
-TasmotaHandler.prototype.getDiscoveredDevices = getDiscoveredDevices;
+TasmotaHandler.prototype.getMqttDiscoveredDevices = getMqttDiscoveredDevices;
 TasmotaHandler.prototype.setValue = setValue;
 TasmotaHandler.prototype.forceScan = forceScan;
 TasmotaHandler.prototype.mergeWithExistingDevice = mergeWithExistingDevice;

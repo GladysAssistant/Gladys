@@ -2,9 +2,9 @@
  * @description Get all discovered devices, and if device already created, the Gladys device.
  * @returns {*} Discovered devices.
  * @example
- * getDiscoveredDevices()
+ * getMqttDiscoveredDevices()
  */
-function getDiscoveredDevices() {
+function getMqttDiscoveredDevices() {
   const discovered = Object.values(this.mqttDevices).map((d) => {
     return this.mergeWithExistingDevice(d);
   });
@@ -13,5 +13,5 @@ function getDiscoveredDevices() {
 }
 
 module.exports = {
-  getDiscoveredDevices,
+  getMqttDiscoveredDevices,
 };

@@ -34,7 +34,7 @@ const gladys = {
   },
 };
 
-describe('TasmotaHandler - getDiscoveredDevices', () => {
+describe('TasmotaHandler - getMqttDiscoveredDevices', () => {
   const tasmotaHandler = new TasmotaHandler(gladys, 'service-uuid-random');
   sinon.spy(tasmotaHandler, 'handleMqttMessage');
 
@@ -44,7 +44,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
   });
 
   it('nothing discovered', () => {
-    const result = tasmotaHandler.getDiscoveredDevices();
+    const result = tasmotaHandler.getMqttDiscoveredDevices();
     expect(result).to.be.lengthOf(0);
   });
 
@@ -53,7 +53,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
       external_id: 'alreadyExists',
       model: 'sonoff-basic',
     };
-    const result = tasmotaHandler.getDiscoveredDevices();
+    const result = tasmotaHandler.getMqttDiscoveredDevices();
     expect(result).to.be.lengthOf(1);
     expect(result).deep.eq([existingDevice]);
   });
@@ -83,7 +83,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
         },
       ],
     };
-    const result = tasmotaHandler.getDiscoveredDevices();
+    const result = tasmotaHandler.getMqttDiscoveredDevices();
     expect(result).to.be.lengthOf(1);
 
     const expectedDevice = {
@@ -120,7 +120,7 @@ describe('TasmotaHandler - getDiscoveredDevices', () => {
     tasmotaHandler.mqttDevices.notAlreadyExists = {
       external_id: 'notAlreadyExists',
     };
-    const result = tasmotaHandler.getDiscoveredDevices();
+    const result = tasmotaHandler.getMqttDiscoveredDevices();
     expect(result).to.be.lengthOf(1);
     expect(result).deep.eq([tasmotaHandler.mqttDevices.notAlreadyExists]);
   });

@@ -1,11 +1,11 @@
-module.exports = function MqttController(mqttManager) {
+module.exports = function MqttController(tasmotaManager) {
   /**
    * @api {get} /api/v1/service/tasmota/discover/mqtt Get discovered Tasmota devices over MQTT
-   * @apiName discoverMqtt
+   * @apiName discoverHttp
    * @apiGroup Tasmota
    */
   function discoverMqtt(req, res) {
-    res.json(mqttManager.getDiscoveredDevices());
+    res.json(tasmotaManager.getMqttDiscoveredDevices());
   }
 
   /**
@@ -14,7 +14,7 @@ module.exports = function MqttController(mqttManager) {
    * @apiGroup Tasmota
    */
   function scanMqtt(req, res) {
-    mqttManager.forceScan();
+    tasmotaManager.forceScan();
     res.json({
       success: true,
     });
