@@ -20,6 +20,27 @@ module.exports = function MqttController(tasmotaManager) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/tasmota/discover/http Get discovered Tasmota devices over HTTP
+   * @apiName discoverHttp
+   * @apiGroup Tasmota
+   */
+  function discoverHttp(req, res) {
+    res.json(tasmotaManager.getHttpDiscoveredDevices());
+  }
+
+  /**
+   * @api {post} /api/v1/service/tasmota/discover/http Discover Tasmota devices over HTTP
+   * @apiName scanHttp
+   * @apiGroup Tasmota
+   */
+  function scanHttp(req, res) {
+    tasmotaManager.scanHttp(req.body);
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
@@ -28,6 +49,14 @@ module.exports = function MqttController(tasmotaManager) {
     'post /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
       controller: scanMqtt,
+    },
+    'get /api/v1/service/tasmota/discover/http': {
+      authenticated: true,
+      controller: discoverHttp,
+    },
+    'post /api/v1/service/tasmota/discover/http': {
+      authenticated: true,
+      controller: scanHttp,
     },
   };
 };
