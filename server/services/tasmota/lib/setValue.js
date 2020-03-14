@@ -29,9 +29,9 @@ function setValue(device, deviceFeature, value) {
   if (featureTemplate) {
     const tasmotaValue = typeof featureTemplate.writeValue === 'function' ? featureTemplate.writeValue(value) : value;
 
-    const httpInterface = device.params.findIndex((p) => p.name === 'interface' && p.value === 'http');
-    if (httpInterface >= 0) {
-      setHttpValue(topic, command, tasmotaValue, this);
+    const httpInterface = this.isHttpDevice(device);
+    if (httpInterface) {
+      this.setHttpValue(device, topic, command, tasmotaValue);
     } else {
       // Send message to Tasmota topics
       this.mqttService.device.publish(`cmnd/${topic}/${command}`, `${tasmotaValue}`);

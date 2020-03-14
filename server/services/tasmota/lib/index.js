@@ -10,6 +10,10 @@ const { mergeWithExistingDevice } = require('./mergeWithExistingDevice');
 const { notifyNewDevice } = require('./notifyNewDevice');
 const { poll } = require('./poll');
 
+const { isHttpDevice } = require('./isHttpDevice');
+const { getHttpValue } = require('./http/tasmota.http.getHttpValue');
+const { setHttpValue } = require('./http/tasmota.http.setHttpValue');
+
 /**
  * @description Add ability to connect to Tasmota devices.
  * @param {Object} gladys - Gladys instance.
@@ -39,5 +43,8 @@ TasmotaHandler.prototype.scanHttp = scanHttp;
 TasmotaHandler.prototype.mergeWithExistingDevice = mergeWithExistingDevice;
 TasmotaHandler.prototype.notifyNewDevice = notifyNewDevice;
 TasmotaHandler.prototype.poll = poll;
+TasmotaHandler.prototype.isHttpDevice = isHttpDevice;
+TasmotaHandler.prototype.getHttpValue = getHttpValue;
+TasmotaHandler.prototype.setHttpValue = setHttpValue;
 
 module.exports = TasmotaHandler;

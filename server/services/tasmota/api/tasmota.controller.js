@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function MqttController(tasmotaManager) {
   /**
    * @api {get} /api/v1/service/tasmota/discover/mqtt Get discovered Tasmota devices over MQTT
@@ -44,19 +46,19 @@ module.exports = function MqttController(tasmotaManager) {
   return {
     'get /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
-      controller: discoverMqtt,
+      controller: asyncMiddleware(discoverMqtt),
     },
     'post /api/v1/service/tasmota/discover/mqtt': {
       authenticated: true,
-      controller: scanMqtt,
+      controller: asyncMiddleware(scanMqtt),
     },
     'get /api/v1/service/tasmota/discover/http': {
       authenticated: true,
-      controller: discoverHttp,
+      controller: asyncMiddleware(discoverHttp),
     },
     'post /api/v1/service/tasmota/discover/http': {
       authenticated: true,
-      controller: scanHttp,
+      controller: asyncMiddleware(scanHttp),
     },
   };
 };

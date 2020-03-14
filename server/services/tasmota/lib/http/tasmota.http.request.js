@@ -2,6 +2,30 @@ const http = require('http');
 const logger = require('../../../../utils/logger');
 
 /**
+ * @description Build URL from device.
+ * @param {string} urlStr - URL as string.
+ * @param {Object} device - Device.
+ * @returns {string} The build URL.
+ * @example
+ * buildUrl('http://my-device');
+ */
+function buildUrl(urlStr, device = {}) {
+  const url = new URL(urlStr);
+
+  if (device && device.params) {
+    const username = (device.params.find((param) => param.name === 'username') || {}).value;
+    if (username) {
+      url.username = username;
+
+      const password = (device.params.find((param) => param.name === 'password') || {}).value;
+      url.password = password;
+    }
+  }
+
+  return url.href;
+}
+
+/**
  * @description Call HTTP Tasmota request over network.
  * @param {string} url - Tasmota URL to call.
  * @param {Function} dataCallback - Called if success.
@@ -18,19 +42,23 @@ const logger = require('../../../../utils/logger');
 function request(url, dataCallback, authErrorCallback, errorCallback) {
   logger.debug(`Tasmota: HTTP looking for ${url}`);
   const req = http.get(url, (res) => {
+    logger.debug(`Tasmota: HTTP response for ${url}: ${res.statusCode}`);
+
     // Authentication error
     if (res.statusCode >= 400 && res.statusCode <= 403) {
-      logger.debug(`Tasmota: HTTP auth issue for ${url}: ${res.statusCode}`);
       authErrorCallback();
     } else if (res.statusCode >= 200 && res.statusCode < 400) {
-      logger.debug(`Tasmota: HTTP waiting for data on ${url}`);
-
       res.on('data', (data) => {
-        logger.debug(`Tasmota: HTTP success for ${url}`);
-        dataCallback(data);
+        const decodedMessage = JSON.parse(data);
+        if (decodedMessage.WARNING) {
+          logger.warn(`Tasmota: HTTP needs authentication for ${url}`);
+
+          authErrorCallback();
+        } else {
+          dataCallback(data);
+        }
       });
     } else {
-      logger.debug(`Tasmota: HTTP error for ${url}`);
       errorCallback();
     }
   });
@@ -47,4 +75,5 @@ function request(url, dataCallback, authErrorCallback, errorCallback) {
 
 module.exports = {
   request,
+  buildUrl,
 };

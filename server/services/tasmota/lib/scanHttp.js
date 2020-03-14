@@ -10,10 +10,10 @@ const { status } = require('./http/tasmota.http.status.js');
  * tasmotaManager.scanHttp({ firstAddress: '192.168.1.1', lastAddress: '192.168.1.100' });
  */
 function scanHttp(options) {
-  const { singleAddress, firstAddress, lastAddress } = options;
+  const { singleAddress, firstAddress, lastAddress, username, password } = options;
   if (singleAddress) {
-    logger.debug(`Tasmota: HTTP looking for ${singleAddress}`);
-    status(singleAddress, this);
+    logger.debug(`Tasmota: HTTP looking for ${singleAddress} ${username} ${password}`);
+    status(singleAddress, username, password, this);
   } else if (firstAddress && lastAddress) {
     let [firstAddressR1, firstAddressR2, firstAddressR3, firstAddressR4] = firstAddress
       .split('.')
@@ -36,7 +36,7 @@ function scanHttp(options) {
             const ipAddress = `${firstAddressR1}.${firstAddressR2}.${firstAddressR3}.${firstAddressR4}`;
             logger.debug(`Tasmota: HTTP looking for ${ipAddress}`);
 
-            status(ipAddress, this);
+            status(ipAddress, undefined, undefined, this);
             firstAddressR4 += 1;
           }
           firstAddressR3 += 1;

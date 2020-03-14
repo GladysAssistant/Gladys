@@ -1,4 +1,3 @@
-const { getHttpValue } = require('./http/tasmota.http.getHttpValue');
 /**
  * @description Polling requested device.
  * @param {Object} device - Device to poll.
@@ -6,9 +5,9 @@ const { getHttpValue } = require('./http/tasmota.http.getHttpValue');
  * tasmotaManager.poll({}),
  */
 function poll(device) {
-  const externalId = device.external_id;
-  const [, networkAddress] = externalId.split(':');
-  getHttpValue(networkAddress, this.gladys.event);
+  if (this.isHttpDevice(device)) {
+    this.getHttpValue(device, this.gladys.event);
+  }
 }
 
 module.exports = {

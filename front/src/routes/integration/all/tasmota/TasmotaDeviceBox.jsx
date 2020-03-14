@@ -60,7 +60,44 @@ class TasmotaDeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
+  updateUsername = e => {
+    e.preventDefault();
+
+    this.setState({ username: e.target.value });
+  };
+
+  updatePassword = e => {
+    e.preventDefault();
+
+    this.setState({ password: e.target.value });
+  };
+
+  connectAndScan = async () => {
+    this.setState({
+      loading: true,
+      authErrorMessage: null
+    });
+    try {
+      const { device, httpClient } = this.props;
+      const { username, password } = this.state;
+      const options = {
+        singleAddress: device.external_id.replace('tasmota:', ''),
+        username,
+        password
+      };
+      await httpClient.post('/api/v1/service/tasmota/discover/http', options);
+    } catch (e) {
+      console.log(e);
+      this.setState({
+        authErrorMessage: 'integration.tasmota.discover.http.authError'
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+
+  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
     const validModel = device.features.length > 0;
     // default value is 'mqtt'
     const deviceInterface = ((device.params || []).find(p => p.name === 'interface') || { value: 'mqtt' }).value;
@@ -76,7 +113,59 @@ class TasmotaDeviceBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <div class="card-body">
+              {device.needAuthentication && (
+                <div class="card-body position-absolute w-100 h-100">
+                  <div class="alert alert-info">
+                    <Text id="integration.tasmota.discover.http.needAuthenticationAlert" />
+                  </div>
+
+                  {authErrorMessage && (
+                    <div class="alert alert-danger">
+                      <Text id={authErrorMessage} />
+                    </div>
+                  )}
+
+                  <div class="form-group">
+                    <label class="form-label" for={`username_${deviceIndex}`}>
+                      <Text id="integration.tasmota.discover.http.usernameLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id={`username_${deviceIndex}`}
+                        type="text"
+                        class="form-control"
+                        onInput={this.updateUsername}
+                        placeholder={<Text id="integration.tasmota.discover.http.usernameLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for={`password_${deviceIndex}`}>
+                      <Text id="integration.tasmota.discover.http.passwordLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id={`password_${deviceIndex}`}
+                        type="password"
+                        class="form-control"
+                        onInput={this.updatePassword}
+                        placeholder={<Text id="integration.tasmota.discover.http.passwordLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="text-center">
+                    <button class="btn btn-primary mx-auto" onClick={this.connectAndScan}>
+                      <Text id="integration.tasmota.discover.http.authenticateButton" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div
+                class={cx('card-body', {
+                  invisible: device.needAuthentication
+                })}
+              >
                 {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />

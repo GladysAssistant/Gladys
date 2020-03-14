@@ -1,4 +1,5 @@
 const { addSelector } = require('../../../../utils/addSelector');
+const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../constants');
 
 /**
  * @description Handle Tasmota 'stat/+/STATUS' topics.
@@ -24,8 +25,8 @@ function status(deviceExternalId, message, serviceId) {
     should_poll: false,
     params: [
       {
-        name: 'interface',
-        value: 'mqtt',
+        name: DEVICE_PARAM_NAME.INTERFACE,
+        value: DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.INTERFACE].MQTT,
       },
     ],
   };

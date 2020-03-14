@@ -152,6 +152,15 @@ function createActions(store) {
         });
       }
     },
+    async connectAndScan(state, deviceIndex, username, password) {
+      const device = state.discoveredDevices[deviceIndex];
+      const options = {
+        singleAddress: device.external_id.replace('tasmota:', ''),
+        username,
+        password
+      };
+      await state.httpClient.post('/api/v1/service/tasmota/discover/http', options);
+    },
     addDiscoveredDevice(state, newDevice) {
       const existingDevices = state.discoveredDevices || [];
       const newDevices = [];

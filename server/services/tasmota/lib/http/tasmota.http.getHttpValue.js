@@ -1,25 +1,26 @@
 const { featureStatus } = require('../mqtt/featureStatus');
-const { request } = require('./tasmota.http.request');
+const { request, buildUrl } = require('./tasmota.http.request');
 
 /**
  * @description Try to discover HTTP device.
- * @param {string} networkAddress - Device network address.
- * @param {Object} gladysEvent - Gladys event manager.
+ * @param {Object} device - Galdys device.
  * @example
- * getHttpValue('192.168.1.1', {});
+ * getHttpValue({});
  */
-function getHttpValue(networkAddress, gladysEvent) {
+function getHttpValue(device) {
+  const [, networkAddress] = device.externalId;
+
   const fillSTSDevice = (statusMsg) => {
-    featureStatus(networkAddress, statusMsg, gladysEvent);
+    featureStatus(networkAddress, statusMsg, this.gladys.event);
   };
   const fillSNSDevice = (statusMsg) => {
-    featureStatus(networkAddress, statusMsg, gladysEvent);
+    featureStatus(networkAddress, statusMsg, this.gladys.event);
   };
 
   const errorCallback = () => {};
 
-  request(`http://${networkAddress}/cm?cmnd=Status 11`, fillSTSDevice, errorCallback, errorCallback);
-  request(`http://${networkAddress}/cm?cmnd=Status 8`, fillSNSDevice, errorCallback, errorCallback);
+  request(buildUrl(`http://${networkAddress}/cm?cmnd=Status 11`, device), fillSTSDevice, errorCallback, errorCallback);
+  request(buildUrl(`http://${networkAddress}/cm?cmnd=Status 8`, device), fillSNSDevice, errorCallback, errorCallback);
 }
 
 module.exports = {

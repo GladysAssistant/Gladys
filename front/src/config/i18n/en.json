@@ -330,7 +330,12 @@
           "lastAddressLabel": "To:",
           "firstAddressPlaceholer": "192.168.1.1",
           "lastAddressPlaceholer": "192.168.1.100",
-          "discoverButton": "Discover"
+          "discoverButton": "Discover",
+          "usernameLabel": "Username",
+          "passwordLabel": "Password",
+          "needAuthenticationAlert": "The device is protected with username and password.",
+          "authenticateButton": "Connect and scan",
+          "authError": "Invalid username or password."
         }
       },
       "nameLabel": "Device Name",

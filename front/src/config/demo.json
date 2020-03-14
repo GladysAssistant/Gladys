@@ -904,6 +904,24 @@
           "value": "http"
         }
       ]
+    },
+    {
+      "name": "192.168.1.3",
+      "external_id": "tasmota:192.168.1.3",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "needAuthentication": true,
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "interface",
+          "value": "http"
+        }
+      ]
     }
   ],
   "get /api/v1/service/rtsp-camera/device": [
