@@ -11,6 +11,7 @@
   margin-Left: auto;
   margin-right: auto;
   display: block;
+  width: 100%;
   max-width: 300px;
 }
 
