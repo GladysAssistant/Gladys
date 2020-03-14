@@ -497,7 +497,6 @@
     }
   },
   "editScene": {
-    "backButton": "Retour",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "runButton": "Jouer",
@@ -978,7 +977,6 @@
     "calendar": "Calendrier",
     "maps": "Plans",
     "scenes": "Scènes",
-    "adminRole": "Administrateur",
     "profile": "Profil",
     "settings": "Paramètres",
     "needHelp": "Besoin d'aide",
@@ -1152,46 +1150,5 @@
     "cancelSubscriptionButton": "Annuler l'abonnement",
     "accountCancelled": "Votre abonnement a été annulé le {{date}}",
     "subscriptionButton": "S'abonner à nouveau"
-  },
-  "map": {
-    "plans": {
-      "title": "PLANS",
-      "worldTab": "Carte",
-      "setupPlansTab": "Configuration des Plans",
-      "setupViewsTab": "Configuration des Vues",
-      "status": {
-        "notConfigured": "Aucun plan existant"
-      },
-      "world": {},
-      "setupPlans": {
-        "title": "Configuration des Plans",
-        "search": "Recherche de plans",
-        "new": "Nouveau",
-        "newPlan": {
-          "cardTitle": "Nouveau plan",
-          "name": {
-            "label": "Nom",
-            "placeholder": "Entrez le nom de votre plan",
-            "invalid": "Le nom est requis"
-          },
-          "picture": {
-            "label": "Selectionnez une image plan",
-            "chooseFile": "Choisir un fichier",
-            "browseButton": "Parcourir"
-          },
-          "house": {
-            "info": "Ici, vous pouvez sélectionner une maison si votre premier plan n'en contient qu'une. Si vous souhaitez gérer plus d'une maison, laissez vide.",
-            "label": "Sélectionnez une maison",
-            "placeholder": "Sélection..."
-          },
-          "createPlanButton": "Créer un plan",
-          "planAlreadyExist": "Un plan avec ce nom existe déjà.",
-          "backButton": "◀️️ Retour"
-        }
-      },
-      "setupPlanView": {
-        "title": "Configuration des Plans"
-      }
-    }
   }
 }

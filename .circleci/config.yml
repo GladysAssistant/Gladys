@@ -96,7 +96,7 @@ jobs:
           command: npm run eslint
       - run:
           name: Run integration comparison
-          command: npm run compare-integrations
+          command: npm run compare-translations
   build-front:
     working_directory: ~/gladys-build
     docker:
