@@ -39,7 +39,7 @@ async function config(userId) {
     CALDAV_PRINCIPAL_URL = url.resolve(CALDAV_URL, currentUserPrincipal);
   } catch (e) {
     logger.error(e);
-    throw new Error('Bad CalDAV settings');
+    throw new Error("Bad CalDAV settings, can't retrieve principal url");
   }
 
   logger.info(`CalDAV : Principal URL found: ${CALDAV_PRINCIPAL_URL}`);
@@ -60,7 +60,7 @@ async function config(userId) {
     CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
   } catch (e) {
     logger.error(e);
-    throw new Error('Bad CalDAV settings');
+    throw new Error("Bad CalDAV settings, can't retrieve home url");
   }
 
   logger.info(`CalDAV : Home URL found: ${CALDAV_HOME_URL}`);

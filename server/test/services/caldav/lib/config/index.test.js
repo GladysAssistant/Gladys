@@ -1,6 +1,10 @@
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 const { config } = require('../../../../../services/caldav/lib/config/index');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 
@@ -82,5 +86,80 @@ describe('CalDAV config', () => {
       configEnv.serviceId,
       userId,
     ]);
+  });
+
+  it('should failed if no CALDAV_URL', async () => {
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns(undefined);
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'All CalDAV parameters are not setted');
+  });
+
+  it('should failed to get CALDAV_PRINCIPAL_URL', async () => {
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('https://caldav.host.com');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    send.withArgs('request1', 'https://caldav.host.com').rejects();
+
+    configEnv.dav.request.propfind
+      .withArgs({
+        props: [{ name: 'current-user-principal', namespace: namespace.DAV }],
+        depth: 0,
+        mergeResponses: true,
+      })
+      .returns('request1');
+
+    await expect(configEnv.config(userId)).to.be.rejectedWith(
+      Error,
+      "Bad CalDAV settings, can't retrieve principal url",
+    );
+  });
+
+  it('should failed to get CALDAV_HOME_URL', async () => {
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('https://caldav.host.com');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    send
+      .withArgs('request1', 'https://caldav.host.com')
+      .returns({ props: { currentUserPrincipal: 'https://caldav.host.com/principal' } })
+      .withArgs('request2', 'https://caldav.host.com/principal')
+      .rejects();
+
+    configEnv.dav.request.propfind
+      .withArgs({
+        props: [{ name: 'current-user-principal', namespace: namespace.DAV }],
+        depth: 0,
+        mergeResponses: true,
+      })
+      .returns('request1')
+      .withArgs({
+        props: [{ name: 'calendar-home-set', namespace: namespace.CALDAV }],
+        depth: 0,
+        mergeResponses: true,
+      })
+      .returns('request2');
+
+    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, "Bad CalDAV settings, can't retrieve home url");
   });
 });
