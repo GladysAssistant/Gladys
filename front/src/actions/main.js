@@ -40,20 +40,21 @@ function createActions(store) {
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
       }
-      await state.session.init();
-      if (!state.session.isConnected()) {
-        route('/login');
-      }
       try {
+        await state.session.init();
+        if (!state.session.isConnected()) {
+          route('/login');
+        }
         const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
-        const results = await Promise.all(tasks);
+        const [user] = await Promise.all(tasks);
         store.setState({
-          user: results[0]
+          user
         });
       } catch (e) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.error');
         if (status === 401) {
+          state.session.reset();
           route('/login');
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
