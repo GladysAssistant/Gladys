@@ -103,6 +103,12 @@
   width: 37%;
 }
 
+@media (max-width: 576px) {
+  .received_withd_msg {
+    width: 100%;
+  }
+}
+
 .mesgs {
   padding: 30px 15px 0 25px;
 }
