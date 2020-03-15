@@ -8,7 +8,7 @@ import integrationConfig from '../../../../../config/integrations';
 @connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveNodePage extends Component {
   componentWillMount() {
-    this.props.getZWaveDevices(20, 0);
+    this.props.getZWaveDevices();
     this.props.getHouses();
   }
 
