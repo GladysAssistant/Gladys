@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
     "clean:test": "shx --silent rm -f /tmp/gladys-test.db && shx echo Cleaned test database",
-    "pretest": "cross-env SQLITE_FILE_PATH=/tmp/gladys-test.db npm run db-migrate:test && npm run eslint",
+    "pretest": "npm run eslint",
     "test": "cross-env SQLITE_FILE_PATH=/tmp/gladys-test.db NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
     "push-coverage": "codecov -F server",
@@ -14,7 +14,7 @@
     "eslint-fix": "eslint . --fix",
     "eslint": "eslint .",
     "start": "cross-env NODE_ENV=development nodemon index.js",
-    "start:prod": "npm run db-migrate:prod && cross-env NODE_ENV=production node index.js",
+    "start:prod": "cross-env NODE_ENV=production node index.js",
     "db-reset:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate:undo:all",
     "db-migrate:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate",
     "db-migrate:prod": "cross-env NODE_ENV=production node_modules/.bin/sequelize db:migrate",
@@ -30,15 +30,10 @@
   "author": "Pierre-Gilles Leymarie",
   "license": "MIT",
   "nodemonConfig": {
-    "ignore": [
-      "test/*"
-    ]
+    "ignore": ["test/*"]
   },
   "nyc": {
-    "exclude": [
-      "migrations/**/*.js",
-      "test/**/*.js"
-    ]
+    "exclude": ["migrations/**/*.js", "test/**/*.js"]
   },
   "devDependencies": {
     "apidoc": "^0.17.7",
@@ -93,6 +88,7 @@
     "sequelize-cli": "^5.5.1",
     "sqlite3": "^4.0.6",
     "tracer": "^0.9.8",
+    "umzug": "^2.2.0",
     "uuid": "^3.3.2",
     "ws": "^6.2.1"
   }
