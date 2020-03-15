@@ -6,7 +6,7 @@
     "postinstall": "node ./cli/install_service_dependencies.js",
     "clean:test": "shx --silent rm -f /tmp/gladys-test.db && shx echo Cleaned test database",
     "pretest": "npm run eslint",
-    "test": "cross-env SQLITE_FILE_PATH=/tmp/gladys-test.db NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
+    "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
     "push-coverage": "codecov -F server",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
@@ -30,10 +30,15 @@
   "author": "Pierre-Gilles Leymarie",
   "license": "MIT",
   "nodemonConfig": {
-    "ignore": ["test/*"]
+    "ignore": [
+      "test/*"
+    ]
   },
   "nyc": {
-    "exclude": ["migrations/**/*.js", "test/**/*.js"]
+    "exclude": [
+      "migrations/**/*.js",
+      "test/**/*.js"
+    ]
   },
   "devDependencies": {
     "apidoc": "^0.17.7",
