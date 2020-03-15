@@ -152,31 +152,6 @@ const SystemPage = ({ children, ...props }) => (
                     </td>
                   </tr>
                 )}
-
-                {props.systemInfos && props.systemInfos.is_docker === true && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.restartGladys" />
-                    </td>
-                    <td class="text-right">
-                      <button class="btn btn-warning btn-sm">
-                        <Text id="systemSettings.restartButton" />
-                      </button>
-                    </td>
-                  </tr>
-                )}
-                {props.systemInfos && props.systemInfos.is_docker === false && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.restartGladys" />
-                    </td>
-                    <td class="text-right">
-                      <span class="badge badge-warning">
-                        <Text id="systemSettings.notAvailable" />
-                      </span>
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
