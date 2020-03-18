@@ -145,6 +145,19 @@ const SettingsTab = ({ children, ...props }) => (
                }
                </p>
           </div>
+          <div class="input-group mb-3">
+              <input
+                type="text"
+                value={`10;`}
+                onInput={props.updateDebugCommand}
+                class="form-control"
+              />
+            <div class="input-group-append">
+              <button onClick={props.sendDebug} class="btn btn-success">
+                <Text id="integration.rflink.settings.debug.sendButton" />
+              </button>
+            </div>
+          </div>
     </div>
     </div>
   </div>

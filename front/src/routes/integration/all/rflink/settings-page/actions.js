@@ -39,6 +39,9 @@ const actions = store => {
         RflinkPath: e.target.value
       });
     },
+    updateDebugCommand(state, e) {
+      store.setState({commandToSend : e.target.value});
+    },
     updateMilight(state, e) {
       store.setState({
         currentMilightGateway: e.target.value
@@ -112,6 +115,15 @@ const actions = store => {
 
       }
       
+    },
+    async sendDebug(state) {
+      try{
+        await state.httpClient.post('/api/v1/service/rflink/debug', {
+          value: state.commandToSend
+        });
+      } catch (e) {
+
+      }
     },
     async getStatus(state) {
       store.setState({
