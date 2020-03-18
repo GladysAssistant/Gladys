@@ -124,6 +124,29 @@ const SettingsTab = ({ children, ...props }) => (
     </div>
     </div>
     </div>
+
+
+
+
+
+    <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">
+        <Text id="integration.rflink.settings.debug.title" />
+      </h2>
+      </div>
+      <div class="card-body">
+        <Text class="mb-2" id="integration.rflink.settings.debug.info" />
+          <div class="mt-2 alert alert-dark ">
+             <p>
+               {
+                 
+                 `>          ${get(props, 'rflinkStatus.lastCommand')} \n` 
+               }
+               </p>
+          </div>
+    </div>
+    </div>
   </div>
 );
 

@@ -20,7 +20,6 @@ class RflinkDeviceForm extends Component {
   updateExternalId = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', e.target.value);
   };
-
   render({ ...props }) {
     return (
       <div>
@@ -60,7 +59,8 @@ class RflinkDeviceForm extends Component {
               ))}
           </select>
         </div>
-        {props.device.model !== 'milight' &&
+        
+        {(props.device.model === undefined || props.device.model.toLowerCase() !== 'milight') && (
         <div class="form-group">
           <label class="form-label" for="model">
             <Text id="integration.rflink.feature.model" />
@@ -77,7 +77,7 @@ class RflinkDeviceForm extends Component {
               ))}
           </select>
         </div>
-            }
+            )}
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.rflink.device.featuresLabel" />

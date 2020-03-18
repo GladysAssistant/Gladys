@@ -31,7 +31,7 @@ class RflinkDeviceSetupPage extends Component {
             category: featureData[0],
             external_id: 'rflink:',
             type: featureData[1],
-            read_only: true,
+            read_only: false,
             has_feedback: false,
             keep_history: true
           }
@@ -165,9 +165,19 @@ class RflinkDeviceSetupPage extends Component {
         loadedDevice.service_id === this.props.currentIntegration.id
       ) {
         device = loadedDevice;
+
       }
     }
 
+        for (let feature in device.features) {
+          if (feature !== undefined) {
+             if (device.external_id.split(':')[1] !== 'milight') {
+              device.features[`${feature}`].switchId = device.features[`${feature}`].external_id.split(':')[1];
+              device.features[`${feature}`].switchNumber = device.features[`${feature}`].external_id.split(':')[3];
+            }
+          }
+        }
+        console.log(device);
     this.setState({
       device,
       loading: false

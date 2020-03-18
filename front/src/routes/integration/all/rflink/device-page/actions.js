@@ -32,18 +32,21 @@ function createActions(store) {
             $push: rflinkDevicesReceived
           });
         }
+
+
+        console.log(rflinkDevices);
         store.setState({
           rflinkDevices,
           getRflinkDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
+        console.log(e);
         store.setState({
           getRflinkDevicesStatus: RequestStatus.Error
         });
       }
     },
     async saveDevice(state, device) {
-      console.log(device);
       await state.httpClient.post('/api/v1/device', device);
     },
     updateDeviceProperty(state, index, property, value) {
