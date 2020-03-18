@@ -190,7 +190,7 @@
         "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
         "debug" : {
           "title" : "Rflink debug console",
-          "info" : "Here you can see the last command that Rflink sent to Gladys \n it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ..."
+          "info" : "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ..."
 
         },
         "milight" : {
@@ -206,12 +206,12 @@
         "nameLabel": "Name",
         "model": "Model",
         "namePlaceholder": "Enter feature name",
-        "switchIdLabel": "Switch ID",
+        "switchIdLabel": "ID ",
         "switchIdMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
-        "switchIdPlaceholder": "Switch id",
-        "switchNumberLabel": "Switch number",
+        "switchIdPlaceholder": "Rflink device ID",
+        "switchNumberLabel": "Channel",
         "switchNumberMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
-        "switchNumberPlaceholder": "Switch number",
+        "switchNumberPlaceholder": "value of SWITCH in debug console (settings tab) ",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
