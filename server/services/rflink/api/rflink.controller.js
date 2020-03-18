@@ -100,7 +100,21 @@ async function unpair(req, res) {
           currentMilightGateway,
           milightZone
       });
+
 }
+    /**
+     * @api {get} /api/v1/service/rflink/debug send a rflink command
+     * @apiName debug
+     * @apiGroup RFlink
+     */
+    async function sendDebug(req, res) {
+        const command = req.body.value;
+        RFlinkManager.sendUsb.write(command);
+
+        res.json({
+            succes : true,
+        });
+      }
     /** 
      * @apiName unpair
      * @apiGroup RFlink
@@ -133,6 +147,10 @@ async function unpair(req, res) {
         'post /api/v1/service/rflink/disconnect' : {
             authenticated: true,
             controller: asyncMiddleware(disconnect)
+        },
+        'post /api/v1/service/rflink/debug' : {
+            authenticated: true,
+            controller: asyncMiddleware(sendDebug)
         },
         'get /api/v1/service/rflink/status' : {
             authenticated: true,

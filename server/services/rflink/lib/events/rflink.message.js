@@ -15,6 +15,7 @@ const {
  * rflink.message(msg);
  */
 function message(msgRF) {
+    console.log(msgRF);
     this.lastCommand = msgRF;
     const msg = RFtoObj(msgRF);
     let newDevice;
