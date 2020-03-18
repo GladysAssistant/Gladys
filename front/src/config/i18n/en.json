@@ -190,7 +190,10 @@
         "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
         "debug" : {
           "title" : "Rflink debug console",
-          "info" : "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ..."
+          "info" : "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ...",
+          "placeholder" : "message to send",
+          "sendButton" : "Send"
+
 
         },
         "milight" : {
