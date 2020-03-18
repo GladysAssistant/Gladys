@@ -188,21 +188,30 @@
         "connectedWithSuccess": "Rflink Gateway connected with success.",
         "connecting": "Trying to connect to Rflink Gateway ...",
         "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
+        "debug" : {
+          "title" : "Rflink debug console",
+          "info" : "Here you can see the last command that Rflink sent to Gladys"
+
+        },
         "milight" : {
           "title" : "Rflink Milight settings",
           "gatewayBarinfo" : "Gateway number: ",
           "zoneInfo" : "Gateway zone: ",
-          "about" : " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway . For the moment you can use unlimited milight but with one bridge",
+          "about" : " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway. You can use unlimited milight but each bridge has 4 zones",
           "pairButton" : "Pair",
           "unpairButton" : "Unpair"
         }
       },
       "feature": {
         "nameLabel": "Name",
+        "model": "Model",
         "namePlaceholder": "Enter feature name",
-        "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a Rflink message. It musts start with \"rflink:\". Read the Rflink API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
-        "externalIdPlaceholder": "Feature RFlink message key",
+        "switchIdLabel": "Switch ID",
+        "switchIdMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
+        "switchIdPlaceholder": "Switch id",
+        "switchNumberLabel": "Switch number",
+        "switchNumberMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
+        "switchNumberPlaceholder": "Switch number",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
