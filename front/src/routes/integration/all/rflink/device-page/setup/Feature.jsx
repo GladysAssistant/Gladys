@@ -31,7 +31,7 @@ const RflinkFeatureBox = ({ children, ...props }) => {
             </Localizer>
           </div>
 
-        {(props.feature.type ==='binary' && props.feature.category === 'switch') && (         // Switch
+        
         <div>
             <div class="form-group">
             <label class="form-label" for={`switchid_${props.featureIndex}`}>
@@ -48,8 +48,9 @@ const RflinkFeatureBox = ({ children, ...props }) => {
               />
             </Localizer>
           </div>
+          </div>
           
-            
+          {(props.feature.read_only === false || props.feature.read_only === undefined) && (         // Switch
           <div class="form-group">
             <label class="form-label" for={`switchnumber_${props.featureIndex}`}>
               <Text id="integration.rflink.feature.switchNumberLabel" />
@@ -65,7 +66,7 @@ const RflinkFeatureBox = ({ children, ...props }) => {
               />
             </Localizer>
           </div>
-        </div>
+        
         
         )}
 
@@ -159,6 +160,7 @@ class RflinkFeatureBoxComponent extends Component {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
   };
   updateSwitchId = e => {
+    console.log(this.props);
     this.props.feature.switchId = e.target.value;
     let external =  {
       target : {
