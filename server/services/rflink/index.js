@@ -29,7 +29,12 @@ module.exports = function RfLink(gladys, serviceId) {
       if (rfLinkManager === undefined)  {
         throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
       } else {
-        rfLinkManager.connect(RflinkPath);
+        try {
+          rfLinkManager.connect(RflinkPath);
+        } catch (err){
+          Promise.reject(Error(err));
+        }
+          
       }
       const currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
       rfLinkManager.currentMilightGateway = currentMilightGateway;
@@ -41,7 +46,6 @@ module.exports = function RfLink(gladys, serviceId) {
      
       
     }
-
 
     
 /**

@@ -45,6 +45,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     async function getStatus(req, res) {
     res.json({
       currentMilightGateway : RFlinkManager.currentMilightGateway,
+      lastCommand : RFlinkManager.lastCommand,
       connected: RFlinkManager.connected,
       scanInProgress: RFlinkManager.scanInProgress,
       ready: RFlinkManager.ready,

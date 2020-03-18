@@ -15,7 +15,7 @@ const {
  * rflink.message(msg);
  */
 function message(msgRF) {
-    logger.log(msgRF);
+    this.lastCommand = msgRF;
     const msg = RFtoObj(msgRF);
     let newDevice;
     
@@ -25,14 +25,20 @@ function message(msgRF) {
             const doesntExistYet = this.device[msg.id] === undefined;
 
             if (doesntExistYet === true) {
+
                 
+                
+                
+                
+                const model = `${msg.protocol.charAt(0).toUpperCase()}${msg.protocol.toLowerCase().slice(1)}`;
             
+                console.log(model);
                 newDevice = {
                     service_id : this.serviceId,
                     name : `${msg.protocol} `,
                     selector : `rflink:${msg.id}:${msg.switch}`,
                     external_id: `rflink:${msg.id}:${msg.switch}`,
-                    model : `${msg.protocol}`,
+                    model,
                     should_poll : false,
                     features : []
                 };

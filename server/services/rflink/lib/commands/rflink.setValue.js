@@ -41,13 +41,13 @@ function setValue(device, deviceFeature, state)  {
     if (device.external_id.split(':')[1] === 'milight') {
         const id = device.external_id.split(':')[2];
         const channel = `0${device.external_id.split(':')[3]}`;
-        if (deviceFeature.name.toLowerCase() === 'color') {
+        if (deviceFeature.external_id.split()[2].toLowerCase() === 'color') {
             msg = `10;MiLightv1;${id};${channel};${value};COLOR;`;
-        } else if (deviceFeature.name.toLowerCase() === 'brightness') {
+        } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'brightness') {
             msg = `10;MiLightv1;${id};${channel};${value};BRIGHT;`;
-        } else if (deviceFeature.name.toLowerCase() === 'power') {
+        } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'power') {
             msg = `10;MiLightv1;${id};${channel};34BC;${value};`;
-        } else if (deviceFeature.name.toLowerCase() === 'milight-mode') {
+        } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'milight-mode') {
             msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};`;
         }
         

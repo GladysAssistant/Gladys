@@ -17,29 +17,41 @@ function connect(Path) {
       this.Path = Path;
     }
 
-
-    const port = new Serialport(this.Path, {
-      baudRate : 57600,
-      dataBits : 8,
-      parity : 'none',
-      autoOpen : true,
+    try {
+      const port = new Serialport(this.Path, {
+        baudRate : 57600,
+        dataBits : 8,
+        parity : 'none',
+        autoOpen : true,
+        
+      });
       
-    });
-    
-    const readline = new Readline({
-      baudRate : 57600,
-    });
-    logger.log(readline);
-    port.pipe(readline);
-    this.usb = readline;
-    this.sendUsb = port;
+      const readline = new Readline({
+        baudRate : 57600,
+      });
+      port.pipe(readline);
+      this.usb = readline;
+      this.sendUsb = port;
+
+      logger.debug(`Rflink : Connecting to USB = ${Path}`);
+
+      this.connected = true;
+      this.ready = true;
+      this.listen();
 
 
-    logger.debug(`Rflink : Connecting to USB = ${Path}`);
+    } catch (error) {
+      this.connected = false;
+      this.ready = false;
+      this.scanInProgress = false;
 
-    this.connected = true;
-    this.ready = true;
-    this.listen();
+    }
+
+
+
+
+
+
     
   }
   
