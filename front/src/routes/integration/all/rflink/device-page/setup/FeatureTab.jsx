@@ -27,7 +27,7 @@ const FeatureTab = ({ children, ...props }) => (
       <div class="dimmer-content">
         <div class="card-body">
           <div class="alert alert-secondary">
-            <MarkupText id="integration.rflink.feature.externalIdMessage" />
+            <MarkupText id="integration.rflink.feature.message" />
           </div>
           {props.saveStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
