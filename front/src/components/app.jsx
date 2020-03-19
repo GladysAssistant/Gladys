@@ -71,7 +71,6 @@ import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
 import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
 import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
 
-
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -157,10 +156,7 @@ const AppRouter = connect(
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
-        <Redirect
-          path="/dashboard/integration/device/rflink"
-          to="/dashboard/integration/device/rflink/device"
-        />
+        <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
