@@ -626,7 +626,7 @@
       ]
     }
   ],
-  "get /api/v1/service/rflink/device" : [
+  "get /api/v1/service/rflink/device": [
     {
       "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
       "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
@@ -647,7 +647,7 @@
         }
       ]
     }
-    ],
+  ],
   "get /api/v1/service/zwave/device": [
     {
       "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
