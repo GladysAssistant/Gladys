@@ -233,7 +233,7 @@ const DEVICE_FEATURE_CATEGORIES = {
 const DEVICE_MODELS = {
   TRISTATE: 'Tristate',
   KAKU: 'Kaku',
-  NEWKAKU:  'Newkaku',
+  NEWKAKU: 'Newkaku',
   HOMEEASY: 'Homeeasy',
   CONRAD: 'Conrad rsl2',
   BLYSS: 'Blyss',
@@ -248,14 +248,7 @@ const DEVICE_MODELS = {
   SELECTPLUS: 'Selectplus',
   DELTRONIC: 'Deltronic',
   MERTIK: 'Mertik',
-  EV1527 : 'Ev1527',
-
-
-
-
-
-
-
+  EV1527: 'Ev1527',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -382,7 +375,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
   },
-  RFLINK : {
+  RFLINK: {
     DRIVER_READY: 'rflink.driver-ready',
   },
   XIAOMI: {
