@@ -59,25 +59,24 @@ class RflinkDeviceForm extends Component {
               ))}
           </select>
         </div>
-        
+
         {(props.device.model === undefined || props.device.model.toLowerCase() !== 'milight') && (
-        <div class="form-group">
-          <label class="form-label" for="model">
-            <Text id="integration.rflink.feature.model" />
-          </label>
-          <select onChange={this.updateModel} class="form-control" id="room">
-            <option value="">
-              <Text id="global.emptySelectOption" />
-            
-            </option>
-            {DEVICE_MODELS_LIST.map(model => (
-                    <option selected={model === props.device.model} value={model}>
-                      {model}
-                    </option>
+          <div class="form-group">
+            <label class="form-label" for="model">
+              <Text id="integration.rflink.feature.model" />
+            </label>
+            <select onChange={this.updateModel} class="form-control" id="room">
+              <option value="">
+                <Text id="global.emptySelectOption" />
+              </option>
+              {DEVICE_MODELS_LIST.map(model => (
+                <option selected={model === props.device.model} value={model}>
+                  {model}
+                </option>
               ))}
-          </select>
-        </div>
-            )}
+            </select>
+          </div>
+        )}
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.rflink.device.featuresLabel" />
@@ -98,12 +97,6 @@ class RflinkDeviceForm extends Component {
             )}
           </div>
         </div>
-
-        
-
-
-
-
       </div>
     );
   }
