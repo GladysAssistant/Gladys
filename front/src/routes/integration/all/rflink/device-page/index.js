@@ -12,8 +12,6 @@ class RflinkDevicePage extends Component {
     this.props.getHouses();
   }
 
-  
-
   render(props, {}) {
     return (
       <RflinkPage integration={integrationConfig[props.user.language].rflink}>
@@ -22,6 +20,5 @@ class RflinkDevicePage extends Component {
     );
   }
 }
-console.log(this.props);
 
 export default RflinkDevicePage;

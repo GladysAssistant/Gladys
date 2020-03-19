@@ -9,7 +9,6 @@ import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 
-
 @connect('session,user,httpClient,houses,currentIntegration', actions)
 class RflinkDeviceSetupPage extends Component {
   selectFeature(e) {
@@ -20,10 +19,8 @@ class RflinkDeviceSetupPage extends Component {
 
   addFeature() {
     const featureData = this.state.selectedFeature.split('|');
-  
 
     const device = update(this.state.device, {
-      
       features: {
         $push: [
           {
@@ -98,10 +95,8 @@ class RflinkDeviceSetupPage extends Component {
       loading: true
     });
     try {
-      console.log(this.state.device.features[0].external_id);   //// Mauvais chemin ?
       const id = this.state.device.features[0].external_id.split(':');
       this.state.device.external_id = `rflink:${id[1]}:${id[3]}`;
-      console.log(this.state.device);
       const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
       this.setState({
         saveStatus: RequestStatus.Success,
@@ -165,19 +160,17 @@ class RflinkDeviceSetupPage extends Component {
         loadedDevice.service_id === this.props.currentIntegration.id
       ) {
         device = loadedDevice;
-
       }
     }
 
-        for (let feature in device.features) {
-          if (feature !== undefined) {
-             if (device.external_id.split(':')[1] !== 'milight') {
-              device.features[`${feature}`].switchId = device.features[`${feature}`].external_id.split(':')[1];
-              device.features[`${feature}`].switchNumber = device.features[`${feature}`].external_id.split(':')[3];
-            }
-          }
+    for (let feature in device.features) {
+      if (feature !== undefined) {
+        if (device.external_id.split(':')[1] !== 'milight') {
+          device.features[`${feature}`].switchId = device.features[`${feature}`].external_id.split(':')[1];
+          device.features[`${feature}`].switchNumber = device.features[`${feature}`].external_id.split(':')[3];
         }
-        console.log(device);
+      }
+    }
     this.setState({
       device,
       loading: false

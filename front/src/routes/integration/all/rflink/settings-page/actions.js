@@ -40,7 +40,7 @@ const actions = store => {
       });
     },
     updateDebugCommand(state, e) {
-      store.setState({commandToSend : e.target.value});
+      store.setState({ commandToSend: e.target.value });
     },
     updateMilight(state, e) {
       store.setState({
@@ -94,13 +94,9 @@ const actions = store => {
           value: state.currentMilightGateway
         });
         await state.httpClient.post('/api/v1/service/rflink/pair', {
-          zone : state.currentMilightZone,
+          zone: state.currentMilightZone
         });
-        
-
-      } catch (e) {
-
-      }
+      } catch (e) {}
     },
     async unpair(state) {
       try {
@@ -108,22 +104,16 @@ const actions = store => {
           value: state.currentMilightGateway
         });
         await state.httpClient.post('/api/v1/service/rflink/unpair', {
-          zone : state.currentMilightZone,
+          zone: state.currentMilightZone
         });
-
-      } catch (e) {
-
-      }
-      
+      } catch (e) {}
     },
     async sendDebug(state) {
-      try{
+      try {
         await state.httpClient.post('/api/v1/service/rflink/debug', {
           value: state.commandToSend
         });
-      } catch (e) {
-
-      }
+      } catch (e) {}
     },
     async getStatus(state) {
       store.setState({
@@ -135,7 +125,7 @@ const actions = store => {
         if (currentMilightGateway === undefined || currentMilightGateway === null) {
           currentMilightGateway = 'error';
         }
-        
+
         store.setState({
           rflinkStatus,
           currentMilightGateway,

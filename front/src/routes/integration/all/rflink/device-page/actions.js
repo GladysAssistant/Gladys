@@ -6,7 +6,7 @@ import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
-  store.setState({integrationActions});
+  store.setState({ integrationActions });
   const houseActions = createActionsHouse(store);
   const actions = {
     async getRflinkDevices(state, take, skip) {
@@ -33,14 +33,11 @@ function createActions(store) {
           });
         }
 
-
-        console.log(rflinkDevices);
         store.setState({
           rflinkDevices,
           getRflinkDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
-        console.log(e);
         store.setState({
           getRflinkDevicesStatus: RequestStatus.Error
         });
@@ -64,7 +61,7 @@ function createActions(store) {
     async deleteDevice(state, device, index) {
       await state.httpClient.delete('/api/v1/device/' + device.selector);
       await state.httpClient.post('/api/v1/service/rflink/remove/', {
-        external_id : device.selector,
+        external_id: device.selector
       });
       const newState = update(state, {
         rflinkDevices: {
@@ -87,7 +84,7 @@ function createActions(store) {
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, integrationActions ,actions);
+  return Object.assign({}, houseActions, integrationActions, actions);
 }
 
 export default createActions;
