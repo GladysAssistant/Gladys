@@ -174,6 +174,79 @@
         "navigation": "navigation"
       }
     },
+    "rflink": {
+      "title": "RFlink",
+      "settingsTab": "Settings",
+      "deviceTab": "devices",
+      "settings": {
+        "title": "Rflink Usb Settings",
+        "description": "To use Rflink in Gladys, you need to have a Rflink gateway connected to your Gladys instance.",
+        "zwaveUsbDriverPathLabel": "Select the USB port where your Rflink is connected",
+        "connectButton": "Connect",
+        "disconnectButton": "Disconnect",
+        "refreshButton": "Refresh USB list",
+        "notConnected": "Gladys is not connected to any Rflink Gateway.",
+        "connectedWithSuccess": "Rflink Gateway connected with success.",
+        "connecting": "Trying to connect to Rflink Gateway ...",
+        "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
+        "debug": {
+          "title": "Rflink debug console",
+          "info": "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ...",
+          "placeholder": "message to send",
+          "sendButton": "Send"
+        },
+        "milight": {
+          "title": "Rflink Milight settings",
+          "gatewayBarinfo": "Gateway number: ",
+          "zoneInfo": "Gateway zone: ",
+          "about": " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway. You can use unlimited milight but each bridge has 4 zones",
+          "pairButton": "Pair",
+          "unpairButton": "Unpair"
+        }
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "model": "Model",
+        "message": "You can only create actuators , sensors are automatically detected and added in the device tab when they send messages",
+        "namePlaceholder": "Enter feature name",
+        "switchIdLabel": "ID ",
+        "switchIdMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
+        "switchIdPlaceholder": "Rflink device ID",
+        "switchNumberLabel": "Channel",
+        "switchNumberMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
+        "switchNumberPlaceholder": "value of SWITCH in debug console (settings tab) ",
+        "unitLabel": "Unit",
+        "minLabel": "Minimum value",
+        "minPlaceholder": "Enter feature minimum value",
+        "maxLabel": "Maximum value",
+        "maxPlaceholder": "Enter feature maximum value",
+        "addButton": "Add feature",
+        "deleteLabel": "Delete feature"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "deviceOnNetworkTitle": "Devices detected by the gateway",
+        "connectButton": "Connect/Reconnect",
+        "search": "Search devices",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "noDevices": "No devices found. Make sure you have a connected Rflink gateway in the setup tab.",
+        "scanButton": "Scan",
+        "nameLabel": "Name",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "newButton": "New",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "noNameLabel": "No name",
+        "roomLabel": "Room",
+        "returnButton": "Return back",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
@@ -436,12 +509,12 @@
     "selectTriggerLabel": "Select a trigger type",
     "newAction": "New action",
     "selectActionType": "Select an action type",
-    "addActionButton": "Add action",
+    "addActionButton": "Add new action",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
-    "addNewTriggerButton": "Add trigger",
+    "addNewTriggerButton": "Add new trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
       "delay": {
@@ -554,6 +627,24 @@
           "saturday": "Saturday",
           "sunday": "Sunday"
         }
+      }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
       }
     }
   },
