@@ -89,7 +89,7 @@ class MapComponent extends Component {
     this.displayUsers();
     if (markerArray.length >= 1) {
     var group = leaflet.featureGroup(markerArray);
-    this.leafletMap.fitBounds(group.getBounds(), {padding: [25, 25]});
+    this.leafletMap.fitBounds(group.getBounds(), { padding: [25, 25] });
     }
   }
 
