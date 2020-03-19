@@ -188,27 +188,25 @@
         "connectedWithSuccess": "Rflink Gateway connected with success.",
         "connecting": "Trying to connect to Rflink Gateway ...",
         "driverFailedError": "An error occured while trying to connect to Rflink Gateway .",
-        "debug" : {
-          "title" : "Rflink debug console",
-          "info" : "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ...",
-          "placeholder" : "message to send",
-          "sendButton" : "Send"
-
-
+        "debug": {
+          "title": "Rflink debug console",
+          "info": "Here you can see the last command that Rflink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ...",
+          "placeholder": "message to send",
+          "sendButton": "Send"
         },
-        "milight" : {
-          "title" : "Rflink Milight settings",
-          "gatewayBarinfo" : "Gateway number: ",
-          "zoneInfo" : "Gateway zone: ",
-          "about" : " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway. You can use unlimited milight but each bridge has 4 zones",
-          "pairButton" : "Pair",
-          "unpairButton" : "Unpair"
+        "milight": {
+          "title": "Rflink Milight settings",
+          "gatewayBarinfo": "Gateway number: ",
+          "zoneInfo": "Gateway zone: ",
+          "about": " You can use your actual milight bridge id or if you don't have a gateway , use a new one (F746 by default) the id is just a code to identify the gateway. You can use unlimited milight but each bridge has 4 zones",
+          "pairButton": "Pair",
+          "unpairButton": "Unpair"
         }
       },
       "feature": {
         "nameLabel": "Name",
         "model": "Model",
-        "message" : "You can only create actuators , sensors are automatically detected and added in the device tab when they send messages",
+        "message": "You can only create actuators , sensors are automatically detected and added in the device tab when they send messages",
         "namePlaceholder": "Enter feature name",
         "switchIdLabel": "ID ",
         "switchIdMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
@@ -247,7 +245,6 @@
         "saveError": "Error saving or deleting device",
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
       }
-      
     },
     "telegram": {
       "title": "Telegram",

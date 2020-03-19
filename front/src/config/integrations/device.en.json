@@ -35,7 +35,7 @@
     "description": "Control your Sonoff devices.",
     "img": "/assets/integrations/cover/sonoff.jpg"
   },
-    {
+  {
     "key": "rflink",
     "name": "rflink",
     "description": "Control your rflink devices.",
