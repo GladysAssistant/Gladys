@@ -10,52 +10,40 @@ const logger = require('../../../../utils/logger');
  * rflink.connect(Path);
  */
 function connect(Path) {
-    // special case for macOS
-    if (os.platform() === 'darwin') {
-      this.Path = Path.replace('/dev/tty.', '/dev/cu.');
-    } else {
-      this.Path = Path;
-    }
-
-    try {
-      const port = new Serialport(this.Path, {
-        baudRate : 57600,
-        dataBits : 8,
-        parity : 'none',
-        autoOpen : true,
-        
-      });
-      
-      const readline = new Readline({
-        baudRate : 57600,
-      });
-      port.pipe(readline);
-      this.usb = readline;
-      this.sendUsb = port;
-
-      logger.debug(`Rflink : Connecting to USB = ${Path}`);
-
-      this.connected = true;
-      this.ready = true;
-      this.listen();
-
-
-    } catch (error) {
-      this.connected = false;
-      this.ready = false;
-      this.scanInProgress = false;
-
-    }
-
-
-
-
-
-
-    
+  // special case for macOS
+  if (os.platform() === 'darwin') {
+    this.Path = Path.replace('/dev/tty.', '/dev/cu.');
+  } else {
+    this.Path = Path;
   }
-  
-  module.exports = {
-    connect,
-  };
-  
+
+  try {
+    const port = new Serialport(this.Path, {
+      baudRate: 57600,
+      dataBits: 8,
+      parity: 'none',
+      autoOpen: true,
+    });
+
+    const readline = new Readline({
+      baudRate: 57600,
+    });
+    port.pipe(readline);
+    this.usb = readline;
+    this.sendUsb = port;
+
+    logger.debug(`Rflink : Connecting to USB = ${Path}`);
+
+    this.connected = true;
+    this.ready = true;
+    this.listen();
+  } catch (error) {
+    this.connected = false;
+    this.ready = false;
+    this.scanInProgress = false;
+  }
+}
+
+module.exports = {
+  connect,
+};

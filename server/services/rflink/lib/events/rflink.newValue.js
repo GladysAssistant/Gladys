@@ -9,16 +9,14 @@ const { EVENTS } = require('../../../../utils/constants');
  *  newValue(Object, 'temperature', 30)
  */
 function newValue(device, deviceFeature, state) {
+  logger.debug(`RFlink : value ${deviceFeature} of device ${device} changed to ${state}`);
 
-    logger.debug(`RFlink : value ${deviceFeature} of device ${device} changed to ${state}`);
-
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `rflink:${device.id}:${deviceFeature}`,
-        state,
-    });
-
+  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+    device_feature_external_id: `rflink:${device.id}:${deviceFeature}`,
+    state,
+  });
 }
 
 module.exports = {
-    newValue,
+  newValue,
 };
