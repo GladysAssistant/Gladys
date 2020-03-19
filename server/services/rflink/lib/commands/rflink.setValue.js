@@ -14,27 +14,27 @@ function setValue(device, deviceFeature, state)  {
     let value;
     logger.log(device.external_id);
 
+    value = state;
 
-    if (state === 0 || state === false) {
-        value = 'OFF';
+    if (deviceFeature.type === 'binary') {
+        switch (state) {
+            case 0:
+            case false : 
+                value = 'OFF';
+            break;
+            case 1:
+            case true : 
+                value = 'ON';
+    
+            break;
+            default : 
+                value = state;
+            break;
+    
+        }
     }
 
-    switch (state) {
-        case 0:
-        case false : 
-            value = 'OFF';
 
-        break;
-        case 1:
-        case true : 
-            value = 'ON';
-
-        break;
-        default : 
-            value = state;
-        break;
-
-    }
 
 
 

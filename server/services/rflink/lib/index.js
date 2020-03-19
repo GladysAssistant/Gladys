@@ -4,7 +4,6 @@
 const { newValue } = require('./events/rflink.newValue');
 const { addDevice } = require('./events/rflink.addDevice');
 const { message } = require('./events/rflink.message.js');
-const { error } = require('./events/rflink.error');
 
 
 // COMMANDS
@@ -39,7 +38,6 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
 RFlinkManager.prototype.message = message;
 RFlinkManager.prototype.newValue = newValue;
 RFlinkManager.prototype.addDevice = addDevice;
-RFlinkManager.prototype.error = error;
 
 
 // Commands

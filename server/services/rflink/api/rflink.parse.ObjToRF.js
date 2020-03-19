@@ -24,7 +24,7 @@ function ObjToRF(device, deviceFeature, state) {
     if (state !== undefined) {
         Rfcode += `${state};`;
     } else {
-       this.error('NoState');
+        logger.log('no state');
     };
 
     Rfcode += '\n';
