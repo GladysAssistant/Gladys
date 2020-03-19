@@ -42,7 +42,7 @@ class MapComponent extends Component {
               zIndexOffset: 1000
             })
             .addTo(this.leafletMap);
-            markerArray.push(this.userMarkers[user.id]);
+          markerArray.push(this.userMarkers[user.id]);
         }
       });
     }
@@ -64,7 +64,7 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
-            markerArray.push(this.houseMarkers[house.id]);
+          markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
@@ -88,8 +88,8 @@ class MapComponent extends Component {
     this.displayHouses();
     this.displayUsers();
     if (markerArray.length >= 1) {
-    var group = leaflet.featureGroup(markerArray);
-    this.leafletMap.fitBounds(group.getBounds(), { padding: [25, 25] });
+      var group = leaflet.featureGroup(markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [25, 25] });
     }
   }
 
