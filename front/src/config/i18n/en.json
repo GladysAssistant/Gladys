@@ -208,6 +208,7 @@
       "feature": {
         "nameLabel": "Name",
         "model": "Model",
+        "message" : "You can only create actuators , sensors are automatically detected and added in the device tab when they send messages",
         "namePlaceholder": "Enter feature name",
         "switchIdLabel": "ID ",
         "switchIdMessage": "The feature external ID is an unique ID which is used to control the device, it is always in the form : 'rflink:id:type:channel'.Read the documentation here : not online for the moment",
