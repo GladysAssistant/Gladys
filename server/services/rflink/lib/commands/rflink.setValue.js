@@ -1,4 +1,7 @@
 const ObjToRF = require('../../api/rflink.parse.ObjToRF');
+const {
+  DEVICE_FEATURE_CATEGORIES
+} = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 /**
  * @description send a message to change a device's value
@@ -20,11 +23,20 @@ function setValue(device, deviceFeature, state) {
     switch (state) {
       case 0:
       case false:
-        value = 'OFF';
+        if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SWITCH) {
+          value = 'OFF';
+        } else if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BUTTON) {
+          value = 'DOWN';
+        }
+        
         break;
       case 1:
       case true:
-        value = 'ON';
+        if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SWITCH) {
+          value = 'ON';
+        } else if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BUTTON) {
+          value = 'UP';
+        }
 
         break;
       default:

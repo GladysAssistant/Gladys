@@ -218,6 +218,27 @@ function message(msgRF) {
           });
         }
 
+        if (
+          msg.switch !== undefined &&
+          msg.rgwb === undefined &&
+          (msg.cmd === 'UP' || msg.cmd === 'DOWN')
+        ) {
+          newDevice.name += 'switch';
+          newDevice.features.push({
+            name: 'switch',
+            selector: `rflink:${msg.id}:switch:${msg.switch}`,
+            external_id: `rflink:${msg.id}:switch:${msg.switch}`,
+            rfcode: 'CMD',
+            category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+            type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+            read_only: false,
+            keep_history: true,
+            has_feedback: false,
+            min: 0,
+            max: 1,
+          });
+        }
+
         if (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true) {
           newDevice.selector = `rflink:milight:${msg.id}:${msg.switch}`;
           newDevice.external_id = `rflink:milight:${msg.id}:${msg.switch}`;
@@ -328,10 +349,10 @@ function message(msgRF) {
           this.newValue(msg, 'wind-speed', msg.wings);
         }
         if (
-          (msg.switch !== undefined && msg.cmd === 'ON') ||
+          (msg.switch !== undefined) && (msg.cmd === 'ON' ||
           msg.cmd === 'OFF' ||
           msg.cmd === 'ALLON' ||
-          msg.cmd === 'ALLOFF'
+          msg.cmd === 'ALLOFF')
         ) {
           this.newValue(msg, 'switch', msg.cmd);
         }
