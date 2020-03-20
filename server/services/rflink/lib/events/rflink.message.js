@@ -218,11 +218,7 @@ function message(msgRF) {
           });
         }
 
-        if (
-          msg.switch !== undefined &&
-          msg.rgwb === undefined &&
-          (msg.cmd === 'UP' || msg.cmd === 'DOWN')
-        ) {
+        if (msg.switch !== undefined && msg.rgwb === undefined && (msg.cmd === 'UP' || msg.cmd === 'DOWN')) {
           newDevice.name += 'switch';
           newDevice.features.push({
             name: 'switch',
@@ -349,10 +345,8 @@ function message(msgRF) {
           this.newValue(msg, 'wind-speed', msg.wings);
         }
         if (
-          (msg.switch !== undefined) && (msg.cmd === 'ON' ||
-          msg.cmd === 'OFF' ||
-          msg.cmd === 'ALLON' ||
-          msg.cmd === 'ALLOFF')
+          msg.switch !== undefined &&
+          (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF')
         ) {
           this.newValue(msg, 'switch', msg.cmd);
         }
