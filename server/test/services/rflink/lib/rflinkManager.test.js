@@ -1,6 +1,8 @@
 /* eslint-disable consistent-return */
 /* eslint-disable max-len */
 /* eslint-disable no-restricted-syntax */
+/* eslint-disable import/no-unresolved */
+
 const EventEmitter = require('events');
 // const {DEVICE_FEATURE_CATEGORIES} = require('../../../../utils/constants');
 
@@ -50,6 +52,10 @@ describe('Rflink Manager Commands', () => {
             }
             return 'error';
           }
+        });
+
+        it('should add devices', () => {
+          rflinkManager.addDevice(device);
         });
       }
     });

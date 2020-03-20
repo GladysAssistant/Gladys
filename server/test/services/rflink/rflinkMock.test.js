@@ -15,5 +15,6 @@ Rflink.prototype.listen = fake.returns(null);
 Rflink.prototype.getDevices = fake.returns(null);
 Rflink.prototype.pair = fake.returns(null);
 Rflink.prototype.unpair = fake.returns(null);
+Rflink.prototype.write = fake.returns(null);
 
 module.exports = Rflink;
