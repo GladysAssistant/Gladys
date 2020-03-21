@@ -10,10 +10,8 @@ const logger = require('../../../../utils/logger');
  * rflink.SetValue();
  */
 function setValue(device, deviceFeature, state) {
-  logger.log(deviceFeature);
   let msg;
   let value;
-  logger.log(device.external_id);
 
   value = state;
 
@@ -60,15 +58,9 @@ function setValue(device, deviceFeature, state) {
   }
   logger.log(msg);
 
-  this.sendUsb.write(msg, (error) => {
-    logger.log(error);
-  });
-  this.sendUsb.write(msg, (error) => {
-    logger.log(error);
-  });
-  this.sendUsb.write(msg, (error) => {
-    logger.log(error);
-  });
+  this.sendUsb.write(msg, (error) => {});
+  this.sendUsb.write(msg, (error) => {});
+  this.sendUsb.write(msg, (error) => {});
 }
 
 module.exports = {
