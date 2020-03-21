@@ -59,7 +59,8 @@ export const RequestStatus = {
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
-  RoomConflictError: 'RoomConflictError'
+  RoomConflictError: 'RoomConflictError',
+  RoomValidationError: 'RoomValidationError'
 };
 
 export const GetWeatherStatus = {

@@ -3,12 +3,10 @@ coverage:
     project:
       server:
         target: 90%
-        flags: server
+        flags:
+          - server
 
 flags:
   server:
     paths:
       - server
-  front:
-    paths:
-      - front
