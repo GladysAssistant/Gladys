@@ -48,9 +48,11 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
       <td class="text-right">
-        {dayjs(props.deviceFeature.last_value_changed)
-          .locale(props.user.language)
-          .fromNow()}
+        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+        {props.deviceFeature.last_value_changed &&
+          dayjs(props.deviceFeature.last_value_changed)
+            .locale(props.user.language)
+            .fromNow()}
       </td>
     )}
   </tr>
