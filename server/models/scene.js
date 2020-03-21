@@ -1,5 +1,5 @@
-const Joi = require('joi');
-const { ACTION_LIST } = require('../utils/constants');
+const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
+const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -7,18 +7,50 @@ const actionSchema = Joi.array().items(
   Joi.array().items(
     Joi.object().keys({
       type: Joi.string()
-        .valid(ACTION_LIST)
+        .valid(...ACTION_LIST)
         .required(),
-      deviceFeature: Joi.string(),
+      device_feature: Joi.string(),
+      device_features: Joi.array().items(Joi.string()),
       device: Joi.string(),
+      devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       text: Joi.string(),
-      milliseconds: Joi.number(),
-      seconds: Joi.number(),
-      minutes: Joi.number(),
-      hours: Joi.number(),
+      value: Joi.number(),
+      unit: Joi.string(),
+      conditions: Joi.array().items({
+        variable: Joi.string().required(),
+        operator: Joi.string()
+          .valid('=', '!=', '>', '>=', '<', '<=')
+          .required(),
+        value: Joi.number(),
+      }),
     }),
   ),
+);
+
+const triggersSchema = Joi.array().items(
+  Joi.object().keys({
+    type: Joi.string()
+      .valid(...EVENT_LIST)
+      .required(),
+    house: Joi.string(),
+    device: Joi.string(),
+    device_feature: Joi.string(),
+    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
+    value: Joi.number(),
+    user: Joi.string(),
+    scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
+    date: Joi.date().format('YYYY-MM-DD'),
+    time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+    interval: Joi.number(),
+    unit: Joi.string(),
+    days_of_the_week: Joi.array().items(
+      Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+    ),
+    day_of_the_month: Joi.number()
+      .min(1)
+      .max(31),
+  }),
 );
 
 module.exports = (sequelize, DataTypes) => {
@@ -51,7 +83,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = Joi.validate(value, actionSchema);
+            const result = actionSchema.validate(value);
+            if (result.error) {
+              throw new Error(result.error.details[0].message);
+            }
+          },
+        },
+      },
+      triggers: {
+        type: DataTypes.JSON,
+        validate: {
+          isEven(value) {
+            const result = triggersSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }
@@ -67,17 +110,6 @@ module.exports = (sequelize, DataTypes) => {
 
   // add slug if needed
   scene.beforeValidate(addSelector);
-
-  scene.associate = (models) => {
-    scene.belongsToMany(models.Trigger, {
-      through: {
-        model: models.TriggerScene,
-        unique: true,
-      },
-      foreignKey: 'scene_id',
-      as: 'triggers',
-    });
-  };
 
   return scene;
 };
