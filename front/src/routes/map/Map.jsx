@@ -4,13 +4,13 @@ import 'leaflet/dist/leaflet.css';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
-var markerArray = [];
 
 class MapComponent extends Component {
   initMap = () => {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
+    this.markerArray = [];
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
     leaflet
       .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -42,7 +42,7 @@ class MapComponent extends Component {
               zIndexOffset: 1000
             })
             .addTo(this.leafletMap);
-          markerArray.push(this.userMarkers[user.id]);
+          this.markerArray.push(this.userMarkers[user.id]);
         }
       });
     }
@@ -64,7 +64,7 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
-          markerArray.push(this.houseMarkers[house.id]);
+          this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
@@ -87,9 +87,9 @@ class MapComponent extends Component {
   componentDidUpdate() {
     this.displayHouses();
     this.displayUsers();
-    if (markerArray.length >= 1) {
-      var group = leaflet.featureGroup(markerArray);
-      this.leafletMap.fitBounds(group.getBounds(), { padding: [25, 25] });
+    if (this.markerArray.length >= 1) {
+      const group = leaflet.featureGroup(this.markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
     }
   }
 
