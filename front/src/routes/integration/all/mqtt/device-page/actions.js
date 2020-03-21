@@ -9,29 +9,19 @@ function createActions(store) {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getMqttDevices(state, take, skip) {
+    async getMqttDevices(state) {
       store.setState({
         getMqttDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
           service: 'mqtt',
-          order_dir: state.getMqttDeviceOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getMqttDeviceOrderDir || 'asc'
         };
         if (state.mqttDeviceSearch && state.mqttDeviceSearch.length) {
           options.search = state.mqttDeviceSearch;
         }
-        const mqttDevicesReceived = await state.httpClient.get('/api/v1/service/mqtt/device', options);
-        let mqttDevices;
-        if (skip === 0) {
-          mqttDevices = mqttDevicesReceived;
-        } else {
-          mqttDevices = update(state.mqttDevices, {
-            $push: mqttDevicesReceived
-          });
-        }
+        const mqttDevices = await state.httpClient.get('/api/v1/service/mqtt/device', options);
         store.setState({
           mqttDevices,
           getMqttDevicesStatus: RequestStatus.Success
@@ -77,13 +67,13 @@ function createActions(store) {
       store.setState({
         mqttDeviceSearch: e.target.value
       });
-      await actions.getMqttDevices(store.getState(), 20, 0);
+      await actions.getMqttDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
         getMqttDeviceOrderDir: e.target.value
       });
-      await actions.getMqttDevices(store.getState(), 20, 0);
+      await actions.getMqttDevices(store.getState());
     },
     addDeviceFeature(state, index, category, type) {
       const uniqueId = uuid.v4();
