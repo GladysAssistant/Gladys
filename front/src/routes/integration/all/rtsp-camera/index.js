@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import RtspCameraPage from './RtspCamera';
-import integrationConfig from '../../../../config/integrations';
 
 @connect('user,rtspCameras,housesWithRooms,getRtspCameraStatus', actions)
 class RtspCameraIntegration extends Component {
