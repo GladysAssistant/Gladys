@@ -19,7 +19,9 @@ async function destroy(selector) {
   }
 
   await existingScene.destroy();
-
+  // we cancel triggers linked to the scene
+  this.cancelTriggers(selector);
+  // then we delete the scene in RAM
   delete this.scenes[selector];
 }
 
