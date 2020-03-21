@@ -173,12 +173,12 @@ function createActions(store) {
 
         const promises = house.rooms.map(async room => {
           if (room.to_delete) {
-            return state.httpClient.delete(`/api/v1/room/${room.selector}`, room);
+            return state.httpClient.delete(`/api/v1/room/${room.selector}`);
           }
           if (!room.id) {
             return state.httpClient.post(`/api/v1/house/${houseCreatedOrUpdated.selector}/room`, room);
           } else if (room.to_update) {
-            return state.httpClient.patch(`/api/v1/room/${room.selector}`, room);
+            return state.httpClient.patch(`/api/v1/room/${room.selector}`, { name: room.name });
           }
           return room;
         });
