@@ -72,7 +72,7 @@ const EditHouse = ({ children, ...props }) => (
             <Text id="signup.configureHouse.validationErrorRoom" />
           </div>
         )}
-        <div class="form-inline mb-2">
+        <div class="row mb-2">
           {props.house.rooms &&
             props.house.rooms.map((room, index) => <EditRoom {...props} room={room} index={index} />)}
         </div>
