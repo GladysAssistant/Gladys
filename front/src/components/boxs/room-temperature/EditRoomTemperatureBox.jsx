@@ -4,8 +4,10 @@ import { Text } from 'preact-i18n';
 import actions from '../../../actions/dashboard/edit-boxes/editTemperatureInRoom';
 import BaseEditBox from '../baseEditBox';
 
-const updateBoxRoom = (updateBoxRoomFunc, x, y) => e => {
-  updateBoxRoomFunc(x, y, e.target.value);
+import RoomSelector from '../../house/RoomSelector';
+
+const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
+  updateBoxRoomFunc(x, y, room.selector);
 };
 
 const EditRoomTemperatureBox = ({ children, ...props }) => (
@@ -14,25 +16,16 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
       <label>
         <Text id="dashboard.boxes.temperatureInRoom.editRoomLabel" />
       </label>
-      <select onChange={updateBoxRoom(props.updateBoxRoom, props.x, props.y)} class="form-control">
-        <option value="">-------</option>
-        {props.rooms &&
-          props.rooms.map(room => (
-            <option selected={room.selector === props.box.room} value={room.selector}>
-              {room.name}
-            </option>
-          ))}
-      </select>
+      <RoomSelector
+        selectedRoom={props.box.room}
+        updateRoomSelection={updateBoxRoom(props.updateBoxRoom, props.x, props.y)}
+      />
     </div>
   </BaseEditBox>
 );
 
-@connect('rooms', actions)
+@connect('', actions)
 class EditRoomTemperatureBoxComponent extends Component {
-  componentDidMount() {
-    this.props.getRooms();
-  }
-
   render(props, {}) {
     return <EditRoomTemperatureBox {...props} />;
   }
