@@ -214,8 +214,8 @@ function createActions(store) {
         store.setState(newState);
       } catch (e) {
         const status = get(e, 'response.status');
-        const errorValue = get(e, 'response.data.error.value');
-        if (status === 409 && errorValue === 'room') {
+        const url = get(e, 'response.config.url');
+        if (status === 409 && url.endsWith('/room')) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.RoomConflictError
@@ -225,6 +225,12 @@ function createActions(store) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.ConflictError
+            }
+          });
+        } else if (status === 422 && url.includes('/room/')) {
+          store.setState({
+            houseUpdateStatus: {
+              [house.id]: RequestStatus.RoomValidationError
             }
           });
         } else if (status === 422) {

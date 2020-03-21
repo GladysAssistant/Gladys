@@ -23,11 +23,6 @@ const EditHouse = ({ children, ...props }) => (
           <Text id="signup.configureHouse.conflictError" />
         </div>
       )}
-      {props.houseUpdateStatus === RequestStatus.RoomConflictError && (
-        <div class="alert alert-danger">
-          <Text id="signup.configureHouse.roomConflictError" />
-        </div>
-      )}
       {props.houseUpdateStatus === RequestStatus.NetworkError && (
         <div class="alert alert-danger">
           <Text id="signup.httpErrors.networkError" />
@@ -67,6 +62,16 @@ const EditHouse = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.configureHouse.roomsLabel" />
         </label>
+        {props.houseUpdateStatus === RequestStatus.RoomConflictError && (
+          <div class="alert alert-danger">
+            <Text id="signup.configureHouse.roomConflictError" />
+          </div>
+        )}
+        {props.houseUpdateStatus === RequestStatus.RoomValidationError && (
+          <div class="alert alert-danger">
+            <Text id="signup.configureHouse.validationErrorRoom" />
+          </div>
+        )}
         <div class="form-inline mb-2">
           {props.house.rooms &&
             props.house.rooms.map((room, index) => <EditRoom {...props} room={room} index={index} />)}

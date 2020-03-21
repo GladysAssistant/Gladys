@@ -101,7 +101,8 @@
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
       "roomConflictError": "A room with the same name already exist.",
-      "validationError": "Validation error: A house can't have an empty name."
+      "validationError": "House name should be between 1 and 40 characters",
+      "validationErrorRoom": "Room name should be between 1 and 40 characters"
     },
     "success": {
       "title": "Allow me to thank you 🙏",
