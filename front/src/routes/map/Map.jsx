@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
+var markerArray = [];
 
 class MapComponent extends Component {
   initMap = () => {
@@ -41,6 +42,7 @@ class MapComponent extends Component {
               zIndexOffset: 1000
             })
             .addTo(this.leafletMap);
+          markerArray.push(this.userMarkers[user.id]);
         }
       });
     }
@@ -62,6 +64,7 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
+          markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
@@ -84,6 +87,10 @@ class MapComponent extends Component {
   componentDidUpdate() {
     this.displayHouses();
     this.displayUsers();
+    if (markerArray.length >= 1) {
+      var group = leaflet.featureGroup(markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [25, 25] });
+    }
   }
 
   componentWillUnmount() {
