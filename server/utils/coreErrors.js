@@ -40,6 +40,13 @@ class BadParameters extends Error {
   }
 }
 
+class AbortScene extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 module.exports = {
   PasswordNotMatchingError,
   NotFoundError,
@@ -47,4 +54,5 @@ module.exports = {
   BadParameters,
   NoValuesFoundError,
   PlatformNotCompatible,
+  AbortScene,
 };

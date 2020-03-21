@@ -88,6 +88,9 @@ const EVENTS = {
     HUE_CHANGED: 'light.hue-changed',
     SATURATION_CHANGED: 'light.saturation-changed',
   },
+  TIME: {
+    CHANGED: 'time.changed',
+  },
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
@@ -173,9 +176,11 @@ const CONDITIONS = {
 const ACTIONS = {
   DEVICE: {
     SET_VALUE: 'device.set-value',
+    GET_VALUE: 'device.get-value',
   },
   LIGHT: {
     TURN_ON: 'light.turn-on',
+    TURN_OFF: 'light.turn-off',
   },
   TIME: {
     DELAY: 'delay',
@@ -189,6 +194,9 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+  },
+  CONDITION: {
+    ONLY_CONTINUE_IF: 'condition.only-continue-if',
   },
 };
 
@@ -260,7 +268,6 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
-    MODE: 'mode',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -445,6 +452,7 @@ module.exports.ACTIONS_STATUS = ACTIONS_STATUS;
 module.exports.USER_ROLE = USER_ROLE;
 module.exports.AVAILABLE_LANGUAGES = AVAILABLE_LANGUAGES;
 module.exports.SESSION_TOKEN_TYPES = SESSION_TOKEN_TYPES;
+module.exports.DEVICE_MODELS_LIST = DEVICE_MODELS_LIST;
 
 module.exports.EVENT_LIST = EVENT_LIST;
 module.exports.LIFE_EVENT_LIST = LIFE_EVENT_LIST;
@@ -455,7 +463,6 @@ module.exports.DEVICE_FEATURE_TYPES_LIST = DEVICE_FEATURE_TYPES_LIST;
 module.exports.USER_ROLE_LIST = USER_ROLE_LIST;
 module.exports.AVAILABLE_LANGUAGES_LIST = AVAILABLE_LANGUAGES_LIST;
 module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
-module.exports.DEVICE_MODELS_LIST = DEVICE_MODELS_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
