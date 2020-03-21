@@ -15,7 +15,6 @@ const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
-const TriggerController = require('./controllers/trigger.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 
@@ -45,7 +44,6 @@ function getRoutes(gladys) {
   const serviceController = ServiceController(gladys);
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
-  const triggerController = TriggerController(gladys);
   const weatherController = WeatherController(gladys);
 
   const routes = {};
@@ -432,23 +430,6 @@ function getRoutes(gladys) {
     'get /api/v1/system/upgrade/download/status': {
       authenticated: true,
       controller: systemController.getUpgradeDownloadStatus,
-    },
-    // trigger
-    'post /api/v1/trigger': {
-      authenticated: true,
-      controller: triggerController.create,
-    },
-    'get /api/v1/trigger': {
-      authenticated: true,
-      controller: triggerController.get,
-    },
-    'patch /api/v1/trigger/:trigger_selector': {
-      authenticated: true,
-      controller: triggerController.update,
-    },
-    'delete /api/v1/trigger/:trigger_selector': {
-      authenticated: true,
-      controller: triggerController.destroy,
     },
     // user
     'post /api/v1/user': {
