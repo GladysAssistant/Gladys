@@ -3,6 +3,7 @@ const chaiAsPromised = require('chai-as-promised');
 
 const server = require('../api/');
 const Gladys = require('../lib');
+const db = require('../models');
 const logger = require('../utils/logger');
 const { seedDb, cleanDb } = require('./helpers/db.test');
 const fakeDarkSkyService = require('./services/darksky/fakeDarkSkyService');
@@ -24,6 +25,11 @@ before(async function before() {
   const gladys = Gladys(config);
   try {
     await cleanDb();
+  } catch (e) {
+    logger.trace('Impossible to clean database, ignoring error');
+  }
+  try {
+    await db.umzug.up();
     await seedDb();
   } catch (e) {
     logger.trace(e);
