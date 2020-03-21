@@ -9,6 +9,3 @@ flags:
   server:
     paths:
       - server
-  front:
-    paths:
-      - front
