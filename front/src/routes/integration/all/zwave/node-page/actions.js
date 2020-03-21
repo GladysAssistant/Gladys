@@ -12,7 +12,6 @@ function createActions(store) {
       });
       try {
         const options = {
-          service: 'zwave',
           order_dir: state.getZwaveDeviceOrderDir || 'asc'
         };
         if (state.zwaveDeviceSearch && state.zwaveDeviceSearch.length) {

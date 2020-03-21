@@ -15,7 +15,6 @@ function createActions(store) {
       });
       try {
         const options = {
-          service: 'mqtt',
           order_dir: state.getMqttDeviceOrderDir || 'asc'
         };
         if (state.mqttDeviceSearch && state.mqttDeviceSearch.length) {
