@@ -10,7 +10,6 @@ class MapComponent extends Component {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
-    this.markerArray = [];
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
     leaflet
       .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -78,6 +77,7 @@ class MapComponent extends Component {
     this.props = props;
     this.userMarkers = {};
     this.houseMarkers = {};
+    this.markerArray = [];
   }
 
   componentDidMount() {
@@ -85,6 +85,7 @@ class MapComponent extends Component {
   }
 
   componentDidUpdate() {
+    this.markerArray = [];
     this.displayHouses();
     this.displayUsers();
     if (this.markerArray.length >= 1) {
