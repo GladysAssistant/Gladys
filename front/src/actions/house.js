@@ -121,6 +121,25 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    editRoom(state, houseIndex, roomIndex, property, value) {
+      const newState = update(state, {
+        houses: {
+          [houseIndex]: {
+            rooms: {
+              [roomIndex]: {
+                [property]: {
+                  $set: value
+                },
+                to_update: {
+                  $set: true
+                }
+              }
+            }
+          }
+        }
+      });
+      store.setState(newState);
+    },
     addHouse(state) {
       const newState = update(state, {
         houses: {
@@ -158,6 +177,8 @@ function createActions(store) {
           }
           if (!room.id) {
             return state.httpClient.post(`/api/v1/house/${houseCreatedOrUpdated.selector}/room`, room);
+          } else if (room.to_update) {
+            return state.httpClient.patch(`/api/v1/room/${room.selector}`, room);
           }
           return room;
         });
