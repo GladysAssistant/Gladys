@@ -17,7 +17,9 @@ class EditDeviceInRoom extends Component {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room">
         <div class="form-group">
-          <label>Select the room you want to display here:</label>
+          <label>
+            <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
+          </label>
           <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
         </div>
       </BaseEditBox>

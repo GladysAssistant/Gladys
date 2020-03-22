@@ -118,7 +118,8 @@
       "cancelDeleteHouse": "Annuler",
       "conflictError": "Une maison avec le même non existe déjà.",
       "roomConflictError": "Une pièce avec le même non existe déjà.",
-      "validationError": "Erreur de validation : une maison ne peut pas avoir un nom vide."
+      "validationError": "Erreur de validation : une maison ne peut pas avoir un nom vide.",
+      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {
       "title": "Permettez-moi de vous remercier 🙏",
@@ -751,8 +752,6 @@
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
     "download": "Télécharger",
-    "restartGladys": "Redémarrer Gladys",
-    "restartButton": "Redémarrer",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",
     "containerName": "Nom",
