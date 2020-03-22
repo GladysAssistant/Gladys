@@ -1,4 +1,3 @@
-const logger = require('../../../utils/logger');
 
 // Events
 
@@ -20,12 +19,12 @@ const { getDevices } = require('./commands/rflink.getDevices');
 
 
 
-const RFlinkManager = function RFlinkManager(usb, gladys, serviceId) {
-    this.usb = usb;
+const RFlinkManager = function RFlinkManager(gladys, serviceId) {
     this.gladys = gladys;
     this.scanInProgress = false;
     this.serviceId = serviceId;
     this.connected = false;
+    this.scanInProgress = false;
     this.device = {};
 
 
