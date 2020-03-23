@@ -28,8 +28,7 @@ const actions = store => ({
       store.setState({
         currentIntegration
       });
-    } catch (e) {
-    }
+    } catch (e) {}
   },
   getIntegrationByCategory(state, category) {
     const userLanguage = getLanguage(state);

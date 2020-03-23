@@ -14,7 +14,7 @@ module.exports = function RfLink(gladys, serviceId) {
   async function start() {
     const RflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
 
-    if (RflinkPath === undefined || !RflinkPath) {
+    if (!RflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     } else {
       logger.log('Starting Rflink service');
