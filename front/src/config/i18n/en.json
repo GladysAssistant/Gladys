@@ -646,6 +646,24 @@
         "on": "On",
         "off": "Off"
       }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
+      }
     }
   },
   "profile": {

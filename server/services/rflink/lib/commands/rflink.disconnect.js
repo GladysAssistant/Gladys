@@ -12,6 +12,7 @@ function disconnect() {
     logger.debug('Rflink: Not connected, disconnecting');
   }
   this.connected = false;
+  this.ready = false;
   this.scanInProgress = false;
 }
 

@@ -1,18 +1,14 @@
-const logger = require('../../../../utils/logger');
 /**
  * @description listen
  * @example
  * rflink.listen();
  */
-function listen () {
-    this.usb.on('data', (data) => {
-        this.message(data);
-        
-        
-
-    });
+function listen() {
+  this.usb.on('data', (data) => {
+    this.message(data);
+  });
 }
 
 module.exports = {
-    listen,
+  listen,
 };

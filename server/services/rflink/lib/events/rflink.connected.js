@@ -9,6 +9,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 function connected() {
   logger.debug(`Rflink : Gateway is connected`);
   this.connected = true;
+  this.ready = true;
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.RFLINK.CONNECTED,
     payload: {},

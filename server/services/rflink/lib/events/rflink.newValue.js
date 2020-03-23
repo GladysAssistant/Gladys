@@ -9,16 +9,39 @@ const { EVENTS } = require('../../../../utils/constants');
  *  newValue(Object, 'temperature', 30)
  */
 function newValue(device, deviceFeature, state) {
+  logger.debug(
+    `RFlink : value ${deviceFeature} of device rflink:${device.id}:${deviceFeature}:${device.switch} changed to ${state}`,
+  );
+  let value = state;
+  switch (state) {
+    case 'ON':
+    case 'ALLON':
+    case 'UP':
+      value = 1;
+      break;
+    case 'OFF':
+    case 'ALLOFF':
+    case 'DOWN':
+      value = 0;
+      break;
+    default:
+      value = state;
+      break;
+  }
 
-    logger.debug(`RFlink : value ${deviceFeature} of device ${device.id} changed to ${state}`);
-
+  if (device.switch === undefined) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `rflink:${device.id}:${deviceFeature}`,
-        state,
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}`,
+      state: value,
     });
-
+  } else {
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: value,
+    });
+  }
 }
 
 module.exports = {
-    newValue,
+  newValue,
 };
