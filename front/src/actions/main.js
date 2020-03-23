@@ -59,7 +59,6 @@ function createActions(store) {
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else {
-          console.log(e);
         }
       }
     },

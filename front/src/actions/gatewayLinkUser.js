@@ -14,7 +14,6 @@ function createActions(store) {
           usersGetStatus: RequestStatus.Success
         });
       } catch (e) {
-        console.log(e);
         const error = get(e, 'response.error');
         const errorMessage = get(e, 'response.error_message');
         const errorMessageOtherFormat = get(e, 'response.message');

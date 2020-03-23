@@ -25,12 +25,9 @@ class SonoffBox extends Component {
   updateTopic = e => {
     let { value } = e.target;
     if (!value.startsWith('sonoff:')) {
-      console.log('dont starts with sonoff:', value);
       if (value.length < 7) {
-        console.log('< 7', value);
         value = 'sonoff:';
       } else {
-        console.log('>= 7', value);
         value = `sonoff:${value}`;
       }
     }
@@ -44,7 +41,6 @@ class SonoffBox extends Component {
 
   updateModel = e => {
     const selectedModel = e.target.value;
-    console.log(GetFeatures(selectedModel));
 
     this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'model', selectedModel);
     this.props.updateDeviceField('sonoffDevices', this.props.deviceIndex, 'features', GetFeatures(selectedModel));

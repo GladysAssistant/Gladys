@@ -29,7 +29,6 @@ const actions = store => ({
         currentIntegration
       });
     } catch (e) {
-      console.log(e);
     }
   },
   getIntegrationByCategory(state, category) {

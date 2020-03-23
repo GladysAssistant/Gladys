@@ -21,7 +21,6 @@ class TurnOnOffLight extends Component {
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
-      console.log(e);
     }
   };
   handleChange = selectedOptions => {

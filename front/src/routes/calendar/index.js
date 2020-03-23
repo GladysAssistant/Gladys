@@ -12,7 +12,6 @@ const localizer = momentLocalizer(moment);
 @connect('', actions)
 class Map extends Component {
   onSelectSlot(slotInfo) {
-    console.log(slotInfo);
   }
   render({}, {}) {
     return (

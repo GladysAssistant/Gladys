@@ -154,7 +154,6 @@ class RflinkFeatureBoxComponent extends Component {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
   };
   updateSwitchId = e => {
-    console.log(this.props);
     this.props.feature.switchId = e.target.value;
     let external = {
       target: {
@@ -165,7 +164,6 @@ class RflinkFeatureBoxComponent extends Component {
     this.updateExternalId(external);
   };
   updateSwitchNumber = e => {
-    console.log(this.props);
     this.props.feature.switchNumber = e.target.value;
     let external = {
       target: {

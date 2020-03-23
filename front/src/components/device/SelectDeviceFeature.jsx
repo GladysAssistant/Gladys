@@ -55,7 +55,6 @@ class SelectDeviceFeature extends Component {
       }
       return deviceOptions;
     } catch (e) {
-      console.log(e);
     }
   };
   handleChange = selectedOption => {
