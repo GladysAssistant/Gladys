@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 
 import { Text, Localizer } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../../../../components/form/Select';
 import update from 'immutability-helper';
 
 class Condition extends Component {
@@ -14,10 +14,10 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleOperatorChange = e => {
+  handleOperatorChange = operator => {
     const newCondition = update(this.props.condition, {
       operator: {
-        $set: e.target.value
+        $set: operator.value
       }
     });
     this.props.handleConditionChange(this.props.index, newCondition);
@@ -50,8 +50,43 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  render(props, {}) {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      options: [
+        {
+          value: '=',
+          label: <Text id="editScene.triggersCard.newState.equal" />
+        },
+        {
+          value: '>=',
+          label: <Text id="editScene.triggersCard.newState.superiorOrEqual" />
+        },
+        {
+          value: '>',
+          label: <Text id="editScene.triggersCard.newState.superior" />
+        },
+        {
+          value: '!=',
+          label: <Text id="editScene.triggersCard.newState.different" />
+        },
+        {
+          value: '<=',
+          label: <Text id="editScene.triggersCard.newState.lessOrEqual" />
+        },
+        {
+          value: '<',
+          label: <Text id="editScene.triggersCard.newState.less" />
+        }
+      ]
+    };
+  }
+
+  render(props, { options }) {
     const selectedOption = this.getSelectedOption();
+    const selectedOperator = this.state.options.find(option => option.value === props.condition.operator);
+
     return (
       <div>
         <div class="row">
@@ -63,12 +98,7 @@ class Condition extends Component {
                   <Text id="global.requiredField" />
                 </span>
               </label>
-              <Select
-                defaultValue={''}
-                value={selectedOption}
-                onChange={this.handleChange}
-                options={props.variableOptions}
-              />
+              <Select value={selectedOption} onChange={this.handleChange} options={props.variableOptions} searchable />
             </div>
           </div>
           <div class="col-md-2">
@@ -79,29 +109,7 @@ class Condition extends Component {
                   <Text id="global.requiredField" />
                 </span>
               </label>
-              <select class="form-control" value={props.condition.operator} onChange={this.handleOperatorChange}>
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
-                <option value="=">
-                  <Text id="editScene.triggersCard.newState.equal" />
-                </option>
-                <option value=">=">
-                  <Text id="editScene.triggersCard.newState.superiorOrEqual" />
-                </option>
-                <option value=">">
-                  <Text id="editScene.triggersCard.newState.superior" />
-                </option>
-                <option value="!=">
-                  <Text id="editScene.triggersCard.newState.different" />
-                </option>
-                <option value="<=">
-                  <Text id="editScene.triggersCard.newState.lessOrEqual" />
-                </option>
-                <option value="<">
-                  <Text id="editScene.triggersCard.newState.less" />
-                </option>
-              </select>
+              <Select value={selectedOperator} onChange={this.handleOperatorChange} options={options} />
             </div>
           </div>
           <div class="col-md-4">

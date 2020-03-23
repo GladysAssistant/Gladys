@@ -1,31 +1,27 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
+import Select from '../form/Select';
 
 import { getDeviceFeatureName } from '../../utils/device';
 
 @connect('httpClient', {})
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
+    const deviceOptions = [];
     try {
+      this.setState({ loading: true });
+
       // we get the rooms with the devices
       const rooms = await this.props.httpClient.get('/api/v1/room?expand=devices');
-      const deviceOptions = [];
-
-      const deviceDictionnary = {};
-      const deviceFeaturesDictionnary = {};
 
       // and compose the multi-level options
       rooms.forEach(room => {
         const roomDeviceFeatures = [];
         room.devices.forEach(device => {
           device.features.forEach(feature => {
-            // keep device / deviceFeature in dictionnary
-            deviceFeaturesDictionnary[feature.selector] = feature;
-            deviceDictionnary[feature.selector] = device;
-
             roomDeviceFeatures.push({
-              value: feature.selector,
+              device,
+              feature,
               label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
             });
           });
@@ -45,37 +41,32 @@ class SelectDeviceFeature extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
-      await this.refreshSelectedOptions(this.props);
-      if (this.state.selectedOption && this.state.selectedOption.value) {
-        this.props.onDeviceFeatureChange(
-          deviceFeaturesDictionnary[this.state.selectedOption.value],
-          deviceDictionnary[this.state.selectedOption.value]
-        );
-      }
-      return deviceOptions;
     } catch (e) {
       console.log(e);
     }
-  };
-  handleChange = selectedOption => {
-    const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
-    if (selectedOption && selectedOption.value) {
-      this.props.onDeviceFeatureChange(
-        deviceFeaturesDictionnary[selectedOption.value],
-        deviceDictionnary[selectedOption.value]
-      );
-    } else {
-      this.props.onDeviceFeatureChange(null);
+
+    await this.setState({ deviceOptions, loading: false });
+    await this.refreshSelectedOptions(this.props);
+    if (this.state.selectedOption) {
+      this.handleChange(this.state.selectedOption);
     }
   };
+
+  handleChange = selectedOption => {
+    if (selectedOption) {
+      this.props.onDeviceFeatureChange(selectedOption.feature, selectedOption.device);
+    } else {
+      this.props.onDeviceFeatureChange(null, null);
+    }
+  };
+
   refreshSelectedOptions = async nextProps => {
-    let selectedOption = '';
+    let selectedOption;
     if (nextProps.value && this.state.deviceOptions) {
       let deviceOption;
       let i = 0;
       while (i < this.state.deviceOptions.length && deviceOption === undefined) {
-        deviceOption = this.state.deviceOptions[i].options.find(option => option.value === nextProps.value);
+        deviceOption = this.state.deviceOptions[i].options.find(option => option.feature.selector === nextProps.value);
         i++;
       }
 
@@ -85,11 +76,12 @@ class SelectDeviceFeature extends Component {
     }
     await this.setState({ selectedOption });
   };
+
   constructor(props) {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOption: ''
+      selectedOption: null
     };
   }
 
@@ -101,11 +93,17 @@ class SelectDeviceFeature extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOption, deviceOptions }) {
-    if (!deviceOptions) {
-      return null;
-    }
-    return <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />;
+  render({}, { deviceOptions, selectedOption, loading }) {
+    return (
+      <Select
+        value={selectedOption}
+        onChange={this.handleChange}
+        options={deviceOptions}
+        useGroups
+        searchable
+        loading={loading}
+      />
+    );
   }
 }
 

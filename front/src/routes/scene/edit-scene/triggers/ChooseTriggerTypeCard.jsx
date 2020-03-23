@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 
 import { EVENTS } from '../../../../../../server/utils/constants';
 
@@ -28,7 +28,7 @@ class ChooseTriggerType extends Component {
       this.props.updateTriggerProperty(this.props.index, 'type', this.state.currentTrigger.value);
     }
   };
-  render(props, { currentTrigger }) {
+  render({}, { currentTrigger }) {
     return (
       <div>
         <div class="form-group">
@@ -36,6 +36,7 @@ class ChooseTriggerType extends Component {
             <Text id="editScene.selectTriggerLabel" />
           </label>
           <Select
+            searchable
             value={currentTrigger}
             options={TRIGGER_LIST.map(trigger => ({
               value: trigger,

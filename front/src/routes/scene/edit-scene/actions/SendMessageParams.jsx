@@ -1,55 +1,43 @@
-import Select from 'react-select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import Select from '../../../../components/form/Select';
 
 @connect('httpClient', {})
 class SendMessageParams extends Component {
   getOptions = async () => {
+    this.setState({ loading: true });
     try {
       const users = await this.props.httpClient.get('/api/v1/user');
-      const userOptions = [];
-      users.forEach(user => {
-        userOptions.push({
-          label: user.firstname,
-          value: user.selector
-        });
-      });
-      await this.setState({ userOptions });
-      this.refreshSelectedOptions(this.props);
-      return userOptions;
+      await this.setState({ users, loading: false });
+      this.refreshselectedUsers(this.props);
+      return users;
     } catch (e) {
       console.log(e);
     }
+    this.setState({ loading: false });
   };
   handleChangeText = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', e.target.value);
   };
-  handleChange = selectedOption => {
-    if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+  handleChange = selectedUser => {
+    if (selectedUser && selectedUser.selector) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedUser.selector);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
-    let selectedOption = '';
-    if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
+  refreshselectedUsers = nextProps => {
+    let selectedUser = '';
+    if (nextProps.action.user && this.state.users) {
+      const user = this.state.users.find(option => option.selector === nextProps.action.user);
 
-      if (userOption) {
-        selectedOption = userOption;
+      if (user) {
+        selectedUser = user;
       }
     }
-    this.setState({ selectedOption });
+    this.setState({ selectedUser });
   };
-  constructor(props) {
-    super(props);
-    this.props = props;
-    this.state = {
-      selectedOption: ''
-    };
-  }
   componentDidMount() {
     if (!this.props.unit) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
@@ -57,9 +45,9 @@ class SendMessageParams extends Component {
     this.getOptions();
   }
   componentWillReceiveProps(nextProps) {
-    this.refreshSelectedOptions(nextProps);
+    this.refreshselectedUsers(nextProps);
   }
-  render(props, { selectedOption, userOptions }) {
+  render(props, { selectedUser, users, loading }) {
     return (
       <div>
         <div class="form-group">
@@ -69,7 +57,14 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
+          <Select
+            options={users}
+            value={selectedUser}
+            onChange={this.handleChange}
+            searchable
+            loading={loading}
+            itemLabelKey="firstname"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">

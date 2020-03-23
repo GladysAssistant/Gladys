@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { format } from 'date-fns';
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 
 import fr from 'date-fns/locale/fr';
 
@@ -211,8 +211,8 @@ class TurnOnLight extends Component {
                   <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeekLabel" />
                 </div>
                 <Select
-                  defaultValue={[]}
-                  isMulti
+                  multiple
+                  searchable
                   value={selectedWeekDaysOptions}
                   onChange={this.handleDayOfTheWeekChange}
                   options={[
@@ -245,6 +245,7 @@ class TurnOnLight extends Component {
                       label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
                     }
                   ]}
+                  uniqueKey="value"
                 />
               </div>
             </div>

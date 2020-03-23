@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
 import { Text } from 'preact-i18n';
+import Select from '../../../../components/form/Select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
@@ -29,7 +29,7 @@ class ChooseActionType extends Component {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'type', this.state.currentAction.value);
     }
   };
-  render(props, { currentAction }) {
+  render({}, { currentAction }) {
     return (
       <div>
         <div class="form-group">
@@ -37,6 +37,7 @@ class ChooseActionType extends Component {
             <Text id="editScene.selectActionType" />
           </label>
           <Select
+            searchable
             onChange={this.handleChange}
             value={currentAction}
             options={ACTION_LIST.map(action => ({

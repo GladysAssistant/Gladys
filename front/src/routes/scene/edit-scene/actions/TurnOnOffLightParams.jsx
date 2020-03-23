@@ -1,54 +1,51 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
 @connect('httpClient', {})
 class TurnOnOffLight extends Component {
   getOptions = async () => {
+    this.setState({ loading: true });
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
-      const deviceOptions = devices.map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
-      await this.setState({ deviceOptions });
-      this.refreshSelectedOptions(this.props);
-      return deviceOptions;
+      await this.setState({ devices });
+      this.refreshselectedDevices(this.props);
     } catch (e) {
       console.log(e);
     }
+    this.setState({ loading: false });
   };
-  handleChange = selectedOptions => {
-    if (selectedOptions) {
-      const lights = selectedOptions.map(selectedOption => selectedOption.value);
+  handleChange = selectedDevices => {
+    if (selectedDevices) {
+      const lights = selectedDevices.map(selectedDevice => selectedDevice.selector);
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
   };
-  refreshSelectedOptions = nextProps => {
-    const selectedOptions = [];
-    if (nextProps.action.devices && this.state.deviceOptions) {
+  refreshselectedDevices = nextProps => {
+    const selectedDevices = [];
+    if (nextProps.action.devices && this.state.devices) {
       nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
-        if (deviceOption) {
-          selectedOptions.push(deviceOption);
+        const device = this.state.devices.find(device => device.selector === light);
+        if (device) {
+          selectedDevices.push(device);
         }
       });
     }
-    this.setState({ selectedOptions });
+    this.setState({ selectedDevices });
   };
   constructor(props) {
     super(props);
     this.state = {
-      deviceOptions: null,
-      selectedOptions: []
+      devices: null,
+      selectedDevices: []
     };
   }
   async componentDidMount() {
@@ -56,10 +53,10 @@ class TurnOnOffLight extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.refreshSelectedOptions(nextProps);
+    this.refreshselectedDevices(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedDevices, devices, loading }) {
     return (
       <div class="form-group">
         <label class="form-label">
@@ -67,11 +64,13 @@ class TurnOnOffLight extends Component {
           {props.action.type === ACTIONS.LIGHT.TURN_OFF && <Text id="editScene.actionsCard.turnOffLights.label" />}
         </label>
         <Select
-          defaultValue={[]}
-          isMulti
-          value={selectedOptions}
+          multiple
+          searchable
+          value={selectedDevices}
           onChange={this.handleChange}
-          options={deviceOptions}
+          options={devices}
+          loading={loading}
+          itemLabelKey="name"
         />
       </div>
     );

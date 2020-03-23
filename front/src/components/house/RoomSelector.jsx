@@ -1,50 +1,40 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
+import Select from '../form/Select';
 import actions from '../../actions/house';
+import { RequestStatus } from '../../utils/consts';
 
-@connect('houses', actions)
+@connect('houses,housesGetStatus', actions)
 class RoomSelector extends Component {
-  updateSelection = option => {
-    this.props.updateRoomSelection(option.room);
-  };
-
   componentDidMount = () => {
     this.props.getHouses();
   };
 
-  componentWillReceiveProps = newProps => {
-    let selectedRoom;
-    let houseOptions = [];
-    if (newProps.houses) {
-      houseOptions = newProps.houses.map(house => {
-        return {
-          label: house.name,
-          options:
-            house && house.rooms
-              ? house.rooms.map(room => {
-                  const option = {
-                    label: room.name,
-                    value: room.selector,
-                    room
-                  };
+  componentWillReceiveProps = nextProps => {
+    if (
+      nextProps.houses &&
+      (nextProps.selectedRoom !== this.props.selectedRoom || nextProps.housesGetStatus !== this.props.housesGetStatus)
+    ) {
+      const selectedRoom = nextProps.houses
+        .flatMap(house => house.rooms)
+        .find(room => room.selector === nextProps.selectedRoom);
 
-                  if (newProps.selectedRoom === room.selector) {
-                    selectedRoom = option;
-                  }
-
-                  return option;
-                })
-              : []
-        };
-      });
+      this.setState({ selectedRoom, houses: nextProps.houses });
     }
-
-    this.setState({ houseOptions, selectedRoom });
   };
 
-  render({}, { selectedRoom, houseOptions }) {
-    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} />;
+  render({ housesGetStatus, houses, updateRoomSelection }, { selectedRoom }) {
+    return (
+      <Select
+        value={selectedRoom}
+        options={houses}
+        onChange={updateRoomSelection}
+        itemLabelKey="name"
+        useGroups
+        groupItemsKey="rooms"
+        loading={housesGetStatus === RequestStatus.Getting}
+      />
+    );
   }
 }
 

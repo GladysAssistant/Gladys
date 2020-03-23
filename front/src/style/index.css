@@ -226,7 +226,21 @@ body {
 .custom-file-input:lang(fr) ~ .custom-file-label::after {
   content: 'Parcourir';
 }
+.btn-transparent,
+.btn-transparent:active {
+  background-color: transparent;
+  border: 0px;
+  color: inherit;
+}
+.cursor-default {
+  cursor: default;
+}
 .cursor-pointer {
   pointer-events: auto;
   cursor: pointer;
+}
+.form-control.custom-select:disabled,
+.form-control.custom-select[readOnly] {
+  background-color: inherit;
+  cursor: default;
 }
