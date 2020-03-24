@@ -68,6 +68,10 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 
+// Netatmo integration
+import NetatmoDevicePage from '../routes/integration/all/netatmo/device-page';
+import NetatmoSettingPage from '../routes/integration/all/netatmo/setting';
+
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -171,6 +175,8 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <SonoffPage path="/dashboard/integration/device/sonoff" />
         <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+        <NetatmoDevicePage path="/dashboard/integration/device/netatmo" />
+        <NetatmoSettingPage path="/dashboard/integration/device/netatmo/setting" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

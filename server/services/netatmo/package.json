@@ -1,0 +1,17 @@
+{
+    "name": "gladys-netatmo",
+    "main": "index.js",
+    "os": [
+        "darwin",
+        "linux"
+    ],
+    "cpu": [
+        "x64",
+        "arm",
+        "arm64"
+    ],
+    "scripts": {},
+    "dependencies": {
+        "netatmo": "^2.3.0"
+    }
+}
