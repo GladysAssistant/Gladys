@@ -9,7 +9,7 @@ const { EVENTS } = require('../../../../utils/constants');
  *  newValue(Object, 'temperature', 30)
  */
 function newValue(device, deviceFeature, state) {
-  logger.debug(
+  logger.log(
     `RFlink : value ${deviceFeature} of device rflink:${device.id}:${deviceFeature}:${device.switch} changed to ${state}`,
   );
   let value = state;

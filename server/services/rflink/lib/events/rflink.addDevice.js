@@ -1,6 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Add device.
@@ -9,6 +10,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  * Rflink.addDevice(device);
  */
 function addDevice(device) {
+  logger.log(`ajout du device : ${device}`)
   const id = device.external_id.split(':')[1];
 
   this.gladys.event.emit(EVENTS.DEVICE.NEW, device);
