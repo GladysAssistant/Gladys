@@ -1,0 +1,43 @@
+{
+  "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+  "name": "Yeelight White",
+  "model": "White",
+  "external_id": "yeelight:0x00000000035ac140",
+  "selector": "yeelight:0x00000000035ac140",
+  "should_poll": true,
+  "poll_frequency": 60000,
+  "features": [
+    {
+      "name": "Yeelight White On/Off",
+      "external_id": "yeelight:0x00000000035ac140:binary",
+      "selector": "yeelight:0x00000000035ac140:binary",
+      "category": "light",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Yeelight White Brightness",
+      "external_id": "yeelight:0x00000000035ac140:brightness",
+      "selector": "yeelight:0x00000000035ac140:brightness",
+      "category": "light",
+      "type": "brightness",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 1,
+      "max": 100
+    }
+  ],
+  "params": [
+    {
+      "name": "IP_ADDRESS",
+      "value": "192.168.0.2"
+    },
+    {
+      "name": "PORT_ADDRESS",
+      "value": 55443
+    }
+  ]
+}

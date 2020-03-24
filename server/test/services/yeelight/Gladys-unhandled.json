@@ -1,0 +1,31 @@
+{
+  "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+  "name": "Yeelight",
+  "model": "unhandled",
+  "external_id": "yeelight:0x00000000035ac100",
+  "selector": "yeelight:0x00000000035ac100",
+  "should_poll": true,
+  "poll_frequency": 60000,
+  "features": [],
+  "params": [
+    {
+      "name": "IP_ADDRESS",
+      "value": "192.168.0.3"
+    },
+    {
+      "name": "PORT_ADDRESS",
+      "value": 55443
+    }
+  ],
+  "not_handled": true,
+  "raw_yeelight_device": {
+    "location": "yeelight://192.168.0.3:55443",
+    "id": "0x00000000035ac100",
+    "model": "unhandled",
+    "version": "76",
+    "capabilities": [],
+    "mode": 1,
+    "port": 55443,
+    "host": "192.168.0.3"
+  }
+}

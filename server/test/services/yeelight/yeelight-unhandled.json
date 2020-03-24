@@ -1,0 +1,10 @@
+{
+  "location": "yeelight://192.168.0.3:55443",
+  "id": "0x00000000035ac100",
+  "model": "unhandled",
+  "version": "76",
+  "capabilities": [],
+  "mode": 1,
+  "port": 55443,
+  "host": "192.168.0.3"
+}

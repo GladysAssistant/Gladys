@@ -1,0 +1,30 @@
+{
+  "location": "yeelight://192.168.0.2:55443",
+  "id": "0x00000000035ac140",
+  "model": "mono",
+  "version": "76",
+  "capabilities": [
+    "get_prop",
+    "set_default",
+    "set_power",
+    "toggle",
+    "set_bright",
+    "start_cf",
+    "stop_cf",
+    "set_scene",
+    "cron_add",
+    "cron_get",
+    "cron_del",
+    "set_ct_abx",
+    "set_adjust",
+    "adjust_bright",
+    "adjust_ct",
+    "set_music",
+    "set_name"
+  ],
+  "status": "off",
+  "bright": 50,
+  "mode": 1,
+  "port": 55443,
+  "host": "192.168.0.2"
+}
