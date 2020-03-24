@@ -268,6 +268,7 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
+    MODE: 'mode',
   },
   SENSOR: {
     DECIMAL: 'decimal',
