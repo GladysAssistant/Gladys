@@ -4,6 +4,7 @@ import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import get from 'get-value';
 
+
 const RflinkFeatureBox = ({ children, ...props }) => {
   return (
     <div class="col-md-6">
@@ -93,6 +94,13 @@ const RflinkFeatureBox = ({ children, ...props }) => {
               </Localizer>
             </div>
           )}
+
+
+
+
+
+
+
           <div>
             <div class="form-group">
               <label class="form-label" for={`min_${props.featureIndex}`}>
@@ -127,6 +135,21 @@ const RflinkFeatureBox = ({ children, ...props }) => {
           </div>
 
           <div class="form-group">
+            <Text id="integration.rflink.feature.read_only_label" class="text-left" />
+          <label class="custom-switch text-right">
+            <input
+              type="radio"
+              name='bouton'
+              class="custom-switch-input"
+              value={props.feature.read_only}
+              checked={props.feature.read_only === true || props.feature.read_only === 'true'}
+              onClick={props.updateReadOnly}
+            />
+            <span class="custom-switch-indicator" />
+          </label>
+          </div>
+
+          <div class="form-group">
             <button onClick={props.deleteFeature} class="btn btn-outline-danger">
               <Text id="integration.rflink.feature.deleteLabel" />
             </button>
@@ -149,6 +172,18 @@ class RflinkFeatureBoxComponent extends Component {
   };
   updateMax = e => {
     this.props.updateFeatureProperty(e, 'max', this.props.featureIndex);
+  };
+  updateReadOnly = e => {
+    if (e.target.value === 'false') {
+      e.target.value = true;
+    } else if (e.target.value === false) {
+      e.target.value = true;
+    } else if (e.target.value === 'true') {
+      e.target.value = false;
+    } else if (e.target.value === true) {
+      e.target.value = false;
+    }
+    this.props.updateFeatureProperty(e, 'read_only', this.props.featureIndex);
   };
   updateUnit = e => {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
@@ -186,6 +221,7 @@ class RflinkFeatureBoxComponent extends Component {
         updateMin={this.updateMin}
         updateMax={this.updateMax}
         updateUnit={this.updateUnit}
+        updateReadOnly={this.updateReadOnly}
         updateSwitchId={this.updateSwitchId}
         updateSwitchNumber={this.updateSwitchNumber}
         deleteFeature={this.deleteFeature}

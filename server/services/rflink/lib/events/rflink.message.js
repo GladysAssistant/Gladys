@@ -210,7 +210,7 @@ function message(msgRF) {
             rfcode: 'CMD',
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-            read_only: false,
+            read_only: true,
             keep_history: true,
             has_feedback: false,
             min: 0,

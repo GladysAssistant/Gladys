@@ -75,6 +75,7 @@ class RflinkDeviceSetupPage extends Component {
         value = `rflink:${value}`;
       }
     }
+    console.log(this.state.device.features[0].read_only);
     const device = update(this.state.device, {
       features: {
         [featureIndex]: {
@@ -84,6 +85,7 @@ class RflinkDeviceSetupPage extends Component {
         }
       }
     });
+    console.log(this.state.device.features[0].read_only);
 
     this.setState({
       device
