@@ -17,21 +17,17 @@ class RflinkDeviceForm extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'model', e.target.value);
   };
   checkModel = e => {
-
-
-    for (let i=0;i<DEVICE_MODELS_LIST.length;i++) {
-        if (e === DEVICE_MODELS_LIST[`${i}`]) {
-          return true;
-        }
-
+    for (let i = 0; i < DEVICE_MODELS_LIST.length; i++) {
+      if (e === DEVICE_MODELS_LIST[`${i}`]) {
+        return true;
+      }
     }
 
-
-    DEVICE_MODELS_LIST.forEach((model) => {
-        if(e === model) {
-          return true;
-        }
-    })
+    DEVICE_MODELS_LIST.forEach(model => {
+      if (e === model) {
+        return true;
+      }
+    });
   };
 
   updateExternalId = e => {

@@ -206,7 +206,7 @@
       },
       "feature": {
         "nameLabel": "Name",
-        "read_only_label" : "read only : ",
+        "read_only_label": "read only : ",
         "model": "Model",
         "message": "You can only create actuators , sensors are automatically detected and added in the device tab when they send messages",
         "namePlaceholder": "Enter feature name",

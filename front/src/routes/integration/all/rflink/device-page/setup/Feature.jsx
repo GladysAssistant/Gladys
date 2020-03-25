@@ -4,7 +4,6 @@ import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import get from 'get-value';
 
-
 const RflinkFeatureBox = ({ children, ...props }) => {
   return (
     <div class="col-md-6">
@@ -95,12 +94,6 @@ const RflinkFeatureBox = ({ children, ...props }) => {
             </div>
           )}
 
-
-
-
-
-
-
           <div>
             <div class="form-group">
               <label class="form-label" for={`min_${props.featureIndex}`}>
@@ -136,17 +129,17 @@ const RflinkFeatureBox = ({ children, ...props }) => {
 
           <div class="form-group">
             <Text id="integration.rflink.feature.read_only_label" class="text-left" />
-          <label class="custom-switch text-right">
-            <input
-              type="radio"
-              name='bouton'
-              class="custom-switch-input"
-              value={props.feature.read_only}
-              checked={props.feature.read_only === true || props.feature.read_only === 'true'}
-              onClick={props.updateReadOnly}
-            />
-            <span class="custom-switch-indicator" />
-          </label>
+            <label class="custom-switch text-right">
+              <input
+                type="radio"
+                name="bouton"
+                class="custom-switch-input"
+                value={props.feature.read_only}
+                checked={props.feature.read_only === true || props.feature.read_only === 'true'}
+                onClick={props.updateReadOnly}
+              />
+              <span class="custom-switch-indicator" />
+            </label>
           </div>
 
           <div class="form-group">

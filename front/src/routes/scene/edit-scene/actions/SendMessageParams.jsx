@@ -18,8 +18,7 @@ class SendMessageParams extends Component {
       await this.setState({ userOptions });
       this.refreshSelectedOptions(this.props);
       return userOptions;
-    } catch (e) {
-    }
+    } catch (e) {}
   };
   handleChangeText = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', e.target.value);
