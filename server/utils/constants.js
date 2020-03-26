@@ -810,6 +810,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
   },
+  YEELIGHT: {
+    NEW_DEVICE: 'yeelight.new-device',
+  },
 };
 
 const DASHBOARD_TYPE = {

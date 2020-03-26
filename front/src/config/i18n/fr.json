@@ -1164,6 +1164,58 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "yeelight": {
+      "title": "Yeelight",
+      "description": "Contrôler les lumières Yeelight.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Yeelight",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Yeelight",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "ipLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge",
+      "device": {
+        "title": "Appareils Yeelight dans Gladys",
+        "search": "Chercher les appareils",
+        "noDevices": "Aucun appareil Yeelight n'a encore été ajouté.",
+        "deviceOnNetworkTitle": "Appareils détectés sur le réseau",
+        "scanButton": "Recherche sur le réseau",
+        "noDeviceFound": "Aucun appareil Yeelight trouvé.",
+        "noDevicesFound": "Aucun appareil Yeelight trouvé. Assurez-vous d'avoir activé le \"LAN Control\".",
+        "connectButton": "Connecter/Reconnecter",
+        "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "noNameLabel": "No name",
+        "modelLabel": "Modèle",
+        "ipLabel": "Adresse IP",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "saveButton": "Sauvegarder",
+        "editButton": "Modifier",
+        "deleteButton": "Supprimer"
+      },
+      "discover": {
+        "title": "Appareils détectés sur le réseau",
+        "description": "Les appareils Yeelight configurés sont automatiquement découverts sur le réseau LAN. Vos appareils Yeelight doivent avoir le \"LAN Control\" activé. En savoir plus <a href=\"https://gladysassistant.com/en/docs/integrations/yeelight#activate-lan-control\" target=\"_blank\">ici</a>.",
+        "error": "Erreur lors de la découverte des appareils Yeelight.",
+        "noDeviceFound": "Aucun appareil Yeelight découvert. Êtes-vous sûr que vous êtes connecté au même réseau que votre appareil et que celui-ci a le \"LAN Control\" activé?",
+        "documentation": "Documentation Yeelight",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "openai": {
       "title": "OpenAI ChatGPT",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",

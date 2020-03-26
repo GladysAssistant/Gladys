@@ -3177,6 +3177,129 @@ const data = {
       ]
     }
   ],
+  'get /api/v1/service/yeelight': {
+    id: '1147bdef-0c95-40f1-a7ef-922ebcad7d0e',
+    name: 'Yeelight',
+    selector: 'yeelight'
+  },
+  'get /api/v1/service/yeelight/device': [
+    {
+      id: '28e8ad03-58a8-423f-93cb-df916019c509',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Lounge Living Color',
+      model: 'RGBW',
+      selector: 'yeelight:0x0000000000000001',
+      external_id: 'yeelight:0x0000000000000001',
+      features: [
+        {
+          name: 'Yeelight RGBW On/Off',
+          category: 'light',
+          type: 'binary',
+          min: 0,
+          max: 1
+        },
+        {
+          name: 'Yeelight RGBW Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100
+        },
+        {
+          name: 'Yeelight RGBW Color',
+          category: 'light',
+          type: 'color',
+          min: 0,
+          max: 0
+        }
+      ],
+      params: [
+        {
+          name: 'IP_ADDRESS',
+          value: '192.168.0.1'
+        },
+        {
+          name: 'PORT_ADDRESS',
+          value: 55443
+        }
+      ]
+    },
+    {
+      id: 'aab32d9a-8f77-9443-f3b4-215062d2ffea',
+      room_id: 'f99ab22a-e6a8-4756-b1fe-4d19dc8c8620',
+      name: 'Kitchen White',
+      model: 'White',
+      external_id: 'yeelight:0x0000000000000002',
+      selector: 'yeelight:0x0000000000000002',
+      features: [
+        {
+          name: 'Yeelight White On/Off',
+          category: 'light',
+          type: 'binary',
+          min: 0,
+          max: 1
+        },
+        {
+          name: 'Yeelight White Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100
+        }
+      ],
+      params: [
+        {
+          name: 'IP_ADDRESS',
+          value: '192.168.0.2'
+        },
+        {
+          name: 'PORT_ADDRESS',
+          value: 55443
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/yeelight/scan': [
+    {
+      name: 'Yeelight RGBW',
+      model: 'RGBW',
+      external_id: 'yeelight:0x0000000000000001',
+      selector: 'yeelight:0x0000000000000001',
+      features: [
+        {
+          name: 'Yeelight RGBW On/Off',
+          category: 'light',
+          type: 'binary',
+          min: 0,
+          max: 1
+        },
+        {
+          name: 'Yeelight RGBW Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100
+        },
+        {
+          name: 'Yeelight RGBW Color',
+          category: 'light',
+          type: 'color',
+          min: 0,
+          max: 0
+        }
+      ],
+      params: [
+        {
+          name: 'IP_ADDRESS',
+          value: '192.168.0.1'
+        },
+        {
+          name: 'PORT_ADDRESS',
+          value: 55443
+        }
+      ]
+    }
+  ],
   'get /api/v1/device_feature/aggregated_states': [
     {
       device: {

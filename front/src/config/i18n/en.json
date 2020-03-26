@@ -1164,6 +1164,58 @@
         "conflictError": "Current device is already in Gladys."
       }
     },
+    "yeelight": {
+      "title": "Yeelight",
+      "description": "Control your Yeelight devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "Yeelight discover",
+      "discoverDeviceDescr": "Automatically scan Yeelight devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "ipLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
+      "device": {
+        "title": "Yeelight devices in Gladys",
+        "search": "Search devices",
+        "noDevices": "No Yeelight device added yet.",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "scanButton": "Scan network",
+        "noDeviceFound": "No Yeelight device found.",
+        "noDevicesFound": "No Yeelight devices found. Make sure you have activate \"LAN Control\".",
+        "connectButton": "Connect/Reconnect",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "nameLabel": "Device Name",
+        "namePlaceholder": "Enter the name of your device",
+        "noNameLabel": "No name",
+        "modelLabel": "Model",
+        "ipLabel": "IP Address",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "saveButton": "Save",
+        "editButton": "Edit",
+        "deleteButton": "Delete"
+      },
+      "discover": {
+        "title": "Devices detected on network",
+        "description": "Yeelight devices are automatically discovered over LAN network. Your Yeelight devices need to have \"LAN Control\" activated. Learn more <a href=\"https://gladysassistant.com/fr/docs/integrations/yeelight#activer-lan-control\" target=\"_blank\">here</a>.",
+        "error": "Error discovering Yeelight devices.",
+        "noDeviceFound": "No Yeelight device discovered. Are you sure you are connected to the same network as your device and your device have \"LAN Control\" activated?",
+        "documentation": "Yeelight documentation",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
+    },
     "openai": {
       "title": "OpenAI ChatGPT",
       "description": "Give Gladys the power of artifical intelligence",

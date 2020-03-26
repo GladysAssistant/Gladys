@@ -130,6 +130,11 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// Yeelight
+import YeelightDevicePage from '../routes/integration/all/yeelight/device-page';
+import YeelightEditPage from '../routes/integration/all/yeelight/edit-page';
+import YeelightDiscoverPage from '../routes/integration/all/yeelight/discover-page';
+
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
 
@@ -250,14 +255,15 @@ const AppRouter = connect(
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
+        <YeelightDevicePage path="/dashboard/integration/device/yeelight" />
+        <YeelightEditPage path="/dashboard/integration/device/yeelight/edit/:deviceSelector" />
+        <YeelightDiscoverPage path="/dashboard/integration/device/yeelight/discover" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
-
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
-
         <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
@@ -266,12 +272,11 @@ const AppRouter = connect(
         <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
         <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
         <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
-
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
-        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
+        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <EnedisGateway path="/dashboard/integration/device/enedis" />
         <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
         <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />

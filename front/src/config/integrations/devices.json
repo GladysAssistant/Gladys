@@ -58,5 +58,9 @@
     "key": "lanManager",
     "link": "lan-manager",
     "img": "/assets/integrations/cover/lan-manager.jpg"
+  },
+  {
+    "key": "yeelight",
+    "img": "/assets/integrations/cover/yeelight.jpg"
   }
 ]
