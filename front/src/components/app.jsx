@@ -86,6 +86,12 @@ import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-pa
 import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
 import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
 
+// EweLink
+import EweLinkPage from '../routes/integration/all/ewelink/device-page';
+import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
+import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
+import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -184,6 +190,10 @@ const AppRouter = connect(
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+        <EweLinkPage path="/dashboard/integration/device/ewelink" />
+        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
+        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
+        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
