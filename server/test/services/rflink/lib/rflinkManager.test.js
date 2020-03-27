@@ -30,7 +30,7 @@ describe('Rflink Manager Commands', () => {
   });
 
   it('should get devices', () => {
-    rflinkManager.getDevices();
+    rflinkManager.getNewDevices();
   });
 
   it('should pair Milights', () => {
@@ -55,7 +55,7 @@ describe('Rflink Manager Commands', () => {
         });
 
         it('should add devices', () => {
-          rflinkManager.addDevice(device);
+          rflinkManager.addNewDevice(device);
         });
       }
     });

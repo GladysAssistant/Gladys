@@ -92,7 +92,7 @@ function pair(currentMilightGateway, milightZone) {
         },
       ],
     };
-    this.addDevice(newLight);
+    this.addNewDevice(newLight);
   }
 }
 
