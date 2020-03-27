@@ -232,11 +232,7 @@
             "mindimlevel": 40,
             "maxlumen": 1600,
             "colorgamuttype": "C",
-            "colorgamut": [
-              [0.6915, 0.3083],
-              [0.17, 0.7],
-              [0.1532, 0.0475]
-            ],
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
             "ct": {
               "min": 153,
               "max": 500
@@ -295,11 +291,7 @@
             "mindimlevel": 500,
             "maxlumen": 540,
             "colorgamuttype": "C",
-            "colorgamut": [
-              [0.6915, 0.3083],
-              [0.17, 0.7],
-              [0.1532, 0.0475]
-            ],
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
             "ct": { "min": 153, "max": 500 }
           },
           "streaming": { "renderer": true, "proxy": true }
@@ -353,11 +345,7 @@
             "mindimlevel": 1000,
             "maxlumen": 806,
             "colorgamuttype": "C",
-            "colorgamut": [
-              [0.6915, 0.3083],
-              [0.17, 0.7],
-              [0.1532, 0.0475]
-            ],
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
             "ct": { "min": 153, "max": 500 }
           },
           "streaming": { "renderer": true, "proxy": true }
@@ -527,11 +515,7 @@
             "mindimlevel": 1000,
             "maxlumen": 806,
             "colorgamuttype": "C",
-            "colorgamut": [
-              [0.6915, 0.3083],
-              [0.17, 0.7],
-              [0.1532, 0.0475]
-            ],
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
             "ct": { "min": 153, "max": 500 }
           },
           "streaming": { "renderer": true, "proxy": true }
@@ -651,11 +635,7 @@
             "mindimlevel": 10000,
             "maxlumen": 210,
             "colorgamuttype": "A",
-            "colorgamut": [
-              [0.704, 0.296],
-              [0.2151, 0.7106],
-              [0.138, 0.08]
-            ]
+            "colorgamut": [[0.704, 0.296], [0.2151, 0.7106], [0.138, 0.08]]
           },
           "streaming": { "renderer": true, "proxy": false }
         },
@@ -769,11 +749,7 @@
             "mindimlevel": 200,
             "maxlumen": 800,
             "colorgamuttype": "C",
-            "colorgamut": [
-              [0.6915, 0.3083],
-              [0.17, 0.7],
-              [0.1532, 0.0475]
-            ],
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
             "ct": {
               "min": 153,
               "max": 500

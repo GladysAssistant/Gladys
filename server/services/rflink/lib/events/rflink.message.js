@@ -19,7 +19,7 @@ function message(msgRF) {
 
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
-      const doesntExistYet = this.device[msg.id] === undefined;
+      const doesntExistYet = this.newDevices[msg.id] === undefined;
 
       if (doesntExistYet === true) {
         const model = `${msg.protocol.charAt(0).toUpperCase()}${msg.protocol.toLowerCase().slice(1)}`;
@@ -36,6 +36,7 @@ function message(msgRF) {
 
         if (msg.temp !== undefined) {
           newDevice.name += 'temperature sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'temperature',
             selector: `rflink:${msg.id}:temperature:${msg.switch}`,
@@ -69,6 +70,7 @@ function message(msgRF) {
         }
         if (msg.baro !== undefined) {
           newDevice.name += 'pressure sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'pressure',
             selector: `rflink:${msg.id}:pressure:${msg.switch}`,
@@ -86,6 +88,7 @@ function message(msgRF) {
         }
         if (msg.uv !== undefined) {
           newDevice.name += 'uv sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'uv intensity',
             selector: `rflink:${msg.id}:uv:${msg.switch}`,
@@ -102,6 +105,7 @@ function message(msgRF) {
         }
         if (msg.lux !== undefined) {
           newDevice.name += 'light sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'light intensity',
             selector: `rflink:${msg.id}:light-intensity:${msg.switch}`,
@@ -135,6 +139,7 @@ function message(msgRF) {
         }
         if (msg.rain !== undefined || msg.rainrate !== undefined) {
           newDevice.name += 'rain sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'rain',
             selector: `rflink:${msg.id}:rain:${msg.switch}`,
@@ -151,6 +156,7 @@ function message(msgRF) {
         }
         if (msg.winsp !== undefined || msg.awinsp !== undefined || msg.wings !== undefined) {
           newDevice.name += 'wind speed sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'wind speed',
             selector: `rflink:${msg.id}:wind-speed:${msg.switch}`,
@@ -167,6 +173,7 @@ function message(msgRF) {
         }
         if (msg.windir !== undefined) {
           newDevice.name += 'wind direction sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'wind direction',
             selector: `rflink:${msg.id}:wind-dir:${msg.switch}`,
@@ -183,6 +190,7 @@ function message(msgRF) {
         }
         if (msg.co2 !== undefined) {
           newDevice.name += 'co2 sensor';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'co2',
             selector: `rflink:${msg.id}:co2:${msg.switch}`,
@@ -203,6 +211,7 @@ function message(msgRF) {
           (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF')
         ) {
           newDevice.name += 'switch';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'switch',
             selector: `rflink:${msg.id}:switch:${msg.switch}`,
@@ -220,6 +229,7 @@ function message(msgRF) {
 
         if (msg.switch !== undefined && msg.rgwb === undefined && (msg.cmd === 'UP' || msg.cmd === 'DOWN')) {
           newDevice.name += 'switch';
+          newDevice.name += `  ${msg.switch}`;
           newDevice.features.push({
             name: 'switch',
             selector: `rflink:${msg.id}:switch:${msg.switch}`,
@@ -303,7 +313,7 @@ function message(msgRF) {
           });
         }
 
-        this.addDevice(newDevice);
+        this.addNewDevice(newDevice);
       } else if (doesntExistYet === false) {
         if (msg.temp !== undefined) {
           this.newValue(msg, 'temperature', msg.temp);

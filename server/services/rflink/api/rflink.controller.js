@@ -9,8 +9,8 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiName getDevices
    * @apiGroup RFlink
    */
-  async function getDevices(req, res) {
-    res.json(RFlinkManager.getDevices());
+  async function getNewDevices(req, res) {
+    res.json(RFlinkManager.getNewDevices());
   }
 
   /**
@@ -134,9 +134,9 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
       authenticated: true,
       controller: asyncMiddleware(unpair),
     },
-    'get /api/v1/service/rflink/devices': {
+    'get /api/v1/service/rflink/newDevices': {
       authenticated: true,
-      controller: asyncMiddleware(getDevices),
+      controller: asyncMiddleware(getNewDevices),
     },
     'post /api/v1/service/rflink/connect': {
       authenticated: true,

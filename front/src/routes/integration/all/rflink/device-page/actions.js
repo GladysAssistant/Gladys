@@ -32,9 +32,11 @@ function createActions(store) {
             $push: rflinkDevicesReceived
           });
         }
-
+        const rflinkDevicesMap = new Map();
+        rflinkDevices.forEach(device => rflinkDevicesMap.set(device.external_id, device));
         store.setState({
           rflinkDevices,
+          rflinkDevicesMap,
           getRflinkDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -43,6 +45,46 @@ function createActions(store) {
         });
       }
     },
+    async getRflinkNewDevices(state) {
+      store.setState({
+        getRflinkNewDevicesStatus: RequestStatus.Getting
+      });
+      try {
+        const rflinkNewDevices = await state.httpClient.get('/api/v1/service/rflink/newDevices');
+        const rflinkNewDevicesFiltered = rflinkNewDevices.filter(device => {
+          if (!state.rflinkDevicesMap) {
+            return true;
+          }
+          return !state.rflinkDevicesMap.has(device.external_id);
+        });
+
+        store.setState({
+          rflinkNewDevices: rflinkNewDevicesFiltered,
+          getRflinkNewDevicesStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getRflinkNewDevicesStatus: RequestStatus.Error
+        });
+      }
+    },
+    async createDevice(state, device) {
+      store.setState({
+        getRflinkCreateDeviceStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/device', device);
+        store.setState({
+          getRflinkCreateDeviceStatus: RequestStatus.Success
+        });
+        actions.getRflinkDevices(store.getState());
+      } catch (e) {
+        store.setState({
+          getRflinkCreateDeviceStatus: RequestStatus.Error
+        });
+      }
+    },
+
     async saveDevice(state, device) {
       await state.httpClient.post('/api/v1/device', device);
     },

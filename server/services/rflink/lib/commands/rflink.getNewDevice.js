@@ -1,14 +1,14 @@
 /**
  * @description return a list of the rflink devices
  * @example
- * rflink.getDevices();
+ * rflink.getNewDevices();
  * @returns {Object} Devices.
  */
-function getDevices() {
-  const devices = this.device;
+function getNewDevices() {
+  const devices = this.newDevices;
   return devices;
 }
 
 module.exports = {
-  getDevices,
+  getNewDevices,
 };
