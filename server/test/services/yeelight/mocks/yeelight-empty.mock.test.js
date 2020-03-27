@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const { EventEmitter } = require('events');
 
 const DevicePropery = {
   POWER: 'power',
@@ -26,15 +27,15 @@ const DevicePropery = {
   ACTIVE_MODE: 'active_mode',
 };
 
-class Discover {
+class Discover extends EventEmitter {
   start() {
     this.test = 1; // useless, this is just for eslint
-    return Promise.resolve([]);
+    return new Promise((resolve, _) => resolve([]));
   }
 
   destroy() {
     this.test = 1; // useless, this is just for eslint
-    return Promise.resolve(null);
+    return Promise.resolve();
   }
 }
 

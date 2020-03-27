@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
+    "bluebird": "^3.7.2",
     "yeelight-awesome": "^1.1.0"
   }
 }

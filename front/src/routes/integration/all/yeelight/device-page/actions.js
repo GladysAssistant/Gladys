@@ -42,7 +42,7 @@ function createActions(store) {
         getYeelightNewDevicesStatus: RequestStatus.Getting
       });
       try {
-        const yeelightDevices = await state.httpClient.get('/api/v1/service/yeelight/scan');
+        const yeelightDevices = await state.httpClient.get('/api/v1/service/yeelight/discover');
         const yeelightNewDevices = yeelightDevices.filter(device => {
           if (!state.yeelightDevicesMap) {
             return true;

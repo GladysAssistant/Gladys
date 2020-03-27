@@ -5,7 +5,7 @@ const {
 } = require('../../../../utils/constants');
 const { DEVICES_MODELS, DEVICE_EXTERNAL_ID_BASE } = require('../utils/constants');
 
-const getYeelightWhiteLight = (device, serviceId) => {
+const getDevice = (device, serviceId) => {
   const modelName = DEVICES_MODELS[device.model] || '';
   const name = device.name || modelName === '' ? 'Yeelight' : `Yeelight ${modelName}`;
 
@@ -55,5 +55,5 @@ const getYeelightWhiteLight = (device, serviceId) => {
 };
 
 module.exports = {
-  getYeelightWhiteLight,
+  getDevice,
 };

@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const { DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
 const { emitNewState } = require('../../../../../services/yeelight/lib/utils/emitNewState');
-const GladysColorDevice = require('../../Gladys-color.json');
+const GladysColorDevice = require('../../mocks/Gladys-color.json');
 
 const { assert, fake } = sinon;
 
@@ -20,7 +20,7 @@ const deviceWithLastValue = {
   }),
 };
 
-describe('Yeelight - emitNewState', () => {
+describe('Yeelight utils emitNewState', () => {
   beforeEach(() => {
     sinon.reset();
   });

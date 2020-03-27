@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const YeelightApi = require('./yeelight.mock.test');
+const YeelightApi = require('./mocks/yeelight.mock.test');
 
 const YeelightService = proxyquire('../../../services/yeelight/index', {
   'yeelight-awesome': YeelightApi,

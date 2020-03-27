@@ -1,23 +1,38 @@
-const { assert } = require('chai');
+const { expect } = require('chai');
+const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const GladysDevice = require('../../Gladys-color.json');
-const YeelightApi = require('../../yeelight.mock.test');
+const GladysDevice = require('../../mocks/Gladys-color.json');
+const YeelightApi = require('../../mocks/yeelight.mock.test');
+
+const { assert } = sinon;
 
 const YeelightService = proxyquire('../../../../../services/yeelight/index', {
   'yeelight-awesome': YeelightApi,
 });
 
-describe('YeelightHandler - setValue', () => {
+describe('YeelightHandler setValue', () => {
   const yeelightService = YeelightService({}, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+  const setPowerSpy = sinon.spy(YeelightApi.Yeelight.prototype, 'setPower');
+  const setBrightSpy = sinon.spy(YeelightApi.Yeelight.prototype, 'setBright');
+
+  beforeEach(() => {
+    sinon.reset();
+  });
 
   it('should set binary value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'binary' }, 1);
+    assert.calledWithExactly(setPowerSpy, true);
+    assert.notCalled(setBrightSpy);
   });
   it('should set brightness value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'brightness' }, 90);
+    assert.notCalled(setPowerSpy);
+    assert.calledWithExactly(setBrightSpy, 90);
   });
   it('should do nothing because of the feature type is not handled yet', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'not_handled' }, 90);
+    assert.notCalled(setPowerSpy);
+    assert.notCalled(setBrightSpy);
   });
   it('should return Yeelight device not found error', async () => {
     const notFoundDevice = {
@@ -33,7 +48,11 @@ describe('YeelightHandler - setValue', () => {
         },
       ],
     };
-    const promise = yeelightService.device.setValue(notFoundDevice, { category: 'light', type: 'binary' }, 1);
-    return assert.isRejected(promise, 'YEELIGHT_DEVICE_NOT_FOUND');
+    try {
+      await yeelightService.device.setValue(notFoundDevice, { category: 'light', type: 'binary' }, 1);
+      assert.fail();
+    } catch (error) {
+      expect(error.message).to.equal('YEELIGHT_DEVICE_NOT_FOUND');
+    }
   });
 });

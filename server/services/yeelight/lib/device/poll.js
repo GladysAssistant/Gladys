@@ -21,7 +21,7 @@ async function poll(device) {
   try {
     response = await yeelight.connect();
   } catch (error) {
-    logger.warn(error);
+    logger.warn(`Yeelight: ${error}`);
   }
   if (!response || !response.connected) {
     throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);

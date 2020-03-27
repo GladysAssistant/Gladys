@@ -149,29 +149,6 @@ function createActions(store) {
           errorLoading: true
         });
       }
-    },
-    addDiscoveredDevice(state, newDevice) {
-      const existingDevices = state.discoveredDevices || [];
-      const newDevices = [];
-
-      let added = false;
-      existingDevices.forEach(device => {
-        if (device.external_id === newDevice.external_id) {
-          newDevices.push(newDevice);
-          added = true;
-        } else {
-          newDevices.push(device);
-        }
-      });
-
-      if (!added) {
-        newDevices.push(newDevice);
-      }
-
-      store.setState({
-        discoveredDevices: newDevices,
-        loading: false
-      });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

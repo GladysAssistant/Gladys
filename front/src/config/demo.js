@@ -3259,7 +3259,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/service/yeelight/scan': [
+  'get /api/v1/service/yeelight/discover': [
     {
       name: 'Yeelight RGBW',
       model: 'RGBW',
