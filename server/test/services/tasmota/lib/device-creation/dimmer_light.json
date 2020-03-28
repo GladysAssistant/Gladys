@@ -1,0 +1,50 @@
+{
+  "STATUS": {
+    "Status": {
+      "Module": 9,
+      "FriendlyName": ["Tasmota"],
+      "Topic": "tasmota",
+      "ButtonTopic": "0",
+      "Power": 0,
+      "PowerOnState": 3,
+      "LedState": 1,
+      "LedMask": "FFFF",
+      "SaveData": 1,
+      "SaveState": 1,
+      "SwitchTopic": "0",
+      "SwitchMode": [0, 0, 0, 0, 0, 0, 0, 0],
+      "ButtonRetain": 0,
+      "SwitchRetain": 0,
+      "SensorRetain": 0,
+      "PowerRetain": 0
+    }
+  },
+  "STATUS8": {
+    "StatusSNS": {
+      "Time": "2020-01-10T22:02:53"
+    }
+  },
+  "STATUS11": {
+    "StatusSTS": {
+      "Time": "2020-01-10T22:02:53",
+      "Uptime": "0T00:00:08",
+      "UptimeSec": 8,
+      "Heap": 29,
+      "SleepMode": "Dynamic",
+      "Sleep": 50,
+      "LoadAvg": 26,
+      "MqttCount": 1,
+      "Dimmer": 100,
+      "Wifi": {
+        "AP": 1,
+        "SSId": "MY-NETWORK",
+        "BSSId": "XX:XX:XX:XX:XX:XX",
+        "Channel": 1,
+        "RSSI": 76,
+        "Signal": -62,
+        "LinkCount": 1,
+        "Downtime": "0T00:00:06"
+      }
+    }
+  }
+}
