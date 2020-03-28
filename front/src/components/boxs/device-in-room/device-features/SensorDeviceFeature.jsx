@@ -36,6 +36,8 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
           </span>
         )}
       </td>
