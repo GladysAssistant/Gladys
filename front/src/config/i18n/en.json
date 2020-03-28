@@ -289,6 +289,7 @@
         "scanButton": "Scan",
         "noZwaveDevices": "No Z-Wave devices found. Have you selected your dongle USB port in Settings?",
         "manufacturer": "Manufacturer",
+        "name": "Name",
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
@@ -298,6 +299,7 @@
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
+        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
         "deviceCreatedSuccess": "The device was added with success."
       },
       "network": {
