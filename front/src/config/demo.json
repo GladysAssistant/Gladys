@@ -677,11 +677,12 @@
     "configured": true,
     "connected": true
   },
-  "get /api/v1/service/sonoff": {},
-  "get /api/v1/service/sonoff/device": [
+  "get /api/v1/service/tasmota": {},
+  "get /api/v1/service/tasmota/device": [
     {
       "name": "Switch",
-      "external_id": "sonoff:sonoff-basic",
+      "external_id": "tasmota:sonoff-basic",
+      "selector": "sonoff-basic",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "model": "sonoff-basic",
       "features": [
@@ -692,10 +693,24 @@
       ]
     }
   ],
-  "get /api/v1/service/sonoff/discover": [
+  "get /api/v1/device/sonoff-basic": {
+    "name": "Switch",
+    "external_id": "tasmota:sonoff-basic",
+    "selector": "sonoff-basic",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "model": "sonoff-basic",
+    "features": [
+      {
+        "category": "switch",
+        "type": "binary",
+        "name": "Switch"
+      }
+    ]
+  },
+  "get /api/v1/service/tasmota/discover": [
     {
       "name": "Sonoff Basic Kitchen",
-      "external_id": "sonoff:sonoff-basic",
+      "external_id": "tasmota:sonoff-basic",
       "created_at": "2019-02-12T07:49:07.556Z",
       "model": "sonoff-basic",
       "features": [
@@ -707,8 +722,21 @@
     },
     {
       "name": "Sonoff Pow Kitchen",
-      "external_id": "sonoff:sonoff-pow",
+      "external_id": "tasmota:sonoff-pow",
       "model": "sonoff-pow",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ]
+    },
+    {
+      "name": "Sonoff Mini Outside",
+      "external_id": "tasmota:sonoff-mini",
+      "model": "sonoff-basic",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updatable": true,
       "features": [
         {
           "category": "switch",
