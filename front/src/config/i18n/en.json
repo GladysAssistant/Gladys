@@ -299,6 +299,7 @@
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
+        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
         "deviceCreatedSuccess": "The device was added with success."
       },
       "network": {

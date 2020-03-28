@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../../../server/utils/constants';
+import { slugify } from '../../../../../../../server/utils/slugify';
 import createActionsIntegration from '../../../../../actions/integration';
 
 const createActions = store => {
@@ -111,6 +112,9 @@ const createActions = store => {
           [index]: {
             name: {
               $set: name
+            },
+            selector: {
+              $set: slugify(name)
             }
           }
         }
