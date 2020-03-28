@@ -1,4 +1,5 @@
 import get from 'get-value';
+import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../../../server/utils/constants';
@@ -103,6 +104,18 @@ const createActions = store => {
     },
     async createDevice(state, newDevice) {
       await state.httpClient.post('/api/v1/device', newDevice);
+    },
+    editNodeName(state, index, name) {
+      const newState = update(state, {
+        zwaveNodes: {
+          [index]: {
+            name: {
+              $set: name
+            }
+          }
+        }
+      });
+      store.setState(newState);
     }
   };
   return Object.assign({}, actions, integrationActions);

@@ -17,6 +17,10 @@ class ZwaveNode extends Component {
     this.setState({ loading: false });
   };
 
+  editNodeName = e => {
+    this.props.editNodeName(this.props.nodeIndex, e.target.value);
+  };
+
   render(props, { loading, error, deviceCreated }) {
     return (
       <div index={props.node.id} class="col-md-6">
@@ -47,6 +51,12 @@ class ZwaveNode extends Component {
                 </div>
               )}
               <div class="card-body">
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.zwave.setup.name" />
+                  </label>
+                  <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
+                </div>
                 <div class="form-group">
                   <label>
                     <Text id="integration.zwave.setup.type" />
