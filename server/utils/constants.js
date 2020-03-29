@@ -409,6 +409,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATE: 'bluetooth.status',
     DISCOVER: 'bluetooth.discover',
   },
+  EWELINK: {
+    CONNECTED: 'ewelink.connected',
+    NEW_DEVICE: 'ewelink.new-device',
+    ERROR: 'ewelink.error',
+  },
 };
 
 const DASHBOARD_TYPE = {

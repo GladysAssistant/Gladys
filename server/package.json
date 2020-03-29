@@ -47,6 +47,8 @@
     "apidoc": "^0.17.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "codecov": "^3.5.0",
+    "deep-equal-in-any-order": "^1.0.25",
     "dotenv": "^6.2.0",
     "eslint": "^5.13.0",
     "eslint-config-airbnb": "^17.1.0",
