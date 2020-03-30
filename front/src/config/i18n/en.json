@@ -784,7 +784,9 @@
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
-    "fahrenheit": "°F"
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
