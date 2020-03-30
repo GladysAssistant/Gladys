@@ -141,8 +141,8 @@ class ZWaveDeviceBox extends Component {
                       <Text id="integration.zwave.device.noFeatures" />
                     )}
                   </div>
-                  {mostRecentValueAt && (
-                    <p class="mt-4">
+                  <p class="mt-4">
+                    {mostRecentValueAt ? (
                       <Text
                         id="integration.zwave.device.mostRecentValueAt"
                         fields={{
@@ -151,8 +151,10 @@ class ZWaveDeviceBox extends Component {
                             .fromNow()
                         }}
                       />
-                    </p>
-                  )}
+                    ) : (
+                      <Text id="integration.zwave.device.noValueReceived" />
+                    )}
+                  </p>
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">

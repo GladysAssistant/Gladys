@@ -280,7 +280,8 @@
         "saveButton": "Save",
         "deleteButton": "Delete",
         "editButton": "Edit",
-        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}."
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -364,7 +365,9 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "feature": {
         "nameLabel": "Name",

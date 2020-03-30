@@ -63,6 +63,7 @@ const DeviceTab = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  user={props.user}
                 />
               ))}
             {props.mqttDevices && props.mqttDevices.length === 0 && <Text id="integration.mqtt.device.noDevices" />}
