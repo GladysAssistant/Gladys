@@ -38,6 +38,7 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
           </span>
         )}
       </td>

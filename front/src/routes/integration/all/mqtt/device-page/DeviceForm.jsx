@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
+import dayjs from 'dayjs';
 
 class MqttDeviceForm extends Component {
   updateName = e => {
@@ -75,6 +76,20 @@ class MqttDeviceForm extends Component {
               <Text id="integration.mqtt.device.noFeatures" />
             )}
           </div>
+          <p class="mt-4">
+            {props.mostRecentValueAt ? (
+              <Text
+                id="integration.mqtt.device.mostRecentValueAt"
+                fields={{
+                  mostRecentValueAt: dayjs(props.mostRecentValueAt)
+                    .locale(props.user.language)
+                    .fromNow()
+                }}
+              />
+            ) : (
+              <Text id="integration.mqtt.device.noValueReceived" />
+            )}
+          </p>
         </div>
       </div>
     );

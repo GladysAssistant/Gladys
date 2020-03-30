@@ -74,6 +74,54 @@ const MqttFeatureBox = ({ children, ...props }) => {
             </div>
           )}
 
+          {props.feature.category === DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR && (
+            <div class="form-group">
+              <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.unitLabel" />
+              </label>
+              <Localizer>
+                <select
+                  id={`unit_${props.featureIndex}`}
+                  type="text"
+                  value={props.feature.unit}
+                  onChange={props.updateUnit}
+                  class="form-control"
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.PERCENT}>
+                    <Text id="deviceFeatureUnit.percent" />
+                  </option>
+                </select>
+              </Localizer>
+            </div>
+          )}
+
+          {props.feature.category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR && (
+            <div class="form-group">
+              <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <Text id="integration.mqtt.feature.unitLabel" />
+              </label>
+              <Localizer>
+                <select
+                  id={`unit_${props.featureIndex}`}
+                  type="text"
+                  value={props.feature.unit}
+                  onChange={props.updateUnit}
+                  class="form-control"
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value={DEVICE_FEATURE_UNITS.PPM}>
+                    <Text id="deviceFeatureUnit.ppm" />
+                  </option>
+                </select>
+              </Localizer>
+            </div>
+          )}
+
           <div class="form-group">
             <label class="form-label" for={`min_${props.featureIndex}`}>
               <Text id="integration.mqtt.feature.minLabel" />

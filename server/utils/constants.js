@@ -228,6 +228,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
+  CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
@@ -306,6 +307,7 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
   VOLT: 'volt',
+  PPM: 'ppm',
 };
 
 const ACTIONS_STATUS = {
