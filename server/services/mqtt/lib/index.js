@@ -7,6 +7,7 @@ const { publish } = require('./publish');
 const { subscribe } = require('./subscribe');
 const { unsubscribe } = require('./unsubscribe');
 const { status } = require('./status');
+const { setValue } = require('./setValue');
 
 /**
  * @description Add ability to connect to a MQTT broker.
@@ -36,5 +37,6 @@ MqttHandler.prototype.publish = publish;
 MqttHandler.prototype.subscribe = subscribe;
 MqttHandler.prototype.unsubscribe = unsubscribe;
 MqttHandler.prototype.status = status;
+MqttHandler.prototype.setValue = setValue;
 
 module.exports = MqttHandler;
