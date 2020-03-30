@@ -778,7 +778,9 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -825,6 +827,9 @@
     "smoke-sensor": {
       "binary": "Smoke",
       "decimal": "Density"
+    },
+    "co2-sensor": {
+      "decimal": "Co2"
     },
     "switch": {
       "voltage": "Switch Voltage",
