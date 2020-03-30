@@ -274,11 +274,14 @@
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
+        "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit"
+        "editButton": "Edit",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -362,7 +365,9 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "feature": {
         "nameLabel": "Name",
@@ -773,11 +778,15 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
-    "fahrenheit": "°F"
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -820,6 +829,9 @@
     "smoke-sensor": {
       "binary": "Smoke",
       "decimal": "Density"
+    },
+    "co2-sensor": {
+      "decimal": "Co2"
     },
     "switch": {
       "voltage": "Switch Voltage",

@@ -290,6 +290,18 @@
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
           },
           {
+            "name": "Co2",
+            "selector": "co2-kitchen",
+            "category": "co2-sensor",
+            "type": "decimal",
+            "unit": "ppm",
+            "min": 0,
+            "max": 5000,
+            "read_only": true,
+            "last_value": 340,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
             "name": "Kitchen door",
             "selector": "temperature-living-room-celsius",
             "category": "opening-sensor",
@@ -334,13 +346,14 @@
       "devices": [
         {
           "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+          "name": "Multi-sensor",
           "selector": "sensors",
           "features": [
             {
               "name": "Temperature",
               "selector": "temperature-sensor",
               "category": "temperature-sensor",
-              "type": "",
+              "type": "decimal",
               "min": -20,
               "max": 255,
               "read_only": true,
@@ -352,24 +365,36 @@
               "name": "Humidity",
               "selector": "humidity-sensor",
               "category": "humidity-sensor",
-              "type": "",
+              "type": "decimal",
               "min": 0,
               "max": 100,
               "read_only": true,
               "last_value": 56,
-              "unit": "%",
+              "unit": "percent",
+              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+            },
+            {
+              "name": "Co2",
+              "selector": "co2-sensor",
+              "category": "co2-sensor",
+              "type": "decimal",
+              "min": 0,
+              "max": 5000,
+              "read_only": true,
+              "last_value": 410,
+              "unit": "ppm",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             },
             {
               "name": "Door",
               "selector": "door-opening-sensor",
               "category": "door-opening-sensor",
-              "type": "",
+              "type": "binary",
               "min": 0,
               "max": 1,
               "read_only": true,
               "last_value": 0,
-              "unit": "%",
+              "unit": "percent",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             }
           ]
@@ -383,20 +408,9 @@
       "devices": [
         {
           "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+          "name": "Kitchen Light",
           "selector": "sensors",
           "features": [
-            {
-              "name": "Humidity",
-              "selector": "kitchen-humidity-sensor",
-              "category": "humidity-sensor",
-              "type": "",
-              "min": 0,
-              "max": 100,
-              "read_only": true,
-              "last_value": 74,
-              "unit": "%",
-              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
-            },
             {
               "name": "Light",
               "selector": "main-lamp-binary",
@@ -407,6 +421,25 @@
               "read_only": true,
               "last_value": 60,
               "unit": " lux",
+              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+            }
+          ]
+        },
+        {
+          "id": "284d8f68-220c-45fd-a73a-eccb547aff24",
+          "name": "Sensor",
+          "selector": "humidity-sensor",
+          "features": [
+            {
+              "name": "Humidity",
+              "selector": "kitchen-humidity-sensor",
+              "category": "humidity-sensor",
+              "type": "decimal",
+              "min": 0,
+              "max": 100,
+              "read_only": true,
+              "last_value": 74,
+              "unit": "percent",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             }
           ]
