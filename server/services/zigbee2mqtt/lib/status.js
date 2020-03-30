@@ -6,8 +6,8 @@
  */
 function status() {
   const zigbee2mqttStatus = {
-    configured: this.configured,
-    connected: this.connected,
+    usbConfigured: this.usbConfigured,
+    mqttConnected: this.mqttConnected,
   };
   return zigbee2mqttStatus;
 }

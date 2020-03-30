@@ -268,6 +268,23 @@
       "title": "Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
+      "settingsTab": "Settings",
+      "status": {
+        "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
+        "notConnected": "Zigbee2mqtt service failed to connect, please go to ",
+        "settingsPageLink": "USB dongle configuration page",
+        "setupPageLink": "Zigbee2mqtt configuration page"
+      },
+      "settings": {
+        "title": "Zigbee2mqtt USB dongle Settings",
+        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
+        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
+        "saveButton": "Save Settings",
+        "refreshButton": "Refresh USB list",
+        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
+        "attached": "Zigbee2mqtt USB Dongle configured.",
+        "saving": "Saving USB Dongle configuration..."
+      },
       "device": {
         "title": "Zigbee2mqtt devices",
         "search": "Search devices",

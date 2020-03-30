@@ -80,6 +80,7 @@ import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
 // Zigbee2mqtt
 import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
 import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
+import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/settings-page';
 import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
 
 const defaultState = getDefaultState();
@@ -178,6 +179,7 @@ const AppRouter = connect(
         <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
         <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
         <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
+        <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <ChatPage path="/dashboard/chat" />
