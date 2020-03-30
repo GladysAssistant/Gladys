@@ -54,11 +54,28 @@ class MqttDeviceSetupPage extends Component {
   }
 
   updateDeviceProperty(deviceIndex, property, value) {
-    const device = update(this.state.device, {
+    let device;
+    if (property === 'external_id' && !value.startsWith('mqtt:')) {
+      if (value.length < 5) {
+        value = 'mqtt:';
+      } else {
+        value = `mqtt:${value}`;
+      }
+    }
+
+    device = update(this.state.device, {
       [property]: {
         $set: value
       }
     });
+
+    if (property === 'external_id') {
+      device = update(device, {
+        selector: {
+          $set: value
+        }
+      });
+    }
 
     this.setState({
       device
@@ -67,6 +84,7 @@ class MqttDeviceSetupPage extends Component {
 
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
+    let device;
     if (property === 'external_id' && !value.startsWith('mqtt:')) {
       if (value.length < 5) {
         value = 'mqtt:';
@@ -74,7 +92,8 @@ class MqttDeviceSetupPage extends Component {
         value = `mqtt:${value}`;
       }
     }
-    const device = update(this.state.device, {
+
+    device = update(this.state.device, {
       features: {
         [featureIndex]: {
           [property]: {
@@ -83,6 +102,18 @@ class MqttDeviceSetupPage extends Component {
         }
       }
     });
+
+    if (property === 'external_id') {
+      device = update(device, {
+        features: {
+          [featureIndex]: {
+            selector: {
+              $set: value
+            }
+          }
+        }
+      });
+    }
 
     this.setState({
       device
@@ -144,7 +175,7 @@ class MqttDeviceSetupPage extends Component {
         id: uniqueId,
         name: null,
         should_poll: false,
-        external_id: uniqueId,
+        external_id: 'mqtt:',
         service_id: this.props.currentIntegration.id,
         features: []
       };

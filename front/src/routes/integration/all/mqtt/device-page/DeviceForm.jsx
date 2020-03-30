@@ -37,6 +37,22 @@ class MqttDeviceForm extends Component {
         </div>
 
         <div class="form-group">
+          <label class="form-label">
+            <Text id="integration.mqtt.device.externalIdLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              value={props.device.external_id}
+              onInput={this.updateExternalId}
+              disabled={props.device.created_at !== undefined}
+              class="form-control"
+              placeholder={<Text id="integration.mqtt.device.externalIdLabel" />}
+            />
+          </Localizer>
+        </div>
+
+        <div class="form-group">
           <label class="form-label" for="room">
             <Text id="integration.mqtt.device.roomLabel" />
           </label>
