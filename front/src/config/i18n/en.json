@@ -101,7 +101,8 @@
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
       "roomConflictError": "A room with the same name already exist.",
-      "validationError": "Validation error: A house can't have an empty name."
+      "validationError": "House name should be between 1 and 40 characters",
+      "validationErrorRoom": "Room name should be between 1 and 40 characters"
     },
     "success": {
       "title": "Allow me to thank you 🙏",
@@ -226,41 +227,38 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
-    "sonoff": {
-      "title": "Sonoff",
+    "tasmota": {
+      "title": "Tasmota",
       "deviceTab": "Devices",
       "discoverTab": "MQTT discover",
-      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
-        "title": "Sonoff devices in Gladys",
+        "title": "Tasmota devices in Gladys",
         "search": "Search devices",
-        "newButton": "New",
-        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
+        "editButton": "Edit",
+        "noDeviceFound": "No Tasmota device found.",
+        "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Sonoff discover devices over MQTT",
-        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Sonoff devices.",
-        "noDeviceFound": "No Sonoff device discovered.",
-        "documentation": "Sonoff documentation"
+        "title": "Tasmota discover devices over MQTT",
+        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Tasmota devices.",
+        "noDeviceFound": "No Tasmota device discovered.",
+        "documentation": "Tasmota documentation",
+        "scan": "Scan"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Topic (%topic% Sonoff MQTT)",
-      "topicPlaceholder": "Should starts with 'sonoff:'",
-      "modelLabel": "Sonoff Model",
-      "model": {
-        "sonoff-basic": "Basic",
-        "sonoff-pow": "Pow",
-        "sonoff-s2x": "S20/S26 Smart Plug"
-      },
+      "topicLabel": "Tasmota MQTT Topic",
       "saveButton": "Save",
+      "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
       "error": {
         "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current topic is already in use."
       }
     },
@@ -276,11 +274,14 @@
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
+        "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit"
+        "editButton": "Edit",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -291,6 +292,7 @@
         "scanButton": "Scan",
         "noZwaveDevices": "No Z-Wave devices found. Have you selected your dongle USB port in Settings?",
         "manufacturer": "Manufacturer",
+        "name": "Name",
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
@@ -300,6 +302,7 @@
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
+        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
         "deviceCreatedSuccess": "The device was added with success."
       },
       "network": {
@@ -362,7 +365,9 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "feature": {
         "nameLabel": "Name",
@@ -664,8 +669,6 @@
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
     "download": "Download",
-    "restartGladys": "Restart Gladys",
-    "restartButton": "Restart",
     "notAvailable": "Not available on custom install.",
     "containers": "Containers",
     "containerName": "Name",
@@ -775,11 +778,15 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
-    "fahrenheit": "°F"
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -789,7 +796,9 @@
       "color": "Light Color",
       "saturation": "Light Saturation",
       "temperature": "Light Temperature",
-      "power": "Light Power consumption"
+      "power": "Light Power consumption",
+      "effect-mode": "Effect mode",
+      "effect-speed": "Effect speed"
     },
     "battery": {
       "integer": "Battery"
@@ -811,12 +820,18 @@
     "camera": {
       "image": "Camera"
     },
+    "counter-sensor": {
+      "integer": "Counter"
+    },
     "access-control": {
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
       "binary": "Smoke",
       "decimal": "Density"
+    },
+    "co2-sensor": {
+      "decimal": "Co2"
     },
     "switch": {
       "voltage": "Switch Voltage",

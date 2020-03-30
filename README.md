@@ -43,7 +43,7 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 Right now we are migrating from Gladys 3 to Gladys 4, a new release rewrote from scratch. If you want to install Gladys 3, visit [our website](https://gladysassistant.com).
 
-To install Gladys 4 Alpha, read the following instructions.
+To install Gladys 4 Beta, read the following instructions.
 
 We use Docker to deploy Gladys 4, so it's easy to install it on any system.
 
@@ -69,7 +69,7 @@ It's only thanks to donation from the community that my open-source work is sust
 
 To support the project, you can:
 
-- Support monthly, 9.99€/month with the [Gladys Community Package](https://gladysassistant.com/gladys-community-package).
+- Support monthly, 9.99€/month with [Gladys Plus](https://gladysassistant.com/pricing).
 - Donate with Bitcoin: 3KQiX1FtbdXLXPH9UfLSyuzRMDRGY52EiA
 
 ## Links
@@ -82,4 +82,4 @@ To support the project, you can:
 
 ## Copyright & License
 
-Copyright (c) 2013-2019 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2020 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).

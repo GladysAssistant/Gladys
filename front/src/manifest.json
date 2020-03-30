@@ -4,15 +4,27 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#fff",
+  "background_color": "#ffffff",
   "theme_color": "#0052D4",
   "icons": [
     {
+      "src": "/assets/icons/android-icon-192x192-round.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icons/android-icon-512x512-round.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "purpose": "maskable",
       "src": "/assets/icons/android-icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
+      "purpose": "maskable",
       "src": "/assets/icons/android-icon-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
