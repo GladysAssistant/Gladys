@@ -21,7 +21,7 @@ async function setValue(device, deviceFeature, value) {
 
   const topic = `gladys/device/${device.external_id}/feature/${deviceFeature.external_id}/state`;
   return new Promise((resolve, reject) => {
-    this.mqttClient.publish(topic, value, undefined, (err) => {
+    this.mqttClient.publish(topic, value.toString(), undefined, (err) => {
       if (err) {
         reject(err);
       } else {

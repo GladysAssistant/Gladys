@@ -36,7 +36,7 @@ describe('mqtt.setValue', () => {
     assert.calledWith(
       mqttApi.publish,
       'gladys/device/my-device/feature/my-device-light/state',
-      1,
+      '1',
       undefined,
       sinon.match.func,
     );
