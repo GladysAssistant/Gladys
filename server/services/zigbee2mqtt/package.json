@@ -11,5 +11,8 @@
     "x64",
     "arm",
     "arm64"
-  ]
+  ],
+  "dependencies": {
+    "mqtt": "^3.0.0"
+  }
 }

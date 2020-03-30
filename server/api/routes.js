@@ -355,6 +355,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getByLocalService,
     },
+    'delete /api/v1/service/:service_name/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.destroyByLocalService,
+    },
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
       controller: variableController.setValue,
@@ -362,6 +366,10 @@ function getRoutes(gladys) {
     'get /api/v1/variable/:variable_key': {
       authenticated: true,
       controller: variableController.getValue,
+    },
+    'delete /api/v1/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.destroy,
     },
     // session
     'post /api/v1/session/:session_id/revoke': {
