@@ -274,11 +274,13 @@
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
+        "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit"
+        "editButton": "Edit",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}."
       },
       "setup": {
         "title": "Z-Wave Devices",

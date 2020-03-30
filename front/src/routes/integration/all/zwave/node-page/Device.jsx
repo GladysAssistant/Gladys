@@ -3,6 +3,11 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
 import { Link } from 'preact-router/match';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
+
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
@@ -15,8 +20,15 @@ class ZWaveDeviceBox extends Component {
       deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
+    let mostRecentValueAt = null;
+    this.props.device.features.forEach(feature => {
+      if (feature.last_value_changed && new Date(feature.last_value_changed) > mostRecentValueAt) {
+        mostRecentValueAt = new Date(feature.last_value_changed);
+      }
+    });
     this.setState({
-      batteryLevel
+      batteryLevel,
+      mostRecentValueAt
     });
   };
   saveDevice = async () => {
@@ -51,7 +63,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, loading, error }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading, error }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -86,13 +98,13 @@ class ZWaveDeviceBox extends Component {
                       value={props.device.name}
                       onInput={this.updateName}
                       class="form-control"
-                      placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
+                      placeholder={<Text id="integration.zwave.device.nameLabel" />}
                     />
                   </Localizer>
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.rtspCamera.roomLabel" />
+                    <Text id="integration.zwave.device.roomLabel" />
                   </label>
                   <select onChange={this.updateRoom} class="form-control">
                     <option value="">-------</option>
@@ -129,6 +141,18 @@ class ZWaveDeviceBox extends Component {
                       <Text id="integration.zwave.device.noFeatures" />
                     )}
                   </div>
+                  {mostRecentValueAt && (
+                    <p class="mt-4">
+                      <Text
+                        id="integration.zwave.device.mostRecentValueAt"
+                        fields={{
+                          mostRecentValueAt: dayjs(mostRecentValueAt)
+                            .locale(props.user.language)
+                            .fromNow()
+                        }}
+                      />
+                    </p>
+                  )}
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
