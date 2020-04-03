@@ -297,42 +297,38 @@
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
     },
-    "sonoff": {
-      "title": "Sonoff",
+    "tasmota": {
+      "title": "Tasmota",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte MQTT",
-      "prepareDeviceDescr": "Ou préparez manuellement les appareils futurs ou non découverts",
       "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
       "device": {
-        "title": "Appareils Sonoff dans Gladys",
+        "title": "Appareils Tasmota dans Gladys",
         "search": "Recherche d'appareils",
-        "newButton": "Nouveau",
-        "noDeviceFound": "Aucun appareil Sonoff trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "editButton": "Modifier",
+        "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
-        "title": "Découverte des appareils Sonoff sur MQTT",
-        "description": "Les appareils Sonoff configurés sont automatiquement découverts sur le réseau MQTT.",
-        "error": "Erreur lors de la découverte des appareils Sonoff.",
-        "noDeviceFound": "Aucun appareil Sonoff découvert.",
-        "documentation": "Documentation Sonoff"
+        "title": "Découverte des appareils Tasmota sur MQTT",
+        "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
+        "error": "Erreur lors de la découverte des appareils Tasmota.",
+        "noDeviceFound": "Aucun appareil Tasmota découvert.",
+        "documentation": "Documentation Tasmota",
+        "scan": "Scanner"
       },
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "roomLabel": "Pièce",
-      "topicLabel": "Topic (%topic% Sonoff MQTT)",
-      "topicPlaceholder": "Devrait commencer par 'sonoff:'",
-      "modelLabel": "Modèle Sonoff",
-      "model": {
-        "sonoff-basic": "Basic",
-        "sonoff-pow": "POW",
-        "sonoff-s2x": "Prise connectée S20/S26"
-      },
+      "topicLabel": "Topic (%topic% Tasmota MQTT)",
       "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge",
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "Le topic actuel est déjà utilisé."
       }
     },
@@ -348,11 +344,14 @@
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
+        "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
         "noFeatures": "Pas de fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer"
+        "editButton": "Editer",
+        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
+        "noValueReceived": "Aucune valeur reçue."
       },
       "setup": {
         "title": "Appareils Z-Wave",
@@ -363,6 +362,7 @@
         "scanButton": "Recherche",
         "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous sélectionné le port USB de votre dongle dans les paramètres ?",
         "manufacturer": "Fabricant",
+        "name": "Nom",
         "type": "Type",
         "scanInProgressText": "Recherche en cours...",
         "createDeviceInGladys": "Connecter dans Gladys",
@@ -372,6 +372,7 @@
         "nodeId": "Noeud",
         "zwaveNotConfiguredError": "Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
+        "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
       },
       "network": {
@@ -424,6 +425,7 @@
         "noDevices": "Aucun appareil MQTT n'a encore été ajouté.",
         "noNameLabel": "Pas de nom",
         "nameLabel": "Nom",
+        "externalIdLabel": "ID externe",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
         "noFeatures": "Aucune fonctionnalité",
@@ -434,7 +436,9 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
-        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?"
+        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
+        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
+        "noValueReceived": "Aucune valeur reçue."
       },
       "feature": {
         "nameLabel": "Nom",
@@ -447,7 +451,13 @@
         "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
         "maxLabel": "Valeur maximum",
         "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+        "readOnlyLabel": "Est-ce un capteur ?",
+        "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter fonctionnalité",
+        "mqttTopicExampleLabel": "Topic MQTT",
+        "copyMqttTopic": "Copier le topic MQTT",
+        "copied": "Copié !",
+        "copyFailed": "Erreur lors de la copie",
         "deleteLabel": "Supprimer fonctionnalité"
       },
       "setup": {
@@ -863,11 +873,15 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
-    "fahrenheit": "°F"
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -877,7 +891,9 @@
       "color": "Couleur éclairage",
       "saturation": "Saturation éclairage",
       "temperature": "Température éclairage",
-      "power": "Puissance consommée éclairage"
+      "power": "Puissance consommée éclairage",
+      "effect-mode": "Effet",
+      "effect-speed": "Vitesse de l'effet"
     },
     "battery": {
       "integer": "Batterie"
@@ -899,12 +915,18 @@
     "camera": {
       "image": "Caméra"
     },
+    "counter-sensor": {
+      "integer": "Compteur"
+    },
     "access-control": {
       "mode": "Mode de contrôle d'accès"
     },
     "smoke-sensor": {
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur feeeumée détectée"
+    },
+    "co2-sensor": {
+      "decimal": "CO2"
     },
     "switch": {
       "voltage": "Tension moyenne",

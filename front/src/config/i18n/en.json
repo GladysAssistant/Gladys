@@ -433,7 +433,7 @@
         "mqttTopicExampleLabel": "MQTT Topic",
         "copyMqttTopic": "Copy MQTT Topic",
         "copied": "Copied!",
-        "copiedFailed": "Fail to copy",
+        "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
       },
       "setup": {
