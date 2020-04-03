@@ -53,9 +53,16 @@ describe('MqttHandler', () => {
     expect(mqttHandler.connected).to.eq(true);
   });
 
-  it('should create device', () => {
-    event.emit('message', 'gladys/master/device/create', Buffer.from('{}'));
+  it('should send new state', () => {
+    event.emit(
+      'message',
+      'gladys/master/device/my_device_external_id/feature/my_feature_external_id/state',
+      Buffer.from('19.8'),
+    );
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW, {});
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'my_feature_external_id',
+      state: '19.8',
+    });
   });
 });
