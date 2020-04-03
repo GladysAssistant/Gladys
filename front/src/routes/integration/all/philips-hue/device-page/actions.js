@@ -15,10 +15,7 @@ function createActions(store) {
       });
       try {
         const options = {
-          service: 'mqtt',
-          order_dir: state.getPhilipsHueDeviceOrderDir || 'asc',
-          take: 10000,
-          skip: 0
+          order_dir: state.getPhilipsHueDeviceOrderDir || 'asc'
         };
         if (state.philipsHueDeviceSearch && state.philipsHueDeviceSearch.length) {
           options.search = state.philipsHueDeviceSearch;

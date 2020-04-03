@@ -121,6 +121,25 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    editRoom(state, houseIndex, roomIndex, property, value) {
+      const newState = update(state, {
+        houses: {
+          [houseIndex]: {
+            rooms: {
+              [roomIndex]: {
+                [property]: {
+                  $set: value
+                },
+                to_update: {
+                  $set: true
+                }
+              }
+            }
+          }
+        }
+      });
+      store.setState(newState);
+    },
     addHouse(state) {
       const newState = update(state, {
         houses: {
@@ -154,10 +173,12 @@ function createActions(store) {
 
         const promises = house.rooms.map(async room => {
           if (room.to_delete) {
-            return state.httpClient.delete(`/api/v1/room/${room.selector}`, room);
+            return state.httpClient.delete(`/api/v1/room/${room.selector}`);
           }
           if (!room.id) {
             return state.httpClient.post(`/api/v1/house/${houseCreatedOrUpdated.selector}/room`, room);
+          } else if (room.to_update) {
+            return state.httpClient.patch(`/api/v1/room/${room.selector}`, { name: room.name });
           }
           return room;
         });
@@ -193,8 +214,8 @@ function createActions(store) {
         store.setState(newState);
       } catch (e) {
         const status = get(e, 'response.status');
-        const errorValue = get(e, 'response.data.error.value');
-        if (status === 409 && errorValue === 'room') {
+        const url = get(e, 'response.config.url');
+        if (status === 409 && url.endsWith('/room')) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.RoomConflictError
@@ -204,6 +225,12 @@ function createActions(store) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.ConflictError
+            }
+          });
+        } else if (status === 422 && url.includes('/room/')) {
+          store.setState({
+            houseUpdateStatus: {
+              [house.id]: RequestStatus.RoomValidationError
             }
           });
         } else if (status === 422) {

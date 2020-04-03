@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import NodeTab from './NodeTab';
-import integrationConfig from '../../../../../config/integrations';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect('user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveHealNetworkStatus', actions)
@@ -31,7 +30,7 @@ class ZwaveNodePage extends Component {
 
   render(props, {}) {
     return (
-      <ZwavePage integration={integrationConfig[props.user.language].zwave}>
+      <ZwavePage>
         <NodeTab {...props} />
       </ZwavePage>
     );

@@ -9,6 +9,7 @@ describe('SceneManager', () => {
     const sceneManager = new SceneManager({}, event);
     sceneManager.scenes['test-scene'] = {
       name: 'Test Scene',
+      triggers: [],
     };
     await sceneManager.destroy('test-scene');
     expect(sceneManager.scenes['test-scene']).to.be.undefined; // eslint-disable-line

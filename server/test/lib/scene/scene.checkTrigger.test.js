@@ -50,6 +50,46 @@ describe('scene.checkTrigger', () => {
       });
     });
   });
+  it('should execute scene', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    const addedScene = sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'custom-time',
+          date: '01-01-1990',
+          time: '12:00',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.CHANGED,
+      key: addedScene.triggers[0].key,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should not execute scene, condition not verified', async () => {
     const stateManager = new StateManager();
     const device = {
@@ -145,5 +185,91 @@ describe('scene.checkTrigger', () => {
         last_value: 12,
       });
     }).to.throw(Error, 'Trigger type "one-unknown-event" has no checker function.');
+  });
+  it('should execute scene, event & key matching', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    const addedScene = sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'interval',
+          interval: 10,
+          unit: 'hour',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.CHANGED,
+      key: addedScene.triggers[0].key,
+      scheduler_type: 'interval',
+      interval: 10,
+      unit: 'hour',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene, key not matching', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'interval',
+          interval: 10,
+          unit: 'hour',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.CHANGED,
+      key: 'not-the-same-key',
+      scheduler_type: 'interval',
+      interval: 10,
+      unit: 'hour',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
   });
 });
