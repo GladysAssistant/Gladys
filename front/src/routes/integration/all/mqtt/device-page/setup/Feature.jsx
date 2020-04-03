@@ -167,7 +167,7 @@ const MqttFeatureBox = ({ children, ...props }) => {
               />
               <span class="custom-switch-indicator" />
               <span class="custom-switch-description">
-                <Text id="integration.mqtt.feature.readOnlyLabel" />
+                <Text id="integration.mqtt.feature.readOnlyButton" />
               </span>
             </label>
           </div>
