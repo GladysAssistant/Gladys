@@ -216,10 +216,7 @@ describe('CalDAV sync', () => {
       .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
       .returns('12345');
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(
-      Error,
-      'CalDAV parameters must be setted and saved',
-    );
+    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_NOT_CONFIGURED');
   });
 
   it('should failed fetch calendars', async () => {
@@ -238,7 +235,7 @@ describe('CalDAV sync', () => {
 
     sync.requestCalendars.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, "Can't fetch calendars");
+    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_CALENDARS');
   });
 
   it('should failed fetch changes', async () => {
@@ -289,7 +286,7 @@ describe('CalDAV sync', () => {
 
     sync.requestChanges.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, "Can't fetch changes");
+    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_CHANGES');
   });
 
   it('should failed get events data', async () => {
@@ -355,6 +352,6 @@ describe('CalDAV sync', () => {
 
     sync.requestEventsData.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, "Can't get events data");
+    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_EVENTS');
   });
 });

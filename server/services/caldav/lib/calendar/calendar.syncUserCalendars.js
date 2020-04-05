@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
+const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Start user's calendars synchronization.
@@ -15,7 +16,7 @@ async function syncUserCalendars(userId) {
   const CALDAV_PASSWORD = await this.gladys.variable.getValue('CALDAV_PASSWORD', this.serviceId, userId);
 
   if (!CALDAV_HOST || !CALDAV_HOME_URL || !CALDAV_USERNAME || !CALDAV_PASSWORD) {
-    throw new Error('CalDAV parameters must be setted and saved');
+    throw new ServiceNotConfiguredError('CALDAV_NOT_CONFIGURED');
   }
 
   const xhr = new this.dav.transport.Basic(
@@ -31,7 +32,7 @@ async function syncUserCalendars(userId) {
     davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
   } catch (e) {
     logger.error(e);
-    throw new Error("Can't fetch calendars");
+    throw new NotFoundError('CALDAV_FAILED_REQUEST_CALENDARS');
   }
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
@@ -66,7 +67,7 @@ async function syncUserCalendars(userId) {
         eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
       } catch (e) {
         logger.error(e);
-        throw new Error("Can't fetch changes");
+        throw new NotFoundError('CALDAV_FAILED_REQUEST_CHANGES');
       }
       await Promise.all(
         eventsToUpdate.map(async (eventToUpdate) => {
@@ -95,7 +96,7 @@ async function syncUserCalendars(userId) {
         jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
       } catch (e) {
         logger.error(e);
-        throw new Error("Can't get events data");
+        throw new NotFoundError('CALDAV_FAILED_REQUEST_EVENTS');
       }
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);

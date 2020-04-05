@@ -1,4 +1,5 @@
-import { RequestStatus } from '../../../../utils/consts';
+import { CalDAVStatus } from '../../../../utils/consts';
+import get from 'get-value';
 
 const actions = store => ({
   updateCaldavHost(state, e) {
@@ -29,7 +30,7 @@ const actions = store => ({
   },
   async getCaldavSetting(state) {
     store.setState({
-      caldavGetSettingsStatus: RequestStatus.Getting
+      caldavGetSettingsStatus: CalDAVStatus.Getting
     });
 
     let caldavHost = 'other';
@@ -66,11 +67,11 @@ const actions = store => ({
       caldavPassword = password;
 
       store.setState({
-        caldavGetSettingsStatus: RequestStatus.Success
+        caldavGetSettingsStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavGetSettingsStatus: RequestStatus.Error
+        caldavGetSettingsStatus: CalDAVStatus.Error
       });
     }
 
@@ -83,10 +84,9 @@ const actions = store => ({
   },
   async saveCaldavSettings(state) {
     store.setState({
-      caldavSaveSettingsStatus: RequestStatus.Getting,
+      caldavSaveSettingsStatus: CalDAVStatus.Getting,
       caldavCleanUpStatus: null,
-      caldavSyncStatus: null,
-      caldavErrorMessage: null
+      caldavSyncStatus: null
     });
     try {
       // save caldav host
@@ -114,18 +114,36 @@ const actions = store => ({
 
       await state.httpClient.get('/api/v1/service/caldav/config');
       store.setState({
-        caldavSaveSettingsStatus: RequestStatus.Success
+        caldavSaveSettingsStatus: CalDAVStatus.Success
       });
     } catch (e) {
-      store.setState({
-        caldavSaveSettingsStatus: RequestStatus.Error,
-        caldavErrorMessage: e.response.data.error
-      });
+      const responseMessage = get(e, 'response.data.message');
+      if (responseMessage === 'CALDAV_BAD_USERNAME_PASSWORD') {
+        store.setState({
+          caldavSaveSettingsStatus: CalDAVStatus.BadCredentialsError
+        });
+      } else if (responseMessage === 'CALDAV_BAD_URL') {
+        store.setState({
+          caldavSaveSettingsStatus: CalDAVStatus.BadUrlError
+        });
+      } else if (responseMessage === 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL') {
+        store.setState({
+          caldavSaveSettingsStatus: CalDAVStatus.RetrievePrincipalUrlError
+        });
+      } else if (responseMessage === 'CALDAV_BAD_SETTINGS_HOME_URL') {
+        store.setState({
+          caldavSaveSettingsStatus: CalDAVStatus.RetrieveHomeUrlError
+        });
+      } else {
+        store.setState({
+          caldavSaveSettingsStatus: CalDAVStatus.Error
+        });
+      }
     }
   },
   async cleanUp(state) {
     store.setState({
-      caldavCleanUpStatus: RequestStatus.Getting,
+      caldavCleanUpStatus: CalDAVStatus.Getting,
       caldavSaveSettingsStatus: null,
       caldavSyncStatus: null
     });
@@ -133,31 +151,48 @@ const actions = store => ({
     try {
       await state.httpClient.get('/api/v1/service/caldav/cleanup');
       store.setState({
-        caldavCleanUpStatus: RequestStatus.Success
+        caldavCleanUpStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavCleanUpStatus: RequestStatus.Error
+        caldavCleanUpStatus: CalDAVStatus.Error
       });
     }
   },
   async startSync(state) {
     store.setState({
-      caldavSyncStatus: RequestStatus.Getting,
+      caldavSyncStatus: CalDAVStatus.Getting,
       caldavSaveSettingsStatus: null,
-      caldavCleanUpStatus: null,
-      caldavErrorMessage: null
+      caldavCleanUpStatus: null
     });
     try {
       await state.httpClient.get('/api/v1/service/caldav/sync');
       store.setState({
-        caldavSyncStatus: RequestStatus.Success
+        caldavSyncStatus: CalDAVStatus.Success
       });
     } catch (e) {
-      store.setState({
-        caldavSyncStatus: RequestStatus.Error,
-        caldavErrorMessage: e.response.data.error
-      });
+      const responseMessage = get(e, 'response.data.message');
+      if (responseMessage === 'SERVICE_NOT_CONFIGURED') {
+        store.setState({
+          caldavSyncStatus: CalDAVStatus.BadCredentialsError
+        });
+      } else if (responseMessage === 'CALDAV_FAILED_REQUEST_CALENDARS') {
+        store.setState({
+          caldavSyncStatus: CalDAVStatus.RequestCalendarsError
+        });
+      } else if (responseMessage === 'CALDAV_FAILED_REQUEST_CHANGES') {
+        store.setState({
+          caldavSyncStatus: CalDAVStatus.RequestChangesError
+        });
+      } else if (responseMessage === 'CALDAV_FAILED_REQUEST_EVENTS') {
+        store.setState({
+          caldavSyncStatus: CalDAVStatus.RequestEventsError
+        });
+      } else {
+        store.setState({
+          caldavSyncStatus: CalDAVStatus.Error
+        });
+      }
     }
   }
 });

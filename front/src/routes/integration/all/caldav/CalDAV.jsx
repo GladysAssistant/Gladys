@@ -1,5 +1,5 @@
 import { Text, MarkupText } from 'preact-i18n';
-import { RequestStatus } from '../../../../utils/consts';
+import { CalDAVStatus } from '../../../../utils/consts';
 import cx from 'classnames';
 
 const CaldavPage = ({ children, ...props }) => (
@@ -74,42 +74,46 @@ const CaldavPage = ({ children, ...props }) => (
                           value={props.caldavPassword}
                         />
                       </div>
-                      {props.caldavSaveSettingsStatus === RequestStatus.Error && (
+                      {(props.caldavSaveSettingsStatus === CalDAVStatus.BadCredentialsError ||
+                        props.caldavSaveSettingsStatus === CalDAVStatus.BadUrlError ||
+                        props.caldavSaveSettingsStatus === CalDAVStatus.RetrievePrincipalUrlError ||
+                        props.caldavSaveSettingsStatus === CalDAVStatus.RetrieveHomeUrlError ||
+                        props.caldavSaveSettingsStatus === CalDAVStatus.Error) && (
                         <div class="alert alert-danger">
-                          <Text id="integration.caldav.configurationError" />
-                          {props.caldavErrorMessage && (
-                            <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
-                              <Text id="caldavErrorMessage">{props.caldavErrorMessage}</Text>
-                            </p>
-                          )}
+                          <Text id="integration.caldav.configurationDefaultError" />
+                          <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                            <Text id={`integration.caldav.configuration${props.caldavSaveSettingsStatus}`} />
+                          </p>
                         </div>
                       )}
-                      {props.caldavSaveSettingsStatus === RequestStatus.Success && (
+                      {props.caldavSaveSettingsStatus === CalDAVStatus.Success && (
                         <p class="alert alert-info">
                           <Text id="integration.caldav.configurationSuccess" />
                         </p>
                       )}
-                      {props.caldavCleanUpStatus === RequestStatus.Error && (
+                      {props.caldavCleanUpStatus === CalDAVStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.cleanUpError" />
                         </div>
                       )}
-                      {props.caldavCleanUpStatus === RequestStatus.Success && (
+                      {props.caldavCleanUpStatus === CalDAVStatus.Success && (
                         <p class="alert alert-info">
                           <Text id="integration.caldav.cleanUpSuccess" />
                         </p>
                       )}
-                      {props.caldavSyncStatus === RequestStatus.Error && (
+                      {(props.caldavSyncStatus === CalDAVStatus.BadCredentialsError ||
+                        props.caldavSyncStatus === CalDAVStatus.RequestCalendarsError ||
+                        props.caldavSyncStatus === CalDAVStatus.RequestChangesError ||
+                        props.caldavSyncStatus === CalDAVStatus.RequestEventsError ||
+                        props.caldavSyncStatus === CalDAVStatus.Error) && (
                         <div class="alert alert-danger">
-                          <Text id="integration.caldav.synchronizationError" />
-                          {props.caldavErrorMessage && (
-                            <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
-                              <Text id="caldavErrorMessage">{props.caldavErrorMessage}</Text>
-                            </p>
-                          )}
+                          <Text id="integration.caldav.synchronizationDefaultError" />
+                          <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                            <Text id={`integration.caldav.synchronization${props.caldavSyncStatus}`} />
+                          </p>
                         </div>
                       )}
-                      {props.caldavSyncStatus === RequestStatus.Success && (
+                      {props.caldavSyncStatus === CalDAVStatus.Success && (
                         <p class="alert alert-info">
                           <Text id="integration.caldav.synchronizationSuccess" />
                         </p>

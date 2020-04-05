@@ -99,7 +99,7 @@ describe('CalDAV config', () => {
       .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
       .returns('12345');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'All CalDAV parameters are not setted');
+    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'MISSING_PARAMETERS');
   });
 
   it('should failed to get CALDAV_PRINCIPAL_URL', async () => {
@@ -123,10 +123,7 @@ describe('CalDAV config', () => {
       })
       .returns('request1');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(
-      Error,
-      "Bad CalDAV settings, can't retrieve principal url",
-    );
+    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
   });
 
   it('should failed to get CALDAV_HOME_URL', async () => {
@@ -160,6 +157,6 @@ describe('CalDAV config', () => {
       })
       .returns('request2');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, "Bad CalDAV settings, can't retrieve home url");
+    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_HOME_URL');
   });
 });

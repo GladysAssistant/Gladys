@@ -1,3 +1,5 @@
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
 module.exports = function CalDAVController(caldavHandler) {
   /**
    * @api {get} /api/v1/service/caldav/config Check config
@@ -5,13 +7,11 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function config(req, res) {
-    try {
-      await caldavHandler.config(req.user.id);
-      await caldavHandler.cleanUp(req.user.id);
-      res.status(200).send();
-    } catch (error) {
-      res.status(500).send({ error: error.toString() });
-    }
+    await caldavHandler.config(req.user.id);
+    await caldavHandler.cleanUp(req.user.id);
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -20,12 +20,10 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function cleanup(req, res) {
-    try {
-      await caldavHandler.cleanUp(req.user.id);
-      res.status(200).send();
-    } catch (error) {
-      res.status(500).send();
-    }
+    await caldavHandler.cleanUp(req.user.id);
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -34,26 +32,24 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function sync(req, res) {
-    try {
-      await caldavHandler.syncUserCalendars(req.user.id);
-      res.status(200).send();
-    } catch (error) {
-      res.status(500).send({ error: error.toString() });
-    }
+    await caldavHandler.syncUserCalendars(req.user.id);
+    res.json({
+      success: true,
+    });
   }
 
   return {
     'get /api/v1/service/caldav/config': {
       authenticated: true,
-      controller: config,
+      controller: asyncMiddleware(config),
     },
     'get /api/v1/service/caldav/cleanup': {
       authenticated: true,
-      controller: cleanup,
+      controller: asyncMiddleware(cleanup),
     },
     'get /api/v1/service/caldav/sync': {
       authenticated: true,
-      controller: sync,
+      controller: asyncMiddleware(sync),
     },
   };
 };

@@ -1,5 +1,7 @@
 const url = require('url');
 const logger = require('../../../../utils/logger');
+const { BadParameters } = require('../../../../utils/coreErrors');
+const { Error400 } = require('../../../../utils/httpErrors');
 
 /**
  * @description Start configuration depending on host.
@@ -14,7 +16,7 @@ async function config(userId) {
   const CALDAV_PASSWORD = await this.gladys.variable.getValue('CALDAV_PASSWORD', this.serviceId, userId);
 
   if (!CALDAV_URL || !CALDAV_USERNAME || !CALDAV_PASSWORD) {
-    throw new Error('All CalDAV parameters are not setted');
+    throw new BadParameters('MISSING_PARAMETERS');
   }
   const xhr = new this.dav.transport.Basic(
     new this.dav.Credentials({
@@ -39,7 +41,15 @@ async function config(userId) {
     CALDAV_PRINCIPAL_URL = url.resolve(CALDAV_URL, currentUserPrincipal);
   } catch (e) {
     logger.error(e);
-    throw new Error("Bad CalDAV settings, can't retrieve principal url");
+    switch (e.message) {
+      case 'Bad status: 401':
+      case 'Bad status: 403':
+        throw new BadParameters('CALDAV_BAD_USERNAME_PASSWORD');
+      case 'Bad status: 404':
+        throw new BadParameters('CALDAV_BAD_URL');
+      default:
+        throw new Error400('CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
+    }
   }
 
   logger.info(`CalDAV : Principal URL found: ${CALDAV_PRINCIPAL_URL}`);
@@ -60,7 +70,7 @@ async function config(userId) {
     CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
   } catch (e) {
     logger.error(e);
-    throw new Error("Bad CalDAV settings, can't retrieve home url");
+    throw new Error400('CALDAV_BAD_SETTINGS_HOME_URL');
   }
 
   logger.info(`CalDAV : Home URL found: ${CALDAV_HOME_URL}`);
