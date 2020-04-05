@@ -1,3 +1,10 @@
+const removeSecretValue = (variable) => {
+  if (variable && variable.secret) {
+    variable.value = null;
+  }
+  return variable;
+};
+
 module.exports = (sequelize, DataTypes) => {
   const variable = sequelize.define(
     't_variable',
@@ -34,6 +41,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.TEXT,
       },
+      secret: {
+        allowNull: false,
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
+      },
     },
     {},
   );
@@ -50,6 +62,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'user',
     });
   };
+
+  // Do not load value for secret variable
+  variable.afterCreate(removeSecretValue);
+  variable.afterUpdate(removeSecretValue);
 
   return variable;
 };

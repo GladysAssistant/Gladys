@@ -82,5 +82,17 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  // Do not load value for secret params
+  device.afterFind((foundDevice) => {
+    if (foundDevice && foundDevice.params) {
+      foundDevice.params.forEach((param) => {
+        if (param.secret) {
+          param.value = null;
+        }
+      });
+    }
+    return foundDevice;
+  });
+
   return device;
 };

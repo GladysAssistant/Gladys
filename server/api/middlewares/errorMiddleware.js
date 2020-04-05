@@ -4,6 +4,7 @@ const {
   NotFoundError,
   ServiceNotConfiguredError,
   BadParameters,
+  NotAuthorizedResourceError,
 } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -35,6 +36,8 @@ module.exports = function errorMiddleware(error, req, res, next) {
     responseError = new Error409(errorToReturn);
   } else if (error instanceof BadParameters) {
     responseError = new Error400(error.message);
+  } else if (error instanceof NotAuthorizedResourceError) {
+    responseError = new Error403(error.message);
   } else if (error instanceof PasswordNotMatchingError) {
     responseError = new Error403(error.message);
   } else if (error instanceof ServiceNotConfiguredError) {

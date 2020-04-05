@@ -6,16 +6,18 @@ const db = require('../../models');
  * @param {string} value - The value of the variable.
  * @param {string} [serviceId] - The unique ID of a service, or null.
  * @param {string} [userId] - The unique ID of a user, or null.
+ * @param {boolean} [secret] - The secret indicator of the variable, default is false.
  * @returns {Promise} - Resolve with the variable.
  * @example
  * variable.setValue('API_KEY', 'XXXX', '5bbaaea4-2ad6-4f3e-9bbc-819b9d310309', 'd1d73559-a987-44eb-9453-3cbf5bcb5a2f');
  */
-async function setValue(key, value, serviceId = null, userId = null) {
+async function setValue(key, value, serviceId = null, userId = null, secret = false) {
   const variable = await db.Variable.findOne({
     where: {
       name: key,
       service_id: serviceId,
       user_id: userId,
+      secret,
     },
   });
 
@@ -26,6 +28,7 @@ async function setValue(key, value, serviceId = null, userId = null) {
       name: key,
       service_id: serviceId,
       user_id: userId,
+      secret,
     });
   }
 

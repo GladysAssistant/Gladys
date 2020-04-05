@@ -33,6 +33,12 @@ describe('GET /api/v1/service/:service_name/variable/:variable_name', () => {
         });
       });
   });
+  it('should get a secret variable by service', async () => {
+    await authenticatedRequest
+      .get('/api/v1/service/test-service/variable/SECRET_VARIABLE')
+      .expect('Content-Type', /json/)
+      .expect(403);
+  });
   it('should return 404 not found', async () => {
     await authenticatedRequest
       .get('/api/v1/service/test-service/variable/NOT_FOUND')

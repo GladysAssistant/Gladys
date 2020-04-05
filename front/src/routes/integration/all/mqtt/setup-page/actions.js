@@ -48,7 +48,8 @@ const createActions = store => {
         });
         if (state.passwordChanges) {
           await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_PASSWORD', {
-            value: state.mqttPassword
+            value: state.mqttPassword,
+            secret: true
           });
         }
         await state.httpClient.post(`/api/v1/service/mqtt/connect`);

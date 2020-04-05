@@ -5,6 +5,13 @@ class PasswordNotMatchingError extends Error {
   }
 }
 
+class NotAuthorizedResourceError extends Error {
+  constructor() {
+    super();
+    this.message = 'Resource is not public';
+  }
+}
+
 class NotFoundError extends Error {
   constructor(message) {
     super();
@@ -49,6 +56,7 @@ class AbortScene extends Error {
 
 module.exports = {
   PasswordNotMatchingError,
+  NotAuthorizedResourceError,
   NotFoundError,
   ServiceNotConfiguredError,
   BadParameters,

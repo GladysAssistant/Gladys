@@ -34,6 +34,15 @@ describe('Device', () => {
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_SECRET_PARAM',
+          value: 'secret',
+          secret: true,
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2020-02-12 07:49:07.556 +00:00',
+          updated_at: '2020-02-12 07:49:07.556 +00:00',
+        },
       ],
     });
     const device = new Device(event, {}, stateManager);
@@ -55,19 +64,36 @@ describe('Device', () => {
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_SECRET_PARAM',
+          value: 'secret_updated',
+          secret: true,
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2020-02-12 07:49:07.556 +00:00',
+          updated_at: '2020-02-12 07:49:07.556 +00:00',
+        },
       ],
     });
     expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
     expect(newDevice).to.have.property('selector', 'test-device');
     expect(newDevice).to.have.property('params');
     expect(newDevice).to.have.property('features');
-    expect(newDevice.params).to.have.lengthOf(1);
+    expect(newDevice.params).to.have.lengthOf(2);
     newDevice.params.forEach((param) => {
-      expect(param).to.have.property('value', 'UPDATED_VALUE');
+      if (param.secret) {
+        expect(param).to.have.property('value', null);
+      } else {
+        expect(param).to.have.property('value', 'UPDATED_VALUE');
+      }
     });
     expect(newDevice.features).to.deep.equal([]);
+
+    // check if secret param has been updated
+    const secretParam = await device.getParam(newDevice, 'TEST_SECRET_PARAM');
+    expect(secretParam).to.have.property('value', 'secret_updated');
   });
-  it('should update device which already exist, update a feature and a param', async () => {
+  it('should update device which already exist, update a feature and a param (keep secret value)', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager);
     const newDevice = await device.create({
@@ -101,16 +127,28 @@ describe('Device', () => {
           value: 'UPDATED_VALUE',
           device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
         },
+        {
+          name: 'TEST_SECRET_PARAM',
+        },
       ],
     });
     expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
     expect(newDevice).to.have.property('selector', 'test-device');
     expect(newDevice).to.have.property('params');
     expect(newDevice).to.have.property('features');
-    expect(newDevice.params).to.have.lengthOf(1);
+    expect(newDevice.params).to.have.lengthOf(2);
     newDevice.params.forEach((param) => {
-      expect(param).to.have.property('value', 'UPDATED_VALUE');
+      if (param.secret) {
+        expect(param).to.have.property('value', null);
+      } else {
+        expect(param).to.have.property('value', 'UPDATED_VALUE');
+      }
     });
+
+    // check if secret param has not been updated
+    const secretParam = await device.getParam(newDevice, 'TEST_SECRET_PARAM');
+    expect(secretParam).to.have.property('value', 'a_secret_value');
+
     expect(newDevice.features).to.deep.equal([
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
