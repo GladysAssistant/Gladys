@@ -1,11 +1,9 @@
 const Promise = require('bluebird');
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const { getDeviceFeature } = require('../../../../utils/device');
-const { Error500 } = require('../../../../utils/httpErrors');
-const { getDeviceParam } = require('../../../../utils/device');
+const { getDeviceFeature, getDeviceParam } = require('../../../../utils/device');
 const logger = require('../../../../utils/logger');
-const { DEVICE_FIRMWARE } = require('../utils/constants');
+const { DEVICE_FIRMWARE, EWELINK_REGION_KEY } = require('../utils/constants');
 const { parseExternalId } = require('../utils/parseExternalId');
 
 /**
@@ -19,12 +17,11 @@ async function poll(device) {
     await this.connect();
   }
 
+  const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
   const { deviceId, channel } = parseExternalId(device.external_id);
-  const connection = new this.EweLinkApi({ at: this.accessToken, region: this.region });
+  const connection = new this.EweLinkApi({ at: this.accessToken, region });
   const eWeLinkDevice = await connection.getDevice(deviceId);
-  if (eWeLinkDevice.error) {
-    throw new Error500(`EWeLink error: ${eWeLinkDevice.msg}`);
-  }
+  this.throwErrorIfNeeded(eWeLinkDevice);
   if (!eWeLinkDevice.online) {
     throw new NotFoundError('EWeLink error: Device is not currently online');
   }
@@ -39,9 +36,8 @@ async function poll(device) {
 
   if (binaryFeature) {
     const response = await connection.getDevicePowerState(deviceId, channel);
-    if (response.error) {
-      throw new Error500(`EWeLink error: ${response.msg}`);
-    }
+    // belt, suspenders ;)
+    this.throwErrorIfNeeded(response);
 
     const currentBinaryState = response.state === 'on' ? STATE.ON : STATE.OFF;
     // if the value is different from the value we have, save new state
@@ -56,9 +52,8 @@ async function poll(device) {
 
   if (powFeature) {
     const response = await connection.getDevicePowerUsage(deviceId);
-    if (response.error) {
-      throw new Error500(`EWeLink error: ${response.msg}`);
-    }
+    // belt, suspenders ;)
+    this.throwErrorIfNeeded(response);
 
     const currentPowerState = response.monthly;
     // if the value is different from the value we have, save new state
@@ -73,9 +68,8 @@ async function poll(device) {
 
   if (tempFeature || humFeature) {
     const response = await connection.getDeviceCurrentTH(deviceId);
-    if (response.error) {
-      throw new Error500(`EWeLink error: ${response.msg}`);
-    }
+    // belt, suspenders ;)
+    this.throwErrorIfNeeded(response);
 
     if (tempFeature && response.temperature) {
       const currentTemperature = response.temperature;
@@ -103,9 +97,8 @@ async function poll(device) {
 
   if (firmwareParam) {
     const response = await connection.getFirmwareVersion(deviceId);
-    if (response.error) {
-      throw new Error500(`EWeLink error: ${response.msg}`);
-    }
+    // belt, suspenders ;)
+    this.throwErrorIfNeeded(response);
 
     const currentVersion = response.fwVersion;
     // if the value is different from the value we have, save new param

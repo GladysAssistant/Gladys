@@ -1,53 +1,22 @@
-const Promise = require('bluebird');
-const chai = require('chai');
+const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const {
+  serviceId,
+  event,
+  variableNotConfigured,
+  variableOk,
+  variableOkNoRegion,
+  variableOkFalseRegion,
+  variableNok,
+} = require('../../mocks/consts.test');
 const EweLinkApi = require('../../mocks/ewelink-api.mock.test');
 
-const { expect } = chai;
-const { assert, fake } = sinon;
+const { assert } = sinon;
+
 const EwelinkService = proxyquire('../../../../../services/ewelink/index', {
   'ewelink-api': EweLinkApi,
 });
-
-const variable = {
-  getValue: (valueId, serviceId) => {
-    if (valueId === 'EWELINK_EMAIL') {
-      return Promise.resolve('email@valid.ok');
-    }
-    if (valueId === 'EWELINK_PASSWORD') {
-      return Promise.resolve('password');
-    }
-    return Promise.resolve(undefined);
-  },
-};
-const event = { emit: fake.returns(null) };
-const gladys = {
-  event,
-  variable,
-};
-const gladysNotConfigured = {
-  event,
-  variable: {
-    getValue: (valueId) => {
-      return Promise.resolve(undefined);
-    },
-  },
-};
-const gladysUnvalid = {
-  event,
-  variable: {
-    getValue: (valueId) => {
-      if (valueId === 'EWELINK_EMAIL') {
-        return Promise.resolve('email@valid.ko');
-      }
-      if (valueId === 'EWELINK_PASSWORD') {
-        return Promise.resolve('');
-      }
-      return Promise.resolve(undefined);
-    },
-  },
-};
 
 describe('EwelinkHandler connect', () => {
   beforeEach(() => {
@@ -55,27 +24,71 @@ describe('EwelinkHandler connect', () => {
   });
 
   it('should connect', async () => {
-    const ewelinkService = EwelinkService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    await ewelinkService.device.connect();
+    const gladys = { event, variable: variableOk };
+    const eweLinkService = EwelinkService(gladys, serviceId);
+    await eweLinkService.device.connect();
 
-    assert.callCount(gladys.event.emit, 1);
+    assert.notCalled(gladys.variable.setValue);
+    assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', { type: 'ewelink.connected' });
 
-    expect(ewelinkService.device.configured).to.equal(true);
-    expect(ewelinkService.device.connected).to.equal(true);
-    expect(ewelinkService.device.accessToken).to.equal('validAccessToken');
-    expect(ewelinkService.device.apiKey).to.equal('validApiKey');
-    expect(ewelinkService.device.region).to.equal('eu');
+    expect(eweLinkService.device.configured).to.equal(true);
+    expect(eweLinkService.device.connected).to.equal(true);
+    expect(eweLinkService.device.accessToken).to.equal('validAccessToken');
+    expect(eweLinkService.device.apiKey).to.equal('validApiKey');
   });
-  it('should return not configured error', () => {
-    const ewelinkService = EwelinkService(gladysNotConfigured, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    const promise = ewelinkService.device.connect();
-
-    chai.assert.isRejected(promise, 'EWeLink is not configured.');
+  it('should return not configured error', async () => {
+    const gladys = { event, variable: variableNotConfigured };
+    const eweLinkService = EwelinkService(gladys, serviceId);
+    try {
+      await eweLinkService.device.connect();
+      assert.fail();
+    } catch (error) {
+      assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', {
+        type: 'ewelink.error',
+        payload: 'Service is not configured',
+      });
+      expect(error.message).to.equal('EWeLink error: Service is not configured');
+    }
   });
-  it('should return connect error', () => {
-    const ewelinkService = EwelinkService(gladysUnvalid, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    const promise = ewelinkService.device.connect();
+  it('should get region and connect', async () => {
+    const gladys = { event, variable: variableOkNoRegion };
+    const eweLinkService = EwelinkService(gladys, serviceId);
+    await eweLinkService.device.connect();
 
-    chai.assert.isRejected(promise, 'EWeLink connect error: ');
+    assert.calledWithExactly(gladys.variable.setValue, 'EWELINK_REGION', 'eu', serviceId);
+    assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', { type: 'ewelink.connected' });
+
+    expect(eweLinkService.device.configured).to.equal(true);
+    expect(eweLinkService.device.connected).to.equal(true);
+    expect(eweLinkService.device.accessToken).to.equal('validAccessToken');
+    expect(eweLinkService.device.apiKey).to.equal('validApiKey');
+  });
+  it('should get right region and connect', async () => {
+    const gladys = { event, variable: variableOkFalseRegion };
+    const eweLinkService = EwelinkService(gladys, serviceId);
+    await eweLinkService.device.connect();
+
+    assert.calledWithExactly(gladys.variable.setValue, 'EWELINK_REGION', 'eu', serviceId);
+    assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', { type: 'ewelink.connected' });
+
+    expect(eweLinkService.device.configured).to.equal(true);
+    expect(eweLinkService.device.connected).to.equal(true);
+    expect(eweLinkService.device.accessToken).to.equal('validAccessToken');
+    expect(eweLinkService.device.apiKey).to.equal('validApiKey');
+  });
+  it('should throw an error and emit a message when authentication fail', async () => {
+    const gladys = { event, variable: variableNok };
+    const eweLinkService = EwelinkService(gladys, serviceId);
+    try {
+      await eweLinkService.device.connect();
+      assert.fail();
+    } catch (error) {
+      assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', {
+        type: 'ewelink.error',
+        payload: 'Authentication error',
+      });
+      expect(error.status).to.equal(401);
+      expect(error.message).to.equal('EWeLink error: Authentication error');
+    }
   });
 });

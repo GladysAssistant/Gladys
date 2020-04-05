@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
+const { DEVICE_EXTERNAL_ID_BASE, EWELINK_REGION_KEY } = require('../utils/constants');
 const models = require('../models');
-const { DEVICE_EXTERNAL_ID_BASE } = require('../utils/constants');
 
 /**
  * @description Retrieve eWelink devices from cloud.
@@ -14,11 +14,10 @@ async function discover() {
     await this.connect();
   }
 
-  const connection = new this.EweLinkApi({ at: this.accessToken, region: this.region });
+  const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
+  const connection = new this.EweLinkApi({ at: this.accessToken, region });
   const discoveredDevices = await connection.getDevices();
-  if (discoveredDevices.error) {
-    throw new Error(`EWeLink getDevices error: ${discoveredDevices.msg}`);
-  }
+  this.throwErrorIfNeeded(discoveredDevices, true);
 
   const unknownDevices = [];
 
@@ -34,9 +33,8 @@ async function discover() {
       if (Object.keys(models).includes(uiid)) {
         // ...if the model is supported, ...
         const channels = await connection.getDeviceChannelCount(discoveredDevice.deviceid);
-        if (channels.error) {
-          throw new Error(`EWeLink getDeviceChannelCount error: ${channels.msg}`);
-        }
+        // belt, suspenders ;)
+        this.throwErrorIfNeeded(channels, true);
 
         // ...for each channel of the device...
         for (let channel = 1; channel <= channels.switchesAmount; channel += 1) {

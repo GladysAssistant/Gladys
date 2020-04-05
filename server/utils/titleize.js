@@ -8,7 +8,7 @@
 function titleize(str) {
   const newStr = !str ? '' : str;
 
-  return newStr.toLowerCase().replace(/(?:^|\s|-)\S/g, function(c) {
+  return newStr.toLowerCase().replace(/(?:^|\s|-)\S/g, (c) => {
     return c.toUpperCase();
   });
 }

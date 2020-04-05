@@ -12,7 +12,7 @@ class EwelinkApi {
   }
 
   getCredentials() {
-    if (this.email === 'email@valid.ok') {
+    if (this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') {
       return Promise.resolve({
         at: 'validAccessToken',
         user: { apikey: 'validApiKey' },
@@ -22,22 +22,32 @@ class EwelinkApi {
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
+  getRegion() {
+    if (this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') {
+      return Promise.resolve({
+        email: this.email,
+        region: 'eu',
+      });
+    }
+    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+  }
+
   getDevices() {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve([]);
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
   getDevice(deviceId) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
   getDeviceChannelCount(deviceId) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
@@ -51,21 +61,21 @@ class EwelinkApi {
   }
 
   getDevicePowerState(deviceId, channel = 1) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
   async getDevicePowerUsage(deviceId) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
   async getDeviceCurrentTH(deviceId, type = '') {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
@@ -80,14 +90,14 @@ class EwelinkApi {
   }
 
   getFirmwareVersion(deviceId) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
 
   checkDeviceUpdate(deviceId) {
-    if (this.email === 'email@valid.ok' || this.at === 'validAccessToken') {
+    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });

@@ -1,6 +1,7 @@
-const { assert } = require('chai');
-const { fake } = require('sinon');
+const { expect } = require('chai');
+const { assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const { serviceId, event, variableOk } = require('../../mocks/consts.test');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const Gladys2Ch1Device = require('../../mocks/Gladys-2ch1.json');
@@ -11,24 +12,18 @@ const EwelinkService = proxyquire('../../../../../services/ewelink/index', {
 });
 
 const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-  variable: {
-    getValue: (valueId, serviceId) => {
-      if (valueId === 'EWELINK_EMAIL') {
-        return Promise.resolve('email@valid.ok');
-      }
-      if (valueId === 'EWELINK_PASSWORD') {
-        return Promise.resolve('password');
-      }
-      return Promise.resolve(undefined);
-    },
-  },
+  event,
+  variable: variableOk,
 };
 
 describe('EweLinkHandler setValue', () => {
-  const eweLinkService = EwelinkService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+  const eweLinkService = EwelinkService(gladys, serviceId);
+
+  beforeEach(() => {
+    eweLinkService.device.connected = false;
+    eweLinkService.device.accessToken = '';
+    eweLinkService.device.apiKey = '';
+  });
 
   it('should set binary value of the device with 1 feature', async () => {
     await eweLinkService.device.setValue(Gladys2Ch1Device, { category: 'switch', type: 'binary' }, 1);
@@ -39,8 +34,23 @@ describe('EweLinkHandler setValue', () => {
   it('should do nothing because of the feature type is not handled yet', async () => {
     await eweLinkService.device.setValue(GladysPowDevice, { category: 'switch', type: 'not_handled' }, 1);
   });
-  it('should return EweLink device not found error', () => {
-    const promise = eweLinkService.device.setValue(GladysOfflineDevice, { category: 'switch', type: 'binary' }, 1);
-    assert.isRejected(promise, 'EWeLink error: Device is not currently online');
+  it('should throw an error when device is offline', async () => {
+    try {
+      await eweLinkService.device.setValue(GladysOfflineDevice, { category: 'switch', type: 'binary' }, 1);
+      assert.fail();
+    } catch (error) {
+      expect(error.message).to.equal('EWeLink error: Device is not currently online');
+    }
+  });
+  it('should throw an error when AccessToken is no more valid', async () => {
+    eweLinkService.device.connected = true;
+    eweLinkService.device.accessToken = 'NoMoreValidAccessToken';
+    try {
+      await eweLinkService.device.setValue(Gladys2Ch1Device, { category: 'switch', type: 'binary' }, 1);
+      assert.fail();
+    } catch (error) {
+      expect(error.status).to.equal(401);
+      expect(error.message).to.equal('EWeLink error: Authentication error');
+    }
   });
 });

@@ -1,8 +1,7 @@
-const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const { Error500 } = require('../../../../utils/httpErrors');
 const logger = require('../../../../utils/logger');
-const { STATE } = require('../../../../utils/constants');
+const { EWELINK_REGION_KEY } = require('../utils/constants');
 const { parseExternalId } = require('../utils/parseExternalId');
 
 /**
@@ -18,13 +17,13 @@ async function setValue(device, deviceFeature, value) {
     await this.connect();
   }
 
+  const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
+  const connection = new this.EweLinkApi({ at: this.accessToken, apiKey: this.apiKey, region });
+
   const { deviceId, channel } = parseExternalId(device.external_id);
-  const connection = new this.EweLinkApi({ at: this.accessToken, apiKey: this.apiKey, region: this.region });
-  const eWeLinkDevice = await connection.getDevice(deviceId);
-  if (eWeLinkDevice.error) {
-    throw new Error500(`EWeLink error: ${eWeLinkDevice.msg}`);
-  }
-  if (!eWeLinkDevice.online) {
+  const eweLinkDevice = await connection.getDevice(deviceId);
+  this.throwErrorIfNeeded(eweLinkDevice);
+  if (!eweLinkDevice.online) {
     throw new NotFoundError('EWeLink error: Device is not currently online');
   }
 
@@ -34,12 +33,10 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
       state = value === STATE.ON ? 'on' : 'off';
       response = await connection.setDevicePowerState(deviceId, state, channel);
-      if (response.error) {
-        throw new Error500(`EWeLink error: ${response.msg}`);
-      }
+      this.throwErrorIfNeeded(response);
       break;
     default:
-      logger.warn(`Feature type "${deviceFeature.type}" not handled yet !`);
+      logger.warn(`EWeLink warning: Feature type "${deviceFeature.type}" not handled yet!`);
       break;
   }
 }
