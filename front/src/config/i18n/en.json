@@ -915,6 +915,7 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
+    "description": " Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save",
