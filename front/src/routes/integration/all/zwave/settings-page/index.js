@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import SettingsTab from './SettingsTab';
-import integrationConfig from '../../../../../config/integrations';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -41,7 +40,7 @@ class ZwaveSettingsPage extends Component {
       props.connectZwaveStatus === RequestStatus.Getting;
 
     return (
-      <ZwavePage integration={integrationConfig[props.user.language].zwave}>
+      <ZwavePage>
         <SettingsTab {...props} loading={loading} />
       </ZwavePage>
     );

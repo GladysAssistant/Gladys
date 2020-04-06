@@ -7,14 +7,23 @@ import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils
 
 class ZwaveNode extends Component {
   createDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: undefined });
     try {
       await this.props.createDevice(this.props.node);
       this.setState({ deviceCreated: true });
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      if (status === 409) {
+        this.setState({ error: RequestStatus.ConflictError });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
+  };
+
+  editNodeName = e => {
+    this.props.editNodeName(this.props.nodeIndex, e.target.value);
   };
 
   render(props, { loading, error, deviceCreated }) {
@@ -36,9 +45,14 @@ class ZwaveNode extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {error && (
+              {error === RequestStatus.Error && (
                 <div class="alert alert-danger">
                   <Text id="integration.zwave.setup.createDeviceError" />
+                </div>
+              )}
+              {error === RequestStatus.ConflictError && (
+                <div class="alert alert-danger">
+                  <Text id="integration.zwave.setup.conflictError" />
                 </div>
               )}
               {deviceCreated && (
@@ -47,6 +61,12 @@ class ZwaveNode extends Component {
                 </div>
               )}
               <div class="card-body">
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.zwave.setup.name" />
+                  </label>
+                  <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
+                </div>
                 <div class="form-group">
                   <label>
                     <Text id="integration.zwave.setup.type" />

@@ -8,9 +8,15 @@
             "mindimlevel": 2000,
             "maxlumen": 800,
             "colorgamuttype": "other",
-            "ct": { "min": 0, "max": 65535 }
+            "ct": {
+              "min": 0,
+              "max": 65535
+            }
           },
-          "streaming": { "renderer": false, "proxy": false }
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         }
       },
       "state": {
@@ -26,7 +32,10 @@
         "mode": "homeautomation",
         "reachable": false
       },
-      "swupdate": { "state": "transferring", "lastinstall": null },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": null
+      },
       "type": "Extended color light",
       "name": "Hue color lamp 1",
       "modelid": "LCT007",
@@ -292,9 +301,15 @@
             "maxlumen": 540,
             "colorgamuttype": "C",
             "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
-            "ct": { "min": 153, "max": 500 }
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
           },
-          "streaming": { "renderer": true, "proxy": true }
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
         },
         "config": {
           "archetype": "hueplay",
@@ -303,7 +318,10 @@
           "startup": {
             "mode": "custom",
             "configured": true,
-            "customsettings": { "bri": 254, "xy": [0.309, 0.3276] }
+            "customsettings": {
+              "bri": 254,
+              "xy": [0.309, 0.3276]
+            }
           }
         },
         "uniqueid": "unique-id",
@@ -346,9 +364,15 @@
             "maxlumen": 806,
             "colorgamuttype": "C",
             "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
-            "ct": { "min": 153, "max": 500 }
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
           },
-          "streaming": { "renderer": true, "proxy": true }
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
         },
         "config": {
           "archetype": "sultanbulb",
@@ -357,7 +381,10 @@
           "startup": {
             "mode": "custom",
             "configured": true,
-            "customsettings": { "bri": 254, "ct": 301 }
+            "customsettings": {
+              "bri": 254,
+              "ct": 301
+            }
           }
         },
         "uniqueid": "unique-id",
@@ -389,14 +416,23 @@
       "_rawData": {
         "capabilities": {
           "certified": true,
-          "control": { "mindimlevel": 2000, "maxlumen": 806 },
-          "streaming": { "renderer": false, "proxy": false }
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 806
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "classicbulb",
           "function": "functional",
           "direction": "omnidirectional",
-          "startup": { "mode": "safety", "configured": true }
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
         },
         "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
@@ -426,14 +462,23 @@
       "_rawData": {
         "capabilities": {
           "certified": true,
-          "control": { "mindimlevel": 2000, "maxlumen": 806 },
-          "streaming": { "renderer": false, "proxy": false }
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 806
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "classicbulb",
           "function": "functional",
           "direction": "omnidirectional",
-          "startup": { "mode": "safety", "configured": true }
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
         },
         "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
@@ -468,15 +513,24 @@
           "control": {
             "mindimlevel": 1000,
             "maxlumen": 806,
-            "ct": { "min": 153, "max": 454 }
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
           },
-          "streaming": { "renderer": false, "proxy": false }
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "sultanbulb",
           "function": "functional",
           "direction": "omnidirectional",
-          "startup": { "mode": "powerfail", "configured": true }
+          "startup": {
+            "mode": "powerfail",
+            "configured": true
+          }
         },
         "uniqueid": "unique-id",
         "swversion": "version"
@@ -516,15 +570,24 @@
             "maxlumen": 806,
             "colorgamuttype": "C",
             "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
-            "ct": { "min": 153, "max": 500 }
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
           },
-          "streaming": { "renderer": true, "proxy": true }
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
         },
         "config": {
           "archetype": "sultanbulb",
           "function": "mixed",
           "direction": "omnidirectional",
-          "startup": { "mode": "powerfail", "configured": true }
+          "startup": {
+            "mode": "powerfail",
+            "configured": true
+          }
         },
         "uniqueid": "unique-id",
         "swversion": "1.46.13_r26312",
@@ -549,7 +612,10 @@
         "mode": "homeautomation",
         "reachable": false
       },
-      "swupdate": { "state": "notupdatable", "lastinstall": null },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": null
+      },
       "type": "Extended color light",
       "name": "Led Strip bureau",
       "modelid": "GL-C-008",
@@ -560,9 +626,15 @@
           "certified": false,
           "control": {
             "colorgamuttype": "other",
-            "ct": { "min": 0, "max": 65535 }
+            "ct": {
+              "min": 0,
+              "max": 65535
+            }
           },
-          "streaming": { "renderer": false, "proxy": false }
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "classicbulb",
@@ -583,7 +655,10 @@
         "mode": "homeautomation",
         "reachable": true
       },
-      "swupdate": { "state": "notupdatable", "lastinstall": null },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": null
+      },
       "type": "On/Off plug-in unit",
       "name": "Guirlande",
       "modelid": "SP 120",
@@ -593,7 +668,10 @@
         "capabilities": {
           "certified": false,
           "control": {},
-          "streaming": { "renderer": false, "proxy": false }
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "huelightstrip",
@@ -637,13 +715,19 @@
             "colorgamuttype": "A",
             "colorgamut": [[0.704, 0.296], [0.2151, 0.7106], [0.138, 0.08]]
           },
-          "streaming": { "renderer": true, "proxy": false }
+          "streaming": {
+            "renderer": true,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "hueiris",
           "function": "decorative",
           "direction": "upwards",
-          "startup": { "mode": "safety", "configured": true }
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
         },
         "uniqueid": "00:17:88:01:00:0d:b3:60-0b",
         "swversion": "5.127.1.26581"
@@ -671,7 +755,10 @@
         "capabilities": {
           "certified": false,
           "control": {},
-          "streaming": { "renderer": false, "proxy": false }
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "christmastree",
@@ -704,14 +791,23 @@
       "_rawData": {
         "capabilities": {
           "certified": true,
-          "control": { "mindimlevel": 2000, "maxlumen": 800 },
-          "streaming": { "renderer": false, "proxy": false }
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 800
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
         },
         "config": {
           "archetype": "pendantround",
           "function": "functional",
           "direction": "omnidirectional",
-          "startup": { "mode": "safety", "configured": true }
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
         },
         "uniqueid": "00:17:88:01:10:40:cb:71-0b",
         "swversion": "5.127.1.26420"
@@ -870,11 +966,11 @@
         "bri": 86,
         "alert": "select",
         "mode": "homeautomation",
-        "reachable": false
+        "reachable": true
       },
       "swupdate": {
         "state": "notupdatable",
-        "lastinstall": "2019-07-13T18:43:10"
+        "lastinstall": null
       },
       "type": "Dimmable light",
       "name": "E14 1 sdb",
@@ -900,6 +996,103 @@
       },
       "_id": 21,
       "id": 21
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 80,
+        "hue": 25951,
+        "sat": 254,
+        "effect": "none",
+        "xy": [0.2143, 0.7047],
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": null
+      },
+      "type": "Color light",
+      "name": "LivingColors",
+      "modelid": "LLC001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "LivingColors",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "colorgamuttype": "A",
+            "colorgamut": [[0.704, 0.296], [0.2151, 0.7106], [0.138, 0.08]]
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "floorshade",
+          "function": "decorative",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:17:88:01:00:06:b9:02-0b",
+        "swversion": "2.0.0.5206"
+      },
+      "_id": 22,
+      "id": 22
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 144,
+        "ct": 443,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-02T21:43:51"
+      },
+      "type": "Color temperature light",
+      "name": "spot bibliotheque 1",
+      "modelid": "LTW013",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue ambiance spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 1000,
+            "maxlumen": 250,
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "functional",
+          "direction": "downwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:02:31:00:d7-0b",
+        "swversion": "1.50.2_r30933",
+        "swconfigid": "FBD2BF7E",
+        "productid": "Philips-LTW013-1-GU10CTv1"
+      },
+      "_id": 23,
+      "id": 23
     }
   ]
 }

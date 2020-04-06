@@ -61,7 +61,12 @@ const NodeTab = ({ children, ...props }) => {
               {props.zwaveNodes &&
                 !get(props, 'zwaveStatus.scanInProgress') &&
                 props.zwaveNodes.map((zwaveNode, index) => (
-                  <Node node={zwaveNode} nodeIndex={index} createDevice={props.createDevice} />
+                  <Node
+                    node={zwaveNode}
+                    nodeIndex={index}
+                    createDevice={props.createDevice}
+                    editNodeName={props.editNodeName}
+                  />
                 ))}
             </div>
           </div>

@@ -88,6 +88,9 @@ function Gladys(params = {}) {
     variable,
     weather,
     start: async () => {
+      // Execute DB migrations
+      await db.umzug.up();
+
       if (!params.disableBrainLoading) {
         await brain.load();
       }
