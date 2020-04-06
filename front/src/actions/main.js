@@ -58,6 +58,8 @@ function createActions(store) {
           route('/login');
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
+        } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
+          route('/link-gateway-user');
         } else {
           console.log(e);
         }
