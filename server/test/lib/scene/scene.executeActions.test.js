@@ -30,25 +30,6 @@ describe('scene.executeActions', () => {
     );
     assert.calledOnce(device.setValue);
   });
-  it('should execute light turn off', async () => {
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(device.setValue);
-  });
   it('should execute switch turn on', async () => {
     const device = {
       setValue: fake.resolves(null),
@@ -60,25 +41,6 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.SWITCH.TURN_ON,
-            devices: ['switch-1'],
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(device.setValue);
-  });
-  it('should execute switch turn off', async () => {
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.SWITCH.TURN_OFF,
             devices: ['switch-1'],
           },
         ],
@@ -197,7 +159,7 @@ describe('scene.executeActions', () => {
         ],
         [
           {
-            type: ACTIONS.LIGHT.TURN_OFF,
+            type: ACTIONS.LIGHT.TURN_ON,
             devices: ['light-1'],
           },
         ],
@@ -231,26 +193,6 @@ describe('scene.executeActions', () => {
           {
             type: 'THISDOESNOTEXIST',
             device: 'light-1',
-          },
-        ],
-      ],
-      {},
-    );
-    return chaiAssert.isRejected(promise, 'Action type "THISDOESNOTEXIST" does not exist.');
-  });
-  it('should throw error, action type does not exist', async () => {
-    const switchs = {
-      turnOn: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', switchs);
-    const promise = executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: 'THISDOESNOTEXIST',
-            device: 'switch-1',
           },
         ],
       ],
@@ -297,7 +239,7 @@ describe('scene.executeActions', () => {
       11,
     );
   });
-  it('should execute action device.setValue for light', async () => {
+  it('should execute action device.setValue', async () => {
     const example = {
       stop: fake.resolves(null),
     };
@@ -348,57 +290,6 @@ describe('scene.executeActions', () => {
       1,
     );
   });
-  it('should execute action device.setValue for switch', async () => {
-    const example = {
-      stop: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('service', 'example', example);
-    stateManager.setState('device', 'my-device', {
-      id: 'device-id',
-      features: [
-        {
-          category: 'switch',
-          type: 'binary',
-        },
-      ],
-    });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            device: 'my-device',
-            feature_category: 'switch',
-            feature_type: 'binary',
-            value: 1,
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledWith(
-      device.setValue,
-      {
-        id: 'device-id',
-        features: [
-          {
-            category: 'switch',
-            type: 'binary',
-          },
-        ],
-      },
-      {
-        category: 'switch',
-        type: 'binary',
-      },
-      1,
-    );
-  });
   it('should execute action device.getValue', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
@@ -423,31 +314,6 @@ describe('scene.executeActions', () => {
       scope,
     );
     expect(scope).to.deep.equal({ '0.0.last_value': 15 });
-  });
-  it('should execute action device.getValue for switch', async () => {
-    const stateManager = new StateManager(event);
-    stateManager.setState('deviceFeature', 'my-device-feature', {
-      category: 'switch',
-      type: 'binary',
-      last_value: 0,
-    });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const scope = {};
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.DEVICE.GET_VALUE,
-            device_feature: 'my-device-feature',
-          },
-        ],
-      ],
-      scope,
-    );
-    expect(scope).to.deep.equal({ '0.0.last_value': 0 });
   });
   it('should abort scene, condition is not verified', async () => {
     const stateManager = new StateManager(event);
