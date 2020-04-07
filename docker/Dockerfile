@@ -11,24 +11,27 @@ COPY qemu-* /usr/bin/
 # System dependencies
 RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip
 
-RUN mkdir /src
-WORKDIR /src
-ADD . /src
-COPY ./static /src/server/static
-WORKDIR /src/server
+WORKDIR /tmp
 
+# Install OZW in a dedicated RUN to benefit from Docker cache on local dev'
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python libffi-dev linux-headers git udev coreutils \
     # Install OZW 1.6 - Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
-    && cd /tmp \
     && git clone https://github.com/OpenZWave/open-zwave.git \
     && cd open-zwave \
     && git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 \
     && make \
     && make install \
-    && cd /src/server \
-    && rm -rf /tmp/open-zwave \
-    # Install Gladys
-    && npm install --unsafe-perm --production \
+    && cd /tmp \
+    && rm -rf /tmp/open-zwave
+
+
+# Install Gladys
+RUN mkdir /src
+WORKDIR /src
+ADD . /src
+COPY ./static /src/server/static
+WORKDIR /src/server
+RUN npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
 
