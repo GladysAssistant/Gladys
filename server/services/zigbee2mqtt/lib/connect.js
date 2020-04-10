@@ -16,9 +16,14 @@ function connect(driverPath) {
     logger.info(`Zigbee2mqtt USB dongle not attached`); 
     this.usbConfigured = false; 
   }
+
+  //= =============================================
+  // Pour simuler dongle OK
+  // this.usbConfigured = true;
+
   // Loads MQTT service
   logger.log('starting MQTT service for Zigbee2mqtt');
-  this.mqttClient = this.mqttLibrary.connect('mqtt://mqtt-broker', {
+  this.mqttClient = this.mqttLibrary.connect('mqtt://192.168.64.131:1883', {
     username: '',
     password: '',
   });
