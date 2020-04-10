@@ -20,6 +20,7 @@ const Scheduler = require('./scheduler');
 const StateManager = require('./state');
 const Scene = require('./scene');
 const System = require('./system');
+const Docker = require('./docker');
 const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
@@ -61,6 +62,7 @@ function Gladys(params = {}) {
   const scene = new Scene(stateManager, event, device, message);
   const scheduler = new Scheduler(event);
   const system = new System(db.sequelize, event);
+  const docker = new Docker();
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user);
 
@@ -85,6 +87,7 @@ function Gladys(params = {}) {
     room,
     stateManager,
     system,
+    docker,
     variable,
     weather,
     start: async () => {
@@ -115,6 +118,7 @@ function Gladys(params = {}) {
       }
       gateway.init();
       system.init();
+      docker.init();
     },
   };
 

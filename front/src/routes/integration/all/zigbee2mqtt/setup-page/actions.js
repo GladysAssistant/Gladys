@@ -22,10 +22,10 @@ const createActions = store => {
           container.created_at_formatted = dayjs(container.created_at * 1000)
             .locale(state.user.language)
             .fromNow();
-          if (container.name === 'zigbee2mqtt') {
+          if (container.name === '/zigbee2mqtt') {
             z2mContainerExists = true;
           }
-          if (container.name === 'mqtt4z2m') {
+          if (container.name === '/mqtt4z2m') {
             mqtt4z2mContainerExists = true;
           }
         });

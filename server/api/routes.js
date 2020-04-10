@@ -15,6 +15,7 @@ const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
+const DockerController = require('./controllers/docker.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 
@@ -44,6 +45,7 @@ function getRoutes(gladys) {
   const serviceController = ServiceController(gladys);
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
+  const dockerController = DockerController(gladys);
   const weatherController = WeatherController(gladys);
 
   const routes = {};
@@ -438,6 +440,19 @@ function getRoutes(gladys) {
     'get /api/v1/system/upgrade/download/status': {
       authenticated: true,
       controller: systemController.getUpgradeDownloadStatus,
+    },
+    // docker
+    'get /api/v1/docker/container/list': {
+      authenticated: true,
+      controller: dockerController.getContainers,
+    },
+    'get /api/v1/docker/container/:container_name/start': {
+      authenticated: true,
+      controller: dockerController.getContainers,
+    },
+    'get /api/v1/docker/container/:container_name/stop': {
+      authenticated: true,
+      controller: dockerController.getContainers,
     },
     // user
     'post /api/v1/user': {

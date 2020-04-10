@@ -6,7 +6,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 class SetupTab extends Component {
   toggle = e => {
     let checked;
-    console.log(this.props);
+    console.log("Setup props : ", this.props);
 
     if (this.props.zigbee2mqttContainerStatus !== RequestStatus.Getting && this.props.dockerContainers) {
       checked = !this.checked;
