@@ -245,7 +245,7 @@ function message(msgRF) {
           });
         }
 
-        if (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true) {
+        if ( msg.cmd !== undefined && (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true)) {
           newDevice.selector = `rflink:milight:${msg.id}:${msg.switch}`;
           newDevice.external_id = `rflink:milight:${msg.id}:${msg.switch}`;
           newDevice.features.push(

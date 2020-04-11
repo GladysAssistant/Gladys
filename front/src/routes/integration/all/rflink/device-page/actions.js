@@ -77,6 +77,9 @@ function createActions(store) {
         store.setState({
           getRflinkCreateDeviceStatus: RequestStatus.Success
         });
+        await state.httpClient.post('/api/v1/service/rflink/remove/', {
+          external_id: device.selector
+        });
         actions.getRflinkDevices(store.getState());
       } catch (e) {
         store.setState({
@@ -102,9 +105,6 @@ function createActions(store) {
     },
     async deleteDevice(state, device, index) {
       await state.httpClient.delete('/api/v1/device/' + device.selector);
-      await state.httpClient.post('/api/v1/service/rflink/remove/', {
-        external_id: device.selector
-      });
       const newState = update(state, {
         rflinkDevices: {
           $splice: [[index, 1]]

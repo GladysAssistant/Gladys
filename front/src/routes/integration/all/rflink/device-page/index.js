@@ -20,7 +20,7 @@ class RflinkDevicePage extends Component {
 
   render(props, {}) {
     return (
-      <RflinkPage integration={integrationConfig[props.user.language].rflink}>
+      <RflinkPage>
         <DevicePage {...props} />
         <FoundDevices {...props} />
       </RflinkPage>

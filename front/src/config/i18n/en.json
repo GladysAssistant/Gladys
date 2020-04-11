@@ -226,6 +226,7 @@
       },
       "device": {
         "title": "Devices in Gladys",
+        "devicesInfo" : "Cheap 433mhz devices are detected by default as sensors , you can change it by editing a device 's read only property",
         "deviceOnNetworkTitle": "Devices detected by the gateway",
         "connectButton": "Connect/Reconnect",
         "search": "Search devices",
@@ -233,6 +234,7 @@
         "noDevices": "No devices , you can add devices with the new device tab",
         "scanButton": "Scan",
         "noDevicesFound": "No devices found . Make sure you have a connected Rflink Gateway in the settings Tab",
+        "found": "All detected devices will appear here",
         "nameLabel": "Name",
         "featuresLabel": "Features",
         "noFeatures": "No features",

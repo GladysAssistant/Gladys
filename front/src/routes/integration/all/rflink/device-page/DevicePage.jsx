@@ -47,6 +47,9 @@ const NodeTab = ({ children, ...props }) => (
           active: props.getRflinkDevicesStatus === RequestStatus.Getting
         })}
       >
+        <div class="alert alert-dark">
+              <Text id="integration.rflink.device.devicesInfo" />
+        </div>
         <div class="loader" />
         <div class="dimmer-content">
           {props.rflinkDevices && props.rflinkDevices.length === 0 && (

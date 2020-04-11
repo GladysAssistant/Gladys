@@ -40,7 +40,7 @@ class RflinkSettingsPage extends Component {
       props.connectRflinkStatus === RequestStatus.Getting;
 
     return (
-      <RflinkPage integration={integrationConfig[props.user.language].rflink}>
+      <RflinkPage>
         <SettingsTab {...props} loading={loading} />
       </RflinkPage>
     );
