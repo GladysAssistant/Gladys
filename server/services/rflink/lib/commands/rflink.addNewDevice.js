@@ -7,9 +7,10 @@ const logger = require('../../../../utils/logger');
  * Rflink.addDevice(device);
  */
 function addNewDevice(device) {
-  logger.log(`ajout du device : ${device}`);
 
-  this.newDevices.push(device);
+    logger.log(`ajout du device : ${device}`);
+    this.newDevices.push(device);
+
 }
 
 module.exports = { addNewDevice };

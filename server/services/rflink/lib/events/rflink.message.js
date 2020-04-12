@@ -13,13 +13,26 @@ const {
  * rflink.message(msg);
  */
 function message(msgRF) {
+
   this.lastCommand = msgRF;
   const msg = RFtoObj(msgRF);
   let newDevice;
+  let doesntExistYet = true;
 
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
-      const doesntExistYet = this.newDevices[msg.id] === undefined;
+
+      this.newDevices.forEach(d => {
+        logger.log(`d.external_id: ${d.external_id}`);
+        logger.log(`msg.id: ${msg.id}`);
+        if (`rflink:${msg.id}:${msg.switch}` === d.external_id) {
+           doesntExistYet = false;
+        }
+        
+      });
+
+
+
 
       if (doesntExistYet === true) {
         const model = `${msg.protocol.charAt(0).toUpperCase()}${msg.protocol.toLowerCase().slice(1)}`;
