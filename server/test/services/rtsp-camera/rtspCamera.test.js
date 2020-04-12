@@ -23,12 +23,42 @@ const device = {
   params: [
     {
       name: 'CAMERA_URL',
-      value: 'test',
+      value: 'rstp://test',
+    },
+  ],
+};
+
+const securedDevice = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'rstp://test',
+    },
+    {
+      name: 'CAMERA_USERNAME',
+      value: 'username',
+    },
+    {
+      name: 'CAMERA_PASSWORD',
+      value: null,
     },
   ],
 };
 
 const brokenDevice = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'rstp://broken',
+    },
+  ],
+};
+
+const invalidUrlDevice = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
   selector: 'my-camera',
   params: [
@@ -52,8 +82,16 @@ describe('RtspCameraManager commands', () => {
     const image = await rtspCameraManager.getImage(device);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
+  it('should getImage with username/password', async () => {
+    const image = await rtspCameraManager.getImage(securedDevice);
+    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+  });
   it('should return error', async () => {
     const promise = rtspCameraManager.getImage(brokenDevice);
+    return assertChai.isRejected(promise);
+  });
+  it('should return error, invalid camera url param', async () => {
+    const promise = rtspCameraManager.getImage(invalidUrlDevice);
     return assertChai.isRejected(promise);
   });
   it('should return error, no camera url param', async () => {

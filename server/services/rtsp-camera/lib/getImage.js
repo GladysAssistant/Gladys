@@ -1,9 +1,11 @@
 const fse = require('fs-extra');
 const path = require('path');
 const logger = require('../../../utils/logger');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
+const DEVICE_PARAM_CAMERA_USERNAME = 'CAMERA_USERNAME';
+const DEVICE_PARAM_CAMERA_PASSWORD = 'CAMERA_PASSWORD';
 
 /**
  * @description Get camera image.
@@ -22,6 +24,23 @@ async function getImage(device) {
     if (!cameraUrlParam.value || cameraUrlParam.value.length === 0) {
       return reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
     }
+
+    // build url
+    let url;
+    try {
+      url = new URL(cameraUrlParam.value);
+
+      const username = (device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_USERNAME) || {}).value;
+      if (username) {
+        url.username = username;
+
+        const password = (device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_PASSWORD) || {}).value;
+        url.password = password;
+      }
+    } catch (e) {
+      return reject(new BadParameters('CAMERA_URL_IS_NOT_VALID'));
+    }
+
     // we create a temp folder
     const now = new Date();
     const filePath = path.join(
@@ -30,8 +49,9 @@ async function getImage(device) {
     );
     // we create a writestream
     const writeStream = fse.createWriteStream(filePath);
+
     // and send a camera thumbnail to this stream
-    this.ffmpeg(cameraUrlParam.value)
+    this.ffmpeg(url.href)
       .format('image2')
       .outputOptions('-vframes 1')
       // resize the image with max width = 640
