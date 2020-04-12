@@ -828,6 +828,24 @@
           "value": "http://camera-url"
         }
       ]
+    },
+    {
+      "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",
+      "name": "Outside Camera",
+      "params": [
+        {
+          "name": "CAMERA_URL",
+          "value": "http://outside-camera-url"
+        },
+        {
+          "name": "CAMERA_USERNAME",
+          "value": "username"
+        },
+        {
+          "name": "CAMERA_PASSWORD",
+          "value": "password"
+        }
+      ]
     }
   ],
   "get /api/v1/service/rtsp-camera": {

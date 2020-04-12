@@ -70,9 +70,66 @@ class RtspCameraBox extends Component {
     const newRoom = e.target.value === '' ? null : e.target.value;
     this.props.updateCameraField(this.props.cameraIndex, 'room_id', newRoom);
   };
-  componentWillMount() {}
 
-  render(props, { loading, saveError, testConnectionError }) {
+  updateCameraUsername = e => {
+    const { params } = this.props.camera;
+
+    const passwordParam = params.find(p => p.name === 'CAMERA_USERNAME');
+    if (passwordParam) {
+      passwordParam.value = e.target.value;
+    } else {
+      params.push({
+        name: 'CAMERA_USERNAME',
+        value: e.target.value
+      });
+    }
+
+    this.props.updateCameraField(this.props.cameraIndex, 'params', params);
+  };
+
+  updateCameraPassword = e => {
+    const { params } = this.props.camera;
+
+    const passwordParam = params.find(p => p.name === 'CAMERA_PASSWORD');
+    if (passwordParam) {
+      passwordParam.value = e.target.value;
+    } else {
+      params.push({
+        name: 'CAMERA_PASSWORD',
+        value: e.target.value
+      });
+    }
+
+    this.props.updateCameraField(this.props.cameraIndex, 'params', params);
+  };
+
+  toggleSecurity = () => {
+    const securityEnabled = !this.state.securityEnabled;
+
+    if (!securityEnabled) {
+      const params = this.props.camera.params.filter(p => p.name !== 'CAMERA_USERNAME' && p.name !== 'CAMERA_PASSWORD');
+      this.props.updateCameraField(this.props.cameraIndex, 'params', params);
+    }
+
+    this.setState({ securityEnabled });
+  };
+
+  constructor(props) {
+    super(props);
+
+    const usernameParam = props.camera.params.find(p => p.name === 'CAMERA_USERNAME');
+    const passwordParam = props.camera.params.find(p => p.name === 'CAMERA_PASSWORD');
+    const securityEnabled = usernameParam || passwordParam;
+
+    this.state = {
+      securityEnabled
+    };
+  }
+
+  render(props, { loading, saveError, testConnectionError, securityEnabled }) {
+    const usernameParam = props.camera.params.find(p => p.name === 'CAMERA_USERNAME');
+    const passwordParam = props.camera.params.find(p => p.name === 'CAMERA_PASSWORD');
+
     return (
       <div class="col-md-4">
         <div class="card">
@@ -164,6 +221,49 @@ class RtspCameraBox extends Component {
                       onInput={this.updateCameraUrl}
                       class="form-control"
                       placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
+                    />
+                  </Localizer>
+                </div>
+                <label class="custom-switch mb-3">
+                  <input
+                    type="checkbox"
+                    name={`read_only_${props.featureIndex}`}
+                    checked={securityEnabled}
+                    onClick={this.toggleSecurity}
+                    class="custom-switch-input"
+                  />
+                  <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id="integration.rtspCamera.enableSecurityButton" />
+                  </span>
+                </label>
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.rtspCamera.usernameLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="text"
+                      value={usernameParam && usernameParam.value}
+                      onInput={this.updateCameraUsername}
+                      class="form-control"
+                      disabled={!securityEnabled}
+                      placeholder={<Text id="integration.rtspCamera.usernameLabel" />}
+                    />
+                  </Localizer>
+                </div>
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.rtspCamera.passwordLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="password"
+                      value={passwordParam && passwordParam.value}
+                      onInput={this.updateCameraPassword}
+                      class="form-control"
+                      disabled={!securityEnabled}
+                      placeholder={<Text id="integration.rtspCamera.passwordLabel" />}
                     />
                   </Localizer>
                 </div>
