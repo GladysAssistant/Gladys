@@ -11,6 +11,13 @@ class RtspCameraBox extends Component {
       loading: true
     });
     try {
+      if (!this.state.securityEnabled) {
+        const params = this.props.camera.params.filter(
+          p => p.name !== 'CAMERA_USERNAME' && p.name !== 'CAMERA_PASSWORD'
+        );
+        this.props.updateCameraField(this.props.cameraIndex, 'params', params);
+      }
+
       await this.props.saveCamera(this.props.cameraIndex);
       this.setState({
         saveError: null
@@ -105,12 +112,6 @@ class RtspCameraBox extends Component {
 
   toggleSecurity = () => {
     const securityEnabled = !this.state.securityEnabled;
-
-    if (!securityEnabled) {
-      const params = this.props.camera.params.filter(p => p.name !== 'CAMERA_USERNAME' && p.name !== 'CAMERA_PASSWORD');
-      this.props.updateCameraField(this.props.cameraIndex, 'params', params);
-    }
-
     this.setState({ securityEnabled });
   };
 
