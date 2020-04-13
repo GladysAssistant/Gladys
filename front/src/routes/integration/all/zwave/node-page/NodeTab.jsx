@@ -59,6 +59,7 @@ const NodeTab = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  user={props.user}
                 />
               ))}
           </div>

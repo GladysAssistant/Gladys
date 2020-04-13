@@ -34,26 +34,26 @@ describe('Mqtt handle message', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should not do anything, JSON parsing failed', () => {
-    mqttHandler.handleNewMessage('gladys/master/device/create', 'thisisnotjson');
+  it('should update device state', () => {
+    mqttHandler.handleNewMessage(
+      'gladys/master/device/my_device_external_id/feature/my_feature_external_id/state',
+      '19.8',
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'my_feature_external_id',
+      state: '19.8',
+    });
+  });
+
+  it('should fail to update device state, but not crash', () => {
+    mqttHandler.handleNewMessage('gladys/master/device/my_device_external_id/', '19.8');
 
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should create device', () => {
-    mqttHandler.handleNewMessage('gladys/master/device/create', '{}');
-
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW, {});
-  });
-
-  it('should update device state', () => {
-    mqttHandler.handleNewMessage('gladys/master/device/state/update', '{}');
-
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {});
-  });
-
-  it('handle stric topic', () => {
-    mqttHandler.handleNewMessage('gladys/master/#', '{}');
+  it('handle strict topic', () => {
+    mqttHandler.handleNewMessage('gladys/master/random-topic', '{}');
 
     assert.notCalled(gladys.event.emit);
   });
