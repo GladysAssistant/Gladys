@@ -54,6 +54,7 @@ class Session {
         const { type, payload } = JSON.parse(data);
         this.dispatcher.dispatch(type, payload);
       };
+      this.dispatcher.ws = this.ws;
     };
     this.ws.onerror = e => {
       console.log('Error', e);

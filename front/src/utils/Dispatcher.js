@@ -1,6 +1,9 @@
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
+
 export class Dispatcher {
   constructor() {
     this.events = {};
+    this.ws = null;
   }
 
   addListener(event, callback) {
@@ -24,6 +27,18 @@ export class Dispatcher {
     }
 
     this.events[event].listeners.push(callback);
+
+    if (this.events[event].listeners.length === 1 && this.ws) {
+      // Subscribe to websocket topic
+      this.ws.send(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPES.SUBSCRIPTION.SUBSCRIBE,
+          payload: {
+            event
+          }
+        })
+      );
+    }
   }
 
   removeListener(event, callback) {
@@ -36,6 +51,18 @@ export class Dispatcher {
     this.events[event].listeners = this.events[event].listeners.filter(
       listener => listener.toString() !== callback.toString()
     );
+
+    if (this.events[event].listeners.length === 0 && this.ws) {
+      // Unsubscribe from websocket topic
+      this.ws.send(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPES.SUBSCRIPTION.UNSUBSCRIBE,
+          payload: {
+            event
+          }
+        })
+      );
+    }
   }
 
   dispatch(event, details) {

@@ -338,6 +338,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
   },
+  SUBSCRIPTION: {
+    SUBSCRIBE: 'subscription.subscribe',
+    UNSUBSCRIBE: 'subscription.unsubscribe',
+  },
   GATEWAY: {
     BACKUP_UPLOAD_PROGRESS: 'gateway.backup-upload-progress',
     BACKUP_DOWNLOAD_PROGRESS: 'gateway.backup-download-progress',
