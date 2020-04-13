@@ -41,6 +41,21 @@ describe('GET /api/v1/service/:service_name/variable/:variable_name', () => {
   });
 });
 
+describe('POST /api/v1/service/:service_name/variable/:variable_name', () => {
+  it('should set a variable for a service', async () => {
+    await authenticatedRequest
+      .post('/api/v1/service/test-service/variable/SECURE_VARIABLE')
+      .send({
+        value: 'NEW_SERVICE_DATA',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('value', 'NEW_SERVICE_DATA');
+      });
+  });
+});
+
 describe('POST /api/v1/variable/:variable_name', () => {
   it('should create a variable', async () => {
     await authenticatedRequest

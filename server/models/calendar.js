@@ -52,6 +52,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      ctag: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      sync_token: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
     },
     {},
   );
