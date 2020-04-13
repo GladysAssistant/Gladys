@@ -7,6 +7,7 @@ import GatewayConfigured from './GatewayConfigured';
 import GatewayBackupKey from './GatewayBackupKey';
 import GatewayUsersList from './GatewayUsersList';
 import GatewayDisconnect from './GatewayDisconnect';
+import GatewayConnectedSuccess from './GatewayConnectedSuccess';
 
 const GatewayPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -25,7 +26,17 @@ const GatewayPage = ({ children, ...props }) => (
         </div>
       </div>
     )}
-    {get(props, 'gatewayStatus.configured') === true && (
+    {props.displayConnectedSuccess && (
+      <div class="row">
+        <div class="col-md-12">
+          <GatewayConnectedSuccess
+            gatewayBackupKey={props.gatewayBackupKey}
+            finalizeGatewaySetup={props.finalizeGatewaySetup}
+          />
+        </div>
+      </div>
+    )}
+    {!props.displayConnectedSuccess && get(props, 'gatewayStatus.configured') === true && (
       <div class="row">
         <div class="col-md-12">
           <GatewayConfigured {...props} />

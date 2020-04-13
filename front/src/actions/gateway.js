@@ -69,20 +69,26 @@ function createActions(store) {
           two_factor_token: state.gatewayLoginResults.two_factor_token,
           two_factor_code: state.gatewayLoginTwoFactorCode
         });
-        store.setState({
-          gatewayLoginStatus: RequestStatus.Success,
-          displayGatewayLogin: false,
-          gatewayLoginStep2: false
-        });
         await actions.getStatus(store.getState());
         await actions.getKeys(store.getState());
         await actions.getInstanceKeys(store.getState());
         await actions.getBackupKey(store.getState());
+        store.setState({
+          gatewayLoginStatus: RequestStatus.Success,
+          displayGatewayLogin: false,
+          gatewayLoginStep2: false,
+          displayConnectedSuccess: true
+        });
       } catch (e) {
         store.setState({
           gatewayLoginStatus: RequestStatus.Error
         });
       }
+    },
+    finalizeGatewaySetup() {
+      store.setState({
+        displayConnectedSuccess: false
+      });
     },
     async disconnect(state) {
       store.setState({
