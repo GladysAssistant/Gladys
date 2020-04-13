@@ -17,14 +17,32 @@ class SettingsSystem extends Component {
     this.props.getDiskSpace();
     this.props.getContainers();
     this.props.getUpgradeDownloadStatus();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS, payload =>
-      this.props.newDownloadProgress(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS,
+      this.props.newDownloadProgress
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED, payload =>
-      this.props.downloadFinished()
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED,
+      this.props.downloadFinished
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED, payload =>
-      this.props.downloadFailed()
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED,
+      this.props.downloadFailed
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS,
+      this.props.newDownloadProgress
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED,
+      this.props.downloadFinished
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED,
+      this.props.downloadFailed
     );
   }
 

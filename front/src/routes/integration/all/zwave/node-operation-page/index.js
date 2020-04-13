@@ -75,7 +75,7 @@ class ZwaveNodeOperationPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED, this.nodeAddedListener);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_READY, this.nodeReadyListener);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_REMOVED, this.nodeRemovedListener);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_REMOVED, this.nodeRemovedListener);
   }
 
   render(props, { remainingTimeInSeconds, nodeAdded }) {

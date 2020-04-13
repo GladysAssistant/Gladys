@@ -241,12 +241,13 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
-    this.props.session.dispatcher.addListener('scene.executing-action', payload =>
-      this.highlighCurrentlyExecutedAction(payload)
-    );
-    this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
-      this.removeHighlighAction(payload)
-    );
+    this.props.session.dispatcher.addListener('scene.executing-action', this.highlighCurrentlyExecutedAction);
+    this.props.session.dispatcher.addListener('scene.finished-executing-action', this.removeHighlighAction);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener('scene.executing-action', this.highlighCurrentlyExecutedAction);
+    this.props.session.dispatcher.removeListener('scene.finished-executing-action', this.removeHighlighAction);
   }
 
   render(props, { saving, error, variables, scene }) {

@@ -10,12 +10,19 @@ class MqttNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('mqtt');
     this.props.loadProps();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED, () =>
-      this.props.displayConnectedMessage()
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
+      this.props.displayConnectedMessage
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR, payload =>
-      this.props.displayMqttError(payload)
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR, this.props.displayMqttError);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
+      this.props.displayConnectedMessage
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR, this.props.displayMqttError);
   }
 
   render(props, {}) {

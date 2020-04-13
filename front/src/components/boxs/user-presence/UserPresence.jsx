@@ -97,11 +97,18 @@ const UserPresence = ({ children, ...props }) => (
 class UserPresenceComponent extends Component {
   componentDidMount() {
     this.props.getUsersWithPresence();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, payload =>
-      this.props.userChanged(payload)
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.props.userChanged);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.props.userChanged);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME,
+      this.props.userChanged
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, payload =>
-      this.props.userChanged(payload)
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,
+      this.props.userChanged
     );
   }
 

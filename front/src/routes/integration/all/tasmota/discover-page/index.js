@@ -18,6 +18,13 @@ class TasmotaIntegration extends Component {
     );
   }
 
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_DEVICE,
+      this.props.addDiscoveredDevice
+    );
+  }
+
   render(props) {
     return (
       <TasmotaPage user={props.user}>
