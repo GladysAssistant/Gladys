@@ -54,7 +54,7 @@ describe('calendar.getEvents', () => {
   it('should get events of a user', async () => {
     const events = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       from: '2019-01-12 07:49:07.556',
-      to: '2019-03-12 07:49:07.556',
+      to: '2019-03-01 07:49:07.556',
     });
     expect(events).to.deep.equal([
       {
@@ -62,10 +62,129 @@ describe('calendar.getEvents', () => {
         calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
         name: 'Test Calendar Event',
         selector: 'test-calendar-event',
-        external_id: null,
+        external_id: 'd5ad1bd8-96a1-44ed-b103-98515892c2d0',
         location: null,
         start: new Date('2019-02-12T07:49:07.556Z'),
         end: new Date('2019-02-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
+        full_day: false,
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        calendar: {
+          name: 'Test Calendar',
+          selector: 'test-calendar',
+        },
+      },
+    ]);
+  });
+  it('should get events of a user by selector', async () => {
+    const events = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      selector: 'test-calendar-event',
+    });
+    expect(events).to.deep.equal([
+      {
+        id: '2ae9c476-3230-4f82-8f93-5ebfac15e736',
+        calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        name: 'Test Calendar Event',
+        selector: 'test-calendar-event',
+        external_id: 'd5ad1bd8-96a1-44ed-b103-98515892c2d0',
+        location: null,
+        start: new Date('2019-02-12T07:49:07.556Z'),
+        end: new Date('2019-02-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
+        full_day: false,
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        calendar: {
+          name: 'Test Calendar',
+          selector: 'test-calendar',
+        },
+      },
+    ]);
+  });
+  it('should get events of a user by url', async () => {
+    const events = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      url: '/remote.php/dav/calendars/tony/personal/47e754ac-bcef-4b53-ba5b-29dfb588e196.ics',
+    });
+    expect(events).to.deep.equal([
+      {
+        id: 'f2d58e17-bea5-4922-b15b-afbd4ad923dc',
+        calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        name: 'Test Calendar Event 2',
+        selector: 'test-calendar-event-2',
+        external_id: 'b22891f7-692e-496f-a180-ed085bd99042',
+        location: null,
+        start: new Date('2019-03-12T07:49:07.556Z'),
+        end: new Date('2019-03-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/47e754ac-bcef-4b53-ba5b-29dfb588e196.ics',
+        full_day: false,
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        calendar: {
+          name: 'Test Calendar',
+          selector: 'test-calendar',
+        },
+      },
+    ]);
+  });
+  it('should get events of a user by external_id', async () => {
+    const events = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      externalId: 'b22891f7-692e-496f-a180-ed085bd99042',
+    });
+    expect(events).to.deep.equal([
+      {
+        id: 'f2d58e17-bea5-4922-b15b-afbd4ad923dc',
+        calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        name: 'Test Calendar Event 2',
+        selector: 'test-calendar-event-2',
+        external_id: 'b22891f7-692e-496f-a180-ed085bd99042',
+        location: null,
+        start: new Date('2019-03-12T07:49:07.556Z'),
+        end: new Date('2019-03-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/47e754ac-bcef-4b53-ba5b-29dfb588e196.ics',
+        full_day: false,
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        calendar: {
+          name: 'Test Calendar',
+          selector: 'test-calendar',
+        },
+      },
+    ]);
+  });
+  it('should get events of a user by calendar_id', async () => {
+    const events = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      calendarId: '07ec2599-3221-4d6c-ac56-41443973201b',
+    });
+    expect(events).to.deep.equal([
+      {
+        id: '2ae9c476-3230-4f82-8f93-5ebfac15e736',
+        calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        name: 'Test Calendar Event',
+        selector: 'test-calendar-event',
+        external_id: 'd5ad1bd8-96a1-44ed-b103-98515892c2d0',
+        location: null,
+        start: new Date('2019-02-12T07:49:07.556Z'),
+        end: new Date('2019-02-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
+        full_day: false,
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        calendar: {
+          name: 'Test Calendar',
+          selector: 'test-calendar',
+        },
+      },
+      {
+        id: 'f2d58e17-bea5-4922-b15b-afbd4ad923dc',
+        calendar_id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        name: 'Test Calendar Event 2',
+        selector: 'test-calendar-event-2',
+        external_id: 'b22891f7-692e-496f-a180-ed085bd99042',
+        location: null,
+        start: new Date('2019-03-12T07:49:07.556Z'),
+        end: new Date('2019-03-12T08:49:07.556Z'),
+        url: '/remote.php/dav/calendars/tony/personal/47e754ac-bcef-4b53-ba5b-29dfb588e196.ics',
         full_day: false,
         created_at: new Date('2019-02-12T07:49:07.556Z'),
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
