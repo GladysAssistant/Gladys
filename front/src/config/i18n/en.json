@@ -485,6 +485,7 @@
     "caldav": {
       "title": "CalDAV",
       "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
         "apple": {

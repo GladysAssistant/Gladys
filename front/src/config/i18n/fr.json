@@ -202,6 +202,7 @@
     "caldav": {
       "title": "CalDAV",
       "introduction": "Pour synchroniser Gladys calendar en utilisant CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
+      "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
         "apple": {
@@ -1058,23 +1059,6 @@
     "emailAlreadyExist": "Un compte avec cette adresse e-mail existe déjà !",
     "paymentFailed": "Paiement échoué. Veuillez réessayer ou essayer avec une autre carte.",
     "paymentSuccess": "Félicitations, vous venez de vous abonner à Gladys Plus. Vérifiez votre boîte de réception mail pour accéder au Slack et à la passerelle Gladys. Merci pour votre aide !"
-  },
-  "calendar": {
-    "date": "Date",
-    "time": "Heure",
-    "event": "Évènement",
-    "allDay": "Journée entière",
-    "week": "Semaine",
-    "work_week": "Semaine de travail",
-    "day": "Jour",
-    "month": "Mois",
-    "previous": "Avant",
-    "next": "Après",
-    "yesterday": "Hier",
-    "tomorrow": "Demain",
-    "today": "Aujourd'hui",
-    "agenda": "Agenda",
-    "noEventsInRange": "Pas d'évènements sur cette période."
   },
   "gatewayForgotPassword": {
     "pageTitle": "Gladys Assistant",
