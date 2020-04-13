@@ -34,5 +34,11 @@
     "name": "Tasmota",
     "description": "Control your Tasmota devices.",
     "img": "/assets/integrations/cover/tasmota.jpg"
+  },
+  {
+    "key": "w215",
+    "name": "DLink DSP-W215",
+    "description": "Control your DSP-W215 plug.",
+    "img": "/assets/integrations/cover/w215.jpg"
   }
 ]
