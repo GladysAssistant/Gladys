@@ -731,7 +731,11 @@
     "userEcdsaKey": "ECDSA key",
     "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list.",
     "disconnectTitle": "Disconnect your Plus account",
-    "disconnectButton": "Disconnect"
+    "disconnectButton": "Disconnect",
+    "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
+    "gatewayConnectedSuccessDescription": "Your Gladys instance was connected with success.",
+    "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
+    "gatewayConnectedSuccessButton": "I saved the backup key!"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
