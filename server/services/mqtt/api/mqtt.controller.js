@@ -24,6 +24,16 @@ module.exports = function MqttController(mqttManager) {
     res.json(response);
   }
 
+  /**
+   * @api {get} /api/v1/service/mqtt/config Get MQTT configuration.
+   * @apiName getConfiguration
+   * @apiGroup Mqtt
+   */
+  async function getConfiguration(req, res) {
+    const configuration = await mqttManager.getConfiguration();
+    res.json(configuration);
+  }
+
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
@@ -32,6 +42,10 @@ module.exports = function MqttController(mqttManager) {
     'get /api/v1/service/mqtt/status': {
       authenticated: true,
       controller: status,
+    },
+    'get /api/v1/service/mqtt/config': {
+      authenticated: true,
+      controller: asyncMiddleware(getConfiguration),
     },
   };
 };
