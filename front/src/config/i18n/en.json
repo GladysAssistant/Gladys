@@ -28,7 +28,7 @@
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the informations you'll enter are just saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
       "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
-      "buttonCreateAccountGladysGateway": "Create account with Gladys Gateway",
+      "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
     "createLocalAccount": {

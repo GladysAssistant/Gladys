@@ -6,6 +6,7 @@ import { isUrlInArray } from '../utils/url';
 
 const OPEN_PAGES = [
   '/signup',
+  '/signup/create-account-gladys-gateway',
   '/login',
   '/forgot-password',
   '/reset-password',
