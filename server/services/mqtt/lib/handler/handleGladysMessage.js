@@ -11,8 +11,10 @@ const logger = require('../../../../utils/logger');
  */
 function handleGladysMessage(topic, message) {
   const parsedTopic = topic.split('/');
-  // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
-  if (topic.startsWith('gladys/master/device/')) {
+  if (topic === 'gladys/master/device/create') {
+    this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
+  } else if (topic.startsWith('gladys/master/device/')) {
+    // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
     if (!parsedTopic[5]) {
       throw new BadParameters('Device feature external_id is required');
     }
