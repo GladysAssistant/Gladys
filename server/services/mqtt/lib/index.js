@@ -7,6 +7,7 @@ const { publish } = require('./publish');
 const { subscribe } = require('./subscribe');
 const { unsubscribe } = require('./unsubscribe');
 const { status } = require('./status');
+const { getConfiguration } = require('./getConfiguration');
 const { setValue } = require('./setValue');
 
 /**
@@ -37,6 +38,7 @@ MqttHandler.prototype.publish = publish;
 MqttHandler.prototype.subscribe = subscribe;
 MqttHandler.prototype.unsubscribe = unsubscribe;
 MqttHandler.prototype.status = status;
+MqttHandler.prototype.getConfiguration = getConfiguration;
 MqttHandler.prototype.setValue = setValue;
 
 module.exports = MqttHandler;

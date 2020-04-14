@@ -28,7 +28,7 @@ describe('Mqtt handle message', () => {
   });
 
   it('should publish message', async () => {
-    await mqttHandler.connect();
+    await mqttHandler.connect({ mqttUrl: 'url' });
     mqttHandler.publish('UNKNOWN_TOPIC', '{}');
 
     assert.calledWith(mqttApi.publish, 'UNKNOWN_TOPIC', '{}', undefined, sinon.match.func);

@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { DEFAULT } = require('../lib/constants');
 
 module.exports = function MqttController(mqttManager) {
   /**
@@ -7,8 +8,8 @@ module.exports = function MqttController(mqttManager) {
    * @apiGroup Mqtt
    */
   async function connect(req, res) {
-    const { mqttURL, mqttUsername, mqttPassword } = req.body;
-    await mqttManager.connect(mqttURL, mqttUsername, mqttPassword);
+    await mqttManager.connect(req.body);
+    await mqttManager.saveConfiguration(req.body);
     res.json({
       success: true,
     });
@@ -31,6 +32,9 @@ module.exports = function MqttController(mqttManager) {
    */
   async function getConfiguration(req, res) {
     const configuration = await mqttManager.getConfiguration();
+    if (!configuration.useEmbeddedBroker && configuration.mqttPassword) {
+      configuration.mqttPassword = DEFAULT.HIDDEN_PASSWORD; // Hide password from external broker
+    }
     res.json(configuration);
   }
 

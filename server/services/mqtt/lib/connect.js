@@ -1,20 +1,22 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
  * @description Connect and listen to all topics
+ * @param {Object} configuration - MQTT configuration.
+ * @param {string} [configuration.mqttUrl] - MQTT URL.
+ * @param {string} [configuration.mqttUsername] - MQTT username.
+ * @param {string} [configuration.mqttPassword] - MQTT password.
  * @example
- * connect('htpp://localhost:1883', 'mqttUser', 'mqttPassword');
+ * connect({
+ *  mqttUrl: 'htpp://localhost:1883',
+ *  mqttUsername: 'mqttUser',
+ *  mqttPassword: 'mqttPassword',
+ * });
  */
-async function connect() {
-  const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
-  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.MQTT_USERNAME_KEY, this.serviceId);
-  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.MQTT_PASSWORD_KEY, this.serviceId);
-
-  const variablesFound = mqttUrl;
-  if (!variablesFound) {
+async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
+  if (!mqttUrl) {
     this.configured = false;
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }

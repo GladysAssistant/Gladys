@@ -5,20 +5,15 @@ const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async loadProps(state) {
-      let mqttURL;
-      let mqttUsername;
-      let mqttPassword;
+      let configuration;
       try {
-        mqttURL = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_URL');
-        mqttUsername = await state.httpClient.get('/api/v1/service/mqtt/variable/MQTT_USERNAME');
-        if (mqttUsername.value) {
-          mqttPassword = '*********'; // this is just used so that the field is filled
-        }
+        configuration = await state.httpClient.get('/api/v1/service/mqtt/config');
       } finally {
         store.setState({
-          mqttURL: (mqttURL || {}).value,
-          mqttUsername: (mqttUsername || { value: '' }).value,
-          mqttPassword,
+          mqttURL: configuration.mqttURL,
+          mqttUsername: configuration.mqttUsername,
+          mqttPassword: configuration.mqttPassword,
+          useEmbeddedBroker: configuration.useEmbeddedBroker,
           passwordChanges: false,
           connected: false
         });
@@ -40,18 +35,12 @@ const createActions = store => {
         mqttConnectionError: undefined
       });
       try {
-        await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_URL', {
-          value: state.mqttURL
+        const { mqttUrl, mqttUsername, mqttPassword } = state;
+        await state.httpClient.post(`/api/v1/service/mqtt/connect`, {
+          mqttUrl,
+          mqttUsername,
+          mqttPassword
         });
-        await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_USERNAME', {
-          value: state.mqttUsername
-        });
-        if (state.passwordChanges) {
-          await state.httpClient.post('/api/v1/service/mqtt/variable/MQTT_PASSWORD', {
-            value: state.mqttPassword
-          });
-        }
-        await state.httpClient.post(`/api/v1/service/mqtt/connect`);
 
         store.setState({
           connectMqttStatus: RequestStatus.Success
