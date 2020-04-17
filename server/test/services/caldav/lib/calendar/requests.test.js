@@ -50,11 +50,13 @@ describe('CalDAV requests', () => {
         parseFromString: sinon.stub().returns({
           getElementsByTagName: sinon.stub().returns([
             {
+              tagName: 'response',
               getElementsByTagName: sinon
                 .stub()
                 .onFirstCall()
                 .returns([
                   {
+                    tagName: 'calendar-data',
                     childNodes: [
                       {
                         data: `
@@ -82,7 +84,9 @@ describe('CalDAV requests', () => {
                   },
                 ])
                 .onSecondCall()
-                .returns([{ childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] }]),
+                .returns([
+                  { tagName: 'href', childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] },
+                ]),
             },
           ]),
         }),

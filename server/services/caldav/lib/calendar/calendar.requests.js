@@ -2,6 +2,18 @@ const url = require('url');
 const logger = require('../../../../utils/logger');
 
 /**
+ * @description Search elements as getElementsByTagName with regex instead of string.
+ * @param {Object} container - Element where execute research.
+ * @param {RegExp} regex - Regex to search.
+ * @returns {Array} Elements that match with regex.
+ * @example
+ * getElementsByTagRegex(document, /(cal:)?calendar-data/)
+ */
+function getElementsByTagRegex(container, regex) {
+  return Array.from(container.getElementsByTagName('*')).filter((elem) => regex.test(elem.tagName));
+}
+
+/**
  * @description Get calendars from caldav server.
  * @param {Object} xhr - Request with dav credentials.
  * @param {string} homeUrl - Request url.
@@ -105,36 +117,31 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
                   </c:comp-filter>
               </c:filter>
           </c:calendar-multiget>`,
+    transformRequest: (request) => request.setRequestHeader('Content-Type', 'application/xml;charset=utf-8'),
   });
 
   const eventsData = await xhr.send(req, calendarUrl);
 
-  const tags = {};
-  switch (calDavHost) {
-    case 'apple':
-      tags.response = 'response';
-      tags.calendarData = 'calendar-data';
-      tags.href = 'href';
-      break;
-    default:
-      tags.response = 'd:response';
-      tags.calendarData = 'cal:calendar-data';
-      tags.href = 'd:href';
-      break;
-  }
   // Extract data from XML response
   const xmlEvents = new this.xmlDom.DOMParser().parseFromString(eventsData.request.responseText);
-  const jsonEvents = Array.from(xmlEvents.getElementsByTagName(tags.response)).map((xmlEvent) => {
-    const event = this.ical.parseICS(xmlEvent.getElementsByTagName(tags.calendarData)[0].childNodes[0].data);
-    return {
-      href: xmlEvent.getElementsByTagName(tags.href)[0].childNodes[0].data,
-      ...event[Object.keys(event)[0]],
-    };
+  const jsonEvents = getElementsByTagRegex(xmlEvents, /^[a-zA-Z]*:?response$/).map((xmlEvent) => {
+    const event = this.ical.parseICS(
+      getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?calendar-data$/)[0].childNodes[0].data,
+    );
+    for (let j = 0; j < Object.keys(event).length; j += 1) {
+      if (event[Object.keys(event)[j]].type === 'VEVENT') {
+        return {
+          href: getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?href$/)[0].childNodes[0].data,
+          ...event[Object.keys(event)[j]],
+        };
+      }
+    }
+    return null;
   });
 
   // Filter only event objects
   return jsonEvents.filter((jsonEvent) => {
-    return jsonEvent.type === 'VEVENT';
+    return jsonEvent !== null;
   });
 }
 
