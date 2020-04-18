@@ -10,6 +10,7 @@ const { getContainers } = require('./system.getContainers');
 const { getInfos } = require('./system.getInfos');
 const { getDiskSpace } = require('./system.getDiskSpace');
 const { saveLatestGladysVersion } = require('./system.saveLatestGladysVersion');
+const { pull } = require('./system.pull');
 const { shutdown } = require('./system.shutdown');
 
 const System = function System(sequelize, event, config) {
@@ -32,6 +33,7 @@ System.prototype.getContainers = getContainers;
 System.prototype.getInfos = getInfos;
 System.prototype.getDiskSpace = getDiskSpace;
 System.prototype.saveLatestGladysVersion = saveLatestGladysVersion;
+System.prototype.pull = pull;
 System.prototype.shutdown = shutdown;
 
 module.exports = System;

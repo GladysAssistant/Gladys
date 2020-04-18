@@ -10,16 +10,14 @@ async function installUpgrade() {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
-  const containers = await this.dockerode.listContainers({
-    all: true,
-  });
+  const containers = await this.getContainers();
   const watchTowerContainer = containers.find((container) => {
-    return container.Image === 'containrrr/watchtower';
+    return container.image.startsWith('containrrr/watchtower');
   });
   if (!watchTowerContainer) {
     throw new PlatformNotCompatible('WATCHTOWER_NOT_FOUND');
   }
-  await this.dockerode.getContainer(watchTowerContainer.Id).restart();
+  await this.dockerode.getContainer(watchTowerContainer.id).restart();
   // reset download upgrade status
   this.downloadUpgradeError = null;
   this.downloadUpgradeFinished = null;
