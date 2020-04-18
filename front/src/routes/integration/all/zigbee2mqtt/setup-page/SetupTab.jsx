@@ -2,34 +2,29 @@ import { Component } from 'preact';
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
+import CheckStatus from '../commons/CheckStatus.js';
 
 class SetupTab extends Component {
   toggle = e => {
-    let checked;
-    console.log("Setup props : ", this.props);
+    let checked = this.props.z2mEnabled;
 
     if (this.props.zigbee2mqttContainerStatus !== RequestStatus.Getting && this.props.dockerContainers) {
-      checked = !this.checked;
+      checked = !e.checked;
 
       console.log('toggle : ', checked);
 
       if (checked) {
-        // query API for container start
-        //        this.props.startContainer("xplanet");
         this.props.startContainer();
       } else {
         this.props.stopContainer();
       }
 
-      this.setState(checked);
+      this.props.z2mEnabled = checked ;
+
     }
   };
 
-  refreshContainersList = e => {
-    this.props.getContainers();
-  };
-
-  render(props, { checked }, {}) {
+  render(props, {}) {
     return (
       <div class="card">
         <div class="card-header">
@@ -38,29 +33,21 @@ class SetupTab extends Component {
           </h3>
         </div>
         <div class="card-body">
+          <CheckStatus />
+
           <div
             class={cx('dimmer', {
-              active: props.connectMqttStatus === RequestStatus.Getting
+              active: props.zigbee2mqttContainerStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />
             <div class="dimmer-content">
               <p>
-                <MarkupText id="integration.zigbee2mqtt.setup.zigbee2mqttDescription" />
+                <MarkupText id="integration.zigbee2mqtt.setup.description" />
               </p>
-              {props.connectMqttStatus === RequestStatus.Error && (
+              {props.zigbee2mqttContainerStatus === RequestStatus.Error && (
                 <p class="alert alert-danger">
                   <Text id="integration.zigbee2mqtt.setup.error" />
-                </p>
-              )}
-              {props.connectMqttStatus === RequestStatus.Success && !props.mqttConnected && (
-                <p class="alert alert-info">
-                  <Text id="integration.zigbee2mqtt.setup.connecting" />
-                </p>
-              )}
-              {props.zigbee2mqttContainerStatus === RequestStatus.Getting && !props.mqttConnected && (
-                <p class="alert alert-info">
-                  <Text id="integration.zigbee2mqtt.setup.connecting" />
                 </p>
               )}
               {props.mqttConnected && (
@@ -68,26 +55,21 @@ class SetupTab extends Component {
                   <Text id="integration.zigbee2mqtt.setup.connected" />
                 </p>
               )}
-              {props.mqttConnectionError && (
-                <p class="alert alert-danger">
-                  <Text id="integration.zigbee2mqtt.setup.connectionError" /> - {props.mqttConnectionError}
-                </p>
-              )}
 
               <tr>
                 <td class="text-right">
                   <label>
-                    <input type="radio" class="custom-switch-input" checked={checked} onClick={this.toggle} />
+                    <input type="radio" class="custom-switch-input" checked={props.z2mEnabled} onClick={props.toggleEnable} />
                     <span class="custom-switch-indicator" />
                   </label>
                 </td>
-                <td>{' Enable Zigbee2mqtt'}</td>
+                <td><Text id="integration.zigbee2mqtt.setup.enable" /></td>
               </tr>
 
               <h3 class="card-header">
-                <Text id="systemSettings.containers" />
+                <Text id="integration.zigbee2mqtt.setup.containersTitle" />
                 <div class="page-options">
-                  <button class="btn btn-info" onClick={this.refreshContainersList()}>
+                  <button class="btn btn-info" onClick={props.getContainers}>
                     Refresh <i class="fe fe-refresh-cw" />
                   </button>
                 </div>

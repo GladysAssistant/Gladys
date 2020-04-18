@@ -1,8 +1,9 @@
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 /**
  * @description Stop a container.
- * @returns {Promise} Container object.
+ * @returns Container object.
  * @param containerName - Container name.
  * @example
  * const container = await stopContainer(containerName);
@@ -13,6 +14,8 @@ async function stopContainer(containerName) {
   }
 
   const container = await this.dockerode.getContainer(containerName).stop();
+
+  logger.info(`container ${containerName} stop : ${container}`);
 
   return container;
 }

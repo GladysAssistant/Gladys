@@ -1,4 +1,5 @@
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 /**
  * @description Start container.
@@ -13,6 +14,8 @@ async function startContainer(containerName) {
   }
 
   const container = await this.dockerode.getContainer(containerName).start();
+
+  logger.info(`container ${containerName} start : ${container}`);
 
   return container;
 }

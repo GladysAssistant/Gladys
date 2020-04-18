@@ -446,13 +446,13 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dockerController.getContainers,
     },
-    'get /api/v1/docker/container/:container_name/start': {
+    'post /api/v1/docker/container/:container_name/start': {
       authenticated: true,
-      controller: dockerController.getContainers,
+      controller: dockerController.startContainer,
     },
-    'get /api/v1/docker/container/:container_name/stop': {
+    'post /api/v1/docker/container/:container_name/stop': {
       authenticated: true,
-      controller: dockerController.getContainers,
+      controller: dockerController.stopContainer,
     },
     // user
     'post /api/v1/user': {

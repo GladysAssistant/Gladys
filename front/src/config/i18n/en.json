@@ -286,12 +286,11 @@
       },
       "setup": {
         "title": "Zigbe2mqtt configuration",
-        "z2mDescription": "This service uses two docker containers (MQTT broker and Zigbee2mqtt). You can manage your own or let Gladys deploy this container. Learn more on the Zigbee2mqtt tuto page",
-        "z2mDeploy": "Enable Zigbee2mqtt",
-        "z2mContainersTitle": " Zigbee2mqtt Docker containers",
-        "z2mNotConfiguredError": "Zigbee2mqtt is not configured. Please select the USB port where your Zigbee2mqtt dongle is plugged in Settings tab.",
-        "z2mCreatedSuccess": "Zigbee2mqtt was started with success.",
-        "z2mCreatedError": "An error occured while starting Zigbee2mqtt."
+        "description": "This service uses two independant docker containers (a MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers. Learn more on the Zigbee2mqtt tuto page",
+        "enable": "Enable Zigbee2mqtt",
+        "containersTitle": " Zigbee2mqtt Docker containers",
+        "connected": "Zigbee2mqtt was started with success.",
+        "error": "An error occured while starting Zigbee2mqtt."
       },
       "device": {
         "title": "Zigbee2mqtt devices",
