@@ -340,6 +340,34 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
+    "kodi": {
+      "title": "Kodi Media Center",
+      "deviceTab": "Devices",
+      "new": "New",
+      "device": {
+        "title": "Devices in Gladys",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "connectButton": "Connect/Reconnect",
+        "default": "Default",
+        "search": "Search devices",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "noDevicesFound": "No devices found. Make sure you have connected one Kodi device in the setup tab.",
+        "noParams": "No params found.",
+        "paramsLabel": "Parameters",
+        "param": {
+          "host": "host",
+          "port": "port",
+          "login": "login",
+          "pwd": "password",
+          "no": {
+            "host":"Host (ex: 192.168.0.1)",
+            "port":"Port (ex: 8080)",
+            "login":"Login (ex: kodi)",
+            "pwd":"Password"
+          }
+        }
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "deviceTab": "Devices",

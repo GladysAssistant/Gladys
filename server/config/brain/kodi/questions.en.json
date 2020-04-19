@@ -1,0 +1,7 @@
+[
+  {
+    "label": "kodi.ping",
+    "questions": ["Kodi ping %room%", "I want some Kodi ping in the %room%", "Kodi ping"],
+    "answers": ["Kodi ping ...", "Kodi ping !"]
+  }
+]

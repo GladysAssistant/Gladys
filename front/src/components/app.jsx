@@ -69,6 +69,9 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 
+// Kodi integration
+import KodiDevicePage from '../routes/integration/all/kodi/device-page';
+
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -166,6 +169,11 @@ const AppRouter = connect(
         <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
         <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
+        <Redirect
+            path="/dashboard/integration/device/kodi"
+            to="/dashboard/integration/device/kodi/device"
+        />
+        <KodiDevicePage path="/dashboard/integration/device/kodi/device" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
