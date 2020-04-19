@@ -1,9 +1,9 @@
 const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
+
+const { fake } = sinon;
 const { config } = require('../../../../../services/caldav/lib/config/index');
 
-chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
@@ -30,7 +30,7 @@ describe('CalDAV config', () => {
     dav: {
       ns: namespace,
       transport: {
-        Basic: sinon.stub().returns({
+        Basic: fake.returns({
           send,
         }),
       },
@@ -40,6 +40,10 @@ describe('CalDAV config', () => {
       },
     },
   };
+
+  beforeEach(() => {
+    sinon.reset();
+  });
 
   it('should config URLs', async () => {
     configEnv.gladys.variable.getValue
