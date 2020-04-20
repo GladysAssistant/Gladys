@@ -66,7 +66,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.2.4",
+    "@gladysassistant/gladys-gateway-js": "^3.2.5",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "bcrypt": "^3.0.3",
