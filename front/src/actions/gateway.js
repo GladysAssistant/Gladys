@@ -274,6 +274,7 @@ function createActions(store) {
         const restoreStatus = await state.httpClient.get('/api/v1/gateway/backup/restore/status');
         store.setState({
           gatewayRestoreInProgress: restoreStatus.restore_in_progress,
+          gatewayRestoreErrored: restoreStatus.restore_errored,
           gatewayRestoreStatusStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -289,6 +290,10 @@ function createActions(store) {
           setTimeout(() => {
             actions.waitForRestoreToFinish(state);
           }, 2000);
+        } else if (restoreStatus.restore_errored) {
+          store.setState({
+            gatewayRestoreErrored: true
+          });
         } else {
           window.location = '/dashboard';
         }

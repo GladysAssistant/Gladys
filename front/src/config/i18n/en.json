@@ -73,6 +73,14 @@
       "selectorAlreadyExistError": "A user with this firstname already exist.",
       "createAccountButton": "Create Account"
     },
+    "restoreBackupSetBackupKey": {
+      "title": "Enter your backup key",
+      "description": "As Gladys Plus backups are end-to-end encrypted, we need you to enter your backup key. Your local instance can only decrypt the backup with this backup key.",
+      "backupKeyLabel": "Backup key",
+      "backupKeyPlaceholder": "Enter your backup key",
+      "cancelButton": "Cancel",
+      "saveButton": "Save backup key"
+    },
     "preferences": {
       "title": "Your preferences",
       "description": "You can modify those settings anytime later.",
