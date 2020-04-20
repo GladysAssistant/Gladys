@@ -13,11 +13,14 @@ describe('mqttHandler.init', () => {
       variable: {
         getValue: fake.resolves('value'),
       },
+      system: {
+        isDocker: fake.resolves(false),
+      },
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
     await mqttHandler.init();
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 3);
     expect(Object.keys(mqttHandler.topicBinds)).is.deep.eq(DEFAULT.TOPICS);
   });
 });

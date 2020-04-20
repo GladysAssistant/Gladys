@@ -1,5 +1,7 @@
-const { fake } = require('sinon');
-const { containers } = require('./DockerApiMock.test');
+const sinon = require('sinon');
+
+const { fake } = sinon;
+const { containers, images } = require('./DockerApiMock.test');
 
 class Docker {
   constructor() {
@@ -10,17 +12,23 @@ class Docker {
 }
 
 Docker.prototype.listContainers = fake.resolves(containers);
+Docker.prototype.listImages = fake.resolves(images);
+Docker.prototype.createContainer = fake.resolves({ id: containers[0].Id });
 
 Docker.prototype.getContainer = fake.returns({
-  restart: fake.resolves(null),
+  restart: fake.resolves(true),
+  exec: ({ Cmd }) => {
+    return fake.resolves({
+      start: sinon.stub().yields(Cmd[0] === 'fail' ? 'error' : null, 'success'),
+    })();
+  },
 });
 
-Docker.prototype.pull = (repoTag, callback) => {
+Docker.prototype.pull = (repoTag) => {
   if (repoTag.endsWith('latest')) {
-    callback(null, {});
-  } else {
-    callback('ERROR');
+    return fake.resolves(true)();
   }
+  return fake.rejects('ERROR')();
 };
 
 Docker.prototype.followProgress = (stream, onFinished, onProgress) => {

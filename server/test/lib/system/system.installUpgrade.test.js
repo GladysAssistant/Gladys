@@ -6,7 +6,6 @@ const { fake, assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
-const { containers } = require('./DockerApiMock.test');
 const DockerodeMock = require('./DockerodeMock.test');
 
 const System = proxyquire('../../../lib/system', {
@@ -65,7 +64,7 @@ describe('system.installUpgrade', () => {
   });
 
   it('should fail: watchtower not installed', async () => {
-    containers.pop();
+    system.dockerode.listContainers = fake.resolves([]);
 
     try {
       await system.installUpgrade();

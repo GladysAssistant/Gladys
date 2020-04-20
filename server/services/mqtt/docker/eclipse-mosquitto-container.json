@@ -1,0 +1,25 @@
+{
+  "name": "eclipse-mosquitto",
+  "Image": "eclipse-mosquitto:latest",
+  "ExposedPorts": { "1883/tcp": {} },
+  "HostConfig": {
+    "Binds": ["/var/lib/gladysassistant/mosquitto:/mosquitto/config"],
+    "PortBindings": {
+      "1883/tcp": [
+        {
+          "HostPort": "1883"
+        }
+      ]
+    },
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

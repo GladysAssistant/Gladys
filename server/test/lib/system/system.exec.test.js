@@ -5,7 +5,6 @@ const { fake, assert } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
 
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
 
@@ -22,15 +21,11 @@ const event = {
   emit: fake.resolves(null),
 };
 
-const config = {
-  tempFolder: '/tmp/gladys',
-};
-
-describe('system.downloadUpgrade', () => {
+describe('system.exec', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();
@@ -43,8 +38,10 @@ describe('system.downloadUpgrade', () => {
   it('should failed as not on docker env', async () => {
     system.dockerode = undefined;
 
+    const options = { Cmd: ['ls'] };
+
     try {
-      await system.downloadUpgrade('latest');
+      await system.exec('my-container', options);
       assert.fail('should have fail');
     } catch (e) {
       expect(e).be.instanceOf(PlatformNotCompatible);
@@ -55,35 +52,32 @@ describe('system.downloadUpgrade', () => {
     }
   });
 
-  it('should download upgrade', async () => {
-    const tag = 'latest';
-    await system.downloadUpgrade(tag);
+  it('should exec command with success', async () => {
+    const options = { Cmd: ['success'] };
+
+    const result = await system.exec('my-container', options);
+
+    expect(result).to.be.eq(true);
 
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);
+    assert.notCalled(event.emit);
 
-    assert.calledTwice(event.emit);
-    assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS,
-      payload: { event: {} },
-    });
-    assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED,
-      payload: {},
-    });
+    assert.calledOnce(system.dockerode.getContainer);
   });
 
-  it('should fail downloading upgrade', async () => {
-    const tag = 'fail';
-    await system.downloadUpgrade(tag);
+  it('should exec command with error', async () => {
+    const options = { Cmd: ['fail'] };
 
-    assert.notCalled(sequelize.close);
-    assert.notCalled(event.on);
+    try {
+      await system.exec('my-container', options);
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).to.be.eq('error');
 
-    assert.calledOnce(event.emit);
-    assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED,
-      payload: {},
-    });
+      assert.notCalled(sequelize.close);
+      assert.notCalled(event.on);
+      assert.notCalled(event.emit);
+    }
   });
 });

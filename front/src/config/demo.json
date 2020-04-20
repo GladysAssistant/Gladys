@@ -710,6 +710,11 @@
     "configured": true,
     "connected": true
   },
+  "get /api/v1/service/mqtt/config": {
+    "useEmbeddedBroker": true,
+    "dockerBased": true,
+    "brokerContainerAvailable": false
+  },
   "get /api/v1/service/tasmota": {},
   "get /api/v1/service/tasmota/device": [
     {

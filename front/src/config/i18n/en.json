@@ -461,6 +461,13 @@
       "setup": {
         "title": "MQTT configuration",
         "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "embeddedBrokerLabel": "Broker Docker container",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
+        "installBrokerContainer": "Use broker in a Docker container.",
+        "brokerDockerNotInstalled": "No broker is available yet on current Docker environment, continue to install and configure <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> broker inside a Docker container.",
+        "installBrokerButton": "Install broker on Docker",
+        "installingBrokerButton": "Installation in progress...",
+        "installBrokerError": "An error occured while installing Docker container, please consult Gladys logs.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",

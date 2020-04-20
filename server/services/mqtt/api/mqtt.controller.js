@@ -8,7 +8,6 @@ module.exports = function MqttController(mqttManager) {
    * @apiGroup Mqtt
    */
   async function connect(req, res) {
-    await mqttManager.connect(req.body);
     await mqttManager.saveConfiguration(req.body);
     res.json({
       success: true,
@@ -21,7 +20,7 @@ module.exports = function MqttController(mqttManager) {
    * @apiGroup Mqtt
    */
   async function status(req, res) {
-    const response = await mqttManager.status();
+    const response = mqttManager.status();
     res.json(response);
   }
 
@@ -38,6 +37,16 @@ module.exports = function MqttController(mqttManager) {
     res.json(configuration);
   }
 
+  /**
+   * @api {post} /api/v1/service/mqtt/config/docker Install MQTT broker container.
+   * @apiName getConfiguration
+   * @apiGroup Mqtt
+   */
+  async function installContainer(req, res) {
+    await mqttManager.installContainer();
+    res.json({ status: DEFAULT.INSTALLATION_STATUS.DONE });
+  }
+
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
@@ -50,6 +59,10 @@ module.exports = function MqttController(mqttManager) {
     'get /api/v1/service/mqtt/config': {
       authenticated: true,
       controller: asyncMiddleware(getConfiguration),
+    },
+    'post /api/v1/service/mqtt/config/docker': {
+      authenticated: true,
+      controller: asyncMiddleware(installContainer),
     },
   };
 };

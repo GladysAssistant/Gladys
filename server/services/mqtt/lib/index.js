@@ -8,6 +8,8 @@ const { subscribe } = require('./subscribe');
 const { unsubscribe } = require('./unsubscribe');
 const { status } = require('./status');
 const { getConfiguration } = require('./getConfiguration');
+const { saveConfiguration } = require('./saveConfiguration');
+const { installContainer } = require('./installContainer');
 const { setValue } = require('./setValue');
 
 /**
@@ -39,6 +41,8 @@ MqttHandler.prototype.subscribe = subscribe;
 MqttHandler.prototype.unsubscribe = unsubscribe;
 MqttHandler.prototype.status = status;
 MqttHandler.prototype.getConfiguration = getConfiguration;
+MqttHandler.prototype.saveConfiguration = saveConfiguration;
+MqttHandler.prototype.installContainer = installContainer;
 MqttHandler.prototype.setValue = setValue;
 
 module.exports = MqttHandler;

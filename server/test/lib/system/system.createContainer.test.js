@@ -21,15 +21,11 @@ const event = {
   emit: fake.resolves(null),
 };
 
-const config = {
-  tempFolder: '/tmp/gladys',
-};
-
-describe('system.pull', () => {
+describe('system.createContainer', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();
@@ -43,7 +39,7 @@ describe('system.pull', () => {
     system.dockerode = undefined;
 
     try {
-      await system.pull('latest');
+      await system.createContainer({ image: 'my-image' });
       assert.fail('should have fail');
     } catch (e) {
       expect(e).be.instanceOf(PlatformNotCompatible);
@@ -54,29 +50,13 @@ describe('system.pull', () => {
     }
   });
 
-  it('should pull image', async () => {
-    const tag = 'latest';
-    const onProgress = fake.returns(null);
-    await system.pull(tag, onProgress);
+  it('should createContainer', async () => {
+    const image = { image: 'my-image' };
+    await system.createContainer(image);
 
+    assert.calledOnce(system.dockerode.createContainer);
+    assert.calledOnce(system.dockerode.listContainers);
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);
-
-    assert.calledOnce(onProgress);
-  });
-
-  it('should fail downloading upgrade', async () => {
-    const tag = 'fail';
-    const onProgress = fake.returns(null);
-
-    try {
-      await system.pull(tag, onProgress);
-      assert.fail('should have fail');
-    } catch (e) {
-      assert.notCalled(onProgress);
-      assert.notCalled(sequelize.close);
-      assert.notCalled(event.on);
-      assert.notCalled(event.emit);
-    }
   });
 });

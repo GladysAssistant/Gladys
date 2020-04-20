@@ -10,6 +10,11 @@ const DEFAULT = {
     'gladys/master/#', // Default gladys topic
   ],
   HIDDEN_PASSWORD: '*********',
+  INSTALLATION_STATUS: {
+    DONE: 'DONE',
+    IN_PROGRESS: 'IN_PROGRESS',
+    ERROR: 'ERROR',
+  },
 };
 
 module.exports = {

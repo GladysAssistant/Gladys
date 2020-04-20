@@ -30,23 +30,31 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
     username: mqttUsername,
     password: mqttPassword,
+    reconnectPeriod: 5000,
+    clientId: 'gladys',
   });
+
   this.mqttClient.on('connect', () => {
     logger.info(`Connected to MQTT server ${mqttUrl}`);
+
     Object.keys(this.topicBinds).forEach((topic) => {
       this.subscribe(topic, this.topicBinds[topic]);
     });
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
     });
+
     this.connected = true;
   });
   this.mqttClient.on('error', (err) => {
     logger.warn(`Error while connecting to MQTT - ${err}`);
+
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
       payload: err,
     });
+
+    this.disconnect();
   });
   this.mqttClient.on('offline', () => {
     logger.warn(`Disconnected from MQTT server`);

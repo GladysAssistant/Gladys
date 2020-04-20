@@ -5,10 +5,10 @@ const MqttController = require('../../../../services/mqtt/api/mqtt.controller');
 
 const configuration = {};
 const mqttHandler = {
-  connect: fake.returns(true),
   status: fake.resolves(true),
   getConfiguration: fake.returns(configuration),
-  saveConfiguration: fake.resolves(true),
+  saveConfiguration: fake.returns(true),
+  installContainer: fake.returns(true),
 };
 
 describe('POST /api/v1/service/mqtt/connect', () => {
@@ -32,8 +32,7 @@ describe('POST /api/v1/service/mqtt/connect', () => {
     };
 
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
-    assert.calledWith(mqttHandler.connect, req.body);
-    assert.calledOnce(mqttHandler.saveConfiguration);
+    assert.calledWith(mqttHandler.saveConfiguration, req.body);
   });
 });
 
@@ -125,5 +124,25 @@ describe('GET /api/v1/service/mqtt/config', () => {
       useEmbeddedBroker: true,
       mqttPassword: 'my_password',
     });
+  });
+});
+
+describe('POST /api/v1/service/mqtt/config/docker', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+    sinon.reset();
+  });
+
+  it('Install container', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/mqtt/config/docker'].controller(req, res);
+    assert.calledOnce(mqttHandler.installContainer);
+    assert.calledOnce(res.json);
   });
 });

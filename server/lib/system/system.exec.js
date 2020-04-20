@@ -1,0 +1,30 @@
+const { PlatformNotCompatible } = require('../../utils/coreErrors');
+
+/**
+ * @description Execute a command in a container image.
+ * @param {string} containerId - Container id.
+ * @param {Object} options - Command to execute.
+ * @returns {Promise<Object>} The state of the command.
+ * @example
+ * const state = await exec(containerId, options);
+ */
+async function exec(containerId, options) {
+  if (!this.dockerode) {
+    throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
+  }
+
+  const container = await this.dockerode.getContainer(containerId);
+  const executable = await container.exec(options);
+  return new Promise((resolve, reject) => {
+    executable.start((err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(true);
+    });
+  });
+}
+
+module.exports = {
+  exec,
+};

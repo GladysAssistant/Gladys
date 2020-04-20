@@ -11,6 +11,9 @@ const gladys = {
   event: {
     emit: fake.returns(null),
   },
+  system: {
+    isDocker: fake.resolves(false),
+  },
 };
 
 const MqttHandler = require('../../../services/mqtt/lib');
@@ -33,7 +36,7 @@ describe('MqttHandler', () => {
 
     expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#']);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);
     expect(mqttHandler.configured).to.eq(true);
     expect(mqttHandler.connected).to.eq(false);

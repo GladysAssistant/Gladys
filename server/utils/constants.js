@@ -368,6 +368,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
+    INSTALLATION_STATUS: 'mqtt.install-status',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',

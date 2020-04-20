@@ -11,6 +11,18 @@ const containers = [
   },
 ];
 
+const images = [
+  {
+    Id: '0f72aecf-4a85-4b00-86c4-43dbdf9c8c05',
+    RepoTags: ['gladysassistant/gladys'],
+  },
+  {
+    Id: '3eb811ca-e050-4324-a6fa-a7a09141b4fa',
+    RepoTags: ['containrrr/watchtower'],
+  },
+];
+
 module.exports = {
   containers,
+  images,
 };

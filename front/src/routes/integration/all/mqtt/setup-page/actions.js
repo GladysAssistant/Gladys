@@ -5,27 +5,24 @@ const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async loadProps(state) {
-      let configuration;
+      let configuration = {};
       try {
         configuration = await state.httpClient.get('/api/v1/service/mqtt/config');
       } finally {
         store.setState({
-          mqttURL: configuration.mqttURL,
+          mqttUrl: configuration.mqttUrl,
           mqttUsername: configuration.mqttUsername,
           mqttPassword: configuration.mqttPassword,
           useEmbeddedBroker: configuration.useEmbeddedBroker,
+          dockerBased: configuration.dockerBased,
+          brokerContainerAvailable: configuration.brokerContainerAvailable,
           passwordChanges: false,
           connected: false
         });
       }
     },
-    updateConfigration(state, e) {
-      const data = {};
-      data[e.target.name] = e.target.value;
-      if (e.target.name === 'mqttPassword') {
-        data.passwordChanges = true;
-      }
-      store.setState(data);
+    updateConfiguration(state, config) {
+      store.setState(config);
     },
     async saveConfiguration(state) {
       event.preventDefault();
@@ -35,11 +32,12 @@ const createActions = store => {
         mqttConnectionError: undefined
       });
       try {
-        const { mqttUrl, mqttUsername, mqttPassword } = state;
+        const { mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker } = state;
         await state.httpClient.post(`/api/v1/service/mqtt/connect`, {
           mqttUrl,
           mqttUsername,
-          mqttPassword
+          mqttPassword,
+          useEmbeddedBroker
         });
 
         store.setState({
