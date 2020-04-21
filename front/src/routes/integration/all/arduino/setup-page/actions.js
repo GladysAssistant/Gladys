@@ -20,7 +20,7 @@ const actions = store => {
         });
       }
     },
-    async saveDevice(state) {
+    async saveDevice(state, device, index) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
       const newState = update(state, {
         ArduinoDevices: {
