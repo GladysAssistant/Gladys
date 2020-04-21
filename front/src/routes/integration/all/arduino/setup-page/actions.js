@@ -49,6 +49,8 @@ const actions = store => {
         });
       }
 
+      console.log(store.getState());
+
     },
     async getArduinoNewDevices(state) {
       store.setState({
