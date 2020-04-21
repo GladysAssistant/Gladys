@@ -33,8 +33,7 @@ const actions = store => {
         if (state.arduinoDeviceSearch && state.arduinoDeviceSearch.length) {
           options.search = state.arduinoDeviceSearch;
         }
-        const arduinoDevicesReceived = await state.httpClient.get('/api/v1/service/arduino/device', options);
-        //const arduinoDevices = arduinoDevicesReceived.filter(device => device.model !== BRIDGE_MODEL);
+        
         const arduinoDevicesMap = new Map();
         arduinoDevices.forEach(device => arduinoDevicesMap.set(device.external_id, device));
         store.setState({
