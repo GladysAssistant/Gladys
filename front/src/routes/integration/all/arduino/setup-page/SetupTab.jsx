@@ -84,30 +84,6 @@ const SetupTab = ({ children, ...props }) => {
           </div>
         </div>
       </div>
-
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <Text id="integration.arduino.device.title" />
-          </h3>
-        </div>
-        <div class="card-body">
-          <div
-            class={cx('dimmer', {
-              active: props.connectArduinoStatus === RequestStatus.Getting
-            })}
-          >
-            <div class="loader" />
-
-
-
-
-
-
-          </div>
-        </div>
-      </div>
     </div>
 
   );
