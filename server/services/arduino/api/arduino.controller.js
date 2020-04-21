@@ -31,6 +31,29 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/arduino/info Get Arduino Informations
+   * @apiName getInfos
+   * @apiGroup Arduino
+   */
+  async function getInfos(req, res) {
+    const infos = arduinoManager.getInfos();
+    res.json(infos);
+  }
+
+  /**
+   * @api {get} /api/v1/service/arduino/status Get Arduino Status
+   * @apiName getStatus
+   * @apiGroup Arduino
+   */
+  async function getStatus(req, res) {
+    res.json({
+      connected: arduinoManager.connected,
+      scanInProgress: arduinoManager.scanInProgress,
+      ready: arduinoManager.ready,
+    });
+  }
+
   return {
     'post /api/v1/service/arduino/connect': {
       authenticated: true,
@@ -40,5 +63,13 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(disconnect),
     },
+    'get /api/v1/service/arduino/info': {
+      authenticated: true,
+      controller: asyncMiddleware(getInfos),
+    },
+    'get /api/v1/service/arduino/status': {
+      authenticated: true,
+      controller: asyncMiddleware(getStatus),
+    }
   };
 };

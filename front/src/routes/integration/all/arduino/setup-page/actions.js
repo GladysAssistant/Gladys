@@ -19,6 +19,22 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
+    },
+    async getCurrentArduinoPath(state) {
+      store.setState({
+        getCurrentArduinoPathStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoDriverPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
+        store.setState({
+          arduinoPath: arduinoPath.value,
+          getCurrentArduinoPathStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoPathStatus: RequestStatus.Error
+        });
+      }
     }, 
     updateArduinoPath(state, e) {
       store.setState({
@@ -58,6 +74,40 @@ const actions = store => {
       } catch (e) {
         store.setState({
           arduinoDisconnectStatus: RequestStatus.Error
+        });
+      }
+    },
+    async getInfos(state) {
+      store.setState({
+        getArduinoInfos: RequestStatus.Getting
+      });
+      try {
+        const arduinoInfos = await state.httpClient.get('/api/v1/service/arduino/info');
+        store.setState({
+          arduinoInfos,
+          getArduinoInfos: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getArduinoInfos: RequestStatus.Error
+        });
+      }
+    },
+    async getStatus(state) {
+      store.setState({
+        arduinoGetStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoStatus = await state.httpClient.get('/api/v1/service/arduino/status');
+        store.setState({
+          arduinoStatus,
+          arduinoConnectionInProgress: false,
+          arduinoGetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          arduinoGetStatus: RequestStatus.Error,
+          arduinoConnectionInProgress: false
         });
       }
     }
