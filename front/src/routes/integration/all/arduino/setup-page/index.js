@@ -22,7 +22,7 @@ class ArduinoSetupPage extends Component {
   render(props, { }) {
     return (
       <ArduinoPage>
-        <SetupTab {...props} />
+        <SetupTab {...props} loading={loading} />
       </ArduinoPage>
     );
   }
