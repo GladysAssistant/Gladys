@@ -3,6 +3,10 @@ import cx from 'classnames';
 import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 
+const createDevice = (props, device) => () => {
+  props.createDevice(device);
+};
+
 const SetupTab = ({ children, ...props }) => {
   return (
     <div>
@@ -74,7 +78,7 @@ const SetupTab = ({ children, ...props }) => {
                       </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success" onClick={props.saveDevice}>
+                    <button type="submit" class="btn btn-success" onClick={createDevice(props, device)}>
                       <Text id="integration.arduino.setup.connectButton" />
                     </button>
                   </div>
