@@ -522,6 +522,36 @@
         "disconnected": "Disconnected from MQTT broker."
       }
     },
+    "arduino": {
+      "title": "Arduino",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "status": {
+        "notConfigured": "Arduino service is not configured, please go to ",
+        "notConnected": "Arduino card is not connected, please connect a card.",
+        "setupPageLink": "Arduino configuration page"
+      },
+      "device": {
+        "title": "Arduino Devices",
+        "arduinoDescription": "List of Arduino devices currently connected or which have been connected to Gladys.",
+        "search": "Search devices",
+        "noDevices": "No Arduino devices added yet.",
+        "noNameLabel": "No name",
+        "nameLabel": "Name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "refreshButton": "Refresh Arduino list",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "returnButton": "Return back",
+        "editButton": "Edit details",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Display Xiaomi home devices.",
