@@ -557,7 +557,8 @@
         "connecting": "Connection",
         "connected": "Arduino connected",
         "connectionError": "Error while connecting, please check your configuration.",
-        "notConnected": "Arduino card is not connected, please connect a card."
+        "notConnected": "Arduino card is not connected, please connect a card.",
+        "connectButton": "Connect"
       }
     },
     "xiaomi": {
