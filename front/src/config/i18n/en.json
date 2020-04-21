@@ -554,6 +554,7 @@
       "setup": {
         "title": "Arduino Settings",
         "arduinoDescription": "To use this service, you need to connect an Arduino card",
+        "arduinoUsbDriverPathLabel": "Select the USB port where your Arduino is connected",
         "error": "No Arduino device added yet.",
         "connecting": "Connection",
         "connected": "Arduino connected",
