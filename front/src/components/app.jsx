@@ -69,7 +69,7 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import ArduinoDevicePage from '../routes/integration/all/arduino/device-page';
-import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
+//import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
 import ArduinoSetupPage from '../routes/integration/all/arduino/setup-page';
 
 // MQTT integration
