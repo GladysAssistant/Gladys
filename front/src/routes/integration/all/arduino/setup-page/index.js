@@ -18,7 +18,7 @@ class ArduinoSetupPage extends Component {
 
   render(props, { }) {
     return (
-      <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
+      <ArduinoPage /*integration={integrationConfig[props.user.language].arduino}*/>
         <SetupTab {...props} />
       </ArduinoPage>
     );
