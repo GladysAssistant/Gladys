@@ -49,7 +49,6 @@ const actions = store => {
         });
       }
 
-      console.log(store.getState());
     },
     async getArduinoNewDevices(state) {
       store.setState({
@@ -75,6 +74,7 @@ const actions = store => {
     },
     async saveDevice(state, device, index) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
+      console.log(savedDevice);
       const newState = update(state, {
         ArduinoDevices: {
           $splice: [[index, 1, savedDevice]]
