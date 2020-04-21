@@ -20,8 +20,8 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
-    }, 
-    async getArduinoDevices(state){
+    },
+    async getArduinoDevices(state) {
       store.setState({
         getArduinoDevicesStatus: RequestStatus.Getting
       });
@@ -75,12 +75,12 @@ const actions = store => {
     async saveDevice(state, device, index) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
       console.log(savedDevice);
-      const newState = update(state, {
+      /*const newState = update(state, {
         ArduinoDevices: {
           $splice: [[index, 1, savedDevice]]
         }
       });
-      store.setState(newState);
+      store.setState(newState);*/
     },
     async createDevice(state, device) {
       store.setState({
