@@ -69,7 +69,6 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import ArduinoDevicePage from '../routes/integration/all/arduino/device-page';
-//import ArduinoDeviceSetupPage from '../routes/integration/all/arduino/device-page/setup';
 import ArduinoSetupPage from '../routes/integration/all/arduino/setup-page';
 
 // MQTT integration
@@ -171,8 +170,8 @@ const AppRouter = connect(
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
 
-        <ArduinoDevicePage path="/dashboard/integration/device/philips-hue/device" />
-        <ArduinoSetupPage path="/dashboard/integration/device/philips-hue/setup" />
+        <ArduinoDevicePage path="/dashboard/integration/device/arduino/device" />
+        <ArduinoSetupPage path="/dashboard/integration/device/arduino/setup" />
         <Redirect path="/dashboard/integration/device/arduino" to="/dashboard/integration/device/arduino/device" />
 
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
