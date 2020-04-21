@@ -18,6 +18,9 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
+    },
+    async saveConfiguration(state) {
+
     }
   };
 
