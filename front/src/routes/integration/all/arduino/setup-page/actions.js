@@ -1,10 +1,8 @@
 import { RequestStatus } from '../../../../../utils/consts';
-import update from 'immutability-helper';
-import debounce from 'debounce';
 
 const actions = store => {
   const actions = {
-    async getUsbPorts(state) { //getUsbPorts --> Fonctionnel !
+    async getUsbPorts(state) {
       store.setState({
         getArduinoUsbPortStatus: RequestStatus.Getting
       });
@@ -110,6 +108,12 @@ const actions = store => {
           arduinoConnectionInProgress: false
         });
       }
+    },
+    driverFailed(state) {
+      store.setState({
+        arduinoDriverFailed: true,
+        arduinoConnectionInProgress: false
+      });
     }
   };
 
