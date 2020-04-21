@@ -8,9 +8,7 @@ const DashboardSettings = ({ children, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
-              <h3 class="page-title mb-5">
-                <Text id="integration.arduino.title" />
-              </h3>
+              <h3 class="page-title mb-5">Arduino</h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
