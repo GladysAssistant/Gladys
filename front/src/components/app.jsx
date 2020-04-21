@@ -78,6 +78,11 @@ import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
+// DSP-W215
+import W215Page from '../routes/integration/all/w215/device-page';
+import W215EditPage from '../routes/integration/all/w215/edit-page';
+import W215DiscoverPage from '../routes/integration/all/w215/discover-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -173,6 +178,9 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <W215Page path="/dashboard/integration/device/w215" />
+        <W215EditPage path="/dashboard/integration/device/w215/edit/:deviceSelector" />
+        <W215DiscoverPage path="/dashboard/integration/device/w215/discover" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

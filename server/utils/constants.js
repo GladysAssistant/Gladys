@@ -267,6 +267,7 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
+    TEMPERATURE: 'temperature',
   },
   CAMERA: {
     IMAGE: 'image',
@@ -303,6 +304,7 @@ const DEVICE_FEATURE_UNITS = {
   PERCENT: 'percent',
   PASCAL: 'pascal',
   LUX: 'lux',
+  WATT: 'watt',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',

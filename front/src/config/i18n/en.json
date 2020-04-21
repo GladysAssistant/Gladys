@@ -434,6 +434,42 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "w215": {
+      "title": "D-Link DSP-W215",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "discoverDeviceDescr": "Automatically scan for device",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "ip_adress": "IP address",
+      "roomLabel": "Room",
+      "pin_code": "Pin code",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
+      "device": {
+        "title": "Devices in Gladys",
+        "search": "Search devices",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No DSP-W215 device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your network",
+        "description": "D-Link DSP-W215 smart plug are automatically discovered over your network. Once the device is discovered, you will have to complete installation with the pin code witch is behind the smart plug.",
+        "error": "Error discovering your device. Please, contact us on http://community.gladysassistant.com",
+        "noDeviceFound": "No device discovered.",
+        "scan": "Scan"
+      },      
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
     }
   },
   "editScene": {
@@ -847,7 +883,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "temperature": "Switch temperature"
     },
     "siren": {
       "binary": "Siren"

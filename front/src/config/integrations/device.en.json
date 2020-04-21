@@ -37,8 +37,8 @@
   },
   {
     "key": "w215",
-    "name": "DLink DSP-W215",
-    "description": "Control your DSP-W215 plug.",
+    "name": "D-Link DSP-W215",
+    "description": "Control DSP-W215 smart plug.",
     "img": "/assets/integrations/cover/w215.jpg"
   }
 ]
