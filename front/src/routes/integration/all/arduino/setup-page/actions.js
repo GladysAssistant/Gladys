@@ -43,12 +43,13 @@ const actions = store => {
           getArduinoDevicesStatus: RequestStatus.Success
         });
         actions.getArduinoNewDevices(store.getState());
-        console.log(store.getState());
       } catch (e) {
         store.setState({
           getArduinoDevicesStatus: RequestStatus.Error
         });
       }
+
+      console.log(store.getState());
     },
     async getArduinoNewDevices(state) {
       store.setState({
