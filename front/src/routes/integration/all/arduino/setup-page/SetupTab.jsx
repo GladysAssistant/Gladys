@@ -61,7 +61,7 @@ const SetupTab = ({ children, ...props }) => {
                       <label class="form-label">
                         <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                       </label>
-                      <select class="form-control">
+                      <select class="form-control" onChange={props.updateArduinoPath}>
                         <option>
                           <Text id="global.emptySelectOption" />
                         </option>
@@ -74,7 +74,7 @@ const SetupTab = ({ children, ...props }) => {
                       </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success" onClick={props.createDevice}>
+                    <button type="submit" class="btn btn-success" onClick={props.connectDevice}>
                       <Text id="integration.arduino.setup.connectButton" />
                     </button>
                   </div>

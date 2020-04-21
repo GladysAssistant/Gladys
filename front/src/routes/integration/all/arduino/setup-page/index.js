@@ -9,8 +9,8 @@ class ArduinoSetupPage extends Component {
 
   componentWillMount() {
     this.props.getUsbPorts();
+    this.props.getStatus();
     //this.props.getArduinoDevices();
-    //this.props.getIntegrationByName('arduino');
   }
 
   componentWillUnmount() {
@@ -18,7 +18,7 @@ class ArduinoSetupPage extends Component {
 
   render(props, { }) {
     return (
-      <ArduinoPage /*integration={integrationConfig[props.user.language].arduino}*/>
+      <ArduinoPage>
         <SetupTab {...props} />
       </ArduinoPage>
     );

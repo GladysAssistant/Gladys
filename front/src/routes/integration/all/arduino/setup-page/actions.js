@@ -19,20 +19,29 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
-    },
-    async createDevice(state, device) {
+    }, 
+    updateArduinoPath(state, e) {
       store.setState({
-        getArduinoCreateDeviceStatus: RequestStatus.Getting
+        arduinoPath: e.target.value
+      });
+    },
+    async savePathAndConnect(state) {
+      store.setState({
+        connectArduinoStatus: RequestStatus.Getting,
+        arduinoDriverFailed: false
       });
       try {
-        await state.httpClient.post('/api/v1/device', device);
-        store.setState({
-          getArduinoCreateDeviceStatus: RequestStatus.Success
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
+          value: state.zwaveDriverPath
         });
-        actions.getArduinoDevices(store.getState());
+        await state.httpClient.post('/api/v1/service/arduino/connect');
+        store.setState({
+          connectArduinoStatus: RequestStatus.Success,
+          arduinoConnectionInProgress: true
+        });
       } catch (e) {
         store.setState({
-          getArduinoCreateDeviceStatus: RequestStatus.Error
+          connectArduinoStatus: RequestStatus.Error
         });
       }
     }

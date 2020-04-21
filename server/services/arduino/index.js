@@ -1,7 +1,10 @@
 const logger = require('../../utils/logger');
+const ArduinoManager = require('./lib');
 const ArduinoController = require('./api/arduino.controller');
 
 module.exports = function ArduinoService(gladys, serviceId) {
+  const serial = require('serialport');
+  const arduinoManager = new ArduinoManager(serial, gladys.event, serviceId);
 
   /**
    * @public
@@ -26,6 +29,7 @@ module.exports = function ArduinoService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: ArduinoController(gladys, serviceId),
+    device: arduinoManager,
+    controllers: ArduinoController(gladys, arduinoManager, serviceId),
   });
 };
