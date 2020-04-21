@@ -5,7 +5,7 @@ import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 import integrationConfig from '../../../../../config/integrations';
 
-@connect('user,session,usbPorts,connectArduinoStatus,arduinoConnected,arduinoConnectionError', actions)
+@connect('user,session,usbPorts,connectArduinoStatus,arduinoConnected,arduinoConnectionError,getArduinoUsbPortStatus,getArduinoDevicesStatus,getArduinoCreateDevicesStatus,getArduinoNewDevicesStatus,arduinoDevices,arduinoDevicesMap,arduinoNewDevices', actions)
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
