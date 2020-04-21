@@ -7,7 +7,7 @@ module.exports = function ArduinoService(gladys, serviceId) {
    * @public
    * @description This function starts service
    * @example
-   * gladys.services.serial.start();
+   * gladys.services.arduino.start();
    */
   async function start() {
     logger.log('starting Arduino service');
