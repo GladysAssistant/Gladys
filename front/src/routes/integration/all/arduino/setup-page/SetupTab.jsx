@@ -50,6 +50,11 @@ const SetupTab = ({ children, ...props }) => {
                   <Text id="integration.arduino.setup.notConnected" />
                 </div>
               )}
+              {get(props, 'arduinoStatus.ready') && (
+                <div class="alert alert-warning">
+                  <Text id="integration.arduino.setup.Connected" />
+                </div>
+              )}
               <p>
                 <MarkupText id="integration.arduino.setup.arduinoDescription" />
               </p>
