@@ -115,32 +115,32 @@ const AppRouter = connect(
         {config.gatewayMode ? (
           <GatewayForgotPassword path="/forgot-password" />
         ) : (
-          <ForgotPassword path="/forgot-password" />
-        )}
+            <ForgotPassword path="/forgot-password" />
+          )}
         {config.gatewayMode ? (
           <GatewayResetPassword path="/reset-password" />
         ) : (
-          <ResetPassword path="/reset-password" />
-        )}
+            <ResetPassword path="/reset-password" />
+          )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
         {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
         {config.gatewayMode ? (
           <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />
         ) : (
-          <Error type="404" default />
-        )}
+            <Error type="404" default />
+          )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
@@ -170,6 +170,11 @@ const AppRouter = connect(
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
+
+        <ArduinoDevicePage path="/dashboard/integration/device/philips-hue/device" />
+        <ArduinoSetupPage path="/dashboard/integration/device/philips-hue/setup" />
+        <Redirect path="/dashboard/integration/device/arduino" to="/dashboard/integration/device/arduino/device" />
+
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
@@ -220,13 +225,8 @@ class MainApp extends Component {
     this.props.getIntegrations();
   }
 
-  render({ user }, {}) {
-    const translationDefinition = get(translations, user.language, { default: translations.en });
-    return (
-      <IntlProvider definition={translationDefinition}>
-        <AppRouter />
-      </IntlProvider>
-    );
+  render({ }, { }) {
+    return <AppRouter />;
   }
 }
 
