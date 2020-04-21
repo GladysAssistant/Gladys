@@ -12,7 +12,7 @@ const SetupTab = ({ children, ...props }) => {
             <Text id="integration.arduino.setup.title" />
           </h3>
           <div class="page-options d-flex">
-            <button class="btn btn-info" onClick={/*props.getUsbPorts*/ props.getArduinoDevices}>
+            <button class="btn btn-info" onClick={props.getUsbPorts}>
               <Text id="integration.arduino.device.refreshButton" />
             </button>
           </div>
@@ -74,7 +74,7 @@ const SetupTab = ({ children, ...props }) => {
                       </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success" onClick={props.saveDevice}>
+                    <button type="submit" class="btn btn-success" onClick={props.createDevice}>
                       <Text id="integration.arduino.setup.connectButton" />
                     </button>
                   </div>
