@@ -74,7 +74,7 @@ const SetupTab = ({ children, ...props }) => {
                       </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+                    <button type="submit" class="btn btn-success" onClick={props.saveDevice}>
                       <Text id="integration.arduino.setup.connectButton" />
                     </button>
                   </div>

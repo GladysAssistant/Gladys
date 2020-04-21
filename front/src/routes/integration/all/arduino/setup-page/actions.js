@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../../../../utils/consts';
+import update from 'immutability-helper';
 
 const actions = store => {
   const actions = {
@@ -19,8 +20,14 @@ const actions = store => {
         });
       }
     },
-    async saveConfiguration(state) {
-
+    async saveDevice(state) {
+      const savedDevice = await state.httpClient.post('/api/v1/device', device);
+      const newState = update(state, {
+        ArduinoDevices: {
+          $splice: [[index, 1, savedDevice]]
+        }
+      });
+      store.setState(newState);
     }
   };
 
