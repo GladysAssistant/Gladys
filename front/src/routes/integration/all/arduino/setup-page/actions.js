@@ -25,7 +25,7 @@ const actions = store => {
         getCurrentArduinoPathStatus: RequestStatus.Getting
       });
       try {
-        const arduinoDriverPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
+        const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
         store.setState({
           arduinoPath: arduinoPath.value,
           getCurrentArduinoPathStatus: RequestStatus.Success
@@ -48,7 +48,7 @@ const actions = store => {
       });
       try {
         await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
-          value: state.zwaveDriverPath
+          value: state.arduinoPath
         });
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({
