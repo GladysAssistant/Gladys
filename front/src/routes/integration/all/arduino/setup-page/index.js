@@ -10,7 +10,7 @@ class ArduinoSetupPage extends Component {
 
   componentWillMount() {
     this.props.getUsbPorts();
-    this.props.getIntegrationByName('arduino');
+    //this.props.getIntegrationByName('arduino');
   }
 
   componentWillUnmount() {

@@ -550,6 +550,9 @@
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      },
+      "setup": {
+        "title" : "Arduino Settings"
       }
     },
     "xiaomi": {
