@@ -15,6 +15,7 @@ const actions = store => {
           getArduinoUsbPortStatus: RequestStatus.Success
         });
         //console.log(usbPorts);
+        console.log(store);
       } catch (e) {
         store.setState({
           getArduinoUsbPortStatus: RequestStatus.Error
