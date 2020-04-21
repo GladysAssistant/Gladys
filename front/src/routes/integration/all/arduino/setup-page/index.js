@@ -14,6 +14,7 @@ class ArduinoSetupPage extends Component {
     this.props.getUsbPorts();
     this.props.getInfos();
     this.props.getStatus();
+    this.props.getCurrentArduinoPath();
   }
 
   componentWillUnmount() {
@@ -22,7 +23,7 @@ class ArduinoSetupPage extends Component {
   render(props, { }) {
     return (
       <ArduinoPage>
-        <SetupTab {...props} loading={loading} />
+        <SetupTab {...props} />
       </ArduinoPage>
     );
   }
