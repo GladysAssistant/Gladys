@@ -553,12 +553,14 @@
       },
       "setup": {
         "title": "Arduino Settings",
+        "arduinoDescription": "To use this service, you need to connect an Arduino card",
         "error": "No Arduino device added yet.",
         "connecting": "Connection",
         "connected": "Arduino connected",
         "connectionError": "Error while connecting, please check your configuration.",
         "notConnected": "Arduino card is not connected, please connect a card.",
-        "connectButton": "Connect"
+        "connectButton": "Connect",
+        "disconnectButton": "Disconnect"
       }
     },
     "xiaomi": {

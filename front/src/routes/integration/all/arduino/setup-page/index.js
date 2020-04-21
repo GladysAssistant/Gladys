@@ -4,13 +4,16 @@ import actions from './actions';
 import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 
-@connect('user,session,usbPorts,arduinoDeviceSearch,getArduinoDeviceOrderDir,connectArduinoStatus,arduinoConnected,arduinoConnectionError,getArduinoUsbPortStatus,getArduinoDevicesStatus,getArduinoCreateDevicesStatus,getArduinoNewDevicesStatus,arduinoDevices,arduinoDevicesMap,arduinoNewDevices', actions)
+@connect(
+  'user,session,usbPorts,arduinoInfos,arduinoPath,arduinoStatus,getArduinoUsbPortStatus,getCurrentArduinoPathStatus,arduinoGetStatus,arduinoDriverFailed,arduinoDisconnectStatus,connectArduinoStatus,arduinoConnectionInProgress', 
+  actions
+)
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
     this.props.getUsbPorts();
-    this.props.getStatus();
-    //this.props.getArduinoDevices();
+    //this.props.getInfos();
+    //this.props.getStatus();
   }
 
   componentWillUnmount() {

@@ -77,6 +77,9 @@ const SetupTab = ({ children, ...props }) => {
                     <button type="submit" class="btn btn-success" onClick={props.connectDevice}>
                       <Text id="integration.arduino.setup.connectButton" />
                     </button>
+                    <button class="btn btn-danger ml-2" onClick={props.disconnect}>
+                      <Text id="integration.arduino.settings.disconnectButton" />
+                    </button>
                   </div>
                 </div>
               </form>

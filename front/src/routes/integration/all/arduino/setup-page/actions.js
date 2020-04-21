@@ -44,6 +44,22 @@ const actions = store => {
           connectArduinoStatus: RequestStatus.Error
         });
       }
+    },
+    async disconnect(state) {
+      store.setState({
+        arduinoDisconnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/arduino/disconnect');
+        await actions.getStatus(store.getState());
+        store.setState({
+          arduinoDisconnectStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          arduinoDisconnectStatus: RequestStatus.Error
+        });
+      }
     }
   };
 
