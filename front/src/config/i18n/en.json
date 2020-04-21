@@ -552,7 +552,12 @@
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
       },
       "setup": {
-        "title" : "Arduino Settings"
+        "title": "Arduino Settings",
+        "error": "No Arduino device added yet.",
+        "connecting": "Connection",
+        "connected": "Arduino connected",
+        "connectionError": "Error while connecting, please check your configuration.",
+        "notConnected": "Arduino card is not connected, please connect a card."
       }
     },
     "xiaomi": {
