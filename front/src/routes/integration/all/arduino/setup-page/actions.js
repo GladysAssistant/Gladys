@@ -12,7 +12,6 @@ const actions = store => {
           usbPorts,
           getArduinoUsbPortStatus: RequestStatus.Success
         });
-        //this.checkConnected(state);
       } catch (e) {
         store.setState({
           getArduinoUsbPortStatus: RequestStatus.Error
@@ -35,7 +34,7 @@ const actions = store => {
         });
       }
     },
-    checkConnected(state) {
+    async checkConnected(state) {
       store.setState({
         getCurrentArduinoPathStatus: RequestStatus.Getting
       });
