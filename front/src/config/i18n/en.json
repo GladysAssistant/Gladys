@@ -535,7 +535,7 @@
         "title": "Arduino Devices",
         "arduinoDescription": "List of Arduino devices currently connected or which have been connected to Gladys.",
         "search": "Search devices",
-        "noDevices": "No Arduino devices added yet.",
+        "noDevices": "No Arduino devices added yet. Please go to Setup tab to connect an Arduino.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
         "roomLabel": "Room",
