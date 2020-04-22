@@ -39,11 +39,9 @@ function createActions(store) {
     },
     async updateValue(state, device, deviceFeature, roomIndex, deviceIndex, deviceFeatureIndex, value, oldValue) {
       actions.updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value);
-      if (deviceFeature.category === 'light' && deviceFeature.type === 'binary') {
-        await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-          value
-        });
-      }
+      await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
+        value
+      });
     },
     updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value) {
       // create a new immutable state
@@ -56,7 +54,10 @@ function createActions(store) {
                   [deviceFeatureIndex]: {
                     lastValue: {
                       $set: value
-                    }
+                    },
+                    lastValue_changed: {
+                      $set: new Date()
+                    },
                   }
                 }
               }

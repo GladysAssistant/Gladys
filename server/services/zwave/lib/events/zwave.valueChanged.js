@@ -21,6 +21,12 @@ function valueChanged(nodeId, comClass, value) {
       this.nodes[nodeId].classes[comClass][value.index].value,
       value.value,
     );
+
+    // If the value is the same as the in-memory one, do not send any event
+    if (this.nodes[nodeId].classes[comClass][value.index].value == value.value) {
+      return;
+    }
+
     this.nodes[nodeId].classes[comClass][value.index] = value;
     this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: getDeviceFeatureExternalId(value),

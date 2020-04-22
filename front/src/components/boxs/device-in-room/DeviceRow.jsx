@@ -1,6 +1,6 @@
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
-// import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
+import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 
 const DeviceRow = ({ children, ...props }) => {
   if (props.deviceFeature.display === 0) {
@@ -27,6 +27,21 @@ const DeviceRow = ({ children, ...props }) => {
         deviceFeatureIndex={props.deviceFeatureIndex}
         updateValue={props.updateValue}
       />
+    );
+  }
+
+  if (props.deviceFeature.type === 'dimmer') {
+    return (
+      <MultilevelDeviceFeature
+        x={props.x}
+        y={props.y}
+        device={props.device}
+        deviceFeature={props.deviceFeature}
+        roomIndex={props.roomIndex}
+        deviceIndex={props.deviceIndex}
+        deviceFeatureIndex={props.deviceFeatureIndex}
+        updateValue={props.updateValue}
+        />
     );
   }
   // if not, we return nothing
