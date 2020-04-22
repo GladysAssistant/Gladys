@@ -33,6 +33,29 @@ const actions = store => {
           getCurrentArduinoPathStatus: RequestStatus.Error
         });
       }
+    },
+    async checkConnected(state) {
+      store.setState({
+        getCurrentArduinoPathStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
+        store.setState({
+          arduinoPath: arduinoPath.value,
+          getCurrentArduinoPathStatus: RequestStatus.Success
+        });
+
+        if (arduinoPath.value === "---------"){
+          store.setState({
+            arduinoConnected: true,
+            arduinoConnectionError: false
+          });
+        }
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoPathStatus: RequestStatus.Error
+        });
+      }
     }, 
     updateArduinoPath(state, e) {
       store.setState({
