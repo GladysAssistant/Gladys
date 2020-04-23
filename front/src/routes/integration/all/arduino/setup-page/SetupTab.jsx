@@ -45,11 +45,11 @@ const SetupTab = ({ children, ...props }) => {
                   <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
                 </p>
               )}
-              {!get(props, 'arduinoStatus.ready') && (
+              {/*!get(props, 'arduinoStatus.ready') && (
                 <div class="alert alert-warning">
                   <Text id="integration.arduino.setup.notConnected" />
                 </div>
-              )}
+              )*/}
               {get(props, 'arduinoConnected') && (
                 <div class="alert alert-warning">
                   <Text id="integration.arduino.setup.Connected" />
