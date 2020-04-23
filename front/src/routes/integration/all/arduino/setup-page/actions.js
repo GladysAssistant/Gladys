@@ -47,8 +47,11 @@ const actions = store => {
 
         if (arduinoPath.value !== "---------"){
           store.setState({
-            arduinoConnected: true,
-            arduinoConnectionError: false
+            arduinoConnected: true
+          });
+        }else{
+          store.setState({
+            arduinoConnected: false
           });
         }
       } catch (e) {
@@ -74,7 +77,8 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({
           connectArduinoStatus: RequestStatus.Success,
-          arduinoConnectionInProgress: true
+          arduinoConnectionInProgress: true,
+          arduinoConnected: true
         });
       } catch (e) {
         store.setState({
@@ -90,7 +94,8 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/arduino/disconnect');
         await actions.getStatus(store.getState());
         store.setState({
-          arduinoDisconnectStatus: RequestStatus.Success
+          arduinoDisconnectStatus: RequestStatus.Success,
+          arduinoConnected:false
         });
       } catch (e) {
         store.setState({
