@@ -12,8 +12,6 @@ class ArduinoSetupPage extends Component {
 
   componentWillMount() {
     this.props.getUsbPorts();
-    //this.props.getInfos();
-    //this.props.getStatus();
     this.props.getCurrentArduinoPath();
     this.props.checkConnected();
   }
