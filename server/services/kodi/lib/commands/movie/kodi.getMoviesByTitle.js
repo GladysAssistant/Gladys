@@ -11,14 +11,15 @@ const logger = require('../../../../../utils/logger');
  * @returns {Object|Array} The list of all movies filter by title.
  */
 async function getMoviesByTitle(deviceId, title) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) ){
-
-    const movies = await connection.VideoLibrary.GetMovies({'filter':{'operator': 'contains', 'field': 'title', 'value': title}, properties: ['title', 'file']});
+  if (this.checkConnectionAndServerSate(connection, deviceId)) {
+    const movies = await connection.VideoLibrary.GetMovies({
+      filter: { operator: 'contains', field: 'title', value: title },
+      properties: ['title', 'file'],
+    });
     // logger.debug(`Movies list : ${movies}`);
-    logger.debug(JSON.parse(JSON.stringify(movies)).movies[0] );
+    logger.debug(JSON.parse(JSON.stringify(movies)).movies[0]);
 
     return movies;
   }

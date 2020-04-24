@@ -1,4 +1,3 @@
-// @ts-nocheck
 const logger = require('../../../../utils/logger');
 
 /**
@@ -10,12 +9,11 @@ const logger = require('../../../../utils/logger');
  * @returns {string} The server status.
  */
 async function pingKodi(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
   logger.debug(`Try to ping Kodi with deviceId : ${deviceId} (connection : ${connection} )`);
 
-  if( this.checkConnection(connection) ){
+  if (this.checkConnection(connection)) {
     const kodiPingValue = await connection.JSONRPC.Ping();
     logger.debug(`kodiPingValue : ${kodiPingValue}`);
     return kodiPingValue;

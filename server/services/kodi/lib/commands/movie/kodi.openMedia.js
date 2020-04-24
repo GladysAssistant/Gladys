@@ -9,11 +9,10 @@
  * @returns {string} The list of all movies.
  */
 async function openMedia(deviceId, mediaItem) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) && mediaItem ){
-    const movies = await connection.Player.Open({'item': {'file':mediaItem}});
+  if (this.checkConnectionAndServerSate(connection, deviceId) && mediaItem) {
+    const movies = await connection.Player.Open({ item: { file: mediaItem } });
     return movies;
   }
   return null;

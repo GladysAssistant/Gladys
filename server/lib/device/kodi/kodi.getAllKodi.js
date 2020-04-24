@@ -17,9 +17,13 @@ async function getAllKodi() {
         model: db.DeviceParam,
         as: 'params',
       },
+      {
+        model: db.DeviceFeature,
+        as: 'features',
+      },
     ],
     where: {
-      selector: { [Op.like]: 'kodi%'}
+      selector: { [Op.like]: 'kodi%' },
     },
   });
   // logger.debug("Devices found: ", devices);

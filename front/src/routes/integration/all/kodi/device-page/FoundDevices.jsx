@@ -5,7 +5,7 @@ import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 
-const FoundDevices = ({ children, ...props }) => (
+const FoundDevices = ({ children, user, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
@@ -20,8 +20,7 @@ const FoundDevices = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active:
-            props.getKodiDevicesStatus === RequestStatus.Getting
+          active: props.getKodiDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
@@ -38,14 +37,20 @@ const FoundDevices = ({ children, ...props }) => (
                   updateParamProperty={props.updateParamProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  testConnection={props.testConnection}
                 />
-            ))}
+              ))}
             {props.kodiDevices && props.kodiDevices.length === 0 && (
-                <div class="col-md-12">
-                  <div class="alert alert-info">
-                    <Text id="integration.kodi.device.noDevicesFound" />
-                  </div>
+              <div class="col-md-12">
+                <div class="alert alert-info">
+                  <Text id="integration.kodi.device.noDevicesFound" />
                 </div>
+                <div class="alert alert-info">
+                  <Text id="integration.kodi.device.beforeAddingDevice" />
+                  {user.language === 'fr' && <img class="card-img-top" src="/assets/images/kodi/kodi-config-fr.jpg" />}
+                  {user.language !== 'fr' && <img class="card-img-top" src="/assets/images/kodi/kodi-config-en.jpg" />}
+                </div>
+              </div>
             )}
           </div>
         </div>

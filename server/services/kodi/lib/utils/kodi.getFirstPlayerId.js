@@ -10,16 +10,15 @@ const logger = require('../../../../utils/logger');
  * @returns {number} The first player id.
  */
 async function getFirstPlayerId(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) ){
+  if (this.checkConnectionAndServerSate(connection, deviceId)) {
     const tableElement = await connection.Player.GetActivePlayers();
-    if( tableElement ){
+    if (tableElement) {
       const firstElement = tableElement[0];
-      if( firstElement && firstElement.playerid ){
+      if (firstElement && firstElement.playerid) {
         logger.debug(`Player.PlayPause : ${firstElement.playerid}`);
-        return firstElement.playerid ;
+        return firstElement.playerid;
       }
     }
   }

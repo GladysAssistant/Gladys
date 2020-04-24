@@ -16,13 +16,13 @@ const kodiOkPingServerState = 'pong';
 async function checkConnectionAndServerSate(connection, deviceId) {
   // TODO : return exception to stop treatment and display generic error mesg or restart service !?
 
-  if ( !this.checkConnection(connection) ){
+  if (!this.checkConnection(connection)) {
     logger.warn('kodiConnection object is not alive !!!');
     return false;
   }
 
   const kodiPingValue = await this.pingKodi(deviceId);
-  if( kodiPingValue!== kodiOkPingServerState ){
+  if (kodiPingValue !== kodiOkPingServerState) {
     logger.warn(`pingKodi return KO value (${kodiPingValue}) => Kodi server is down !!!`);
     return false;
   }

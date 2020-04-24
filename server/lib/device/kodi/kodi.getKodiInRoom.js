@@ -18,9 +18,13 @@ async function getKodiInRoom(roomId) {
         model: db.DeviceParam,
         as: 'params',
       },
+      {
+        model: db.DeviceFeature,
+        as: 'features',
+      },
     ],
     where: {
-      selector: { [Op.like]: 'kodi%'},
+      selector: { [Op.like]: 'kodi%' },
       room_id: roomId,
     },
   });

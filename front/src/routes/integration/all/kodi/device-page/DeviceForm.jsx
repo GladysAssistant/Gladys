@@ -1,20 +1,25 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import get from 'get-value';
+import { RequestStatus } from '../../../../../utils/consts';
 
 class KodiDeviceForm extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', 'kodi:'+e.target.value);
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', 'kodi:' + e.target.value);
   };
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
   updateParam = e => {
-      this.props.updateParamProperty(this.props.deviceIndex, e.target.attributes.paramIndex.value, e.target.name, e.target.value);
+    this.props.updateParamProperty(
+      this.props.deviceIndex,
+      e.target.attributes.paramIndex.value,
+      e.target.name,
+      e.target.value
+    );
   };
   updateDefault = e => {
-      this.props.updateParamProperty(this.props.deviceIndex,  0, e.target.id,  e.target.checked);
+    this.props.updateParamProperty(this.props.deviceIndex, 0, e.target.id, e.target.checked);
   };
   saveDevice = async () => {
     this.setState({ loading: true });
@@ -82,14 +87,14 @@ class KodiDeviceForm extends Component {
           </label>
           <div class="card-options">
             <label class="custom-switch m-0">
-                <input
-                  id="default"
-                  type="checkbox"
-                  value="1"
-                  checked={props.device.params[0].value === "true"}
-                  onClick={this.updateDefault}
-                  class="custom-switch-input"
-                  />
+              <input
+                id="default"
+                type="checkbox"
+                value="1"
+                checked={props.device.params[0].value === 'true'}
+                onClick={this.updateDefault}
+                class="custom-switch-input"
+              />
               <span class="custom-switch-indicator" />
             </label>
           </div>
@@ -102,22 +107,24 @@ class KodiDeviceForm extends Component {
           <div class="tags">
             {props.device &&
               props.device.params &&
-              props.device.params.map(function(param, index){
-                if (param.name != 'default') {
-                  return <span class="tag">
-                    <Localizer>
-                      <input
-                        id={param.id}
-                        type="text"
-                        name={param.name}
-                        paramIndex={index}
-                        onChange={this.updateParam}
-                        value={param.value}
-                        class="form-control"
-                        placeholder={<Text id={`integration.kodi.device.param.no.${param.name}`} />}
-                      />
-                    </Localizer>
-                  </span> ;
+              props.device.params.map(function(param, index) {
+                if (param.name !== 'default') {
+                  return (
+                    <span class="tag">
+                      <Localizer>
+                        <input
+                          id={param.id}
+                          type="text"
+                          name={param.name}
+                          paramIndex={index}
+                          onChange={this.updateParam}
+                          value={param.value}
+                          class="form-control"
+                          placeholder={<Text id={`integration.kodi.device.param.no.${param.name}`} />}
+                        />
+                      </Localizer>
+                    </span>
+                  );
                 }
                 return null;
               }, this)}

@@ -7,11 +7,10 @@
  * @returns {boolean} The mute state.
  */
 function unmute(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) ){
-    return connection.run('Application.SetMute', false);
+  if (this.checkConnectionAndServerSate(connection, deviceId)) {
+    return connection.Application.SetMute(false);
   }
   return true;
 }

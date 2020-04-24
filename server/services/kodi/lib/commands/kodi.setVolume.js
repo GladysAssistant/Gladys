@@ -8,11 +8,10 @@
  * @returns {number} The volume value.
  */
 function setVolume(deviceId, percentVolume) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) && percentVolume ){
-    const volumeValue = connection.Application.SetVolume({'volume': percentVolume});
+  if (this.checkConnectionAndServerSate(connection, deviceId) && percentVolume) {
+    const volumeValue = connection.Application.SetVolume({ volume: percentVolume });
     return volumeValue;
   }
 

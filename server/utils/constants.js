@@ -103,11 +103,11 @@ const EVENTS = {
       STOP: 'kodi.player.stop',
     },
     VOLUME: {
-      SET: 'kodi.',
+      SET: 'kodi.volme.set',
       INCREASE: 'kodi.volume.increase',
       DECREASE: 'kodi.volume.decrease',
     },
-    MOVIES:{
+    MOVIES: {
       GET: {
         ALL: 'kodi.movies.all',
         BYNAME: 'kodi.movies.byname',
@@ -240,6 +240,20 @@ const INTENTS = {
   },
   KODI: {
     PING: 'intent.kodi.ping',
+    MUTE: 'intent.kodi.mute',
+    UNMUTE: 'intent.kodi.unmute',
+    PLAYER: {
+      PLAY: 'intent.kodi.player.play',
+      STOP: 'intent.kodi.player.stop',
+    },
+    VOLUME: {
+      SET: 'intent.kodi.volume.set',
+      INCREASE: 'intent.kodi.volume.increase',
+      DECREASE: 'intent.kodi.volume.decrease',
+    },
+    MOVIES: {
+      OPEN: 'intent.kodi.movies.open',
+    },
   },
 };
 
@@ -295,6 +309,9 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
+  },
+  KODI: {
+    PING: 'ping',
   },
   CAMERA: {
     IMAGE: 'image',

@@ -14,8 +14,8 @@ class KodiDevicePage extends Component {
 
   render(props, {}) {
     return (
-      <KodiPage>
-        <FoundDevices {...props} />
+      <KodiPage user={props.user}>
+        <FoundDevices user={props.user} {...props} />
       </KodiPage>
     );
   }

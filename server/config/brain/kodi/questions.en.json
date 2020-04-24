@@ -3,5 +3,60 @@
     "label": "kodi.ping",
     "questions": ["Kodi ping %room%", "I want some Kodi ping in the %room%", "Kodi ping"],
     "answers": ["Kodi ping ...", "Kodi ping !"]
+  },
+  {
+    "label": "kodi.mute",
+    "questions": ["Kodi mute %room%", "Shut up Kodi", "Kodi mute"],
+    "answers": ["Kodi is mute"]
+  },
+  {
+    "label": "kodi.unmute",
+    "questions": ["Kodi unmute %room%", "Talk Kodi", "Kodi unmute"],
+    "answers": ["Kodi is unmute"]
+  },
+  {
+    "label": "kodi.player.play",
+    "questions": ["Kodi play in %room%", "Play Kodi in %room%", "Play Kodi", "Kodi play"],
+    "answers": ["Kodi is play !"]
+  },
+  {
+    "label": "kodi.player.pause",
+    "questions": ["Kodi pause in %room%", "Pause Kodi in %room%", "Pause Kodi", "Kodi pause"],
+    "answers": ["Kodi is pause !"]
+  },
+  {
+    "label": "kodi.player.stop",
+    "questions": ["Kodi stop in %room%", "Stop Kodi in %room%", "Stop Kodi", "Kodi stop"],
+    "answers": ["Kodi is stop !"]
+  },
+  {
+    "label": "kodi.volme.set",
+    "questions": ["Kodi set volume to %volumeValue% in %room%", "Kodi set volume to %volumeValue%"],
+    "answers": ["Kodi sound volume set to !"]
+  },
+  {
+    "label": "kodi.volume.increase",
+    "questions": [
+      "Kodi increase volume in %room%",
+      "Kodi increase volume in %room%",
+      "Kodi increase volume",
+      "Kodi increase volume"
+    ],
+    "answers": ["Kodi sound increase !"]
+  },
+  {
+    "label": "kodi.volume.decrease",
+    "questions": [
+      "Kodi decrease volume in %room%",
+      "Kodi decrease volume in %room%",
+      "Kodi decrease volume",
+      "Kodi decrease volume"
+    ],
+    "answers": ["Kodi sound decrease !"]
+  },
+  {
+    "label": "kodi.movies.open",
+    "questions": ["Kodi open movie %moviename% in %room%", "Kodi open movie %moviename%"],
+    "answers": ["Kodi start movie {{moviename}} !"]
   }
 ]

@@ -1,4 +1,3 @@
-
 /**
  * @public
  * @description This function increase the sond volume to the percent number in parameter.
@@ -8,12 +7,11 @@
  * @returns {number} The volume value.
  */
 function increaseVolume(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) && this.setVolume ){
-    let volumeValue = connection.Application.SetVolume( { 'volume': 'increment' } );
-    volumeValue = connection.Application.SetVolume( { 'volume': 'increment' } );
+  if (this.checkConnectionAndServerSate(connection, deviceId) && this.setVolume) {
+    let volumeValue = connection.Application.SetVolume({ volume: 'increment' });
+    volumeValue = connection.Application.SetVolume({ volume: 'increment' });
     return volumeValue;
   }
 

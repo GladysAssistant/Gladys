@@ -169,10 +169,7 @@ const AppRouter = connect(
         <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
         <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
-        <Redirect
-            path="/dashboard/integration/device/kodi"
-            to="/dashboard/integration/device/kodi/device"
-        />
+        <Redirect path="/dashboard/integration/device/kodi" to="/dashboard/integration/device/kodi/device" />
         <KodiDevicePage path="/dashboard/integration/device/kodi/device" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />

@@ -344,26 +344,26 @@
       "title": "Kodi Media Center",
       "deviceTab": "Devices",
       "new": "New",
+      "testConnectionButton": "Test connection",
+      "testConnectionSuccess": "Test connection Success.",
+      "testConnectionError": "Test connection fail, check host/port of your Kodi Media Center and verify his up.",
+      "saveError": "Save error of Kodi Media Center device.",
+      "documentation": "Kodi documentation",
+      "officialWebSite": "Kodi official website",
       "device": {
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
-        "connectButton": "Connect/Reconnect",
         "default": "Default",
-        "search": "Search devices",
-        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
-        "noDevicesFound": "No devices found. Make sure you have connected one Kodi device in the setup tab.",
+        "noDevicesFound": "No Kodi Media Center devices found. Add device configuration with new button.",
+        "beforeAddingDevice": "Before add Kodi Media Center device, ensure you have already configure Kodi to allowed 'Web Conrtrol' in settings (menu: Settings / Services / Control), like: ",
         "noParams": "No params found.",
         "paramsLabel": "Parameters",
         "param": {
           "host": "host",
           "port": "port",
-          "login": "login",
-          "pwd": "password",
           "no": {
-            "host":"Host (ex: 192.168.0.1)",
-            "port":"Port (ex: 8080)",
-            "login":"Login (ex: kodi)",
-            "pwd":"Password"
+            "host": "Host (ex: 192.168.0.1)",
+            "port": "Port (ex: 8080)"
           }
         }
       }

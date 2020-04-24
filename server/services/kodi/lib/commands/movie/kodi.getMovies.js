@@ -10,14 +10,12 @@ const logger = require('../../../../../utils/logger');
  * @returns {Object|Array} The list of all movies.
  */
 async function getMovies(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) ){
-
-    const movies = await connection.VideoLibrary.GetMovies({properties: ['title', 'file']});
+  if (this.checkConnectionAndServerSate(connection, deviceId)) {
+    const movies = await connection.VideoLibrary.GetMovies({ properties: ['title', 'file'] });
     // logger.debug(`Movies list : ${movies}`);
-    logger.debug(JSON.parse(JSON.stringify(movies)).movies[0] );
+    logger.debug(JSON.parse(JSON.stringify(movies)).movies[0]);
 
     return movies;
   }

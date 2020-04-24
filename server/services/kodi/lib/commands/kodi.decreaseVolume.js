@@ -7,12 +7,11 @@
  * @returns {number} The volume value.
  */
 function decreaseVolume(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) && this.setVolume ){
-    let volumeValue = connection.Application.SetVolume( { 'volume': 'decrement'} );
-    volumeValue = connection.Application.SetVolume( { 'volume': 'decrement' } );
+  if (this.checkConnectionAndServerSate(connection, deviceId) && this.setVolume) {
+    let volumeValue = connection.Application.SetVolume({ volume: 'decrement' });
+    volumeValue = connection.Application.SetVolume({ volume: 'decrement' });
     return volumeValue;
   }
 

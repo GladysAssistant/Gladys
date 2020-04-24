@@ -7,10 +7,10 @@
  * @returns {boolean} True if kodi connection is not null.
  */
 function checkConnection(connection) {
-	if ( connection ){
-		return true;
-	}
-	return false;
+  if (connection) {
+    return true;
+  }
+  return false;
 }
 
 module.exports = {

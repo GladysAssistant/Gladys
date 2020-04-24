@@ -13,7 +13,7 @@ module.exports = {
         },
         // Kodi device params
         {
-          id:'3c222e91-d991-4dd1-bacf-9369a88c897e',
+          id: '3c222e91-d991-4dd1-bacf-9369a88c897e',
           device_id: '99dc1ca1-ed80-46c7-b330-c0d57383640b',
           name: 'default',
           value: 'true',
@@ -21,15 +21,15 @@ module.exports = {
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
         {
-          id:'5a9353ca-e719-439e-a1b5-0ee1dfb4f34b',
+          id: '5a9353ca-e719-439e-a1b5-0ee1dfb4f34b',
           device_id: '99dc1ca1-ed80-46c7-b330-c0d57383640b',
           name: 'host',
-          value: '192.168.0.33',
+          value: 'localhost',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
         {
-          id:'b107c97b-d55a-4125-9796-08d561c57d36',
+          id: 'b107c97b-d55a-4125-9796-08d561c57d36',
           device_id: '99dc1ca1-ed80-46c7-b330-c0d57383640b',
           name: 'port',
           value: '9090',

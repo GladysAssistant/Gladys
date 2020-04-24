@@ -4,10 +4,15 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import uuid from 'uuid';
+import {
+  DEVICE_POLL_FREQUENCIES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../../../server/utils/constants';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
-  const integrationActions = createActionsIntegration(store); 
+  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getKodiDevices(state) {
       store.setState({
@@ -26,8 +31,7 @@ function createActions(store) {
         }
 
         const kodiDevicesReceived = await state.httpClient.get('/api/v1/service/kodi/device', options);
-        console.log('kodiDevicesReceived: ', kodiDevicesReceived);
-        const kodiDevices = kodiDevicesReceived ;
+        const kodiDevices = kodiDevicesReceived;
 
         const kodiDevicesMap = new Map();
         kodiDevices.forEach(device => kodiDevicesMap.set(device.external_id, device));
@@ -62,17 +66,34 @@ function createActions(store) {
       store.setState(newState);
     },
     async addKodi(state) {
+      const uniqueId = uuid.v4();
       let defaultValue = false;
-      if (state.kodiDevices && state.kodiDevices.length === 0 ) {
+      if (state.kodiDevices && state.kodiDevices.length === 0) {
         defaultValue = true;
       }
       const kodiDevices = update(state.kodiDevices, {
         $push: [
           {
+            id: uniqueId,
             name: null,
             room_id: null,
             service_id: state.currentIntegration.id,
-            // TODO voir pour mettre un device poll function should_poll: true, + poll_frequency
+            should_poll: true,
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+            features: [
+              {
+                name: 'PING_STATUS',
+                selector: 'kodi-ping',
+                external_id: uniqueId,
+                category: DEVICE_FEATURE_CATEGORIES.KODI,
+                type: DEVICE_FEATURE_TYPES.KODI.PING,
+                read_only: false,
+                keep_history: false,
+                has_feedback: false,
+                min: 0,
+                max: 0
+              }
+            ],
             params: [
               {
                 name: 'default',
@@ -85,21 +106,22 @@ function createActions(store) {
               {
                 name: 'port',
                 value: null
-              },
-              {
-                name: 'login',
-                value: null
-              },
-              {
-                name: 'pwd',
-                value: null
-              },
+              }
             ]
           }
         ]
       });
       store.setState({
         kodiDevices
+      });
+    },
+    async testConnection(state, deviceIndex) {
+      const device = state.kodiDevices[deviceIndex];
+
+      await state.httpClient.post('/api/v1/service/kodi/test', device);
+
+      store.setState({
+        device
       });
     },
     updateDeviceProperty(state, deviceIndex, property, value) {
@@ -115,59 +137,59 @@ function createActions(store) {
       store.setState(newState);
     },
     updateParamProperty(state, deviceIndex, paramIndex, paramName, value) {
-      if ( paramName === 'default') {
-          state.kodiDevices.forEach(function (device, index) {
-              device.params.forEach((item, i) => {
-                if( item.name === 'default' ){
-                  if ( index != deviceIndex) {
-                    item.value = false;
-                    const newState = update(item, {
-                      kodiDevices : {
-                        [deviceIndex]: {
-                          params: {
-                            [paramIndex]: {
-                              value: {
-                                $set: 'false'
-                              }
-                            }
+      if (paramName === 'default') {
+        state.kodiDevices.forEach(function(device, index) {
+          device.params.forEach((item, i) => {
+            if (item.name === 'default') {
+              if (index !== deviceIndex) {
+                item.value = false;
+                const newState = update(item, {
+                  kodiDevices: {
+                    [deviceIndex]: {
+                      params: {
+                        [paramIndex]: {
+                          value: {
+                            $set: 'false'
                           }
                         }
                       }
-                    })
-                    store.setState(newState);
-                  } else {
-                    item.value = value;
-                    const newState = update(state, {
-                      kodiDevices : {
-                        [deviceIndex]: {
-                          params: {
-                            [paramIndex]: {
-                              value: {
-                                $set: ''+value
-                              }
-                            }
-                          }
-                        }
-                      }
-                    })
-                    store.setState(newState);
+                    }
                   }
-                }
-              });
+                });
+                store.setState(newState);
+              } else {
+                item.value = value;
+                const newState = update(state, {
+                  kodiDevices: {
+                    [deviceIndex]: {
+                      params: {
+                        [paramIndex]: {
+                          value: {
+                            $set: '' + value
+                          }
+                        }
+                      }
+                    }
+                  }
+                });
+                store.setState(newState);
+              }
+            }
           });
+        });
       } else {
         const newState = update(state, {
-          kodiDevices : {
-          [deviceIndex]: {
-            params: {
-              [paramIndex]: {
-                value: {
-                  $set: value
+          kodiDevices: {
+            [deviceIndex]: {
+              params: {
+                [paramIndex]: {
+                  value: {
+                    $set: value
+                  }
                 }
               }
             }
           }
-        }
         });
         store.setState(newState);
       }

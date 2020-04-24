@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const { assert, fake } = require('sinon');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const { EVENTS } = require('../../../../utils/constants');
 
 const event = new EventEmitter();
 
@@ -41,7 +42,14 @@ describe('Kodi.command', () => {
   it('should send a ping command', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, service);
-    await deviceManager.kodiManager.command(message, { intent: 'kodi.ping' }, context);
+    await deviceManager.kodiManager.command(message, { intent: EVENTS.KODI.PING }, context);
+    assert.calledWith(messageManager.replyByIntent, message, 'kodi.ping.success', context);
+  });
+  it('should send a ping command', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken);
+    context.room = null;
+    await deviceManager.kodiManager.command(message, { intent: EVENTS.KODI.PING }, context);
     assert.calledWith(messageManager.replyByIntent, message, 'kodi.ping.success', context);
   });
   it('should fail to send a ping command', async () => {
@@ -50,11 +58,5 @@ describe('Kodi.command', () => {
     await deviceManager.kodiManager.command(message, { intent: 'unknow' }, context);
     assert.calledWith(messageManager.replyByIntent, message, 'kodi.ping.fail', context);
   });
-  it('should fail to send a ping command', async () => {
-    const stateManager = new StateManager(event); 
-    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken);
-    context.room = null;
-    await deviceManager.kodiManager.command(message, { intent: 'kodi.ping' }, context);
-    assert.calledWith(messageManager.replyByIntent, message, 'kodi.ping.get-in-room.fail.room-not-found', context);
-  });
+  // TODO ajouter test pour chaque intent
 });

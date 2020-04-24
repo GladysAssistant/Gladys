@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Get the average temperature in a room.
@@ -11,29 +12,43 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * command(message, classification, context);
  */
 async function command(message, classification, context) {
-
   // const roomEntity = classification.entities.find((entity) => entity.entity === 'room');
   let devices = null;
-  if(context.room){
+  if (context.room) {
     devices = await this.getKodiInRoom(context.room);
   } else {
     devices = await this.getKodiDefault();
   }
-  logger.debug('device: ', devices);
+  logger.trace('device: ', devices);
   if (!devices) {
     throw new NotFoundError('Device not found');
   }
-  logger.debug(classification.intent);
+  logger.trace(classification.intent);
   try {
-    switch (classification.intent) {
+    let eventToSend;
+    let successMsg;
 
-      case 'kodi.ping':
+    switch (classification.intent) {
+      case EVENTS.KODI.PING:
+      case EVENTS.KODI.MUTE:
+      case EVENTS.KODI.UNMUTE:
+      case EVENTS.KODI.PLAYER.PLAY:
+      case EVENTS.KODI.PLAYER.STOP:
+      case EVENTS.KODI.VOLUME.SET:
+      case EVENTS.KODI.VOLUME.INCREASE:
+      case EVENTS.KODI.VOLUME.DECREASE:
+      case EVENTS.KODI.MOVIES.OPEN:
+        eventToSend = classification.intent;
+        successMsg = `${classification.intent}.success`;
+
         // foreach devices found
         await Promise.map(devices, async (device) => {
-          await this.ping(device);
+          logger.debug(`Send event ${eventToSend} on device "${device.selector}"`);
+          this.eventManager.emit(eventToSend, device.id);
         });
-        this.messageManager.replyByIntent(message, 'kodi.ping.success', context);
+        this.messageManager.replyByIntent(message, successMsg, context);
         break;
+
       default:
         throw new Error('Not found');
     }

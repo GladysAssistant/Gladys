@@ -8,13 +8,12 @@
  * @returns {string} The player state.
  */
 async function playPlayer(deviceId) {
-
   const connection = this.mapOfKodiConnection.get(deviceId);
 
-  if( this.checkConnectionAndServerSate(connection, deviceId) ){
+  if (this.checkConnectionAndServerSate(connection, deviceId)) {
     const firstPlayerId = await this.getFirstPlayerId(deviceId);
-    if( firstPlayerId ){
-      return connection.run('Player.PlayPause', firstPlayerId);
+    if (firstPlayerId) {
+      return connection.Player.PlayPause(firstPlayerId);
     }
   }
   return null;

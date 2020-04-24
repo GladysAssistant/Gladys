@@ -4,7 +4,7 @@
  * kodi.disconnect();
  */
 function disconnect() {
-    this.mapOfKodiConnection = null;
+  this.mapOfKodiConnection = null;
 }
 
 module.exports = {

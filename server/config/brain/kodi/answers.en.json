@@ -2,5 +2,41 @@
   {
     "label": "kodi.ping.success",
     "answers": ["Ping kodi media center with success!"]
+  },
+  {
+    "label": "kodi.mute.success",
+    "answers": ["Kodi is mute !"]
+  },
+  {
+    "label": "kodi.unmute.success",
+    "answers": ["Kodi is unmute !"]
+  },
+  {
+    "label": "kodi.player.play.success",
+    "answers": ["Kodi is play !"]
+  },
+  {
+    "label": "kodi.player.pause.success",
+    "answers": ["Kodi is pause !"]
+  },
+  {
+    "label": "kodi.player.stop.success",
+    "answers": ["Kodi is stop !"]
+  },
+  {
+    "label": "kodi.volme.set.success",
+    "answers": ["Kodi sound volume set to !"]
+  },
+  {
+    "label": "kodi.volume.increase.success",
+    "answers": ["Kodi sound increase !"]
+  },
+  {
+    "label": "kodi.volume.decrease.success",
+    "answers": ["Kodi sound decrease !"]
+  },
+  {
+    "label": "kodi.movies.open.success",
+    "answers": ["Kodi start movie !"]
   }
 ]
