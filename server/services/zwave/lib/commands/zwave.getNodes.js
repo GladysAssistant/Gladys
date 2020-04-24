@@ -39,33 +39,36 @@ function getNodes() {
 
     const comclasses = Object.keys(node.classes);
     comclasses.forEach((comclass) => {
-      const values = node.classes[comclass];
-      const indexes = Object.keys(values);
+      const valuesClass = node.classes[comclass];   
+      const indexes = Object.keys(valuesClass);
       indexes.forEach((idx) => {
-        const { min, max } = values[idx];
-
-        if (values[idx].genre === 'user') {
-          const { category, type } = getCategory(node, values[idx]);
-          if (category !== 'unknown') {
-            newDevice.features.push({
-              name: values[idx].label,
-              selector: slugify(`zwave-${values[idx].label}-${node.product}-node-${node.id}`),
-              category,
-              type,
-              external_id: getDeviceFeatureExternalId(values[idx]),
-              read_only: values[idx].read_only,
-              unit: getUnit(values[idx].units),
-              has_feedback: true,
-              min,
-              max,
+        const value = node.classes[comclass][idx]; 
+        const instances = Object.keys(value);
+        instances.forEach((inst) => {
+          const { min, max } = value[inst];
+          if (value[inst].genre === 'user') {
+            const { category, type } = getCategory(node, value[inst]);
+            if (category !== 'unknown') {
+              newDevice.features.push({
+                name: (`${value[inst].label}`),
+                selector: slugify(`zwave-${value[inst].instance}-${value[inst].index}-${value[inst].label}-${node.product}-node-${node.id}`),
+                category,
+                type,
+                external_id: getDeviceFeatureExternalId(value[inst]),
+                read_only: value[inst].read_only,
+                unit: getUnit(value[inst].units),
+                has_feedback: true,
+                min,
+                max,
+              });
+            }
+          } else {
+            newDevice.params.push({
+              name: slugify(`${value[inst].label}-${value[inst].value_id}`),
+              value: value[inst].value || '',
             });
           }
-        } else {
-          newDevice.params.push({
-            name: slugify(`${values[idx].label}-${values[idx].value_id}`),
-            value: values[idx].value || '',
-          });
-        }
+        });
       });
     });
     return newDevice;

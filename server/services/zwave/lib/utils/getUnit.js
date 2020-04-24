@@ -17,6 +17,16 @@ function getUnit(zwaveUnit) {
       return DEVICE_FEATURE_UNITS.PERCENT;
     case 'lux':
       return DEVICE_FEATURE_UNITS.LUX;
+    case 'A':
+      return DEVICE_FEATURE_UNITS.AMPERE;
+    case 'V':
+      return DEVICE_FEATURE_UNITS.VOLT;
+    case 'kWh':
+      return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+    case 'W':
+      return DEVICE_FEATURE_UNITS.WATT;
+    case 'Watt':
+      return DEVICE_FEATURE_UNITS.WATT;
     default:
       return null;
   }

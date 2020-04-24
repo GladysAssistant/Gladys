@@ -145,6 +145,6 @@ describe('zwaveManager events', () => {
     });
   });
   it('should receive value removed', () => {
-    zwaveManager.valueRemoved(1, 10, 0);
+    zwaveManager.valueRemoved(1, 10, 0, 0);
   });
 });
