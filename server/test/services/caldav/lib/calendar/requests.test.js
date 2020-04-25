@@ -250,6 +250,7 @@ describe('CalDAV requests', () => {
     const xhr = {
       send: sinon.stub(),
     };
+    const setRequestHeader = sinon.stub();
     xhr.send.resolves({ request: { responseText: '<xml></xml>' } });
     const eventsData = await requests.requestEventsData(
       xhr,
@@ -270,6 +271,9 @@ describe('CalDAV requests', () => {
       ],
       'other',
     );
+
+    requests.dav.Request.args[0][0].transformRequest({ setRequestHeader });
+    expect(setRequestHeader.args[0]).to.eql(['Content-Type', 'application/xml;charset=utf-8']);
 
     expect(eventsData).to.eql([
       {
