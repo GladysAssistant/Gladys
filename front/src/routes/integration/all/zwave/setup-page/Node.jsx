@@ -31,7 +31,7 @@ class ZwaveNode extends Component {
       <div index={props.node.id} class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">{props.node.name}</h3>
+            {props.node.ready ? <h3 class="card-title">{ props.node.name}</h3> : <h3 class="card-title"><Text id="integration.zwave.setup.unknowNode" /></h3>}
             <div class="card-options">
               <span class="tag">
                 <Text id="integration.zwave.setup.nodeId" /> {props.node.rawZwaveNode.id}
@@ -60,6 +60,7 @@ class ZwaveNode extends Component {
                   <Text id="integration.zwave.setup.deviceCreatedSuccess" />
                 </div>
               )}
+              {props.node.ready ?
               <div class="card-body">
                 <div class="form-group">
                   <label>
@@ -99,6 +100,11 @@ class ZwaveNode extends Component {
                   </button>
                 </div>
               </div>
+              : 
+              <div class="card-body">
+                <div class="alert alert-warning" role="alert"><Text id="integration.zwave.setup.sleepingNodeMsg" /></div>
+              </div>
+              }
             </div>
           </div>
         </div>

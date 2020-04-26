@@ -17,10 +17,7 @@ function getNodes() {
   const nodeIds = Object.keys(this.nodes);
 
   // transform object in array
-  let nodes = nodeIds.map((nodeId) => Object.assign({}, { id: nodeId }, this.nodes[nodeId]));
-
-  // remove non-ready nodes
-  nodes = nodes.filter((node) => node.ready === true);
+  const nodes = nodeIds.map((nodeId) => Object.assign({}, { id: nodeId }, this.nodes[nodeId]));
 
   // foreach node in RAM, we format it with the gladys device format
   return nodes.map((node) => {
@@ -28,6 +25,7 @@ function getNodes() {
       name: node.product,
       service_id: this.serviceId,
       external_id: `zwave:node_id:${node.id}`,
+      ready: node.ready,
       rawZwaveNode: {
         id: node.id,
         manufacturer: node.manufacturer,
