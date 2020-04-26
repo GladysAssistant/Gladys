@@ -11,10 +11,19 @@ module.exports = function W215Controller(w215Handler) {
     res.json(devices);
   }
 
+  async function testConnection(req, res) {
+    const status = await w215Handler.testConnection(req.body);
+    res.send(status);
+  }
+
   return {
     'get /api/v1/service/w215/discover': {
       authenticated: true,
       controller: asyncMiddleware(discover),
-    }
+    },
+    'post /api/v1/service/w215/test': {
+      authenticated: true,
+      controller: asyncMiddleware(testConnection),
+    },
   };
 };

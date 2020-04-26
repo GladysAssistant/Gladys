@@ -47,14 +47,14 @@ const DeviceTab = ({ children, ...props }) => (
           <div class="row">
             {props.w215Devices &&
               props.w215Devices.length > 0 &&
-              props.w215Devices.map((device, index) => (
+              props.w215Devices.map((w215Device, index) => (
                 <W215DeviceBox
                   {...props}
                   editable
                   saveButton
                   deleteButton
                   editButton
-                  device={device}
+                  w215Device={w215Device}
                   deviceIndex={index}
                   listName="w215Devices"
                 />

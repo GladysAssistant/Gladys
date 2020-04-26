@@ -8,16 +8,7 @@ function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async loadProps(state) {
-      
-     // TODO : à effacer si besoin
-     let pin_code;
-      try{
-        pin_code= 'TEST';
-      } finally {
-        store.setState({
-          pin_code
-        });
-      }
+      // TODO
     },
     displayW215Error(state, error) {
       store.setState({
@@ -94,7 +85,7 @@ function createActions(store) {
       }
     },
     updateDeviceField(state, listName, index, field, value) {
-      const devices = update(state[listName], {
+      const w215Devices = update(state[listName], {
         [index]: {
           [field]: {
             $set: value
@@ -102,11 +93,11 @@ function createActions(store) {
         }
       });
       store.setState({
-        [listName]: devices
+        [listName]: w215Devices
       });
     },
     updateFeatureProperty(state, listName, deviceIndex, featureIndex, property, value) {
-      const devices = update(state[listName], {
+      const w215Devices = update(state[listName], {
         [deviceIndex]: {
           features: {
             [featureIndex]: {
@@ -119,20 +110,20 @@ function createActions(store) {
       });
 
       store.setState({
-        [listName]: devices
+        [listName]: w215Devices
       });
     },
     updateParamPinCode(state, index, value) {
       const trimmedValue = value && value.trim ? value.trim() : value;
       let pinCodeParamIndex = state.w215Devices[index].params.findIndex(param => param.name === W215_PIN_CODE);
-      const devices = update(state.w215Devices, {
+      const w215Devices = update(state.w215Devices, {
         [index]: {
+          pin_code: {
+            value: {
+              $set: trimmedValue
+            }
+          },
           params: {
-            pin_code: {
-              value: {
-                $set: trimmedValue
-              }
-            },
             [pinCodeParamIndex]: {
               value: {
                 $set: trimmedValue
@@ -142,18 +133,26 @@ function createActions(store) {
         }
       });
       store.setState({
-        devices
+        w215Devices
+      });
+    },
+    async testConnection(state, index) {
+      const w215Device = state.w215Devices[index];
+      const connectionSucces = await state.httpClient.post(`/api/v1/service/w215/test`, w215Device);
+      const w215Devices = update(state.w215Devices, {
+        [index]: {
+          connectionSucces: {
+            $set: connectionSucces
+          }
+        }
+      });
+      store.setState({
+        w215Devices
       });
     },
     async saveDevice(state, listName, index) {
-      const device = state[listName][index];
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
-      const devices = update(state[listName], {
-        $splice: [[index, 1, savedDevice]]
-      });
-      store.setState({
-        [listName]: devices
-      });
+      const w215Device = state[listName][index];
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, w215Device);
     },
     async deleteDevice(state, index) {
       const device = state.w215Devices[index];

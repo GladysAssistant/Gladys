@@ -16,7 +16,7 @@ const {
    */
   function getDevice(serviceId, device) {
     
-    var name = device.name;
+    const name = device.name;
 
     return {
       service_id: serviceId,

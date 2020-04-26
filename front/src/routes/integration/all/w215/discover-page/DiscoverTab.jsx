@@ -39,14 +39,14 @@ const DeviceTab = ({ children, ...props }) => (
           )}
           <div class="row">
             {props.discoveredDevices &&
-              props.discoveredDevices.map((device, index) => (
+              props.discoveredDevices.map((w215Device, index) => (
                 <W215DeviceBox
                   {...props}
-                  editable={!device.created_at || device.updatable}
-                  alreadyCreatedButton={device.created_at && !device.updatable}
-                  updateButton={device.updatable}
-                  saveButton={!device.created_at}
-                  device={device}
+                  editable={!w215Device.created_at || w215Device.updatable}
+                  alreadyCreatedButton={w215Device.created_at && !w215Device.updatable}
+                  updateButton={w215Device.updatable}
+                  saveButton={!w215Device.created_at}
+                  w215Device={w215Device}
                   deviceIndex={index}
                   listName="discoveredDevices"
                 />

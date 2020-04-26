@@ -27,6 +27,25 @@ class W215DeviceBox extends Component {
     });
   };
 
+  testConnection = async () => {
+    this.setState({
+      loading: true
+    });
+    try {
+      await this.props.testConnection(this.props.deviceIndex);
+      this.setState({
+        testConnectionError: null
+      });
+    } catch (e) {
+      this.setState({
+        testConnectionError: RequestStatus.Error
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+
   saveDevice = async () => {
     this.setState({
       loading: true,
@@ -66,14 +85,14 @@ class W215DeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, pin_code, ...props }, { loading, errorMessage }) {
-    const validModel = device.features.length > 0;
+  render({ deviceIndex, w215Device, housesWithRooms, editable, ...props }, { loading, errorMessage, testConnectionError }) {
+    const validModel = w215Device.features.length > 0;
 
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            {device.name}
+            {w215Device.name}
           </div>
           <div
             class={cx('dimmer', {
@@ -88,6 +107,11 @@ class W215DeviceBox extends Component {
                     <Text id={errorMessage} />
                   </div>
                 )}
+                {testConnectionError && (
+                  <div class="alert alert-danger">
+                    <Text id="integration.w215.testConnectionError" />
+                  </div>
+                )}
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>
                     <Text id="integration.w215.nameLabel" />
@@ -96,7 +120,7 @@ class W215DeviceBox extends Component {
                     <input
                       id={`name_${deviceIndex}`}
                       type="text"
-                      value={device.name}
+                      value={w215Device.name}
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.w215.namePlaceholder" />}
@@ -113,7 +137,7 @@ class W215DeviceBox extends Component {
                     <input
                       id={`model_${deviceIndex}`}
                       type="text"
-                      value={device.external_id}
+                      value={w215Device.external_id}
                       class="form-control"
                       disabled="true"
                     />
@@ -128,9 +152,9 @@ class W215DeviceBox extends Component {
                     <input
                       id={`pin_code_${deviceIndex}`}
                       type="text"
-                      value={device.params.find(param => param.name === W215_PIN_CODE).value}
+                      maxlength="6"
+                      value={w215Device.params.find(param => param.name === W215_PIN_CODE).value}
                       //value={get(props, 'w215Device.pin_code.value')}
-                      //value={device.pin_code.value}
                       onInput={this.updatePinCode}
                       class="form-control"
                       disabled={!editable || !validModel}
@@ -155,7 +179,7 @@ class W215DeviceBox extends Component {
                       housesWithRooms.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
+                            <option selected={room.id === w215Device.room_id} value={room.id}>
                               {room.name}
                             </option>
                           ))}
@@ -164,13 +188,13 @@ class W215DeviceBox extends Component {
                   </select>
                 </div>
 
-                {device.features && device.features.length > 0 && (
+                {w215Device.features && w215Device.features.length > 0 && (
                   <div class="form-group">
                     <label class="form-label">
                       <Text id="integration.w215.device.featuresLabel" />
                     </label>
                     <div class="tags">
-                      {device.features.map(feature => (
+                      {w215Device.features.map(feature => (
                         <span class="tag">
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
@@ -198,6 +222,12 @@ class W215DeviceBox extends Component {
                   )}
 
                   {validModel && props.saveButton && (
+                    <button onClick={this.testConnection} class="btn btn-primary mr-2">
+                      <Text id="integration.w215.checkConnection" />
+                    </button>
+                  )}
+
+                  {validModel && props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.w215.saveButton" />
                     </button>
@@ -216,7 +246,7 @@ class W215DeviceBox extends Component {
                   )}
 
                   {validModel && props.editButton && (
-                    <Link href={`/dashboard/integration/device/w215/edit/${device.selector}`}>
+                    <Link href={`/dashboard/integration/device/w215/edit/${w215Device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.w215.device.editButton" />
                       </button>

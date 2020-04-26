@@ -1,5 +1,5 @@
-const w215 = require('./dsp_w215');
+const w215 = require('./dsp-w215');
 
 module.exports = {
-  DSP_W215: w215
+  DSPW215: w215
 };

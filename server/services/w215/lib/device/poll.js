@@ -1,8 +1,8 @@
-'use strict';
-const requireUncached = require('require-uncached');
-const dsp = requireUncached('hnap/js/soapclient');
 
 const Promise = require('bluebird');
+const requireUncached = require('require-uncached');
+
+const dsp = requireUncached('hnap/js/soapclient');
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { getDeviceFeature, getDeviceParam } = require('../../../../utils/device');
 const logger = require('../../../../utils/logger');
@@ -19,7 +19,7 @@ async function poll(device) {
 
   // deviceId is the outlet's IP adress
   const { outletIpAdress } = parseExternalId(device.external_id);
-  this.ip_adress = "http://" + outletIpAdress + "/HNAP1";
+  this.ip_adress = `http://${outletIpAdress}/HNAP1`;
 
   // To limit errors, we will determine if the device is OK with 4 features expected
   // + Outlet's PIN CODE
@@ -36,13 +36,13 @@ async function poll(device) {
   this.pin_code = pin;
 
   // Galdys declaration for
-  const gladys = this.gladys
+  const gladys = this.gladys;
+  // var {gladys: gladys} = this; A supprimer probablement...
 
-  dsp.login(this.username, parseInt(this.pin_code), this.ip_adress).done(function (loginStatus){
-    if (loginStatus == 'failed' || loginStatus === 'undefined' ){
+  dsp.login(this.username, parseInt(this.pin_code, 10), this.ip_adress).done(function (loginStatus){
+    if (loginStatus === 'failed' || loginStatus === 'undefined' ){
         logger.debug(`Polling w215 ${user} / ${outletIpAdress} / ${pin} , connection status = ${loginStatus}`);
-    } 
-    else {    // success
+    } else {    // success
 
       logger.debug(`w215 connection status : ${loginStatus} (IP Adress : ${outletIpAdress})`);
       // Outlet ON / OFF ?
@@ -50,54 +50,64 @@ async function poll(device) {
         dsp.state().done(function(state) {
             const currentBinaryState = state === 'true' ? STATE.ON : STATE.OFF;
             // if the value is different from the value we have, save new state
-            if (binaryFeature.last_value !== currentBinaryState && state !== 'undefined') {
+            if (binaryFeature.last_value !== currentBinaryState && state !== 'undefined'&&  state !== 'ERROR') {
                 logger.debug(`w215 new state = ${currentBinaryState}`);
                 gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `${binaryFeature.external_id}`,
                     state: currentBinaryState,
                 });
-            } else {logger.debug(`w215 state no DB update = ${currentBinaryState}`);}
+            } else { 
+              logger.debug(`w215 state no DB update = ${currentBinaryState}`); 
+            }
         });
       }        
       
       // Outlet temperature
       if (tempFeature){
-        dsp.temperature().done(function(temperature){            
-            if (tempFeature.last_value !== temperature && temperature !== 'undefined'){
-                logger.debug(`w215 temperature : ${parseFloat(temperature)}°`);
+        dsp.temperature().done(function(temperature){
+            if (parseInt(tempFeature.last_value, 10) !== parseInt(temperature, 10) && temperature !== 'undefined' && temperature !== 'ERROR'){
+                logger.debug(`w215 temperature : ${parseInt(temperature, 10)}°`);
                 gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `${tempFeature.external_id}`,
                     state: temperature,
                 });
-            } else {logger.debug(`w215 temperature no DB update = ${temperature}°`);}
+            } else { 
+              logger.debug(`w215 temperature no DB update = ${temperature}°`); 
+            }
           });
       }      
     
       // Outlet consumption (W)
       if (powFeature){
-        dsp.consumption().done(function(consumption){            
-            if (powFeature.last_value !== consumption && consumption !== 'undefined'){
+        dsp.consumption().done(function(consumption){
+            const powerRounded = Math.round(consumption);
+            if (parseFloat(powFeature.last_value) !== powerRounded && consumption !== 'undefined' && consumption !== 'ERROR'){
                 logger.debug(`w215 consumption : ${parseFloat(consumption)} Watt`);
                 // Data rounded at closer integer
                 gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `${powFeature.external_id}`,
-                    state: Math.round(consumption),
+                    state: powerRounded,
                 });
-            } else {logger.debug(`w215 power no DB update = ${consumption} Watt`);}
+            } else { 
+              logger.debug(`w215 power no DB update = ${powerRounded} Watt`); 
+            }
           });
       }
     
-      //Outlet total consumption (KWH)
+      // Outlet total consumption (KWH)
       if (energyFeature){
-        dsp.totalConsumption().done(function(totalConsumption){            
-            if (energyFeature.last_value !== totalConsumption && totalConsumption !== 'undefined'){
+        dsp.totalConsumption().done(function(totalConsumption){
+            const energyRounded = Math.round(parseFloat(totalConsumption)*1000)/1000;
+            if (parseFloat(energyFeature.last_value) !== energyRounded && totalConsumption !== 'undefined' && totalConsumption !== 'ERROR'){
                 logger.debug(`w215 total consumption : ${parseFloat(totalConsumption)} kWh`);
                 // Data rounded
                 gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `${energyFeature.external_id}`,
-                    state: Math.round(totalConsumption*1000)/1000,
+                    state: energyRounded,
                 });
-            } else {logger.debug(`w215 total consumption no DB update = ${totalConsumption} kWh`);}
+            } else { 
+              logger.debug(`w215 total consumption no DB update = ${energyRounded} kWh`); 
+            }
           });
       }
       

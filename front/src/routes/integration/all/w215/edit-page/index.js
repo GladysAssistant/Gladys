@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import W215Page from '../W215Page';
 import UpdateDevice from '../../../../../components/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,w215Device,session,httpClient,currentIntegration,houses', {})
 class EditW215Device extends Component {
   render(props, {}) {
     return (

@@ -450,6 +450,8 @@
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed",
+      "checkConnection": "Test connection",
+      "testConnectionError": "Connection to your smart plug failed, please verify pin code.",
       "device": {
         "title": "Devices in Gladys",
         "search": "Search devices",
@@ -460,7 +462,7 @@
       },
       "discover": {
         "title": "Devices detected on your network",
-        "description": "D-Link DSP-W215 smart plug are automatically discovered over your network. Once the device is discovered, you will have to complete installation with the pin code witch is behind the smart plug.",
+        "description": "D-Link DSP-W215 smart plug are automatically discovered over your network. Once the device is discovered, you will have to complete installation with the pin code whitch is behind the smart plug (6 digits).",
         "error": "Error discovering your device. Please, contact us on http://community.gladysassistant.com",
         "noDeviceFound": "No device discovered.",
         "scan": "Scan"

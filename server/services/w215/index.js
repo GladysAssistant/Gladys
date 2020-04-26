@@ -4,9 +4,6 @@ const W215Controller = require('./api/w215.controller');
 
 module.exports = function w215Service(gladys, serviceId) {
   
-  // require 
-  //const dsp = requireUncached('hnap/js/soapclient');
-  //const w215Handler = new W215Handler(gladys, dsp, serviceId);
   const w215Handler = new W215Handler(gladys, serviceId);
 
   /**
