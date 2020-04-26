@@ -17,6 +17,8 @@ function getUnit(zwaveUnit) {
       return DEVICE_FEATURE_UNITS.PERCENT;
     case 'lux':
       return DEVICE_FEATURE_UNITS.LUX;
+    case 'Lux':
+      return DEVICE_FEATURE_UNITS.LUX;
     case 'A':
       return DEVICE_FEATURE_UNITS.AMPERE;
     case 'V':
