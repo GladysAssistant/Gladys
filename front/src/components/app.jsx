@@ -1,10 +1,3 @@
-// Must be the first import
-if (process.env.NODE_ENV==='development') {
-  // Must use require here as import statements are only allowed
-  // to exist at the top of a file.
-  require("preact/debug");
-}
-
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';

@@ -3,6 +3,7 @@ const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
+const { UNKNOWN_CATEGORY } = require('../constants');
 
 /**
  * @description Return array of Nodes.
@@ -46,7 +47,7 @@ function getNodes() {
 
         if (values[idx].genre === 'user') {
           const { category, type } = getCategory(node, values[idx]);
-          if (category !== 'unknown') {
+          if (category !== UNKNOWN_CATEGORY) {
             newDevice.features.push({
               name: values[idx].label,
               selector: slugify(`zwave-${values[idx].label}-${node.product}-node-${node.id}`),
@@ -68,6 +69,7 @@ function getNodes() {
         }
       });
     });
+
     return newDevice;
   });
 }
