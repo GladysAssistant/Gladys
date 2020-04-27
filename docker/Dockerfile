@@ -32,7 +32,7 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python libffi-dev linux-headers git udev \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers udev \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
