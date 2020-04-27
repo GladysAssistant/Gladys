@@ -27,6 +27,7 @@ const system = {
   }),
   isDocker: fake.resolves(true),
   saveLatestGladysVersion: fake.returns(null),
+  shutdown: fake.resolves(true),
 };
 
 const config = getConfig();
@@ -107,6 +108,15 @@ describe('gateway', () => {
       const { backupFilePath } = await gateway.downloadBackup(encryptedBackupFilePath);
       gateway.config.storage = '/tmp/gladys-database-restore-test.db';
       await gateway.restoreBackup(backupFilePath);
+    });
+    it('should restore a backup with error', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      await gateway.restoreBackupEvent('this-path-does-not-exist');
     });
   });
 
