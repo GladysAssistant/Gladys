@@ -426,8 +426,7 @@ function createActions(store) {
     },
     async tempSignupForRestore(state, language) {
       await state.session.init();
-      const localUser = state.session.getUser();
-      if (localUser) {
+      if (state.session.isConnected()) {
         return null;
       }
       const user = await state.httpClient.post(`/api/v1/signup`, {
@@ -443,8 +442,8 @@ function createActions(store) {
         user,
         createLocalAccountStatus: RequestStatus.Success
       });
-      state.session.saveUser(user);
-      state.session.init();
+      await state.session.saveUser(user);
+      await state.session.init();
     }
   };
   return actions;

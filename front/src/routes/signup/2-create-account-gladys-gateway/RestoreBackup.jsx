@@ -6,12 +6,12 @@ const GatewayPage = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h2 class="page-title">
-        <Text id="gatewayBackup.title" />
+        <Text id="signup.gatewayBackup.title" />
       </h2>
     </div>
     <div class="card-body">
       <p>
-        <Text id="gatewayBackup.description" />
+        <Text id="signup.gatewayBackup.description" />
       </p>
     </div>
     <div class="table-responsive-lg">

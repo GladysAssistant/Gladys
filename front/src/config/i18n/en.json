@@ -87,6 +87,10 @@
       "errored": "Backup restore failed, maybe the restore key is not valid",
       "updateRestoreKeyButton": "Update restore key"
     },
+    "gatewayBackup": {
+      "title": "Choose a backup",
+      "description": "Choose the backup you want to restore in this list."
+    },
     "preferences": {
       "title": "Your preferences",
       "description": "You can modify those settings anytime later.",

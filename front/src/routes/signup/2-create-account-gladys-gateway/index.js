@@ -124,7 +124,9 @@ class CreateAccountGladysGateway extends Component {
                 </div>
               )}
               {step === 3 && !this.props.gatewayRestoreInProgress && (
-                <RestoreBackup {...this.props} restoreBackup={this.restoreBackup} />
+                <div class="col-md-6 mx-auto">
+                  <RestoreBackup {...this.props} restoreBackup={this.restoreBackup} />
+                </div>
               )}
               {step === 4 && (
                 <div class="col-md-4 mx-auto">
