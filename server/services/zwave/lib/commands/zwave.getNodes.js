@@ -70,7 +70,9 @@ function getNodes() {
       });
     });
     return newDevice;
-  });
+  }).sort(function sortByNodeReady (a, b) {
+    return b.ready - a.ready || a.rawZwaveNode.id - b.rawZwaveNode.id ;
+  });;
 }
 
 module.exports = {
