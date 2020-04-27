@@ -425,6 +425,7 @@ function createActions(store) {
       };
     },
     async tempSignupForRestore(state, language) {
+      await state.session.init();
       const localUser = state.session.getUser();
       if (localUser) {
         return null;

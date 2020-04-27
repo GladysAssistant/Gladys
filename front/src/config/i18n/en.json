@@ -81,6 +81,12 @@
       "cancelButton": "Cancel",
       "saveButton": "Save backup key"
     },
+    "restoreBackupInProgress": {
+      "title": "Restore in progress...",
+      "description": "At the end of the restore process, Gladys will restart automatically.",
+      "errored": "Backup restore failed, maybe the restore key is not valid",
+      "updateRestoreKeyButton": "Update restore key"
+    },
     "preferences": {
       "title": "Your preferences",
       "description": "You can modify those settings anytime later.",

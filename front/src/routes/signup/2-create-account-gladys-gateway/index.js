@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import get from 'get-value';
 import actions from '../../../actions/gateway';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
@@ -31,13 +32,16 @@ class CreateAccountGladysGateway extends Component {
         value: this.state.backupKey
       });
       await this.props.getBackups();
-      this.setState({ loading: false, step: 2 });
+      this.setState({ loading: false, step: 3 });
     } catch (e) {
       this.setState({ loading: false, error: true });
     }
   };
   restoreBackup = async fileUrl => {
-    await this.setState({ step: 3 });
+    await this.setState({
+      step: 4,
+      gatewayRestoreErrored: false
+    });
     try {
       this.props.httpClient.post('/api/v1/gateway/backup/restore', {
         file_url: fileUrl
@@ -61,12 +65,35 @@ class CreateAccountGladysGateway extends Component {
         window.location = '/dashboard';
       }
     } catch (e) {
-      setTimeout(() => this.getRestoreStatus(), 1000);
+      const status = get(e, 'response.status');
+      if (status === 401) {
+        window.location = '/dashboard';
+      } else {
+        setTimeout(() => this.getRestoreStatus(), 1000);
+      }
     }
+  };
+  isGladysPlusConnected = async () => {
+    try {
+      const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
+      if (gatewayStatus.configured) {
+        this.setState({ step: 2 });
+      }
+    } catch (e) {}
+  };
+  changeStepToUpdateRestoreKey = () => {
+    this.setState({ step: 2 });
   };
   async componentDidMount() {
     await this.props.session.init();
     this.props.getBackups();
+    this.isGladysPlusConnected();
+  }
+
+  componentDidUpdate() {
+    if (this.props.displayConnectedSuccess && this.state.step === 1) {
+      this.changeStepToUpdateRestoreKey();
+    }
   }
   render() {
     const { step, backupKey, loading, error, gatewayRestoreErrored } = this.state;
@@ -75,7 +102,7 @@ class CreateAccountGladysGateway extends Component {
         <div class="page-single mt-6">
           <div class="container">
             <div class="row">
-              {this.props.displayConnectedSuccess && (
+              {step === 1 && (
                 <div class="col col-login mx-auto">
                   <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
                     ◀️️ <Text id="signup.createLocalAccount.backButton" />
@@ -84,7 +111,7 @@ class CreateAccountGladysGateway extends Component {
                   <GatewayLoginForm {...this.props} external_forgot_password login={this.login} />
                 </div>
               )}
-              {!this.props.displayConnectedSuccess && step === 1 && (
+              {step === 2 && (
                 <div class="col col-login mx-auto">
                   <SetRestoreKey
                     {...this.props}
@@ -96,10 +123,17 @@ class CreateAccountGladysGateway extends Component {
                   />
                 </div>
               )}
-              {!this.props.displayConnectedSuccess && step === 2 && !this.props.gatewayRestoreInProgress && (
+              {step === 3 && !this.props.gatewayRestoreInProgress && (
                 <RestoreBackup {...this.props} restoreBackup={this.restoreBackup} />
               )}
-              {step === 3 && <RestoreInProgress gatewayRestoreErrored={gatewayRestoreErrored} />}
+              {step === 4 && (
+                <div class="col-md-4 mx-auto">
+                  <RestoreInProgress
+                    gatewayRestoreErrored={gatewayRestoreErrored}
+                    changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

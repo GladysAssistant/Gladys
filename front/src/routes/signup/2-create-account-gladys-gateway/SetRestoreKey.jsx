@@ -33,9 +33,6 @@ const GatewayPage = ({ children, ...props }) => (
     </div>
     <div class="card-footer text-right">
       <div class="d-flex">
-        <a href="javascript:void(0)" class="btn btn-link">
-          <Text id="signup.restoreBackupSetBackupKey.cancelButton" />
-        </a>
         <button type="submit" class="btn btn-primary ml-auto" onClick={props.saveBackupKey}>
           <Text id="signup.restoreBackupSetBackupKey.saveButton" />
         </button>
