@@ -28,7 +28,7 @@
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the informations you'll enter are just saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
       "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
-      "buttonCreateAccountGladysGateway": "Create account with Gladys Gateway",
+      "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
     "createLocalAccount": {
@@ -72,6 +72,24 @@
       "emailAlreadyExistError": "A user with this email already exist.",
       "selectorAlreadyExistError": "A user with this firstname already exist.",
       "createAccountButton": "Create Account"
+    },
+    "restoreBackupSetBackupKey": {
+      "title": "Enter your backup key",
+      "description": "As Gladys Plus backups are end-to-end encrypted, we need you to enter your backup key. Your local instance can only decrypt the backup with this backup key.",
+      "backupKeyLabel": "Backup key",
+      "backupKeyPlaceholder": "Enter your backup key",
+      "cancelButton": "Cancel",
+      "saveButton": "Save backup key"
+    },
+    "restoreBackupInProgress": {
+      "title": "Restore in progress...",
+      "description": "At the end of the restore process, Gladys will restart automatically.",
+      "errored": "Backup restore failed, maybe the restore key is not valid",
+      "updateRestoreKeyButton": "Update restore key"
+    },
+    "gatewayBackup": {
+      "title": "Choose a backup",
+      "description": "Choose the backup you want to restore in this list."
     },
     "preferences": {
       "title": "Your preferences",
