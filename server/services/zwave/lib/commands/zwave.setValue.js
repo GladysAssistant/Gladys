@@ -16,7 +16,7 @@ function setValue(device, deviceFeature, value) {
     return;
   }
   
-  logger.debug(`Zwave : Setting value`, {deviceFeature, value});
+  logger.debug(`Zwave : Setting value ${deviceFeature.external_id} -> ${value}`);
   node['classes'][comclass][index].value = transformValueForNode(node, comclass, index, value);
   this.zwave.setValue({ node_id: nodeId, class_id: comclass, instance, index }, node['classes'][comclass][index].value);
 }
