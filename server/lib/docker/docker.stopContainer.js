@@ -15,7 +15,7 @@ async function stopContainer(containerName) {
 
   const container = await this.dockerode.getContainer(containerName).stop();
 
-  logger.info(`container ${containerName} stop : ${container}`);
+  logger.info(`container ${containerName} stopped`);
 
   return container;
 }
