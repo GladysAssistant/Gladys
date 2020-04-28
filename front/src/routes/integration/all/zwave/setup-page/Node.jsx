@@ -31,7 +31,13 @@ class ZwaveNode extends Component {
       <div index={props.node.id} class="col-md-6">
         <div class="card">
           <div class="card-header">
-            {props.node.ready ? <h3 class="card-title">{ props.node.name}</h3> : <h3 class="card-title"><Text id="integration.zwave.setup.unknowNode" /></h3>}
+            {props.node.ready ? (
+              <h3 class="card-title">{props.node.name}</h3>
+            ) : (
+              <h3 class="card-title">
+                <Text id="integration.zwave.setup.unknowNode" />
+              </h3>
+            )}
             <div class="card-options">
               <span class="tag">
                 <Text id="integration.zwave.setup.nodeId" /> {props.node.rawZwaveNode.id}
@@ -60,51 +66,56 @@ class ZwaveNode extends Component {
                   <Text id="integration.zwave.setup.deviceCreatedSuccess" />
                 </div>
               )}
-              {props.node.ready ?
-              <div class="card-body">
-                <div class="form-group">
-                  <label>
-                    <Text id="integration.zwave.setup.name" />
-                  </label>
-                  <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
-                </div>
-                <div class="form-group">
-                  <label>
-                    <Text id="integration.zwave.setup.type" />
-                  </label>
-                  <input type="text" class="form-control" disabled value={props.node.rawZwaveNode.type} />
-                </div>
-                {props.node.features.length > 0 && (
+              {props.node.ready ? (
+                <div class="card-body">
                   <div class="form-group">
                     <label>
-                      <Text id="integration.zwave.setup.features" />
+                      <Text id="integration.zwave.setup.name" />
                     </label>
-
-                    <div class="tags">
-                      {props.node.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
                   </div>
-                )}
-                <div class="form-group">
-                  <button class="btn btn-success" onClick={this.createDevice}>
-                    <Text id="integration.zwave.setup.createDeviceInGladys" />
-                  </button>
+                  <div class="form-group">
+                    <label>
+                      <Text id="integration.zwave.setup.type" />
+                    </label>
+                    <input type="text" class="form-control" disabled value={props.node.rawZwaveNode.type} />
+                  </div>
+                  {props.node.features.length > 0 && (
+                    <div class="form-group">
+                      <label>
+                        <Text id="integration.zwave.setup.features" />
+                      </label>
+
+                      <div class="tags">
+                        {props.node.features.map(feature => (
+                          <span class="tag">
+                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+                            <div class="tag-addon">
+                              <i
+                                class={`fe fe-${get(
+                                  DeviceFeatureCategoriesIcon,
+                                  `${feature.category}.${feature.type}`
+                                )}`}
+                              />
+                            </div>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div class="form-group">
+                    <button class="btn btn-success" onClick={this.createDevice}>
+                      <Text id="integration.zwave.setup.createDeviceInGladys" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              : 
-              <div class="card-body">
-                <div class="alert alert-warning" role="alert"><Text id="integration.zwave.setup.sleepingNodeMsg" /></div>
-              </div>
-              }
+              ) : (
+                <div class="card-body">
+                  <div class="alert alert-warning" role="alert">
+                    <Text id="integration.zwave.setup.sleepingNodeMsg" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

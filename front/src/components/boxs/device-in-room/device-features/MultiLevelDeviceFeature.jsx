@@ -34,7 +34,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             value={props.deviceFeature.lastValue}
             onChange={updateValue}
             class="form-control custom-range"
-            step='1'
+            step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
           />

@@ -10,7 +10,9 @@ const logger = require('../../../../utils/logger');
  * zwave.on('value removed', this.valueRemoved);
  */
 function valueRemoved(nodeId, comClass, index, instance) {
-  logger.debug(`Zwave : Value removed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${index}, instance = ${instance}`);
+  logger.debug(
+    `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${index}, instance = ${instance}`,
+  );
   if (this.nodes[nodeId].classes[comClass] && this.nodes[nodeId].classes[comClass][index][instance]) {
     delete this.nodes[nodeId].classes[comClass][index][instance];
   }
