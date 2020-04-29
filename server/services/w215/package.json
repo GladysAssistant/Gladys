@@ -16,8 +16,7 @@
         "hnap": "2.1.0",
         "require-uncached": "1.0.3",
         "bottleneck": "^2.19.5",
-        "node-dns-sd": "0.4.1",
-        "mdns": "2.5.1"
+        "node-dns-sd": "0.4.1"
     },
     "keywords": [
         "gladys",

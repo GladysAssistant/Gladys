@@ -10,6 +10,21 @@ function createActions(store) {
     async loadProps(state) {
       // TODO
     },
+    displayConnectedMessage(state) {
+      // display 3 seconds a message "Connected to outlet"
+      store.setState({
+        w215Connected: true,
+        w215ConnectionError: undefined
+      });
+      setTimeout(
+        () =>
+          store.setState({
+            w215Connected: false,
+            connectW215Status: undefined
+          }),
+        3000
+      );
+    },
     displayW215Error(state, error) {
       store.setState({
         w215Connected: false,
@@ -153,6 +168,19 @@ function createActions(store) {
     async saveDevice(state, listName, index) {
       const w215Device = state[listName][index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, w215Device);
+      const devices = update(state[listName], {
+        $splice: [[index, 1, savedDevice]]
+      });
+      // find pin code
+      devices.forEach(w215Device => {
+        const devicePinCode = w215Device.params.find(param => param.name === W215_PIN_CODE);
+        if (devicePinCode) {
+          w215Device.pin_code = devicePinCode;
+        }
+      });
+      store.setState({
+        [listName]: devices
+      });
     },
     async deleteDevice(state, index) {
       const device = state.w215Devices[index];

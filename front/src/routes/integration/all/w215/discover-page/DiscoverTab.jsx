@@ -5,7 +5,7 @@ import EmptyState from './EmptyState';
 import style from './style.css';
 import W215DeviceBox from '../W215DeviceBox';
 
-const DeviceTab = ({ children, ...props }) => (
+const DiscoverTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
@@ -59,4 +59,4 @@ const DeviceTab = ({ children, ...props }) => (
   </div>
 );
 
-export default DeviceTab;
+export default DiscoverTab;
