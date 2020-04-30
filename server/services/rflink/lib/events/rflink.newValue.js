@@ -29,17 +29,11 @@ function newValue(device, deviceFeature, state) {
       break;
   }
 
-  if (device.switch === undefined) {
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: `rflink:${device.id}:${deviceFeature}`,
-      state: value,
-    });
-  } else {
+
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
       state: value,
     });
-  }
 }
 
 module.exports = {

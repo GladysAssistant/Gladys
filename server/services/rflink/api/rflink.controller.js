@@ -19,10 +19,12 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function connect(req, res) {
+
     const rflinkPath = await gladys.variable.getValue('RFLINK_PATH');
     if (!rflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     }
+
     RFlinkManager.connect(rflinkPath);
     res.json({ succes: true });
   }
@@ -114,12 +116,22 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     });
   }
   /**
-   * @apiName unpair
+   * @apiName remove
    * @apiGroup RFlink
    * @api {post} /api/v1/service/rflink/remove remove a device from the device list
    */
   async function remove(req, res) {
-    logger.log(req);
+    const index = RFlinkManager.newDevices.findIndex(element => {
+      console.log(element.external_id);
+      if (element.external_id === req.body.external_id) {
+        return true;
+      } 
+        return false;
+    });
+    if (index !== -1) {
+      RFlinkManager.newDevices.splice(index, 1);
+    }
+
     res.json({
       success: true,
     });
@@ -154,7 +166,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
       authenticated: true,
       controller: asyncMiddleware(getStatus),
     },
-    'get /api/v1/service/rflink/remove': {
+    'post /api/v1/service/rflink/remove': {
       authenticated: true,
       controller: asyncMiddleware(remove),
     },

@@ -22,8 +22,20 @@ function connect(Path) {
       baudRate: 57600,
       dataBits: 8,
       parity: 'none',
-      autoOpen: true,
+      autoOpen: false,
     });
+
+
+    port.open((err) => {
+      if (err) {
+        this.connected = false;
+        this.ready = false;
+        this.scanInProgress = false;
+        return console.log(`Rflink : ${err}`);
+      }
+    });
+
+
 
     const readline = new Readline({
       baudRate: 57600,
