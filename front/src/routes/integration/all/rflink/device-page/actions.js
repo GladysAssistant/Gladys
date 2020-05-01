@@ -24,7 +24,6 @@ function createActions(store) {
           options.search = state.rflinkDeviceSearch;
         }
         const rflinkDevicesReceived = await state.httpClient.get('/api/v1/service/rflink/device', options);
-        console.log(rflinkDevicesReceived);
         let rflinkDevices;
         if (skip === 0) {
           rflinkDevices = rflinkDevicesReceived;

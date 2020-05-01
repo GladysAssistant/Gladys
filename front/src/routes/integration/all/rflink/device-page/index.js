@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import RflinkPage from '../RflinkPage';
 import DevicePage from './DevicePage';
-import integrationConfig from '../../../../../config/integrations';
 import FoundDevices from './FoundDevices';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
