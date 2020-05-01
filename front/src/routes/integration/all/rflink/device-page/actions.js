@@ -82,7 +82,7 @@ function createActions(store) {
           external_id: device.selector
         });
         actions.getRflinkNewDevices(store.getState());
-        actions.getRflinkDevices(store.getState(),20,0);
+        actions.getRflinkDevices(store.getState(), 20, 0);
       } catch (e) {
         store.setState({
           getRflinkCreateDeviceStatus: RequestStatus.Error

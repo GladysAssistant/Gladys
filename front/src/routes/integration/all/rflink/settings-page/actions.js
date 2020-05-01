@@ -57,7 +57,7 @@ const actions = store => {
         connectRflinkStatus: RequestStatus.Getting,
         rflinkFailed: false
       });
-      console.log(state.RflinkPath)
+      console.log(state.RflinkPath);
       try {
         await state.httpClient.post('/api/v1/service/rflink/variable/RFLINK_PATH', {
           value: state.RflinkPath

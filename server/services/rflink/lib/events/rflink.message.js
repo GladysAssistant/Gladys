@@ -13,7 +13,6 @@ const {
  * rflink.message(msg);
  */
 function message(msgRF) {
-
   this.lastCommand = msgRF;
   const msg = RFtoObj(msgRF);
   let newDevice;
@@ -21,18 +20,13 @@ function message(msgRF) {
 
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
-
-      this.newDevices.forEach(d => {
+      this.newDevices.forEach((d) => {
         logger.log(`d.external_id: ${d.external_id}`);
         logger.log(`msg.id: ${msg.id}`);
         if (`rflink:${msg.id}:${msg.switch}` === d.external_id) {
-           doesntExistYet = false;
+          doesntExistYet = false;
         }
-        
       });
-
-
-
 
       if (doesntExistYet === true) {
         const model = `${msg.protocol.charAt(0).toUpperCase()}${msg.protocol.toLowerCase().slice(1)}`;
@@ -258,7 +252,10 @@ function message(msgRF) {
           });
         }
 
-        if ( msg.cmd !== undefined && (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true)) {
+        if (
+          msg.cmd !== undefined &&
+          (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true)
+        ) {
           newDevice.selector = `rflink:milight:${msg.id}:${msg.switch}`;
           newDevice.external_id = `rflink:milight:${msg.id}:${msg.switch}`;
           newDevice.features.push(

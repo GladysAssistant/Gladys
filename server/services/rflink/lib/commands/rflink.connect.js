@@ -25,7 +25,6 @@ function connect(Path) {
       autoOpen: false,
     });
 
-
     port.open((err) => {
       if (err) {
         this.connected = false;
@@ -34,8 +33,6 @@ function connect(Path) {
         return console.log(`Rflink : ${err}`);
       }
     });
-
-
 
     const readline = new Readline({
       baudRate: 57600,

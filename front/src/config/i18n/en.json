@@ -226,7 +226,7 @@
       },
       "device": {
         "title": "Devices in Gladys",
-        "devicesInfo" : "Cheap 433mhz devices are detected by default as sensors , you can change it by editing a device 's read only property",
+        "devicesInfo": "Cheap 433mhz devices are detected by default as sensors , you can change it by editing a device 's read only property",
         "deviceOnNetworkTitle": "Devices detected by the gateway",
         "connectButton": "Connect/Reconnect",
         "search": "Search devices",

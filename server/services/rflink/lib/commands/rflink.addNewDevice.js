@@ -8,14 +8,11 @@ const logger = require('../../../../utils/logger');
  * Rflink.addDevice(device);
  */
 function addNewDevice(device) {
-
-    logger.log(`ajout du device : ${device}`);
-    this.newDevices.push(device);
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE,
-      });
-
-
+  logger.log(`ajout du device : ${device}`);
+  this.newDevices.push(device);
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE,
+  });
 }
 
 module.exports = { addNewDevice };

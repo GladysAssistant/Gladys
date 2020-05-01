@@ -13,7 +13,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 )
 class RflinkDevicePage extends Component {
   componentWillMount() {
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE , () => {
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE, () => {
       this.props.getRflinkNewDevices();
     });
     this.props.getRflinkDevices(20, 0);

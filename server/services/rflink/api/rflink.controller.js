@@ -19,7 +19,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function connect(req, res) {
-
     const rflinkPath = await gladys.variable.getValue('RFLINK_PATH');
     if (!rflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
@@ -121,12 +120,12 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @api {post} /api/v1/service/rflink/remove remove a device from the device list
    */
   async function remove(req, res) {
-    const index = RFlinkManager.newDevices.findIndex(element => {
+    const index = RFlinkManager.newDevices.findIndex((element) => {
       console.log(element.external_id);
       if (element.external_id === req.body.external_id) {
         return true;
-      } 
-        return false;
+      }
+      return false;
     });
     if (index !== -1) {
       RFlinkManager.newDevices.splice(index, 1);
