@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import RflinkPage from '../RflinkPage';
 import SettingsTab from './SettingsTab';
-import integrationConfig from '../../../../../config/integrations';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
