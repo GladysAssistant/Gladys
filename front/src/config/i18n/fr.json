@@ -84,6 +84,24 @@
       "selectorAlreadyExistError": "Un utilisateur avec ce prénom existe déjà.",
       "createAccountButton": "Créer un compte"
     },
+    "restoreBackupSetBackupKey": {
+      "title": "Entrer votre clé de restauration",
+      "description": "Les données et sauvegardes Gladys Plus sont entièrement cryptées, c'est pour cela que nous avons besoin de votre clé de restauration.",
+      "backupKeyLabel": "Clé de restauration",
+      "backupKeyPlaceholder": "Saississez votre clé de restauration",
+      "cancelButton": "Annuler",
+      "saveButton": "Enregistrer la clé de restauration"
+    },
+    "restoreBackupInProgress": {
+      "title": "Restauration en cours...",
+      "description": "A la fin du processus de restauration, Gladys redémarrera automatiquement.",
+      "errored": "La restauration a échoué, la clé de restauration n'est peut-être pas valide",
+      "updateRestoreKeyButton": "Mettre à jour la clé de restauration"
+    },
+    "gatewayBackup": {
+      "title": "Sélectionnez votre sauvegarde",
+      "description": "Sélectionnez dans la liste la sauvegarde que vous souhaitez restaurer."
+    },
     "preferences": {
       "title": "Vos préférences",
       "description": "Vous pouvez modifier ces paramètres à tout moment ultérieurement.",
