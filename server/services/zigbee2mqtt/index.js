@@ -19,7 +19,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
     if (!zigbee2mqttDriverPath) {
       throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
     }
-    
+
     zigbee2mqttManager.connect(zigbee2mqttDriverPath);
   }
 

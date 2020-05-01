@@ -3,8 +3,8 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Stop a container.
- * @returns Container object.
- * @param containerName - Container name.
+ * @returns {Promise} Container object.
+ * @param {string} containerName - Container name.
  * @example
  * const container = await stopContainer(containerName);
  */

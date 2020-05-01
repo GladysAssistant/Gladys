@@ -10,7 +10,7 @@ module.exports = function UsbController({ list }) {
     const ports = await list();
 
     res.json(
-      ports.map(function(port) {
+      ports.map((port) => {
         return {
           comPath: port.path,
           comName: port.manufacturer,

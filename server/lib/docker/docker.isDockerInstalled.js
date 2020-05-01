@@ -1,5 +1,4 @@
 const fs = require('fs');
-const sys = require('sys');
 const { exec } = require('child_process');
 /**
  * @description Return true if process is running inside Docker

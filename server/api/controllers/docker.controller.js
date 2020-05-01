@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { EVENTS } = require('../../utils/constants');
 
 module.exports = function DockerController(gladys) {
   /**

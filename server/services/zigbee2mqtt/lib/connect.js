@@ -6,21 +6,20 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * connect();
  */
 async function connect() {
-  
   const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
   const usb = this.gladys.service.getService('usb');
   let dongleOK = false;
 
   if (driverPath) {
     const usbList = await usb.list();
-    usbList.forEach( usbPort => {
+    usbList.forEach((usbPort) => {
       if (driverPath === usbPort.path) {
         dongleOK = true;
       }
     });
   }
 
-  if ( dongleOK ) {
+  if (dongleOK) {
     logger.info(`Zigbee2mqtt USB dongle attached to ${driverPath}`);
     this.usbConfigured = true;
   } else {
@@ -57,7 +56,7 @@ async function connect() {
   });
 
   // Subscribe to Zigbee2mqtt topics
-    this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
+  this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
 }
 
 module.exports = {

@@ -2,8 +2,8 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 
 /**
  * @description Run container.
- * @param containerName
- * @returns
+ * @param {Object} containerOptions - Parameters passed to Docker run command.
+ * @returns {Promise} Running container.
  * @example
  * const container = await runContainer();
  */
@@ -12,7 +12,6 @@ async function runContainer(containerOptions) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  console.log('Run command options : ', containerOptions);
   const container = await this.dockerode.run(containerOptions.image, null, null, containerOptions.options);
 
   /*  docker.createContainer({

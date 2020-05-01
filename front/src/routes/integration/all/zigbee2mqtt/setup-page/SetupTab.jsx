@@ -19,8 +19,7 @@ class SetupTab extends Component {
         this.props.stopContainer();
       }
 
-      this.props.z2mEnabled = checked ;
-
+      this.props.z2mEnabled = checked;
     }
   };
 
@@ -56,7 +55,9 @@ class SetupTab extends Component {
                 <span class="custom-switch-indicator" />
               </label>
             </td>
-            <td><Text id="integration.zigbee2mqtt.setup.enable" /></td>
+            <td>
+              <Text id="integration.zigbee2mqtt.setup.enable" />
+            </td>
           </tr>
 
           <h3 class="card-header">
@@ -101,7 +102,7 @@ class SetupTab extends Component {
                       </td>
                       <td>
                         <span
-                           class={cx('dimmer', {
+                          class={cx('dimmer', {
                             active: container.state === 'starting' || container.state === 'stopping'
                           })}
                         >
@@ -109,8 +110,7 @@ class SetupTab extends Component {
                         </span>
                       </td>
                     </tr>
-                  ))
-                }
+                  ))}
               </tbody>
             </table>
           </div>

@@ -3,10 +3,10 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Start container.
- * @param containerName
- * @returns
+ * @returns {Promise} Container object.
+ * @param {string} containerName - Container name.
  * @example
- * const container = await startContainer();
+ * const container = await startContainer('mqtt');
  */
 async function startContainer(containerName) {
   if (!this.dockerode) {
