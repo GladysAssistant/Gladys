@@ -75,10 +75,13 @@ function createActions(store) {
         // save informations in localstorage
         state.session.saveLoginInformations(data);
         // connect
-        state.session.connect();
+        await state.session.connect();
         if (data.gladysUserId) {
           // get user
           const user = await state.httpClient.get('/api/v1/me');
+          store.setState({
+            user
+          });
           // save user
           state.session.saveUser(user);
           // get profile picture

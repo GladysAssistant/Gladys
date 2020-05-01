@@ -36,6 +36,9 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PRESSURE_HPA && 'hPa'}
           </span>
         )}
@@ -49,9 +52,11 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
       <td class="text-right">
-        {dayjs(props.deviceFeature.last_value_changed)
-          .locale(props.user.language)
-          .fromNow()}
+        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+        {props.deviceFeature.last_value_changed &&
+          dayjs(props.deviceFeature.last_value_changed)
+            .locale(props.user.language)
+            .fromNow()}
       </td>
     )}
   </tr>

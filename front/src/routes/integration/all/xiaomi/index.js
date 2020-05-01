@@ -11,7 +11,7 @@ class XiaomiPage extends Component {
   componentWillMount() {
     this.props.getHouses();
     this.props.getXiaomiSensors();
-    this.props.getXiaomiDevices(1000, 0);
+    this.props.getXiaomiDevices();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE, payload => {
       this.props.getXiaomiSensors();
     });

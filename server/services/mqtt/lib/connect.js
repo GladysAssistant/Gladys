@@ -46,6 +46,14 @@ async function connect() {
       payload: err,
     });
   });
+  this.mqttClient.on('offline', () => {
+    logger.warn(`Disconnected from MQTT server`);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+      payload: 'DISCONNECTED',
+    });
+    this.connected = false;
+  });
   this.mqttClient.on('message', (topic, message) => {
     this.handleNewMessage(topic, message.toString());
   });

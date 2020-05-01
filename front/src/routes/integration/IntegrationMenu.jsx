@@ -76,6 +76,7 @@ const IntegrationMenu = connect(
 
       <Link
         activeClassName="active"
+        onClick={refreshIntegrations('device')}
         href="/dashboard/integration/weather"
         class="list-group-item list-group-item-action d-flex align-items-center"
       >

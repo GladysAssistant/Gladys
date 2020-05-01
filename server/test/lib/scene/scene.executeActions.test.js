@@ -1,7 +1,9 @@
 const { assert, fake } = require('sinon');
 const chaiAssert = require('chai').assert;
+const { expect } = require('chai');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
+const { AbortScene } = require('../../../utils/coreErrors');
 const { executeActions } = require('../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../lib/state');
@@ -10,24 +12,23 @@ const event = new EventEmitter();
 
 describe('scene.executeActions', () => {
   it('should execute light turn on', async () => {
-    const light = {
-      turnOn: fake.resolves(null),
+    const device = {
+      setValue: fake.resolves(null),
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', light);
     await executeActions(
-      { stateManager, event },
+      { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
       ],
       {},
     );
-    assert.calledOnce(light.turnOn);
+    assert.calledOnce(device.setValue);
   });
   it('should execute wait 5 ms', async () => {
     await executeActions(
@@ -36,7 +37,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            milliseconds: 5,
+            unit: 'milliseconds',
+            value: 5,
           },
         ],
       ],
@@ -48,7 +50,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            seconds: 5 / 1000,
+            unit: 'seconds',
+            value: 5 / 1000,
           },
         ],
       ],
@@ -60,7 +63,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            minutes: 5 / 1000 / 60,
+            unit: 'minutes',
+            value: 5 / 1000 / 60,
           },
         ],
       ],
@@ -72,7 +76,8 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            hours: 5 / 1000 / 60 / 60,
+            unit: 'hours',
+            value: 5 / 1000 / 60 / 60,
           },
         ],
       ],
@@ -120,30 +125,29 @@ describe('scene.executeActions', () => {
     assert.calledOnce(example.stop);
   });
   it('should execute sequential actions', async () => {
-    const light = {
-      turnOn: fake.resolves(null),
+    const device = {
+      setValue: fake.resolves(null),
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', light);
     await executeActions(
-      { stateManager, event },
+      { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            device: 'light-1',
+            devices: ['light-1'],
           },
         ],
       ],
       {},
     );
-    assert.calledTwice(light.turnOn);
+    assert.calledTwice(device.setValue);
   });
   it('should throw error, action type does not exist', async () => {
     const light = {
@@ -253,6 +257,104 @@ describe('scene.executeActions', () => {
         type: 'binary',
       },
       1,
+    );
+  });
+  it('should execute action device.getValue', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+      ],
+      scope,
+    );
+    expect(scope).to.deep.equal({ '0.0.last_value': 15 });
+  });
+  it('should abort scene, condition is not verified', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 20,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish scene, condition is verified', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 15,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
     );
   });
 });

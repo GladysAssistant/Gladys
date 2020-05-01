@@ -18,6 +18,18 @@ describe('house.create', () => {
     expect(newHouse).to.have.property('name', 'My test house');
     expect(newHouse).to.have.property('selector', 'my-test-house');
   });
+  it('should not create a house (name is empty)', async () => {
+    const promise = house.create({
+      name: '',
+    });
+    return assertChai.isRejected(promise);
+  });
+  it('should not create a house (name is too long)', async () => {
+    const promise = house.create({
+      name: 'this-is-a-long-long-name-this-is-a-long-long-name-this-is-a-long-long-name',
+    });
+    return assertChai.isRejected(promise);
+  });
 });
 
 describe('house.update', () => {

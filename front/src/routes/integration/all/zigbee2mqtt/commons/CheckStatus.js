@@ -18,11 +18,10 @@ class CheckStatus extends Component {
       messageKey = 'integration.zigbee2mqtt.status.notConfigured';
       linkUrl = '/dashboard/integration/device/zigbee2mqtt/settings';
       linkText = 'integration.zigbee2mqtt.status.settingsPageLink';
-      //   }
-      //else if (!props.zigbee2mqttStatusMqttConnected) {
-      //  messageKey = 'integration.zigbee2mqtt.status.notConnected';
-      //      linkUrl = '/dashboard/integration/device/zigbee2mqtt/setup';
-      //  linkText = 'integration.zigbee2mqtt.status.setupPageLink';
+    } else if (!props.zigbee2mqttStatusMqttConnected) {
+      messageKey = 'integration.zigbee2mqtt.status.notConnected';
+      linkUrl = '/dashboard/integration/device/zigbee2mqtt/setup';
+      linkText = 'integration.zigbee2mqtt.status.setupPageLink';
     } else {
       return null;
     }

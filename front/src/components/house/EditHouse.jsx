@@ -3,10 +3,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import { RequestStatus } from '../../utils/consts';
 import Map from './Map';
-
-const removeRoomLocal = (index, removeRoom) => () => {
-  removeRoom(index);
-};
+import EditRoom from './EditRoom';
 
 const EditHouse = ({ children, ...props }) => (
   <div
@@ -24,11 +21,6 @@ const EditHouse = ({ children, ...props }) => (
       {props.houseUpdateStatus === RequestStatus.ConflictError && (
         <div class="alert alert-danger">
           <Text id="signup.configureHouse.conflictError" />
-        </div>
-      )}
-      {props.houseUpdateStatus === RequestStatus.RoomConflictError && (
-        <div class="alert alert-danger">
-          <Text id="signup.configureHouse.roomConflictError" />
         </div>
       )}
       {props.houseUpdateStatus === RequestStatus.NetworkError && (
@@ -70,26 +62,19 @@ const EditHouse = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.configureHouse.roomsLabel" />
         </label>
-        <div
-          class="tags"
-          style={{
-            marginBottom: '10px'
-          }}
-        >
+        {props.houseUpdateStatus === RequestStatus.RoomConflictError && (
+          <div class="alert alert-danger">
+            <Text id="signup.configureHouse.roomConflictError" />
+          </div>
+        )}
+        {props.houseUpdateStatus === RequestStatus.RoomValidationError && (
+          <div class="alert alert-danger">
+            <Text id="signup.configureHouse.validationErrorRoom" />
+          </div>
+        )}
+        <div class="row mb-2">
           {props.house.rooms &&
-            props.house.rooms.map((room, index) => {
-              if (room.to_delete === true) {
-                return null;
-              }
-              return (
-                <span class="tag">
-                  {room.name}
-                  <a onClick={removeRoomLocal(index, props.removeRoom)} class="tag-addon">
-                    <i class="fe fe-x" />
-                  </a>
-                </span>
-              );
-            })}
+            props.house.rooms.map((room, index) => <EditRoom {...props} room={room} index={index} />)}
         </div>
         <div class="input-group">
           <Localizer>

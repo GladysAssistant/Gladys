@@ -1,10 +1,26 @@
 const Sequelize = require('sequelize');
+const Umzug = require('umzug');
+const path = require('path');
 const getConfig = require('../utils/getConfig');
+const logger = require('../utils/logger');
 
 const config = getConfig();
 
 // SQLite
 const sequelize = new Sequelize('mainDB', null, null, config);
+
+// Migrations
+const umzug = new Umzug({
+  migrations: {
+    path: path.join(__dirname, '../migrations'),
+    params: [sequelize.getQueryInterface(), Sequelize],
+  },
+  logging: logger.debug,
+  storage: 'sequelize',
+  storageOptions: {
+    sequelize,
+  },
+});
 
 const AreaModel = require('./area');
 const CalendarModel = require('./calendar');
@@ -24,8 +40,6 @@ const SceneModel = require('./scene');
 const ScriptModel = require('./script');
 const ServiceModel = require('./service');
 const SessionModel = require('./session');
-const TriggerSceneModel = require('./trigger_scene');
-const TriggerModel = require('./trigger');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
@@ -48,8 +62,6 @@ const models = {
   Script: ScriptModel(sequelize, Sequelize),
   Service: ServiceModel(sequelize, Sequelize),
   Session: SessionModel(sequelize, Sequelize),
-  TriggerScene: TriggerSceneModel(sequelize, Sequelize),
-  Trigger: TriggerModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
 };
@@ -64,6 +76,7 @@ Object.values(models)
 const db = {
   ...models,
   sequelize,
+  umzug,
 };
 
 module.exports = db;

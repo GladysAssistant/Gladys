@@ -6,29 +6,18 @@ import debounce from 'debounce';
 function createActions(store) {
   const houseActions = createActionsHouse(store);
   const actions = {
-    async getZWaveDevices(state, take, skip) {
+    async getZWaveDevices(state) {
       store.setState({
         getZwaveDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          service: 'zwave',
-          order_dir: state.getZwaveDeviceOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getZwaveDeviceOrderDir || 'asc'
         };
         if (state.zwaveDeviceSearch && state.zwaveDeviceSearch.length) {
           options.search = state.zwaveDeviceSearch;
         }
-        const zwaveDevicesReceived = await state.httpClient.get('/api/v1/service/zwave/device', options);
-        let zwaveDevices;
-        if (skip === 0) {
-          zwaveDevices = zwaveDevicesReceived;
-        } else {
-          zwaveDevices = update(state.zwaveDevices, {
-            $push: zwaveDevicesReceived
-          });
-        }
+        const zwaveDevices = await state.httpClient.get('/api/v1/service/zwave/device', options);
         store.setState({
           zwaveDevices,
           getZwaveDevicesStatus: RequestStatus.Success
@@ -67,13 +56,13 @@ function createActions(store) {
       store.setState({
         zwaveDeviceSearch: e.target.value
       });
-      await actions.getZWaveDevices(store.getState(), 20, 0);
+      await actions.getZWaveDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
         getZwaveDeviceOrderDir: e.target.value
       });
-      await actions.getZWaveDevices(store.getState(), 20, 0);
+      await actions.getZWaveDevices(store.getState());
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

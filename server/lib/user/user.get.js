@@ -3,7 +3,6 @@ const db = require('../../models');
 const DEFAULT_OPTIONS = {
   fields: ['id', 'firstname', 'lastname', 'selector', 'email'],
   expand: [],
-  take: 20,
   skip: 0,
 };
 
@@ -29,13 +28,18 @@ async function get(options) {
     });
   }
 
-  const users = await db.User.findAll({
+  const queryParams = {
     attributes: optionsWithDefault.fields,
     include: includeExpand,
-    limit: optionsWithDefault.take,
     offset: optionsWithDefault.skip,
     order: [['created_at', 'ASC']],
-  });
+  };
+
+  if (optionsWithDefault.take) {
+    queryParams.limit = optionsWithDefault.take;
+  }
+
+  const users = await db.User.findAll(queryParams);
 
   const usersPlain = users.map((user) => {
     // we converted the user to plain object

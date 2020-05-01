@@ -1,6 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import ActionColumn from './ActionColumn';
+import ActionGroup from './ActionGroup';
+import TriggerGroup from './TriggerGroup';
+import update from 'immutability-helper';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -23,7 +25,7 @@ const EditScenePage = ({ children, ...props }) => (
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
                 <Text id="editScene.startButton" /> <i class="fe fe-play" />
               </button>
-              <button onClick={props.saveScene} class="btn btn-sm btn-success ml-2">
+              <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>
               <button onClick={props.deleteScene} class="btn btn-sm btn-danger ml-2">
@@ -31,28 +33,60 @@ const EditScenePage = ({ children, ...props }) => (
               </button>
             </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row flex-nowrap" style="overflow-x: auto;">
-                    {props.scene.actions.map((parallelActions, index) => (
-                      <ActionColumn
-                        addAction={props.addAction}
-                        actions={parallelActions}
-                        deleteAction={props.deleteAction}
-                        updateSelectedNewAction={props.updateSelectedNewAction}
-                        updateActionProperty={props.updateActionProperty}
-                        highLightedActions={props.highLightedActions}
-                        sceneParamsData={props.sceneParamsData}
-                        index={index}
-                      />
-                    ))}
-                  </div>
+          <div>
+            {props.error && (
+              <div class="alert alert-danger">
+                <Text id="editScene.saveSceneError" />
+              </div>
+            )}
+            <div class="row">
+              <TriggerGroup
+                triggers={props.scene.triggers}
+                addTrigger={props.addTrigger}
+                deleteTrigger={props.deleteTrigger}
+                updateTriggerProperty={props.updateTriggerProperty}
+                saving={props.saving}
+              />
+            </div>
+            <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+              <div class="col-lg-12">
+                <div class="text-center">
+                  <i class="fe fe-arrow-down" />
                 </div>
               </div>
             </div>
           </div>
+          {props.scene.actions.map((parallelActions, index) => (
+            <div>
+              <div class="row">
+                <ActionGroup
+                  addAction={props.addAction}
+                  actions={parallelActions}
+                  deleteAction={props.deleteAction}
+                  updateSelectedNewAction={props.updateSelectedNewAction}
+                  updateActionProperty={props.updateActionProperty}
+                  highLightedActions={props.highLightedActions}
+                  sceneParamsData={props.sceneParamsData}
+                  index={index}
+                  saving={props.saving}
+                  actionsGroupsBefore={update(props.scene.actions, {
+                    $splice: [[index, props.scene.actions.length - index]]
+                  })}
+                  variables={props.variables}
+                  setVariables={props.setVariables}
+                />
+              </div>
+              {index + 1 < props.scene.actions.length && (
+                <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+                  <div class="col-lg-12">
+                    <div class="text-center">
+                      <i class="fe fe-arrow-down" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

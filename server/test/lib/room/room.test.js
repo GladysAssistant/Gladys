@@ -18,6 +18,18 @@ describe('room.create', () => {
     expect(newRoom).to.have.property('selector', 'my-test-room');
     assert.calledOnce(brain.addRoom);
   });
+  it('should not create a room (empty name)', async () => {
+    const promise = room.create('test-house', {
+      name: '',
+    });
+    return assertChai.isRejected(promise);
+  });
+  it('should not create a room (name too long)', async () => {
+    const promise = room.create('test-house', {
+      name: 'this-is-a-long-long-name-this-is-a-long-long-name-this-is-a-long-long-name',
+    });
+    return assertChai.isRejected(promise);
+  });
   it('should return house not found', async () => {
     const promise = room.create('house-does-not-exist', {
       name: 'My test room',
@@ -131,6 +143,7 @@ describe('room.get', () => {
   it('should get rooms with expanded devices + features', async () => {
     const rooms = await room.get({
       expand: ['devices'],
+      take: 100,
     });
     expect(rooms).to.be.instanceOf(Array);
     rooms.forEach((oneRoom) => {
@@ -158,5 +171,13 @@ describe('room.get', () => {
         });
       });
     });
+  });
+  it('should get 0 rooms (take = 0)', async () => {
+    const rooms = await room.get({
+      expand: ['devices'],
+      take: 0,
+    });
+    expect(rooms).to.be.instanceOf(Array);
+    expect(rooms).to.have.lengthOf(0);
   });
 });

@@ -1,12 +1,10 @@
 const EventEmitter = require('events');
 const logger = require('../../utils/logger');
-const TriggerManager = require('../../lib/trigger');
 const StateManager = require('../../lib/state');
 const { EVENT_LIST, CONDITIONS, STATES } = require('../../utils/constants');
 
 const event = new EventEmitter();
 const stateManager = new StateManager();
-const triggerManager = new TriggerManager(event, stateManager);
 
 const NUMBER_OF_LISTENERS = 300;
 const NUMBER_OF_CONDITIONS_PER_TRIGGER = 5;
@@ -58,12 +56,7 @@ for (let i = 0; i < NUMBER_OF_LISTENERS; i += 1) {
       ],
     });
   }
-  triggerManager.addToListeners(listener);
 }
-
-EVENT_LIST.forEach((type) => {
-  event.on(type, (oneEvent) => triggerManager.handleEvent(type, oneEvent));
-});
 
 while (1) {
   // eslint-disable-line

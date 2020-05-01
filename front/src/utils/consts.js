@@ -59,7 +59,8 @@ export const RequestStatus = {
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
-  RoomConflictError: 'RoomConflictError'
+  RoomConflictError: 'RoomConflictError',
+  RoomValidationError: 'RoomValidationError'
 };
 
 export const GetWeatherStatus = {
@@ -92,7 +93,9 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.SATURATION]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: 'sun',
-    [DEVICE_FEATURE_TYPES.LIGHT.POWER]: 'zap'
+    [DEVICE_FEATURE_TYPES.LIGHT.POWER]: 'zap',
+    [DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE]: 'play',
+    [DEVICE_FEATURE_TYPES.LIGHT.EFFECT_SPEED]: 'activity'
   },
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'thermometer'
@@ -104,6 +107,9 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.ACCELERATION_Y]: 'zap',
     [DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.ACCELERATION_Z]: 'zap',
     [DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.BED_ACTIVITY]: 'moon'
+  },
+  [DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: 'plus'
   },
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'user-check'
@@ -142,6 +148,9 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'droplet'
+  },
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'bar-chart-2'
   },
   [DEVICE_FEATURE_CATEGORIES.CUBE]: {
     [DEVICE_FEATURE_TYPES.CUBE.MODE]: 'activity',

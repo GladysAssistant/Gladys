@@ -290,6 +290,18 @@
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
           },
           {
+            "name": "Co2",
+            "selector": "co2-kitchen",
+            "category": "co2-sensor",
+            "type": "decimal",
+            "unit": "ppm",
+            "min": 0,
+            "max": 5000,
+            "read_only": true,
+            "last_value": 340,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
             "name": "Kitchen door",
             "selector": "temperature-living-room-celsius",
             "category": "opening-sensor",
@@ -334,13 +346,14 @@
       "devices": [
         {
           "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+          "name": "Multi-sensor",
           "selector": "sensors",
           "features": [
             {
               "name": "Temperature",
-              "selector": "main-lamp-binary",
+              "selector": "temperature-sensor",
               "category": "temperature-sensor",
-              "type": "",
+              "type": "decimal",
               "min": -20,
               "max": 255,
               "read_only": true,
@@ -350,26 +363,38 @@
             },
             {
               "name": "Humidity",
-              "selector": "main-lamp-binary",
+              "selector": "humidity-sensor",
               "category": "humidity-sensor",
-              "type": "",
+              "type": "decimal",
               "min": 0,
               "max": 100,
               "read_only": true,
               "last_value": 56,
-              "unit": "%",
+              "unit": "percent",
+              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+            },
+            {
+              "name": "Co2",
+              "selector": "co2-sensor",
+              "category": "co2-sensor",
+              "type": "decimal",
+              "min": 0,
+              "max": 5000,
+              "read_only": true,
+              "last_value": 410,
+              "unit": "ppm",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             },
             {
               "name": "Door",
-              "selector": "main-lamp-binary",
+              "selector": "door-opening-sensor",
               "category": "door-opening-sensor",
-              "type": "",
+              "type": "binary",
               "min": 0,
               "max": 1,
               "read_only": true,
               "last_value": 0,
-              "unit": "%",
+              "unit": "percent",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             }
           ]
@@ -383,30 +408,38 @@
       "devices": [
         {
           "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+          "name": "Kitchen Light",
           "selector": "sensors",
           "features": [
             {
-              "name": "Humidity",
-              "selector": "main-lamp-binary",
-              "category": "humidity-sensor",
-              "type": "",
-              "min": 0,
-              "max": 100,
-              "read_only": true,
-              "last_value": 74,
-              "unit": "%",
-              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
-            },
-            {
               "name": "Light",
               "selector": "main-lamp-binary",
-              "category": "light-sensor",
-              "type": "",
+              "category": "light",
+              "type": "binary",
               "min": 0,
               "max": 100,
               "read_only": true,
               "last_value": 60,
               "unit": " lux",
+              "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+            }
+          ]
+        },
+        {
+          "id": "284d8f68-220c-45fd-a73a-eccb547aff24",
+          "name": "Sensor",
+          "selector": "humidity-sensor",
+          "features": [
+            {
+              "name": "Humidity",
+              "selector": "kitchen-humidity-sensor",
+              "category": "humidity-sensor",
+              "type": "decimal",
+              "min": 0,
+              "max": 100,
+              "read_only": true,
+              "last_value": 74,
+              "unit": "percent",
               "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
             }
           ]
@@ -495,18 +528,26 @@
     "selector": "wake-up",
     "icon": "fe fe-bell",
     "name": "Wake Up",
+    "triggers": [
+      {
+        "type": "device.new-state",
+        "device_feature": "main-lamp-binary",
+        "operator": "=",
+        "value": 1
+      }
+    ],
     "actions": [
       [
         {
           "type": "delay",
-          "seconds": 2
+          "value": 2,
+          "unit": "seconds"
         }
       ],
       [
         {
-          "type": "telegram.send",
-          "user": "tony",
-          "text": "Time to wake up!"
+          "type": "light.turn-on",
+          "devices": ["light"]
         }
       ]
     ]
@@ -669,11 +710,12 @@
     "configured": true,
     "connected": true
   },
-  "get /api/v1/service/sonoff": {},
-  "get /api/v1/service/sonoff/device": [
+  "get /api/v1/service/tasmota": {},
+  "get /api/v1/service/tasmota/device": [
     {
       "name": "Switch",
-      "external_id": "sonoff:sonoff-basic",
+      "external_id": "tasmota:sonoff-basic",
+      "selector": "sonoff-basic",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "model": "sonoff-basic",
       "features": [
@@ -684,10 +726,24 @@
       ]
     }
   ],
-  "get /api/v1/service/sonoff/discover": [
+  "get /api/v1/device/sonoff-basic": {
+    "name": "Switch",
+    "external_id": "tasmota:sonoff-basic",
+    "selector": "sonoff-basic",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "model": "sonoff-basic",
+    "features": [
+      {
+        "category": "switch",
+        "type": "binary",
+        "name": "Switch"
+      }
+    ]
+  },
+  "get /api/v1/service/tasmota/discover": [
     {
       "name": "Sonoff Basic Kitchen",
-      "external_id": "sonoff:sonoff-basic",
+      "external_id": "tasmota:sonoff-basic",
       "created_at": "2019-02-12T07:49:07.556Z",
       "model": "sonoff-basic",
       "features": [
@@ -699,12 +755,101 @@
     },
     {
       "name": "Sonoff Pow Kitchen",
-      "external_id": "sonoff:sonoff-pow",
+      "external_id": "tasmota:sonoff-pow",
       "model": "sonoff-pow",
       "features": [
         {
           "category": "switch",
           "type": "binary"
+        }
+      ]
+    },
+    {
+      "name": "Sonoff Mini Outside",
+      "external_id": "tasmota:sonoff-mini",
+      "model": "sonoff-basic",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updatable": true,
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/zigbee2mqtt": {},
+  "get /api/v1/service/zigbee2mqtt/device": [
+    {
+      "name": "Smart LED",
+      "external_id": "0x12456",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "features": [
+        {
+          "category": "light",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNLDP12LM"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/zigbee2mqtt/discover": [
+    {
+      "name": "Xiaomi MiJia temperature & humidity sensor",
+      "external_id": "0x234567",
+      "features": [
+        {
+          "category": "temperature-sensor",
+          "type": "decimal"
+        },
+        {
+          "category": "humidity-sensor",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "WSDCGQ01LM"
+        }
+      ]
+    },
+    {
+      "name": "Xiaomi Mi power plug",
+      "external_id": "0x345678",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNCZ02LM"
+        }
+      ]
+    },
+    {
+      "name": "Smart LED",
+      "external_id": "0x12456",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "features": [
+        {
+          "category": "light",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "model",
+          "value": "ZNLDP12LM"
         }
       ]
     }
@@ -1022,6 +1167,21 @@
           "has_feedback": true,
           "min": 0,
           "max": 100
+        }
+      ]
+    }
+  ],
+  "get /api/v1/device": [
+    {
+      "id": "06e735a3-ac62-4a05-85b6-855f2c556d7b",
+      "name": "Living room lamp",
+      "selector": "light",
+      "features": [
+        {
+          "name": "Living room lamp",
+          "type": "binary",
+          "selector": "light.binary",
+          "category": "light"
         }
       ]
     }

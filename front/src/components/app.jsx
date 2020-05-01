@@ -73,14 +73,16 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
-// Sonoff
-import SonoffPage from '../routes/integration/all/sonoff/device-page';
-import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
+// Tasmota
+import TasmotaPage from '../routes/integration/all/tasmota/device-page';
+import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
+import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
 // Zigbee2mqtt
 import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
 import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
 import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/settings-page';
+import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
 import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
 
 const defaultState = getDefaultState();
@@ -175,11 +177,13 @@ const AppRouter = connect(
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-        <SonoffPage path="/dashboard/integration/device/sonoff" />
-        <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+        <TasmotaPage path="/dashboard/integration/device/tasmota" />
+        <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
+        <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
         <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
         <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
         <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
+        <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <ChatPage path="/dashboard/chat" />

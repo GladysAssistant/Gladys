@@ -53,6 +53,9 @@ const SignupLayout = ({ children, ...props }) => (
                         <Text id="httpErrors.unknownError" />
                       </div>
                     )}
+                    <p>
+                      <Text id="gatewayLinkUser.description" />
+                    </p>
                     <div class="form-group">
                       <label>
                         <Text id="gatewayLinkUser.label" />

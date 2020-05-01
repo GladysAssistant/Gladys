@@ -101,7 +101,8 @@
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
       "roomConflictError": "A room with the same name already exist.",
-      "validationError": "Validation error: A house can't have an empty name."
+      "validationError": "House name should be between 1 and 40 characters",
+      "validationErrorRoom": "Room name should be between 1 and 40 characters"
     },
     "success": {
       "title": "Allow me to thank you 🙏",
@@ -226,41 +227,38 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
-    "sonoff": {
-      "title": "Sonoff",
+    "tasmota": {
+      "title": "Tasmota",
       "deviceTab": "Devices",
       "discoverTab": "MQTT discover",
-      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
-        "title": "Sonoff devices in Gladys",
+        "title": "Tasmota devices in Gladys",
         "search": "Search devices",
-        "newButton": "New",
-        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
+        "editButton": "Edit",
+        "noDeviceFound": "No Tasmota device found.",
+        "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Sonoff discover devices over MQTT",
-        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Sonoff devices.",
-        "noDeviceFound": "No Sonoff device discovered.",
-        "documentation": "Sonoff documentation"
+        "title": "Tasmota discover devices over MQTT",
+        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Tasmota devices.",
+        "noDeviceFound": "No Tasmota device discovered.",
+        "documentation": "Tasmota documentation",
+        "scan": "Scan"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Topic (%topic% Sonoff MQTT)",
-      "topicPlaceholder": "Should starts with 'sonoff:'",
-      "modelLabel": "Sonoff Model",
-      "model": {
-        "sonoff-basic": "Basic",
-        "sonoff-pow": "Pow",
-        "sonoff-s2x": "S20/S26 Smart Plug"
-      },
+      "topicLabel": "Tasmota MQTT Topic",
       "saveButton": "Save",
+      "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
       "error": {
         "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current topic is already in use."
       }
     },
@@ -269,6 +267,7 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "settingsTab": "Settings",
+      "setupTab": "Setup",
       "status": {
         "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
         "notConnected": "Zigbee2mqtt service failed to connect, please go to ",
@@ -284,6 +283,14 @@
         "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
         "attached": "Zigbee2mqtt USB Dongle configured.",
         "saving": "Saving USB Dongle configuration..."
+      },
+      "setup": {
+        "title": "Zigbe2mqtt configuration",
+        "description": "This service uses two independant docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers. Learn more on the Zigbee2mqtt documentation page",
+        "enable": "Enable Zigbee2mqtt",
+        "containersTitle": " Zigbee2mqtt Docker containers",
+        "connected": "Zigbee2mqtt was started with success.",
+        "error": "An error occured while starting Zigbee2mqtt."
       },
       "device": {
         "title": "Zigbee2mqtt devices",
@@ -322,11 +329,14 @@
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
+        "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit"
+        "editButton": "Edit",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -337,6 +347,7 @@
         "scanButton": "Scan",
         "noZwaveDevices": "No Z-Wave devices found. Have you selected your dongle USB port in Settings?",
         "manufacturer": "Manufacturer",
+        "name": "Name",
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
@@ -346,6 +357,7 @@
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
+        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
         "deviceCreatedSuccess": "The device was added with success."
       },
       "network": {
@@ -398,6 +410,7 @@
         "noDevices": "No MQTT devices added yet.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
+        "externalIdLabel": "External ID",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
@@ -408,20 +421,28 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "feature": {
         "nameLabel": "Name",
         "namePlaceholder": "Enter feature name",
         "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
         "maxPlaceholder": "Enter feature maximum value",
+        "readOnlyLabel": "Is it a sensor?",
+        "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
+        "mqttTopicExampleLabel": "MQTT Topic",
+        "copyMqttTopic": "Copy MQTT Topic",
+        "copied": "Copied!",
+        "copiedFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
       },
       "setup": {
@@ -436,7 +457,8 @@
         "saveLabel": "Save configuration",
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
-        "connected": "Connected to the MQTT broker with success !"
+        "connected": "Connected to the MQTT broker with success !",
+        "connectionError": "Error while connecting, please check your configuration."
       }
     },
     "xiaomi": {
@@ -474,15 +496,63 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
-    "first": "First",
-    "then": "Then",
+    "triggersTitle": "Triggers",
+    "newTrigger": "New trigger",
+    "addTriggerButton": "Add trigger",
+    "selectTriggerLabel": "Select a trigger type",
+    "newAction": "New action",
+    "selectActionType": "Select an action type",
+    "addActionButton": "Add action",
+    "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
+    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
+    "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
+    "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
+    "addNewTriggerButton": "Add trigger",
+    "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
+    "actionsCard": {
+      "delay": {
+        "label": " This block will wait the specified duration.",
+        "inputPlaceholder": "Duration",
+        "milliseconds": "milliseconds",
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours"
+      },
+      "messageSend": {
+        "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text"
+      },
+      "turnOnLights": {
+        "label": "Select the lights you want to turn on"
+      },
+      "turnOffLights": {
+        "label": "Select the lights you want to turn off"
+      },
+      "deviceGetValue": {
+        "description": "This will get the last value of the selected device, so you can use it later in the scene.",
+        "deviceLabel": "Select a device"
+      },
+      "onlyContinueIf": {
+        "variableLabel": "Variable",
+        "operatorLabel": "Operator",
+        "valueLabel": "Value",
+        "removeLabel": "Remove",
+        "orText": "OR",
+        "orButton": "OR"
+      }
+    },
     "actions": {
-      "telegram": {
-        "send": "Send Telegram Message"
+      "device": {
+        "get-value": "Get device value"
+      },
+      "message": {
+        "send": "Send Message"
       },
       "delay": "Wait",
       "light": {
-        "turn-on": "Turn On the Lights"
+        "turn-on": "Turn On the Lights",
+        "turn-off": "Turn Off the Lights"
       },
       "scene": {
         "start": "Start scene"
@@ -490,6 +560,66 @@
       "service": {
         "start": "Start service",
         "stop": "Stop service"
+      },
+      "condition": {
+        "only-continue-if": "Only continue if"
+      }
+    },
+    "variables": {
+      "device": {
+        "get-value": {
+          "last_value": "Device last value"
+        }
+      }
+    },
+    "triggers": {
+      "device": {
+        "new-state": "Device state change"
+      },
+      "time": {
+        "changed": "Scheduled trigger"
+      }
+    },
+    "triggersCard": {
+      "newState": {
+        "equal": "equal",
+        "superior": "superior",
+        "superiorOrEqual": "superior or equal",
+        "less": "less",
+        "lessOrEqual": "less or equal",
+        "different": "different",
+        "valuePlaceholder": "Value",
+        "on": "On",
+        "off": "Off"
+      },
+      "scheduledTrigger": {
+        "everyMonth": "Every month",
+        "everyWeek": "Every week",
+        "everyDay": "Every day",
+        "interval": "Interval",
+        "customTime": "On a specific day",
+        "dateLabel": "Date",
+        "timeLabel": "Time",
+        "unitLabel": "Unit",
+        "intervalLabel": "Interval",
+        "daysOfTheWeekLabel": "Days of the week",
+        "dayOfTheMonthLabel": "Day of the month",
+        "dateFormat": "MM-dd-yyyy",
+        "timeCaption": "Time",
+        "units": {
+          "second": "seconds",
+          "minute": "minutes",
+          "hour": "hours"
+        },
+        "daysOfTheWeek": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        }
       }
     }
   },
@@ -601,8 +731,6 @@
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
     "download": "Download",
-    "restartGladys": "Restart Gladys",
-    "restartButton": "Restart",
     "notAvailable": "Not available on custom install.",
     "containers": "Containers",
     "containerName": "Name",
@@ -620,13 +748,30 @@
       "dead": "Dead"
     }
   },
+  "docker": {
+    "containers": "Containers",
+    "containerName": "Name",
+    "containerCreated": "Created",
+    "containerStatus": "Status",
+    "containerState": {
+      "created": "Created",
+      "starting": "Starting",
+      "restarting": "Restarting",
+      "running": "Running",
+      "stopping": "Stopping",
+      "removing": "Removing",
+      "paused": "Paused",
+      "exited": "Exited",
+      "dead": "Dead"
+    }
+  },
   "newScene": {
     "cardTitle": "New scene",
     "nameLabel": "Name",
     "namePlaceholder": "Enter the name of your scene",
     "iconLabel": "Select an icon for you scene",
     "createSceneButton": "Create scene",
-    "invalidName": "Name is required",
+    "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },
@@ -712,7 +857,15 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
+  },
+  "deviceFeatureUnitShort": {
+    "celsius": "°C",
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -722,7 +875,9 @@
       "color": "Light Color",
       "saturation": "Light Saturation",
       "temperature": "Light Temperature",
-      "power": "Light Power consumption"
+      "power": "Light Power consumption",
+      "effect-mode": "Effect mode",
+      "effect-speed": "Effect speed"
     },
     "battery": {
       "integer": "Battery"
@@ -756,12 +911,18 @@
     "camera": {
       "image": "Camera"
     },
+    "counter-sensor": {
+      "integer": "Counter"
+    },
     "access-control": {
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
       "binary": "Smoke",
       "decimal": "Density"
+    },
+    "co2-sensor": {
+      "decimal": "Co2"
     },
     "switch": {
       "voltage": "Switch Voltage",
@@ -832,6 +993,7 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
+    "description": " Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save",
