@@ -385,6 +385,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   RFLINK: {
     DRIVER_READY: 'rflink.driver-ready',
+    NEW_DEVICE: 'rflink.new-device',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',

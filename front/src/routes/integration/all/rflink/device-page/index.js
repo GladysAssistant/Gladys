@@ -5,6 +5,7 @@ import RflinkPage from '../RflinkPage';
 import DevicePage from './DevicePage';
 import integrationConfig from '../../../../../config/integrations';
 import FoundDevices from './FoundDevices';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
   'session,user,rflinkDevices,houses,getRflinkDevicesStatus,currentIntegration,rflinkNewDevices,getRflinkCreateDeviceStatus,getRflinkNewDevicesStatus',
@@ -12,6 +13,9 @@ import FoundDevices from './FoundDevices';
 )
 class RflinkDevicePage extends Component {
   componentWillMount() {
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE , () => {
+      this.props.getRflinkNewDevices();
+    });
     this.props.getRflinkDevices(20, 0);
     this.props.getRflinkNewDevices();
     this.props.getHouses();
