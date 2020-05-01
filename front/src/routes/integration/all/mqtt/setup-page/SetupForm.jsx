@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 class SetupForm extends Component {
   updateUrl = e => {
@@ -14,7 +15,12 @@ class SetupForm extends Component {
     this.props.updateConfiguration({ mqttPassword: e.target.value, passwordChanges: true });
   };
 
-  render(props) {
+  showPassword = () => {
+    this.setState({ showPassword: true });
+    setTimeout(() => this.setState({ showPassword: false }), 5000);
+  };
+
+  render(props, { showPassword }) {
     return (
       <form>
         <div class="form-group">
@@ -55,18 +61,30 @@ class SetupForm extends Component {
           <label for="mqttPassword" class="form-label">
             <Text id={`integration.mqtt.setup.passwordLabel`} />
           </label>
-          <Localizer>
-            <input
-              id="mqttPassword"
-              name="mqttPassword"
-              type="password"
-              placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
-              value={props.mqttPassword}
-              class="form-control"
-              onInput={this.updatePassword}
-              autoComplete="new-password"
-            />
-          </Localizer>
+          <div class="input-icon mb-3">
+            <Localizer>
+              <input
+                id="mqttPassword"
+                name="mqttPassword"
+                type={props.useEmbeddedBroker && showPassword ? 'text' : 'password'}
+                placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
+                value={props.mqttPassword}
+                class="form-control"
+                onInput={this.updatePassword}
+                autoComplete="new-password"
+              />
+            </Localizer>
+            {props.useEmbeddedBroker && (
+              <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
+                <i
+                  class={cx('fe', {
+                    'fe-eye': !showPassword,
+                    'fe-eye-off': showPassword
+                  })}
+                />
+              </span>
+            )}
+          </div>
         </div>
 
         <div class="form-group">
