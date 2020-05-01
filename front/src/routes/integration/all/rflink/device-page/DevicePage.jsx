@@ -48,7 +48,7 @@ const NodeTab = ({ children, ...props }) => (
         })}
       >
         <div class="alert alert-dark">
-              <Text id="integration.rflink.device.devicesInfo" />
+          <Text id="integration.rflink.device.devicesInfo" />
         </div>
         <div class="loader" />
         <div class="dimmer-content">
