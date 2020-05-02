@@ -1,0 +1,25 @@
+//https://financialmodelingprep.com/api/v3/quote/%5EFCHI
+[ {
+  "symbol" : "^FCHI",
+  "name" : "CAC 40",
+  "price" : 4590.66000000,
+  "changesPercentage" : -1.72000000,
+  "change" : -80.45000000,
+  "dayLow" : 4578.85000000,
+  "dayHigh" : 4719.74000000,
+  "yearHigh" : 6111.41000000,
+  "yearLow" : 3632.06000000,
+  "marketCap" : null,
+  "priceAvg50" : 4308.70260000,
+  "priceAvg200" : 5469.28660000,
+  "volume" : 0,
+  "avgVolume" : 147653834,
+  "exhange" : "INDEX",
+  "open" : 4693.28000000,
+  "previousClose" : 4671.11000000,
+  "eps" : null,
+  "pe" : null,
+  "earningsAnnouncement" : null,
+  "sharesOutstanding" : null,
+  "timestamp" : 1588256395
+} ]
