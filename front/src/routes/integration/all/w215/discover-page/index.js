@@ -16,7 +16,7 @@ class W215Integration extends Component {
       // TODO
       //WEBSOCKET_MESSAGE_TYPES.EWELINK.NEW_DEVICE,
       WEBSOCKET_MESSAGE_TYPES.W215.NEW_DEVICE,
-      
+
       this.props.addDiscoveredDevice
     );
   }

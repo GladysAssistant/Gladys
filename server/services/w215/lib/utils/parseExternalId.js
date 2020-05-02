@@ -6,14 +6,13 @@
  * parseExternalId('w215:xxx.xxx.xxx.xxx');
  */
 function parseExternalId(externalId) {
-    const parsedExternalId = externalId.split(':');
-    const outletIpAdress = parsedExternalId[1];
-    return {
-        outletIpAdress,
-    };
-  }
-  
-  module.exports = {
-    parseExternalId,
+  const parsedExternalId = externalId.split(':');
+  const outletIpAdress = parsedExternalId[1];
+  return {
+    outletIpAdress,
   };
-  
+}
+
+module.exports = {
+  parseExternalId,
+};

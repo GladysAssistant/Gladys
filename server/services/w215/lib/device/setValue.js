@@ -14,20 +14,17 @@ const { W215_PIN_CODE } = require('../utils/constants');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-
   // deviceId is the outlet's IP adress
   const { outletIpAdress } = parseExternalId(device.external_id);
 
   // To limit errors, we will determine if the device is OK with 4 features expected
   // + Outlet's PIN CODE
-  const [pin] = await Promise.all([
-    getDeviceParam(device, W215_PIN_CODE)
-  ]);
+  const [pin] = await Promise.all([getDeviceParam(device, W215_PIN_CODE)]);
 
   const w215Switch = new W215(outletIpAdress, pin);
 
   w215Switch.setPowerState(value, function(err, result) {
-    if(err){
+    if (err) {
       logger.debug(`Change state error : ${err}`);
     } else {
       logger.debug(`Change state success : ${result === true ? 'ON' : 'OFF'}`);

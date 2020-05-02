@@ -1,28 +1,28 @@
 {
-    "name": "gladys-w215",
-    "main": "index.js",
-    "os": [
-        "darwin",
-        "linux",
-        "win32"
-    ],
-    "cpu": [
-        "x64",
-        "arm",
-        "arm64"
-    ],
-    "scripts": {},
-    "dependencies": {
-        "hnap": "2.1.0",
-        "require-uncached": "1.0.3",
-        "bottleneck": "^2.19.5",
-        "node-dns-sd": "0.4.1"
-    },
-    "keywords": [
-        "gladys",
-        "D-Link",
-        "dlink",
-        "w215",
-        "dsp"
-    ]
+  "name": "gladys-w215",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "hnap": "2.1.0",
+    "require-uncached": "1.0.3",
+    "bottleneck": "^2.19.5",
+    "node-dns-sd": "0.4.1"
+  },
+  "keywords": [
+    "gladys",
+    "D-Link",
+    "dlink",
+    "w215",
+    "dsp"
+  ]
 }

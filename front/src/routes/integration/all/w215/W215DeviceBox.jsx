@@ -3,7 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { W215_PIN_CODE } from '../../../../../../server/services/w215/lib/utils/constants'
+import { W215_PIN_CODE } from '../../../../../../server/services/w215/lib/utils/constants';
 import get from 'get-value';
 import { Link } from 'preact-router';
 
@@ -86,15 +86,16 @@ class W215DeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, w215Device, housesWithRooms, editable, ...props }, { loading, errorMessage, testConnectionError }) {
+  render(
+    { deviceIndex, w215Device, housesWithRooms, editable, ...props },
+    { loading, errorMessage, testConnectionError }
+  ) {
     const validModel = w215Device.features.length > 0;
 
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
-            {w215Device.name}
-          </div>
+          <div class="card-header">{w215Device.name}</div>
           <div
             class={cx('dimmer', {
               active: loading

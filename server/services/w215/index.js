@@ -3,7 +3,6 @@ const W215Handler = require('./lib/device');
 const W215Controller = require('./api/w215.controller');
 
 module.exports = function w215Service(gladys, serviceId) {
-  
   const w215Handler = new W215Handler(gladys, serviceId);
 
   /**

@@ -467,7 +467,7 @@
         "error": "Error discovering your device. Please, contact us on http://community.gladysassistant.com",
         "noDeviceFound": "No device discovered.",
         "scan": "Scan"
-      },      
+      },
       "error": {
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",

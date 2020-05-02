@@ -10,14 +10,13 @@ const { W215_EXTERNAL_ID_BASE } = require('../utils/constants');
  * discover();
  */
 async function discover() {
-
   const unknownDevices = [];
-  
+
   // Network scan for device
   const mDnsSd = require('node-dns-sd');
-  
-  try{
-    const discoveredDevices = await mDnsSd.discover({name: '_dhnap._tcp.local', filter: 'D-Link'});
+
+  try {
+    const discoveredDevices = await mDnsSd.discover({ name: '_dhnap._tcp.local', filter: 'D-Link' });
 
     logger.debug(`Discovered devices : "${discoveredDevices.length}"`);
     if (discoveredDevices.length) {
@@ -27,9 +26,9 @@ async function discover() {
         logger.debug(`------MAC ADDRESS : "${discoveredDevice.packet.answers[1].rdata.mac}"`);
         logger.debug(`--------WLAN SSID : "${discoveredDevice.packet.answers[1].rdata.wlan0_ssid}"`);
         logger.debug(`-------------------`);
-        
+
         // Only DSP-W215 is expected
-        if (discoveredDevice.packet.answers[1].rdata.model_number === 'DSP-W215'){
+        if (discoveredDevice.packet.answers[1].rdata.model_number === 'DSP-W215') {
           // External ID = w215:xxx.xxx.xxx.xxx (IP Address)
           const deviceId = `${W215_EXTERNAL_ID_BASE}:${discoveredDevice.address}`;
           discoveredDevice.deviceid = discoveredDevice.address;
@@ -37,7 +36,7 @@ async function discover() {
           discoveredDevice.name = discoveredDevice.packet.answers[1].rdata.wlan0_ssid;
           // Control if device is already in Gladys
           const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', deviceId);
-          if (deviceInGladys){
+          if (deviceInGladys) {
             logger.debug(`Device "${discoveredDevice.deviceid}" is already in Gladys !`);
           } else {
             unknownDevices.push(models.DSPW215.getDevice(this.serviceId, discoveredDevice));
@@ -48,7 +47,7 @@ async function discover() {
         }
       });
     }
-  } catch(e){
+  } catch (e) {
     logger.info(`Discover error, try again. Error message ${e}`);
   }
 
