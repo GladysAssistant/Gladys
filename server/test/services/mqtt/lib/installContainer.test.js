@@ -20,6 +20,10 @@ const MqttHandler = proxiquire('../../../../services/mqtt/lib', {
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
 describe('mqttHandler.installContainer', () => {
+  beforeEach(() => {
+    sinon.reset();
+  });
+
   it('should installContainer: pull failed', async () => {
     const error = new Error('error message');
     const gladys = {
@@ -58,6 +62,13 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
+        getContainers: fake.resolves([{ state: 'running' }]),
+        exec: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+      },
+      variable: {
+        setValue: fake.resolves(true),
+        getValue: fake.resolves(true),
       },
     };
 
@@ -65,6 +76,7 @@ describe('mqttHandler.installContainer', () => {
 
     await mqttHandler.installContainer();
 
+    assert.callCount(gladys.variable.setValue, 4);
     assert.calledOnce(execMock.exec);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);

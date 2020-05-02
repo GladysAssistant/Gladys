@@ -2,6 +2,7 @@ const { DEFAULT } = require('./constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { exec } = require('../../../utils/childProcess');
 const logger = require('../../../utils/logger');
+const { generate } = require('../../../utils/password');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 /**
@@ -41,6 +42,13 @@ async function installContainer() {
     });
     throw e;
   }
+
+  await this.saveConfiguration({
+    mqttUrl: 'mqtt://localhost',
+    mqttUsername: 'gladys',
+    mqttPassword: generate(),
+    useEmbeddedBroker: true,
+  });
 }
 
 module.exports = {

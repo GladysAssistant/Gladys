@@ -1,17 +1,24 @@
 const sinon = require('sinon');
+const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
+const { NotFoundError } = require('../../../../utils/coreErrors');
 const MqttHandler = require('../../../../services/mqtt/lib');
 
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
 describe('mqttHandler.saveConfiguration', () => {
+  beforeEach(() => {
+    sinon.reset();
+  });
+
   it('should saveConfiguration: save all', async () => {
     const gladys = {
       variable: {
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
     };
 
@@ -42,6 +49,7 @@ describe('mqttHandler.saveConfiguration', () => {
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
     };
 
@@ -64,6 +72,7 @@ describe('mqttHandler.saveConfiguration', () => {
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
       system: {
         getContainers: fake.resolves([]),
@@ -78,27 +87,32 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
-    await mqttHandler.saveConfiguration(config);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotFoundError);
+      assert.callCount(gladys.variable.destroy, 2);
+      assert.callCount(gladys.variable.setValue, 2);
+      assert.calledWith(
+        gladys.variable.setValue,
+        CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
+        config.useEmbeddedBroker,
+        serviceId,
+      );
 
-    assert.callCount(gladys.variable.destroy, 2);
-    assert.callCount(gladys.variable.setValue, 2);
-    assert.calledWith(
-      gladys.variable.setValue,
-      CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
-      config.useEmbeddedBroker,
-      serviceId,
-    );
-
-    assert.calledOnce(gladys.system.getContainers);
-    assert.notCalled(gladys.system.exec);
-    assert.notCalled(gladys.system.restartContainer);
+      assert.calledOnce(gladys.system.getContainers);
+      assert.notCalled(gladys.system.exec);
+      assert.notCalled(gladys.system.restartContainer);
+    }
   });
 
-  it('should saveConfiguration: init docker container no present', async () => {
+  it('should saveConfiguration: init docker container no present (no user)', async () => {
     const gladys = {
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
       system: {
         getContainers: fake.resolves([
@@ -129,15 +143,16 @@ describe('mqttHandler.saveConfiguration', () => {
     );
 
     assert.calledOnce(gladys.system.getContainers);
-    assert.calledTwice(gladys.system.exec);
+    assert.calledOnce(gladys.system.exec);
     assert.calledTwice(gladys.system.restartContainer);
   });
 
-  it('should saveConfiguration: init docker container not running', async () => {
+  it('should saveConfiguration: init docker container not running (no user)', async () => {
     const gladys = {
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
       system: {
         getContainers: fake.resolves([
@@ -168,15 +183,16 @@ describe('mqttHandler.saveConfiguration', () => {
     );
 
     assert.calledOnce(gladys.system.getContainers);
-    assert.calledTwice(gladys.system.exec);
+    assert.calledOnce(gladys.system.exec);
     assert.calledTwice(gladys.system.restartContainer);
   });
 
-  it('should saveConfiguration: init docker container is running', async () => {
+  it('should saveConfiguration: init docker container is running (no user)', async () => {
     const gladys = {
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
       },
       system: {
         getContainers: fake.resolves([
@@ -208,7 +224,49 @@ describe('mqttHandler.saveConfiguration', () => {
     );
 
     assert.calledOnce(gladys.system.getContainers);
-    assert.calledTwice(gladys.system.exec);
+    assert.calledOnce(gladys.system.exec);
+    assert.calledOnce(gladys.system.restartContainer);
+  });
+
+  it('should saveConfiguration: init docker container is running (with user no old)', async () => {
+    const gladys = {
+      variable: {
+        destroy: fake.resolves('value'),
+        setValue: fake.resolves('value'),
+        getValue: fake.resolves(null),
+      },
+      system: {
+        getContainers: fake.resolves([
+          {
+            image: DEFAULT.MQTT_IMAGE,
+            state: 'running',
+          },
+        ]),
+        exec: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      useEmbeddedBroker: true,
+      mqttUsername: 'user',
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    await mqttHandler.saveConfiguration(config);
+
+    assert.callCount(gladys.variable.destroy, 1);
+    assert.callCount(gladys.variable.setValue, 3);
+    assert.calledWith(
+      gladys.variable.setValue,
+      CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
+      config.useEmbeddedBroker,
+      serviceId,
+    );
+
+    assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.exec);
     assert.calledOnce(gladys.system.restartContainer);
   });
 });

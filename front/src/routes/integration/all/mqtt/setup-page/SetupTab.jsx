@@ -9,9 +9,6 @@ class SetupTab extends Component {
   updateDockerUsage = () => {
     const useEmbeddedBroker = !this.props.useEmbeddedBroker;
     const config = { useEmbeddedBroker };
-    if (useEmbeddedBroker) {
-      config.mqttUrl = 'mqtt://localhost:1883';
-    }
     this.props.updateConfiguration(config);
   };
 

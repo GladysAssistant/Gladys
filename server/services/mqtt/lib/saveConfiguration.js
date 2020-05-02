@@ -1,5 +1,4 @@
 const { CONFIGURATION } = require('./constants');
-const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
@@ -23,40 +22,42 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
  */
 async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker }) {
   const { variable } = this.gladys;
+  const oldUser = await variable.getValue(CONFIGURATION.MQTT_USERNAME_KEY, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY, useEmbeddedBroker, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_URL_KEY, mqttUrl, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_USERNAME_KEY, mqttUsername, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_PASSWORD_KEY, mqttPassword, this.serviceId);
 
   if (useEmbeddedBroker) {
-    try {
-      const dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerParams.name] },
-      });
+    const dockerContainers = await this.gladys.system.getContainers({
+      all: true,
+      filters: { name: [containerParams.name] },
+    });
 
-      if (dockerContainers.length === 0) {
-        throw new NotFoundError(`${containerParams.name} container not found`);
-      }
+    if (dockerContainers.length === 0) {
+      throw new NotFoundError(`${containerParams.name} container not found`);
+    }
 
-      const [container] = dockerContainers;
-      if (container.state !== 'running') {
-        await this.gladys.system.restartContainer(container.id);
-      }
+    const [container] = dockerContainers;
+    if (container.state !== 'running') {
+      await this.gladys.system.restartContainer(container.id);
+    }
 
-      // Delete password file
+    if (oldUser) {
+      // Delete old user
       await this.gladys.system.exec(container.id, {
-        Cmd: ['mosquitto_passwd', '-D', '/mosquitto/config/mosquitto.passwd'],
+        Cmd: ['mosquitto_passwd', '-D', '/mosquitto/config/mosquitto.passwd', oldUser],
       });
+    }
 
+    if (mqttUsername) {
       // Generate password
       await this.gladys.system.exec(container.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
       });
-      await this.gladys.system.restartContainer(container.id);
-    } catch (e) {
-      logger.error('MQTT embedded broker failed:', e);
     }
+
+    await this.gladys.system.restartContainer(container.id);
   }
 
   return this.connect({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker });
