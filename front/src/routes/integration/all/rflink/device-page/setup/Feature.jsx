@@ -49,7 +49,7 @@ const RflinkFeatureBox = ({ children, ...props }) => {
             </div>
           </div>
 
-          {(props.feature.read_only === false || props.feature.read_only === undefined) && ( // Switch
+          {(props.feature.read_only === false || props.feature.read_only === undefined) && props.feature.category !== DEVICE_FEATURE_CATEGORIES.LIGHT && ( // Switch
             <div class="form-group">
               <label class="form-label" for={`switchnumber_${props.featureIndex}`}>
                 <Text id="integration.rflink.feature.switchNumberLabel" />

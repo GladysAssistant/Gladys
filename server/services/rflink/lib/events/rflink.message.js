@@ -218,10 +218,10 @@ function message(msgRF) {
         if (
           msg.switch !== undefined &&
           msg.rgwb === undefined &&
-          (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF')
+          (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF' || msg.cmd === 'UP' || msg.cmd === 'DOWN')
         ) {
           newDevice.name += 'switch';
-          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
+          newDevice.name += ` ${msg.id}`;
           newDevice.features.push({
             name: 'switch',
             selector: `rflink:${msg.id}:switch:${msg.switch}`,
@@ -230,24 +230,6 @@ function message(msgRF) {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
             read_only: true,
-            keep_history: true,
-            has_feedback: false,
-            min: 0,
-            max: 1,
-          });
-        }
-
-        if (msg.switch !== undefined && msg.rgwb === undefined && (msg.cmd === 'UP' || msg.cmd === 'DOWN')) {
-          newDevice.name += 'switch';
-          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
-          newDevice.features.push({
-            name: 'switch',
-            selector: `rflink:${msg.id}:switch:${msg.switch}`,
-            external_id: `rflink:${msg.id}:switch:${msg.switch}`,
-            rfcode: 'CMD',
-            category: DEVICE_FEATURE_CATEGORIES.BUTTON,
-            type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-            read_only: false,
             keep_history: true,
             has_feedback: false,
             min: 0,
