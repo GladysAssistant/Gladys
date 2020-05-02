@@ -26,8 +26,10 @@ W215.prototype.setPowerState = function setPowerState(state, callback) {
 
   self.login(function(loginStatus) {
     if (!loginStatus || loginStatus === 'failed') {
-      logger.debug(`w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`);
-    } else if (loginStatus === 'success'){
+      logger.debug(
+        `w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`,
+      );
+    } else if (loginStatus === 'success') {
       logger.debug(`w215 connection status : ${loginStatus} (IP Adress : ${ip})`);
       // Récupération de l'état du device avant de changer son état
       self.getPowerState(function(deviceON) {
@@ -57,7 +59,9 @@ W215.prototype.setPowerState = function setPowerState(state, callback) {
         }
       });
     } else {
-      logger.debug(`w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`);
+      logger.debug(
+        `w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`,
+      );
     }
   });
 };

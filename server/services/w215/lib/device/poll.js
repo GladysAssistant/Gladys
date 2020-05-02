@@ -16,8 +16,8 @@ const { parseExternalId } = require('../utils/parseExternalId');
  */
 async function poll(device) {
   // Galdys declaration for intricated code below
-  const { gladys: gladysInstance} = this; // const gladys = this.gladys;
-  
+  const { gladys: gladysInstance } = this; // const gladys = this.gladys;
+
   // deviceId is the outlet's IP adress
   const { outletIpAdress } = parseExternalId(device.external_id);
   this.ip_adress = `http://${outletIpAdress}/HNAP1`;

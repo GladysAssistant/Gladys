@@ -15,7 +15,6 @@ const { W215_EXTERNAL_ID_BASE, W215_PIN_CODE } = require('../utils/constants');
  * getDevice(serviceId, device);
  */
 function getDevice(serviceId, device) {
-  
   return {
     service_id: serviceId,
     name: device.name,
