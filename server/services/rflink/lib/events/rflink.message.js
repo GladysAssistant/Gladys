@@ -43,7 +43,7 @@ function message(msgRF) {
 
         if (msg.temp !== undefined) {
           newDevice.name += 'temperature sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'temperature',
             selector: `rflink:${msg.id}:temperature:${msg.switch}`,
@@ -77,7 +77,7 @@ function message(msgRF) {
         }
         if (msg.baro !== undefined) {
           newDevice.name += 'pressure sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'pressure',
             selector: `rflink:${msg.id}:pressure:${msg.switch}`,
@@ -95,7 +95,7 @@ function message(msgRF) {
         }
         if (msg.uv !== undefined) {
           newDevice.name += 'uv sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'uv intensity',
             selector: `rflink:${msg.id}:uv:${msg.switch}`,
@@ -112,7 +112,7 @@ function message(msgRF) {
         }
         if (msg.lux !== undefined) {
           newDevice.name += 'light sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'light intensity',
             selector: `rflink:${msg.id}:light-intensity:${msg.switch}`,
@@ -135,8 +135,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:battery:${msg.switch}`,
             rfcode: 'BAT',
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            type: DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
             read_only: true,
             keep_history: true,
             has_feedback: false,
@@ -146,7 +145,7 @@ function message(msgRF) {
         }
         if (msg.rain !== undefined || msg.rainrate !== undefined) {
           newDevice.name += 'rain sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'rain',
             selector: `rflink:${msg.id}:rain:${msg.switch}`,
@@ -163,7 +162,7 @@ function message(msgRF) {
         }
         if (msg.winsp !== undefined || msg.awinsp !== undefined || msg.wings !== undefined) {
           newDevice.name += 'wind speed sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'wind speed',
             selector: `rflink:${msg.id}:wind-speed:${msg.switch}`,
@@ -180,7 +179,7 @@ function message(msgRF) {
         }
         if (msg.windir !== undefined) {
           newDevice.name += 'wind direction sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'wind direction',
             selector: `rflink:${msg.id}:wind-dir:${msg.switch}`,
@@ -197,7 +196,7 @@ function message(msgRF) {
         }
         if (msg.co2 !== undefined) {
           newDevice.name += 'co2 sensor';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'co2',
             selector: `rflink:${msg.id}:co2:${msg.switch}`,
@@ -218,7 +217,7 @@ function message(msgRF) {
           (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF')
         ) {
           newDevice.name += 'switch';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'switch',
             selector: `rflink:${msg.id}:switch:${msg.switch}`,
@@ -236,7 +235,7 @@ function message(msgRF) {
 
         if (msg.switch !== undefined && msg.rgwb === undefined && (msg.cmd === 'UP' || msg.cmd === 'DOWN')) {
           newDevice.name += 'switch';
-          newDevice.name += `  ${msg.switch}`;
+          newDevice.name += msg.switch !== undefined ? `  ${msg.switch}` : ' ';
           newDevice.features.push({
             name: 'switch',
             selector: `rflink:${msg.id}:switch:${msg.switch}`,
@@ -331,6 +330,9 @@ function message(msgRF) {
         if (msg.hum !== undefined) {
           this.newValue(msg, 'humidity', msg.hum);
         }
+        if (msg.baro !== undefined) {
+          this.newValue(msg, 'pressure', msg.baro);
+        }
         if (msg.uv !== undefined) {
           this.newValue(msg, 'uv', msg.uv);
         }
@@ -374,10 +376,10 @@ function message(msgRF) {
           this.newValue(msg, 'color', msg.rgbw);
           this.newValue(msg, 'brightness', msg.rgbw);
         }
-        if (msg.cmd.includes('MODE') === true) {
+        if (msg.cmd !== undefined && msg.cmd.includes('MODE') === true) {
           this.newValue(msg, 'milight-mode', msg.cmd);
         }
-        if (msg.cmd.includes('DISCO') === true) {
+        if (msg.cmd !== undefined && msg.cmd.includes('DISCO') === true) {
           this.newValue(msg, 'milight-mode', msg.cmd);
         }
       }

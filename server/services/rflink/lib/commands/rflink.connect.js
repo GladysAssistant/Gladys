@@ -1,6 +1,7 @@
 const os = require('os');
 const Serialport = require('serialport');
 const Readline = require('@serialport/parser-readline');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -27,10 +28,14 @@ function connect(Path) {
 
     port.open((err) => {
       if (err) {
+        logger.log('error');
         this.connected = false;
         this.ready = false;
         this.scanInProgress = false;
-        return console.log(`Rflink : ${err}`);
+        this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
+        });
+        return logger.log(`Rflink : ${err}`);
       }
     });
 
@@ -40,11 +45,10 @@ function connect(Path) {
     port.pipe(readline);
     this.usb = readline;
     this.sendUsb = port;
-
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
-
     this.connected = true;
     this.ready = true;
+
     this.listen();
   } catch (error) {
     this.connected = false;

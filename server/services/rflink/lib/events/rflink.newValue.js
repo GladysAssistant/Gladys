@@ -28,6 +28,26 @@ function newValue(device, deviceFeature, state) {
       value = state;
       break;
   }
+  switch (deviceFeature) {
+    case 'temperature':
+      value = parseInt(value, 16);
+      value /= 10;
+      break;
+    case 'battery':
+      value = 'non géré';
+      break;
+    case 'uv':
+    case 'light-intensity':
+      value = parseInt(value, 16);
+      break;
+    case 'pressure':
+      value = parseInt(value, 16);
+      logger.log(`baro : ${value}`);
+      break;
+
+    default:
+      break;
+  }
 
   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
