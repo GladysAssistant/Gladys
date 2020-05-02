@@ -15,11 +15,10 @@ const { W215_EXTERNAL_ID_BASE, W215_PIN_CODE } = require('../utils/constants');
  * getDevice(serviceId, device);
  */
 function getDevice(serviceId, device) {
-  const name = device.name;
-
+  
   return {
     service_id: serviceId,
-    name,
+    name: device.name,
     model: device.productModel || 'DSP-W215',
     external_id: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}`,
     selector: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}`,
@@ -27,7 +26,7 @@ function getDevice(serviceId, device) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
-        name: `${name} On/Off`,
+        name: `On/Off`,
         external_id: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         selector: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -38,7 +37,7 @@ function getDevice(serviceId, device) {
         max: 1,
       },
       {
-        name: `${name} Temperature`,
+        name: `Temperature`,
         external_id: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.TEMPERATURE}`,
         selector: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.TEMPERATURE}`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -50,7 +49,7 @@ function getDevice(serviceId, device) {
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
       },
       {
-        name: `${name} Power`,
+        name: `Power`,
         external_id: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
         selector: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.POWER}`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -62,7 +61,7 @@ function getDevice(serviceId, device) {
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
       {
-        name: `${name} Energy`,
+        name: `Energy`,
         external_id: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.ENERGY}`,
         selector: `${W215_EXTERNAL_ID_BASE}:${device.deviceid}:${DEVICE_FEATURE_TYPES.SWITCH.ENERGY}`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,

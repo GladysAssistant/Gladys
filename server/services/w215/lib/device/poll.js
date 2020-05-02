@@ -15,6 +15,9 @@ const { parseExternalId } = require('../utils/parseExternalId');
  * poll(device);
  */
 async function poll(device) {
+  // Galdys declaration for intricated code below
+  const { gladys: gladysInstance} = this; // const gladys = this.gladys;
+  
   // deviceId is the outlet's IP adress
   const { outletIpAdress } = parseExternalId(device.external_id);
   this.ip_adress = `http://${outletIpAdress}/HNAP1`;
@@ -33,10 +36,6 @@ async function poll(device) {
   const user = this.username;
   this.pin_code = pin;
 
-  // Galdys declaration for
-  const gladys = this.gladys;
-  // var {gladys: gladys} = this; A supprimer probablement...
-
   dsp.login(this.username, parseInt(this.pin_code, 10), this.ip_adress).done(function(loginStatus) {
     if (loginStatus === 'failed' || loginStatus === 'undefined') {
       logger.debug(`Polling w215 ${user} / ${outletIpAdress} / ${pin} , connection status = ${loginStatus}`);
@@ -51,7 +50,7 @@ async function poll(device) {
           // if the value is different from the value we have, save new state
           if (binaryFeature.last_value !== currentBinaryState && state !== 'undefined' && state !== 'ERROR') {
             logger.debug(`w215 new state = ${currentBinaryState}`);
-            gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            gladysInstance.event.emit(EVENTS.DEVICE.NEW_STATE, {
               device_feature_external_id: `${binaryFeature.external_id}`,
               state: currentBinaryState,
             });
@@ -70,7 +69,7 @@ async function poll(device) {
             temperature !== 'ERROR'
           ) {
             logger.debug(`w215 temperature : ${parseInt(temperature, 10)}°`);
-            gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            gladysInstance.event.emit(EVENTS.DEVICE.NEW_STATE, {
               device_feature_external_id: `${tempFeature.external_id}`,
               state: temperature,
             });
@@ -91,7 +90,7 @@ async function poll(device) {
           ) {
             logger.debug(`w215 consumption : ${parseFloat(consumption)} Watt`);
             // Data rounded at closer integer
-            gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            gladysInstance.event.emit(EVENTS.DEVICE.NEW_STATE, {
               device_feature_external_id: `${powFeature.external_id}`,
               state: powerRounded,
             });
@@ -112,7 +111,7 @@ async function poll(device) {
           ) {
             logger.debug(`w215 total consumption : ${parseFloat(totalConsumption)} kWh`);
             // Data rounded
-            gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            gladysInstance.event.emit(EVENTS.DEVICE.NEW_STATE, {
               device_feature_external_id: `${energyFeature.external_id}`,
               state: energyRounded,
             });

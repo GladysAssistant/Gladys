@@ -1,8 +1,7 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { RequestStatus } from '../../../../utils/consts';
-import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { W215_PIN_CODE } from '../../../../../../server/services/w215/lib/utils/constants';
 import get from 'get-value';
 import { Link } from 'preact-router';

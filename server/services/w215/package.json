@@ -13,6 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
+    "bluebird": "^3.7.0",
     "hnap": "2.1.0",
     "require-uncached": "1.0.3",
     "bottleneck": "^2.19.5",

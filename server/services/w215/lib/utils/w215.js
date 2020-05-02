@@ -21,13 +21,13 @@ W215.prototype.getPowerState = function(callback) {
 W215.prototype.setPowerState = function setPowerState(state, callback) {
   const self = this;
   const ip = this.url;
-  const username = this.username;
-  const password = this.password;
+  // const username = this.username; A SUPPRIMER SI OK
+  // const password = this.password; A SUPPRIMER SI OK
 
   self.login(function(loginStatus) {
-    if (!loginStatus) {
-      logger.debug(`w215 login error : ${username} / ${ip} / ${password}, connection status = ${loginStatus}`);
-    } else {
+    if (!loginStatus || loginStatus === 'failed') {
+      logger.debug(`w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`);
+    } else if (loginStatus === 'success'){
       logger.debug(`w215 connection status : ${loginStatus} (IP Adress : ${ip})`);
       // Récupération de l'état du device avant de changer son état
       self.getPowerState(function(deviceON) {
@@ -56,6 +56,8 @@ W215.prototype.setPowerState = function setPowerState(state, callback) {
           /* synchro gladys / device KO, nothing to do */
         }
       });
+    } else {
+      logger.debug(`w215 login error : ${self.username} / ${ip} / ${self.password}, connection status = ${loginStatus}`);
     }
   });
 };
