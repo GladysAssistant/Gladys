@@ -45,12 +45,13 @@ function createActions(store) {
         }
 
         const w215Devices = await state.httpClient.get('/api/v1/service/w215/device', options);
-        // find pin code
+        // find pin code + init connection status
         w215Devices.forEach(w215Device => {
           const devicePinCode = w215Device.params.find(param => param.name === W215_PIN_CODE);
           if (devicePinCode) {
             w215Device.pin_code = devicePinCode;
           }
+          w215Device.connectionSuccess = '';
         });
         store.setState({
           w215Devices,
@@ -153,11 +154,11 @@ function createActions(store) {
     },
     async testConnection(state, index) {
       const w215Device = state.w215Devices[index];
-      const connectionSucces = await state.httpClient.post(`/api/v1/service/w215/test`, w215Device);
+      const connectionStatus = await state.httpClient.post(`/api/v1/service/w215/test`, w215Device);
       const w215Devices = update(state.w215Devices, {
         [index]: {
-          connectionSucces: {
-            $set: connectionSucces
+          connectionSuccess: {
+            $set: connectionStatus
           }
         }
       });
@@ -171,12 +172,13 @@ function createActions(store) {
       const devices = update(state[listName], {
         $splice: [[index, 1, savedDevice]]
       });
-      // find pin code
+      // Load PIN code + init connection status
       devices.forEach(w215Device => {
         const devicePinCode = w215Device.params.find(param => param.name === W215_PIN_CODE);
         if (devicePinCode) {
           w215Device.pin_code = devicePinCode;
         }
+        w215Device.connectionSuccess = '';
       });
       store.setState({
         [listName]: devices

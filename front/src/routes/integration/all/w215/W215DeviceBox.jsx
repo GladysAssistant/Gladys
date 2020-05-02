@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { RequestStatus } from '../../../../utils/consts';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { W215_PIN_CODE } from '../../../../../../server/services/w215/lib/utils/constants'
 import get from 'get-value';
@@ -107,9 +108,14 @@ class W215DeviceBox extends Component {
                     <Text id={errorMessage} />
                   </div>
                 )}
-                {testConnectionError && (
+                {!testConnectionError && w215Device.connectionSuccess === false && (
                   <div class="alert alert-danger">
                     <Text id="integration.w215.testConnectionError" />
+                  </div>
+                )}
+                {!testConnectionError && w215Device.connectionSuccess === true && (
+                  <div class="alert alert-success">
+                    <Text id="integration.w215.testConnectionSuccess" />
                   </div>
                 )}
                 <div class="form-group">
@@ -154,7 +160,6 @@ class W215DeviceBox extends Component {
                       type="text"
                       maxlength="6"
                       value={w215Device.params.find(param => param.name === W215_PIN_CODE).value}
-                      //value={get(props, 'w215Device.pin_code.value')}
                       onInput={this.updatePinCode}
                       class="form-control"
                       disabled={!editable || !validModel}

@@ -19,29 +19,34 @@ async function testConnection(device) {
     if (!pinCodeParam) {
       return reject(new NotFoundError('PIN_CODE_PARAM_NOT_FOUND'));
     }
-    // TODO : à refaire car la valeur par défaut du param n'est pas vide... Il faut donc tester vide + la valeur par défaut
-    if (!pinCodeParam.value || pinCodeParam.value.length === 0) {
+    // pin code must be informed by user and default value is not usable
+    if (!pinCodeParam.value || pinCodeParam.value.length === 0 || pinCodeParam.value.length === 'See behind the outlet') {
       return reject(new NotFoundError('PIN_CODE_SHOULD_BE_INFORMED'));
     }
     
     // deviceId is the outlet's IP adress
     const { outletIpAdress } = parseExternalId(device.external_id);
     
-    const w215Switch = new W215(outletIpAdress, pinCodeParam);
+    const w215Switch = new W215(outletIpAdress, pinCodeParam.value);
     
     let connectionSuccess = false;
 
     w215Switch.login(function(loginStatus) {
-        if (!loginStatus) {
-            connectionSuccess = false;
-            logger.debug(`w215 login error : admin / ${outletIpAdress} / ${pinCodeParam}, connection status = ${loginStatus}`);
+      logger.debug(`Test connection : ${loginStatus}`);  
+      if (loginStatus === 'failed') {
+          connectionSuccess = false;
+          logger.debug(`w215 login error : admin / ${outletIpAdress} / ${pinCodeParam.value}, connection status = ${loginStatus}`);
+        } else if (loginStatus === 'success') {
+          connectionSuccess = true;
+          logger.debug(`w215 login success !`);
         } else {
-            connectionSuccess = true;
-            logger.debug(`w215 login succes !`);
+          connectionSuccess = false;
+          logger.debug(`w215 login error : admin / ${outletIpAdress} / ${pinCodeParam.value}, connection status = ${loginStatus}`);
         }
+        resolve(connectionSuccess);
     });
        
-    return connectionSuccess;
+    return null;
   });
 }
 

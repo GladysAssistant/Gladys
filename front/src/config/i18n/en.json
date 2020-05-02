@@ -452,6 +452,7 @@
       "unmanagedModelButton": "Model not managed",
       "checkConnection": "Test connection",
       "testConnectionError": "Connection to your smart plug failed, please verify pin code.",
+      "testConnectionSuccess": "Gladys is connected to your smart plug !",
       "device": {
         "title": "Devices in Gladys",
         "search": "Search devices",

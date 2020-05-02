@@ -5,6 +5,7 @@ const { discover } = require('./discover');
 const { poll } = require('./poll');
 const { setValue } = require('./setValue');
 const { testConnection} = require('./testConnection');
+const logger = require('../../../../utils/logger');
 
 // we rate-limit the number of request per seconds to poll lights
 const pollLimiter = new Bottleneck({
@@ -45,6 +46,8 @@ const W215Handler = function W215Handler(gladys, serviceId) {
  */
 function throwErrorIfNeeded(response, emit = false) {
   // TODO : adapter fonction des erreurs constatées à l'appel du module dns-sd
+  
+  logger.debug(`Discover crash... Response error : ${response.error}`);
   if (response.error) {
     if (response.error === 401) {
       this.connected = false;
