@@ -441,13 +441,13 @@
         "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
-    "darkSky": {
-      "title": "DarkSky",
+    "openWeather": {
+      "title": "API OpenWeather",
       "description": "Récupérer la météo dans Gladys.",
-      "introduction": "Cette intégration vous aide à intégrer l'API DarkSky pour obtenir la météo dans Gladys.",
-      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky : <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
+      "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
+      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : ",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
-      "apiKeyPlaceholder": "Entrer la clé API DarkSky",
+      "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },

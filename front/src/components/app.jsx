@@ -57,6 +57,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 import TelegramPage from '../routes/integration/all/telegram';
 import CaldavPage from '../routes/integration/all/caldav';
 import DarkSkyPage from '../routes/integration/all/darksky';
+import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -149,6 +150,7 @@ const AppRouter = connect(
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
+        <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"

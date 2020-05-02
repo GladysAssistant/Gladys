@@ -119,7 +119,7 @@ const WeatherBox = ({ children, ...props }) => (
                   fontSize: '30px'
                 }}
               >
-                {props.units === 'si' ? 'C' : 'F'}
+                {props.units === 'metric' ? 'C' : 'F'}
               </span>
             </div>
           </div>

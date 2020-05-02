@@ -1,0 +1,8 @@
+[
+  {
+    "key": "openweather",
+    "name": "OpenWeather",
+    "description": "Get the weather in Gladys.",
+    "img": "/assets/integrations/cover/openweather.jpg"
+  }
+]
