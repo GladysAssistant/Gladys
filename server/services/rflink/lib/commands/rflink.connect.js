@@ -32,7 +32,7 @@ function connect(Path) {
         this.connected = false;
         this.ready = false;
         this.scanInProgress = false;
-        this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
         });
         return logger.log(`Rflink : ${err}`);
@@ -48,6 +48,9 @@ function connect(Path) {
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
     this.connected = true;
     this.ready = true;
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_READY,
+    });
 
     this.listen();
   } catch (error) {

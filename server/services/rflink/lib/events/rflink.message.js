@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const RFtoObj = require('../../api/rflink.parse.RFtoObject');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -14,6 +15,9 @@ const {
  */
 function message(msgRF) {
   this.lastCommand = msgRF;
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_MESSAGE,
+  });
   const msg = RFtoObj(msgRF);
   let newDevice;
   let doesntExistYet = true;

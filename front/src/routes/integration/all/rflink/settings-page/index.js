@@ -13,6 +13,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 class RflinkSettingsPage extends Component {
   rflinkReadyListener = () => this.props.getStatus();
   rflinkFailedListener = () => this.props.rflinkFailed();
+  rflinkGetStatus = () => this.props.getStatus();
 
   componentWillMount() {
     this.props.getUsbPorts();
@@ -20,6 +21,7 @@ class RflinkSettingsPage extends Component {
     this.props.getCurrentRflinkPath();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_READY, this.rflinkReadyListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED, this.rflinkFailedListener);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_MESSAGE, this.rflinkGetStatus);
   }
 
   componentWillUnmount() {
