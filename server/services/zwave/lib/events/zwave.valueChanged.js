@@ -23,7 +23,7 @@ function valueChanged(nodeId, comClass, value) {
     // In the V4 implementation, the level should be based on the target value
     // and not the level one.
     // See following docs:
-    //  - Silabs  Application  Command Class Specification $4.72 - Multilevel Switch Command Class, version 4: 
+    //  - Silabs  Application  Command Class Specification §4.72 - Multilevel Switch Command Class, version 4: 
     //      https://www.silabs.com/documents/login/miscellaneous/SDS13781-Z-Wave-Application-Command-Class-Specification.pdf
     //  - OpenZwave 1.6 Update:
     //      https://github.com/OpenZWave/open-zwave/wiki/OpenZWave-1.6-Release-Notes#switchmultilevel-commandclass

@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-const { assert } = require('sinon');
 
 const { getMode } = require('../../../../../services/zwave/lib/utils/getMode');
 const { VALUE_MODES } = require('../../../../../services/zwave/lib/constants');
