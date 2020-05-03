@@ -5,7 +5,7 @@ import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 
 @connect(
-  'user,session,usbPorts,arduinoInfos,arduinoPath,arduinoStatus,getArduinoUsbPortStatus,getCurrentArduinoPathStatus,arduinoGetStatus,arduinoDriverFailed,arduinoDisconnectStatus,connectArduinoStatus,arduinoConnectionInProgress',
+  'user,session,usbPorts,arduinoInfos,arduinoPath,arduinoStatus,getArduinoUsbPortStatus,getCurrentArduinoPathStatus,arduinoGetStatus,arduinoDriverFailed,arduinoDisconnectStatus,arduinoConnected,connectArduinoStatus,arduinoConnectionInProgress',
   actions
 )
 class ArduinoSetupPage extends Component {
