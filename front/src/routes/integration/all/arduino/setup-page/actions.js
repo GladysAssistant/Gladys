@@ -47,11 +47,11 @@ const actions = store => {
 
         if (arduinoPath.value !== "---------"){
           store.setState({
-            arduinoConnected: true
+            arduinoConnected: RequestStatus.Success
           });
         }else{
           store.setState({
-            arduinoConnected: false
+            arduinoConnected: RequestStatus.Error
           });
         }
       } catch (e) {

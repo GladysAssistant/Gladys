@@ -1,6 +1,5 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupTab = ({ children, ...props }) => {
@@ -25,7 +24,7 @@ const SetupTab = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.arduinoConnected && (
+              {props.arduinoConnected === RequestStatus.Success && (
                 <p class="alert alert-success">
                   <Text id="integration.arduino.setup.connected" />
                 </p>
