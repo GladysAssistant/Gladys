@@ -69,6 +69,11 @@ function createActions(store) {
       });
       try {
         const discoveredDevices = await state.httpClient.get('/api/v1/service/w215/discover');
+        // For each discovered device, parameters pin_code and connectionSuccess initialisation
+        discoveredDevices.forEach(discoveredDevice => {
+          discoveredDevice.pin_code = discoveredDevice.params.find(param => param.name === W215_PIN_CODE);
+          discoveredDevice.connectionSuccess = '';
+        });
         store.setState({
           discoveredDevices,
           loading: false,
@@ -129,10 +134,10 @@ function createActions(store) {
         [listName]: w215Devices
       });
     },
-    updateParamPinCode(state, index, value) {
+    updateParamPinCode(state, listName, index, value) {
       const trimmedValue = value && value.trim ? value.trim() : value;
-      let pinCodeParamIndex = state.w215Devices[index].params.findIndex(param => param.name === W215_PIN_CODE);
-      const w215Devices = update(state.w215Devices, {
+      let pinCodeParamIndex = state[listName][index].params.findIndex(param => param.name === W215_PIN_CODE);
+      const w215Devices = update(state[listName], {
         [index]: {
           pin_code: {
             value: {
@@ -149,13 +154,13 @@ function createActions(store) {
         }
       });
       store.setState({
-        w215Devices
+        [listName]: w215Devices
       });
     },
-    async testConnection(state, index) {
-      const w215Device = state.w215Devices[index];
+    async testConnection(state, listName, index) {
+      const w215Device = state[listName][index];
       const connectionStatus = await state.httpClient.post(`/api/v1/service/w215/test`, w215Device);
-      const w215Devices = update(state.w215Devices, {
+      const w215Devices = update(state[listName], {
         [index]: {
           connectionSuccess: {
             $set: connectionStatus
@@ -163,7 +168,7 @@ function createActions(store) {
         }
       });
       store.setState({
-        w215Devices
+        [listName]: w215Devices
       });
     },
     async saveDevice(state, listName, index) {

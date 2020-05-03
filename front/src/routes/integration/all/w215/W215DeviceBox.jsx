@@ -16,7 +16,7 @@ class W215DeviceBox extends Component {
   };
 
   updatePinCode = e => {
-    this.props.updateParamPinCode(this.props.deviceIndex, e.target.value);
+    this.props.updateParamPinCode(this.props.listName, this.props.deviceIndex, e.target.value);
   };
 
   updateRoom = e => {
@@ -32,7 +32,7 @@ class W215DeviceBox extends Component {
       loading: true
     });
     try {
-      await this.props.testConnection(this.props.deviceIndex);
+      await this.props.testConnection(this.props.listName, this.props.deviceIndex);
       this.setState({
         testConnectionError: null
       });
