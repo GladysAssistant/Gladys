@@ -1,5 +1,5 @@
-const { defaultCommandClass } = require('./defaultCommandClass');
-const { switchMultilevelCommandClass } = require('./switchMultilevelCommandClass');
+const defaultCommandClass = require('./defaultCommandClass').instance;
+const switchMultilevelCommandClass = require('./switchMultilevelCommandClass').instance;
 
 const commandClasses = {};
 commandClasses[switchMultilevelCommandClass.getId()] = switchMultilevelCommandClass;

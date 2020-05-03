@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { defaultCommandClass } = require('../../../../../services/zwave/lib/comClass/defaultCommandClass');
+const defaultCommandClass = require('../../../../../services/zwave/lib/comClass/defaultCommandClass').instance;
 
 describe('zWave Command Class Default', () => {
   it('should returns the valid commClassId', () => {

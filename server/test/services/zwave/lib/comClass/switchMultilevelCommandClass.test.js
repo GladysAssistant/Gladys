@@ -1,8 +1,7 @@
 const { expect } = require('chai');
 const { COMMAND_CLASSES, INDEXES } = require('../../../../../services/zwave/lib/constants');
-const {
-  switchMultilevelCommandClass,
-} = require('../../../../../services/zwave/lib/comClass/switchMultilevelCommandClass');
+const switchMultilevelCommandClass = require('../../../../../services/zwave/lib/comClass/switchMultilevelCommandClass')
+  .instance;
 
 const nodeV4 = {
   manufacturer: '',
