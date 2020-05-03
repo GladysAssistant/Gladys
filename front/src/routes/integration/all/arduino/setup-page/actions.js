@@ -47,14 +47,13 @@ const actions = store => {
           getCurrentArduinoPathStatus: RequestStatus.Success
         });
 
-        if (arduinoPath.value !== "---------"){
+        if (arduinoPath.value !== "---------") {
           store.getState().usbPorts.forEach(element => {
-            console.log(usb.comPath);
-            if (usb.comPath === arduinoPath) {
+            if (element.comPath === arduinoPath) {
               connected = true;
             }
           });
-          
+
           if (connected) {
             store.setState({
               arduinoConnected: true
@@ -64,7 +63,7 @@ const actions = store => {
               arduinoConnected: false
             });
           }
-        }else{
+        } else {
           store.setState({
             arduinoConnected: false
           });
@@ -74,7 +73,7 @@ const actions = store => {
           getCurrentArduinoPathStatus: RequestStatus.Error
         });
       }
-    }, 
+    },
     updateArduinoPath(state, e) {
       store.setState({
         arduinoPath: e.target.value
@@ -113,7 +112,7 @@ const actions = store => {
         await actions.getStatus(store.getState());
         store.setState({
           arduinoDisconnectStatus: RequestStatus.Success,
-          arduinoConnected:false
+          arduinoConnected: false
         });
       } catch (e) {
         store.setState({
