@@ -39,6 +39,7 @@ const actions = store => {
         getCurrentArduinoPathStatus: RequestStatus.Getting
       });
       try {
+        await actions.getUsbPorts(store.getState());
         const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
         store.setState({
           arduinoPath: arduinoPath.value,

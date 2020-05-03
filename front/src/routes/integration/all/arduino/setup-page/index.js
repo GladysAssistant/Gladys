@@ -11,9 +11,9 @@ import SetupTab from './SetupTab';
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
-    this.props.getUsbPorts();
-    this.props.getCurrentArduinoPath();
     this.props.checkConnected();
+    this.props.getCurrentArduinoPath();
+    this.props.getUsbPorts();
   }
 
   componentWillUnmount() {
