@@ -30,6 +30,9 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         type: DataTypes.STRING,
       },
+      url: {
+        type: DataTypes.STRING,
+      },
       location: {
         type: DataTypes.STRING,
       },

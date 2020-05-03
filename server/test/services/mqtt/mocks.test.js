@@ -8,7 +8,7 @@ const mqttApi = Object.assign(event, {
   disconnected: true,
   subscribe: fake.resolves(null),
   unsubscribe: fake.resolves(null),
-  publish: fake.resolves(null),
+  publish: fake.yieldsAsync(null),
   internalEnd: fake.resolves(null),
   end: () => {
     mqttApi.disconnected = true;

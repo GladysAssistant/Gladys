@@ -35,18 +35,16 @@ const IntegrationMenu = connect(
         <Text id="integration.root.menu.communication" />
       </Link>
 
-      {false && (
-        <Link
-          activeClassName="active"
-          href="/dashboard/integration/calendar"
-          class="list-group-item list-group-item-action d-flex align-items-center"
-        >
-          <span class="icon mr-3">
-            <i class="fe fe-calendar" />
-          </span>
-          <Text id="integration.root.menu.calendar" />
-        </Link>
-      )}
+      <Link
+        activeClassName="active"
+        href="/dashboard/integration/calendar"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+      >
+        <span class="icon mr-3">
+          <i class="fe fe-calendar" />
+        </span>
+        <Text id="integration.root.menu.calendar" />
+      </Link>
 
       {false && (
         <Link

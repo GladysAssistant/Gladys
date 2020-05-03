@@ -28,7 +28,7 @@
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the informations you'll enter are just saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
       "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
-      "buttonCreateAccountGladysGateway": "Create account with Gladys Gateway",
+      "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
     "createLocalAccount": {
@@ -72,6 +72,24 @@
       "emailAlreadyExistError": "A user with this email already exist.",
       "selectorAlreadyExistError": "A user with this firstname already exist.",
       "createAccountButton": "Create Account"
+    },
+    "restoreBackupSetBackupKey": {
+      "title": "Enter your backup key",
+      "description": "As Gladys Plus backups are end-to-end encrypted, we need you to enter your backup key. Your local instance can only decrypt the backup with this backup key.",
+      "backupKeyLabel": "Backup key",
+      "backupKeyPlaceholder": "Enter your backup key",
+      "cancelButton": "Cancel",
+      "saveButton": "Save backup key"
+    },
+    "restoreBackupInProgress": {
+      "title": "Restore in progress...",
+      "description": "At the end of the restore process, Gladys will restart automatically.",
+      "errored": "Backup restore failed, maybe the restore key is not valid",
+      "updateRestoreKeyButton": "Update restore key"
+    },
+    "gatewayBackup": {
+      "title": "Choose a backup",
+      "description": "Choose the backup you want to restore in this list."
     },
     "preferences": {
       "title": "Your preferences",
@@ -355,6 +373,7 @@
         "noDevices": "No MQTT devices added yet.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
+        "externalIdLabel": "External ID",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
@@ -373,14 +392,20 @@
         "nameLabel": "Name",
         "namePlaceholder": "Enter feature name",
         "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
         "maxPlaceholder": "Enter feature maximum value",
+        "readOnlyLabel": "Is it a sensor?",
+        "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
+        "mqttTopicExampleLabel": "MQTT Topic",
+        "copyMqttTopic": "Copy MQTT Topic",
+        "copied": "Copied!",
+        "copiedFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
       },
       "setup": {
@@ -427,6 +452,48 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "caldav": {
+      "title": "CalDAV",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "hostInfo": "Choose your calendar host to be helped during configuration.",
+      "services": {
+        "apple": {
+          "name": "iCloud Calendar",
+          "url": "iCloud URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Apple ID",
+          "usernameInfo": "Enter your Apple ID.",
+          "password": "Password",
+          "passwordInfo": "<a href=https://support.apple.com/en-us/HT204397 target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "other": {
+          "name": "Other",
+          "url": "CalDAV URL",
+          "username": "CalDAV Username",
+          "password": "CalDAV Password"
+        }
+      },
+      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
+      "configurationSuccess": "Auto-configuration done.",
+      "configurationDefaultError": "An error occured during auto-configuration.",
+      "configurationError": "Check settings and CalDAV server status.",
+      "configurationBadCredentialsError": "Check your username/password.",
+      "configurationBadUrlError": "Check your CalDAV server URL.",
+      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
+      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
+      "cleanUpSuccess": "Clean up completed.",
+      "cleanUpError": "An error occured while trying clean up.",
+      "synchronizationSuccess": "Synchronization completed.",
+      "synchronizationDefaultError": "An error occured while trying synchronization.",
+      "synchronizationError": "Check CalDAV server state.",
+      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
+      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
+      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
+      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "buttonSave": "Save",
+      "buttonCleanUp": "Clean Up",
+      "buttonSync": "Sync now"
     }
   },
   "editScene": {
@@ -724,7 +791,11 @@
     "userEcdsaKey": "ECDSA key",
     "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list.",
     "disconnectTitle": "Disconnect your Plus account",
-    "disconnectButton": "Disconnect"
+    "disconnectButton": "Disconnect",
+    "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
+    "gatewayConnectedSuccessDescription": "Your Gladys instance was connected with success.",
+    "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
+    "gatewayConnectedSuccessButton": "I saved the backup key!"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
@@ -908,6 +979,7 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
+    "description": " Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save",

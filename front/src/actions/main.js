@@ -6,6 +6,7 @@ import { isUrlInArray } from '../utils/url';
 
 const OPEN_PAGES = [
   '/signup',
+  '/signup/create-account-gladys-gateway',
   '/login',
   '/forgot-password',
   '/reset-password',
@@ -57,6 +58,8 @@ function createActions(store) {
           state.session.reset();
           route('/login');
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
+          route('/link-gateway-user');
+        } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           route('/link-gateway-user');
         } else {
           console.log(e);
