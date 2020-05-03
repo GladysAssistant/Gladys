@@ -13,7 +13,7 @@ class ArduinoSetupPage extends Component {
   componentWillMount() {
     this.props.checkConnected();
     this.props.getCurrentArduinoPath();
-    this.props.getUsbPorts();
+    //this.props.getUsbPorts();
   }
 
   componentWillUnmount() {

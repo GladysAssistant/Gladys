@@ -24,7 +24,7 @@ const SetupTab = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.arduinoConnected === RequestStatus.Success && (
+              {props.arduinoConnected && (
                 <p class="alert alert-success">
                   <Text id="integration.arduino.setup.connected" />
                 </p>
