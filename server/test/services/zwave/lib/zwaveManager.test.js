@@ -124,26 +124,6 @@ describe('zwaveManager events', () => {
       value: 0,
     });
   });
-  it('should receive value changed', () => {
-    zwaveManager.valueChanged(1, 10, {
-      value_id: '5-32-1-0',
-      node_id: 5,
-      class_id: 32,
-      type: 'byte',
-      genre: 'basic',
-      instance: 1,
-      index: 0,
-      label: 'Basic',
-      units: '',
-      help: '',
-      read_only: false,
-      write_only: false,
-      min: 0,
-      max: 255,
-      is_polled: false,
-      value: 0,
-    });
-  });
   it('should receive value removed', () => {
     zwaveManager.valueRemoved(1, 10, 0);
   });
