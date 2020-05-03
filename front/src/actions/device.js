@@ -57,7 +57,7 @@ function createActions(store) {
                     },
                     lastValue_changed: {
                       $set: new Date()
-                    },
+                    }
                   }
                 }
               }

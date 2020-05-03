@@ -41,7 +41,7 @@ const DeviceRow = ({ children, ...props }) => {
         deviceIndex={props.deviceIndex}
         deviceFeatureIndex={props.deviceFeatureIndex}
         updateValue={props.updateValue}
-        />
+      />
     );
   }
   // if not, we return nothing

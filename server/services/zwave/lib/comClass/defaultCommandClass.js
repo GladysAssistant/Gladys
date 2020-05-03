@@ -66,12 +66,13 @@ DefaultCommandClass.prototype = {
    *
    * @returns {Object} Returns min and max values for a given value.
    *
-   * @example const {min, max} = commClass.getMinMax(node, comClassId, index);
+   * @example const {min, max, step} = commClass.getMinMax(node, comClassId, index);
    */
   getMinMax: function getMinMax(node, comClassId, index) {
     return {
       min: node.classes[comClassId][index].min,
       max: node.classes[comClassId][index].max,
+      step: 1,
     };
   },
 };

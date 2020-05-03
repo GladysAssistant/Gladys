@@ -107,6 +107,7 @@ SwitchMultilevelCommandClass.prototype.getMinMax = function getMinMax(node, comC
     return {
       min: 0,
       max: 99,
+      step: 1,
     };
   }
 

@@ -39,7 +39,7 @@ function getNodes() {
       params: [],
     };
 
-    const comclasses = Object.keys(node.classes).map(comclass => parseInt(comclass, 10));
+    const comclasses = Object.keys(node.classes).map((comclass) => parseInt(comclass, 10));
     comclasses.forEach((comclass) => {
       const values = node.classes[comclass];
       const commandClass = getCommandClass(comclass);
