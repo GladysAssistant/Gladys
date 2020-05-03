@@ -3,7 +3,8 @@ const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
-const { UNKNOWN_CATEGORY } = require('../constants');
+const { GENRES, UNKNOWN_CATEGORY } = require('../constants');
+const { getCommandClass } = require('../comClass/factory');
 
 /**
  * @description Return array of Nodes.
@@ -38,14 +39,15 @@ function getNodes() {
       params: [],
     };
 
-    const comclasses = Object.keys(node.classes);
+    const comclasses = Object.keys(node.classes).map(comclass => parseInt(comclass, 10));
     comclasses.forEach((comclass) => {
       const values = node.classes[comclass];
-      const indexes = Object.keys(values);
-      indexes.forEach((idx) => {
-        const { min, max } = values[idx];
+      const commandClass = getCommandClass(comclass);
 
-        if (values[idx].genre === 'user') {
+      Object.keys(values).forEach((idx) => {
+        const { min, max } = commandClass.getMinMax(node, comclass, idx);
+
+        if (values[idx].genre === GENRES.USER) {
           const { category, type } = getCategory(node, values[idx]);
           if (category !== UNKNOWN_CATEGORY) {
             newDevice.features.push({

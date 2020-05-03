@@ -267,6 +267,12 @@ const VALUE_MODES = {
   READ_WRITE: 3,
 };
 
+const GENRES = {
+  BASIC: 'basic',
+  SYSTEM: 'system',
+  USER: 'user',
+};
+
 module.exports = {
   COMMAND_CLASSES,
   INDEXES,
@@ -274,4 +280,5 @@ module.exports = {
   UNKNOWN_CATEGORY: DEVICE_FEATURE_CATEGORIES.UNKNOWN,
   UNKNOWN_TYPE: DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
   VALUE_MODES,
+  GENRES,
 };
