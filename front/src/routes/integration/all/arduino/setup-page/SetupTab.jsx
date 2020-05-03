@@ -25,16 +25,6 @@ const SetupTab = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.connectArduinoStatus === RequestStatus.Error && (
-                <p class="alert alert-danger">
-                  <Text id="integration.arduino.setup.error" />
-                </p>
-              )}
-              {props.connectArduinoStatus === RequestStatus.Success && !props.arduinoConnected && (
-                <p class="alert alert-info">
-                  <Text id="integration.arduino.setup.connecting" />
-                </p>
-              )}
               {props.arduinoConnected && (
                 <p class="alert alert-success">
                   <Text id="integration.arduino.setup.connected" />
@@ -44,16 +34,6 @@ const SetupTab = ({ children, ...props }) => {
                 <p class="alert alert-danger">
                   <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
                 </p>
-              )}
-              {/*!get(props, 'arduinoStatus.ready') && (
-                <div class="alert alert-warning">
-                  <Text id="integration.arduino.setup.notConnected" />
-                </div>
-              )*/}
-              {get(props, 'arduinoConnected') && (
-                <div class="alert alert-warning">
-                  <Text id="integration.arduino.setup.Connected" />
-                </div>
               )}
               <p>
                 <MarkupText id="integration.arduino.setup.arduinoDescription" />
