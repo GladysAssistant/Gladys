@@ -48,12 +48,13 @@ const actions = store => {
         });
 
         if (arduinoPath.value !== "---------"){
-          for(usb in store.getState().usbPorts){
+          store.getState().usbPorts.forEach(element => {
             console.log(usb.comPath);
-            if(usb.comPath === arduinoPath){
+            if (usb.comPath === arduinoPath) {
               connected = true;
             }
-          }
+          });
+          
           if (connected) {
             store.setState({
               arduinoConnected: true
