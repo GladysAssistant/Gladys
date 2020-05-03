@@ -40,6 +40,7 @@ const actions = store => {
       });
       try {
         await actions.getUsbPorts(store.getState());
+        var connected = false;
         const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
         store.setState({
           arduinoPath: arduinoPath.value,
@@ -47,9 +48,20 @@ const actions = store => {
         });
 
         if (arduinoPath.value !== "---------"){
-          store.setState({
-            arduinoConnected: true
-          });
+          for(usb in store.getState().usbPorts){
+            if(usb.comPath === arduinoPath){
+              connected = true;
+            }
+          }
+          if (connected) {
+            store.setState({
+              arduinoConnected: true
+            });
+          } else {
+            store.setState({
+              arduinoConnected: false
+            });
+          }
         }else{
           store.setState({
             arduinoConnected: false
