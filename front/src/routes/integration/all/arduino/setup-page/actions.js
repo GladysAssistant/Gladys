@@ -78,7 +78,7 @@ const actions = store => {
         store.setState({
           connectArduinoStatus: RequestStatus.Success,
           arduinoConnectionInProgress: true,
-          arduinoConnected: true
+          arduinoConnected: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
