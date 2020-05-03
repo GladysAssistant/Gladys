@@ -10,14 +10,14 @@ const { VALUE_MODES } = require('../constants');
  */
 function getMode(zwaveValue) {
   if (zwaveValue.read_only) {
-      return VALUE_MODES.READ;
+      return VALUE_MODES.READ_ONLY;
   }
 
   if (zwaveValue.write_only) {
-      return VALUE_MODES.WRITE;
+      return VALUE_MODES.WRITE_ONLY;
   }
 
-  return VALUE_MODES.READ | VALUE_MODES.WRITE;
+  return VALUE_MODES.READ_WRITE;
 }
 
 module.exports = {

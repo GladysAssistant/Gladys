@@ -1,11 +1,14 @@
-const SwitchMultilevelCommandClass = function() {
+const SwitchMultilevelCommandClass = function SwitchMultilevelCommandClass() {
 
 };
 
 /**
- * @returns Get the command class Id
+ * @description Get the command class ID.
+ * 
+ * @returns {number} - Command Class ID.
+ * @example SwitchMultilevelCommandClass.getId();
  */
-SwitchMultilevelCommandClass.getId = function() {
+SwitchMultilevelCommandClass.getId = function SwitchMultilevelCommandClassGetId() {
     return 0x38;
 };
 
