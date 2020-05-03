@@ -95,7 +95,7 @@ const actions = store => {
         await actions.getStatus(store.getState());
         store.setState({
           arduinoDisconnectStatus: RequestStatus.Success,
-          arduinoConnected:false
+          arduinoConnected:RequestStatus.Error
         });
       } catch (e) {
         store.setState({

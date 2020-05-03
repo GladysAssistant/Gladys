@@ -6,7 +6,7 @@ import DeviceTab from './DeviceTab';
 import integrationConfig from '../../../../../config/integrations';
 
 @connect(
-  'session,user,arduinoDevices,houses,getArduinoDevicesStatus',
+  'session,user,arduinoDevices,houses',
   actions
 )
 class ArduinoDevicePage extends Component {
