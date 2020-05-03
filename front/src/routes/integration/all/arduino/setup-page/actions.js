@@ -91,6 +91,9 @@ const actions = store => {
         arduinoDisconnectStatus: RequestStatus.Getting
       });
       try {
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
+          value: "---------"
+        });
         await state.httpClient.post('/api/v1/service/arduino/disconnect');
         await actions.getStatus(store.getState());
         store.setState({
