@@ -8,17 +8,19 @@ const { getCommandClass } = require('../comClass/factory');
 /**
  * @description When a value changed, update the in-memory node
  * if necessary.
- * 
+ *
  * @param {number} nodeId - ID of the node.
  * @param {number} comClass - ZWave comClass.
  * @param {Object} value - The zWave value changed.
  * @returns {undefined}
- * 
+ *
  * @example
  * zwave.on('value changed', this.valueChanged);
  */
 function valueChanged(nodeId, comClass, value) {
-  logger.debug(`Zwave : Value Changed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${value.index}, value = ${value.value}`);
+  logger.debug(
+    `Zwave : Value Changed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${value.index}, value = ${value.value}`,
+  );
   const node = this.nodes[nodeId];
   if (!node.ready) {
     return;
@@ -33,7 +35,7 @@ function valueChanged(nodeId, comClass, value) {
 
   // If the value is the same as the one in memory, don't do anything except if READ only.
   if (node.classes[comClass][changedValue.index].value === changedValue.value) {
-    if (getMode(changedValue) !== VALUE_MODES.READ_ONLY ) {
+    if (getMode(changedValue) !== VALUE_MODES.READ_ONLY) {
       logger.debug('Ignoring change. Memory already in sync.');
 
       return;
