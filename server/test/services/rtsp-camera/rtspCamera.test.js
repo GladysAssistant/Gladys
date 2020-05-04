@@ -4,6 +4,7 @@ const assertChai = require('chai').assert;
 const { fake, assert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
+const RtspCameraService = require('../../../services/rtsp-camera');
 
 const gladys = {
   config: {
@@ -42,6 +43,10 @@ describe('RtspCameraManager commands', () => {
   const rtspCameraManager = new RtspCameraManager(gladys, FfmpegMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   before(async () => {
     await fse.ensureDir(gladys.config.tempFolder);
+  });
+  it('should start service', async () => {
+    const rtspCameraService = RtspCameraService(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    await rtspCameraService.start();
   });
   it('should getImage', async () => {
     const image = await rtspCameraManager.getImage(device);
