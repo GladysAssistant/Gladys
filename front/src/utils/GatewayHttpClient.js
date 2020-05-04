@@ -17,7 +17,10 @@ export class GatewayHttpClient {
       return result;
     } catch (e) {
       const error = {
-        response: e
+        response: {
+          status: e.status,
+          data: e
+        }
       };
       throw error;
     }
