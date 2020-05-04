@@ -84,6 +84,18 @@ const IntegrationMenu = connect(
         <Text id="integration.root.menu.weather" />
       </Link>
 
+      <Link
+        activeClassName="active"
+        onClick={refreshIntegrations('service')}
+        href="/dashboard/integration/service"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+      >
+        <span class="icon mr-3">
+          <i class="fe fe-cloud" />
+        </span>
+        <Text id="integration.root.menu.service" />
+      </Link>
+
       {false && (
         <Link
           activeClassName="active"

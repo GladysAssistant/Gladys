@@ -79,6 +79,9 @@ import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
+// StockExchange integrations
+import StockExchangePage from '../routes/integration/all/stock-exchange';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -148,10 +151,12 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/music" />
         <IntegrationPage path="/dashboard/integration/health" />
         <IntegrationPage path="/dashboard/integration/weather" />
+        <IntegrationPage path="/dashboard/integration/service" />
         <IntegrationPage path="/dashboard/integration/navigation" />
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
+        <StockExchangePage path="/dashboard/integration/service/stockexchange" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"

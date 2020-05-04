@@ -171,7 +171,8 @@
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "navigation",
+        "service": "Service"
       }
     },
     "telegram": {
@@ -339,6 +340,15 @@
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "stockExchange": {
+      "title": "Stock Exchange API",
+      "introduction": "This integration helps you integrate with Fmp Cloud API to get the stock exchange indexes and values in Gladys.",
+      "instructions": "You first need to create an account on Fmp Cloud API website:",
+      "apiKeyLabel": "Then, enter your API key here:",
+      "apiKeyPlaceholder": "Enter Fmp Cloud API key",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a stock exchange box."
     },
     "mqtt": {
       "title": "MQTT",
