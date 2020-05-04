@@ -62,16 +62,15 @@ class ArduinoDeviceForm extends Component {
             <Text id="integration.arduino.device.subserviceLabel" />
           </label>
           <select class="form-control" id="subservice">
-            <option value="">
-              <Text id="global.emptySelectOption" />
+            <option value={DEVICE_SUBSERVICE_LIST.EMIT_433}>
+              <Text id="integration.subservice.emit433" />
             </option>
-            {DEVICE_SUBSERVICE_LIST &&
-              Object.keys(DEVICE_SUBSERVICE_LIST).map(key => (
-                <option value={DEVICE_SUBSERVICE_LIST[key]}>
-                  {DEVICE_SUBSERVICE_LIST[key].name}
-                </option>
-              ))}
-              ))}
+            <option value={DEVICE_SUBSERVICE_LIST.EMIT_433_CHACON}>
+              <Text id="integration.subservice.emit433Chacon" />
+            </option>
+            <option value={DEVICE_SUBSERVICE_LIST.EMIT_IR}>
+              <Text id="integration.subservice.emit433IR" />
+            </option>
           </select>
         </div>
 

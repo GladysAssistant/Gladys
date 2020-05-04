@@ -567,6 +567,11 @@
         "notConnected": "Arduino card is not connected, please connect a card.",
         "connectButton": "Connect",
         "disconnectButton": "Disconnect"
+      },
+      "subservice": {
+        "emit433": "Emit in 433 MHz",
+        "emit433Chacon": "Emit in 433 MHz for Chacon outlets",
+        "emitIR": "Emit in IR",
       }
     },
     "xiaomi": {
