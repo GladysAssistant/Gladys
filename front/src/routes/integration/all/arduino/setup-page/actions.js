@@ -76,9 +76,9 @@ const actions = store => {
         arduinoPath: e.target.value
       });
     },
-    getModel(state){
+    getModels(state){
       store.setState({
-        arduinoModels: [
+        arduinoModelsList: [
           "Arduino Yun",
           "Arduino Uno",
           "Arduino Duemilanove or Diecimila",
@@ -115,6 +115,9 @@ const actions = store => {
       try {
         await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
           value: state.arduinoPath
+        });
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
+          value: state.arduinoModel
         });
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({

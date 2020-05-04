@@ -53,10 +53,10 @@ const SetupTab = ({ children, ...props }) => {
                         <option>
                           <Text id="global.emptySelectOption" />
                         </option>
-                        {props.arduinoModels &&
-                          props.arduinoModels.map(arduinoModel => (
-                            <option value={arduinoModel}>
-                              {arduinoModel}
+                        {props.arduinoModelsList &&
+                          props.arduinoModelsList.map(model => (
+                            <option value={model} selected={props.arduinoModel === model}>
+                              {model}
                             </option>
                           ))}
                       </select>
