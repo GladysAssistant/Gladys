@@ -12,13 +12,14 @@ const { getDiskSpace } = require('./system.getDiskSpace');
 const { saveLatestGladysVersion } = require('./system.saveLatestGladysVersion');
 const { shutdown } = require('./system.shutdown');
 
-const System = function System(sequelize, event) {
+const System = function System(sequelize, event, config) {
   this.downloadUpgradeError = null;
   this.downloadUpgradeFinished = null;
   this.downloadUpgradeLastEvent = null;
   this.Docker = Docker;
   this.sequelize = sequelize;
   this.event = event;
+  this.config = config;
   this.dockerode = null;
   this.event.on(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, eventFunctionWrapper(this.downloadUpgrade.bind(this)));
 };

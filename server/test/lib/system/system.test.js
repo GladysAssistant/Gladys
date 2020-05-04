@@ -13,11 +13,15 @@ const sequelize = {
   close: fake.resolves(null),
 };
 
+const config = {
+  tempFolder: '/tmp/gladys',
+};
+
 const event = new EventEmitter();
 
 describe('system', () => {
   it('should get infos', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     await system.init();
     const infos = await system.getInfos();
     expect(infos).to.have.property('hostname');
@@ -38,7 +42,7 @@ describe('system', () => {
     expect(infos.gladys_version.substr(0, 1)).to.equal('v');
   });
   it('should return disk space', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     const diskSpace = await system.getDiskSpace();
     expect(diskSpace).to.have.property('filesystem');
     expect(diskSpace).to.have.property('size');
@@ -48,27 +52,27 @@ describe('system', () => {
     expect(diskSpace).to.have.property('mountpoint');
   });
   it('should return if process is running inside docker or not', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     const isDocker = await system.isDocker();
     expect(typeof isDocker).to.equal('boolean');
   });
   it('should list containers', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     await system.init();
     const containers = await system.getContainers();
     expect(containers).be.instanceOf(Array);
   });
   it('should init system', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     await system.init();
   });
   it('should download upgrade', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     await system.init();
     await system.downloadUpgrade('latest');
   });
   it('should install upgrade', async () => {
-    const system = new System(sequelize, event);
+    const system = new System(sequelize, event, config);
     await system.init();
     await system.installUpgrade();
   });
