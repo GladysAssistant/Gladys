@@ -119,8 +119,6 @@ function createActions(store) {
           {
             id: uniqueId,
             name: null,
-            should_poll: true,
-            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             features: [
@@ -128,8 +126,8 @@ function createActions(store) {
                 name: null,
                 selector: null,
                 external_id: uniqueId,
-                category: DEVICE_FEATURE_CATEGORIES.CAMERA,
-                type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+                category:null,
+                type: null,
                 read_only: false,
                 keep_history: false,
                 has_feedback: false,
@@ -139,7 +137,7 @@ function createActions(store) {
             ],
             params: [
               {
-                name: 'CAMERA_URL',
+                name: 'name_param',
                 value: null
               }
             ]
