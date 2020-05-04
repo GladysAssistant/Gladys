@@ -24,8 +24,10 @@ const actions = store => {
       });
       try {
         const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
+        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
         store.setState({
           arduinoPath: arduinoPath.value,
+          arduinoModel: arduinoModel.value,
           getCurrentArduinoPathStatus: RequestStatus.Success
         });
       } catch (e) {
