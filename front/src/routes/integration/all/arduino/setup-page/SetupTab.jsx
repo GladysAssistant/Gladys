@@ -12,7 +12,7 @@ const SetupTab = ({ children, ...props }) => {
           </h3>
           <div class="page-options d-flex">
             <button class="btn btn-info" onClick={props.getUsbPorts && props.checkConnected}>
-              <Text id="integration.arduino.device.refreshButton" />
+              <Text id="integration.arduino.setup.refreshButton" />
             </button>
           </div>
         </div>
