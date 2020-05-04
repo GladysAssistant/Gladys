@@ -536,7 +536,7 @@
         "arduinoDescription": "List of Arduino devices currently connected or which have been connected to Gladys.",
         "search": "Search devices",
         "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
-        "arduinoConnected": "Arduino connected",
+        "arduinoConnected": "Arduino connected.",
         "arduinoNotConnected": "Arduino card is not connected, please connect a card in the Setup page.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
@@ -555,7 +555,7 @@
       },
       "setup": {
         "title": "Arduino Settings",
-        "arduinoDescription": "To use this service, you need to connect an Arduino card",
+        "arduinoDescription": "To use this service, you need to connect an Arduino card.",
         "refreshButton": "Refresh Arduino list",
         "arduinoModelLabel": "Select the model of your Arduino",
         "arduinoUsbDriverPathLabel": "Select the USB port where your Arduino is connected",
