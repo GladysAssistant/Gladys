@@ -33,7 +33,7 @@ const DeviceTab = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        <div class="page-options d-flex">
+        <div class="page-options d-flex ml-2">
           <button class="btn btn-info" onClick={props.getUsbPorts && props.checkConnected}>
             <Text id="integration.arduino.device.refreshButton" />
           </button>
