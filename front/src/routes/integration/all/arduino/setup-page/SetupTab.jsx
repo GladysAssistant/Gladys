@@ -48,6 +48,13 @@ const SetupTab = ({ children, ...props }) => {
 
                     <div class="form-group">
                       <label class="form-label">
+                        <Text id="integration.arduino.setup.arduinoModelLabel" />
+                      </label>
+                      <select class="form-control">
+                        <option>Arduino Uno</option>
+                        <option>Arduino Mega</option>
+                      </select>
+                      <label class="form-label">
                         <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                       </label>
                       <select class="form-control" onChange={props.updateArduinoPath}>
