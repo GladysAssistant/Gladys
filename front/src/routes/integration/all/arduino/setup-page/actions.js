@@ -116,13 +116,13 @@ const actions = store => {
           arduinoDisconnectStatus: RequestStatus.Error
         });
       }
-    },
+    }/*,
     driverFailed(state) {
       store.setState({
         arduinoDriverFailed: true,
         arduinoConnectionInProgress: false
       });
-    }
+    }*/
   };
 
   return actions;
