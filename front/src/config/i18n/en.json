@@ -535,7 +535,7 @@
         "title": "Arduino Devices",
         "arduinoDescription": "List of Arduino devices currently connected or which have been connected to Gladys.",
         "search": "Search devices",
-        "noDevices": "No Arduino devices added yet. Please configure your devices.",
+        "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
         "arduinoConnected": "Arduino connected",
         "arduinoNotConnected": "Arduino card is not connected, please connect a card in the Setup page.",
         "noNameLabel": "No name",
