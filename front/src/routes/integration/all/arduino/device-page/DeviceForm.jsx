@@ -9,6 +9,10 @@ class ArduinoDeviceForm extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
+  updateDataPin = e => {
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'dataPin', e.target.value);
+  };
+
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
@@ -81,6 +85,8 @@ class ArduinoDeviceForm extends Component {
           <input
             id="dataPin"
             type="text"
+            value={props.device.dataPin}
+            onInput={this.updateDataPin}
             class="form-control"
             placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
           />
