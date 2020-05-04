@@ -66,7 +66,7 @@ const DeviceTab = ({ children, ...props }) => (
           )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.arduinoDevices &&
+            {props.arduinoConnected && props.arduinoDevices &&
               props.arduinoDevices.map((arduinoDevice, index) => (
                 <Device
                   device={arduinoDevice}
