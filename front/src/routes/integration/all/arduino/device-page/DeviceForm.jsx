@@ -63,13 +63,13 @@ class ArduinoDeviceForm extends Component {
           </label>
           <select class="form-control" id="subservice">
             <option value={DEVICE_SUBSERVICE_LIST.EMIT_433}>
-              <Text id="integration.subservice.emit433" />
+              <Text id="integration.arduino.subservice.emit433" />
             </option>
             <option value={DEVICE_SUBSERVICE_LIST.EMIT_433_CHACON}>
-              <Text id="integration.subservice.emit433Chacon" />
+              <Text id="integration.arduino.subservice.emit433Chacon" />
             </option>
             <option value={DEVICE_SUBSERVICE_LIST.EMIT_IR}>
-              <Text id="integration.subservice.emitIR" />
+              <Text id="integration.arduino.subservice.emitIR" />
             </option>
           </select>
         </div>
