@@ -62,7 +62,7 @@ describe('MqttHandler', () => {
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'my_feature_external_id',
-      state: '19.8',
+      state: 19.8,
     });
   });
 });
