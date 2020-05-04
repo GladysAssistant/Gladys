@@ -9,6 +9,75 @@ function createActions(store) {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async getUsbPorts(state) {
+      store.setState({
+        getArduinoUsbPortStatus: RequestStatus.Getting
+      });
+      try {
+        const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
+        store.setState({
+          usbPorts,
+          getArduinoUsbPortStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getArduinoUsbPortStatus: RequestStatus.Error
+        });
+      }
+    },
+    async getCurrentArduinoPath(state) {
+      store.setState({
+        getCurrentArduinoPathStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
+        store.setState({
+          arduinoPath: arduinoPath.value,
+          getCurrentArduinoPathStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoPathStatus: RequestStatus.Error
+        });
+      }
+    },
+    async checkConnected(state) {
+      store.setState({
+        getCurrentArduinoPathStatus: RequestStatus.Getting
+      });
+      try {
+        await actions.getUsbPorts(store.getState());
+        var connected = false;
+        await actions.getCurrentArduinoPath(store.getState());
+        const arduinoPath = store.getState().arduinoPath;
+
+        if (arduinoPath !== "---------") {
+          store.getState().usbPorts.forEach(element => {
+            if (element.comPath === arduinoPath) {
+              connected = true;
+            }
+          });
+
+          if (connected) {
+            store.setState({
+              arduinoConnected: true
+            });
+          } else {
+            store.setState({
+              arduinoConnected: false
+            });
+          }
+        } else {
+          store.setState({
+            arduinoConnected: false
+          });
+        }
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoPathStatus: RequestStatus.Error
+        });
+      }
+    },
     async getArduinoDevices(state, take, skip) {
       store.setState({
         getArduinoDevicesStatus: RequestStatus.Getting
