@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
-import { DEVICE_SUBSERVICE_LIST } from '../../../../../../server/utils/constants';
+import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
 
 class ArduinoDeviceForm extends Component {
   updateName = e => {
