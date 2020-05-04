@@ -77,7 +77,6 @@ function createActions(store) {
           getCurrentArduinoPathStatus: RequestStatus.Error
         });
       }
-      console.log(store.getState());
     },
     async getArduinoDevices(state, take, skip) {
       store.setState({
