@@ -49,7 +49,7 @@ const SetupTab = ({ children, ...props }) => {
                       <label class="form-label">
                         <Text id="integration.arduino.setup.arduinoModelLabel" />
                       </label>
-                      <select class="form-control">
+                      <select class="form-control" onChange={props.updateArduinoModel}>
                         <option>
                           <Text id="global.emptySelectOption" />
                         </option>
