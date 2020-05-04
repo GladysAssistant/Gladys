@@ -76,6 +76,11 @@ const actions = store => {
         arduinoPath: e.target.value
       });
     },
+    getModel(state){
+      store.setState({
+        arduinoModels: ["Arduino Uno", "Arduino Mega"]
+      });
+    },
     async savePathAndConnect(state) {
       store.setState({
         connectArduinoStatus: RequestStatus.Getting,

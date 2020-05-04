@@ -50,12 +50,19 @@ const SetupTab = ({ children, ...props }) => {
                         <Text id="integration.arduino.setup.arduinoModelLabel" />
                       </label>
                       <select class="form-control">
-                        <option>Arduino Uno</option>
-                        <option>Arduino Mega</option>
+                        <option>
+                          <Text id="global.emptySelectOption" />
+                        </option>
+                        {props.arduinoModels &&
+                          props.usbPorts.map(arduinoModel => (
+                            <option value={arduinoModel}>
+                              {arduinoModel}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div class="form-group">
-                      
+
                       <label class="form-label">
                         <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                       </label>
