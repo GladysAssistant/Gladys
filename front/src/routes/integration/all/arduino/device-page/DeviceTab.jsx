@@ -72,7 +72,7 @@ const DeviceTab = ({ children, ...props }) => (
                 />
               ))}
             <div class="dimmer-content alert alert-info">
-              {/*props.arduinoDevices && props.arduinoDevices.length === 0 && */<Text id="integration.arduino.device.noDevices" />}
+              {/*props.arduinoDevices && props.arduinoDevices.length === 0 && */props.arduinoConnected && <Text id="integration.arduino.device.noDevices" />}
             </div>
           </div>
         </div>
