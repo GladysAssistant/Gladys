@@ -75,6 +75,18 @@ class ArduinoDeviceForm extends Component {
         </div>
 
         <div class="form-group">
+          <label class="form-label" for="dataPin">
+            <Text id="integration.arduino.device.nameLabel" />
+          </label>
+          <input
+            id="dataPin"
+            type="text"
+            class="form-control"
+            placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
+          />
+        </div>
+
+        <div class="form-group">
           <label class="form-label">
             <Text id="integration.arduino.device.featuresLabel" />
           </label>
