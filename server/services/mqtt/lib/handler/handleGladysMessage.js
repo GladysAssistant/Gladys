@@ -20,7 +20,7 @@ function handleGladysMessage(topic, message) {
     }
     const event = {
       device_feature_external_id: parsedTopic[5],
-      state: message,
+      state: parseFloat(message),
     };
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
   } else {
