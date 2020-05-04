@@ -81,7 +81,6 @@ class ArduinoDeviceForm extends Component {
           <input
             id="dataPin"
             type="text"
-            value={<Text id="integration.arduino.device.dataPinLabel" />}
             class="form-control"
             placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
           />
