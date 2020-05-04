@@ -43,6 +43,7 @@ async function getLights() {
         case 'LLC010': // Hue iris
           lightsToReturn.push(getPhilipsHueColorLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LWO001': // Hue White Filament Bulb G93 E27
         case 'LWB010': // Hue white bulb with fixed warming light (2700K)
         case 'LWB006': // Hue white lamp
         case 'LWG004': // Hue white spot
