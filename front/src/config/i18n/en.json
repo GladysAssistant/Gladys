@@ -551,7 +551,8 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "subserviceLabel": "Sub-service"
       },
       "setup": {
         "title": "Arduino Settings",

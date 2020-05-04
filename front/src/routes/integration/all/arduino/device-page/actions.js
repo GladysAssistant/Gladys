@@ -3,7 +3,8 @@ import update from 'immutability-helper';
 import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
-import debounce from 'debounce';
+import debounce from 'debounce'; 
+import { DEVICE_SUBSERVICE_LIST } from '../../../../../../server/utils/constants';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);

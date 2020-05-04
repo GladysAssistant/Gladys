@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
+import { DEVICE_SUBSERVICE_LIST } from '../../../../../../server/utils/constants';
 
 class ArduinoDeviceForm extends Component {
   updateName = e => {
@@ -52,6 +53,24 @@ class ArduinoDeviceForm extends Component {
                     </option>
                   ))}
                 </optgroup>
+              ))}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="subservice">
+            <Text id="integration.arduino.device.subserviceLabel" />
+          </label>
+          <select class="form-control" id="subservice">
+            <option value="">
+              <Text id="global.emptySelectOption" />
+            </option>
+            {DEVICE_SUBSERVICE_LIST &&
+              DEVICE_SUBSERVICE_LIST.map((key, value) => (
+                <option value={key}>
+                  {value}
+                </option>
+              ))}
               ))}
           </select>
         </div>
