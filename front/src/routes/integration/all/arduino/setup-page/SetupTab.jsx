@@ -54,7 +54,7 @@ const SetupTab = ({ children, ...props }) => {
                           <Text id="global.emptySelectOption" />
                         </option>
                         {props.arduinoModels &&
-                          props.usbPorts.map(arduinoModel => (
+                          props.arduinoModels.map(arduinoModel => (
                             <option value={arduinoModel}>
                               {arduinoModel}
                             </option>
