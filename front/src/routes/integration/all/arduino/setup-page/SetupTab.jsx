@@ -30,7 +30,7 @@ const SetupTab = ({ children, ...props }) => {
                 </p>
               )}
               {!props.arduinoConnected && (
-                <p class="alert alert-success">
+                <p class="alert alert-danger">
                   <Text id="integration.arduino.setup.notConnected" />
                 </p>
               )}
