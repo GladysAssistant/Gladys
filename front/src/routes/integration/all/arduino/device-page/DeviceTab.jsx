@@ -39,7 +39,7 @@ const DeviceTab = ({ children, ...props }) => (
           </button>
         </div>
         {props.arduinoConnected && (
-          <button class="btn btn-outline-primary ml-2" onClick={props.saveDevice}>
+          <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
             <Text id="scene.newButton" /> <i class="fe fe-plus" />
           </button>
         )}

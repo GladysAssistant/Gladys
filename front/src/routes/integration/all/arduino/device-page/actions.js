@@ -111,6 +111,44 @@ function createActions(store) {
           getArduinoDevicesStatus: RequestStatus.Error
         });
       }
+    }, async addDevice(state) {
+      const uniqueId = uuid.v4();
+      await integrationActions.getIntegrationByName(state, 'arduino');
+      const arduinoDevices = update(state.arduinoDevices, {
+        $push: [
+          {
+            id: uniqueId,
+            name: null,
+            should_poll: true,
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+            external_id: uniqueId,
+            service_id: store.getState().currentIntegration.id,
+            features: [
+              {
+                name: null,
+                selector: null,
+                external_id: uniqueId,
+                category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+                type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+                read_only: false,
+                keep_history: false,
+                has_feedback: false,
+                min: 0,
+                max: 0
+              }
+            ],
+            params: [
+              {
+                name: 'CAMERA_URL',
+                value: null
+              }
+            ]
+          }
+        ]
+      });
+      store.setState({
+        arduinoDevices
+      });
     },
     async saveDevice(state, device, index) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
