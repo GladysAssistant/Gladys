@@ -1,0 +1,8 @@
+[
+  {
+    "key": "stockexchange",
+    "name": "StockExchange",
+    "description": "Get the stock exchange indexes in Gladys.",
+    "img": "/assets/integrations/cover/stockexchange.jpg"
+  }
+]
