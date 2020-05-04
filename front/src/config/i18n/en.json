@@ -543,7 +543,7 @@
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
-        "refreshButton": "Refresh Arduino list",
+        "refreshButton": "Refresh Arduino",
         "saveButton": "Save",
         "deleteButton": "Delete",
         "returnButton": "Return back",
