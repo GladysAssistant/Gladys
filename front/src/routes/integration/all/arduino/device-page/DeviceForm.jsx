@@ -66,9 +66,9 @@ class ArduinoDeviceForm extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {DEVICE_SUBSERVICE_LIST &&
-              DEVICE_SUBSERVICE_LIST.map((key, value) => (
-                <option value={key}>
-                  {value}
+              Object.keys(DEVICE_SUBSERVICE_LIST).map(key => (
+                <option value={DEVICE_SUBSERVICE_LIST[key]}>
+                  {DEVICE_SUBSERVICE_LIST[key].name}
                 </option>
               ))}
               ))}
