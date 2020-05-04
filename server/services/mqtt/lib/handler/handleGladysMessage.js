@@ -1,4 +1,5 @@
 const { EVENTS } = require('../../../../utils/constants');
+const { BadParameters } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -9,16 +10,21 @@ const logger = require('../../../../utils/logger');
  * handleGladysMessage('gladys/device/create', '{ message: "content" }');
  */
 function handleGladysMessage(topic, message) {
-  switch (topic) {
-    case 'gladys/master/device/create':
-      this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
-      break;
-    case 'gladys/master/device/state/update':
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, JSON.parse(message));
-      break;
-    default:
-      logger.info(`MQTT : Gladys topic ${topic} not handled.`);
-      break;
+  const parsedTopic = topic.split('/');
+  if (topic === 'gladys/master/device/create') {
+    this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
+  } else if (topic.startsWith('gladys/master/device/')) {
+    // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
+    if (!parsedTopic[5]) {
+      throw new BadParameters('Device feature external_id is required');
+    }
+    const event = {
+      device_feature_external_id: parsedTopic[5],
+      state: message,
+    };
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+  } else {
+    logger.warn(`MQTT : Gladys topic ${topic} not handled.`);
   }
 }
 

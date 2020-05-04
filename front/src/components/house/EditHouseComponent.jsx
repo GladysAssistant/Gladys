@@ -20,6 +20,9 @@ class EditHouseComponent extends Component {
   removeRoom = roomIndex => {
     this.props.removeRoom(this.props.houseIndex, roomIndex);
   };
+  editRoom = (roomIndex, property, value) => {
+    this.props.editRoom(this.props.houseIndex, roomIndex, property, value);
+  };
   saveHouse = async () => {
     this.setState({
       loading: true
@@ -72,6 +75,7 @@ class EditHouseComponent extends Component {
         newRoomName={newRoomName}
         addRoom={this.addRoom}
         removeRoom={this.removeRoom}
+        editRoom={this.editRoom}
         saveHouse={this.saveHouse}
         onKeyPressRoomInput={this.onKeyPressRoomInput}
         wantToDeleteHouse={wantToDeleteHouse}

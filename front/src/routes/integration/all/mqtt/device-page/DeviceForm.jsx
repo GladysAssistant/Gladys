@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
+import dayjs from 'dayjs';
 
 class MqttDeviceForm extends Component {
   updateName = e => {
@@ -31,6 +32,22 @@ class MqttDeviceForm extends Component {
               onInput={this.updateName}
               class="form-control"
               placeholder={<Text id="integration.mqtt.device.nameLabel" />}
+            />
+          </Localizer>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="integration.mqtt.device.externalIdLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              value={props.device.external_id}
+              onInput={this.updateExternalId}
+              disabled={props.device.created_at !== undefined}
+              class="form-control"
+              placeholder={<Text id="integration.mqtt.device.externalIdLabel" />}
             />
           </Localizer>
         </div>
@@ -75,6 +92,20 @@ class MqttDeviceForm extends Component {
               <Text id="integration.mqtt.device.noFeatures" />
             )}
           </div>
+          <p class="mt-4">
+            {props.mostRecentValueAt ? (
+              <Text
+                id="integration.mqtt.device.mostRecentValueAt"
+                fields={{
+                  mostRecentValueAt: dayjs(props.mostRecentValueAt)
+                    .locale(props.user.language)
+                    .fromNow()
+                }}
+              />
+            ) : (
+              <Text id="integration.mqtt.device.noValueReceived" />
+            )}
+          </p>
         </div>
       </div>
     );

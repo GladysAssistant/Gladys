@@ -38,10 +38,7 @@ function createActions(store) {
       });
       try {
         const options = {
-          service: 'xiaomi',
-          order_dir: state.getXiaomiDeviceOrderDir || 'asc',
-          take: 10000,
-          skip: 0
+          order_dir: state.getXiaomiDeviceOrderDir || 'asc'
         };
         if (state.xiaomiDeviceSearch && state.xiaomiDeviceSearch.length) {
           options.search = state.xiaomiDeviceSearch;

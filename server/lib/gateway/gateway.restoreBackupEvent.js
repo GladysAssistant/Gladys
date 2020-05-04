@@ -10,6 +10,7 @@ const logger = require('../../utils/logger');
  */
 async function restoreBackupEvent(event) {
   try {
+    this.restoreErrored = false;
     this.restoreInProgress = true;
     logger.info(`Receiving restore backup event. File url = ${event.file_url}`);
     const { backupFilePath } = await this.downloadBackup(event.file_url);
@@ -18,6 +19,7 @@ async function restoreBackupEvent(event) {
   } catch (e) {
     logger.warn(e);
     this.restoreInProgress = false;
+    this.restoreErrored = true;
   }
 }
 
