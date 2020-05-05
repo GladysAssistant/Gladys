@@ -28,10 +28,10 @@ const actions = store => {
           arduinoPath: arduinoPath.value,
           getCurrentArduinoPathStatus: RequestStatus.Success
         });
-        /*const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
+        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
         store.setState({
           arduinoModel: arduinoModel.value
-        });*/
+        });
       } catch (e) {
         store.setState({
           getCurrentArduinoPathStatus: RequestStatus.Error
@@ -125,9 +125,9 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
           value: state.arduinoPath
         });
-        /*await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
           value: state.arduinoModel
-        });*/
+        });
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({
           connectArduinoStatus: RequestStatus.Success,
@@ -146,6 +146,9 @@ const actions = store => {
       });
       try {
         await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
+          value: "---------"
+        });
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
           value: "---------"
         });
         await state.httpClient.post('/api/v1/service/arduino/disconnect');
