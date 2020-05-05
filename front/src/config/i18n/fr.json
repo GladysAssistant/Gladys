@@ -296,7 +296,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
-      "search": "Recherche de caméras",
+      "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
       "namePlaceholder": "Entrez le nom de votre caméra",
@@ -310,7 +310,7 @@
       "urlLabel": "Flux RTSP/HTTP de la caméra",
       "urlPlaceholder": "Ex: rtsp://[identifiant]:[mot-de-passe]@[adresse-ip-camera]:554/media",
       "noCameraFound": "Aucune caméra trouvée",
-      "testConnectionButton": "Test de connexion",
+      "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
@@ -389,7 +389,7 @@
         "params": "Paramètre",
         "noFeatures": "Aucune fonctionnalité",
         "nodeId": "Noeud",
-        "zwaveNotConfiguredError": "Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
+        "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
         "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
@@ -399,7 +399,7 @@
       },
       "settings": {
         "title": "Paramètres Z-Wave",
-        "description": "Pour utiliser Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
+        "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
         "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
         "connectButton": "Connecter",
         "disconnectButton": "Déconnecter",
@@ -546,7 +546,7 @@
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "triggerCard": {
       "title": "Déclencheurs",
-      "searchPlaceholder": "Recherche de déclencheurs",
+      "searchPlaceholder": "Chercher un déclencheur",
       "leavingHomeTitle": "Départ la maison"
     },
     "actionsCard": {
@@ -584,7 +584,7 @@
     },
     "actions": {
       "device": {
-        "get-value": "Récupération de la valeur de l'appareil"
+        "get-value": "Chercher la valeur de l'appareil"
       },
       "message": {
         "send": "Envoyer un message"
@@ -714,7 +714,7 @@
     "gatewayOpenApiTab": "API Open"
   },
   "housesSettings": {
-    "searchPlaceholder": "Recherche de maisons",
+    "searchPlaceholder": "Chercher une maison",
     "newButton": "Nouveau",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -816,17 +816,17 @@
     "newButton": "Nouveau",
     "editButton": "Editer",
     "startButton": "Démarrer",
-    "searchPlaceholder": "Recherche de scènes"
+    "searchPlaceholder": "Chercher une scène"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
     "yourGatewayIsConfigured": "Votre compte Gladys Plus est configuré.",
     "yourGatewayIsConnected": "Votre instance Gladys est connectée à la passerelle distante.",
     "yourGatewayIsNotConnected": "Votre instance Gladys n'est pas connectée à la passerelle distante.",
-    "instanceRsaKey": "Empreinte de clé d'instance RSA",
-    "instanceEcdsaKey": "Empreinte de clé d'instance ECDSA",
+    "instanceRsaKey": "Empreinte de la clé RSA de l'instance",
+    "instanceEcdsaKey": "Empreinte de la clé ECDSA de l'instance",
     "backupKeyTitle": "Clé de sauvegarde",
-    "backupKeyDescription": "Votre clé de sauvegarde est utilisée pour crypter en toute sécurité vos sauvegardes Gladys. Veuillez enregistrer cette clé quelque part en dehors de Gladys pour pouvoir restaurer Gladys. Nous vous recommandons d'utiliser un gestionnaire de mots de passe pour cela.",
+    "backupKeyDescription": "Votre clé de sauvegarde est utilisée pour chiffrer vos sauvegardes Gladys. Veuillez enregistrer cette clé quelque part en dehors de Gladys pour pouvoir restaurer Gladys. Nous vous recommandons d'utiliser un gestionnaire de mots de passe pour cela.",
     "backupKeyLabel": "Votre clé de sauvegarde",
     "backupKeyPlaceholder": "Entrez / restaurez une clé de sauvegarde",
     "saveBackupKeyButton": "Sauvegarder",
@@ -886,7 +886,7 @@
     "createdAtColumn": "Date",
     "sizeColumn": "Taille",
     "restoreColumn": "Restaurer",
-    "restoreButton": "Restaurer une sauvegarde",
+    "restoreButton": "Restaurer",
     "confirmRestore": "Confirmer",
     "cancelRestore": "Annuler",
     "restoreInProgressTitle": "Restauration de la sauvegarde en cours ...",
