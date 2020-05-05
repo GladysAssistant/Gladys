@@ -60,7 +60,7 @@ function Gladys(params = {}) {
   const device = new Device(event, message, stateManager, service, room, variable);
   const scene = new Scene(stateManager, event, device, message);
   const scheduler = new Scheduler(event);
-  const system = new System(db.sequelize, event);
+  const system = new System(db.sequelize, event, config);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user);
 
@@ -91,6 +91,8 @@ function Gladys(params = {}) {
       // Execute DB migrations
       await db.umzug.up();
 
+      await system.init();
+
       if (!params.disableBrainLoading) {
         await brain.load();
       }
@@ -114,7 +116,6 @@ function Gladys(params = {}) {
         scheduler.init();
       }
       gateway.init();
-      system.init();
     },
   };
 
