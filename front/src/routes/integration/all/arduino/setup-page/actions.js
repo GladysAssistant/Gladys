@@ -167,6 +167,24 @@ const actions = store => {
         });
       }
     },
+    async discardModel(state) {
+      store.setState({
+        arduinoDiscardModel: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
+          value: "---------"
+        });
+        await actions.getStatus(store.getState());
+        store.setState({
+          arduinoDiscardModel: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          arduinoDiscardModel: RequestStatus.Error
+        });
+      }
+    },
     async disconnect(state) {
       store.setState({
         arduinoDisconnectStatus: RequestStatus.Getting
@@ -185,24 +203,6 @@ const actions = store => {
       } catch (e) {
         store.setState({
           arduinoDisconnectStatus: RequestStatus.Error
-        });
-      }
-    },
-    async discardModel(state) {
-      store.setState({
-        arduinoDiscardModel: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
-          value: "---------"
-        });
-        await actions.getStatus(store.getState());
-        store.setState({
-          arduinoDiscardModel: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          arduinoDiscardModel: RequestStatus.Error
         });
       }
     }
