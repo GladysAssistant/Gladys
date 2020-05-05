@@ -18,16 +18,16 @@
     "welcome": "Bienvenue",
     "createAccountStep": "Créer un compte",
     "preferencesStep": "Vos préférences",
-    "houseStep": "Configurer une maison",
+    "houseStep": "Configurer votre maison",
     "success": "Succès !",
-    "cardTitle": "Identifiez-vous",
+    "cardTitle": "Connexion",
     "loginWithGladysGatewayButton": "Identification avec Gladys Gateway",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
     "forgotPasswordLabel": "J’ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
-    "loginButtonText": "S'identifier",
+    "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
     "invalidEmail": "E-mail invalide",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
@@ -40,7 +40,7 @@
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
       "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\"> documentation </a> ou posez une question sur <a href = \"https: //community.gladysassistant. com \"> Gladys community </a>.",
       "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/pricing\"> Gladys Plus. </a>",
-      "buttonCreateAccountGladysGateway": "Créer un compte avec Gladys Gateway",
+      "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
       "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
     },
     "createLocalAccount": {
@@ -50,7 +50,7 @@
       "firstnamePlaceHolder": "Entrez votre prénom",
       "lastnameLabel": "Nom de famille",
       "lastnamePlaceHolder": "Entrez votre nom de famille",
-      "languageLabel": "Langage",
+      "languageLabel": "Langue",
       "english": "English",
       "french": "Français",
       "birthdateLabel": "Date de naissance",
@@ -85,12 +85,12 @@
       "createAccountButton": "Créer un compte"
     },
     "restoreBackupSetBackupKey": {
-      "title": "Entrer votre clé de restauration",
-      "description": "Les données et sauvegardes Gladys Plus sont entièrement cryptées, c'est pour cela que nous avons besoin de votre clé de restauration.",
+      "title": "Clé de restauration",
+      "description": "Les sauvegardes Gladys Plus sont entièrement chiffrées, c'est pour cela que nous avons besoin de votre clé de restauration.",
       "backupKeyLabel": "Clé de restauration",
       "backupKeyPlaceholder": "Saississez votre clé de restauration",
       "cancelButton": "Annuler",
-      "saveButton": "Enregistrer la clé de restauration"
+      "saveButton": "Enregistrer"
     },
     "restoreBackupInProgress": {
       "title": "Restauration en cours...",
@@ -128,7 +128,7 @@
       "houseNameError": "Le nom de la maison est requis",
       "houseLocationLabel": "Sélectionnez l'emplacement de votre maison",
       "roomsLabel": "Ajoutez toutes les pièces de votre maison",
-      "roomNamePlaceHolder": "Entrez une nouvelle pièce pour l'ajoutée",
+      "roomNamePlaceHolder": "Entrez une nouvelle pièce pour l'ajouter",
       "addRoomButton": "Ajouter",
       "saveHouse": "Sauvegarder la maison",
       "deleteHouse": "Supprimer la maison",
@@ -140,10 +140,10 @@
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {
-      "title": "Permettez-moi de vous remercier 🙏",
-      "introduction": "Je suis <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez autant l'utilisation de ce logiciel tel que je l'ai conçu.",
-      "ifYouWantToSupportThisSotware": "Comme Gladys est maintenant mon travail principal, je compte sur les contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter Gladys, vous pouvez en savoir plus sur <a href=\"https://gladysassistant.com/pricing\"> Gladys Plus </a>.",
+      "title": "Merci 🙏",
+      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
+      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez utiliser ce logiciel.",
+      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/pricing\"> Gladys Plus </a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -152,13 +152,13 @@
     "editDashboardButton": "Editer",
     "editDashboardCancelButton": "Annuler",
     "editDashboardSaveButton": "Sauvegarder",
-    "emptyDashboardSentenceTop": "Il semble que votre tableau de bord ne soit pas encore configuré.",
-    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Editer\" pour concevoir votre tableau de bord.",
-    "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Gateway.",
+    "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
+    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Editer\" pour le compléter.",
+    "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
-      "user-presence": "Utilisateur présent",
+      "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce"
     },
@@ -167,7 +167,7 @@
       "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
       "weather": {
-        "editHouseLabel": "Sélectionner une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
         "serviceNotConfigured": "Le service DarkSky n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service DarkSky.",
         "requestToThirdPartyFailed": "La requête à l'API DarkSKy a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de DarkSky pour résoudre ce problème.",
@@ -176,7 +176,7 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noValue": "Aucune valeur n'a encore été enregistré.",
+        "noValue": "Aucune valeur n'a encore été enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
       },
@@ -185,12 +185,12 @@
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
       },
       "userPresence": {
-        "description": "Afficher qui est à la maison et qui ne l'est pas.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
-        "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Rafraîchissez la page s'il vous plait.",
-        "emptyText": "Il n'y a aucun utilisateur à afficher ici. Vous pouvez ajouter des utilisateurs dans les paramètres Gladys."
+        "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
+        "emptyText": "Il n'y a aucun utilisateurs à afficher ici. Vous pouvez ajouter des utilisateurs dans les paramètres Gladys."
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -204,7 +204,7 @@
     "root": {
       "title": "Intégrations",
       "subtitle": "1 - {{length}} de {{total}} intégrations",
-      "searchPlaceholder": "Recherche intégration",
+      "searchPlaceholder": "Chercher une intégration",
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
       "menu": {
@@ -323,7 +323,7 @@
       "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
-        "search": "Recherche d'appareils",
+        "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
         "featuresLabel": "Fonctionnalités"
@@ -359,7 +359,7 @@
       "setupTab": "Configuration",
       "device": {
         "title": "Appareils Z-Wave",
-        "search": "Recherche d'appareils",
+        "search": "Chercher un appareil",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -440,7 +440,7 @@
       },
       "device": {
         "title": "Appareils MQTT",
-        "search": "Recherche d'appareils",
+        "search": "Chercher un appareil",
         "noDevices": "Aucun appareil MQTT n'a encore été ajouté.",
         "noNameLabel": "Pas de nom",
         "nameLabel": "Nom",
@@ -499,7 +499,7 @@
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
-        "searchPlaceholder": "Recherche d'appareils Xiaomi",
+        "searchPlaceholder": "Chercher un appareil",
         "sidLabel": "SID Xiaomi",
         "ipLabel": "Adresse IP",
         "roomLabel": "Pièce",
@@ -615,6 +615,9 @@
     "triggers": {
       "device": {
         "new-state": "Changement d'état de l'appareil"
+      },
+      "time": {
+        "changed": "Déclenchement programmé"
       }
     },
     "triggersCard": {
@@ -678,11 +681,11 @@
     "month": "Mois",
     "day": "Jour",
     "selectorText": "Le sélecteur est l'identifiant unique de votre utilisateur. Il peut être utilisé dans l'API.",
-    "profilePictureLabel": "Image de profil",
+    "profilePictureLabel": "Photo de profil",
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailPlaceholder": "Entrez votre e-mail",
-    "languageLabel": "Langage",
+    "languageLabel": "Langue",
     "english": "English",
     "french": "Français",
     "passwordLabel": "Mot de passe (min 8 caractères)",
@@ -867,7 +870,7 @@
     "passwordLabel": "Mot de passe",
     "forgotPasswordLabel": "J’ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
-    "loginButtonText": "S'identifier",
+    "loginButtonText": "Connexion",
     "wrongCredentials": "E-mail / mot de passe incorrect.",
     "invalidEmail": "E-mail invalide",
     "networkError": "Erreur réseau: êtes-vous sûr que votre instance Gladys est connectée à Internet ?",

@@ -615,6 +615,9 @@
     "triggers": {
       "device": {
         "new-state": "Device state change"
+      },
+      "time": {
+        "changed": "Scheduled trigger"
       }
     },
     "triggersCard": {
