@@ -584,7 +584,7 @@
         "label": "Sélectionnez les lumière que vous souhaitez éteindre"
       },
       "deviceGetValue": {
-        "description": "La scène récupèrera la dernière valeur de l'appareil sélectionné, vous pourrez donc l'utiliser plus tard dans celle-ci.",
+        "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
       "onlyContinueIf": {
@@ -593,12 +593,12 @@
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
         "orText": "OU",
-        "orButton": "OU"
+        "orButton": "+ OU"
       }
     },
     "actions": {
       "device": {
-        "get-value": "Chercher la valeur de l'appareil"
+        "get-value": "Chercher le dernier état"
       },
       "message": {
         "send": "Envoyer un message"
