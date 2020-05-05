@@ -44,7 +44,7 @@ async function installContainer() {
   }
 
   await this.saveConfiguration({
-    mqttUrl: 'mqtt://localhost',
+    mqttUrl: 'mqtt://host.docker.internal',
     mqttUsername: 'gladys',
     mqttPassword: generate(),
     useEmbeddedBroker: true,

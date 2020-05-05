@@ -11,6 +11,9 @@
         }
       ]
     },
+    "RestartPolicy": {
+      "Name": "always"
+    },
     "Dns": [],
     "DnsOptions": [],
     "DnsSearch": [],

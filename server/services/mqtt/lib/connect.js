@@ -10,7 +10,7 @@ const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
  * @param {string} [configuration.mqttPassword] - MQTT password.
  * @example
  * connect({
- *  mqttUrl: 'htpp://localhost:1883',
+ *  mqttUrl: 'http://localhost:1883',
  *  mqttUsername: 'mqttUser',
  *  mqttPassword: 'mqttPassword',
  * });
