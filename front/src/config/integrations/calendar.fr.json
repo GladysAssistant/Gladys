@@ -2,7 +2,7 @@
   {
     "key": "caldav",
     "name": "CalDAV",
-    "description": "Synchonisez votre calendrier avec CalDAV.",
+    "description": "Synchonisez vos calendriers CalDAV.",
     "img": "/assets/integrations/cover/caldav.jpg"
   }
 ]

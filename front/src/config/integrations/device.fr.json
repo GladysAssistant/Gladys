@@ -8,13 +8,13 @@
   {
     "key": "rtsp-camera",
     "name": "Camera",
-    "description": "Affichez vos caméras HTTP/RTSP dans Gladys.",
+    "description": "Affichez vos caméras HTTP/RTSP.",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"
   },
   {
     "key": "xiaomi",
     "name": "Xiaomi Home",
-    "description": "Affichez les appareils domestiques Xiaomi.",
+    "description": "Gérez les appareils Xiaomi.",
     "img": "/assets/integrations/cover/xiaomi.jpg"
   },
   {
@@ -30,9 +30,9 @@
     "img": "/assets/integrations/cover/philips-hue.jpg"
   },
   {
-    "key": "sonoff",
-    "name": "Sonoff",
-    "description": "Contrôler vos appareils Sonoff.",
-    "img": "/assets/integrations/cover/sonoff.jpg"
+    "key": "tasmota",
+    "name": "Tasmota",
+    "description": "Contrôler vos appareils Tasmota.",
+    "img": "/assets/integrations/cover/tasmota.jpg"
   }
 ]

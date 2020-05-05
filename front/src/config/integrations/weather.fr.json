@@ -2,7 +2,7 @@
   {
     "key": "darksky",
     "name": "DarkSky",
-    "description": "Obtenir la météo dans Gladys.",
+    "description": "Récupérer la météo dans Gladys.",
     "img": "/assets/integrations/cover/darksky.jpg"
   }
 ]
