@@ -728,7 +728,7 @@
     "backupTab": "Sauvegardes",
     "billingTab": "Facturation",
     "gatewayUsersTab": "Utilisateurs",
-    "gatewayOpenApiTab": "API Open"
+    "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
     "searchPlaceholder": "Chercher une maison",
@@ -754,13 +754,13 @@
     "button": "Récupérez votre mot de passe",
     "wrongEmailError": "Ce n'est pas un e-mail valide",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?",
-    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
-    "success": "Succès ! Vous devriez voir un lien de réinitialisation de mot de passe dans les journaux Gladys.",
+    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou poster un message sur Gladys community.",
+    "success": "Succès ! Vous devriez voir un lien de réinitialisation de mot de passe dans les logs de Gladys.",
     "userNotFound": "Aucun compte n'est lié à cet e-mail.",
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
     "validationLinkConfirmation": "Êtes-vous sûr d'avoir cliqué/copié correctement le lien ?",
-    "contactUs": "Si cela ne fonctionne toujours pas, veuillez nous contacter sur <a href=\"https://twitter.com/gladysassistant\">Twitter</a> ou sur <a href=\"https://community.gladysassistant.com\">Gladys Community</a>.",
+    "contactUs": "Si cela ne fonctionne toujours pas, veuillez nous contacter sur la <a href=\"https://community.gladysassistant.com\">communauté Gladys</a>.",
     "emailConfirmed": "E-mail confirmé",
     "signIn": "Connexion",
     "confirmationInProgress": "Confirmation en cours ..."
@@ -866,7 +866,7 @@
     "free": "Gratuit",
     "gladysPlus": "Gladys Plus",
     "currentPlan": "Choix actuel",
-    "subscribeButton": "Abonnez-vous (9,99 € / mois / maison)",
+    "subscribeButton": "Abonnez-vous (9,99 € / mois)",
     "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier.",
     "openSourceSoftware": "Logiciel Open-Source",
     "endToEndEncryptedRemoteAccess": "Accès à distance chiffré de bout en bout",
@@ -878,7 +878,7 @@
     "supportOpenSourceSoftware": "Support logiciel Open-Source"
   },
   "gatewayLogin": {
-    "cardTitle": "Connectez-vous à votre compte Gladys Plus",
+    "cardTitle": "Connexion à Gladys Plus",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
@@ -889,13 +889,13 @@
     "invalidEmail": "E-mail invalide",
     "networkError": "Erreur réseau: êtes-vous sûr que votre instance Gladys est connectée à Internet ?",
     "userNotAcceptedLocally": "Votre utilisateur n'est pas accepté localement, veuillez revenir à votre instance Gladys et autoriser l'accès à cet utilisateur dans les paramètres.",
-    "gatewayNoInstanceFound": "Votre utilisateur n'est pas accepté localement, veuillez revenir à votre instance Gladys et autoriser l'accès à cet utilisateur dans les paramètres.",
+    "gatewayNoInstanceFound": "Aucune instance connectée à Gladys Plus. Vous devez d'abord connecter votre instance Gladys à Gladys Plus avant de pouvoir l'utiliser ici.",
     "gatewayAccessBilling": "Pour accéder à la facturation, cliquez ici.",
     "unknownError": "Une erreur inconnue est survenue. Veuillez nous contacter pour plus d'informations.",
     "twoFactorCodeLabel": "Code 2FA",
     "twoFactorCodePlaceholder": "Code à 6 chiffres",
     "loginTwoFactorButtonText": "Finaliser la connexion",
-    "invalidTwoFactorCode": "Code 2FA n'est pas valide."
+    "invalidTwoFactorCode": "Le code 2FA n'est pas valide."
   },
   "gatewayBackup": {
     "title": "Sauvegardes",
@@ -1152,9 +1152,9 @@
     }
   },
   "gatewaySignUp": {
-    "generatingKey": "Génération de vos clés publiques/privées ...",
-    "complete": "Terminé ! Veuillez vérifier vos e-mails.",
-    "done": "Terminé ! Vous pouvez maintenant vous connecter <a href=\"/login\" style=\"color: blue\">here</a>.",
+    "generatingKey": "Génération de vos clés publiques/privées...",
+    "complete": "Terminé ! Veuillez vérifier votre e-mail.",
+    "done": "Terminé ! Vous pouvez maintenant vous connecter <a href=\"/login\" style=\"color: blue\">ici</a>.",
     "usernameLabel": "Nom",
     "usernamePlaceholder": "Entez votre nom",
     "usernameInvalid": "Le nom doit comprendre entre 2 et 30 caractères",
