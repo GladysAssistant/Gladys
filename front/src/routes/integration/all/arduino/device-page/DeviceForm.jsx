@@ -82,14 +82,16 @@ class ArduinoDeviceForm extends Component {
           <label class="form-label" for="dataPin">
             <Text id="integration.arduino.device.dataPinLabel" />
           </label>
-          <input
-            id="dataPin"
-            type="text"
-            value={props.device.dataPin}
-            onInput={this.updateDataPin}
-            class="form-control"
-            placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
-          />
+          <Localizer>
+            <input
+              id="dataPin"
+              type="text"
+              value={props.device.dataPin}
+              onInput={this.updateDataPin}
+              class="form-control"
+              placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
+            />
+          </Localizer>
         </div>
 
         <div class="form-group">
