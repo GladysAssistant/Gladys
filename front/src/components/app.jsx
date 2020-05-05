@@ -4,6 +4,7 @@ import createStore from 'unistore';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
+import translationFr from '../config/i18n/fr.json';
 import translationEn from '../config/i18n/en.json';
 import actions from '../actions/main';
 
@@ -194,22 +195,25 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('', actions)
+@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
   }
 
-  render({}, {}) {
-    return <AppRouter />;
+  render({ user }, {}) {
+    const translationDefinition = user && user.language && user.language === 'fr' ? translationFr : translationEn;
+    return (
+      <IntlProvider definition={translationDefinition}>
+        <AppRouter />
+      </IntlProvider>
+    );
   }
 }
 
 const App = () => (
   <Provider store={store}>
-    <IntlProvider definition={translationEn}>
-      <MainApp />
-    </IntlProvider>
+    <MainApp />
   </Provider>
 );
 
