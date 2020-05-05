@@ -397,18 +397,9 @@
         "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }
     },
-    "darkSky": {
-      "title": "DarkSky",
-      "description": "Get the weather in Gladys.",
-      "introduction": "This integration helps you integrate with the DarkSky API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on the DarkSky API website: <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
-      "apiKeyLabel": "Then, enter your API key here:",
-      "apiKeyPlaceholder": "Enter DarkSky API key",
-      "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
-    },
     "openWeather": {
       "title": "OpenWeather API",
+      "description": "Get the weather in Gladys.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website:",
       "apiKeyLabel": "Then, enter your API key here:",

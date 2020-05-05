@@ -1,4 +1,4 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 const DarkSkyPage = ({ children, ...props }) => (
@@ -24,7 +24,8 @@ const DarkSkyPage = ({ children, ...props }) => (
                         <Text id="integration.darkSky.introduction" />
                       </p>
                       <p>
-                        <MarkupText id="integration.darkSky.instructions" />
+                        <Text id="integration.darkSky.instructions" />{' '}
+                        <a href="https://darksky.net/dev">https://darksky.net/dev</a>.
                       </p>
                       <form onSubmit={props.saveApiKey}>
                         <div class="form-group">

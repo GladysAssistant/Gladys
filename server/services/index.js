@@ -1,6 +1,5 @@
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
-module.exports.darksky = require('./darksky');
 module.exports.openweather = require('./openweather');
 module.exports.mqtt = require('./mqtt');
 module.exports['philips-hue'] = require('./philips-hue');
