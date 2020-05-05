@@ -1112,7 +1112,7 @@
   "gatewayOpenApi": {
     "title": "Open API",
     "description": "The Open API allows you to send informations to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "More informations.",
+    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/en/configuration#gateway-open-api\">More informations.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",
@@ -1120,7 +1120,8 @@
     "generateButton": "Generate",
     "registered": "Registered",
     "keyNameLabel": "Name:",
-    "registeredLabel": "Registered:"
+    "registeredLabel": "Registered:",
+    "neverUsed": "Never"
   },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Gateway",

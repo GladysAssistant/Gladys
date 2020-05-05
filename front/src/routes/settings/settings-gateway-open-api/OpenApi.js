@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 
 import OpenApiKey from './OpenApiKey';
 
@@ -11,10 +11,7 @@ const OpenApi = ({ children, ...props }) => (
     </div>
     <div class="card-body">
       <p>
-        <Text id="gatewayOpenApi.description" />{' '}
-        <a href="https://documentation.gladysassistant.com/en/configuration#gateway-open-api">
-          <Text id="gatewayOpenApi.moreInformations" />
-        </a>
+        <Text id="gatewayOpenApi.description" /> <MarkupText id="gatewayOpenApi.moreInformations" />
       </p>
       <p>
         <Text id="gatewayOpenApi.warningKeyDisappear" />
@@ -39,7 +36,7 @@ const OpenApi = ({ children, ...props }) => (
           <tbody>
             {props.apiKeys &&
               props.apiKeys.map((apiKey, index) => (
-                <OpenApiKey apiKey={apiKey} revokeOpenApiKey={props.revokeOpenApiKey} index={index} />
+                <OpenApiKey user={props.user} apiKey={apiKey} revokeOpenApiKey={props.revokeOpenApiKey} index={index} />
               ))}
 
             <tr>

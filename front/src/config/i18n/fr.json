@@ -1104,7 +1104,7 @@
     "formTitle": "Gladys Plus - Mot de passe oublié",
     "success": "Si ce compte existe, vous avez reçu un e-mail avec un lien de réinitialisation de mot de passe.",
     "emailAddress": "Adresse e-mail",
-    "sendEmailButton": "Envoyer un e-mail de réinitialisation du mot de passe",
+    "sendEmailButton": "Réinitialiser mon mot de passe",
     "emailAddressPlaceholder": "Entrez un e-mail",
     "dontHaveAccount": "Vous n'avez pas encore de compte ?",
     "signupLink": "S'inscrire"
@@ -1125,16 +1125,17 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
-    "moreInformations": "Plus d'informations.",
+    "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
+    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/fr/configuration#gateway-open-api\">Plus d'informations.</a>",
     "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
     "keyName": "Nom",
     "keyLastUsed": "Dernière utilisation",
     "revoke": "Révoquer",
     "generateButton": "Générer",
-    "registered": "Enregistrer",
-    "keyNameLabel": "Nom:",
-    "registeredLabel": "Enregistrer:"
+    "registered": "Enregistré le",
+    "keyNameLabel": "Clé :",
+    "registeredLabel": "Enregistré le :",
+    "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Gateway",
