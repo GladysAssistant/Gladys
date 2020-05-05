@@ -154,9 +154,6 @@ const actions = store => {
         await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
           value: state.arduinoPath
         });
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
-          value: state.arduinoModel
-        });
         await state.httpClient.post('/api/v1/service/arduino/connect');
         store.setState({
           connectArduinoStatus: RequestStatus.Success,
