@@ -13,6 +13,20 @@
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours..."
   },
+  "calendar": {
+    "allDay": "Toute la journée",
+    "previous": "précédent",
+    "next": "suivant",
+    "today": "aujourd'hui",
+    "month": "mois",
+    "week": "semaine",
+    "day": "jour",
+    "agenda": "Agenda",
+    "date": "date",
+    "time": "heure",
+    "event": "événement",
+    "noEventsInRange": "Aucuns évènements trouvés dans cette période."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",
@@ -219,7 +233,7 @@
     },
     "caldav": {
       "title": "CalDAV",
-      "introduction": "Pour synchroniser Gladys calendar en utilisant CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
+      "introduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -257,12 +271,12 @@
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
       "buttonSave": "Sauvegarder",
-      "buttonCleanUp": "Reset",
+      "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
     },
     "telegram": {
       "title": "Telegram",
-      "introduction": "Pour connecter Gladys à Telegram, vous devez d'abord créer un bot Telegram à l'aide du Botfather. Envoyez un <b>/newbot</b> message au <a href=\"https://telegram.me/BotFather\"> @BotFather </a> dans Telegram. Ensuite, entrez la clé API qu'il vous a donnée ci-dessous.",
+      "introduction": "Pour connecter Gladys à Telegram, vous devez d'abord créer un bot Telegram à l'aide du Botfather. Envoyez une commande <b>/newbot</b> au <a href=\"https://telegram.me/BotFather\"> @BotFather </a> dans Telegram. Ensuite, entrez la clé API qu'il vous a donné ci-dessous.",
       "link": "<b>ACTION REQUISE :</b> Pour parler à Gladys dans Telegram, cliquez sur <a href=\"{{link}}\"> ce lien </a>. Ne parlez pas à votre bot dans Telegram directement avant d'avoir cliqué sur ce lien, sinon votre bot ne pourra pas savoir que c'est vous qui envoyez un message.",
       "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
       "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que ce token (jeton) est valide?",
@@ -423,7 +437,7 @@
     "darkSky": {
       "title": "API DarkSky",
       "introduction": "Cette intégration vous aide à intégrer l'API DarkSky pour obtenir la météo dans Gladys.",
-      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky :",
+      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky : <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
       "apiKeyPlaceholder": "Entrer la clé API DarkSky",
       "saveButton": "Sauvegarder",
@@ -434,9 +448,9 @@
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
       "status": {
-        "notConfigured": "Le service MQTT n'est pas configuré, veuillez aller à ",
+        "notConfigured": "Le service MQTT n'est pas configuré, veuillez vous rendre sur la ",
         "notConnected": "Le service MQTT n'a pas réussi à se connecter au réseau, veuillez accéder à ",
-        "setupPageLink": "Page de configuration MQTT"
+        "setupPageLink": "page de configuration du service MQTT."
       },
       "device": {
         "title": "Appareils MQTT",
@@ -463,7 +477,7 @@
         "nameLabel": "Nom",
         "namePlaceholder": "Entrez un nom de fonctionnalité",
         "externalIdLabel": "ID externe de la fonctionnalité",
-        "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Lisez la documentation de l'API MQTT <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\"> ici </a>.",
+        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\"> ici </a>.",
         "externalIdPlaceholder": "Message clé de la fonctionnalité MQTT",
         "unitLabel": "Unité",
         "minLabel": "Valeur minimum",
@@ -472,7 +486,7 @@
         "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
-        "addButton": "Ajouter fonctionnalité",
+        "addButton": "Ajouter une fonctionnalité",
         "mqttTopicExampleLabel": "Topic MQTT",
         "copyMqttTopic": "Copier le topic MQTT",
         "copied": "Copié !",
@@ -1003,8 +1017,8 @@
     "goBack": "Retour"
   },
   "chat": {
-    "whatCanYouAsk": "Que puis-je demander ?",
-    "emptyStateMessage": "Envoi moi un message !",
+    "whatCanYouAsk": "Demandez moi...",
+    "emptyStateMessage": "Envoie-moi un message !",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",

@@ -9,7 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
-@connect('eventsFormated', actions, moment)
+@connect('eventsFormated,user', actions, moment)
 class Map extends Component {
   onRangeChange = range => {
     let from, to;
@@ -62,7 +62,7 @@ class Map extends Component {
                         }}
                         onRangeChange={this.onRangeChange}
                         defaultView="week"
-                        culture={navigator.language}
+                        culture={props.user.language}
                         messages={this.context.intl.dictionary.calendar}
                         scrollToTime={moment().subtract(2, 'hours')}
                       />
