@@ -1,3 +1,5 @@
+import { MarkupText } from 'preact-i18n';
+
 const marginTop20px = {
   marginTop: '20px'
 };
@@ -22,8 +24,7 @@ const EmptyState = ({ children, ...props }) => (
       }}
     />
     <p style={marginTop20px}>
-      Looks you don't have any devices in your house!
-      <br /> Define your device in the integration page.
+      <MarkupText id="dashboard.boxes.devicesInRoom.noDevices" />
     </p>
   </div>
 );

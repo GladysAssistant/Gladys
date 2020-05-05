@@ -1,6 +1,5 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import classnames from 'classnames';
-import { h } from 'preact';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 
@@ -31,7 +30,13 @@ const Header = ({ ...props }) => {
         <div class="container">
           <div class="d-flex">
             <a class="header-brand" href="/dashboard">
-              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+              <Localizer>
+                <img
+                  src="/assets/icons/favicon-96x96.png"
+                  class="header-brand-img"
+                  alt={<Text id="global.logoAlt" />}
+                />
+              </Localizer>
               <span id="header-title">
                 <Text id="header.gladysAssistant" />
               </span>
@@ -43,7 +48,8 @@ const Header = ({ ...props }) => {
                   <span class="ml-2 d-none d-lg-block">
                     <span class="text-default">{props.user.firstname}</span>
                     <small class="text-muted d-block mt-1">
-                      {props.user.role === 'admin' ? 'Administrator' : 'User'}
+                      {props.user.role === 'admin' && <Text id="profile.adminRole" />}
+                      {props.user.role !== 'admin' && <Text id="profile.userRole" />}
                     </small>
                   </span>
                 </a>

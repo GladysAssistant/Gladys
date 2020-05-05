@@ -1,0 +1,8 @@
+[
+  {
+    "key": "caldav",
+    "name": "CalDAV",
+    "description": "Synchonisez vos calendriers CalDAV.",
+    "img": "/assets/integrations/cover/caldav.jpg"
+  }
+]

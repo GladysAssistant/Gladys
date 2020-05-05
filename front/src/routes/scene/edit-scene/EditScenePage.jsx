@@ -17,7 +17,7 @@ const EditScenePage = ({ children, ...props }) => (
               }}
             >
               <Link href="/dashboard/scene" class="btn btn-secondary btn-sm btn-block">
-                ◀️️ <Text id="editScene.backButton" />
+                <Text id="global.backButton" />
               </Link>
             </h1>
             <h1 class="page-title">{props.scene.name}</h1>

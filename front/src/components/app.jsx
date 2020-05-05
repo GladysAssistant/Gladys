@@ -4,6 +4,7 @@ import createStore from 'unistore';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
+import translationFr from '../config/i18n/fr.json';
 import translationEn from '../config/i18n/en.json';
 import actions from '../actions/main';
 
@@ -45,7 +46,6 @@ import TriggerPage from '../routes/trigger';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
-import SettingsAdvancedPage from '../routes/settings/settings-advanced';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
@@ -186,7 +186,6 @@ const AppRouter = connect(
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
-        <SettingsAdvancedPage path="/dashboard/settings/advanced" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsBackup path="/dashboard/settings/backup" />
@@ -196,22 +195,25 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('', actions)
+@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
   }
 
-  render({}, {}) {
-    return <AppRouter />;
+  render({ user }, {}) {
+    const translationDefinition = user && user.language && user.language === 'fr' ? translationFr : translationEn;
+    return (
+      <IntlProvider definition={translationDefinition}>
+        <AppRouter />
+      </IntlProvider>
+    );
   }
 }
 
 const App = () => (
   <Provider store={store}>
-    <IntlProvider definition={translationEn}>
-      <MainApp />
-    </IntlProvider>
+    <MainApp />
   </Provider>
 );
 

@@ -13,7 +13,9 @@ const ForgotPasswordPage = ({ children, ...props }) => (
       <div class="col col-login mx-auto" style={margin}>
         <div class="text-center mb-6">
           <h2>
-            <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+            <Localizer>
+              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
+            </Localizer>
             <Text id="forgotPassword.title" />
           </h2>
         </div>
@@ -66,10 +68,10 @@ const ForgotPasswordPage = ({ children, ...props }) => (
                     <div class="form-group">
                       <label class="form-label">
                         <Text id="forgotPassword.emailLabel" />
+                        <Link href="/login" class="float-right small">
+                          <Text id="forgotPassword.backToLogin" />
+                        </Link>
                       </label>
-                      <Link href="/login" class="float-right small">
-                        <Text id="forgotPassword.backToLogin" />
-                      </Link>
                       <Localizer>
                         <input
                           type="email"

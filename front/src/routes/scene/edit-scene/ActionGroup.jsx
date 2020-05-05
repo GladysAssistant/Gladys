@@ -12,7 +12,9 @@ const ActionGroup = ({ children, ...props }) => (
     <div class="card">
       <div class="card-status bg-green" />
       <div class="card-header">
-        <h4 class="text-center card-title ">{props.index + 1}.</h4>
+        <h4 class="text-center card-title ">
+          <Text id="global.listItem" fields={{ index: props.index + 1 }} />
+        </h4>
         <div class="card-options">
           <button onClick={addActionToColumn(props.index, props.addAction)} class="btn btn-outline-primary">
             <Text id="editScene.addActionButton" /> <i class="fe fe-plus" />

@@ -1,15 +1,18 @@
+import { Text, Localizer } from 'preact-i18n';
 import UserRow from './UserRow';
 
 const UserList = ({ children, ...props }) => (
   <div class="col-lg-12">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Manage your users</h3>
+        <h3 class="card-title">
+          <Text id="gatewayUsers.managerUsersLabel" />
+        </h3>
       </div>
 
       {props.revokeUserError && (
         <div class="alert alert-danger" role="alert">
-          You cannot revoke this user.
+          <Text id="gatewayUsers.revokeError" />
         </div>
       )}
 
@@ -18,11 +21,21 @@ const UserList = ({ children, ...props }) => (
           <thead>
             <tr>
               <th />
-              <th>Name</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Added at</th>
-              <th>Revoke</th>
+              <th>
+                <Text id="gatewayUsers.columnName" />
+              </th>
+              <th>
+                <Text id="gatewayUsers.columnRole" />
+              </th>
+              <th>
+                <Text id="gatewayUsers.columnStatus" />
+              </th>
+              <th>
+                <Text id="gatewayUsers.columnAddDate" />
+              </th>
+              <th>
+                <Text id="gatewayUsers.columnRevoke" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -33,23 +46,29 @@ const UserList = ({ children, ...props }) => (
             <tr>
               <td />
               <td>
-                <input
-                  onChange={props.updateEmail}
-                  value={props.email}
-                  type="email"
-                  class="form-control"
-                  placeholder="Email"
-                />
+                <Localizer>
+                  <input
+                    onChange={props.updateEmail}
+                    value={props.email}
+                    type="email"
+                    class="form-control"
+                    placeholder={<Text id="gatewayUsers.emailPlaceholder" />}
+                  />
+                </Localizer>
               </td>
               <td>
                 <select class="form-control custom-select selectized" onChange={props.updateRole} value={props.role}>
-                  <option value="admin">Administrator</option>
-                  <option value="user">User</option>
+                  <option value="admin">
+                    <Text id="gatewayUsers.roleAdmin" />
+                  </option>
+                  <option value="user">
+                    <Text id="gatewayUsers.roleUser" />
+                  </option>
                 </select>
               </td>
               <td>
                 <button onClick={props.inviteUser} class="btn btn-primary ml-auto">
-                  Invite User
+                  <Text id="gatewayUsers.inviteUserButton" />
                 </button>
               </td>
               <td />
