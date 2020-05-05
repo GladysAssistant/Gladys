@@ -739,7 +739,7 @@
     "noHouseFound": "Aucune maison trouvée"
   },
   "sessionsSettings": {
-    "registered": "Enregistré",
+    "registered": "Connexion",
     "session": "Session",
     "revoke": "Révoquer",
     "device": "Appareil",
