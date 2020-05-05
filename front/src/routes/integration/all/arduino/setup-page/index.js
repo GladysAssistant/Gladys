@@ -5,7 +5,7 @@ import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 
 @connect(
-  'user,session,usbPorts,arduinoInfos,arduinoPath,arduinoStatus,arduinoModelsList,arduinoModel,getArduinoUsbPortStatus,getCurrentArduinoPathStatus,arduinoGetStatus,arduinoDriverFailed,arduinoDisconnectStatus,arduinoConnected,connectArduinoStatus,arduinoConnectionInProgress',
+  'user,session,usbPorts,arduinoInfos,arduinoPath,arduinoStatus,arduinoModelsList,arduinoModel,getArduinoUsbPortStatus,getCurrentArduinoPathStatus,getCurrentArduinoModelStatus,setArduinoModel,arduinoGetStatus,arduinoDriverFailed,arduinoDisconnectStatus,arduinoConnected,connectArduinoStatus,arduinoConnectionInProgress',
   actions
 )
 class ArduinoSetupPage extends Component {
@@ -13,6 +13,7 @@ class ArduinoSetupPage extends Component {
   componentWillMount() {
     this.props.checkConnected();
     this.props.getCurrentArduinoPath();
+    this.props.getCurrentArduinoModel();
     this.props.getModels();
     //this.props.getUsbPorts();
   }

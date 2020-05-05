@@ -28,13 +28,25 @@ const actions = store => {
           arduinoPath: arduinoPath.value,
           getCurrentArduinoPathStatus: RequestStatus.Success
         });
-        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
-        store.setState({
-          arduinoModel: arduinoModel.value
-        });
       } catch (e) {
         store.setState({
           getCurrentArduinoPathStatus: RequestStatus.Error
+        });
+      }
+    },
+    async getCurrentArduinoModel(state) {
+      store.setState({
+        getCurrentArduinoModelStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
+        store.setState({
+          arduinoModel: arduinoModel.value,
+          getCurrentArduinoModelStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoModelStatus: RequestStatus.Error
         });
       }
     },
@@ -115,6 +127,23 @@ const actions = store => {
           "Arduino Uno WiFi"
         ]
       });
+    },
+    async saveModel(state) {
+      store.setState({
+        setArduinoModel: RequestStatus.Getting,
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
+          value: state.arduinoModel
+        });
+        store.setState({
+          setArduinoModel: RequestStatus.Success,
+        });
+      } catch (e) {
+        store.setState({
+          setArduinoModel: RequestStatus.Error
+        });
+      }
     },
     async savePathAndConnect(state) {
       store.setState({
