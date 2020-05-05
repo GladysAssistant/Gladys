@@ -42,6 +42,22 @@ function createActions(store) {
         });
       }
     },
+    async getCurrentArduinoModel(state) {
+      store.setState({
+        getCurrentArduinoModelStatus: RequestStatus.Getting
+      });
+      try {
+        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
+        store.setState({
+          arduinoModel: arduinoModel.value,
+          getCurrentArduinoModelStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getCurrentArduinoModelStatus: RequestStatus.Error
+        });
+      }
+    },
     async checkConnected(state) {
       store.setState({
         getCurrentArduinoPathStatus: RequestStatus.Getting

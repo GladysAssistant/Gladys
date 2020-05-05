@@ -56,7 +56,7 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.arduinoConnected && (
             <p class="alert alert-success">
-              <Text id="integration.arduino.device.arduinoConnected" />
+              <Text id="integration.arduino.device.arduinoConnected" /> : {props.arduinoModel}
             </p>
           )}
           {!props.arduinoConnected && (
