@@ -28,7 +28,7 @@ const GatewayBackupKey = ({ children, ...props }) => (
           </p>
           <div class="form-group">
             <label class="form-label">
-              <Text id="gateway.backupKey" />
+              <Text id="gateway.backupKeyTitle" />
             </label>
             <Localizer>
               <input

@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import ResetPasswordForm from './ResetPasswordForm.js';
 
 const ResetPassword = ({ children, ...props }) => (
@@ -9,7 +9,13 @@ const ResetPassword = ({ children, ...props }) => (
           <div className="col col-login mx-auto">
             <div className="text-center mb-6">
               <h2>
-                <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+                <Localizer>
+                  <img
+                    src="/assets/icons/favicon-96x96.png"
+                    class="header-brand-img"
+                    alt={<Text id="global.logoAlt" />}
+                  />
+                </Localizer>
                 <Text id="gatewayResetPassword.pageTitle" />
               </h2>
             </div>
@@ -36,14 +42,14 @@ const ResetPassword = ({ children, ...props }) => (
               <div class="card">
                 <div class="card-body">
                   <p>
-                    Password reset with success! Click <a href="/login">here</a> to login.
+                    <MarkupText id="resetPassword.resetSuccess" />
                   </p>
                 </div>
               </div>
             )}
 
             <div className="text-center text-muted">
-              Already have account? <a href="/login">Sign in</a>
+              <MarkupText id="resetPassword.alreadyHaveAccount" />
             </div>
           </div>
         </div>

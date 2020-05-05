@@ -1,4 +1,4 @@
-import { Text, MarkupText } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { CalDAVStatus } from '../../../../utils/consts';
 import cx from 'classnames';
 
@@ -25,7 +25,9 @@ const CaldavPage = ({ children, ...props }) => (
                         <Text id="integration.caldav.introduction" />
                       </p>
                       <div class="form-group">
-                        <div class="form-label">CalDAV host</div>
+                        <div class="form-label">
+                          <Text id="integration.caldav.hostLabel" />
+                        </div>
                         <Text id="integration.caldav.hostInfo" />
                         <select class="form-control" onChange={props.updateCaldavHost} value={props.caldavHost}>
                           {Object.keys(props.dictionary.services).map(host => (
@@ -40,39 +42,45 @@ const CaldavPage = ({ children, ...props }) => (
                           <Text id={`integration.caldav.services.${props.caldavHost}.url`} />
                         </div>
                         <Text id={`integration.caldav.services.${props.caldavHost}.urlInfo`} />
-                        <input
-                          type="text"
-                          class="form-control"
-                          placeholder="CalDAV URL"
-                          onInput={props.updateCaldavUrl}
-                          value={props.caldavUrl}
-                        />
+                        <Localizer>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder={<Text id={`integration.caldav.services.${props.caldavHost}.url`} />}
+                            onInput={props.updateCaldavUrl}
+                            value={props.caldavUrl}
+                          />
+                        </Localizer>
                       </div>
                       <div class="form-group">
                         <div class="form-label">
                           <Text id={`integration.caldav.services.${props.caldavHost}.username`} />
                         </div>
                         <Text id={`integration.caldav.services.${props.caldavHost}.usernameInfo`} />
-                        <input
-                          type="text"
-                          class="form-control"
-                          placeholder="CalDAV username"
-                          onInput={props.updateCaldavUsername}
-                          value={props.caldavUsername}
-                        />
+                        <Localizer>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder={<Text id={`integration.caldav.services.${props.caldavHost}.username`} />}
+                            onInput={props.updateCaldavUsername}
+                            value={props.caldavUsername}
+                          />
+                        </Localizer>
                       </div>
                       <div class="form-group">
                         <div class="form-label">
                           <Text id={`integration.caldav.services.${props.caldavHost}.password`} />
                         </div>
                         <MarkupText id={`integration.caldav.services.${props.caldavHost}.passwordInfo`} />
-                        <input
-                          type="password"
-                          class="form-control"
-                          placeholder="CalDAV password"
-                          onInput={props.updateCaldavPassword}
-                          value={props.caldavPassword}
-                        />
+                        <Localizer>
+                          <input
+                            type="password"
+                            class="form-control"
+                            placeholder={<Text id={`integration.caldav.services.${props.caldavHost}.password`} />}
+                            onInput={props.updateCaldavPassword}
+                            value={props.caldavPassword}
+                          />
+                        </Localizer>
                       </div>
                       {(props.caldavSaveSettingsStatus === CalDAVStatus.BadCredentialsError ||
                         props.caldavSaveSettingsStatus === CalDAVStatus.BadUrlError ||

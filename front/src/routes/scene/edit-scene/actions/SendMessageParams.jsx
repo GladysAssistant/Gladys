@@ -65,13 +65,18 @@ class SendMessageParams extends Component {
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.messageSend.userLabel" />
-            <span class="form-required">*</span>
+            <span class="form-required">
+              <Text id="global.requiredField" />
+            </span>
           </label>
           <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
         </div>
         <div class="form-group">
           <label class="form-label">
-            <Text id="editScene.actionsCard.messageSend.textLabel" /> <span class="form-required">*</span>
+            <Text id="editScene.actionsCard.messageSend.textLabel" />{' '}
+            <span class="form-required">
+              <Text id="global.requiredField" />
+            </span>
           </label>
           <Localizer>
             <textarea

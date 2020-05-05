@@ -76,7 +76,9 @@ class TurnOnLight extends Component {
         <div class="row">
           <div class="col-sm-4">
             <div class="form-group">
-              <div class="form-label">Type</div>
+              <div class="form-label">
+                <Text id="editScene.triggersCard.scheduledTrigger.typeLabel" />
+              </div>
               <select class="form-control" onChange={this.handleTypeChange} value={this.props.trigger.scheduler_type}>
                 <option>
                   <Text id="global.emptySelectOption" />

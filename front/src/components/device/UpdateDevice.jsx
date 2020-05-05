@@ -12,7 +12,7 @@ const UpdateDevice = ({ children, ...props }) => (
     <div class="card-header">
       <Link href={props.previousPage}>
         <button class="btn btn-secondary mr-2">
-          ◀️ <Text id="editDeviceForm.returnButton" />
+          <Text id="global.backButton" />
         </button>
       </Link>
       <h3 class="card-title">{get(props, 'device.name') || <Text id="editDeviceForm.noName" />}</h3>
@@ -45,7 +45,7 @@ const UpdateDevice = ({ children, ...props }) => (
               </p>
               <Link href={props.previousPage}>
                 <button type="button" class="btn btn-outline-secondary btn-sm">
-                  <Text id="editDeviceForm.returnButton" />
+                  <Text id="global.backButton" />
                 </button>
               </Link>
             </div>
@@ -89,7 +89,7 @@ const UpdateDevice = ({ children, ...props }) => (
               <div class="form-group">
                 <Link href={props.previousPage}>
                   <button class="btn btn-secondary mr-2">
-                    ◀️ <Text id="editDeviceForm.returnButton" />
+                    <Text id="global.backButton" />
                   </button>
                 </Link>
                 <button onClick={props.saveDevice} class="btn btn-success mr-2">

@@ -92,7 +92,9 @@ class TurnOnLight extends Component {
             <div class="col-3">
               <div class="form-group">
                 <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
-                  <option value="">-----</option>
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
                   <option value="=">
                     <Text id="editScene.triggersCard.newState.equal" />
                   </option>

@@ -1,4 +1,5 @@
 import { connect } from 'unistore/preact';
+import { Text, Localizer } from 'preact-i18n';
 import IntegrationMenu from './IntegrationMenu';
 import IntegrationCategory from './IntegrationCategory';
 import actions from '../../actions/integration';
@@ -12,20 +13,33 @@ const IntegrationPage = connect(
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="page-header">
-            <h1 class="page-title">Integrations</h1>
+            <h1 class="page-title">
+              <Text id="integration.root.title" />
+            </h1>
             <div class="page-subtitle">
-              1 - {integrations.length} of {totalSize} integrations
+              <Text id="integration.root.subtitle" fields={{ length: integrations.length, total: totalSize }} />
             </div>
             <div class="page-options d-flex">
               <select class="form-control custom-select w-auto">
-                <option value="asc">A - Z</option>
-                <option value="desc">Z - A</option>
+                <option value="asc">
+                  <Text id="global.orderDirAsc" />
+                </option>
+                <option value="desc">
+                  <Text id="global.orderDirDesc" />
+                </option>
               </select>
               <div class="input-icon ml-2">
                 <span class="input-icon-addon">
                   <i class="fe fe-search" />
                 </span>
-                <input type="text" class="form-control w-10" placeholder="Search integrations" onInput={search} />
+                <Localizer>
+                  <input
+                    type="text"
+                    class="form-control w-10"
+                    placeholder={<Text id="integration.root.searchPlaceholder" />}
+                    onInput={search}
+                  />
+                </Localizer>
               </div>
             </div>
           </div>
