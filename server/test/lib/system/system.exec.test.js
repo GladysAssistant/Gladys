@@ -21,11 +21,15 @@ const event = {
   emit: fake.resolves(null),
 };
 
+const config = {
+  tempFolder: '/tmp/gladys',
+};
+
 describe('system.exec', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event);
+    system = new System(sequelize, event, config);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();
