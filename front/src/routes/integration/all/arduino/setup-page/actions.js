@@ -160,6 +160,7 @@ const actions = store => {
           arduinoConnectionInProgress: true,
           arduinoConnected: true
         });
+        await actions.saveModel(store.getState());
       } catch (e) {
         store.setState({
           connectArduinoStatus: RequestStatus.Error
@@ -180,6 +181,7 @@ const actions = store => {
           arduinoDisconnectStatus: RequestStatus.Success,
           arduinoConnected: false
         });
+        await actions.discardModel(store.getState());
       } catch (e) {
         store.setState({
           arduinoDisconnectStatus: RequestStatus.Error
