@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { RequestStatus } from '../../../../../utils/consts';
+import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import ArduinoDeviceForm from './DeviceForm';
 import { Link } from 'preact-router/match';
 import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
