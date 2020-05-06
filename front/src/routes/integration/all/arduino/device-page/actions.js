@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
-import debounce from 'debounce'; 
+import debounce from 'debounce';
 import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
 
 function createActions(store) {
@@ -143,7 +143,7 @@ function createActions(store) {
                 name: null,
                 selector: null,
                 external_id: uniqueId,
-                category:null,
+                category: null,
                 type: null,
                 read_only: false,
                 keep_history: false,

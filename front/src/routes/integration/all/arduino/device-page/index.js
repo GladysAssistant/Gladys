@@ -17,7 +17,7 @@ class ArduinoDevicePage extends Component {
     this.props.getIntegrationByName('arduino');
   }
 
-  render(props, {}) {
+  render(props, { }) {
     return (
       <ArduinoPage integration={integrationConfig[props.user.language].arduino}>
         <DeviceTab {...props} />

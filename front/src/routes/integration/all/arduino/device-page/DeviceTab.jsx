@@ -66,7 +66,8 @@ const DeviceTab = ({ children, ...props }) => (
           )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.arduinoConnected && props.arduinoDevices &&
+            {props.arduinoConnected && 
+            props.arduinoDevices &&
               props.arduinoDevices.map((arduinoDevice, index) => (
                 <Device
                   device={arduinoDevice}
@@ -78,9 +79,9 @@ const DeviceTab = ({ children, ...props }) => (
                 />
               ))}
             {props.arduinoConnected && props.arduinoDevices && props.arduinoDevices.length === 0 && (
-            <div class="dimmer-content alert alert-info">
-              <Text id="integration.arduino.device.noDevices" />
-            </div> 
+              <div class="dimmer-content alert alert-info">
+                <Text id="integration.arduino.device.noDevices" />
+              </div> 
              )}
           </div>
         </div>
