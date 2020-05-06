@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
