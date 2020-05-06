@@ -630,6 +630,59 @@
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
+    "arduino": {
+      "title": "Arduino",
+      "deviceTab": "Périphériques",
+      "setupTab": "Configuration",
+      "status": {
+        "notConfigured": "Arduino service is not configured, please go to ",
+        "notConnected": "Arduino card is not connected, please connect a card.",
+        "setupPageLink": "Arduino configuration page"
+      },
+      "device": {
+        "title": "Périphériques Arduino",
+        "arduinoDescription": "Liste des périphériques Arduino actuellement connecté ou qui ont été connectés to Gladys.",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun Arduino connecté. Please configure your devices with the New button.",
+        "arduinoConnected": "Arduino connecté",
+        "arduinoNotConnected": "Aucune carte Arduino n'est connectée, veuillez en configurer une dans la page de Configuration.",
+        "noNameLabel": "Pas de nom",
+        "nameLabel": "Nom",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "refreshButton": "Rafraichir",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "returnButton": "Retour",
+        "editButton": "Editer les détails",
+        "notFound": "Appareil recherché introuvable.",
+        "backToList": "Retour à la liste des appareils",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
+        "subserviceLabel": "Sous-service",
+        "dataPinLabel": "Pin de données"
+      },
+      "setup": {
+        "title": "Configuration Arduino",
+        "arduinoDescription": "Pour utiliser ce service, veuillez connecter une carte Arduino.",
+        "refreshButton": "Rafraichir",
+        "arduinoModelLabel": "Selectionnez le modèle de votre Arduino",
+        "arduinoUsbDriverPathLabel": "Selectionnez le port USB sur lequel votre carte est connectée",
+        "error": "Aucun Arduino connecté.",
+        "connecting": "Connexion",
+        "connected": "Arduino connecté.",
+        "connectionError": "Erreur lors de la tentative de connexion, veuillez bérifier votre configuration.",
+        "notConnected": "Aucune carte Arduino n'est connectée, veuillez en brancher une.",
+        "connectButton": "Connecter",
+        "disconnectButton": "Déconnecter"
+      },
+      "subservice": {
+        "emit433": "Emision 433 MHz",
+        "emit433Chacon": "Emission 433 MHz pour prises Chacon",
+        "emitIR": "Emission IR"
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi.",
