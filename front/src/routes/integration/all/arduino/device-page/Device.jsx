@@ -2,7 +2,6 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-import ArduinoDeviceForm from './DeviceForm';
 import { Link } from 'preact-router/match';
 import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
 import get from 'get-value';
@@ -57,7 +56,6 @@ class ArduinoDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {/*<ArduinoDeviceForm {...props} />*/}
                 <div>
                   <div class="form-group">
                     <label class="form-label" for="deviceName">
