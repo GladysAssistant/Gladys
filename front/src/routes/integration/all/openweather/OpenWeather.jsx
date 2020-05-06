@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 const OpenWeatherPage = ({ children, ...props }) => (
@@ -24,8 +24,7 @@ const OpenWeatherPage = ({ children, ...props }) => (
                         <Text id="integration.openWeather.introduction" />
                       </p>
                       <p>
-                        <Text id="integration.openWeather.instructions" />{' '}
-                        <a href="https://openweathermap.org/api">https://openweathermap.org/api</a>.
+                        <MarkupText id="integration.openWeather.instructions" />
                       </p>
                       <form onSubmit={props.saveApiKey}>
                         <div class="form-group">

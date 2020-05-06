@@ -401,7 +401,7 @@
       "title": "OpenWeather API",
       "description": "Get the weather in Gladys.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on OpenWeather API website:",
+      "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",

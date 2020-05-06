@@ -1,0 +1,8 @@
+[
+  {
+    "key": "openweather",
+    "name": "OpenWeather",
+    "description": "Récupérer la météo dans Gladys.",
+    "img": "/assets/integrations/cover/openweather.jpg"
+  }
+]
