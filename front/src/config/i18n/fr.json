@@ -643,7 +643,7 @@
         "title": "Périphériques Arduino",
         "arduinoDescription": "Liste des périphériques Arduino actuellement connecté ou qui ont été connectés to Gladys.",
         "search": "Chercher un appareil",
-        "noDevices": "Aucun Arduino connecté. Please configure your devices with the New button.",
+        "noDevices": "Aucun Arduino connecté. Veuillez configurer vos périphériques avec le bouton Nouveau.",
         "arduinoConnected": "Arduino connecté",
         "arduinoNotConnected": "Aucune carte Arduino n'est connectée, veuillez en configurer une dans la page de Configuration.",
         "noNameLabel": "Pas de nom",
