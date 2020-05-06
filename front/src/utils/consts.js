@@ -177,5 +177,8 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
     [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'
+  },
+  [DEVICE_FEATURE_CATEGORIES.HEATER]: {
+    [DEVICE_FEATURE_TYPES.HEATER.BINARY]: 'wind'
   }
 };

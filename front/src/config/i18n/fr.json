@@ -538,6 +538,81 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
+    },
+    "heatzy": {
+      "title": "Heatzy",
+      "deviceTab": "Appareils",
+      "setupTab": "Configuration",
+      "discoverTab": "Découverte",
+      "status": {
+        "notConfigured": "Le service Heatzy n'est pas configuré, veuillez vous rendre sur la ",
+        "notConnected": "Le service Heatzy n'a pas réussi à se connecter au réseau, veuillez accéder à ",
+        "setupPageLink": "page de configuration du service Heatzy."
+      },
+      "discover": {
+        "title": "Découverte Heatzy",
+        "noDeviceDiscovered": "Aucun appareil Heatzy n'a été détecté. Veuillez cliquer sur Scanner",
+        "scanButton": "Scanner",
+        "noResponse": "Le scan ne répond pas, vérifier votre réseau.",
+        "serverNoResponse": "Le serveur est inaccessible."
+      },
+      "noDeviceFound": "Aucun appareil Heatzy trouvé.",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "roomLabel": "Pièce",
+      "featuresLabel": "Fonctionnalités",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "alreadyExistsButton": "Existe déjà",
+      "saveError": "Erreur de sauvegarde ou de suppression de l'appareil.",
+      "documentation": "Documentation Heatzy",
+      "device": {
+        "title": "Appareils Heatzy",
+        "search": "Rechercher des appareils",
+        "noDevices": "Aucun appareil Heatzy trouvé.",
+        "noNameLabel": "Aucun nom",
+        "nameLabel": "Nom",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "returnButton": "Retour",
+        "editButton": "Editer",
+        "notFound": "Appareil introuvable.",
+        "backToList": "Retour à la liste des appareils",
+        "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
+        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?"
+      },
+      "feature": {
+        "nameLabel": "Nom",
+        "namePlaceholder": "Entrez un nom de fonctionnalité",
+        "externalIdLabel": "ID externe de la fonctionnalité",
+        "externalIdPlaceholder": "Translation coming",
+        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\"> ici </a>.",
+        "unitLabel": "Unité",
+        "minLabel": "Valeur minimum",
+        "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
+        "maxLabel": "Valeur maximum",
+        "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+        "readOnlyLabel": "Est-ce un capteur ?",
+        "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
+        "addButton": "Ajouter une fonctionnalité",
+        "deleteLabel": "Supprimer fonctionnalité"
+      },
+      "setup": {
+        "title": "Configuration Heatzy",
+        "heatzyDescription": "Vous pouvez connecter Gladys à vos appareils Heatzy pour piloter vos radiateurs.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur de votre compte Heatzy",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe de votre compte Heatzy",
+        "saveLabel": "Sauvegarder la configuration",
+        "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
+        "connecting": "Configuration enregistrée. Connexion au serveur Heatzy en cours ...",
+        "connected": "Connecté au serveur Heatzy avec succès !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      }
     }
   },
   "editScene": {

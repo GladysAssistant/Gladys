@@ -114,6 +114,10 @@ const EVENTS = {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
   },
+  HEATER: {
+    TURNED_ON: 'intent.heater.turned-on',
+    TURNED_OFF: 'intent.heater.turned-off'
+  }
 };
 
 const LIFE_EVENTS = {
@@ -199,6 +203,10 @@ const ACTIONS = {
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
   },
+  HEATER: {
+    TURN_ON: 'heater.turn-on',
+    TURN_OFF: 'heater.turn-off',
+  },
 };
 
 const INTENTS = {
@@ -239,6 +247,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CUBE: 'cube',
   BUTTON: 'button',
   UNKNOWN: 'unknown',
+  HEATER: 'heater'
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -296,6 +305,10 @@ const DEVICE_FEATURE_TYPES = {
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
+  HEATER: {
+    ECO: 'eco',
+    'BINARY': 'binary'
+  }
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -375,6 +388,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TASMOTA: {
     NEW_DEVICE: 'tasmota.new-device',
   },
+  HEATZY: {
+    CONNECTED: 'heatzy.connected',
+    ERROR: 'heatzy.error',
+    DISCOVER: 'heatzy.discover'
+  }
 };
 
 const DASHBOARD_TYPE = {

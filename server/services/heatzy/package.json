@@ -1,0 +1,19 @@
+{
+  "name": "gladys-heatzy",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "axios": "^0.19.2",
+    "heatzy": "^1.0.2"
+  }
+}

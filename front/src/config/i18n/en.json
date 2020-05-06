@@ -538,6 +538,80 @@
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
+    },
+    "heatzy": {
+      "title": "Heatzy",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "discoverTab": "Discover",
+      "status": {
+        "notConfigured": "Heatzy service is not configured, please go to ",
+        "notConnected": "Heatzy service failed to connect to network, please go to ",
+        "setupPageLink": "Heatzy configuration page"
+      },
+
+      "discover": {
+        "title": "Heatzy discover",
+        "noDeviceDiscovered": "No devices discovered, please click on scan button.",
+        "scanButton": "Scan",
+        "noResponse": "Scan never answer, please check your network.",
+        "serverNoResponse": "Gladys server is not available."
+      },
+      "noDeviceFound": "No Heatzy devices found.",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "featuresLabel": "Features",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "alreadyExistsButton": "Already created",
+      "saveError": "There was an error saving the device.",
+      "documentation": "Heatzy documentation",
+      "device": {
+        "title": "Heatzy Devices",
+        "search": "Search devices",
+        "noDevices": "No Heatzy devices added yet.",
+        "noNameLabel": "No name",
+        "nameLabel": "Name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "returnButton": "Return back",
+        "editButton": "Edit details",
+        "notFound": "Requested device not found.",
+        "backToList": "Back to device list",
+        "saveError": "Error saving or deleting device",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter feature name",
+        "externalIdLabel": "Feature external ID",
+        "externalIdMessage": "Translation coming",
+        "externalIdPlaceholder": "Translation coming",
+        "unitLabel": "Unit",
+        "minLabel": "Minimum value",
+        "minPlaceholder": "Enter feature minimum value",
+        "maxLabel": "Maximum value",
+        "maxPlaceholder": "Enter feature maximum value",
+        "addButton": "Add feature",
+        "deleteLabel": "Delete feature"
+      },
+      "setup": {
+        "title": "Heatzy configuration",
+        "heatzyDescription": "You can connect Gladys to Heatzy devices in order to pilot your heaters.",
+        "userLabel": "Login",
+        "userPlaceholder": "Enter Heatzy login",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter Heatzy password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Heatzy server...",
+        "connected": "Connected to the Heatzy server with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      }
     }
   },
   "editScene": {
