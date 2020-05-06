@@ -73,7 +73,7 @@ const SetupTab = ({ children, ...props }) => {
                         {props.usbPorts &&
                           props.usbPorts.map(usbPort => (
                             <option value={usbPort.comPath} selected={props.arduinoPath === usbPort.comPath}>
-                              {usbPort.comName}
+                              {usbPort.comName} - {usbPort.manufacturer}
                             </option>
                           ))}
                       </select>
