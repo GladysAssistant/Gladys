@@ -97,7 +97,7 @@ const actions = store => {
         arduinoModel: e.target.value
       });
     },
-    getModels(state){
+    getModels(state) {
       store.setState({
         arduinoModelsList: [
           "Arduino Yun",
@@ -125,6 +125,14 @@ const actions = store => {
           "Arduino Industrial 101",
           "Linino One",
           "Arduino Uno WiFi"
+        ]
+      });
+    },
+    getManufacturers(state) {
+      store.setState({
+        arduinoManufacturersList: [
+          "arduino",
+          "1a86"
         ]
       });
     },
