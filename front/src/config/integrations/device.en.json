@@ -2,7 +2,7 @@
   {
     "key": "arduino",
     "name": "Arduino",
-    "description": "Control your arduino devices.",
+    "description": "Control your Arduino devices.",
     "img": "/assets/integrations/cover/arduino.jpg"
   },
   {
