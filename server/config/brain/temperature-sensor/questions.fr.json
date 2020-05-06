@@ -1,0 +1,6 @@
+[
+  {
+    "label": "temperature-sensor.get-in-room",
+    "questions": ["Quelle est la température dans le %room% ?", "Donne moi la température du %room%"]
+  }
+]

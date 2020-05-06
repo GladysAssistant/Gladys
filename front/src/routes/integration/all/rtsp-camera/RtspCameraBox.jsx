@@ -116,7 +116,9 @@ class RtspCameraBox extends Component {
                     <Text id="integration.rtspCamera.roomLabel" />
                   </label>
                   <select onChange={this.updateCameraRoom} class="form-control">
-                    <option value="">-------</option>
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
                     {props.housesWithRooms &&
                       props.housesWithRooms.map(house => (
                         <optgroup label={house.name}>

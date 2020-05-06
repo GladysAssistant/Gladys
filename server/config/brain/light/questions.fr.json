@@ -1,0 +1,12 @@
+[
+  {
+    "label": "light.turn-on",
+    "questions": ["Allume la lumière dans le %room%", "Allume dans le %room%"],
+    "answers": ["Allumage en cours...", "J'allume la lumière !"]
+  },
+  {
+    "label": "light.turn-off",
+    "questions": ["Eteins la lumière dans le %room%", "Eteins dans le %room%"],
+    "answers": ["Extinction des feux...", "J'éteins la lumière !"]
+  }
+]

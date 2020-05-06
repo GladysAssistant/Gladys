@@ -11,7 +11,9 @@ const EditCameraBox = ({ children, ...props }) => (
         <Text id="dashboard.boxes.camera.editCameraLabel" />
       </label>
       <select onChange={props.updateCamera} class="form-control">
-        <option value="">-------</option>
+        <option value="">
+          <Text id="global.emptySelectOption" />
+        </option>
         {props.cameras &&
           props.cameras.map(camera => (
             <option selected={camera.selector === props.box.camera} value={camera.selector}>

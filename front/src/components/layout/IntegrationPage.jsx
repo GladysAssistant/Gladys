@@ -1,4 +1,5 @@
 import { Link } from 'preact-router/match';
+import { Text } from 'preact-i18n';
 
 const IntegrationPage = ({ children, ...props }) => (
   <div class="page">
@@ -8,7 +9,7 @@ const IntegrationPage = ({ children, ...props }) => (
           <div class="page-header">
             <h1 class="page-title">
               <Link href="/dashboard/integration/device" class="btn btn-secondary btn-sm btn-block">
-                ◀️️ Back
+                <Text id="global.backButton" />
               </Link>
             </h1>
           </div>
@@ -27,10 +28,14 @@ const IntegrationPage = ({ children, ...props }) => (
                   <br />
                   <div class="row">
                     <div class="col-6">
-                      <button class="btn btn-success btn-block">Restart</button>
+                      <button class="btn btn-success btn-block">
+                        <Text id="integration.root.restartButton" />
+                      </button>
                     </div>
                     <div class="col-6">
-                      <button class="btn btn-danger btn-block">Stop</button>
+                      <button class="btn btn-danger btn-block">
+                        <Text id="integration.root.stopButton" />
+                      </button>
                     </div>
                   </div>
                 </div>

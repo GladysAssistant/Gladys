@@ -113,11 +113,9 @@ const GatewayPricing = ({ children, ...props }) => (
     </div>
     <div class="row" style="margin-bottom: 30px">
       <div class="col text-center">
-        Already a Gladys Plus Subscriber? Click{' '}
         <a href="#" onClick={props.displayGatewayLoginForm}>
-          here
-        </a>{' '}
-        to login.
+          <Text id="gatewayPricing.alreadyGladysPlusSubscriber" />
+        </a>
       </div>
     </div>
   </div>

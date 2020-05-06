@@ -18,7 +18,7 @@ const SessionDevice = ({ children, ...props }) => {
           {props.session.token_type === 'api_key' && <Text id="sessionsSettings.apiKey" />}
         </div>
         <div class="small text-muted">
-          <Text id="sessionsSettings.registered" />:{' '}
+          <Text id="sessionsSettings.registered" />{' '}
           {dayjs(props.session.created_at)
             .locale(props.user.language)
             .fromNow()}

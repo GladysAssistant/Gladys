@@ -1093,6 +1093,52 @@
       },
       "_id": 23,
       "id": 23
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "none",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2019-10-06T19:48:01"
+      },
+      "type": "Dimmable light",
+      "name": "Ampoule Hue salon",
+      "modelid": "LWO001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue filament bulb",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 550
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "vintagebulb",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9f:97:bd-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "E552ED14",
+        "productid": "Philips-LWO001-1-G93CFDLv1"
+      },
+      "_id": 24,
+      "id": 24
     }
   ]
 }

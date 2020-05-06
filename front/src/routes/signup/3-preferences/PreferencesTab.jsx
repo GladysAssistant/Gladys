@@ -54,7 +54,7 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
       </div>
       <div class="form-group">
         <label class="form-label">
-          <Text id="signup.preferences.deviceStateHistoryDuration" />
+          <Text id="signup.preferences.deviceStateHistoryDuration.title" />
         </label>
         <div class="custom-controls-stacked">
           <label class="custom-control custom-radio">
@@ -69,7 +69,9 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
               value="7"
               checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 7}
             />
-            <div class="custom-control-label">1 week</div>
+            <div class="custom-control-label">
+              <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
+            </div>
           </label>
           <label class="custom-control custom-radio">
             <input
@@ -83,7 +85,9 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
               value="30"
               checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 30}
             />
-            <div class="custom-control-label">1 month</div>
+            <div class="custom-control-label">
+              <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
+            </div>
           </label>
           <label class="custom-control custom-radio">
             <input
@@ -97,7 +101,9 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
               value="90"
               checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 90}
             />
-            <div class="custom-control-label">3 month</div>
+            <div class="custom-control-label">
+              <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
+            </div>
           </label>
           <label class="custom-control custom-radio">
             <input
@@ -111,7 +117,9 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
               value="-1"
               checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === -1}
             />
-            <div class="custom-control-label">Forever</div>
+            <div class="custom-control-label">
+              <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
+            </div>
           </label>
         </div>
       </div>

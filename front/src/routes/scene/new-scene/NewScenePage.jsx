@@ -9,7 +9,7 @@ import style from './style.css';
 const NewScenePage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
     <Link href="/dashboard/scene" class="btn btn-secondary btn-sm">
-      ◀️️ Back
+      <Text id="global.backButton" />
     </Link>
     <div class="row">
       <div class="col col-login mx-auto">
