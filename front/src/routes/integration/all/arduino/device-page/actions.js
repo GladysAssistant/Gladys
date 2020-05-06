@@ -165,7 +165,8 @@ function createActions(store) {
         arduinoDevices
       });
     },
-    async saveDevice(state, device, index) {
+    async saveDevice(state, index) {
+      const device = state.arduinoDevices[index];
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
       const newState = update(state, {
         arduinoDevices: {

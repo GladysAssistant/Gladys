@@ -132,7 +132,9 @@ const actions = store => {
       store.setState({
         arduinoManufacturersList: [
           "arduino",
-          "1a86"
+          "1a86",
+          "qinheng",
+          "silicon_labs"
         ]
       });
     },
