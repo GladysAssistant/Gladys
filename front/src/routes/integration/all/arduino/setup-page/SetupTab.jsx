@@ -26,23 +26,36 @@ const SetupTab = ({ children, ...props }) => {
           })}
         >
           <div class="loader" />
-          <div class="row">
-            {props.arduinoDevices &&
-              props.arduinoDevices.map((arduinoDevice, index) => (
-                <SetupDevice
-                  device={arduinoDevice}
-                  deviceIndex={index}
-                  houses={props.houses}
-                  updateDeviceProperty={props.updateDeviceProperty}
-                  saveDevice={props.saveDevice}
-                  deleteDevice={props.deleteDevice}
-                />
-              ))}
-            {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
-              <div class="alert alert-danger">
-                <Text id="integration.arduino.setup.noDevices" />
-              </div>
+          <div class="dimmer-content">
+            {props.arduinoConnected && (
+              <p class="alert alert-success">
+                <Text id="integration.arduino.device.arduinoConnected" /> : {props.arduinoModel}
+              </p>
             )}
+            {!props.arduinoConnected && (
+              <p class="alert alert-danger">
+                <Text id="integration.arduino.device.arduinoNotConnected" />
+              </p>
+            )}
+            {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+            <div class="row">
+              {props.arduinoDevices &&
+                props.arduinoDevices.map((arduinoDevice, index) => (
+                  <SetupDevice
+                    device={arduinoDevice}
+                    deviceIndex={index}
+                    houses={props.houses}
+                    updateDeviceProperty={props.updateDeviceProperty}
+                    saveDevice={props.saveDevice}
+                    deleteDevice={props.deleteDevice}
+                  />
+                ))}
+              {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
+                <div class="alert alert-danger">
+                  <Text id="integration.arduino.setup.noDevices" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
