@@ -16,11 +16,9 @@ const SetupTab = ({ children, ...props }) => {
               <Text id="integration.arduino.setup.refreshButton" />
             </button>
           </div>
-          {props.arduinoConnected && (
             <button class="btn btn-outline-primary ml-2">
               <Text id="scene.newButton" /> <i class="fe fe-plus" />
             </button>
-          )}
         </div>
         <SetupDevice/>
       </div>
