@@ -32,7 +32,7 @@ const SetupTab = ({ children, ...props }) => {
                 deleteDevice={props.deleteDevice}
               />
             ))}
-          {props.arduinoConnected && props.arduinoDevices && props.arduinoDevices.length === 0 && (
+          {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
             <div class="dimmer-content alert alert-info">
               <Text id="integration.arduino.setup.noDevices" />
             </div>
