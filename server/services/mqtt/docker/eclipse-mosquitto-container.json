@@ -14,6 +14,7 @@
     "RestartPolicy": {
       "Name": "always"
     },
+    "NetworkMode": "host",
     "Dns": [],
     "DnsOptions": [],
     "DnsSearch": [],

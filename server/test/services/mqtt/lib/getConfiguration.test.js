@@ -17,6 +17,7 @@ describe('mqttHandler.getConfiguration', () => {
       system: {
         isDocker: fake.resolves(false),
         getContainers: fake.resolves([]),
+        getNetworkMode: fake.resolves('host'),
       },
     };
 
@@ -30,12 +31,14 @@ describe('mqttHandler.getConfiguration', () => {
       useEmbeddedBroker: false,
       dockerBased: false,
       brokerContainerAvailable: false,
+      networkModeValid: false,
     };
     expect(config).to.deep.eq(expectedConfig);
 
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(gladys.system.isDocker);
     assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.getNetworkMode);
   });
 
   it('should getConfiguration: Docker no container', async () => {
@@ -50,6 +53,7 @@ describe('mqttHandler.getConfiguration', () => {
       system: {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([]),
+        getNetworkMode: fake.resolves('bridge'),
       },
     };
 
@@ -63,12 +67,14 @@ describe('mqttHandler.getConfiguration', () => {
       useEmbeddedBroker: false,
       dockerBased: true,
       brokerContainerAvailable: false,
+      networkModeValid: false,
     };
     expect(config).to.deep.eq(expectedConfig);
 
     assert.callCount(gladys.variable.getValue, 4);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.getNetworkMode);
   });
 
   it('should getConfiguration: Docker existing container', async () => {
@@ -87,6 +93,7 @@ describe('mqttHandler.getConfiguration', () => {
             image: 'eclipse-mosquitto:any-tag',
           },
         ]),
+        getNetworkMode: fake.resolves('bridge'),
       },
     };
 
@@ -100,12 +107,14 @@ describe('mqttHandler.getConfiguration', () => {
       useEmbeddedBroker: false,
       dockerBased: true,
       brokerContainerAvailable: true,
+      networkModeValid: false,
     };
     expect(config).to.deep.eq(expectedConfig);
 
     assert.callCount(gladys.variable.getValue, 4);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.getNetworkMode);
   });
 
   it('no config on Docker', async () => {
@@ -116,6 +125,7 @@ describe('mqttHandler.getConfiguration', () => {
       system: {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([]),
+        getNetworkMode: fake.resolves('brigde'),
       },
     };
 
@@ -126,15 +136,17 @@ describe('mqttHandler.getConfiguration', () => {
       mqttUrl: null,
       mqttUsername: null,
       mqttPassword: null,
-      useEmbeddedBroker: true,
+      useEmbeddedBroker: false,
       dockerBased: true,
       brokerContainerAvailable: false,
+      networkModeValid: false,
     };
     expect(config).to.deep.eq(expectedConfig);
 
     assert.callCount(gladys.variable.getValue, 4);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.getNetworkMode);
   });
 
   it('no config not on Docker', async () => {
@@ -145,6 +157,7 @@ describe('mqttHandler.getConfiguration', () => {
       system: {
         isDocker: fake.resolves(false),
         getContainers: fake.resolves([]),
+        getNetworkMode: fake.resolves('host'),
       },
     };
 
@@ -158,11 +171,45 @@ describe('mqttHandler.getConfiguration', () => {
       useEmbeddedBroker: false,
       dockerBased: false,
       brokerContainerAvailable: false,
+      networkModeValid: false,
     };
     expect(config).to.deep.eq(expectedConfig);
 
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(gladys.system.isDocker);
     assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.getNetworkMode);
+  });
+
+  it('gladys on right network', async () => {
+    const gladys = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        getContainers: fake.resolves([]),
+        getNetworkMode: fake.resolves('host'),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    const expectedConfig = {
+      mqttUrl: null,
+      mqttUsername: null,
+      mqttPassword: null,
+      useEmbeddedBroker: true,
+      dockerBased: true,
+      brokerContainerAvailable: false,
+      networkModeValid: true,
+    };
+    expect(config).to.deep.eq(expectedConfig);
+
+    assert.callCount(gladys.variable.getValue, 4);
+    assert.calledOnce(gladys.system.isDocker);
+    assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.getNetworkMode);
   });
 });

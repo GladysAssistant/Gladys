@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 
 const { fake } = sinon;
-const { containers, images } = require('./DockerApiMock.test');
+const { containers, images, networks } = require('./DockerApiMock.test');
 
 class Docker {
   constructor() {
@@ -23,6 +23,18 @@ Docker.prototype.getContainer = fake.returns({
     })();
   },
 });
+
+Docker.prototype.getNetwork = (networkName) => {
+  const network = networks.find((n) => n.Name === networkName);
+
+  if (network) {
+    return Promise.resolve(network);
+  }
+
+  return Promise.reject(new Error('Network not found'));
+};
+
+Docker.prototype.createNetwork = fake.resolves(true);
 
 Docker.prototype.pull = (repoTag) => {
   if (repoTag.endsWith('latest')) {

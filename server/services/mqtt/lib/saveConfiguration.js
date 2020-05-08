@@ -1,6 +1,6 @@
 const { CONFIGURATION } = require('./constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const containerParams = require('../docker/eclipse-mosquitto-container.json');
+const containerParams = require('../docker/eclipse-mosquitto-container');
 
 const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
   if (value !== undefined && value !== null && (typeof value !== 'string' || value.length > 0)) {

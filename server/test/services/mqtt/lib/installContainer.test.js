@@ -31,7 +31,7 @@ describe('mqttHandler.installContainer', () => {
         emit: fake.resolves(true),
       },
       system: {
-        pull: fake.rejects(error),
+        getNetworkMode: fake.rejects(error),
       },
     };
 
@@ -65,6 +65,7 @@ describe('mqttHandler.installContainer', () => {
         getContainers: fake.resolves([{ state: 'running' }]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
+        getNetworkMode: fake.resolves('host'),
       },
       variable: {
         setValue: fake.resolves(true),
@@ -80,6 +81,7 @@ describe('mqttHandler.installContainer', () => {
     assert.calledOnce(execMock.exec);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);
+    assert.calledOnce(gladys.system.getNetworkMode);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,

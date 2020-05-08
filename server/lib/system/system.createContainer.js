@@ -2,8 +2,8 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 
 /**
  * @description Pull an new container image.
- * @param {string} options - Otpions.
- * @returns {Promise} THe created container.
+ * @param {string} options - Options.
+ * @returns {Promise} The created container.
  * @example
  * await createContainer(options);
  */

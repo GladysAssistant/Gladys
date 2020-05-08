@@ -1,5 +1,5 @@
 const { CONFIGURATION } = require('./constants');
-const containerParams = require('../docker/eclipse-mosquitto-container.json');
+const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
  * @description Get MQTT configuration.
@@ -16,17 +16,20 @@ async function getConfiguration() {
   const dockerBased = await this.gladys.system.isDocker();
 
   let useEmbeddedBroker = false;
+  let networkModeValid = false;
 
   // Look for broker docker image
   if (dockerBased) {
+    networkModeValid = await this.checkDockerNetwork();
+
     useEmbeddedBroker = await this.gladys.variable.getValue(CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY, this.serviceId);
     // Force boolean value
-    useEmbeddedBroker = !!useEmbeddedBroker || !mqttUrl;
+    useEmbeddedBroker = networkModeValid && (!!useEmbeddedBroker || !mqttUrl);
 
     const dockerImages = await this.gladys.system.getContainers({
       all: true,
       filters: {
-        name: [containerParams.name],
+        name: [containerDescriptor.name],
       },
     });
     brokerContainerAvailable = dockerImages.length > 0;
@@ -39,6 +42,7 @@ async function getConfiguration() {
     useEmbeddedBroker,
     dockerBased,
     brokerContainerAvailable,
+    networkModeValid,
   };
 }
 

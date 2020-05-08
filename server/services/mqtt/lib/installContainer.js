@@ -1,9 +1,11 @@
-const { DEFAULT } = require('./constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { exec } = require('../../../utils/childProcess');
 const logger = require('../../../utils/logger');
+const { exec } = require('../../../utils/childProcess');
 const { generate } = require('../../../utils/password');
-const containerParams = require('../docker/eclipse-mosquitto-container.json');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+
+const { DEFAULT } = require('./constants');
+const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
  * @description Get MQTT configuration.
@@ -12,17 +14,26 @@ const containerParams = require('../docker/eclipse-mosquitto-container.json');
  * installContainer();
  */
 async function installContainer() {
-  logger.trace('MQTT broker is being installed as Docker container...');
+  logger.info('MQTT broker is being installed as Docker container...');
 
   try {
-    await this.gladys.system.pull(containerParams.Image);
+    logger.info(`Check Gladys network...`);
+    const networkModeValid = await this.checkDockerNetwork();
+    if (!networkModeValid) {
+      throw new PlatformNotCompatible('Gladys should be on host network');
+    }
+
+    logger.info(`Pulling ${containerDescriptor.Image} image...`);
+    await this.gladys.system.pull(containerDescriptor.Image);
 
     // Prepare broker env
+    logger.info(`Preparing broker environment...`);
     const brokerEnv = await exec('sh ./services/mqtt/docker/eclipse-mosquitto-env.sh');
     logger.trace(brokerEnv);
 
-    // Create docker container
-    await this.gladys.system.createContainer(containerParams);
+    logger.info(`Creating container...`);
+    const container = await this.gladys.system.createContainer(containerDescriptor);
+    logger.trace(container);
 
     logger.info('MQTT broker successfully installed as Docker container');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -44,7 +55,7 @@ async function installContainer() {
   }
 
   await this.saveConfiguration({
-    mqttUrl: 'mqtt://host.docker.internal',
+    mqttUrl: 'mqtt://localhost',
     mqttUsername: 'gladys',
     mqttPassword: generate(),
     useEmbeddedBroker: true,
