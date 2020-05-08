@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../../../../utils/consts';
+import uuid from 'uuid';
 
 const actions = store => {
   const actions = {
@@ -178,14 +179,20 @@ const actions = store => {
       }
     },
     async saveArduinoDevice(state) {
+      const uniqueId = uuid.v4();
       store.setState({
         connectArduinoStatus: RequestStatus.Getting,
         arduinoDriverFailed: false
       });
       try {
         await state.httpClient.post('/api/v1/device', {
-          name: state.arduinoPath,
-          model: state.arduinoModel
+          id: uniqueId,
+          name: 'test',
+          external_id: uniqueId,
+          service_id: store.getState().currentIntegration.id,
+          model: state.arduinoModel,
+          room_id: null,
+          selector: arduinoPath
         });
       } catch (e) {
         store.setState({
