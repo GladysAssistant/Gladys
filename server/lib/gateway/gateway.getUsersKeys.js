@@ -21,15 +21,22 @@ async function getUsersKeys() {
       onlineUser.ecdsa_public_key = await this.gladysGatewayClient.generateFingerprint(onlineUser.ecdsa_public_key);
       onlineUser.rsa_public_key = await this.gladysGatewayClient.generateFingerprint(onlineUser.rsa_public_key);
 
+      // we try to find if the user already is in the list
       const found = localUsers.find((elem) => {
-        return (
-          elem.id === onlineUser.id &&
-          elem.rsa_public_key === onlineUser.rsa_public_key &&
-          elem.ecdsa_public_key === onlineUser.ecdsa_public_key
-        );
+        return elem.id === onlineUser.id;
       });
 
-      if (!found) {
+      // if the user already exist
+      if (found) {
+        // if the keys are different, we revoke the authorization
+        if (
+          found.rsa_public_key !== onlineUser.rsa_public_key ||
+          found.ecdsa_public_key !== onlineUser.ecdsa_public_key
+        ) {
+          found.accepted = false;
+        }
+      } else {
+        // if the user is not in the list
         onlineUser.accepted = false;
         localUsers.push(onlineUser);
       }
