@@ -93,7 +93,7 @@
       [
         {
           "type": "weather",
-          "house": "main-house"
+          "house": "my-house"
         },
         {
           "type": "camera",
@@ -133,7 +133,7 @@
       [
         {
           "type": "weather",
-          "house": "main-house"
+          "house": "my-house"
         },
         {
           "type": "camera",
@@ -164,7 +164,7 @@
     "created_at": "2019-05-15T08:48:20.275Z",
     "updated_at": "2019-05-16T06:29:44.767Z"
   },
-  "get /api/v1/house/main-house/weather": {
+  "get /api/v1/house/my-house/weather": {
     "temperature": 27.9,
     "humidity": 0.99,
     "pressure": 1005.09,
@@ -175,7 +175,7 @@
     "house": {
       "id": "6a29f33b-e5c9-4b08-9d3f-ced2cab80a87",
       "name": "Main house",
-      "selector": "main-house",
+      "selector": "my-house",
       "created_at": "2019-02-20T04:26:47.811Z",
       "updated_at": "2019-02-20T04:26:47.811Z"
     },
@@ -780,6 +780,19 @@
         {
           "category": "switch",
           "type": "binary"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/camera": [
+    {
+      "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",
+      "name": "Kitchen Camera",
+      "selector": "living-room-camera",
+      "params": [
+        {
+          "name": "CAMERA_URL",
+          "value": "http://camera-url"
         }
       ]
     }

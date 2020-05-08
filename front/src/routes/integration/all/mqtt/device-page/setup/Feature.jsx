@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import get from 'get-value';
+import Select from '../../../../../../components/form/Select';
 
 const MqttFeatureBox = ({ children, ...props }) => {
   return (
@@ -52,25 +53,23 @@ const MqttFeatureBox = ({ children, ...props }) => {
               <label class="form-label" for={`externalid_${props.featureIndex}`}>
                 <Text id="integration.mqtt.feature.unitLabel" />
               </label>
-              <Localizer>
-                <select
-                  id={`unit_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.unit}
-                  onChange={props.updateUnit}
-                  class="form-control"
-                >
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
-                    <Text id="deviceFeatureUnit.celsius" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
-                    <Text id="deviceFeatureUnit.fahrenheit" />
-                  </option>
-                </select>
-              </Localizer>
+              <Select
+                id={`unit_${props.featureIndex}`}
+                value={props.feature.unit}
+                uniqueKey="value"
+                clearable
+                onChange={props.updateUnit}
+                options={[
+                  {
+                    value: DEVICE_FEATURE_UNITS.CELSIUS,
+                    label: <Text id="deviceFeatureUnit.celsius" />
+                  },
+                  {
+                    value: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+                    label: <Text id="deviceFeatureUnit.fahrenheit" />
+                  }
+                ]}
+              />
             </div>
           )}
 
@@ -79,22 +78,19 @@ const MqttFeatureBox = ({ children, ...props }) => {
               <label class="form-label" for={`externalid_${props.featureIndex}`}>
                 <Text id="integration.mqtt.feature.unitLabel" />
               </label>
-              <Localizer>
-                <select
-                  id={`unit_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.unit}
-                  onChange={props.updateUnit}
-                  class="form-control"
-                >
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.PERCENT}>
-                    <Text id="deviceFeatureUnit.percent" />
-                  </option>
-                </select>
-              </Localizer>
+              <Select
+                id={`unit_${props.featureIndex}`}
+                value={props.feature.unit}
+                uniqueKey="value"
+                clearable
+                onChange={props.updateUnit}
+                options={[
+                  {
+                    value: DEVICE_FEATURE_UNITS.PERCENT,
+                    label: <Text id="deviceFeatureUnit.percent" />
+                  }
+                ]}
+              />
             </div>
           )}
 
@@ -103,22 +99,19 @@ const MqttFeatureBox = ({ children, ...props }) => {
               <label class="form-label" for={`externalid_${props.featureIndex}`}>
                 <Text id="integration.mqtt.feature.unitLabel" />
               </label>
-              <Localizer>
-                <select
-                  id={`unit_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.unit}
-                  onChange={props.updateUnit}
-                  class="form-control"
-                >
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.PPM}>
-                    <Text id="deviceFeatureUnit.ppm" />
-                  </option>
-                </select>
-              </Localizer>
+              <Select
+                id={`unit_${props.featureIndex}`}
+                value={props.feature.unit}
+                uniqueKey="value"
+                clearable
+                onChange={props.updateUnit}
+                options={[
+                  {
+                    value: DEVICE_FEATURE_UNITS.PPM,
+                    label: <Text id="deviceFeatureUnit.ppm" />
+                  }
+                ]}
+              />
             </div>
           )}
 
@@ -206,8 +199,8 @@ class MqttFeatureBoxComponent extends Component {
   updateMax = e => {
     this.props.updateFeatureProperty(e, 'max', this.props.featureIndex);
   };
-  updateUnit = e => {
-    this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
+  updateUnit = unit => {
+    this.props.updateFeatureProperty({ target: { value: get(unit, 'value') } }, 'unit', this.props.featureIndex);
   };
   updateReadOnly = () => {
     const e = {

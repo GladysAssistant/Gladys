@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
+import Select from '../form/Select';
 import get from 'get-value';
 
 class UpdateDeviceFeature extends Component {
@@ -9,7 +10,7 @@ class UpdateDeviceFeature extends Component {
   updateExternalId = e => this.props.updateFeatureProperty(this.props.featureIndex, 'external_id', e.target.value);
   updateMin = e => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
-  updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
+  updateUnit = unit => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', get(unit, 'value'));
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
   render(props, {}) {
@@ -63,25 +64,23 @@ class UpdateDeviceFeature extends Component {
                 <label class="form-label" for={`externalid_${props.featureIndex}`}>
                   <Text id="editDeviceForm.unitLabel" />
                 </label>
-                <Localizer>
-                  <select
-                    id={`unit_${props.featureIndex}`}
-                    type="text"
-                    value={props.feature.unit}
-                    onChange={this.updateUnit}
-                    class="form-control"
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
-                      <Text id="deviceFeatureUnit.celsius" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
-                      <Text id="deviceFeatureUnit.fahrenheit" />
-                    </option>
-                  </select>
-                </Localizer>
+                <Select
+                  id={`unit_${props.featureIndex}`}
+                  value={props.feature.unit}
+                  uniqueKey="value"
+                  clearable
+                  onChange={this.updateUnit}
+                  options={[
+                    {
+                      value: DEVICE_FEATURE_UNITS.CELSIUS,
+                      label: <Text id="deviceFeatureUnit.celsius" />
+                    },
+                    {
+                      value: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+                      label: <Text id="deviceFeatureUnit.fahrenheit" />
+                    }
+                  ]}
+                />
               </div>
             )}
             {props.allowModifyFeatures && (

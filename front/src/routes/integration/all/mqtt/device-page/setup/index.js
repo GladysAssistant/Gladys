@@ -11,18 +11,10 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/
 
 @connect('session,user,httpClient,houses,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
-  selectFeature(selectedFeatureOption) {
-    if (selectedFeatureOption && selectedFeatureOption.value) {
-      this.setState({
-        selectedFeature: selectedFeatureOption.value,
-        selectedFeatureOption
-      });
-    } else {
-      this.setState({
-        selectedFeature: null,
-        selectedFeatureOption: null
-      });
-    }
+  selectFeature(feature) {
+    this.setState({
+      selectedFeature: get(feature, 'value')
+    });
   }
 
   addFeature() {

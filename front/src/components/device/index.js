@@ -9,11 +9,11 @@ import UpdateDevice from './UpdateDevice';
 
 @connect('user,session', actions)
 class EditDevicePage extends Component {
-  selectFeature(e) {
+  selectFeature = feature => {
     this.setState({
-      selectedFeature: e.target.value
+      selectedFeature: get(feature, 'value')
     });
-  }
+  };
 
   addFeature() {
     const featureData = this.state.selectedFeature.split('|');

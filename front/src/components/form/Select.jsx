@@ -4,17 +4,16 @@ import Downshift from 'downshift/preact';
 import cx from 'classnames';
 import get from 'get-value';
 
-class SelectComponent extends Component {
+class Select extends Component {
   findSelected = () => {
     const { multiple, value, options, uniqueKey, useGroups } = this.props;
     let selectedItem;
     if (!multiple) {
-      if (uniqueKey && options && typeof value === 'string') {
+      if (uniqueKey && options && typeof value !== 'object') {
         let items = options;
         if (useGroups) {
           items = options.flatMap(o => this.getGroupItems(o));
         }
-
         selectedItem = items.find(o => get(o, uniqueKey) === value);
       } else {
         selectedItem = value;
@@ -56,10 +55,10 @@ class SelectComponent extends Component {
     return newStateToSet;
   };
 
-  onChange = item => {
+  onChange = (item, e) => {
     const { multiple, onChange, required } = this.props;
     let selectedItems = [];
-    let changed = false;
+    let changed = true;
 
     if (multiple) {
       selectedItems = this.state.selectedItems;
@@ -70,11 +69,11 @@ class SelectComponent extends Component {
       if (itemIndex >= 0) {
         if (!required || selectedItems.size() > 1) {
           selectedItems.splice(itemIndex, 1);
-          changed = true;
+        } else {
+          changed = false;
         }
       } else {
         selectedItems.push(item);
-        changed = true;
       }
     }
 
@@ -82,9 +81,9 @@ class SelectComponent extends Component {
       let callback = () => {
         if (onChange) {
           if (multiple) {
-            onChange(selectedItems);
+            onChange(selectedItems, e);
           } else {
-            onChange(item);
+            onChange(item, e);
           }
         }
       };
@@ -98,12 +97,10 @@ class SelectComponent extends Component {
   }
 
   filterItem = (downshiftProps, option) => {
-    const { inputValue, selectedItem } = downshiftProps;
-    const { multiple, searchable } = this.props;
+    const { inputValue } = downshiftProps;
+    const { searchable } = this.props;
 
-    if (!multiple && selectedItem) {
-      return true;
-    } else if (searchable && inputValue && typeof inputValue === 'string') {
+    if (searchable && inputValue && typeof inputValue === 'string') {
       let optionLabel = downshiftProps.itemToString(option);
       if (typeof optionLabel === 'object' && optionLabel.type === Text) {
         optionLabel = get(this.context.intl.dictionary, optionLabel.props.id);
@@ -128,7 +125,7 @@ class SelectComponent extends Component {
   };
 
   itemToString = item => {
-    return item ? get(item, this.props.itemLabelKey || 'label') : '';
+    return item ? `${get(item, this.props.itemLabelKey || 'label')}` : '';
   };
 
   itemGroupToString = (downshiftProps, group) => {
@@ -220,7 +217,7 @@ class SelectComponent extends Component {
     return (
       <div
         {...downshiftProps.getMenuProps()}
-        class={cx('dropdown-menu', 'w-100', {
+        class={cx('dropdown-menu', 'w-100', 'dropdown-select', {
           show: downshiftProps.isOpen
         })}
       >
@@ -256,7 +253,7 @@ class SelectComponent extends Component {
   }
 
   renderInputButtons(downshiftProps) {
-    const { loading, multiple, searchable } = this.props;
+    const { loading, multiple, searchable, disabled, clearable } = this.props;
 
     if (loading) {
       return (
@@ -266,12 +263,18 @@ class SelectComponent extends Component {
           </button>
         </span>
       );
-    } else if (!multiple && searchable && (this.state.selectedItems.length > 0 || downshiftProps.inputValue)) {
+    } else if (
+      !multiple &&
+      (searchable || clearable) &&
+      (this.state.selectedItems.length > 0 || downshiftProps.inputValue)
+    ) {
       return (
         <span class="input-icon-addon cursor-pointer" onClick={downshiftProps.clearSelection}>
           <i class="fe fe-x" />
         </span>
       );
+    } else if (disabled) {
+      return null;
     }
 
     return (
@@ -301,17 +304,21 @@ class SelectComponent extends Component {
   }
 
   renderInput(downshiftProps) {
-    const { loading, searchable, placeholder } = this.props;
+    const { loading, searchable, placeholder, disabled } = this.props;
 
     return (
       <Localizer>
         <input
-          class="form-control custom-select"
+          size={this.props.size}
+          class={cx('form-control', {
+            'bg-white': !disabled,
+            'cursor-pointer': !searchable
+          })}
           {...downshiftProps.getInputProps({
             onClick: downshiftProps.toggleMenu,
-            disabled: loading,
+            disabled: loading || disabled,
             placeholder: placeholder || <Text id="global.selectPlaceholder" />,
-            readOnly: !searchable
+            readOnly: !searchable && !disabled
           })}
         />
       </Localizer>
@@ -331,9 +338,13 @@ class SelectComponent extends Component {
         value={undefined}
       >
         {downshiftProps => (
-          <div class="form-group">
+          <div class={cx('form-group', { 'mb-0': props.noMargin })}>
             {this.renderInputTags(downshiftProps)}
-            <div class="input-icon mb-3">
+            <div
+              class={cx('input-icon', {
+                'mb-3': !props.noMargin
+              })}
+            >
               {this.renderInput(downshiftProps)}
               {!props.useGroups && this.renderItemList(downshiftProps)}
               {props.useGroups && this.renderGroupList(downshiftProps)}
@@ -346,4 +357,4 @@ class SelectComponent extends Component {
   }
 }
 
-export default SelectComponent;
+export default Select;

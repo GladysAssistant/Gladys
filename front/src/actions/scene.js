@@ -37,9 +37,9 @@ function createActions(store) {
       });
       await actions.getScenes(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getScenesOrderDir: e.target.value
+        getScenesOrderDir: order.value
       });
       await actions.getScenes(store.getState());
     }

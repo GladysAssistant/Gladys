@@ -10,6 +10,7 @@ dayjs.extend(relativeTime);
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import RoomSelector from '../../../../../components/house/RoomSelector';
 
 class ZWaveDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -52,8 +53,8 @@ class ZWaveDeviceBox extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
-  updateRoom = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
+  updateRoom = room => {
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', get(room, 'id'));
   };
   componentWillMount() {
     this.refreshDeviceProperty();
@@ -106,21 +107,13 @@ class ZWaveDeviceBox extends Component {
                   <label>
                     <Text id="integration.zwave.device.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <RoomSelector
+                    houses={props.houses}
+                    updateRoomSelection={this.updateRoom}
+                    uniqueKey="id"
+                    selectedRoom={props.device.room_id}
+                    clearable
+                  />
                 </div>
                 <div class="form-group">
                   <label>

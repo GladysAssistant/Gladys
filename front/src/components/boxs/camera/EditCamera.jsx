@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import actions from '../../../actions/dashboard/edit-boxes/editCamera';
 import BaseEditBox from '../baseEditBox';
+import Select from '../../form/Select';
+import { RequestStatus } from '../../../utils/consts';
 
 const EditCameraBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.camera">
@@ -10,17 +12,14 @@ const EditCameraBox = ({ children, ...props }) => (
       <label>
         <Text id="dashboard.boxes.camera.editCameraLabel" />
       </label>
-      <select onChange={props.updateCamera} class="form-control">
-        <option value="">
-          <Text id="global.emptySelectOption" />
-        </option>
-        {props.cameras &&
-          props.cameras.map(camera => (
-            <option selected={camera.selector === props.box.camera} value={camera.selector}>
-              {camera.name}
-            </option>
-          ))}
-      </select>
+      <Select
+        onChange={props.updateCamera}
+        value={props.box.camera}
+        uniqueKey="selector"
+        options={props.cameras}
+        itemLabelKey="name"
+        loading={props.DashboardEditCameraStatus === RequestStatus.Getting}
+      />
     </div>
     <div class="form-group">
       <label>
@@ -39,11 +38,11 @@ const EditCameraBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('cameras', actions)
+@connect('cameras,DashboardEditCameraStatus', actions)
 class EditCameraBoxComponent extends Component {
-  updateCamera = e => {
+  updateCamera = camera => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      camera: e.target.value
+      camera: camera.selector
     });
   };
 

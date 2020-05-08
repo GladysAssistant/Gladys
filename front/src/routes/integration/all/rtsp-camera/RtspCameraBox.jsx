@@ -4,6 +4,8 @@ import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import { DEVICE_POLL_FREQUENCIES } from '../../../../../../server/utils/constants';
+import RoomSelector from '../../../../components/house/RoomSelector';
+import Select from '../../../../components/form/Select';
 
 class RtspCameraBox extends Component {
   saveCamera = async () => {
@@ -60,15 +62,14 @@ class RtspCameraBox extends Component {
   updateCameraName = e => {
     this.props.updateCameraField(this.props.cameraIndex, 'name', e.target.value);
   };
-  updatePollFrequency = e => {
-    this.props.updateCameraField(this.props.cameraIndex, 'poll_frequency', parseInt(e.target.value, 10));
+  updatePollFrequency = freq => {
+    this.props.updateCameraField(this.props.cameraIndex, 'poll_frequency', freq.value);
   };
   updateCameraUrl = e => {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
-  updateCameraRoom = e => {
-    const newRoom = e.target.value === '' ? null : e.target.value;
-    this.props.updateCameraField(this.props.cameraIndex, 'room_id', newRoom);
+  updateCameraRoom = room => {
+    this.props.updateCameraField(this.props.cameraIndex, 'room_id', get(room, 'id'));
   };
   componentWillMount() {}
 
@@ -115,43 +116,45 @@ class RtspCameraBox extends Component {
                   <label>
                     <Text id="integration.rtspCamera.roomLabel" />
                   </label>
-                  <select onChange={this.updateCameraRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.housesWithRooms &&
-                      props.housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.camera.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <RoomSelector
+                    houses={props.housesWithRooms}
+                    uniqueKey="id"
+                    selectedRoom={props.camera.room_id}
+                    updateRoomSelection={this.updateCameraRoom}
+                    clearable
+                  />
                 </div>
                 <div class="form-group">
                   <label>
                     <Text id="integration.rtspCamera.pollFrequencyLabel" />
                   </label>
-                  <select onChange={this.updatePollFrequency} value={props.camera.poll_frequency} class="form-control">
-                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}>
-                      <Text id="integration.rtspCamera.everyMinutes" />
-                    </option>
-                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS}>
-                      <Text id="integration.rtspCamera.every30Seconds" />
-                    </option>
-                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS}>
-                      <Text id="integration.rtspCamera.every10Seconds" />
-                    </option>
-                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_2_SECONDS}>
-                      <Text id="integration.rtspCamera.every2Seconds" />
-                    </option>
-                    <option value={DEVICE_POLL_FREQUENCIES.EVERY_SECONDS}>
-                      <Text id="integration.rtspCamera.every1Seconds" />
-                    </option>
-                  </select>
+                  <Select
+                    onChange={this.updatePollFrequency}
+                    value={props.camera.poll_frequency || DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}
+                    uniqueKey="value"
+                    options={[
+                      {
+                        value: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+                        label: <Text id="integration.rtspCamera.everyMinutes" />
+                      },
+                      {
+                        value: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
+                        label: <Text id="integration.rtspCamera.every30Seconds" />
+                      },
+                      {
+                        value: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
+                        label: <Text id="integration.rtspCamera.every10Seconds" />
+                      },
+                      {
+                        value: DEVICE_POLL_FREQUENCIES.EVERY_2_SECONDS,
+                        label: <Text id="integration.rtspCamera.every2Seconds" />
+                      },
+                      {
+                        value: DEVICE_POLL_FREQUENCIES.EVERY_SECONDS,
+                        label: <Text id="integration.rtspCamera.every1Seconds" />
+                      }
+                    ]}
+                  />
                 </div>
                 <div class="form-group">
                   <label>

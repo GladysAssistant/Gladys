@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
+import RoomSelector from '../house/RoomSelector';
 import get from 'get-value';
 
 const maxWidth = {
@@ -9,7 +10,7 @@ const maxWidth = {
 
 class UpdateDeviceForm extends Component {
   updateName = e => this.props.updateDeviceProperty('name', e.target.value);
-  updateRoom = e => this.props.updateDeviceProperty('room_id', e.target.value);
+  updateRoom = room => this.props.updateDeviceProperty('room_id', get(room, 'id'));
   updateExternalId = e => this.props.updateDeviceProperty('external_id', e.target.value);
 
   render(props, {}) {
@@ -35,21 +36,12 @@ class UpdateDeviceForm extends Component {
           <label class="form-label" for="room">
             <Text id="editDeviceForm.roomLabel" />
           </label>
-          <select onChange={this.updateRoom} class="form-control" id="room">
-            <option value="">
-              <Text id="global.emptySelectOption" />
-            </option>
-            {props.houses &&
-              props.houses.map(house => (
-                <optgroup label={house.name}>
-                  {house.rooms.map(room => (
-                    <option selected={room.id === props.device.room_id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-          </select>
+          <RoomSelector
+            updateRoomSelection={this.updateRoom}
+            uniqueKey="id"
+            selectedRoom={props.device.room_id}
+            clearable
+          />
         </div>
 
         <div class="form-group">

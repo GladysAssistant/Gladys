@@ -1,9 +1,10 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import IntegrationMenu from './IntegrationMenu';
 import IntegrationCategory from './IntegrationCategory';
 import actions from '../../actions/integration';
+import PageOptions from '../../components/form/PageOptions';
 
 @connect('integrations,currentUrl,totalSize,searchKeyword', actions)
 class IntegrationPage extends Component {
@@ -22,30 +23,11 @@ class IntegrationPage extends Component {
                 <div class="page-subtitle">
                   <Text id="integration.root.subtitle" fields={{ length: integrations.length, total: totalSize }} />
                 </div>
-                <div class="page-options d-flex">
-                  <select class="form-control custom-select w-auto">
-                    <option value="asc">
-                      <Text id="global.orderDirAsc" />
-                    </option>
-                    <option value="desc">
-                      <Text id="global.orderDirDesc" />
-                    </option>
-                  </select>
-                  <div class="input-icon ml-2">
-                    <span class="input-icon-addon">
-                      <i class="fe fe-search" />
-                    </span>
-                    <Localizer>
-                      <input
-                        type="text"
-                        class="form-control w-10"
-                        placeholder={<Text id="integration.root.searchPlaceholder" />}
-                        value={searchKeyword}
-                        onInput={this.searchWithI18n}
-                      />
-                    </Localizer>
-                  </div>
-                </div>
+                <PageOptions
+                  debouncedSearch={this.searchWithI18n}
+                  searchPlaceholder={<Text id="integration.root.searchPlaceholder" />}
+                  searchValue={searchKeyword}
+                />
               </div>
               <div class="row">
                 <div class="col-lg-3">

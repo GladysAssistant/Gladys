@@ -4,10 +4,11 @@ import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../server/utils/constan
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import UpdateDeviceFeature from './UpdateDeviceFeature';
 import UpdateDeviceForm from './UpdateDeviceForm';
+import Select from '../form/Select';
 import cx from 'classnames';
 import get from 'get-value';
 
-const UpdateDevice = ({ children, ...props }) => (
+const UpdateDevice = props => (
   <div class="card">
     <div class="card-header">
       <Link href={props.previousPage}>
@@ -56,19 +57,18 @@ const UpdateDevice = ({ children, ...props }) => (
 
               {props.allowModifyFeatures && (
                 <div class="form-group form-inline">
-                  <select class="form-control" onChange={props.selectFeature}>
-                    <option value="" selected={!props.selectedFeature}>
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
-                      Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
-                        <option value={`${category}|${type}`}>
-                          <Text id={`deviceFeatureCategory.${category}.${type}`} />
-                        </option>
-                      ))
+                  <Select
+                    searchable
+                    onChange={props.selectFeature}
+                    options={DEVICE_FEATURE_CATEGORIES_LIST.flatMap(category =>
+                      Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => {
+                        return {
+                          value: `${category}|${type}`,
+                          label: <Text id={`deviceFeatureCategory.${category}.${type}`} />
+                        };
+                      })
                     )}
-                  </select>
-
+                  />
                   <button
                     onClick={props.addFeature}
                     class="btn btn-outline-success ml-2"

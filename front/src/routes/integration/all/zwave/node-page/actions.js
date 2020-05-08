@@ -58,9 +58,9 @@ function createActions(store) {
       });
       await actions.getZWaveDevices(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getZwaveDeviceOrderDir: e.target.value
+        getZwaveDeviceOrderDir: order.value
       });
       await actions.getZWaveDevices(store.getState());
     }

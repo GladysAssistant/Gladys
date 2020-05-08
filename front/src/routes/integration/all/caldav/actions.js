@@ -2,12 +2,12 @@ import { CalDAVStatus } from '../../../../utils/consts';
 import get from 'get-value';
 
 const actions = store => ({
-  updateCaldavHost(state, e) {
+  updateCaldavHost(state, item) {
     store.setState({
-      caldavHost: e.target.value
+      caldavHost: item.value
     });
 
-    if (e.target.value === 'apple') {
+    if (item.value === 'apple') {
       store.setState({
         caldavUrl: 'https://caldav.icloud.com'
       });

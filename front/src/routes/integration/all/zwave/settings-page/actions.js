@@ -34,9 +34,9 @@ const actions = store => {
         });
       }
     },
-    updateZwaveDriverPath(state, e) {
+    updateZwaveDriverPath(state, driver) {
       store.setState({
-        zwaveDriverPath: e.target.value
+        zwaveDriverPath: driver.value
       });
     },
     async saveDriverPathAndConnect(state) {

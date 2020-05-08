@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import UserRow from './UserRow';
+import Select from '../../../components/form/Select';
 
 const UserList = ({ children, ...props }) => (
   <div class="col-lg-12">
@@ -57,14 +58,21 @@ const UserList = ({ children, ...props }) => (
                 </Localizer>
               </td>
               <td>
-                <select class="form-control custom-select selectized" onChange={props.updateRole} value={props.role}>
-                  <option value="admin">
-                    <Text id="gatewayUsers.roleAdmin" />
-                  </option>
-                  <option value="user">
-                    <Text id="gatewayUsers.roleUser" />
-                  </option>
-                </select>
+                <Select
+                  onChange={props.updateRole}
+                  value={props.role}
+                  uniqueKeu="value"
+                  options={[
+                    {
+                      value: 'admin',
+                      label: <Text id="gatewayUsers.roleAdmin" />
+                    },
+                    {
+                      value: 'user',
+                      label: <Text id="gatewayUsers.roleUser" />
+                    }
+                  ]}
+                />
               </td>
               <td>
                 <button onClick={props.inviteUser} class="btn btn-primary ml-auto">

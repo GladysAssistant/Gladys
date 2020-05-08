@@ -4,6 +4,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
+import Select from '../../../../components/form/Select';
 
 @connect('httpClient', {})
 class TurnOnLight extends Component {
@@ -21,8 +22,8 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'operator', '=');
     }
   };
-  handleOperatorChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'operator', e.target.value);
+  handleOperatorChange = operator => {
+    this.props.updateTriggerProperty(this.props.index, 'operator', operator.value);
   };
   handleValueChange = e => {
     if (!isNaN(parseFloat(e.target.value))) {
@@ -91,29 +92,37 @@ class TurnOnLight extends Component {
           {selectedDeviceFeature && selectedDeviceFeature.type !== 'binary' && (
             <div class="col-3">
               <div class="form-group">
-                <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value="=">
-                    <Text id="editScene.triggersCard.newState.equal" />
-                  </option>
-                  <option value=">=">
-                    <Text id="editScene.triggersCard.newState.superiorOrEqual" />
-                  </option>
-                  <option value=">">
-                    <Text id="editScene.triggersCard.newState.superior" />
-                  </option>
-                  <option value="!=">
-                    <Text id="editScene.triggersCard.newState.different" />
-                  </option>
-                  <option value="<=">
-                    <Text id="editScene.triggersCard.newState.lessOrEqual" />
-                  </option>
-                  <option value="<">
-                    <Text id="editScene.triggersCard.newState.less" />
-                  </option>
-                </select>
+                <Select
+                  onChange={this.handleOperatorChange}
+                  value={props.trigger.operator}
+                  uniqueKey="value"
+                  options={[
+                    {
+                      value: '=',
+                      label: <Text id="editScene.triggersCard.newState.equal" />
+                    },
+                    {
+                      value: '>=',
+                      label: <Text id="editScene.triggersCard.newState.superiorOrEqual" />
+                    },
+                    {
+                      value: '>',
+                      label: <Text id="editScene.triggersCard.newState.superior" />
+                    },
+                    {
+                      value: '!=',
+                      label: <Text id="editScene.triggersCard.newState.different" />
+                    },
+                    {
+                      value: '<=',
+                      label: <Text id="editScene.triggersCard.newState.lessOrEqual" />
+                    },
+                    {
+                      value: '<',
+                      label: <Text id="editScene.triggersCard.newState.less" />
+                    }
+                  ]}
+                />
               </div>
             </div>
           )}

@@ -68,9 +68,9 @@ function createActions(store) {
       });
       await actions.getMqttDevices(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getMqttDeviceOrderDir: e.target.value
+        getMqttDeviceOrderDir: order.value
       });
       await actions.getMqttDevices(store.getState());
     },

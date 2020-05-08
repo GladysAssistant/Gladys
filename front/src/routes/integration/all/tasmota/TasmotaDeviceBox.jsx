@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import get from 'get-value';
 import { Link } from 'preact-router';
+import RoomSelector from '../../../../components/house/RoomSelector';
 
 class TasmotaDeviceBox extends Component {
   updateName = e => {
@@ -14,8 +15,8 @@ class TasmotaDeviceBox extends Component {
     });
   };
 
-  updateRoom = e => {
-    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
+  updateRoom = room => {
+    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', get(room, 'id'));
 
     this.setState({
       loading: false
@@ -101,26 +102,14 @@ class TasmotaDeviceBox extends Component {
                   <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.tasmota.roomLabel" />
                   </label>
-                  <select
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    id={`room_${deviceIndex}`}
+                  <RoomSelector
+                    houses={props.houses}
+                    uniqueKey="id"
+                    selectedRoom={device.room_id}
+                    updateRoomSelection={this.updateRoom}
                     disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                    clearable
+                  />
                 </div>
 
                 <div class="form-group">

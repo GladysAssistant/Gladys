@@ -22,8 +22,8 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', undefined);
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', undefined);
   };
-  handleTypeChange = e => {
-    const schedulerType = e.target.value;
+  handleTypeChange = type => {
+    const schedulerType = type.value;
     this.props.updateTriggerProperty(this.props.index, 'scheduler_type', schedulerType);
     this.resetForm();
     if (schedulerType === 'every-month') {
@@ -47,15 +47,15 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'interval', null);
     }
   };
-  handleUnitChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'unit', e.target.value);
+  handleUnitChange = unit => {
+    this.props.updateTriggerProperty(this.props.index, 'unit', unit.value);
   };
   handleDayOfTheWeekChange = options => {
     const values = options ? options.map(option => option.value) : [];
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', values);
   };
-  handleDayOfTheMonthChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', e.target.value);
+  handleDayOfTheMonthChange = value => {
+    this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', value);
   };
 
   render({}, {}) {
@@ -79,26 +79,33 @@ class TurnOnLight extends Component {
               <div class="form-label">
                 <Text id="editScene.triggersCard.scheduledTrigger.typeLabel" />
               </div>
-              <select class="form-control" onChange={this.handleTypeChange} value={this.props.trigger.scheduler_type}>
-                <option>
-                  <Text id="global.emptySelectOption" />
-                </option>
-                <option value="every-month">
-                  <Text id="editScene.triggersCard.scheduledTrigger.everyMonth" />
-                </option>
-                <option value="every-week">
-                  <Text id="editScene.triggersCard.scheduledTrigger.everyWeek" />
-                </option>
-                <option value="every-day">
-                  <Text id="editScene.triggersCard.scheduledTrigger.everyDay" />
-                </option>
-                <option value="interval">
-                  <Text id="editScene.triggersCard.scheduledTrigger.interval" />
-                </option>
-                <option value="custom-time">
-                  <Text id="editScene.triggersCard.scheduledTrigger.customTime" />
-                </option>
-              </select>
+              <Select
+                onChange={this.handleTypeChange}
+                value={this.props.trigger.scheduler_type}
+                uniqueKey="value"
+                options={[
+                  {
+                    value: 'every-month',
+                    label: <Text id="editScene.triggersCard.scheduledTrigger.everyMonth" />
+                  },
+                  {
+                    value: 'every-week',
+                    label: <Text id="editScene.triggersCard.scheduledTrigger.everyWeek" />
+                  },
+                  {
+                    value: 'every-day',
+                    label: <Text id="editScene.triggersCard.scheduledTrigger.everyDay" />
+                  },
+                  {
+                    value: 'interval',
+                    label: <Text id="editScene.triggersCard.scheduledTrigger.interval" />
+                  },
+                  {
+                    value: 'custom-time',
+                    label: <Text id="editScene.triggersCard.scheduledTrigger.customTime" />
+                  }
+                ]}
+              />
             </div>
           </div>
           {this.props.trigger.scheduler_type === 'custom-time' && (
@@ -167,17 +174,25 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.unitLabel" />
                 </div>
-                <select class="form-control" value={this.props.trigger.unit} onChange={this.handleUnitChange}>
-                  <option value="second">
-                    <Text id="editScene.triggersCard.scheduledTrigger.units.second" />
-                  </option>
-                  <option value="minute">
-                    <Text id="editScene.triggersCard.scheduledTrigger.units.minute" />
-                  </option>
-                  <option value="hour">
-                    <Text id="editScene.triggersCard.scheduledTrigger.units.hour" />
-                  </option>
-                </select>
+                <Select
+                  value={this.props.trigger.unit}
+                  onChange={this.handleUnitChange}
+                  uniqueKey="value"
+                  options={[
+                    {
+                      value: 'second',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.units.second" />
+                    },
+                    {
+                      value: 'minute',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.units.minute" />
+                    },
+                    {
+                      value: 'hour',
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.units.hour" />
+                    }
+                  ]}
+                />
               </div>
             </div>
           )}
@@ -279,15 +294,11 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.dayOfTheMonthLabel" />
                 </div>
-                <select
-                  class="form-control"
+                <Select
                   value={this.props.trigger.day_of_the_month}
                   onChange={this.handleDayOfTheMonthChange}
-                >
-                  {DAYS_OF_THE_MONTH.map(value => (
-                    <option value={value}>{value}</option>
-                  ))}
-                </select>
+                  options={DAYS_OF_THE_MONTH}
+                />
               </div>
             </div>
           )}

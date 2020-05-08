@@ -3,6 +3,7 @@ import cx from 'classnames';
 import dayjs from 'dayjs';
 import get from 'get-value';
 import EditableProfilePicture from './EditableProfilePicture';
+import Select from '../form/Select';
 
 const Profile = ({ children, ...props }) => {
   return (
@@ -110,14 +111,21 @@ const Profile = ({ children, ...props }) => {
         <label class="form-label">
           <Text id="profile.languageLabel" />
         </label>
-        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control custom-select">
-          <option value="en">
-            <Text id="profile.english" />
-          </option>
-          <option value="fr">
-            <Text id="profile.french" />
-          </option>
-        </select>
+        <Select
+          value={props.newUser.language}
+          onChange={props.updateLanguage}
+          uniqueKey="value"
+          options={[
+            {
+              value: 'en',
+              label: <Text id="profile.english" />
+            },
+            {
+              value: 'fr',
+              label: <Text id="profile.french" />
+            }
+          ]}
+        />
       </div>
       <div class="form-group">
         <label class="form-label">
@@ -125,57 +133,40 @@ const Profile = ({ children, ...props }) => {
         </label>
         <div class="row gutters-xs">
           <div class="col-4">
-            <select
+            <Select
+              searchable
               value={props.newUser.birthdateYear}
-              onInput={props.updateBirthdateYear}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.year" />
-              </option>
-              {props.years.map(year => (
-                <option value={year}>{year}</option>
-              ))}
-            </select>
+              onChange={props.updateBirthdateYear}
+              placeholder={<Text id="profile.year" />}
+              options={props.years}
+            />
           </div>
           <div class="col-5">
-            <select
+            <Select
+              searchable
               value={props.newUser.birthdateMonth}
-              onInput={props.updateBirthdateMonth}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.month" />
-              </option>
-              {props.months.map(month => (
-                <option value={month}>
-                  {dayjs()
+              onChange={props.updateBirthdateMonth}
+              placeholder={<Text id="profile.month" />}
+              uniqueKey="value"
+              options={props.months.map(month => {
+                return {
+                  value: month,
+                  label: dayjs()
                     .set('month', month - 1)
                     .locale(props.newUser.language)
-                    .format('MMMM')}
-                </option>
-              ))}
-            </select>
+                    .format('MMMM')
+                };
+              })}
+            />
           </div>
           <div class="col-3">
-            <select
+            <Select
+              searchable
               value={props.newUser.birthdateDay}
-              onInput={props.updateBirthdateDay}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.day" />
-              </option>
-              {props.days.map(day => (
-                <option value={day}>{day}</option>
-              ))}
-            </select>
+              onChange={props.updateBirthdateDay}
+              placeholder={<Text id="profile.day" />}
+              options={props.days}
+            />
           </div>
         </div>
         <input

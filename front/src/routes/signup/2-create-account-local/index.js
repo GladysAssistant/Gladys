@@ -22,8 +22,8 @@ class CreateAccountLocal extends Component {
   updateEmail = e => {
     this.props.updateNewUserProperty('email', e.target.value);
   };
-  updateLanguage = e => {
-    this.props.updateNewUserProperty('language', e.target.value);
+  updateLanguage = lang => {
+    this.props.updateNewUserProperty('language', get(lang, 'value'));
   };
   updatePassword = e => {
     this.props.updateNewUserProperty('password', e.target.value);
@@ -33,15 +33,15 @@ class CreateAccountLocal extends Component {
     this.props.updateNewUserProperty('passwordRepeat', e.target.value);
     this.props.validatePasswordRepeat();
   };
-  updateBirthdateDay = e => {
-    this.props.updateNewUserProperty('birthdateDay', e.target.value);
+  updateBirthdateDay = day => {
+    this.props.updateNewUserProperty('birthdateDay', day);
   };
-  updateBirthdateMonth = e => {
-    this.props.updateNewUserProperty('birthdateMonth', e.target.value);
+  updateBirthdateMonth = month => {
+    this.props.updateNewUserProperty('birthdateMonth', get(month, 'value'));
     this.props.updateDays();
   };
-  updateBirthdateYear = e => {
-    this.props.updateNewUserProperty('birthdateYear', e.target.value);
+  updateBirthdateYear = year => {
+    this.props.updateNewUserProperty('birthdateYear', year);
   };
   componentWillMount() {
     this.props.resetNewUser();

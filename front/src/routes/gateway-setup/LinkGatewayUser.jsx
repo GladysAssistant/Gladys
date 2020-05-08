@@ -1,6 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../utils/consts';
+import Select from '../../components/form/Select';
 
 const SignupLayout = ({ children, ...props }) => (
   <div class="page">
@@ -66,12 +67,7 @@ const SignupLayout = ({ children, ...props }) => (
                       <label>
                         <Text id="gatewayLinkUser.label" />
                       </label>
-                      <select class="form-control" onChange={props.selectUser}>
-                        <option>
-                          <Text id="global.emptySelectOption" />
-                        </option>
-                        {props.users && props.users.map(user => <option value={user.id}>{user.firstname}</option>)}
-                      </select>
+                      <Select onChange={props.selectUser} clearable options={props.users} itemLabelKey="firstname" />
                     </div>
                     <div class="form-group">
                       <button

@@ -1,8 +1,9 @@
 import { Text } from 'preact-i18n';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
+import Select from '../../../components/form/Select';
 
 const updateUserProperty = (property, func) => e => {
-  func(property, e.target.value);
+  func(property, e.value);
 };
 
 const updateSystemProperty = (property, func) => e => {
@@ -22,35 +23,41 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.preferences.temperatureUnitsLabel" />
         </label>
-        <select
+        <Select
           value={props.signupUserPreferences.temperature_unit_preference}
-          onInput={updateUserProperty('temperature_unit_preference', props.updateUserPreferences)}
-          class="form-control"
-        >
-          <option value="celsius">
-            <Text id="signup.preferences.temperatureUnitsCelsius" />
-          </option>
-          <option value="fahrenheit">
-            <Text id="signup.preferences.temperatureUnitsFahrenheit" />
-          </option>
-        </select>
+          onChange={updateUserProperty('temperature_unit_preference', props.updateUserPreferences)}
+          uniqueKey="value"
+          options={[
+            {
+              value: 'celsius',
+              label: <Text id="signup.preferences.temperatureUnitsCelsius" />
+            },
+            {
+              value: 'fahrenheit',
+              label: <Text id="signup.preferences.temperatureUnitsFahrenheit" />
+            }
+          ]}
+        />
       </div>
       <div class="form-group">
         <label class="form-label">
           <Text id="signup.preferences.distanceUnit" />
         </label>
-        <select
+        <Select
           value={props.signupUserPreferences.distance_unit_preference}
           onInput={updateUserProperty('distance_unit_preference', props.updateUserPreferences)}
-          class="form-control"
-        >
-          <option value="metric">
-            <Text id="signup.preferences.distanceUnitMeter" />
-          </option>
-          <option value="us">
-            <Text id="signup.preferences.distanceUnitUs" />
-          </option>
-        </select>
+          uniqueKey="value"
+          options={[
+            {
+              value: 'metric',
+              label: <Text id="signup.preferences.distanceUnitMeter" />
+            },
+            {
+              value: 'us',
+              label: <Text id="signup.preferences.distanceUnitUs" />
+            }
+          ]}
+        />
       </div>
       <div class="form-group">
         <label class="form-label">

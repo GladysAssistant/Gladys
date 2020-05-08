@@ -110,9 +110,9 @@ function createActions(store) {
       });
       await actions.getPhilipsHueDevices(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getPhilipsHueDeviceOrderDir: e.target.value
+        getPhilipsHueDeviceOrderDir: order.value
       });
       await actions.getPhilipsHueDevices(store.getState());
     }

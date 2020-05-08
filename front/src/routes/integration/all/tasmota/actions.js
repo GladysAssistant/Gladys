@@ -124,9 +124,9 @@ function createActions(store) {
       });
       await actions.getTasmotaDevices(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getTasmotaOrderDir: e.target.value
+        getTasmotaOrderDir: order.value
       });
       await actions.getTasmotaDevices(store.getState());
     },

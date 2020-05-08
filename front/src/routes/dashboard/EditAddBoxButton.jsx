@@ -1,12 +1,14 @@
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 import { DASHBOARD_BOX_TYPE_LIST } from '../../../../server/utils/constants';
+import Select from '../../components/form/Select';
 
 const addBox = (addBoxFunction, x) => () => {
   addBoxFunction(x);
 };
 
-const updateNewSelectedBox = (updateNewSelectedBoxFunction, x) => e => {
-  updateNewSelectedBoxFunction(x, e.target.value);
+const updateNewSelectedBox = (updateNewSelectedBoxFunction, x) => type => {
+  updateNewSelectedBoxFunction(x, get(type, 'value'));
 };
 
 const marginBottom = {
@@ -16,16 +18,16 @@ const marginBottom = {
 const EditAddBoxButton = ({ children, ...props }) => (
   <div class="row" style={marginBottom}>
     <div class="col-8">
-      <select onChange={updateNewSelectedBox(props.updateNewSelectedBox, props.x)} class="form-control">
-        <option>
-          <Text id="global.emptySelectOption" />
-        </option>
-        {DASHBOARD_BOX_TYPE_LIST.map(dashboardBoxType => (
-          <option value={dashboardBoxType}>
-            <Text id={'dashboard.boxTitle.' + dashboardBoxType} />
-          </option>
-        ))}
-      </select>
+      <Select
+        onChange={updateNewSelectedBox(props.updateNewSelectedBox, props.x)}
+        clearable
+        options={DASHBOARD_BOX_TYPE_LIST.map(dashboardBoxType => {
+          return {
+            value: dashboardBoxType,
+            label: <Text id={'dashboard.boxTitle.' + dashboardBoxType} />
+          };
+        })}
+      />
     </div>
     <div class="col-4">
       <button onClick={addBox(props.addBox, props.x, props.type)} class="btn btn-block btn-outline-primary">

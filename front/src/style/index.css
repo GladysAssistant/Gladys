@@ -244,3 +244,8 @@ body {
   background-color: inherit;
   cursor: default;
 }
+.dropdown-select,
+.dropdown-select .dropdown-item {
+  min-width: 100%;
+  width: auto !important;
+}

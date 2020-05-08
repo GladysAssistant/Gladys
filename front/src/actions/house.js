@@ -41,9 +41,9 @@ function createActions(store) {
       });
       await actions.getHouses(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getHousesOrderDir: e.target.value
+        getHousesOrderDir: order.value
       });
       await actions.getHouses(store.getState());
     },

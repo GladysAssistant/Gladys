@@ -2,6 +2,8 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
+import Select from '../../../../../components/form/Select';
+
 const SettingsTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
@@ -49,17 +51,20 @@ const SettingsTab = ({ children, ...props }) => (
             <label class="form-label">
               <Text id="integration.zwave.settings.zwaveUsbDriverPathLabel" />
             </label>
-            <select class="form-control" onChange={props.updateZwaveDriverPath}>
-              <option>
-                <Text id="global.emptySelectOption" />
-              </option>
-              {props.usbPorts &&
-                props.usbPorts.map(usbPort => (
-                  <option value={usbPort.comPath} selected={props.zwaveDriverPath === usbPort.comPath}>
-                    {usbPort.comName}
-                  </option>
-                ))}
-            </select>
+            <Select
+              onChange={props.updateZwaveDriverPath}
+              value={props.zwaveDriverPath}
+              uniqueKey="value"
+              options={
+                props.usbPorts &&
+                props.usbPorts.map(usbPort => {
+                  return {
+                    value: usbPort.comPath,
+                    label: usbPort.comName
+                  };
+                })
+              }
+            />
           </div>
           <div class="form-group">
             <button class="btn btn-success" onClick={props.saveDriverPathAndConnect}>

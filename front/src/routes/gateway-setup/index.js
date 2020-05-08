@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 import LinkGatewayUserPage from './LinkGatewayUser';
 import actions from '../../actions/gatewayLinkUser';
 import { route } from 'preact-router';
@@ -7,9 +8,9 @@ import { RequestStatus } from '../../utils/consts';
 
 @connect('users,usersGetStatus', actions)
 class LinkGatewayUser extends Component {
-  selectUser = e => {
+  selectUser = user => {
     this.setState({
-      selectedUser: e.target.value
+      selectedUser: get(user, 'id')
     });
   };
   saveUser = async () => {

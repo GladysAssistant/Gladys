@@ -195,9 +195,9 @@ function createActions(store) {
       });
       await actions.getRtspCameraDevices(store.getState());
     },
-    async changeOrderDir(state, e) {
+    async changeOrderDir(state, order) {
       store.setState({
-        getRtspCameraOrderDir: e.target.value
+        getRtspCameraOrderDir: order.value
       });
       await actions.getRtspCameraDevices(store.getState());
     }

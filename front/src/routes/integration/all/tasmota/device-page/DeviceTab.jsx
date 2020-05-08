@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -6,6 +6,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
+import PageOptions from '../../../../../components/form/PageOptions';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -13,29 +14,11 @@ const DeviceTab = ({ children, ...props }) => (
       <h1 class="card-title">
         <Text id="integration.tasmota.device.title" />
       </h1>
-      <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.tasmota.device.search" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
-      </div>
+      <PageOptions
+        changeOrderDir={props.changeOrderDir}
+        debouncedSearch={props.debouncedSearch}
+        searchPlaceholder={<Text id="integration.tasmota.device.search" />}
+      />
     </div>
     <div class="card-body">
       <CheckMqttPanel />

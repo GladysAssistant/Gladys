@@ -1,6 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { CalDAVStatus } from '../../../../utils/consts';
 import cx from 'classnames';
+import Select from '../../../../components/form/Select';
 
 const CaldavPage = ({ children, ...props }) => (
   <div class="page">
@@ -29,13 +30,17 @@ const CaldavPage = ({ children, ...props }) => (
                           <Text id="integration.caldav.hostLabel" />
                         </div>
                         <Text id="integration.caldav.hostInfo" />
-                        <select class="form-control" onChange={props.updateCaldavHost} value={props.caldavHost}>
-                          {Object.keys(props.dictionary.services).map(host => (
-                            <option value={host}>
-                              <Text id={`integration.caldav.services.${host}.name`} />
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          onChange={props.updateCaldavHost}
+                          uniqueKey="value"
+                          value={props.caldavHost}
+                          options={Object.keys(props.dictionary.services).map(host => {
+                            return {
+                              value: host,
+                              label: <Text id={`integration.caldav.services.${host}.name`} />
+                            };
+                          })}
+                        />
                       </div>
                       <div class="form-group">
                         <div class="form-label">

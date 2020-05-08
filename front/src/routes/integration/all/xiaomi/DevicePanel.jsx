@@ -1,9 +1,10 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../utils/consts';
 import Device from './Device';
 import style from './style.css';
+import PageOptions from '../../../../components/form/PageOptions';
 
 const DevicePanel = ({ children, ...props }) => (
   <div class="card">
@@ -11,30 +12,11 @@ const DevicePanel = ({ children, ...props }) => (
       <h3 class="card-title">
         <Text id="integration.xiaomi.device.title" />
       </h3>
-      <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
-              value={props.xiaomiDeviceSearch}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
-      </div>
+      <PageOptions
+        changeOrderDir={props.changeOrderDir}
+        searchPlaceholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
+        debouncedSearch={props.debouncedSearch}
+      />
     </div>
     <div class="card-body">
       <div

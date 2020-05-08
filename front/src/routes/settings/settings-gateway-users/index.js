@@ -47,6 +47,10 @@ class DashboardUsersPage extends Component {
     }
   };
 
+  updateRole = (value, e) => {
+    linkState(this, 'role')(e);
+  };
+
   componentDidMount() {
     this.getUsers();
   }
@@ -61,7 +65,7 @@ class DashboardUsersPage extends Component {
           email={email}
           role={role}
           updateEmail={linkState(this, 'email')}
-          updateRole={linkState(this, 'role')}
+          updateRole={this.updateRole}
           revokeUserError={revokeUserError}
           revokeUser={this.revokeUser}
         />

@@ -5,7 +5,8 @@
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
-    "emptySelectOption": "---------",
+    "orderPlaceholder": "Sort...",
+    "searchPlaceholder": "Search",
     "backButton": "◀️️ Back",
     "requiredField": "*",
     "listItem": "{{index}}.",
@@ -777,8 +778,6 @@
   "housesSettings": {
     "searchPlaceholder": "Search houses",
     "newButton": "New",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "defaultNewHouseName": "New House",
     "noHouseFound": "No houses found."
   },

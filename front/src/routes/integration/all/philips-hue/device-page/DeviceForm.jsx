@@ -2,14 +2,15 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import get from 'get-value';
+import RoomSelector from '../../../../../components/house/RoomSelector';
 
 class PhilipsHueDeviceForm extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
+  updateRoom = room => {
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', get(room, 'id'));
   };
 
   updateExternalId = e => {
@@ -39,21 +40,13 @@ class PhilipsHueDeviceForm extends Component {
           <label class="form-label" for="room">
             <Text id="integration.mqtt.device.roomLabel" />
           </label>
-          <select onChange={this.updateRoom} class="form-control" id="room">
-            <option value="">
-              <Text id="global.emptySelectOption" />
-            </option>
-            {props.houses &&
-              props.houses.map(house => (
-                <optgroup label={house.name}>
-                  {house.rooms.map(room => (
-                    <option selected={room.id === props.device.room_id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-          </select>
+          <RoomSelector
+            houses={props.houses}
+            uniqueKey="id"
+            selectedRoom={props.device.room_id}
+            updateRoomSelection={this.updateRoom}
+            clearable
+          />
         </div>
 
         <div class="form-group">
