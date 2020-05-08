@@ -566,6 +566,7 @@
         "connected": "Arduino connected.",
         "connectionError": "Error while connecting, please check your configuration.",
         "notConnected": "Arduino card is not connected, please connect a card.",
+        "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
         "connectButton": "Connect",
         "disconnectButton": "Disconnect"
       },

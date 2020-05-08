@@ -11,9 +11,9 @@ import SetupTab from './SetupTab';
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
-    this.props.checkConnected();
-    this.props.getCurrentArduinoPath();
-    this.props.getCurrentArduinoModel();
+    //this.props.checkConnected();
+    //this.props.getCurrentArduinoPath();
+    //this.props.getCurrentArduinoModel();
     this.props.getModels();
     this.props.getManufacturers();
   }

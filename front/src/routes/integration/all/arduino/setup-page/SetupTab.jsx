@@ -20,7 +20,24 @@ const SetupTab = ({ children, ...props }) => {
               <Text id="scene.newButton" /> <i class="fe fe-plus" />
             </button>
         </div>
-        <SetupDevice/>
+        <div class="row">
+          {props.arduinoDevices &&
+            props.arduinoDevices.map((arduinoDevice, index) => (
+              <SetupDevice
+                device={arduinoDevice}
+                deviceIndex={index}
+                houses={props.houses}
+                updateDeviceProperty={props.updateDeviceProperty}
+                saveDevice={props.saveDevice}
+                deleteDevice={props.deleteDevice}
+              />
+            ))}
+          {props.arduinoConnected && props.arduinoDevices && props.arduinoDevices.length === 0 && (
+            <div class="dimmer-content alert alert-info">
+              <Text id="integration.arduino.setup.noDevices" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
 

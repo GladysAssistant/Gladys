@@ -19,95 +19,6 @@ const actions = store => {
         });
       }
     },
-    async addDevice(state) {
-      const uniqueId = uuid.v4();
-      await integrationActions.getIntegrationByName(state, 'arduino');
-      const arduinoDevices = update(state.arduinoDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            selector: null,
-            external_id: uniqueId,
-            service_id: store.getState().currentIntegration.id,
-            room_id: null,
-            model: null
-          }
-        ]
-      });
-      store.setState({
-        arduinoDevices
-      });
-    },
-    async getCurrentArduinoPath(state) {
-      store.setState({
-        getCurrentArduinoPathStatus: RequestStatus.Getting
-      });
-      try {
-        const arduinoPath = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_PATH');
-        store.setState({
-          arduinoPath: arduinoPath.value,
-          getCurrentArduinoPathStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getCurrentArduinoPathStatus: RequestStatus.Error
-        });
-      }
-    },
-    async getCurrentArduinoModel(state) {
-      store.setState({
-        getCurrentArduinoModelStatus: RequestStatus.Getting
-      });
-      try {
-        const arduinoModel = await state.httpClient.get('/api/v1/service/arduino/variable/ARDUINO_MODEL');
-        store.setState({
-          arduinoModel: arduinoModel.value,
-          getCurrentArduinoModelStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getCurrentArduinoModelStatus: RequestStatus.Error
-        });
-      }
-    },
-    async checkConnected(state) {
-      store.setState({
-        getCurrentArduinoPathStatus: RequestStatus.Getting
-      });
-      try {
-        await actions.getUsbPorts(store.getState());
-        var connected = false;
-        await actions.getCurrentArduinoPath(store.getState());
-        const arduinoPath = store.getState().arduinoPath;
-
-        if (arduinoPath !== "---------") {
-          store.getState().usbPorts.forEach(element => {
-            if (element.comPath === arduinoPath) {
-              connected = true;
-            }
-          });
-
-          if (connected) {
-            store.setState({
-              arduinoConnected: true
-            });
-          } else {
-            store.setState({
-              arduinoConnected: false
-            });
-          }
-        } else {
-          store.setState({
-            arduinoConnected: false
-          });
-        }
-      } catch (e) {
-        store.setState({
-          getCurrentArduinoPathStatus: RequestStatus.Error
-        });
-      }
-    },
     updateArduinoPath(state, e) {
       store.setState({
         arduinoPath: e.target.value
@@ -159,22 +70,25 @@ const actions = store => {
         ]
       });
     },
-    async saveModel(state) {
-      store.setState({
-        setArduinoModel: RequestStatus.Getting,
+    async addDevice(state) {
+      const uniqueId = uuid.v4();
+      await integrationActions.getIntegrationByName(state, 'arduino');
+      const arduinoDevices = update(state.arduinoDevices, {
+        $push: [
+          {
+            id: uniqueId,
+            name: null,
+            selector: null,
+            external_id: uniqueId,
+            service_id: store.getState().currentIntegration.id,
+            room_id: null,
+            model: null
+          }
+        ]
       });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
-          value: state.arduinoModel
-        });
-        store.setState({
-          setArduinoModel: RequestStatus.Success,
-        });
-      } catch (e) {
-        store.setState({
-          setArduinoModel: RequestStatus.Error
-        });
-      }
+      store.setState({
+        arduinoDevices
+      });
     },
     async savePathAndConnect(state) {
       store.setState({
