@@ -19,26 +19,6 @@ const actions = store => {
         });
       }
     },
-    addDevice(state) {
-      const uniqueId = uuid.v4();
-      await integrationActions.getIntegrationByName(state, 'arduino');
-      const arduinoDevices = update(state.arduinoDevices, {
-        $push: [
-          {
-            id: uniqueId,
-            name: null,
-            selector: null,
-            external_id: uniqueId,
-            service_id: store.getState().currentIntegration.id,
-            room_id: null,
-            model: null
-          }
-        ]
-      });
-      store.setState({
-        arduinoDevices
-      });
-    },
     async getCurrentArduinoPath(state) {
       store.setState({
         getCurrentArduinoPathStatus: RequestStatus.Getting
