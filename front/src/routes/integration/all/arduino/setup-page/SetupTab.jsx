@@ -5,21 +5,21 @@ import SetupDevice from './SetupDevice';
 
 const SetupTab = ({ children, ...props }) => {
   return (
-    <div>
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <Text id="integration.arduino.setup.title" />
-          </h3>
-          <div class="page-options d-flex">
-            <button class="btn btn-info" onClick={props.getUsbPorts && props.checkConnected}>
-              <Text id="integration.arduino.setup.refreshButton" />
-            </button>
-          </div>
-            <button class="btn btn-outline-primary ml-2">
-              <Text id="scene.newButton" /> <i class="fe fe-plus" />
-            </button>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <Text id="integration.arduino.setup.title" />
+        </h3>
+        <div class="page-options d-flex">
+          <button class="btn btn-info" onClick={props.getUsbPorts && props.checkConnected}>
+            <Text id="integration.arduino.setup.refreshButton" />
+          </button>
         </div>
+        <button class="btn btn-outline-primary ml-2">
+          <Text id="scene.newButton" /> <i class="fe fe-plus" />
+        </button>
+      </div>
+      <div class="card-body">
         <div class="row">
           {props.arduinoDevices &&
             props.arduinoDevices.map((arduinoDevice, index) => (
@@ -33,14 +33,13 @@ const SetupTab = ({ children, ...props }) => {
               />
             ))}
           {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
-            <div class="alert alert-danger">
+            <div class="dimmer-content alert alert-danger">
               <Text id="integration.arduino.setup.noDevices" />
             </div>
           )}
         </div>
       </div>
     </div>
-
   );
 };
 
