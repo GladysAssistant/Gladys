@@ -1,4 +1,5 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
