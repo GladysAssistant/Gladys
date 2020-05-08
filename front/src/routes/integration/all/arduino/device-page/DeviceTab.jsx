@@ -43,7 +43,7 @@ const DeviceTab = ({ children, ...props }) => (
             <Text id="scene.newButton" /> <i class="fe fe-plus" />
           </button>
         )}
-        
+
       </div>
     </div>
     <div class="card-body">
@@ -66,8 +66,8 @@ const DeviceTab = ({ children, ...props }) => (
           )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.arduinoConnected && 
-            props.arduinoDevices &&
+            {props.arduinoConnected &&
+              props.arduinoDevices &&
               props.arduinoDevices.map((arduinoDevice, index) => (
                 <Device
                   device={arduinoDevice}
@@ -81,8 +81,8 @@ const DeviceTab = ({ children, ...props }) => (
             {props.arduinoConnected && props.arduinoDevices && props.arduinoDevices.length === 0 && (
               <div class="dimmer-content alert alert-info">
                 <Text id="integration.arduino.device.noDevices" />
-              </div> 
-             )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -20,23 +20,30 @@ const SetupTab = ({ children, ...props }) => {
         </button>
       </div>
       <div class="card-body">
-        <div class="row">
-          {props.arduinoDevices &&
-            props.arduinoDevices.map((arduinoDevice, index) => (
-              <SetupDevice
-                device={arduinoDevice}
-                deviceIndex={index}
-                houses={props.houses}
-                updateDeviceProperty={props.updateDeviceProperty}
-                saveDevice={props.saveDevice}
-                deleteDevice={props.deleteDevice}
-              />
-            ))}
-          {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
-            <div class="dimmer-content alert alert-danger">
-              <Text id="integration.arduino.setup.noDevices" />
-            </div>
-          )}
+        <div
+          class={cx('dimmer', {
+            active: props.getArduinoDevicesStatus === RequestStatus.Getting
+          })}
+        >
+          <div class="loader" />
+          <div class="row">
+            {props.arduinoDevices &&
+              props.arduinoDevices.map((arduinoDevice, index) => (
+                <SetupDevice
+                  device={arduinoDevice}
+                  deviceIndex={index}
+                  houses={props.houses}
+                  updateDeviceProperty={props.updateDeviceProperty}
+                  saveDevice={props.saveDevice}
+                  deleteDevice={props.deleteDevice}
+                />
+              ))}
+            {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
+              <div class="dimmer-content alert alert-danger">
+                <Text id="integration.arduino.setup.noDevices" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
