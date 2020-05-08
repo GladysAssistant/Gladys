@@ -12,7 +12,9 @@
     "percentValue": "{{value}}%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "selectPlaceholder": "Selectionnez...",
+    "selectNoOptionLabel": "Aucun choix"
   },
   "calendar": {
     "allDay": "Toute la journée",
