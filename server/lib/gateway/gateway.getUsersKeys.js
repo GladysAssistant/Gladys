@@ -34,6 +34,8 @@ async function getUsersKeys() {
           found.ecdsa_public_key !== onlineUser.ecdsa_public_key
         ) {
           found.accepted = false;
+          found.rsa_public_key = onlineUser.rsa_public_key;
+          found.ecdsa_public_key = onlineUser.ecdsa_public_key;
         }
       } else {
         // if the user is not in the list
