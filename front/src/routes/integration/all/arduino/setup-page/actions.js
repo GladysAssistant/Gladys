@@ -177,6 +177,22 @@ const actions = store => {
         });
       }
     },
+    async saveArduinoDevice(state) {
+      store.setState({
+        connectArduinoStatus: RequestStatus.Getting,
+        arduinoDriverFailed: false
+      });
+      try {
+        await state.httpClient.post('/api/v1/device', {
+          name: state.arduinoPath,
+          model: state.arduinoModel
+        });
+      } catch (e) {
+        store.setState({
+          connectArduinoStatus: RequestStatus.Error
+        });
+      }
+    },
     async discardModel(state) {
       store.setState({
         arduinoDiscardModel: RequestStatus.Getting
