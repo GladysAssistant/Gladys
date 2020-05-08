@@ -48,7 +48,7 @@ const SetupTab = ({ children, ...props }) => {
                     updateDeviceProperty={props.updateDeviceProperty}
                     saveDevice={props.saveDevice}
                     deleteDevice={props.deleteDevice}
-                    arduinoModelsLlist={props.arduinoModelsLlist}
+                    arduinoModelsList={props.arduinoModelsLlist}
                   />
                 ))}
             </div>
