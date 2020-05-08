@@ -33,7 +33,7 @@ const SetupTab = ({ children, ...props }) => {
               />
             ))}
           {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
-            <div class="dimmer-content alert alert-info">
+            <div class="alert alert-danger">
               <Text id="integration.arduino.setup.noDevices" />
             </div>
           )}
