@@ -112,7 +112,7 @@ const actions = store => {
         });
       }
     },
-    async saveArduinoDevice(state) {
+    async saveDevice(state) {
       const uniqueId = uuid.v4();
       store.setState({
         connectArduinoStatus: RequestStatus.Getting,

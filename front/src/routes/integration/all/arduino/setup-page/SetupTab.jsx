@@ -15,7 +15,7 @@ const SetupTab = ({ children, ...props }) => {
             <Text id="integration.arduino.setup.refreshButton" />
           </button>
         </div>
-        <button class="btn btn-outline-primary ml-2">
+        <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
           <Text id="scene.newButton" /> <i class="fe fe-plus" />
         </button>
       </div>
