@@ -112,27 +112,22 @@ const actions = store => {
         });
       }
     },
-    async saveDevice(state) {
-      const uniqueId = uuid.v4();
-      store.setState({
-        connectArduinoStatus: RequestStatus.Getting,
-        arduinoDriverFailed: false
-      });
-      try {
-        await state.httpClient.post('/api/v1/device', {
-          id: uniqueId,
-          name: 'test',
-          external_id: uniqueId,
-          service_id: store.getState().currentIntegration.id,
-          model: state.arduinoModel,
-          room_id: null,
-          selector: arduinoPath
-        });
-      } catch (e) {
-        store.setState({
-          connectArduinoStatus: RequestStatus.Error
-        });
+    async saveDevice(state, index) {
+      const arduino = state.arduinoDevices[index];
+      await state.httpClient.post(`/api/v1/device`, arduino);
+
+    },
+    async deleteDevice(state, index) {
+      const arduion = state.arduinoDevices[index];
+      if (arduino.created_at) {
+        await state.httpClient.delete(`/api/v1/device/${arduino.selector}`);
       }
+      const arduino = update(state.arduinoDevices, {
+        $splice: [[index, 1]]
+      });
+      store.setState({
+        arduinoDevices
+      });
     },
     async discardModel(state) {
       store.setState({

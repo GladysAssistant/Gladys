@@ -3,6 +3,40 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupDevice = ({ children, ...props }) => {
+  saveDevice = async () => {
+    this.setState({
+      loading: true
+    });
+    try {
+      await this.props.saveDevice(this.props.deviceIndex);
+      this.setState({
+        saveError: null
+      });
+    } catch (e) {
+      this.setState({
+        saveError: RequestStatus.Error
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+  deleteDevice = async () => {
+    this.setState({
+      loading: true
+    });
+    try {
+      await this.props.deleteDevice(this.props.deviceIndex);
+    } catch (e) {
+      this.setState({
+        error: RequestStatus.Error
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+
   return (
     <div class="card-body">
       <div
