@@ -5,6 +5,27 @@ import cx from 'classnames';
 import get from 'get-value';
 
 class SelectComponent extends Component {
+  findSelected = () => {
+    const { multiple, value, options, uniqueKey, useGroups } = this.props;
+    let selectedItem;
+    if (!multiple) {
+      if (uniqueKey && options && typeof value === 'string') {
+        let items = options;
+        if (useGroups) {
+          items = options.flatMap(o => this.getGroupItems(o));
+        }
+
+        selectedItem = items.find(o => get(o, uniqueKey) === value);
+      } else {
+        selectedItem = value;
+      }
+
+      selectedItem = selectedItem || '';
+    }
+
+    return selectedItem;
+  };
+
   areItemsEqual(first, second) {
     const { uniqueKey } = this.props;
     if (uniqueKey) {
@@ -19,6 +40,7 @@ class SelectComponent extends Component {
 
     let newStateToSet = { ...changes };
     switch (changes.type) {
+      case Downshift.stateChangeTypes.mouseUp:
       case Downshift.stateChangeTypes.keyDownEscape:
         newStateToSet.selectedItem = state.selectedItem;
         newStateToSet.inputValue = state.inputValue;
@@ -35,8 +57,9 @@ class SelectComponent extends Component {
   };
 
   onChange = item => {
-    const { multiple, onChange } = this.props;
+    const { multiple, onChange, required } = this.props;
     let selectedItems = [];
+    let changed = false;
 
     if (multiple) {
       selectedItems = this.state.selectedItems;
@@ -45,23 +68,29 @@ class SelectComponent extends Component {
     if (item) {
       const itemIndex = selectedItems.findIndex(selected => this.areItemsEqual(selected, item));
       if (itemIndex >= 0) {
-        selectedItems.splice(itemIndex, 1);
+        if (!required || selectedItems.size() > 1) {
+          selectedItems.splice(itemIndex, 1);
+          changed = true;
+        }
       } else {
         selectedItems.push(item);
+        changed = true;
       }
     }
 
-    let callback = () => {
-      if (onChange) {
-        if (multiple) {
-          onChange(selectedItems);
-        } else {
-          onChange(item);
+    if (changed) {
+      let callback = () => {
+        if (onChange) {
+          if (multiple) {
+            onChange(selectedItems);
+          } else {
+            onChange(item);
+          }
         }
-      }
-    };
+      };
 
-    this.setState({ selectedItems }, callback);
+      this.setState({ selectedItems }, callback);
+    }
   };
 
   getGroupItems(group) {
@@ -290,13 +319,16 @@ class SelectComponent extends Component {
   }
 
   render(props) {
+    const selectedItem = this.findSelected();
+
     return (
       <Downshift
         itemToString={this.itemToString}
         {...props}
         onChange={this.onChange}
-        selectedItem={props.multiple ? null : props.value || ''}
+        selectedItem={selectedItem}
         stateReducer={this.stateReducer}
+        value={undefined}
       >
         {downshiftProps => (
           <div class="form-group">
