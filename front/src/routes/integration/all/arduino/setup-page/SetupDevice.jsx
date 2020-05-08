@@ -2,7 +2,8 @@ import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const SetupDevice = ({ children, ...props }) => {
+//const SetupDevice = ({ children, ...props }) => {
+class SetupDevice extends Component {
   saveDevice = async () => {
     this.setState({
       loading: true
@@ -37,7 +38,7 @@ const SetupDevice = ({ children, ...props }) => {
     });
   };
 
-  return (
+  return(props, { loading }) {
     <div class="card-body">
       <div
         class={cx('dimmer', {
@@ -112,7 +113,8 @@ const SetupDevice = ({ children, ...props }) => {
         </div>
       </div>
     </div>
-  );
-};
+
+  }
+}
 
 export default SetupDevice;
