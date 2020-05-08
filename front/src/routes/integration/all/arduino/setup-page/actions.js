@@ -1,5 +1,6 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import uuid from 'uuid';
+import update from 'immutability-helper';
 
 const actions = store => {
   const actions = {
