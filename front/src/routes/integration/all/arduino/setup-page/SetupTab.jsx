@@ -54,6 +54,7 @@ const SetupTab = ({ children, ...props }) => {
                     deleteDevice={props.deleteDevice}
                     arduinoModelsList={props.arduinoModelsList}
                     usbPorts={props.usbPorts}
+                    checkConnected={props.checkConnected}
                   />
                 ))}
             </div>

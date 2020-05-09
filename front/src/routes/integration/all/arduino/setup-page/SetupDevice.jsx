@@ -51,7 +51,9 @@ class SetupDevice extends Component {
     this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
   };
 
-  componentWillMount() { }
+  componentWillMount() { 
+    this.props.checkConnected(this.props.deviceIndex);
+  }
 
   render(props, { loading }) {
     return (
@@ -63,12 +65,12 @@ class SetupDevice extends Component {
         >
           <div class="loader" />
           <div class="dimmer-content">
-            {props.arduinoConnected && (
+            {props.arduinoConnected === RequestStatus.Success && (
               <p class="alert alert-success">
                 <Text id="integration.arduino.setup.connected" />
               </p>
             )}
-            {!props.arduinoConnected && (
+            {props.arduinoConnected === RequestStatus.Error && (
               <p class="alert alert-danger">
                 <Text id="integration.arduino.setup.notConnected" />
               </p>
