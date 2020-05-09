@@ -20,12 +20,6 @@ const actions = store => {
         }
         const arduinoDevices = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
-        arduinoDevices.forEach(camera => {
-          const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
-          if (cameraUrlParam) {
-            camera.cameraUrl = cameraUrlParam;
-          }
-        });
         store.setState({
           arduinoDevices,
           getArduinoDevicesStatus: RequestStatus.Success

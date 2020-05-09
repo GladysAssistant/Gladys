@@ -26,40 +26,30 @@ function createActions(store) {
         });
       }
     },
-    async getArduinoDevices(state, take, skip) {
+    async getArduinoDevices(state) {
       store.setState({
         getArduinoDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          service: 'arduino',
-          order_dir: state.getArduinoDeviceOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getArduinoDevicesOrderDir || 'asc'
         };
-        if (state.arduinoDeviceSearch && state.arduinoDeviceSearch.length) {
-          options.search = state.arduinoDeviceSearch;
+        if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
+          options.search = state.arduinoDevicesSearch;
         }
-        const arduinoDevicesReceived = await state.httpClient.get('/api/v1/service/arduino/device', options);
-        let arduinoDevices;
-        if (skip === 0) {
-          arduinoDevices = arduinoDevicesReceived;
-        } else {
-          arduinoDevices = update(state.arduinoDevices, {
-            $push: arduinoDevicesReceived
-          });
-        }
+        const arduinoDevices = await state.httpClient.get('/api/v1/service/arduino/device', options);
+
         store.setState({
           arduinoDevices,
           getArduinoDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          arduinoDevices: [],
-          getArduinoDevicesStatus: RequestStatus.Error
+          getArduinoDevices: RequestStatus.Error
         });
       }
-    }, async addDevice(state) {
+    },
+     async addDevice(state) {
       const uniqueId = uuid.v4();
       await integrationActions.getIntegrationByName(state, 'arduino');
       const arduinoDevices = update(state.arduinoDevices, {
