@@ -59,7 +59,8 @@ const DeviceTab = ({ children, ...props }) => (
               <Text id="integration.arduino.device.arduinoConnected" /> : {props.arduinoModel}
             </p>
           )}
-          {!props.arduinoConnected && (
+          {props.arduinoDevices &&
+          props.arduinoDevices.length === 0 && (
             <p class="alert alert-danger">
               <Text id="integration.arduino.device.arduinoNotConnected" />
             </p>
