@@ -73,7 +73,6 @@ const actions = store => {
     },
     async addDevice(state) {
       const uniqueId = uuid.v4();
-      await integrationActions.getIntegrationByName(state, 'arduino');
       const arduinoDevices = update(state.arduinoDevices, {
         $push: [
           {
