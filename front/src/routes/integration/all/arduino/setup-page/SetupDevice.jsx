@@ -52,7 +52,7 @@ class SetupDevice extends Component {
   };
 
   componentWillMount() { 
-    this.props.checkConnected(this.props.deviceIndex);
+    //this.props.checkConnected(this.props.deviceIndex);
   }
 
   render(props, { loading }) {
