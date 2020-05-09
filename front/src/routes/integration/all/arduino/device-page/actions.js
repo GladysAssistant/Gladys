@@ -95,6 +95,7 @@ function createActions(store) {
         $push: [
           {
             name: null,
+            selector: null,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             room_id: null,
