@@ -67,9 +67,9 @@ const DeviceTab = ({ children, ...props }) => (
           <div class="row">
             {props.arduinoDevices &&
               props.devices &&
-              props.devices.map((arduinoDevice, index) => (
+              props.devices.map((device, index) => (
                 <Device
-                  device={arduinoDevice}
+                  device={device}
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
