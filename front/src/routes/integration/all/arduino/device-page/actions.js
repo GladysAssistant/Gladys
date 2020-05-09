@@ -55,10 +55,12 @@ function createActions(store) {
       const devices = update(state.devices, {
         $push: [
           {
-            id: uniqueId,
             name: null,
+            selector: null,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
+            romm_id: null,
+            model: null,
             features: [
               {
                 name: null,
