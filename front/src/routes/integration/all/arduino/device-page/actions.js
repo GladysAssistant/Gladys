@@ -112,7 +112,7 @@ function createActions(store) {
               {
                 name: 'ARDUINO_SELECTOR',
                 value: null,
-              }
+              },
             ],
           },
         ],
@@ -120,10 +120,6 @@ function createActions(store) {
       store.setState({
         devices,
       });
-    },
-    async saveDevice(state, index) {
-      const device = state.devices[index];
-      await state.httpClient.post('/api/v1/device', device);
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
@@ -246,6 +242,10 @@ function createActions(store) {
       store.setState({
         devices,
       });
+    },
+    async saveDevice(state, index) {
+      const device = state.devices[index];
+      await state.httpClient.post('/api/v1/device', device);
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];
