@@ -81,7 +81,7 @@ const DeviceTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.arduinoDevices && props.devices.length === 0 && (
+            {props.arduinoDevices && props.arduinoDevices.length > 0 && props.devices.length === 0 && (
               <div class="dimmer-content alert alert-info">
                 <Text id="integration.arduino.device.noDevices" />
               </div>
