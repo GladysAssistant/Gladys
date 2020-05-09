@@ -123,7 +123,11 @@ const actions = store => {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
-            [arduinoPathIndex]: value
+            [arduinoPathIndex]: {
+              value: {
+                $set: value
+              }
+            }
           }
         }
       });
@@ -136,7 +140,11 @@ const actions = store => {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
-            [arduinoModelIndex]: value
+            [arduinoModelIndex]: {
+              value: {
+                $set: value
+              }
+            }
           }
         }
       });
@@ -147,7 +155,9 @@ const actions = store => {
     updateArduinoName(state, index, value) {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
-          name: value
+          [name]: {
+            $set: value
+          }
         }
       });
       store.setState({
