@@ -50,10 +50,12 @@ function createActions(store) {
       }
     },
     async getDevices(state) {
-      const devices = {};
-      store.setState({
-        devices
-      });
+      const devices = [];
+      if (!state.devices) {
+        store.setState({
+          devices
+        });
+      }
     },
     async addDevice(state) {
       const uniqueId = uuid.v4();
