@@ -109,7 +109,7 @@ class SetupDevice extends Component {
                       </option>
                       {props.arduinoModelsList &&
                         props.arduinoModelsList.map((model) => (
-                          <option value={model} selected={props.arduinoModel === model}>
+                          <option value={model} selected={props.device.params[1].value === model}>
                             {model}
                           </option>
                         ))}
