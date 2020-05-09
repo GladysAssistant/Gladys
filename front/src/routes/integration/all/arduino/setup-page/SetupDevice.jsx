@@ -125,7 +125,7 @@ class SetupDevice extends Component {
                       </option>
                       {props.usbPorts &&
                         props.usbPorts.map((usbPort) => (
-                          <option value={usbPort.comPath} selected={props.arduinoPath === usbPort.comPath}>
+                          <option value={usbPort.comPath} selected={props.device.params[0].value === usbPort.comPath}>
                             {usbPort.comName} - {usbPort.manufacturer}
                           </option>
                         ))}
