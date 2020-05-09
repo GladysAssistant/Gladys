@@ -34,16 +34,16 @@ const DeviceTab = ({ children, ...props }) => (
           </Localizer>
         </div>
         <div class="page-options d-flex ml-2">
-          <button class="btn btn-info" onClick={props.getUsbPorts && props.getArduinoDevices && getDevices}>
+          <button class="btn btn-info" onClick={props.getUsbPorts && props.getArduinoDevices && props.getDevices}>
             <Text id="integration.arduino.device.refreshButton" />
           </button>
         </div>
         {props.arduinoDevices &&
-        props.arduinoDevices.length > 0 && (
-          <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
-            <Text id="scene.newButton" /> <i class="fe fe-plus" />
-          </button>
-        )}
+          props.arduinoDevices.length > 0 && (
+            <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
+              <Text id="scene.newButton" /> <i class="fe fe-plus" />
+            </button>
+          )}
 
       </div>
     </div>
@@ -56,17 +56,17 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           {props.arduinoDevices &&
-          props.arduinoDevices.length > 0 && (
-            <p class="alert alert-success">
-              <Text id="integration.arduino.device.arduinoConnected" />
-            </p>
-          )}
+            props.arduinoDevices.length > 0 && (
+              <p class="alert alert-success">
+                <Text id="integration.arduino.device.arduinoConnected" />
+              </p>
+            )}
           {props.arduinoDevices &&
-          props.arduinoDevices.length === 0 && (
-            <p class="alert alert-danger">
-              <Text id="integration.arduino.device.arduinoNotConnected" />
-            </p>
-          )}
+            props.arduinoDevices.length === 0 && (
+              <p class="alert alert-danger">
+                <Text id="integration.arduino.device.arduinoNotConnected" />
+              </p>
+            )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.arduinoDevices &&
