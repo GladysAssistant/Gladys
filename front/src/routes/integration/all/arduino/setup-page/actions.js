@@ -98,7 +98,7 @@ const actions = store => {
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             room_id: null,
-            model: null,
+            model: 'card',
             params: [
               {
                 name: 'ARDUINO_PATH',
