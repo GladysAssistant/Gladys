@@ -110,17 +110,17 @@ const actions = store => {
             external_id: uniqueId,
             service_id: state.currentIntegration.id,
             room_id: null,
-            model: null
-          }
-        ],
-        params: [
-          {
-            name: 'ARDUINO_PATH',
-            value: null
-          },
-          {
-            name: 'ARDUINO_MODEL',
-            value: null
+            model: null,
+            params: [
+              {
+                name: 'ARDUINO_PATH',
+                value: null
+              },
+              {
+                name: 'ARDUINO_MODEL',
+                value: null
+              }
+            ]
           }
         ]
       });
