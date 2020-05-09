@@ -39,8 +39,8 @@ class SetupDevice extends Component {
     });
   };
 
-  updateName = e => {
-    this.props.updateName(this.props.deviceIndex, e.target.value);
+  updateArduinoName = e => {
+    this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
   };
 
   updateArduinoPath = e => {
@@ -93,7 +93,7 @@ class SetupDevice extends Component {
                         id="arduinoName"
                         type="text"
                         value={props.device.name}
-                        onInput={this.updateName}
+                        onInput={this.updateArduinoName}
                         class="form-control"
                         placeholder={<Text id="integration.arduino.setup.nameLabel" />}
                       />

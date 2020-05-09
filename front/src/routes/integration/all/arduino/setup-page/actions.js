@@ -144,7 +144,7 @@ const actions = store => {
         arduinoDevices
       });
     },
-    updateName(state, index, value) {
+    updateArduinoName(state, index, value) {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           name: value
