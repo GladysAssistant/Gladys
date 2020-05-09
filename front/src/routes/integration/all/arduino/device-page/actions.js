@@ -52,7 +52,7 @@ function createActions(store) {
      async addDevice(state) {
       const uniqueId = uuid.v4();
       await integrationActions.getIntegrationByName(state, 'arduino');
-      const arduinoDevices = update(state.arduinoDevices, {
+      const devices = update(state.devices, {
         $push: [
           {
             id: uniqueId,
@@ -83,7 +83,7 @@ function createActions(store) {
         ]
       });
       store.setState({
-        arduinoDevices
+        devices
       });
     },
     async saveDevice(state, index) {
