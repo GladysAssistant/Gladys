@@ -8,123 +8,123 @@ const Profile = ({ children, ...props }) => {
   return (
     <div>
       {props.unknownError && (
-        <div class="alert alert-danger" role="alert">
-          <Text id="profile.unknownError" />
+        <div class='alert alert-danger' role='alert'>
+          <Text id='profile.unknownError' />
         </div>
       )}
       {props.networkError && (
-        <div class="alert alert-danger" role="alert">
-          <Text id="profile.networkError" />
+        <div class='alert alert-danger' role='alert'>
+          <Text id='profile.networkError' />
         </div>
       )}
       {props.emailAlreadyExistError && (
-        <div class="alert alert-danger" role="alert">
-          <Text id="profile.emailAlreadyExistError" />
+        <div class='alert alert-danger' role='alert'>
+          <Text id='profile.emailAlreadyExistError' />
         </div>
       )}
       {props.selectorAlreadyExist && (
-        <div class="alert alert-danger" role="alert">
-          <Text id="profile.selectorAlreadyExistError" />
+        <div class='alert alert-danger' role='alert'>
+          <Text id='profile.selectorAlreadyExistError' />
         </div>
       )}
       {props.instanceAlreadyConfiguredError && (
-        <div class="alert alert-danger" role="alert">
-          <Text id="profile.instanceAlreadyConfiguredError" />
+        <div class='alert alert-danger' role='alert'>
+          <Text id='profile.instanceAlreadyConfiguredError' />
         </div>
       )}
       <div>
-        <div class="row gutters-xs">
-          <div class="col">
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="profile.firstnameLabel" />
+        <div class='row gutters-xs'>
+          <div class='col'>
+            <div class='form-group'>
+              <label class='form-label'>
+                <Text id='profile.firstnameLabel' />
               </label>
               <Localizer>
                 <input
-                  type="text"
+                  type='text'
                   class={cx('form-control', {
                     'is-invalid': get(props, 'errors.firstname')
                   })}
                   value={props.newUser.firstname}
                   onInput={props.updateFirstname}
-                  placeholder={<Text id="profile.firstnamePlaceholder" />}
+                  placeholder={<Text id='profile.firstnamePlaceholder' />}
                 />
               </Localizer>
-              <div class="invalid-feedback">
-                <Text id="profile.firstnameError" />
+              <div class='invalid-feedback'>
+                <Text id='profile.firstnameError' />
               </div>
             </div>
           </div>
-          <div class="col">
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="profile.lastnameLabel" />
+          <div class='col'>
+            <div class='form-group'>
+              <label class='form-label'>
+                <Text id='profile.lastnameLabel' />
               </label>
               <Localizer>
                 <input
-                  type="text"
+                  type='text'
                   class={cx('form-control', {
                     'is-invalid': get(props, 'errors.lastname')
                   })}
                   value={props.newUser.lastname}
                   onInput={props.updateLastname}
-                  placeholder={<Text id="profile.lastnamePlaceholder" />}
+                  placeholder={<Text id='profile.lastnamePlaceholder' />}
                 />
               </Localizer>
-              <div class="invalid-feedback">
-                <Text id="profile.lastnameError" />
+              <div class='invalid-feedback'>
+                <Text id='profile.lastnameError' />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.selectorLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.selectorLabel' />
         </label>
         <small>
-          <Text id="profile.selectorText" />
+          <Text id='profile.selectorText' />
         </small>
-        <input class="form-control" disabled value={props.newUser.selector} />
+        <input class='form-control' disabled value={props.newUser.selector} />
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.emailLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.emailLabel' />
         </label>
         <Localizer>
           <input
-            type="email"
+            type='email'
             class={cx('form-control', {
               'is-invalid': get(props, 'errors.email')
             })}
             value={props.newUser.email}
             onInput={props.updateEmail}
-            placeholder={<Text id="profile.emailPlaceholder" />}
+            placeholder={<Text id='profile.emailPlaceholder' />}
           />
         </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.emailError" />
+        <div class='invalid-feedback'>
+          <Text id='profile.emailError' />
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.languageLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.languageLabel' />
         </label>
-        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control custom-select">
-          <option value="en">
-            <Text id="profile.english" />
+        <select value={props.newUser.language} onChange={props.updateLanguage} class='form-control custom-select'>
+          <option value='en'>
+            <Text id='profile.english' />
           </option>
-          <option value="fr">
-            <Text id="profile.french" />
+          <option value='fr'>
+            <Text id='profile.french' />
           </option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.birthdateLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.birthdateLabel' />
         </label>
-        <div class="row gutters-xs">
-          <div class="col-4">
+        <div class='row gutters-xs'>
+          <div class='col-4'>
             <select
               value={props.newUser.birthdateYear}
               onInput={props.updateBirthdateYear}
@@ -132,15 +132,15 @@ const Profile = ({ children, ...props }) => {
                 'is-invalid': get(props, 'errors.birthdate')
               })}
             >
-              <option value="">
-                <Text id="profile.year" />
+              <option value=''>
+                <Text id='profile.year' />
               </option>
               {props.years.map(year => (
                 <option value={year}>{year}</option>
               ))}
             </select>
           </div>
-          <div class="col-5">
+          <div class='col-5'>
             <select
               value={props.newUser.birthdateMonth}
               onInput={props.updateBirthdateMonth}
@@ -148,8 +148,8 @@ const Profile = ({ children, ...props }) => {
                 'is-invalid': get(props, 'errors.birthdate')
               })}
             >
-              <option value="">
-                <Text id="profile.month" />
+              <option value=''>
+                <Text id='profile.month' />
               </option>
               {props.months.map(month => (
                 <option value={month}>
@@ -161,7 +161,7 @@ const Profile = ({ children, ...props }) => {
               ))}
             </select>
           </div>
-          <div class="col-3">
+          <div class='col-3'>
             <select
               value={props.newUser.birthdateDay}
               onInput={props.updateBirthdateDay}
@@ -169,8 +169,8 @@ const Profile = ({ children, ...props }) => {
                 'is-invalid': get(props, 'errors.birthdate')
               })}
             >
-              <option value="">
-                <Text id="profile.day" />
+              <option value=''>
+                <Text id='profile.day' />
               </option>
               {props.days.map(day => (
                 <option value={day}>{day}</option>
@@ -179,30 +179,31 @@ const Profile = ({ children, ...props }) => {
           </div>
         </div>
         <input
-          type="hidden"
+          type='hidden'
           class={cx('form-control', {
             'is-invalid': get(props, 'errors.birthdate')
           })}
         />
-        <div class="invalid-feedback">
-          <Text id="profile.birthdateError" />
+        <div class='invalid-feedback'>
+          <Text id='profile.birthdateError' />
         </div>
       </div>
       {!props.disableProfilePicture && (
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="profile.profilePictureLabel" />
+        <div class='form-group'>
+          <label class='form-label'>
+            <Text id='profile.profilePictureLabel' />
           </label>
 
-          <div class="custom-file">
+          <div class='custom-file'>
             <input
-              type="file"
-              class="custom-file-input"
+              type='file'
+              class='custom-file-input'
               onChange={props.updateProfilePicture}
               value={props.newProfilePictureFormValue}
+              lang={props.newUser.language}
             />
-            <label class="custom-file-label">
-              <Text id="profile.chooseFileLabel" />
+            <label class='custom-file-label'>
+              <Text id='profile.chooseFileLabel' />
             </label>
           </div>
           {props.newProfilePictureFormValue && (
@@ -213,44 +214,44 @@ const Profile = ({ children, ...props }) => {
           )}
         </div>
       )}
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.passwordLabel' />
         </label>
         <Localizer>
           <input
-            type="password"
+            type='password'
             class={cx('form-control', {
               'is-invalid': get(props, 'errors.password'),
               'is-valid': props.validPassword && !get(props, 'errors.password')
             })}
             value={props.newUser.password}
             onInput={props.updatePassword}
-            placeholder={<Text id="profile.passwordPlaceholder" />}
+            placeholder={<Text id='profile.passwordPlaceholder' />}
           />
         </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordError" />
+        <div class='invalid-feedback'>
+          <Text id='profile.passwordError' />
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordRepeatLabel" />
+      <div class='form-group'>
+        <label class='form-label'>
+          <Text id='profile.passwordRepeatLabel' />
         </label>
         <Localizer>
           <input
-            type="password"
+            type='password'
             class={cx('form-control', {
               'is-invalid': get(props, 'errors.passwordRepeat'),
               'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
             })}
             value={props.newUser.passwordRepeat}
             onInput={props.updatePasswordRepeat}
-            placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
+            placeholder={<Text id='profile.passwordRepeatPlaceholder' />}
           />
         </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordRepeatError" />
+        <div class='invalid-feedback'>
+          <Text id='profile.passwordRepeatError' />
         </div>
       </div>
     </div>
