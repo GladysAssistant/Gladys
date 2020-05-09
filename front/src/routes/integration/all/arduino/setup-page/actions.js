@@ -112,6 +112,16 @@ const actions = store => {
             room_id: null,
             model: null
           }
+        ],
+        params: [
+          {
+            name: 'ARDUINO_PATH',
+            value: null
+          },
+          {
+            name: 'ARDUINO_MODEL',
+            value: null
+          }
         ]
       });
       store.setState({
