@@ -164,35 +164,13 @@ const actions = store => {
         arduinoDevices
       });
     },
-    async savePathAndConnect(state) {
-      store.setState({
-        connectArduinoStatus: RequestStatus.Getting,
-        arduinoDriverFailed: false
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
-          value: state.arduinoPath
-        });
-        await state.httpClient.post('/api/v1/service/arduino/connect');
-        store.setState({
-          connectArduinoStatus: RequestStatus.Success,
-          arduinoConnectionInProgress: true,
-          arduinoConnected: true
-        });
-        await actions.saveModel(store.getState());
-      } catch (e) {
-        store.setState({
-          connectArduinoStatus: RequestStatus.Error
-        });
-      }
-    },
     async saveDevice(state, index) {
       const arduino = state.arduinoDevices[index];
       await state.httpClient.post(`/api/v1/device`, arduino);
 
     },
     async deleteDevice(state, index) {
-      const arduion = state.arduinoDevices[index];
+      const arduino = state.arduinoDevices[index];
       if (arduino.created_at) {
         await state.httpClient.delete(`/api/v1/device/${arduino.selector}`);
       }
@@ -202,45 +180,6 @@ const actions = store => {
       store.setState({
         arduinoDevices
       });
-    },
-    async discardModel(state) {
-      store.setState({
-        arduinoDiscardModel: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_MODEL', {
-          value: "---------"
-        });
-        await actions.getStatus(store.getState());
-        store.setState({
-          arduinoDiscardModel: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          arduinoDiscardModel: RequestStatus.Error
-        });
-      }
-    },
-    async disconnect(state) {
-      store.setState({
-        arduinoDisconnectStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/arduino/variable/ARDUINO_PATH', {
-          value: "---------"
-        });
-        await state.httpClient.post('/api/v1/service/arduino/disconnect');
-        await actions.getStatus(store.getState());
-        store.setState({
-          arduinoDisconnectStatus: RequestStatus.Success,
-          arduinoConnected: false
-        });
-        await actions.discardModel(store.getState());
-      } catch (e) {
-        store.setState({
-          arduinoDisconnectStatus: RequestStatus.Error
-        });
-      }
     }
   };
 
