@@ -56,7 +56,7 @@ const actions = store => {
       store.setState({
         arduinoConnected: RequestStatus.Getting
       });
-      try{
+      try {
         await actions.getUsbPorts();
         const arduinoPath = state.arduinoDevices[index].params[0].value;
         var connected = false;
@@ -70,21 +70,21 @@ const actions = store => {
 
           if (connected) {
             store.setState({
-              arduinoConnected: true
+              arduinoConnected: RequestStatus.Success
             });
           } else {
             store.setState({
-              arduinoConnected: false
+              arduinoConnected: RequestStatus.Error
             });
           }
         } else {
           store.setState({
-            arduinoConnected: false
+            arduinoConnected: RequestStatus.Error
           });
         }
-      }catch (e) {
+      } catch (e) {
         store.setState({
-          arduinoConnected:RequestStatus.Error
+          arduinoConnected: RequestStatus.Error
         })
       }
     },
