@@ -10,9 +10,6 @@ class SetupDevice extends Component {
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
-      this.setState({
-        saveError: null
-      });
     } catch (e) {
       this.setState({
         saveError: RequestStatus.Error

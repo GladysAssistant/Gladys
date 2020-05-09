@@ -8,7 +8,9 @@ import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
   saveDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ 
+      loading: true 
+    });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
@@ -32,7 +34,9 @@ class ArduinoDeviceBox extends Component {
         error: RequestStatus.Error
       });
     }
-    this.setState({ loading: false });
+    this.setState({ 
+      loading: false 
+    });
   };
 
   updateName = e => {
@@ -49,10 +53,6 @@ class ArduinoDeviceBox extends Component {
 
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
-  };
-
-  updateExternalId = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', e.target.value);
   };
 
   render(props, { loading }) {
