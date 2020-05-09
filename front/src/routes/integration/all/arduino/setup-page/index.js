@@ -14,6 +14,7 @@ class ArduinoSetupPage extends Component {
     //this.props.checkConnected();
     //this.props.getCurrentArduinoPath();
     //this.props.getCurrentArduinoModel();
+    this.props.getArduinoDevices();
     this.props.getModels();
     this.props.getManufacturers();
   }

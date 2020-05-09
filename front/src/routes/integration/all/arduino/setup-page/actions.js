@@ -4,6 +4,35 @@ import update from 'immutability-helper';
 
 const actions = store => {
   const actions = {
+    async getArduinoDevices(state) {
+      store.setState({
+        getArduinoDevicesStatus: RequestStatus.Getting
+      });
+      try {
+        const options = {
+          order_dir: state.getArduinoDevicesOrderDir || 'asc'
+        };
+        if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
+          options.search = state.arduinoDevicesSearch;
+        }
+        const arduinoDevices = await state.httpClient.get('/api/v1/service/arduino/device', options);
+
+        arduinoDevices.forEach(camera => {
+          const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
+          if (cameraUrlParam) {
+            camera.cameraUrl = cameraUrlParam;
+          }
+        });
+        store.setState({
+          arduinoDevices,
+          getArduinoDevicesStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getArduinoDevices: RequestStatus.Error
+        });
+      }
+    },
     async getUsbPorts(state) {
       store.setState({
         getArduinoUsbPortStatus: RequestStatus.Getting
