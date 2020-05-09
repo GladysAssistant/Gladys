@@ -107,6 +107,18 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    updateName(state, index, value) {
+      const devices = update(state.devices, {
+        [index]: {
+          ['name']: {
+            $set: value
+          }
+        }
+      });
+      store.setState({
+        devices
+      });
+    },
     updateDataPin(state, index, value) {
       let arduinoDataPinIndex = state.devices[index].params.findIndex(param => param.name === 'DATA_PIN');
       const devices = update(state.devices, {

@@ -32,7 +32,7 @@ class ArduinoDeviceBox extends Component {
   };
 
   updateName = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
+    this.props.updateName(this.props.deviceIndex, e.target.value);
   };
 
   updateDataPin = e => {
