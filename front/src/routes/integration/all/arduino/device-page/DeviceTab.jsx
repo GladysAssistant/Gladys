@@ -38,7 +38,8 @@ const DeviceTab = ({ children, ...props }) => (
             <Text id="integration.arduino.device.refreshButton" />
           </button>
         </div>
-        {props.arduinoConnected && (
+        {props.arduinoDevices &&
+        props.arduinoDevices.length > 0 && (
           <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
             <Text id="scene.newButton" /> <i class="fe fe-plus" />
           </button>
