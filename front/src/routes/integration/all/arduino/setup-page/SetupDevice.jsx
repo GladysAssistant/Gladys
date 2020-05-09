@@ -80,7 +80,6 @@ class SetupDevice extends Component {
                 <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
               </p>
             )}
-            <form>
               <div class="row mt-5">
                 <div class="col">
                   <div class="form-group">
@@ -139,7 +138,6 @@ class SetupDevice extends Component {
                   </button>
                 </div>
               </div>
-            </form>
           </div>
         </div>
       </div>
