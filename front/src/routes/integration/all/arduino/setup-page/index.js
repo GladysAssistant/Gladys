@@ -17,6 +17,7 @@ class ArduinoSetupPage extends Component {
     this.props.getArduinoDevices();
     this.props.getModels();
     this.props.getManufacturers();
+    this.props.getUsbPorts();
   }
 
   componentWillUnmount() {
