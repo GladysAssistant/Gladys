@@ -75,6 +75,16 @@ const actions = store => {
         arduinoDevices
       });
     },
+    updateArduinoName(state, index, value) {
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          name: value
+        }
+      });
+      store.setState({
+        arduinoDevices
+      });
+    },
     getModels(state) {
       store.setState({
         arduinoModelsList: [
