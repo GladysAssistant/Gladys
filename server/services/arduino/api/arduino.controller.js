@@ -2,7 +2,6 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
-
   /**
    * @api {post} /api/v1/service/arduino/connect Connect
    * @apiName connect
@@ -74,6 +73,6 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
     'get /api/v1/service/arduino/status': {
       authenticated: true,
       controller: asyncMiddleware(getStatus),
-    }
+    },
   };
 };

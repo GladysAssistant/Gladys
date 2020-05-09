@@ -6,50 +6,49 @@ import { RequestStatus } from '../../../../../utils/consts';
 class SetupDevice extends Component {
   saveDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error
+        saveError: RequestStatus.Error,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   deleteDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        error: RequestStatus.Error
+        error: RequestStatus.Error,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
-  updateArduinoName = e => {
+  updateArduinoName = (e) => {
     this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
   };
 
-  updateArduinoPath = e => {
+  updateArduinoPath = (e) => {
     this.props.updateArduinoPath(this.props.deviceIndex, e.target.value);
   };
 
-  updateArduinoModel = e => {
+  updateArduinoModel = (e) => {
     this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
   };
 
-  componentWillMount() {
-  }
+  componentWillMount() {}
 
   render(props, { loading }) {
     return (
@@ -103,7 +102,10 @@ class SetupDevice extends Component {
                     </option>
                     {props.arduinoModelsList &&
                       props.arduinoModelsList.map((model) => (
-                        <option value={model} selected={props.device.params.find(e => e.name === "ARDUINO_MODEL").value === model}>
+                        <option
+                          value={model}
+                          selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model}
+                        >
                           {model}
                         </option>
                       ))}
@@ -119,7 +121,12 @@ class SetupDevice extends Component {
                     </option>
                     {props.usbPorts &&
                       props.usbPorts.map((usbPort) => (
-                        <option value={usbPort.comPath} selected={props.device.params.find(e => e.name === "ARDUINO_PATH").value === usbPort.comPath}>
+                        <option
+                          value={usbPort.comPath}
+                          selected={
+                            props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath
+                          }
+                        >
                           {usbPort.comName} - {usbPort.manufacturer}
                         </option>
                       ))}
@@ -137,7 +144,6 @@ class SetupDevice extends Component {
           </div>
         </div>
       </div>
-
     );
   }
 }

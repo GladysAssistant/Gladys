@@ -22,7 +22,7 @@ const SetupTab = ({ children, ...props }) => {
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.getArduinoDevicesStatus === RequestStatus.Getting
+            active: props.getArduinoDevicesStatus === RequestStatus.Getting,
           })}
         >
           <div class="loader" />
@@ -32,11 +32,12 @@ const SetupTab = ({ children, ...props }) => {
                 <Text id="integration.arduino.setup.connected" /> : {props.arduinoModel}
               </p>
             )}
-            {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
-              <p class="alert alert-danger">
-                <Text id="integration.arduino.setup.notConnected" />
-              </p>
-            )}
+            {!props.arduinoDevices ||
+              (props.arduinoDevices.length === 0 && (
+                <p class="alert alert-danger">
+                  <Text id="integration.arduino.setup.notConnected" />
+                </p>
+              ))}
             <p>
               <MarkupText id="integration.arduino.setup.arduinoDescription" />
             </p>

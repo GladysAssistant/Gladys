@@ -38,35 +38,31 @@ const DeviceTab = ({ children, ...props }) => (
             <Text id="integration.arduino.device.refreshButton" />
           </button>
         </div>
-        {props.arduinoDevices &&
-          props.arduinoDevices.length > 0 && (
-            <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
-              <Text id="scene.newButton" /> <i class="fe fe-plus" />
-            </button>
-          )}
-
+        {props.arduinoDevices && props.arduinoDevices.length > 0 && (
+          <button class="btn btn-outline-primary ml-2" onClick={props.addDevice}>
+            <Text id="scene.newButton" /> <i class="fe fe-plus" />
+          </button>
+        )}
       </div>
     </div>
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getArduinoDevicesStatus === RequestStatus.Getting
+          active: props.getArduinoDevicesStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.arduinoDevices &&
-            props.arduinoDevices.length > 0 && (
-              <p class="alert alert-success">
-                <Text id="integration.arduino.device.arduinoConnected" />
-              </p>
-            )}
-          {props.arduinoDevices &&
-            props.arduinoDevices.length === 0 && (
-              <p class="alert alert-danger">
-                <Text id="integration.arduino.device.arduinoNotConnected" />
-              </p>
-            )}
+          {props.arduinoDevices && props.arduinoDevices.length > 0 && (
+            <p class="alert alert-success">
+              <Text id="integration.arduino.device.arduinoConnected" />
+            </p>
+          )}
+          {props.arduinoDevices && props.arduinoDevices.length === 0 && (
+            <p class="alert alert-danger">
+              <Text id="integration.arduino.device.arduinoNotConnected" />
+            </p>
+          )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.arduinoDevices &&

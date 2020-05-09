@@ -8,50 +8,50 @@ import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
   saveDevice = async () => {
-    this.setState({ 
-      loading: true 
+    this.setState({
+      loading: true,
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({ 
-        error: RequestStatus.Error 
+      this.setState({
+        error: RequestStatus.Error,
       });
     }
-    this.setState({ 
-      loading: false 
+    this.setState({
+      loading: false,
     });
   };
 
   deleteDevice = async () => {
-    this.setState({ 
-      loading: true 
+    this.setState({
+      loading: true,
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({ 
-        error: RequestStatus.Error
+      this.setState({
+        error: RequestStatus.Error,
       });
     }
-    this.setState({ 
-      loading: false 
+    this.setState({
+      loading: false,
     });
   };
 
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateName(this.props.deviceIndex, e.target.value);
   };
 
-  updateDataPin = e => {
+  updateDataPin = (e) => {
     this.props.updateDataPin(this.props.deviceIndex, e.target.value);
   };
 
-  updateSubservice = e => {
+  updateSubservice = (e) => {
     this.props.updateSubservice(this.props.deviceIndex, e.target.value);
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
@@ -62,7 +62,7 @@ class ArduinoDeviceBox extends Component {
           <div class="card-header">{props.device.name || <Text id="integration.arduino.device.noNameLabel" />}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -94,9 +94,9 @@ class ArduinoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {props.houses &&
-                        props.houses.map(house => (
+                        props.houses.map((house) => (
                           <optgroup label={house.name}>
-                            {house.rooms.map(room => (
+                            {house.rooms.map((room) => (
                               <option selected={room.id === props.device.room_id} value={room.id}>
                                 {room.name}
                               </option>
@@ -146,11 +146,16 @@ class ArduinoDeviceBox extends Component {
                     <div class="tags">
                       {props.device &&
                         props.device.features &&
-                        props.device.features.map(feature => (
+                        props.device.features.map((feature) => (
                           <span class="tag">
                             <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                             <div class="tag-addon">
-                              <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+                              <i
+                                class={`fe fe-${get(
+                                  DeviceFeatureCategoriesIcon,
+                                  `${feature.category}.${feature.type}`
+                                )}`}
+                              />
                             </div>
                           </span>
                         ))}

@@ -1,10 +1,10 @@
 const ArduinoManager = function ArduinoManager(Arduino, eventManager, serviceId) {
-    this.eventManager = eventManager;
-    this.serviceId = serviceId;
-    this.nodes = {};
-    this.connected = false;
-    // setup all events listener
-    /*this.arduino.on('driver ready', this.driverReady.bind(this));
+  this.eventManager = eventManager;
+  this.serviceId = serviceId;
+  this.nodes = {};
+  this.connected = false;
+  // setup all events listener
+  /*this.arduino.on('driver ready', this.driverReady.bind(this));
     this.arduino.on('driver failed', this.driverFailed.bind(this));
     this.arduino.on('node added', this.nodeAdded.bind(this));
     this.arduino.on('node removed', this.nodeRemoved.bind(this));

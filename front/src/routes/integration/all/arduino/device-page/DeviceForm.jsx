@@ -5,19 +5,19 @@ import get from 'get-value';
 import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
 
 class ArduinoDeviceForm extends Component {
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateDataPin = e => {
+  updateDataPin = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'dataPin', e.target.value);
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  updateExternalId = e => {
+  updateExternalId = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', e.target.value);
   };
 
@@ -49,9 +49,9 @@ class ArduinoDeviceForm extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {props.houses &&
-              props.houses.map(house => (
+              props.houses.map((house) => (
                 <optgroup label={house.name}>
-                  {house.rooms.map(room => (
+                  {house.rooms.map((room) => (
                     <option selected={room.id === props.device.room_id} value={room.id}>
                       {room.name}
                     </option>
@@ -101,7 +101,7 @@ class ArduinoDeviceForm extends Component {
           <div class="tags">
             {props.device &&
               props.device.features &&
-              props.device.features.map(feature => (
+              props.device.features.map((feature) => (
                 <span class="tag">
                   <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                   <div class="tag-addon">

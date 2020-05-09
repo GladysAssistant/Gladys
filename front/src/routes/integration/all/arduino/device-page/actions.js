@@ -12,27 +12,27 @@ function createActions(store) {
   const actions = {
     async getUsbPorts(state) {
       store.setState({
-        getArduinoUsbPortStatus: RequestStatus.Getting
+        getArduinoUsbPortStatus: RequestStatus.Getting,
       });
       try {
         const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
         store.setState({
           usbPorts,
-          getArduinoUsbPortStatus: RequestStatus.Success
+          getArduinoUsbPortStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getArduinoUsbPortStatus: RequestStatus.Error
+          getArduinoUsbPortStatus: RequestStatus.Error,
         });
       }
     },
     async getArduinoDevices(state) {
       store.setState({
-        getArduinoDevicesStatus: RequestStatus.Getting
+        getArduinoDevicesStatus: RequestStatus.Getting,
       });
       try {
         const options = {
-          order_dir: state.getArduinoDevicesOrderDir || 'asc'
+          order_dir: state.getArduinoDevicesOrderDir || 'asc',
         };
         if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
           options.search = state.arduinoDevicesSearch;
@@ -40,19 +40,19 @@ function createActions(store) {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var arduinoDevices = [];
-        list.forEach(element => {
-          if (element.model === "card") {
+        list.forEach((element) => {
+          if (element.model === 'card') {
             arduinoDevices.push(element);
           }
         });
 
         store.setState({
           arduinoDevices,
-          getArduinoDevicesStatus: RequestStatus.Success
+          getArduinoDevicesStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getArduinoDevices: RequestStatus.Error
+          getArduinoDevices: RequestStatus.Error,
         });
       }
     },
@@ -60,11 +60,11 @@ function createActions(store) {
       var devices = [];
       store.setState({
         devices,
-        getDevicesStatus: RequestStatus.Getting
+        getDevicesStatus: RequestStatus.Getting,
       });
       try {
         const options = {
-          order_dir: state.getDevicesOrderDir || 'asc'
+          order_dir: state.getDevicesOrderDir || 'asc',
         };
         if (state.devicesSearch && state.devicesSearch.length) {
           options.search = state.devicesSearch;
@@ -72,19 +72,19 @@ function createActions(store) {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var devices = [];
-        list.forEach(element => {
-          if (element.model !== "card") {
+        list.forEach((element) => {
+          if (element.model !== 'card') {
             devices.push(element);
           }
         });
 
         store.setState({
           devices,
-          getDevicesStatus: RequestStatus.Success
+          getDevicesStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getDevicesStatus: RequestStatus.Error
+          getDevicesStatus: RequestStatus.Error,
         });
       }
     },
@@ -92,26 +92,28 @@ function createActions(store) {
       const uniqueId = uuid.v4();
       await integrationActions.getIntegrationByName(state, 'arduino');
       const devices = update(state.devices, {
-        $push: [{
-          name: null,
-          external_id: uniqueId,
-          service_id: store.getState().currentIntegration.id,
-          room_id: null,
-          model: null,
-          params: [
-            {
-              name: 'SUBSERVICE',
-              value: null
-            },
-            {
-              name: 'DATA_PIN',
-              value: null
-            }
-          ]
-        }]
+        $push: [
+          {
+            name: null,
+            external_id: uniqueId,
+            service_id: store.getState().currentIntegration.id,
+            room_id: null,
+            model: null,
+            params: [
+              {
+                name: 'SUBSERVICE',
+                value: null,
+              },
+              {
+                name: 'DATA_PIN',
+                value: null,
+              },
+            ],
+          },
+        ],
       });
       store.setState({
-        devices
+        devices,
       });
     },
     async saveDevice(state, index) {
@@ -123,10 +125,10 @@ function createActions(store) {
         arduinoDevices: {
           [index]: {
             [property]: {
-              $set: value
-            }
-          }
-        }
+              $set: value,
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -134,57 +136,57 @@ function createActions(store) {
       const devices = update(state.devices, {
         [index]: {
           ['name']: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState({
-        devices
+        devices,
       });
     },
     updateDataPin(state, index, value) {
-      let arduinoDataPinIndex = state.devices[index].params.findIndex(param => param.name === 'DATA_PIN');
+      let arduinoDataPinIndex = state.devices[index].params.findIndex((param) => param.name === 'DATA_PIN');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoDataPinIndex]: {
               value: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
       store.setState({
-        devices
+        devices,
       });
     },
     updateSubservice(state, index, value) {
-      let arduinoSubserviceIndex = state.devices[index].params.findIndex(param => param.name === 'SUBSERVICE');
+      let arduinoSubserviceIndex = state.devices[index].params.findIndex((param) => param.name === 'SUBSERVICE');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoSubserviceIndex]: {
               value: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
       store.setState({
-        devices
+        devices,
       });
     },
     async search(state, e) {
       store.setState({
-        arduinoDeviceSearch: e.target.value
+        arduinoDeviceSearch: e.target.value,
       });
       await actions.getArduinoDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getArduinoDeviceOrderDir: e.target.value
+        getArduinoDeviceOrderDir: e.target.value,
       });
       await actions.getArduinoDevices(store.getState(), 20, 0);
     },
@@ -199,15 +201,15 @@ function createActions(store) {
                 category,
                 type,
                 read_only: true,
-                has_feedback: false
-              }
-            ]
-          }
-        }
+                has_feedback: false,
+              },
+            ],
+          },
+        },
       });
 
       store.setState({
-        arduinoDevices
+        arduinoDevices,
       });
     },
     updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
@@ -216,28 +218,28 @@ function createActions(store) {
           features: {
             [featureIndex]: {
               [property]: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
 
       store.setState({
-        arduinoDevices
+        arduinoDevices,
       });
     },
     deleteFeature(state, deviceIndex, featureIndex) {
       const arduinoDevices = update(state.arduinoDevices, {
         [deviceIndex]: {
           features: {
-            $splice: [[featureIndex, 1]]
-          }
-        }
+            $splice: [[featureIndex, 1]],
+          },
+        },
       });
 
       store.setState({
-        arduinoDevices
+        arduinoDevices,
       });
     },
     async deleteDevice(state, index) {
@@ -246,12 +248,12 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const devices = update(state.devices, {
-        $splice: [[index, 1]]
+        $splice: [[index, 1]],
       });
       store.setState({
-        devices
+        devices,
       });
-    }
+    },
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
