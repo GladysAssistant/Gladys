@@ -37,7 +37,14 @@ function createActions(store) {
         if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
           options.search = state.arduinoDevicesSearch;
         }
-        const arduinoDevices = await state.httpClient.get('/api/v1/service/arduino/device', options);
+        const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
+
+        var arduinoDevices = [];
+        list.forEach(element => {
+          if (element.model === "card") {
+            arduinoDevices.push(element);
+          }
+        });
 
         store.setState({
           arduinoDevices,
@@ -50,10 +57,32 @@ function createActions(store) {
       }
     },
     async getDevices(state) {
-      const devices = [];
-      if (!state.devices) {
+      store.setState({
+        getDevicesStatus: RequestStatus.Getting
+      });
+      try {
+        const options = {
+          order_dir: state.getDevicesOrderDir || 'asc'
+        };
+        if (state.devicesSearch && state.devicesSearch.length) {
+          options.search = state.devicesSearch;
+        }
+        const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
+
+        var devices = [];
+        list.forEach(element => {
+          if (element.model !== "card") {
+            devices.push(element);
+          }
+        });
+
         store.setState({
-          devices
+          devices,
+          getDevicesStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getDevicesStatus: RequestStatus.Error
         });
       }
     },
