@@ -57,7 +57,9 @@ function createActions(store) {
       }
     },
     async getDevices(state) {
+      var devices = [];
       store.setState({
+        devices,
         getDevicesStatus: RequestStatus.Getting
       });
       try {
