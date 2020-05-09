@@ -106,7 +106,7 @@ class SetupDevice extends Component {
                     </option>
                     {props.arduinoModelsList &&
                       props.arduinoModelsList.map((model) => (
-                        <option value={model} selected={props.device.params[1].value === model}>
+                        <option value={model} selected={props.device.params.find(e => e.name === "ARDUINO_MODEL").value === model}>
                           {model}
                         </option>
                       ))}
@@ -122,7 +122,7 @@ class SetupDevice extends Component {
                     </option>
                     {props.usbPorts &&
                       props.usbPorts.map((usbPort) => (
-                        <option value={usbPort.comPath} selected={props.device.params[0].value === usbPort.comPath}>
+                        <option value={usbPort.comPath} selected={props.device.params.find(e => e.name === "ARDUINO_PATH").value === usbPort.comPath}>
                           {usbPort.comName} - {usbPort.manufacturer}
                         </option>
                       ))}
