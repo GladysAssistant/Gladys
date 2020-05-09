@@ -52,14 +52,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.ENUM(DEVICE_POLL_FREQUENCIES_LIST),
       },
-      subservice: {
-        allowNull: true,
-        type: DataTypes.STRING
-      },
-      data_pin: {
-        allowNull: true,
-        type: DataTypes.STRING
-      },
     },
     {},
   );
