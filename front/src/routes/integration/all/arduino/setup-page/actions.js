@@ -2,6 +2,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import uuid from 'uuid';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
+import debounce from 'debounce';
 
 const actions = store => {
   const integrationActions = createActionsIntegration(store);
