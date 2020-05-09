@@ -185,6 +185,7 @@ const actions = store => {
       });
     }
   };
+  actions.debouncedSearch = debounce(actions.search, 200);
 
   return Object.assign({}, integrationActions, actions);
 };
