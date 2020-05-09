@@ -12,6 +12,7 @@ import integrationConfig from '../../../../../config/integrations';
 class ArduinoDevicePage extends Component {
   componentWillMount() {
     this.props.getArduinoDevices();
+    this.props.getDevices();
     this.props.getHouses();
     this.props.getIntegrationByName('arduino');
   }

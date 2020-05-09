@@ -49,17 +49,23 @@ function createActions(store) {
         });
       }
     },
-     async addDevice(state) {
+    async getDevices(state) {
+      const devices = {};
+      store.setState({
+        devices
+      });
+    },
+    async addDevice(state) {
       const uniqueId = uuid.v4();
       await integrationActions.getIntegrationByName(state, 'arduino');
-       const newDevice = [{
-         name: null,
-         selector: null,
-         external_id: uniqueId,
-         service_id: store.getState().currentIntegration.id,
-         room_id: null,
-         model: null
-       }];
+      const newDevice = [{
+        name: null,
+        selector: null,
+        external_id: uniqueId,
+        service_id: store.getState().currentIntegration.id,
+        room_id: null,
+        model: null
+      }];
       const devices = update(state.devices, {
         $push: newDevice
       });
