@@ -108,6 +108,10 @@ function createActions(store) {
                 name: 'DATA_PIN',
                 value: null,
               },
+              {
+                name: 'ARDUINO_SELECTOR',
+                value: null,
+              }
             ],
           },
         ],
