@@ -20,6 +20,15 @@ const actions = store => {
         }
         const arduinoDevices = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
+        var noCard = [];
+        for(var i = 0; i<arduinoDevices.length; i++){
+          if(airduinoDevices[i].card !== "model"){
+            noCard.push(i);
+          }
+        }
+
+        noCard.forEach(index => arduinoDevices.splice(index,1));
+
         store.setState({
           arduinoDevices,
           getArduinoDevicesStatus: RequestStatus.Success
