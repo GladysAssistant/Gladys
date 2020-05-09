@@ -245,7 +245,7 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.devices[index];
-      await state.httpClient.post('/api/v1/device', device);
+      await state.httpClient.post(`/api/v1/device`, device);
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];
