@@ -49,42 +49,6 @@ const actions = store => {
         });
       }
     },
-    updateArduinoPath(state, index, value) {
-      let arduinoPathIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_PATH');
-      const arduinoDevices = update(state.arduinoDevices, {
-        [index]: {
-          params: {
-            [arduinoPathIndex]: value
-          }
-        }
-      });
-      store.setState({
-        arduinoDevices
-      });
-    },
-    updateArduinoModel(state, index, value) {
-      let arduinoModelIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_MODEL');
-      const arduinoDevices = update(state.arduinoDevices, {
-        [index]: {
-          params: {
-            [arduinoModelIndex]: value
-          }
-        }
-      });
-      store.setState({
-        arduinoDevices
-      });
-    },
-    updateArduinoName(state, index, value) {
-      const arduinoDevices = update(state.arduinoDevices, {
-        [index]: {
-          name: value
-        }
-      });
-      store.setState({
-        arduinoDevices
-      });
-    },
     getModels(state) {
       store.setState({
         arduinoModelsList: [
@@ -149,6 +113,42 @@ const actions = store => {
             ]
           }
         ]
+      });
+      store.setState({
+        arduinoDevices
+      });
+    },
+    updateArduinoPath(state, index, value) {
+      let arduinoPathIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_PATH');
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          params: {
+            [arduinoPathIndex]: value
+          }
+        }
+      });
+      store.setState({
+        arduinoDevices
+      });
+    },
+    updateArduinoModel(state, index, value) {
+      let arduinoModelIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_MODEL');
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          params: {
+            [arduinoModelIndex]: value
+          }
+        }
+      });
+      store.setState({
+        arduinoDevices
+      });
+    },
+    updateArduinoName(state, index, value) {
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          name: value
+        }
       });
       store.setState({
         arduinoDevices
