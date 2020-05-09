@@ -71,7 +71,6 @@ function createActions(store) {
         }
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
-        var devices = [];
         list.forEach((element) => {
           if (element.model !== 'card') {
             devices.push(element);
@@ -181,67 +180,15 @@ function createActions(store) {
     },
     async search(state, e) {
       store.setState({
-        arduinoDeviceSearch: e.target.value,
+        deviceSearch: e.target.value,
       });
-      await actions.getArduinoDevices(store.getState(), 20, 0);
+      await actions.getDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getArduinoDeviceOrderDir: e.target.value,
+        getDeviceOrderDir: e.target.value,
       });
-      await actions.getArduinoDevices(store.getState(), 20, 0);
-    },
-    addDeviceFeature(state, index, category, type) {
-      const uniqueId = uuid.v4();
-      const devices = update(state.devices, {
-        [index]: {
-          features: {
-            $push: [
-              {
-                id: uniqueId,
-                category,
-                type,
-                read_only: true,
-                has_feedback: false,
-              },
-            ],
-          },
-        },
-      });
-
-      store.setState({
-        devices,
-      });
-    },
-    updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
-      const devices = update(state.devices, {
-        [deviceIndex]: {
-          features: {
-            [featureIndex]: {
-              [property]: {
-                $set: value,
-              },
-            },
-          },
-        },
-      });
-
-      store.setState({
-        devices,
-      });
-    },
-    deleteFeature(state, deviceIndex, featureIndex) {
-      const devices = update(state.devices, {
-        [deviceIndex]: {
-          features: {
-            $splice: [[featureIndex, 1]],
-          },
-        },
-      });
-
-      store.setState({
-        devices,
-      });
+      await actions.getDevices(store.getState());
     },
     async saveDevice(state, index) {
       const device = state.devices[index];
