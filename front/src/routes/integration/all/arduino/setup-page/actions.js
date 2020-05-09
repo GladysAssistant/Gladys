@@ -21,7 +21,11 @@ const actions = store => {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var arduinoDevices = [];
-        list.forEach(element => element.card === "model" ? arduinoDevices.push(element));
+        list.forEach(element => {
+          if (element.card === "model") {
+            arduinoDevices.push(element);
+          }
+        });
 
         store.setState({
           arduinoDevices,
