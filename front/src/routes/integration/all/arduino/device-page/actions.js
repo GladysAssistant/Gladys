@@ -97,15 +97,6 @@ function createActions(store) {
       });
       store.setState(newState);
     },
-    async deleteDevice(state, device, index) {
-      await state.httpClient.delete('/api/v1/device/' + device.selector);
-      const newState = update(state, {
-        arduinoDevices: {
-          $splice: [[index, 1]]
-        }
-      });
-      store.setState(newState);
-    },
     async search(state, e) {
       store.setState({
         arduinoDeviceSearch: e.target.value

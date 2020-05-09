@@ -22,7 +22,7 @@ class ArduinoDeviceBox extends Component {
       loading: true 
     });
     try {
-      await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
+      await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({ 
         error: RequestStatus.Error
