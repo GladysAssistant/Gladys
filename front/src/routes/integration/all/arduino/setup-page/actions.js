@@ -1,8 +1,10 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import uuid from 'uuid';
 import update from 'immutability-helper';
+import createActionsIntegration from '../../../../../actions/integration';
 
 const actions = store => {
+  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getArduinoDevices(state) {
       store.setState({
@@ -92,13 +94,14 @@ const actions = store => {
     },
     async addDevice(state) {
       const uniqueId = uuid.v4();
+      await integrationActions.getIntegrationByName(state, 'arduino');
       const arduinoDevices = update(state.arduinoDevices, {
         $push: [
           {
             name: null,
             selector: null,
             external_id: uniqueId,
-            service_id: state.currentIntegration.id,
+            service_id: store.getState().currentIntegration.id,
             room_id: null,
             model: null,
             params: [
@@ -183,7 +186,7 @@ const actions = store => {
     }
   };
 
-  return actions;
+  return Object.assign({}, integrationActions, actions);
 };
 
 export default actions;
