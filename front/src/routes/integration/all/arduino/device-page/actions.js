@@ -127,7 +127,7 @@ function createActions(store) {
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
-        arduinoDevices: {
+        devices: {
           [index]: {
             [property]: {
               $set: value,
@@ -197,7 +197,7 @@ function createActions(store) {
     },
     addDeviceFeature(state, index, category, type) {
       const uniqueId = uuid.v4();
-      const arduinoDevices = update(state.arduinoDevices, {
+      const devices = update(state.devices, {
         [index]: {
           features: {
             $push: [
@@ -214,11 +214,11 @@ function createActions(store) {
       });
 
       store.setState({
-        arduinoDevices,
+        devices,
       });
     },
     updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
-      const arduinoDevices = update(state.arduinoDevices, {
+      const devices = update(state.devices, {
         [deviceIndex]: {
           features: {
             [featureIndex]: {
@@ -231,11 +231,11 @@ function createActions(store) {
       });
 
       store.setState({
-        arduinoDevices,
+        devices,
       });
     },
     deleteFeature(state, deviceIndex, featureIndex) {
-      const arduinoDevices = update(state.arduinoDevices, {
+      const devices = update(state.devices, {
         [deviceIndex]: {
           features: {
             $splice: [[featureIndex, 1]],
@@ -244,7 +244,7 @@ function createActions(store) {
       });
 
       store.setState({
-        arduinoDevices,
+        devices,
       });
     },
     async deleteDevice(state, index) {
