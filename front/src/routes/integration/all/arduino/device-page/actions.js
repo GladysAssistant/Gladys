@@ -59,7 +59,7 @@ function createActions(store) {
             selector: null,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
-            romm_id: null,
+            room_id: null,
             model: null,
             params: [
               {
