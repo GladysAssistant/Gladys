@@ -93,7 +93,7 @@ class SetupDevice extends Component {
                         id="arduinoName"
                         type="text"
                         value={props.device.name}
-                        onInput={this.updateArduinoName}
+                        onInput={this.updateName}
                         class="form-control"
                         placeholder={<Text id="integration.arduino.setup.nameLabel" />}
                       />
