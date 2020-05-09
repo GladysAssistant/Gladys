@@ -667,6 +667,7 @@
         "title": "Configuration Arduino",
         "arduinoDescription": "Pour utiliser ce service, veuillez connecter une carte Arduino.",
         "refreshButton": "Rafraichir",
+        "nameLabel": "Nom de la carte",
         "arduinoModelLabel": "Selectionnez le modèle de votre Arduino",
         "arduinoUsbDriverPathLabel": "Selectionnez le port USB sur lequel votre carte est connectée",
         "error": "Aucun Arduino connecté.",

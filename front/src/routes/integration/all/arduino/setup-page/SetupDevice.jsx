@@ -37,6 +37,19 @@ class SetupDevice extends Component {
       loading: false
     });
   };
+
+  updateArduinoName = e => {
+    this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
+  };
+
+  updateArduinoPath = e => {
+    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value);
+  };
+
+  updateArduinoModel = e => {
+    this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
+  };
+
   render(props, { loading }) {
     return (
       <div class="card-body">
@@ -69,10 +82,25 @@ class SetupDevice extends Component {
               <div class="row mt-5">
                 <div class="col">
                   <div class="form-group">
+                    <label class="form-label" for="arduinoName">
+                      <Text id="integration.arduino.setup.nameLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id="arduinoName"
+                        type="text"
+                        value={props.device.name}
+                        onInput={this.updateArduinoName}
+                        class="form-control"
+                        placeholder={<Text id="integration.arduino.setup.nameLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="form-group">
                     <label class="form-label">
                       <Text id="integration.arduino.setup.arduinoModelLabel" />
                     </label>
-                    <select class="form-control" onChange={props.updateArduinoModel}>
+                    <select class="form-control" onChange={this.updateArduinoModel}>
                       <option>
                         <Text id="global.emptySelectOption" />
                       </option>
@@ -88,7 +116,7 @@ class SetupDevice extends Component {
                     <label class="form-label">
                       <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                     </label>
-                    <select class="form-control" onChange={props.updateArduinoPath}>
+                    <select class="form-control" onChange={this.updateArduinoPath}>
                       <option>
                         <Text id="global.emptySelectOption" />
                       </option>

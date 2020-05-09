@@ -49,14 +49,30 @@ const actions = store => {
         });
       }
     },
-    updateArduinoPath(state, e) {
+    updateArduinoPath(state, index, value) {
+      let arduinoPathIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_PATH');
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          params: {
+            [arduinoPathIndex]: value
+          }
+        }
+      });
       store.setState({
-        arduinoPath: e.target.value
+        arduinoDevices
       });
     },
-    updateArduinoModel(state, e) {
+    updateArduinoModel(state, index, value) {
+      let arduinoModelIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_MODEL');
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          params: {
+            [arduinoModelIndex]: value
+          }
+        }
+      });
       store.setState({
-        arduinoModel: e.target.value
+        arduinoDevices
       });
     },
     getModels(state) {
