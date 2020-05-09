@@ -3,6 +3,7 @@ import uuid from 'uuid';
 import update from 'immutability-helper';
 
 const actions = store => {
+  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getUsbPorts(state) {
       store.setState({
@@ -72,14 +73,15 @@ const actions = store => {
       });
     },
     async addDevice(state) {
-      const uniqueId = uuid.v4();;
+      const uniqueId = uuid.v4();
+      await integrationActions.getIntegrationByName(state, 'arduino');
       const arduinoDevices = update(state.arduinoDevices, {
         $push: [
           {
-            name: null,
-            selector: null,
+            name: 'test',
+            selector: 'test',
             external_id: uniqueId,
-            service_id: store.getState().currentIntegration.id,
+            service_id: state.currentIntegration.id,
             room_id: null,
             model: null
           }
