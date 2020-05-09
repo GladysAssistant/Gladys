@@ -175,7 +175,7 @@ const actions = store => {
     },
     async deleteDevice(state, index) {
       const device = state.arduinoDevices[index];
-      if (device.created_at) {
+      if (device.createdAt) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const arduinoDevices = update(state.arduinoDevices, {
