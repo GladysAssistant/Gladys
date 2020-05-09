@@ -101,10 +101,10 @@ class SetupDevice extends Component {
                     </select>
                   </div>
 
-                  <button class="btn btn-success" onClick={props.saveDevice}>
+                  <button class="btn btn-success" onClick={this.saveDevice}>
                     <Text id="integration.arduino.setup.connectButton" />
                   </button>
-                  <button class="btn btn-danger ml-2" onClick={props.deleteDevice}>
+                  <button class="btn btn-danger ml-2" onClick={this.deleteDevice}>
                     <Text id="integration.arduino.setup.disconnectButton" />
                   </button>
                 </div>
