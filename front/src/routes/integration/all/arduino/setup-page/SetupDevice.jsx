@@ -39,8 +39,8 @@ class SetupDevice extends Component {
     });
   };
 
-  updateArduinoName = e => {
-    this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
+  updateName = e => {
+    this.props.updateName(this.props.deviceIndex, e.target.value);
   };
 
   updateArduinoPath = e => {
