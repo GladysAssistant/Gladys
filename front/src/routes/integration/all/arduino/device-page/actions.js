@@ -61,20 +61,6 @@ function createActions(store) {
             service_id: store.getState().currentIntegration.id,
             romm_id: null,
             model: null,
-            features: [
-              {
-                name: null,
-                selector: null,
-                external_id: uniqueId,
-                category: null,
-                type: null,
-                read_only: false,
-                keep_history: false,
-                has_feedback: false,
-                min: 0,
-                max: 0
-              }
-            ],
             params: [
               {
                 name: 'name_param',
