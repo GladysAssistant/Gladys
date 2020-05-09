@@ -66,7 +66,17 @@ function createActions(store) {
         external_id: uniqueId,
         service_id: store.getState().currentIntegration.id,
         room_id: null,
-        model: null
+        model: null,
+        params: [
+          {
+            name: 'SUBSERVICE',
+            value: null
+          },
+          {
+            name: 'DATA_PIN',
+            value: null
+          }
+        ]
       }];
       const devices = update(state.devices, {
         $push: newDevice
@@ -96,6 +106,40 @@ function createActions(store) {
         }
       });
       store.setState(newState);
+    },
+    updateDataPin(state, index, value) {
+      let arduinoDataPinIndex = state.devices[index].params.findIndex(param => param.name === 'DATA_PIN');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoDataPinIndex]: {
+              value: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+      store.setState({
+        devices
+      });
+    },
+    updateSubservice(state, index, value) {
+      let arduinoSubserviceIndex = state.devices[index].params.findIndex(param => param.name === 'SUBSERVICE');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoSubserviceIndex]: {
+              value: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+      store.setState({
+        devices
+      });
     },
     async search(state, e) {
       store.setState({

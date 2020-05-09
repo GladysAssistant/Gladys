@@ -77,6 +77,8 @@ const DeviceTab = ({ children, ...props }) => (
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
+                  updateDataPin={props.updateDataPin}
+                  updateSubservice={props.updateSubservice}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
                 />

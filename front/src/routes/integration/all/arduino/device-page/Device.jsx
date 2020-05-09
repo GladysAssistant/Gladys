@@ -36,7 +36,11 @@ class ArduinoDeviceBox extends Component {
   };
 
   updateDataPin = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'dataPin', e.target.value);
+    this.props.updateDataPin(this.props.deviceIndex, e.target.value);
+  };
+
+  updateSubservice = e => {
+    this.props.updateSubservice(this.props.deviceIndex, e.target.value);
   };
 
   updateRoom = e => {
@@ -102,7 +106,7 @@ class ArduinoDeviceBox extends Component {
                     <label class="form-label" for="subservice">
                       <Text id="integration.arduino.device.subserviceLabel" />
                     </label>
-                    <select class="form-control" id="subservice">
+                    <select class="form-control" id="subservice" onChange={this.updateSubservice}>
                       <option value={DEVICE_SUBSERVICE_LIST.EMIT_433}>
                         <Text id="integration.arduino.subservice.emit433" />
                       </option>
