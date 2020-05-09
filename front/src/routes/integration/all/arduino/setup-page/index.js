@@ -5,15 +5,12 @@ import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 
 @connect(
-  'user,session,usbPorts,arduinoDevices,arduinoModelsList,arduinoManufacturersList,arduinoConnected',
+  'user,session,usbPorts,arduinoDevices,arduinoModelsList,arduinoManufacturersList',
   actions
 )
 class ArduinoSetupPage extends Component {
 
   componentWillMount() {
-    //this.props.checkConnected();
-    //this.props.getCurrentArduinoPath();
-    //this.props.getCurrentArduinoModel();
     this.props.getArduinoDevices();
     this.props.getModels();
     this.props.getManufacturers();

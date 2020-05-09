@@ -46,13 +46,12 @@ class SetupDevice extends Component {
   updateArduinoPath = e => {
     this.props.updateArduinoPath(this.props.deviceIndex, e.target.value);
   };
-  
+
   updateArduinoModel = e => {
     this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
   };
 
-  componentWillMount() { 
-    //this.props.checkConnected(this.props.deviceIndex);
+  componentWillMount() {
   }
 
   render(props, { loading }) {
@@ -80,64 +79,64 @@ class SetupDevice extends Component {
                 <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
               </p>
             )}
-              <div class="row mt-5">
-                <div class="col">
-                  <div class="form-group">
-                    <label class="form-label" for="arduinoName">
-                      <Text id="integration.arduino.setup.nameLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        id="arduinoName"
-                        type="text"
-                        value={props.device.name}
-                        onInput={this.updateArduinoName}
-                        class="form-control"
-                        placeholder={<Text id="integration.arduino.setup.nameLabel" />}
-                      />
-                    </Localizer>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.arduino.setup.arduinoModelLabel" />
-                    </label>
-                    <select class="form-control" onChange={this.updateArduinoModel}>
-                      <option>
-                        <Text id="global.emptySelectOption" />
-                      </option>
-                      {props.arduinoModelsList &&
-                        props.arduinoModelsList.map((model) => (
-                          <option value={model} selected={props.device.params[1].value === model}>
-                            {model}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
-                    </label>
-                    <select class="form-control" onChange={this.updateArduinoPath}>
-                      <option>
-                        <Text id="global.emptySelectOption" />
-                      </option>
-                      {props.usbPorts &&
-                        props.usbPorts.map((usbPort) => (
-                          <option value={usbPort.comPath} selected={props.device.params[0].value === usbPort.comPath}>
-                            {usbPort.comName} - {usbPort.manufacturer}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-
-                  <button class="btn btn-success" onClick={this.saveDevice}>
-                    <Text id="integration.arduino.setup.connectButton" />
-                  </button>
-                  <button class="btn btn-danger ml-2" onClick={this.deleteDevice}>
-                    <Text id="integration.arduino.setup.disconnectButton" />
-                  </button>
+            <div class="row mt-5">
+              <div class="col">
+                <div class="form-group">
+                  <label class="form-label" for="arduinoName">
+                    <Text id="integration.arduino.setup.nameLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      id="arduinoName"
+                      type="text"
+                      value={props.device.name}
+                      onInput={this.updateArduinoName}
+                      class="form-control"
+                      placeholder={<Text id="integration.arduino.setup.nameLabel" />}
+                    />
+                  </Localizer>
                 </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.arduino.setup.arduinoModelLabel" />
+                  </label>
+                  <select class="form-control" onChange={this.updateArduinoModel}>
+                    <option>
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    {props.arduinoModelsList &&
+                      props.arduinoModelsList.map((model) => (
+                        <option value={model} selected={props.device.params[1].value === model}>
+                          {model}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
+                  </label>
+                  <select class="form-control" onChange={this.updateArduinoPath}>
+                    <option>
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    {props.usbPorts &&
+                      props.usbPorts.map((usbPort) => (
+                        <option value={usbPort.comPath} selected={props.device.params[0].value === usbPort.comPath}>
+                          {usbPort.comName} - {usbPort.manufacturer}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <button class="btn btn-success" onClick={this.saveDevice}>
+                  <Text id="integration.arduino.setup.connectButton" />
+                </button>
+                <button class="btn btn-danger ml-2" onClick={this.deleteDevice}>
+                  <Text id="integration.arduino.setup.disconnectButton" />
+                </button>
               </div>
+            </div>
           </div>
         </div>
       </div>

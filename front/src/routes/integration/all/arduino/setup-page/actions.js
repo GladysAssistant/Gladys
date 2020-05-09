@@ -52,42 +52,6 @@ const actions = store => {
         });
       }
     },
-    async checkConnected(state, index) {
-      store.setState({
-        arduinoConnected: RequestStatus.Getting
-      });
-      try {
-        await actions.getUsbPorts();
-        const arduinoPath = state.arduinoDevices[index].params[0].value;
-        var connected = false;
-
-        if (arduinoPath !== "---------") {
-          store.getState().usbPorts.forEach(element => {
-            if (element.comPath === arduinoPath) {
-              connected = true;
-            }
-          });
-
-          if (connected) {
-            store.setState({
-              arduinoConnected: RequestStatus.Success
-            });
-          } else {
-            store.setState({
-              arduinoConnected: RequestStatus.Error
-            });
-          }
-        } else {
-          store.setState({
-            arduinoConnected: RequestStatus.Error
-          });
-        }
-      } catch (e) {
-        store.setState({
-          arduinoConnected: RequestStatus.Error
-        })
-      }
-    },
     getModels(state) {
       store.setState({
         arduinoModelsList: [
