@@ -170,11 +170,11 @@ const actions = store => {
 
     },
     async deleteDevice(state, index) {
-      const arduino = state.arduinoDevices[index];
-      if (arduino.created_at) {
-        await state.httpClient.delete(`/api/v1/device/${arduino.selector}`);
+      const device = state.arduinoDevices[index];
+      if (device.created_at) {
+        await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
-      const arduino = update(state.arduinoDevices, {
+      const arduinoDevices = update(state.arduinoDevices, {
         $splice: [[index, 1]]
       });
       store.setState({
