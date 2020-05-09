@@ -22,7 +22,7 @@ const actions = store => {
 
         var arduinoDevices = [];
         list.forEach(element => {
-          if (element.card === "model") {
+          if (element.model === "card") {
             arduinoDevices.push(element);
           }
         });
