@@ -169,6 +169,18 @@ function createActions(store) {
       store.setState({
         arduinoDevices
       });
+    },
+    async deleteDevice(state, index) {
+      const device = state.devices[index];
+      if (device.createdAt) {
+        await state.httpClient.delete(`/api/v1/device/${device.selector}`);
+      }
+      const devices = update(state.devices, {
+        $splice: [[index, 1]]
+      });
+      store.setState({
+        devices
+      });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
