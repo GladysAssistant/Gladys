@@ -10,11 +10,15 @@ class ArduinoDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({ loading: true });
     try {
-      await this.props.saveDevice(this.props.device, this.props.deviceIndex);
+      await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      this.setState({ 
+        error: RequestStatus.Error 
+      });
     }
-    this.setState({ loading: false });
+    this.setState({ 
+      loading: false 
+    });
   };
 
   deleteDevice = async () => {
