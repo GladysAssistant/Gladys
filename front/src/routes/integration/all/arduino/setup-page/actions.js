@@ -76,7 +76,6 @@ const actions = store => {
       const arduinoDevices = update(state.arduinoDevices, {
         $push: [
           {
-            id: uniqueId,
             name: null,
             selector: null,
             external_id: uniqueId,
