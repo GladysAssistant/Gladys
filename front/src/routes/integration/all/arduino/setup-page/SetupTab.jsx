@@ -29,12 +29,12 @@ const SetupTab = ({ children, ...props }) => {
           <div class="dimmer-content">
             {props.arduinoConnected && (
               <p class="alert alert-success">
-                <Text id="integration.arduino.device.arduinoConnected" /> : {props.arduinoModel}
+                <Text id="integration.arduino.setup.connected" /> : {props.arduinoModel}
               </p>
             )}
             {!props.arduinoDevices || props.arduinoDevices.length === 0 && (
               <p class="alert alert-danger">
-                <Text id="integration.arduino.device.arduinoNotConnected" />
+                <Text id="integration.arduino.setup.notConnected" />
               </p>
             )}
             <p>
