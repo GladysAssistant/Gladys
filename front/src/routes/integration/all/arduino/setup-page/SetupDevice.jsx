@@ -3,7 +3,6 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
-//const SetupDevice = ({ children, ...props }) => {
 class SetupDevice extends Component {
   saveDevice = async () => {
     this.setState({
@@ -102,10 +101,10 @@ class SetupDevice extends Component {
                     </select>
                   </div>
 
-                  <button class="btn btn-success" onClick={/*props.savePathAndConnect && */ props.saveArduinoDevice}>
+                  <button class="btn btn-success" onClick={props.saveDevice}>
                     <Text id="integration.arduino.setup.connectButton" />
                   </button>
-                  <button class="btn btn-danger ml-2" onClick={props.disconnect}>
+                  <button class="btn btn-danger ml-2" onClick={props.deleteDevice}>
                     <Text id="integration.arduino.setup.disconnectButton" />
                   </button>
                 </div>
