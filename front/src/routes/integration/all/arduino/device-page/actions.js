@@ -87,13 +87,7 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.arduinoDevices[index];
-      const savedDevice = await state.httpClient.post('/api/v1/device', device);
-      const newState = update(state, {
-        arduinoDevices: {
-          $splice: [[index, 1, savedDevice]]
-        }
-      });
-      store.setState(newState);
+      await state.httpClient.post('/api/v1/device', device);
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {
