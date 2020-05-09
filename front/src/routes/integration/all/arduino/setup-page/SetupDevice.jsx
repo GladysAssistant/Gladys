@@ -78,9 +78,6 @@ class SetupDevice extends Component {
                 <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
               </p>
             )}
-            <p>
-              <MarkupText id="integration.arduino.setup.arduinoDescription" />
-            </p>
             <form>
               <div class="row mt-5">
                 <div class="col">

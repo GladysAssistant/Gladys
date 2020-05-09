@@ -676,8 +676,8 @@
         "connectionError": "Erreur lors de la tentative de connexion, veuillez bérifier votre configuration.",
         "notConnected": "Aucune carte Arduino n'est connectée, veuillez en brancher une.",
         "noDevices": "Aucun Arduino connecté. Veuillez configurer vos périphériques avec le bouton Nouveau.",
-        "connectButton": "Connecter",
-        "disconnectButton": "Déconnecter"
+        "connectButton": "Sauvegarder",
+        "disconnectButton": "Supprimer"
       },
       "subservice": {
         "emit433": "Emision 433 MHz",

@@ -37,6 +37,9 @@ const SetupTab = ({ children, ...props }) => {
                 <Text id="integration.arduino.device.arduinoNotConnected" />
               </p>
             )}
+            <p>
+              <MarkupText id="integration.arduino.setup.arduinoDescription" />
+            </p>
             {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
             <div class="row">
               {props.arduinoDevices &&

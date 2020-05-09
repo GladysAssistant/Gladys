@@ -568,8 +568,8 @@
         "connectionError": "Error while connecting, please check your configuration.",
         "notConnected": "Arduino card is not connected, please connect a card.",
         "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
-        "connectButton": "Connect",
-        "disconnectButton": "Disconnect"
+        "connectButton": "Save",
+        "disconnectButton": "Delete"
       },
       "subservice": {
         "emit433": "Emit in 433 MHz",
