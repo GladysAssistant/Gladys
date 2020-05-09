@@ -3,7 +3,6 @@ import uuid from 'uuid';
 import update from 'immutability-helper';
 
 const actions = store => {
-  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getUsbPorts(state) {
       store.setState({
