@@ -57,7 +57,6 @@ const actions = (store) => {
       }
     },
     async getDevices(state) {
-      var devices = [];
       store.setState({
         getDevicesStatus: RequestStatus.Getting,
       });
@@ -70,6 +69,7 @@ const actions = (store) => {
         }
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
+        var devices = [];
         list.forEach((element) => {
           if (element.model != 'card') {
             devices.push(element);
@@ -193,6 +193,6 @@ const actions = (store) => {
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
-}
+};
 
 export default actions;
