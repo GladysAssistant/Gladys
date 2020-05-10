@@ -5,7 +5,7 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import {
-  DEVICE_SUBSERVICE_LIST,
+  DEVICE_SUBSERVICE,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
