@@ -4,7 +4,11 @@ import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
-import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_SUBSERVICE_LIST,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} from '../../../../../../../server/utils/constants';
 
 const actions = (store) => {
   const houseActions = createActionsHouse(store);
@@ -97,6 +101,20 @@ const actions = (store) => {
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             room_id: null,
+            features: [
+              {
+                name: null,
+                selector: null,
+                external_id: uniqueId,
+                category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+                type: DEVICE_FEATURE_TYPES.CAMERA.BINARY,
+                read_only: false,
+                keep_history: false,
+                has_feedback: false,
+                min: 0,
+                max: 1,
+              },
+            ],
             params: [
               {
                 name: 'DATA_PIN',
@@ -186,6 +204,7 @@ const actions = (store) => {
     },
     async saveDevice(state, index) {
       const device = state.devices[index];
+      device.features[0].name = device.name;
       await state.httpClient.post(`/api/v1/device`, device);
     },
     async deleteDevice(state, index) {
