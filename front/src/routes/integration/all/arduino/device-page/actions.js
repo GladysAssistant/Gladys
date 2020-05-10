@@ -107,7 +107,7 @@ const actions = (store) => {
                 selector: null,
                 external_id: uniqueId,
                 category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-                type: DEVICE_FEATURE_TYPES.CAMERA.SWITCH.BINARY,
+                type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
                 read_only: false,
                 keep_history: false,
                 has_feedback: false,
