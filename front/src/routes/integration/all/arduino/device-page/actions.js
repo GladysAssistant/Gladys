@@ -209,6 +209,6 @@ const actions = (store) => {
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
-};
+}
 
 export default actions;
