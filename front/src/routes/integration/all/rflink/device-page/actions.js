@@ -32,6 +32,7 @@ function createActions(store) {
             $push: rflinkDevicesReceived
           });
         }
+
         const rflinkDevicesMap = new Map();
         rflinkDevices.forEach(device => rflinkDevicesMap.set(device.external_id, device));
         store.setState({
@@ -56,6 +57,10 @@ function createActions(store) {
             return true;
           }
           return !state.rflinkDevicesMap.has(device.external_id);
+        });
+
+        await state.httpClient.post('/api/v1/service/rflink/devicess', {
+          value: state.rflinkDevices
         });
 
         store.setState({

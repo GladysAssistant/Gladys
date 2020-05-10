@@ -49,23 +49,24 @@ const RflinkFeatureBox = ({ children, ...props }) => {
             </div>
           </div>
 
-          {(props.feature.read_only === false || props.feature.read_only === undefined) && props.feature.category !== DEVICE_FEATURE_CATEGORIES.LIGHT && ( // Switch
-            <div class="form-group">
-              <label class="form-label" for={`switchnumber_${props.featureIndex}`}>
-                <Text id="integration.rflink.feature.switchNumberLabel" />
-              </label>
-              <Localizer>
-                <input
-                  id={`switchnumber_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.switchNumber}
-                  onInput={props.updateSwitchNumber}
-                  class="form-control"
-                  placeholder={<Text id="integration.rflink.feature.switchNumberPlaceholder" />}
-                />
-              </Localizer>
-            </div>
-          )}
+          {(props.feature.read_only === false || props.feature.read_only === undefined) &&
+          props.feature.category !== DEVICE_FEATURE_CATEGORIES.LIGHT && ( // Switch
+              <div class="form-group">
+                <label class="form-label" for={`switchnumber_${props.featureIndex}`}>
+                  <Text id="integration.rflink.feature.switchNumberLabel" />
+                </label>
+                <Localizer>
+                  <input
+                    id={`switchnumber_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.switchNumber}
+                    onInput={props.updateSwitchNumber}
+                    class="form-control"
+                    placeholder={<Text id="integration.rflink.feature.switchNumberPlaceholder" />}
+                  />
+                </Localizer>
+              </div>
+            )}
 
           {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && (
             <div class="form-group">

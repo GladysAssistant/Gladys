@@ -18,6 +18,7 @@ function message(msgRF) {
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_MESSAGE,
   });
+  logger.log('sending enw message');
   const msg = RFtoObj(msgRF);
   let newDevice;
   let doesntExistYet = true;
@@ -25,8 +26,6 @@ function message(msgRF) {
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
       this.newDevices.forEach((d) => {
-        logger.log(`d.external_id: ${d.external_id}`);
-        logger.log(`msg.id: ${msg.id}`);
         if (`rflink:${msg.id}:${msg.switch}` === d.external_id) {
           doesntExistYet = false;
         }
@@ -54,7 +53,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:temperature:${msg.switch}`,
             rfcode: 'TEMP',
             category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
             unit: DEVICE_FEATURE_UNITS.CELSIUS,
             read_only: true,
             keep_history: true,
@@ -70,7 +69,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:humidity:${msg.switch}`,
             rfcode: 'HUM',
             category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
             unit: DEVICE_FEATURE_UNITS.PERCENT,
             read_only: true,
             keep_history: true,
@@ -88,7 +87,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:pressure:${msg.switch}`,
             rfcode: 'BARO',
             category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
             unit: DEVICE_FEATURE_UNITS.PASCAL,
             read_only: true,
             keep_history: true,
@@ -106,7 +105,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:uv:${msg.switch}`,
             rfcode: 'UV',
             category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
             read_only: true,
             keep_history: true,
             has_feedback: false,
@@ -123,7 +122,7 @@ function message(msgRF) {
             external_id: `rflink:${msg.id}:light-intensity:${msg.switch}`,
             rfcode: 'LUX',
             category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
             unit: DEVICE_FEATURE_UNITS.LUX,
             read_only: true,
             keep_history: true,
@@ -218,7 +217,12 @@ function message(msgRF) {
         if (
           msg.switch !== undefined &&
           msg.rgwb === undefined &&
-          (msg.cmd === 'ON' || msg.cmd === 'OFF' || msg.cmd === 'ALLON' || msg.cmd === 'ALLOFF' || msg.cmd === 'UP' || msg.cmd === 'DOWN')
+          (msg.cmd === 'ON' ||
+            msg.cmd === 'OFF' ||
+            msg.cmd === 'ALLON' ||
+            msg.cmd === 'ALLOFF' ||
+            msg.cmd === 'UP' ||
+            msg.cmd === 'DOWN')
         ) {
           newDevice.name += 'switch';
           newDevice.name += ` ${msg.id}`;

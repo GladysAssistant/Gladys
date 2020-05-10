@@ -2,6 +2,7 @@
 
 const { newValue } = require('./events/rflink.newValue');
 const { addNewDevice } = require('./commands/rflink.addNewDevice');
+const { addDevice } = require('./events/rflink.addDevice');
 const { message } = require('./events/rflink.message.js');
 
 // COMMANDS
@@ -20,8 +21,8 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
   this.connected = false;
   this.ready = false;
   this.scanInProgress = false;
-  this.device = {};
   this.newDevices = [];
+  this.devices = [];
   this.currentMilightGateway = 'F746';
   this.milightBridges = {};
 };
@@ -31,6 +32,7 @@ const RFlinkManager = function RFlinkManager(gladys, serviceId) {
 RFlinkManager.prototype.message = message;
 RFlinkManager.prototype.newValue = newValue;
 RFlinkManager.prototype.addNewDevice = addNewDevice;
+RFlinkManager.prototype.addDevice = addDevice;
 
 // Commands
 

@@ -384,7 +384,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
   },
   RFLINK: {
-    NEW_MESSAGE : 'rflink.new-message',
+    NEW_MESSAGE: 'rflink.new-message',
     DRIVER_FAILED: 'rflink.driver-failed',
     DRIVER_READY: 'rflink.driver-ready',
     NEW_DEVICE: 'rflink.new-device',

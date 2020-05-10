@@ -10,7 +10,42 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function getNewDevices(req, res) {
-    res.json(RFlinkManager.getNewDevices());
+    let NewDevices = RFlinkManager.getNewDevices();
+    logger.log(RFlinkManager.devices);
+    logger.log(NewDevices);
+    if (RFlinkManager.devices !== undefined && NewDevices !== undefined) {
+      NewDevices = NewDevices.filter((newDevice) => {
+        let alreadyListed;
+        RFlinkManager.devices.forEach((device) => {
+          if (!(device.external_id === newDevice.external_id)) {
+            alreadyListed = true;
+            return true;
+          }
+          if (device.external_id === newDevice.external_id) {
+            alreadyListed = false;
+            return false;
+          }
+          return undefined;
+        });
+        if (alreadyListed) {
+          return alreadyListed;
+        }
+        return undefined;
+      });
+
+      logger.log(NewDevices);
+      res.json(NewDevices);
+    }
+  }
+
+  /**
+   *
+   */
+  async function getDevices(req, res) {
+    RFlinkManager.addDevice(req.body.value);
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -120,6 +155,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @api {post} /api/v1/service/rflink/remove remove a device from the device list
    */
   async function remove(req, res) {
+    // Deleting the device from the new device list
     const index = RFlinkManager.newDevices.findIndex((element) => {
       console.log(element.external_id);
       if (element.external_id === req.body.external_id) {
@@ -148,6 +184,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     'get /api/v1/service/rflink/newDevices': {
       authenticated: true,
       controller: asyncMiddleware(getNewDevices),
+    },
+    'post /api/v1/service/rflink/devicess': {
+      authenticated: true,
+      controller: asyncMiddleware(getDevices),
     },
     'post /api/v1/service/rflink/connect': {
       authenticated: true,
