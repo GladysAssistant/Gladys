@@ -63,6 +63,11 @@ const DeviceTab = ({ children, ...props }) => (
               <Text id="integration.arduino.device.arduinoNotConnected" />
             </p>
           )}
+          {props.arduinoDevices && props.arduinoDevices.length > 0 && !props.devices && (
+            <div class="dimmer-content alert alert-info">
+              <Text id="integration.arduino.device.noDevices" />
+            </div>
+          )}
           {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.arduinoDevices &&
