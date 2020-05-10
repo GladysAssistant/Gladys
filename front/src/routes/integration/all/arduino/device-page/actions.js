@@ -97,6 +97,16 @@ const actions = (store) => {
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             room_id: null,
+            params: [
+              {
+                name: 'DATA_PIN',
+                value: null,
+              },
+              {
+                name: 'SUBSERVICE',
+                value: null,
+              },
+            ],
           },
         ],
       });
