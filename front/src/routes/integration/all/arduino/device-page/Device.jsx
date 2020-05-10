@@ -110,7 +110,12 @@ class ArduinoDeviceBox extends Component {
                     <label class="form-label" for="subservice">
                       <Text id="integration.arduino.device.subserviceLabel" />
                     </label>
-                    <select class="form-control" id="subservice" onChange={this.updateSubservice}>
+                    <select
+                      class="form-control"
+                      id="subservice"
+                      value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
+                      onChange={this.updateSubservice}
+                    >
                       <option value={DEVICE_SUBSERVICE_LIST.EMIT_433}>
                         <Text id="integration.arduino.subservice.emit433" />
                       </option>
@@ -138,7 +143,6 @@ class ArduinoDeviceBox extends Component {
                       />
                     </Localizer>
                   </div>
-                  
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
