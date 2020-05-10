@@ -59,7 +59,6 @@ const actions = (store) => {
     async getDevices(state) {
       var devices = [];
       store.setState({
-        devices,
         getDevicesStatus: RequestStatus.Getting,
       });
       try {
@@ -72,7 +71,7 @@ const actions = (store) => {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         list.forEach((element) => {
-          if (element.model !== 'card') {
+          if (element.model != 'card') {
             devices.push(element);
           }
         });
@@ -98,21 +97,6 @@ const actions = (store) => {
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             room_id: null,
-            model: null,
-            params: [
-              {
-                name: 'SUBSERVICE',
-                value: null,
-              },
-              {
-                name: 'DATA_PIN',
-                value: null,
-              },
-              {
-                name: 'ARDUINO_SELECTOR',
-                value: null,
-              },
-            ],
           },
         ],
       });
