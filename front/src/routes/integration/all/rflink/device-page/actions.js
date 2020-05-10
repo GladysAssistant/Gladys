@@ -58,14 +58,12 @@ function createActions(store) {
           }
           return !state.rflinkDevicesMap.has(device.external_id);
         });
-
-        await state.httpClient.post('/api/v1/service/rflink/devicess', {
-          value: state.rflinkDevices
-        });
-
         store.setState({
           rflinkNewDevices: rflinkNewDevicesFiltered,
           getRflinkNewDevicesStatus: RequestStatus.Success
+        });
+        await state.httpClient.post('/api/v1/service/rflink/devicess', {
+          value: state.rflinkDevices
         });
       } catch (e) {
         store.setState({
@@ -117,6 +115,9 @@ function createActions(store) {
         }
       });
       store.setState(newState);
+      await state.httpClient.post('/api/v1/service/rflink/devicess', {
+        value: state.rflinkDevices
+      });
     },
     async search(state, e) {
       store.setState({
