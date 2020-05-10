@@ -25,12 +25,12 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
             alreadyListed = false;
             return false;
           }
-          return undefined;
+          return true;
         });
-        if (alreadyListed) {
+        if (alreadyListed !== undefined) {
           return alreadyListed;
         }
-        return undefined;
+        return true;
       });
 
       logger.log(NewDevices);
