@@ -111,10 +111,10 @@ class ArduinoDeviceBox extends Component {
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="room">
+                    <label class="form-label" for="arduino-linked">
                       <Text id="integration.arduino.device.arduinoLinkedLabel" />
                     </label>
-                    <select onChange={this.updateArduino} class="form-control" id="room">
+                    <select onChange={this.updateArduino} class="form-control" id="arduino-linked">
                       <option value="">
                         <Text id="global.emptySelectOption" />
                       </option>
