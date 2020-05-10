@@ -100,21 +100,21 @@ const actions = (store) => {
             selector: null,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
-            room_id: null,/*
+            room_id: null,
             features: [
               {
                 name: null,
                 selector: null,
                 external_id: uniqueId,
                 category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-                type: DEVICE_FEATURE_TYPES.CAMERA.BINARY,
+                type: DEVICE_FEATURE_TYPES.CAMERA.SWITCH.BINARY,
                 read_only: false,
                 keep_history: false,
                 has_feedback: false,
                 min: 0,
                 max: 1,
               },
-            ],*/
+            ],
             params: [
               {
                 name: 'DATA_PIN',
