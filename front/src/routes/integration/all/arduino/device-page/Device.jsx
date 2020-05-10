@@ -51,6 +51,10 @@ class ArduinoDeviceBox extends Component {
     this.props.updateSubservice(this.props.deviceIndex, e.target.value);
   };
 
+  updateArduino = (e) => {
+    this.props.updateArduino(this.props.deviceIndex, e.target.value);
+  };
+
   updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
@@ -103,6 +107,22 @@ class ArduinoDeviceBox extends Component {
                             ))}
                           </optgroup>
                         ))}
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="room">
+                      <Text id="integration.arduino.device.arduinoLinkedLabel" />
+                    </label>
+                    <select onChange={this.updateArduino} class="form-control" id="room">
+                      <option value="">
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {props.arduinoDevices &&
+                        props.arduinoDevices.map((device) => 
+                        <option value={device.selector}>
+                          {device.name}
+                        </option>)}
                     </select>
                   </div>
 

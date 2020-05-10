@@ -661,7 +661,8 @@
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
         "subserviceLabel": "Sous-service",
-        "dataPinLabel": "Pin de données"
+        "dataPinLabel": "Pin de données",
+        "arduinoLinkedLabel": "Arduino lié"
       },
       "setup": {
         "title": "Configuration Arduino",

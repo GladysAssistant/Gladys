@@ -124,6 +124,10 @@ const actions = (store) => {
                 name: 'SUBSERVICE',
                 value: null,
               },
+              {
+                name: 'ARDUINO_LINKED',
+                value: null,
+              },
             ],
           },
         ],
@@ -179,6 +183,23 @@ const actions = (store) => {
         [index]: {
           params: {
             [arduinoSubserviceIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
+    updateArduino(state, index, newValue) {
+      let arduinoLinkedIndex = state.devices[index].params.findIndex((param) => param.name === 'ARDUINO_LINKED');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoLinkedIndex]: {
               value: {
                 $set: newValue,
               },

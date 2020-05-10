@@ -553,7 +553,8 @@
         "saveError": "Error saving or deleting device",
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
         "subserviceLabel": "Sub-service",
-        "dataPinLabel": "Data pin"
+        "dataPinLabel": "Data pin",
+        "arduinoLinkedLabel": "Arduino linked"
       },
       "setup": {
         "title": "Arduino Settings",
