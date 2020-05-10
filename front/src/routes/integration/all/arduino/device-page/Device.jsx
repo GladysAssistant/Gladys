@@ -138,32 +138,7 @@ class ArduinoDeviceBox extends Component {
                       />
                     </Localizer>
                   </div>
-
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.arduino.device.featuresLabel" />
-                    </label>
-                    <div class="tags">
-                      {props.device &&
-                        props.device.features &&
-                        props.device.features.map((feature) => (
-                          <span class="tag">
-                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                            <div class="tag-addon">
-                              <i
-                                class={`fe fe-${get(
-                                  DeviceFeatureCategoriesIcon,
-                                  `${feature.category}.${feature.type}`
-                                )}`}
-                              />
-                            </div>
-                          </span>
-                        ))}
-                      {(!props.device.features || props.device.features.length === 0) && (
-                        <Text id="integration.arduino.device.noFeatures" />
-                      )}
-                    </div>
-                  </div>
+                  
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">

@@ -6,7 +6,7 @@ import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
 
-function createActions(store) {
+const actions = (store) => {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
@@ -209,6 +209,6 @@ function createActions(store) {
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
-}
+};
 
-export default createActions;
+export default actions;
