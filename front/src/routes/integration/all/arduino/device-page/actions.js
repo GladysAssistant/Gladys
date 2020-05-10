@@ -100,7 +100,7 @@ const actions = (store) => {
             selector: null,
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
-            room_id: null,
+            room_id: null,/*
             features: [
               {
                 name: null,
@@ -114,7 +114,7 @@ const actions = (store) => {
                 min: 0,
                 max: 1,
               },
-            ],
+            ],*/
             params: [
               {
                 name: 'DATA_PIN',
