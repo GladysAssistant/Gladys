@@ -173,14 +173,14 @@ const actions = (store) => {
         devices,
       });
     },
-    updateSubservice(state, index, value) {
+    updateSubservice(state, index, newValue) {
       let arduinoSubserviceIndex = state.devices[index].params.findIndex((param) => param.name === 'SUBSERVICE');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoSubserviceIndex]: {
               value: {
-                $set: value,
+                $set: newValue,
               },
             },
           },
