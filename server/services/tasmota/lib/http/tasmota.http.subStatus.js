@@ -8,12 +8,11 @@ const { request } = require('./tasmota.http.request');
  * @param {string} username - Device username.
  * @param {string} password - Device password.
  * @param {number} statusId - Status ID to call.
- * @param {Object} manager - Tasmota manager.
  * @example
- * status('192.168.1.1', 11, {});
+ * status('192.168.1.1', 11);
  */
-function subStatus(networkAddress, username, password, statusId, manager) {
-  const device = manager.httpDevices[networkAddress];
+function subStatus(networkAddress, username, password, statusId) {
+  const device = this.discoveredDevices[networkAddress];
 
   const fillDevice = (message) => {
     const statusMsg = JSON.parse(message);
@@ -24,19 +23,19 @@ function subStatus(networkAddress, username, password, statusId, manager) {
 
     // Continue call
     if (statusId === 11) {
-      subStatus(networkAddress, username, password, 8, manager);
+      this.subStatus(networkAddress, username, password, 8);
     } else {
-      manager.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+      this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
     }
   };
 
   const authErrorCallback = () => {
     device.needAuthentication = true;
-    manager.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+    this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
   };
 
   const errorCallback = () => {
-    delete manager.httpDevices[networkAddress];
+    delete this.discoveredDevices[networkAddress];
   };
 
   request(

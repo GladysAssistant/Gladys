@@ -1,9 +1,8 @@
 const { addSelector } = require('../../../../utils/addSelector');
 const { request } = require('./tasmota.http.request');
-const { subStatus } = require('./tasmota.http.subStatus');
 const logger = require('../../../../utils/logger');
 const { DEVICE_POLL_FREQUENCIES, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../constants');
+const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../tasmota.constants');
 
 const createDevice = (networkAddress, serviceId, username, password) => {
   const externalId = `tasmota:${networkAddress}`;
@@ -16,8 +15,8 @@ const createDevice = (networkAddress, serviceId, username, password) => {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     params: [
       {
-        name: DEVICE_PARAM_NAME.INTERFACE,
-        value: DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.INTERFACE].HTTP,
+        name: DEVICE_PARAM_NAME.PROTOCOL,
+        value: DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].HTTP,
       },
     ],
   };
@@ -46,43 +45,42 @@ const createDevice = (networkAddress, serviceId, username, password) => {
  * @param {string} networkAddress - Device network address.
  * @param {string} username - Device username.
  * @param {string} password - Device password.
- * @param {Object} manager - Tasmota manager.
  * @example
- * status('192.168.1.1', tasmotaManager);
+ * status('192.168.1.1');
  */
-function status(networkAddress, username, password, manager) {
-  delete manager.httpDevices[networkAddress];
+function status(networkAddress, username, password) {
+  delete this.discoveredDevices[networkAddress];
 
   const storeDevice = (message) => {
     const statusMsg = JSON.parse(message);
 
     logger.debug(`Tasmota: HTTP receive message for ${networkAddress}: ${statusMsg}`);
-    const device = createDevice(networkAddress, manager.serviceId, username, password);
+    const device = createDevice(networkAddress, this.tasmotaHandler.serviceId, username, password);
 
     const { FriendlyName, Module } = statusMsg.Status;
     const [name] = FriendlyName;
     device.name = name;
-    device.moduleId = Module;
+    device.model = Module;
 
-    manager.httpDevices[networkAddress] = device;
+    this.discoveredDevices[networkAddress] = device;
 
     // Continue discovering
-    subStatus(networkAddress, username, password, 11, manager);
+    this.subStatus(networkAddress, username, password, 11);
   };
 
   const authErrorCallback = () => {
-    const device = createDevice(networkAddress, manager.serviceId);
+    const device = createDevice(networkAddress, this.tasmotaHandler.serviceId);
 
     device.name = networkAddress;
     device.needAuthentication = true;
 
-    manager.httpDevices[networkAddress] = device;
+    this.discoveredDevices[networkAddress] = device;
 
-    manager.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+    this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
   };
 
   const errorCallback = () => {
-    delete manager.httpDevices[networkAddress];
+    delete this.discoveredDevices[networkAddress];
   };
 
   request(

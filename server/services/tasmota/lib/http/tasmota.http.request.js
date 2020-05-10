@@ -9,7 +9,7 @@ const logger = require('../../../../utils/logger');
  * @example
  * buildUrl('http://my-device');
  */
-function buildUrl(urlStr, device = {}) {
+function buildUrl(urlStr, device) {
   const url = new URL(urlStr);
 
   if (device && device.params) {
@@ -18,7 +18,9 @@ function buildUrl(urlStr, device = {}) {
       url.username = username;
 
       const password = (device.params.find((param) => param.name === 'password') || {}).value;
-      url.password = password;
+      if (password) {
+        url.password = password;
+      }
     }
   }
 

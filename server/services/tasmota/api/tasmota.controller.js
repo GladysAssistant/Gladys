@@ -1,64 +1,35 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function MqttController(tasmotaManager) {
+module.exports = function TasmotaController(tasmotaManager) {
   /**
-   * @api {get} /api/v1/service/tasmota/discover/mqtt Get discovered Tasmota devices over MQTT
-   * @apiName discoverHttp
+   * @api {get} /api/v1/service/tasmota/discover/:protocol Get discovered Tasmota devices over selected protocol
+   * @apiName discover
    * @apiGroup Tasmota
    */
-  function discoverMqtt(req, res) {
-    res.json(tasmotaManager.getMqttDiscoveredDevices());
+  function discover(req, res) {
+    res.json(tasmotaManager.getDiscoveredDevices(req.params.protocol));
   }
 
   /**
-   * @api {post} /api/v1/service/tasmota/discover/mqtt Force to discover Tasmota devices over MQTT
-   * @apiName scanMqtt
+   * @api {post} /api/v1/service/tasmota/discover/:protocol Discover Tasmota devices over selected protocol.
+   * @apiName scan
    * @apiGroup Tasmota
    */
-  function scanMqtt(req, res) {
-    tasmotaManager.forceScan();
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
-   * @api {get} /api/v1/service/tasmota/discover/http Get discovered Tasmota devices over HTTP
-   * @apiName discoverHttp
-   * @apiGroup Tasmota
-   */
-  function discoverHttp(req, res) {
-    res.json(tasmotaManager.getHttpDiscoveredDevices());
-  }
-
-  /**
-   * @api {post} /api/v1/service/tasmota/discover/http Discover Tasmota devices over HTTP
-   * @apiName scanHttp
-   * @apiGroup Tasmota
-   */
-  function scanHttp(req, res) {
-    tasmotaManager.scanHttp(req.body);
+  function scan(req, res) {
+    tasmotaManager.scan(req.params.protocol, req.body);
     res.json({
       success: true,
     });
   }
 
   return {
-    'get /api/v1/service/tasmota/discover/mqtt': {
+    'get /api/v1/service/tasmota/discover/:protocol': {
       authenticated: true,
-      controller: asyncMiddleware(discoverMqtt),
+      controller: asyncMiddleware(discover),
     },
-    'post /api/v1/service/tasmota/discover/mqtt': {
+    'post /api/v1/service/tasmota/discover/:protocol': {
       authenticated: true,
-      controller: asyncMiddleware(scanMqtt),
-    },
-    'get /api/v1/service/tasmota/discover/http': {
-      authenticated: true,
-      controller: asyncMiddleware(discoverHttp),
-    },
-    'post /api/v1/service/tasmota/discover/http': {
-      authenticated: true,
-      controller: asyncMiddleware(scanHttp),
+      controller: asyncMiddleware(scan),
     },
   };
 };

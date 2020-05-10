@@ -1,18 +1,22 @@
-const { connect } = require('./connect');
-const { disconnect } = require('./disconnect');
-const { handleMqttMessage } = require('./handleMqttMessage');
-const { getMqttDiscoveredDevices } = require('./getMqttDiscoveredDevices');
-const { getHttpDiscoveredDevices } = require('./getHttpDiscoveredDevices');
-const { setValue } = require('./setValue');
-const { forceScan } = require('./forceScan');
-const { scanHttp } = require('./scanHttp');
-const { mergeWithExistingDevice } = require('./mergeWithExistingDevice');
-const { notifyNewDevice } = require('./notifyNewDevice');
-const { poll } = require('./poll');
+const TasmotaMQTTHandler = require('./mqtt');
+const TasmotaHTTPHandler = require('./http');
 
-const { isHttpDevice } = require('./isHttpDevice');
-const { getHttpValue } = require('./http/tasmota.http.getHttpValue');
-const { setHttpValue } = require('./http/tasmota.http.setHttpValue');
+const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('./tasmota.constants');
+
+const { getHandler } = require('./tasmota.getHandler');
+
+const { connect } = require('./tasmota.connect');
+const { disconnect } = require('./tasmota.disconnect');
+
+const { scan } = require('./tasmota.scan');
+
+const { getDiscoveredDevices } = require('./tasmota.getDiscoveredDevices');
+const { setValue } = require('./tasmota.setValue');
+const { mergeWithExistingDevice } = require('./tasmota.mergeWithExistingDevice');
+const { notifyNewDevice } = require('./tasmota.notifyNewDevice');
+const { poll } = require('./tasmota.poll');
+
+const { getProtocolFromDevice } = require('./tasmota.getProtocolFromDevice');
 
 /**
  * @description Add ability to connect to Tasmota devices.
@@ -24,27 +28,25 @@ const { setHttpValue } = require('./http/tasmota.http.setHttpValue');
 const TasmotaHandler = function TasmotaHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
+
+  this.protocols = {};
   // MQTT
-  this.mqttService = null;
-  this.mqttDevices = {};
-  this.pendingMqttDevices = {};
+  this.protocols[DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT] = new TasmotaMQTTHandler(this);
   // HTTP
-  this.httpDevices = {};
+  this.protocols[DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].HTTP] = new TasmotaHTTPHandler(this);
 };
+
+TasmotaHandler.prototype.getHandler = getHandler;
 
 TasmotaHandler.prototype.connect = connect;
 TasmotaHandler.prototype.disconnect = disconnect;
-TasmotaHandler.prototype.handleMqttMessage = handleMqttMessage;
-TasmotaHandler.prototype.getMqttDiscoveredDevices = getMqttDiscoveredDevices;
-TasmotaHandler.prototype.getHttpDiscoveredDevices = getHttpDiscoveredDevices;
+TasmotaHandler.prototype.scan = scan;
+
+TasmotaHandler.prototype.getDiscoveredDevices = getDiscoveredDevices;
 TasmotaHandler.prototype.setValue = setValue;
-TasmotaHandler.prototype.forceScan = forceScan;
-TasmotaHandler.prototype.scanHttp = scanHttp;
 TasmotaHandler.prototype.mergeWithExistingDevice = mergeWithExistingDevice;
 TasmotaHandler.prototype.notifyNewDevice = notifyNewDevice;
 TasmotaHandler.prototype.poll = poll;
-TasmotaHandler.prototype.isHttpDevice = isHttpDevice;
-TasmotaHandler.prototype.getHttpValue = getHttpValue;
-TasmotaHandler.prototype.setHttpValue = setHttpValue;
+TasmotaHandler.prototype.getProtocolFromDevice = getProtocolFromDevice;
 
 module.exports = TasmotaHandler;

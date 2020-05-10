@@ -5,10 +5,8 @@ const TasmotaController = require('../../../../services/tasmota/api/tasmota.cont
 
 const discoveredDevices = [{ device: 'first' }, { device: 'second' }];
 const tasmotaHandler = {
-  getMqttDiscoveredDevices: fake.returns(discoveredDevices),
-  forceScan: fake.returns(discoveredDevices),
-  getHttpDiscoveredDevices: fake.returns(discoveredDevices),
-  scanHttp: fake.returns(discoveredDevices),
+  getDiscoveredDevices: fake.returns(discoveredDevices),
+  scan: fake.resolves(discoveredDevices),
 };
 
 describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
@@ -23,15 +21,18 @@ describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
   });
 
   it('Get discovered MQTT devices', () => {
+    const req = {
+      params: {
+        protocol: 'mqtt',
+      },
+    };
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/tasmota/discover/mqtt'].controller(undefined, res);
-    assert.calledOnce(tasmotaHandler.getMqttDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.forceScan);
-    assert.notCalled(tasmotaHandler.getHttpDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.scanHttp);
+    controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
+    assert.notCalled(tasmotaHandler.scan);
     assert.calledWith(res.json, discoveredDevices);
   });
 });
@@ -48,15 +49,18 @@ describe('POST /api/v1/service/tasmota/discover/mqtt', () => {
   });
 
   it('Look for MQTT devices', () => {
+    const req = {
+      params: {
+        protocol: 'http',
+      },
+    };
     const res = {
       json: fake.returns(null),
     };
 
-    controller['post /api/v1/service/tasmota/discover/mqtt'].controller(undefined, res);
-    assert.notCalled(tasmotaHandler.getMqttDiscoveredDevices);
-    assert.calledOnce(tasmotaHandler.forceScan);
-    assert.notCalled(tasmotaHandler.getHttpDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.scanHttp);
+    controller['post /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    assert.notCalled(tasmotaHandler.getDiscoveredDevices);
+    assert.calledOnce(tasmotaHandler.scan);
     assert.calledWith(res.json, { success: true });
   });
 });
@@ -73,15 +77,18 @@ describe('GET /api/v1/service/tasmota/discover/http', () => {
   });
 
   it('Get discovered HTTP devices', () => {
+    const req = {
+      params: {
+        protocol: 'http',
+      },
+    };
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/tasmota/discover/http'].controller(undefined, res);
-    assert.notCalled(tasmotaHandler.getMqttDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.forceScan);
-    assert.calledOnce(tasmotaHandler.getHttpDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.scanHttp);
+    controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
+    assert.notCalled(tasmotaHandler.scan);
     assert.calledWith(res.json, discoveredDevices);
   });
 });
@@ -98,16 +105,14 @@ describe('POST /api/v1/service/tasmota/discover/http', () => {
   });
 
   it('Look for HTTP devices', () => {
-    const req = { body: { any: 'value' } };
+    const req = { params: { protocol: 'http' }, body: { any: 'value' } };
     const res = {
       json: fake.returns(null),
     };
 
-    controller['post /api/v1/service/tasmota/discover/http'].controller(req, res);
-    assert.notCalled(tasmotaHandler.getMqttDiscoveredDevices);
-    assert.notCalled(tasmotaHandler.forceScan);
-    assert.notCalled(tasmotaHandler.getHttpDiscoveredDevices);
-    assert.calledWith(tasmotaHandler.scanHttp, req.body);
+    controller['post /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    assert.notCalled(tasmotaHandler.getDiscoveredDevices);
+    assert.calledWith(tasmotaHandler.scan, req.params.protocol, req.body);
     assert.calledWith(res.json, { success: true });
   });
 });
