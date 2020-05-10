@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import { Link } from 'preact-router/match';
-import { DEVICE_SUBSERVICE_LIST } from '../../../../../../../server/utils/constants';
+import { DEVICE_SUBSERVICE } from '../../../../../../../server/utils/constants';
 import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
@@ -116,13 +116,13 @@ class ArduinoDeviceBox extends Component {
                       value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
                       onChange={this.updateSubservice}
                     >
-                      <option value={DEVICE_SUBSERVICE_LIST.EMIT_433}>
+                      <option value={DEVICE_SUBSERVICE.EMIT_433}>
                         <Text id="integration.arduino.subservice.emit433" />
                       </option>
-                      <option value={DEVICE_SUBSERVICE_LIST.EMIT_433_CHACON}>
+                      <option value={DEVICE_SUBSERVICE.EMIT_433_CHACON}>
                         <Text id="integration.arduino.subservice.emit433Chacon" />
                       </option>
-                      <option value={DEVICE_SUBSERVICE_LIST.EMIT_IR}>
+                      <option value={DEVICE_SUBSERVICE.EMIT_IR}>
                         <Text id="integration.arduino.subservice.emitIR" />
                       </option>
                     </select>
