@@ -131,7 +131,7 @@ class ArduinoDeviceBox extends Component {
                       <input
                         id="dataPin"
                         type="text"
-                        value={props.device.dataPin}
+                        value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
                         onInput={this.updateDataPin}
                         class="form-control"
                         placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
