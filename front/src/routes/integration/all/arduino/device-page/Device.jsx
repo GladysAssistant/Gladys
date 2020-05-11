@@ -170,6 +170,24 @@ class ArduinoDeviceBox extends Component {
                       />
                     </Localizer>
                   </div>
+
+                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433_CHACON && (
+                    <div class="form-group">
+                    <label class="form-label" for="dataPin">
+                      <Text id="integration.arduino.device.dataPinLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id="dataPin"
+                        type="text"
+                        value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
+                        onInput={this.updateDataPin}
+                        class="form-control"
+                        placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  )}
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
