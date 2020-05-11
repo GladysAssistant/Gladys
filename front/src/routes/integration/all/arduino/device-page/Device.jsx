@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import { Link } from 'preact-router/match';
-import { DEVICE_SUBSERVICE } from '../../../../../../../server/utils/constants';
+import { DEVICE_SUBSERVICE, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
@@ -70,6 +70,11 @@ class ArduinoDeviceBox extends Component {
   updateCodeOff = (e) => {
     this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
   };
+
+  updateFeatureRecv433 = () => {
+    this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
+  }
 
   render(props, { loading }) {
     return (
@@ -182,6 +187,8 @@ class ArduinoDeviceBox extends Component {
                       />
                     </Localizer>
                   </div>
+
+                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.RECV_433 && this.updateFeatureRecv433}
 
                   {(props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433 ||
                     props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_IR) && (

@@ -86,6 +86,7 @@ const DeviceTab = ({ children, ...props }) => (
                   updateCode={props.updateCode}
                   updateCodeOn={props.updateCodeOn}
                   updateCodeOff={props.updateCodeOff}
+                  updateFeature={props.updateFeature}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
                 />
