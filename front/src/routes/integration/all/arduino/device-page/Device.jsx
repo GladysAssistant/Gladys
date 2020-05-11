@@ -119,10 +119,7 @@ class ArduinoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {props.arduinoDevices &&
-                        props.arduinoDevices.map((device) => 
-                        <option value={device.selector}>
-                          {device.name}
-                        </option>)}
+                        props.arduinoDevices.map((device) => <option value={device.external_id}>{device.name}</option>)}
                     </select>
                   </div>
 
