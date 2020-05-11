@@ -4,7 +4,7 @@ const ArduinoController = require('./api/arduino.controller');
 
 module.exports = function ArduinoService(gladys, serviceId) {
   const serial = require('serialport');
-  const arduinoManager = new ArduinoManager(serial, gladys.event, serviceId);
+  const arduinoManager = new ArduinoManager(gladys, serial, gladys.event, serviceId);
 
   /**
    * @public

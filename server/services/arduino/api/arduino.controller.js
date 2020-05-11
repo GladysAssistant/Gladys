@@ -8,15 +8,7 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
    * @apiGroup Arduino
    */
   async function connect(req, res) {
-    const arduinoPath = await gladys.variable.getValue('ARDUINO_PATH', serviceId);
-    const arduinoModel = await gladys.variable.getValue('ARDUINO_MODEL', serviceId);
-    if (!arduinoPath) {
-      throw new ServiceNotConfiguredError('ARDUINO_PATH_NOT_FOUND');
-    }
-    if (!arduinoModel) {
-      throw new ServiceNotConfiguredError('ARDUINO_MODEL_NOT_FOUND');
-    }
-    arduinoManager.connect(arduinoPath);
+    arduinoManager.connect(arduinoManager.device);
     res.json({
       success: true,
     });
