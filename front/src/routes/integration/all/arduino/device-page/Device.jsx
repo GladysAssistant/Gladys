@@ -172,7 +172,7 @@ class ArduinoDeviceBox extends Component {
                   </div>
 
                   {props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433 ||
-                    (props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_IR && (
+                    props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_IR && (
                       <div class="form-group">
                         <label class="form-label" for="code">
                           <Text id="integration.arduino.device.codeLabel" />
@@ -186,7 +186,7 @@ class ArduinoDeviceBox extends Component {
                           />
                         </Localizer>
                       </div>
-                    ))}
+                    )}
 
                   {props.device.params.find((e) => e.name === 'SUBSERVICE').value ===
                     DEVICE_SUBSERVICE.EMIT_433_CHACON && (
