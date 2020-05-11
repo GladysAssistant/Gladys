@@ -110,10 +110,6 @@ const actions = (store) => {
                 name: 'ARDUINO_MODEL',
                 value: null,
               },
-              {
-                name: 'ARDUINO_MANUFACTURER',
-                value: null,
-              },
             ],
           },
         ],
