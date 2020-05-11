@@ -158,7 +158,7 @@ class ArduinoDeviceBox extends Component {
                     <select
                       class="form-control"
                       id="function"
-                      value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
+                      value={props.device.params.find((e) => e.name === 'FUNCTION').value}
                       onChange={this.updateFunction}
                     >
                       <option value={DEVICE_FUNCTION.RECV_433}>
@@ -192,8 +192,8 @@ class ArduinoDeviceBox extends Component {
                     </Localizer>
                   </div>
 
-                  {(props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_FUNCTION.EMIT_433 ||
-                    props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_FUNCTION.EMIT_IR) && (
+                  {(props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433 ||
+                    props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR) && (
                     <div class="form-group">
                       <label class="form-label" for="code">
                         <Text id="integration.arduino.device.codeLabel" />
@@ -211,7 +211,7 @@ class ArduinoDeviceBox extends Component {
                     </div>
                   )}
 
-                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value ===
+                  {props.device.params.find((e) => e.name === 'FUNCTION').value ===
                     DEVICE_FUNCTION.EMIT_433_CHACON && (
                     <div class="form-group">
                       <div class="row">
