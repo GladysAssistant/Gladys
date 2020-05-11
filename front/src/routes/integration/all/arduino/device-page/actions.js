@@ -128,6 +128,10 @@ const actions = (store) => {
                 name: 'ARDUINO_LINKED',
                 value: null,
               },
+              {
+                name: 'CODE',
+                value: null,
+              },
             ],
           },
         ],
