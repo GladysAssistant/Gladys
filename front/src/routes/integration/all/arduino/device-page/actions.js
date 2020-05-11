@@ -274,6 +274,22 @@ const actions = (store) => {
         devices,
       });
     },
+    updateFeature(state, index, featureIndex, property, newValue) {
+      const devices = update(state.devices, {
+        [index]: {
+          features: {
+            [featureIndex]: {
+              [property]: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
     async search(state, e) {
       store.setState({
         deviceSearch: e.target.value,
