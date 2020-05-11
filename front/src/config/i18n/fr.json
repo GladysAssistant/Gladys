@@ -663,6 +663,7 @@
         "subserviceLabel": "Sous-service",
         "dataPinLabel": "Pin de données",
         "arduinoLinkedLabel": "Arduino lié",
+        "codeLabel": "Code",
         "codeOnLabel": "Code ON",
         "codeOffLabel": "Code OFF"
       },

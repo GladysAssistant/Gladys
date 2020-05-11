@@ -555,6 +555,7 @@
         "subserviceLabel": "Sub-service",
         "dataPinLabel": "Data pin",
         "arduinoLinkedLabel": "Arduino linked",
+        "codeLabel": "Code",
         "codeOnLabel": "Code ON",
         "codeOffLabel": "Code OFF"
       },
