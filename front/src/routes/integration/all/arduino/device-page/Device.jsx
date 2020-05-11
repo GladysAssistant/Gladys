@@ -3,7 +3,11 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import { Link } from 'preact-router/match';
-import { DEVICE_SUBSERVICE, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_SUBSERVICE,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} from '../../../../../../../server/utils/constants';
 import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
@@ -74,7 +78,7 @@ class ArduinoDeviceBox extends Component {
   updateFeatureRecv433 = async () => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
-  }
+  };
 
   render(props, { loading }) {
     return (
@@ -155,7 +159,7 @@ class ArduinoDeviceBox extends Component {
                       class="form-control"
                       id="subservice"
                       value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
-                      onChange={this.updateSubservice && (props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.RECV_433 && this.updateFeatureRecv433)}
+                      onChange={this.updateSubservice}
                     >
                       <option value={DEVICE_SUBSERVICE.RECV_433}>
                         <Text id="integration.arduino.subservice.recv433" />
