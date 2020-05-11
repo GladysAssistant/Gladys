@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 import { Link } from 'preact-router/match';
 import {
-  DEVICE_SUBSERVICE,
+  DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
@@ -51,8 +51,8 @@ class ArduinoDeviceBox extends Component {
     this.props.updateDataPin(this.props.deviceIndex, e.target.value);
   };
 
-  updateSubservice = (e) => {
-    this.props.updateSubservice(this.props.deviceIndex, e.target.value);
+  updateFunction = (e) => {
+    this.props.updateFunction(this.props.deviceIndex, e.target.value);
   };
 
   updateArduino = (e) => {
@@ -152,26 +152,26 @@ class ArduinoDeviceBox extends Component {
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="subservice">
-                      <Text id="integration.arduino.device.subserviceLabel" />
+                    <label class="form-label" for="function">
+                      <Text id="integration.arduino.device.functionLabel" />
                     </label>
                     <select
                       class="form-control"
-                      id="subservice"
+                      id="function"
                       value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
-                      onChange={this.updateSubservice}
+                      onChange={this.updateFunction}
                     >
-                      <option value={DEVICE_SUBSERVICE.RECV_433}>
-                        <Text id="integration.arduino.subservice.recv433" />
+                      <option value={DEVICE_FUNCTION.RECV_433}>
+                        <Text id="integration.arduino.function.recv433" />
                       </option>
-                      <option value={DEVICE_SUBSERVICE.EMIT_433}>
-                        <Text id="integration.arduino.subservice.emit433" />
+                      <option value={DEVICE_FUNCTION.EMIT_433}>
+                        <Text id="integration.arduino.function.emit433" />
                       </option>
-                      <option value={DEVICE_SUBSERVICE.EMIT_433_CHACON}>
-                        <Text id="integration.arduino.subservice.emit433Chacon" />
+                      <option value={DEVICE_FUNCTION.EMIT_433_CHACON}>
+                        <Text id="integration.arduino.function.emit433Chacon" />
                       </option>
-                      <option value={DEVICE_SUBSERVICE.EMIT_IR}>
-                        <Text id="integration.arduino.subservice.emitIR" />
+                      <option value={DEVICE_FUNCTION.EMIT_IR}>
+                        <Text id="integration.arduino.function.emitIR" />
                       </option>
                     </select>
                   </div>
@@ -192,8 +192,8 @@ class ArduinoDeviceBox extends Component {
                     </Localizer>
                   </div>
 
-                  {(props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433 ||
-                    props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_IR) && (
+                  {(props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_FUNCTION.EMIT_433 ||
+                    props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_FUNCTION.EMIT_IR) && (
                     <div class="form-group">
                       <label class="form-label" for="code">
                         <Text id="integration.arduino.device.codeLabel" />
@@ -212,7 +212,7 @@ class ArduinoDeviceBox extends Component {
                   )}
 
                   {props.device.params.find((e) => e.name === 'SUBSERVICE').value ===
-                    DEVICE_SUBSERVICE.EMIT_433_CHACON && (
+                    DEVICE_FUNCTION.EMIT_433_CHACON && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">

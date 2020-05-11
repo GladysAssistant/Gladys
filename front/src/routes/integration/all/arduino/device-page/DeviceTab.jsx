@@ -81,7 +81,7 @@ const DeviceTab = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   updateName={props.updateName}
                   updateDataPin={props.updateDataPin}
-                  updateSubservice={props.updateSubservice}
+                  updateFunction={props.updateFunction}
                   updateArduino={props.updateArduino}
                   updateCode={props.updateCode}
                   updateCodeOn={props.updateCodeOn}

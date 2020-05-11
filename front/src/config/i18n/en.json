@@ -552,7 +552,7 @@
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
-        "subserviceLabel": "Sub-service",
+        "functionLabel": "Function",
         "dataPinLabel": "Data pin",
         "arduinoLinkedLabel": "Arduino linked",
         "codeLabel": "Code",
@@ -575,7 +575,7 @@
         "connectButton": "Save",
         "disconnectButton": "Delete"
       },
-      "subservice": {
+      "function": {
         "recv433": "Receive in 433 MHz",
         "emit433": "Emit in 433 MHz",
         "emit433Chacon": "Emit in 433 MHz for Chacon outlets",

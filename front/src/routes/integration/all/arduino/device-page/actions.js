@@ -5,7 +5,7 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import {
-  DEVICE_SUBSERVICE,
+  DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
@@ -189,7 +189,7 @@ const actions = (store) => {
         devices,
       });
     },
-    updateSubservice(state, index, newValue) {
+    updateFunction(state, index, newValue) {
       let arduinoSubserviceIndex = state.devices[index].params.findIndex((param) => param.name === 'SUBSERVICE');
       const devices = update(state.devices, {
         [index]: {

@@ -660,7 +660,7 @@
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
-        "subserviceLabel": "Sous-service",
+        "functionLabel": "Fonction",
         "dataPinLabel": "Pin de données",
         "arduinoLinkedLabel": "Arduino lié",
         "codeLabel": "Code",
@@ -683,7 +683,7 @@
         "connectButton": "Sauvegarder",
         "disconnectButton": "Supprimer"
       },
-      "subservice": {
+      "function": {
         "recv433": "Réception 433 MHz",
         "emit433": "Emision 433 MHz",
         "emit433Chacon": "Emission 433 MHz pour prises Chacon",
