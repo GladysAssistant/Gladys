@@ -400,6 +400,34 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
+    "kodi": {
+      "title": "Kodi Media Center",
+      "deviceTab": "Devices",
+      "new": "New",
+      "testConnectionButton": "Test connection",
+      "testConnectionSuccess": "Test connection Success.",
+      "testConnectionError": "Test connection fail, check host/port of your Kodi Media Center and verify his up.",
+      "saveError": "Save error of Kodi Media Center device.",
+      "documentation": "Kodi documentation",
+      "officialWebSite": "Kodi official website",
+      "device": {
+        "title": "Devices in Gladys",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "default": "Default",
+        "noDevicesFound": "No Kodi Media Center devices found. Add device configuration with new button.",
+        "beforeAddingDevice": "Before add Kodi Media Center device, ensure you have already configure Kodi to allowed 'Web Conrtrol' in settings (menu: Settings / Services / Control), like: ",
+        "noParams": "No params found.",
+        "paramsLabel": "Parameters",
+        "param": {
+          "host": "host",
+          "port": "port",
+          "no": {
+            "host": "Host (ex: 192.168.0.1)",
+            "port": "Port (ex: 8080)"
+          }
+        }
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "deviceTab": "Devices",

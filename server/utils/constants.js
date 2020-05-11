@@ -95,6 +95,27 @@ const EVENTS = {
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
+  KODI: {
+    PING: 'kodi.ping',
+    MUTE: 'kodi.mute',
+    UNMUTE: 'kodi.unmute',
+    PLAYER: {
+      PLAY: 'kodi.player.play',
+      STOP: 'kodi.player.stop',
+    },
+    VOLUME: {
+      SET: 'kodi.volme.set',
+      INCREASE: 'kodi.volume.increase',
+      DECREASE: 'kodi.volume.decrease',
+    },
+    MOVIES: {
+      GET: {
+        ALL: 'kodi.movies.all',
+        BYNAME: 'kodi.movies.byname',
+      },
+      OPEN: 'kodi.movies.open',
+    },
+  },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
   },
@@ -183,6 +204,9 @@ const ACTIONS = {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
   },
+  KODI: {
+    PING: 'kodi.ping',
+  },
   TIME: {
     DELAY: 'delay',
   },
@@ -215,10 +239,28 @@ const INTENTS = {
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
   },
+  KODI: {
+    PING: 'intent.kodi.ping',
+    MUTE: 'intent.kodi.mute',
+    UNMUTE: 'intent.kodi.unmute',
+    PLAYER: {
+      PLAY: 'intent.kodi.player.play',
+      STOP: 'intent.kodi.player.stop',
+    },
+    VOLUME: {
+      SET: 'intent.kodi.volume.set',
+      INCREASE: 'intent.kodi.volume.increase',
+      DECREASE: 'intent.kodi.volume.decrease',
+    },
+    MOVIES: {
+      OPEN: 'intent.kodi.movies.open',
+    },
+  },
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
   LIGHT: 'light',
+  KODI: 'kodi',
   BATTERY: 'battery',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   MOTION_SENSOR: 'motion-sensor',
@@ -268,6 +310,9 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
+  },
+  KODI: {
+    PING: 'ping',
   },
   CAMERA: {
     IMAGE: 'image',
