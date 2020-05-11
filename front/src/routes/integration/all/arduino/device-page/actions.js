@@ -130,7 +130,7 @@ const actions = (store) => {
               },
               {
                 name: 'CODE',
-                value: null,
+                value: '0',
               },
             ],
           },
