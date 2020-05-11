@@ -71,7 +71,7 @@ class ArduinoDeviceBox extends Component {
     this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
   };
 
-  updateFeatureRecv433 = () => {
+  updateFeatureRecv433 = async () => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
   }
