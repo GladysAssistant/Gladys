@@ -1,7 +1,6 @@
 /* eslint-disable prefer-destructuring */
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
-const logger = require('../../../utils/logger');
 
 module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   /**
@@ -10,43 +9,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function getNewDevices(req, res) {
-    let NewDevices = RFlinkManager.getNewDevices();
-    logger.log(RFlinkManager.devices);
-    logger.log(NewDevices);
-    if (RFlinkManager.devices !== undefined && NewDevices !== undefined) {
-      NewDevices = NewDevices.filter((newDevice) => {
-        let alreadyListed;
-        RFlinkManager.devices.forEach((device) => {
-          if (!(device.external_id === newDevice.external_id)) {
-            alreadyListed = true;
-            return true;
-          }
-          if (device.external_id === newDevice.external_id) {
-            alreadyListed = false;
-            return false;
-          }
-          return true;
-        });
-        if (alreadyListed !== undefined) {
-          return alreadyListed;
-        }
-        return true;
-      });
-
-      logger.log(NewDevices);
-      res.json(NewDevices);
+    const NewDevices = RFlinkManager.getNewDevices();
+    res.json(NewDevices);
     }
-  }
-
-  /**
-   *
-   */
-  async function getDevices(req, res) {
-    RFlinkManager.addDevice(req.body.value);
-    res.json({
-      success: true,
-    });
-  }
+  
 
   /**
    * @api {get} /api/v1/service/rflink/connect connect to the gateway
@@ -184,10 +150,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     'get /api/v1/service/rflink/newDevices': {
       authenticated: true,
       controller: asyncMiddleware(getNewDevices),
-    },
-    'post /api/v1/service/rflink/devicess': {
-      authenticated: true,
-      controller: asyncMiddleware(getDevices),
     },
     'post /api/v1/service/rflink/connect': {
       authenticated: true,

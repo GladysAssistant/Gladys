@@ -52,19 +52,42 @@ function createActions(store) {
       });
       try {
         const rflinkNewDevices = await state.httpClient.get('/api/v1/service/rflink/newDevices');
-        const rflinkNewDevicesFiltered = rflinkNewDevices.filter(device => {
+        let rflinkNewDevicesFiltered = rflinkNewDevices.filter(device => {
           if (!state.rflinkDevicesMap) {
             return true;
           }
           return !state.rflinkDevicesMap.has(device.external_id);
         });
+
+        if (state.rflinkDevices !== undefined && rflinkNewDevicesFiltered !== undefined) {
+          rflinkNewDevicesFiltered = rflinkNewDevicesFiltered.filter((newDevice) => {
+            let alreadyListed;
+            state.rflinkDevices.forEach((device) => {
+              if (!(device.external_id === newDevice.external_id)) {
+                alreadyListed = true;
+                return true;
+              }
+              if (device.external_id === newDevice.external_id) {
+                alreadyListed = false;
+                return false;
+              }
+              return true;
+            });
+            if (alreadyListed !== undefined) {
+              return alreadyListed;
+            }
+            return true;
+          });
+      }
+
+
+
+
         store.setState({
           rflinkNewDevices: rflinkNewDevicesFiltered,
           getRflinkNewDevicesStatus: RequestStatus.Success
         });
-        await state.httpClient.post('/api/v1/service/rflink/devicess', {
-          value: state.rflinkDevices
-        });
+
       } catch (e) {
         store.setState({
           getRflinkNewDevicesStatus: RequestStatus.Error
@@ -115,9 +138,6 @@ function createActions(store) {
         }
       });
       store.setState(newState);
-      await state.httpClient.post('/api/v1/service/rflink/devicess', {
-        value: state.rflinkDevices
-      });
     },
     async search(state, e) {
       store.setState({
