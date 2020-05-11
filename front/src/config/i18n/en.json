@@ -554,7 +554,9 @@
         "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
         "subserviceLabel": "Sub-service",
         "dataPinLabel": "Data pin",
-        "arduinoLinkedLabel": "Arduino linked"
+        "arduinoLinkedLabel": "Arduino linked",
+        "codeOnLabel": "Code ON",
+        "codeOffLabel": "Code OFF"
       },
       "setup": {
         "title": "Arduino Settings",

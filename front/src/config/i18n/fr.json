@@ -662,7 +662,9 @@
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
         "subserviceLabel": "Sous-service",
         "dataPinLabel": "Pin de données",
-        "arduinoLinkedLabel": "Arduino lié"
+        "arduinoLinkedLabel": "Arduino lié",
+        "codeOnLabel": "Code ON",
+        "codeOffLabel": "Code OFF"
       },
       "setup": {
         "title": "Configuration Arduino",
