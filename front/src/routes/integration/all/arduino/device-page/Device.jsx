@@ -53,6 +53,20 @@ class ArduinoDeviceBox extends Component {
 
   updateFunction = (e) => {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
+    switch (e.target.value) {
+      case DEVICE_FUNCTION.RECV_433:
+        this.updateFeatureRecv433();
+        break;
+      case DEVICE_FUNCTION.EMIT_433:
+        this.updateFeatureEmit433();
+        break;
+      case DEVICE_FUNCTION.EMIT_433_CHACON:
+        this.updateFeatureEmit433();
+        break;
+      case DEVICE_FUNCTION.EMIT_IR:
+        this.updateFeatureEmit433();
+        break;
+    }
   };
 
   updateArduino = (e) => {
@@ -75,9 +89,14 @@ class ArduinoDeviceBox extends Component {
     this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
   };
 
-  updateFeatureRecv433 = async () => {
+  updateFeatureRecv433 = () => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
+  };
+
+  updateFeatureEmit433 = () => {
+    this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
   };
 
   render(props, { loading }) {
