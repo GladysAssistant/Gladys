@@ -41,11 +41,11 @@ class SetupDevice extends Component {
   };
 
   updateArduinoPath = (e) => {
-    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value.comPath);
+    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value);
   };
 
   updateArduinoManufacturer = (e) => {
-    this.props.updateArduinoManufacturer(this.props.deviceIndex, e.target.value.manufacturer);
+    this.props.updateArduinoManufacturer(this.props.deviceIndex, e.target.value);
   }
 
   updateArduinoModel = (e) => {
@@ -119,7 +119,7 @@ class SetupDevice extends Component {
                   <label class="form-label">
                     <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                   </label>
-                  <select class="form-control" onChange={this.updateArduinoPath && this.updateArduinoManufacturer}>
+                  <select class="form-control" onChange={this.updateArduinoPath}>
                     <option>
                       <Text id="global.emptySelectOption" />
                     </option>
