@@ -132,6 +132,14 @@ const actions = (store) => {
                 name: 'CODE',
                 value: '0',
               },
+              {
+                name: 'CODE_ON',
+                value: '0',
+              },
+              {
+                name: 'CODE_OFF',
+                value: '0',
+              },
             ],
           },
         ],
