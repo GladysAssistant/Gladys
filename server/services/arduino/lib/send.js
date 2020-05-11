@@ -14,13 +14,13 @@ async function send(device) {
 
     const port = new SerialPort(path, function (err) {
       if (err) {
-        return logger.warn('Error: ' + err.message);
+        return logger.warn('Error: ', err.message);
       }
     });
 
     port.write(message, function (err) {
       if (err) {
-        return logger.warn('Error on write: ' + err.message);
+        return logger.warn('Error on write: ', err.message);
       }
       logger.warn('message written');
     })
