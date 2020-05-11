@@ -55,16 +55,20 @@ class ArduinoDeviceBox extends Component {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
     switch (e.target.value) {
       case DEVICE_FUNCTION.RECV_433:
-        this.updateFeatureRecv433();
+        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
+        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
         break;
       case DEVICE_FUNCTION.EMIT_433:
-        this.updateFeatureEmit433();
+        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
         break;
       case DEVICE_FUNCTION.EMIT_433_CHACON:
-        this.updateFeatureEmit433();
+        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
         break;
       case DEVICE_FUNCTION.EMIT_IR:
-        this.updateFeatureEmit433();
+        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
         break;
     }
   };
@@ -87,16 +91,6 @@ class ArduinoDeviceBox extends Component {
 
   updateCodeOff = (e) => {
     this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
-  };
-
-  updateFeatureRecv433 = () => {
-    this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR);
-    this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
-  };
-
-  updateFeatureEmit433 = () => {
-    this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-    this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
   };
 
   render(props, { loading }) {
@@ -230,8 +224,7 @@ class ArduinoDeviceBox extends Component {
                     </div>
                   )}
 
-                  {props.device.params.find((e) => e.name === 'FUNCTION').value ===
-                    DEVICE_FUNCTION.EMIT_433_CHACON && (
+                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433_CHACON && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
