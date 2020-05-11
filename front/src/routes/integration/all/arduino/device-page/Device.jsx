@@ -181,6 +181,7 @@ class ArduinoDeviceBox extends Component {
                         <input
                           id="code"
                           type="text"
+                          value={props.device.params.find((e) => e.name === 'CODE').value}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.codeLabel" />}
                         />
@@ -200,6 +201,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="codeOn"
                               type="text"
+                              value={props.device.params.find((e) => e.name === 'CODE_ON').value}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
                             />
@@ -214,6 +216,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="codeOff"
                               type="text"
+                              value={props.device.params.find((e) => e.name === 'CODE_OFF').value}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
                             />
