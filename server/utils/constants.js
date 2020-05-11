@@ -347,9 +347,10 @@ const DEVICE_POLL_FREQUENCIES = {
 };
 
 const DEVICE_SUBSERVICE = {
+  RECV_433: 'recv_433',
   EMIT_433: 'emit_433',
   EMIT_433_CHACON: 'emit_433_chacon',
-  EMIT_IR: 'emit_ir'
+  EMIT_IR: 'emit_ir',
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {

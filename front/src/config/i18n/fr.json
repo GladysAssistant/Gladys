@@ -681,6 +681,7 @@
         "disconnectButton": "Supprimer"
       },
       "subservice": {
+        "recv433": "Réception 433 MHz",
         "emit433": "Emision 433 MHz",
         "emit433Chacon": "Emission 433 MHz pour prises Chacon",
         "emitIR": "Emission IR"

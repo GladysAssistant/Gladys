@@ -133,6 +133,9 @@ class ArduinoDeviceBox extends Component {
                       value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
                       onChange={this.updateSubservice}
                     >
+                      <option value={DEVICE_SUBSERVICE.RECV_433}>
+                        <Text id="integration.arduino.subservice.recv433" />
+                      </option>
                       <option value={DEVICE_SUBSERVICE.EMIT_433}>
                         <Text id="integration.arduino.subservice.emit433" />
                       </option>

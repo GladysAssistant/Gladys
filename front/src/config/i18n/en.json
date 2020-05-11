@@ -573,6 +573,7 @@
         "disconnectButton": "Delete"
       },
       "subservice": {
+        "recv433": "Receive in 433 MHz",
         "emit433": "Emit in 433 MHz",
         "emit433Chacon": "Emit in 433 MHz for Chacon outlets",
         "emitIR": "Emit in IR"
