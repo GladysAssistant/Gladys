@@ -185,6 +185,12 @@ class ArduinoDeviceBox extends Component {
                           placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
                         />
                       </Localizer>
+                    </div>
+                  )}
+                  
+                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value ===
+                    DEVICE_SUBSERVICE.EMIT_433_CHACON && (
+                    <div class="form-group">
                       <label class="form-label" for="codeOff">
                         <Text id="integration.arduino.device.codeOffLabel" />
                       </label>
