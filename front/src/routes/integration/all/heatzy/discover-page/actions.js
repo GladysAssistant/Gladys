@@ -1,10 +1,10 @@
-import { RequestStatus } from '../../../../../utils/consts';
+import {RequestStatus} from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 
 let scanTimer;
 
-function createActions(store) {
+function actions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async discover(state) {
@@ -12,9 +12,9 @@ function createActions(store) {
         discoverHeatzy: true
       });
       try {
-        const heatzyDiscover = await state.httpClient.post('/api/v1/service/heatzy/discover');
+        const heatzyDiscover = await state.httpClient.get('/api/v1/service/heatzy/discover');
 
-        scanTimer = setTimeout(function() {
+        scanTimer = setTimeout(function () {
           if (!heatzyDiscover) {
             store.setState( {
               discoverHeatzy: false,
@@ -38,8 +38,6 @@ function createActions(store) {
       });
     },
     updateDeviceField(state, index, field, value) {
-console.log(field);
-console.log(value);
       const heatzyDevices = update(state.heatzyDevices, {
         [index]: {
           [field]: {
@@ -92,4 +90,4 @@ console.log(device);
   return Object.assign({}, integrationActions, actions);
 }
 
-export default createActions;
+export default actions;

@@ -19,7 +19,7 @@ async function connect() {
   }
   this.configured = true;
 
-  logger.debug(`Trying to connect to Heatzy with login ${heatzyLogin}...`);
+  // logger.debug(`Trying to connect to Heatzy with login ${heatzyLogin}...`);
   this.heatzyClient = (await new this.heatzyLibrary(heatzyLogin, heatzyPassword));
 
   this.heatzyClient.getDevices()
@@ -29,10 +29,6 @@ async function connect() {
         type: WEBSOCKET_MESSAGE_TYPES.HEATZY.CONNECTED,
       });
       this.connected = true;
-
-      devices.forEach((device) => {
-        this.devices.push(device);
-      });
     })
     .catch((error) => {
       this.connected = false;
@@ -40,7 +36,7 @@ async function connect() {
         type: WEBSOCKET_MESSAGE_TYPES.HEATZY.ERROR,
         payload: error,
       });
-      throw new ServiceNotConfiguredError(error.error_message);
+      throw new ServiceNotConfiguredError(error);
     });
 }
 

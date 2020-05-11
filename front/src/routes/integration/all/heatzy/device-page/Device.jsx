@@ -1,13 +1,12 @@
-import { Text } from 'preact-i18n';
-import { Component } from 'preact';
+import {Text} from 'preact-i18n';
+import {Component} from 'preact';
 import cx from 'classnames';
-import { RequestStatus } from '../../../../../utils/consts';
+import {RequestStatus} from '../../../../../utils/consts';
 import HeatzyDeviceForm from './DeviceForm';
-import { Link } from 'preact-router/match';
 
 class HeatzyDeviceBox extends Component {
   saveDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({loading: true});
     try {
       await this.props.saveDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
@@ -48,12 +47,6 @@ class HeatzyDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.heatzy.device.deleteButton" />
                   </button>
-
-                  <Link href={`/dashboard/integration/device/heatzy/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
-                      <Text id="integration.heatzy.device.editButton" />
-                    </button>
-                  </Link>
                 </div>
               </div>
             </div>

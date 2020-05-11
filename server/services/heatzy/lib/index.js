@@ -24,7 +24,5 @@ const HeatzyHandler = function HeatzyHandler(gladys, heatzyLibrary, serviceId) {
 HeatzyHandler.prototype.connect = connect;
 HeatzyHandler.prototype.discoverDevices = discoverDevices;
 HeatzyHandler.prototype.status = status;
-// HeatzyHandler.prototype.newMessage = newMessage;
-// HeatzyHandler.prototype.send = send;
 
 module.exports = HeatzyHandler;

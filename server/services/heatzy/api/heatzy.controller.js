@@ -15,13 +15,13 @@ module.exports = function HeatzyController(heatzyManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/heatzy/discover Get discovered Heatzy devices
+   * @api {get} /api/v1/service/heatzy/discover Get discovered Heatzy devices
    * @apiName discover
    * @apiGroup Heatzy
    */
-  function discover(req, res) {
-    heatzyManager.discoverDevices();
-    res.json({ status: 'discovering' });
+  async function discover(req, res) {
+    const devices = await heatzyManager.discoverDevices();
+    res.json(devices);
   }
 
   /**
@@ -39,7 +39,7 @@ module.exports = function HeatzyController(heatzyManager) {
       authenticated: true,
       controller: asyncMiddleware(connect),
     },
-    'post /api/v1/service/heatzy/discover': {
+    'get /api/v1/service/heatzy/discover': {
       authenticated: true,
       controller: discover,
     },

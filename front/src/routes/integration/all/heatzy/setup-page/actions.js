@@ -1,7 +1,7 @@
 import createActionsIntegration from '../../../../../actions/integration';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const createActions = store => {
+const actions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async loadProps(state) {
@@ -60,7 +60,7 @@ const createActions = store => {
         });
       }
     },
-    displayConnectedMessage(state) {
+    displayHeatzyConnectedMessage(state) {
       // display 3 seconds a message "Heatzy connected"
       store.setState({
         heatzyConnected: true,
@@ -87,4 +87,4 @@ const createActions = store => {
   return Object.assign({}, actions, integrationActions);
 };
 
-export default createActions;
+export default actions;

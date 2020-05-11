@@ -13,7 +13,7 @@ module.exports = function HeatzyService(gladys, serviceId) {
    * gladys.services.heatzy.start();
    */
   async function start() {
-    logger.log('Starting heatzy service');
+    logger.log('Starting Heatzy service');
 
     await heatzyHandler.connect();
   }
