@@ -119,7 +119,7 @@ class SetupDevice extends Component {
                   <label class="form-label">
                     <Text id="integration.arduino.setup.arduinoUsbDriverPathLabel" />
                   </label>
-                  <select class="form-control" onChange={this.updateArduinoPath}>
+                  <select class="form-control" onChange={this.updateArduinoPath && this.updateArduinoManufacturer}>
                     <option>
                       <Text id="global.emptySelectOption" />
                     </option>
