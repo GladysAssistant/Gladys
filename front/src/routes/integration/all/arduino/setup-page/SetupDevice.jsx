@@ -41,7 +41,7 @@ class SetupDevice extends Component {
   };
 
   updateArduinoPath = (e) => {
-    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value);
+    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value.comPath);
   };
 
   updateArduinoManufacturer = (e) => {
