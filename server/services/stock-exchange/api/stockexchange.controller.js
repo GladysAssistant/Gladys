@@ -1,11 +1,10 @@
-const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { Error400 } = require('../../utils/httpErrors');
-const { ERROR_MESSAGES } = require('../../utils/constants');
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const logger = require('../../../utils/logger');
 
-module.exports = function StockExchangeController(gladys) {
+module.exports = function StockExchangeController(stockExchangHandler) {
   /**
-   * @api {get} /api/v1/stockexchange/:user_selector/get get stock exchange user
-   * @apiName getStockExchangeUser
+   * @api {get} /api/v1/stockexchange/getStockExchangeIndexQuote get stock exchange
+   * @apiName getStockExchangeIndexQuote
    * @apiGroup StockExchange
    * @apiSuccessExample {json} Success-Example
    * {
@@ -33,15 +32,15 @@ module.exports = function StockExchangeController(gladys) {
   *  "timestamp" : 1588581270
    * }
    */
-  async function getByUser(req, res) {
-    const options = {
-      index: "cac40",
-    };
-    const result = await gladys.stock-exchange.get(options);
+  async function getStockExchangeIndexQuote(req, res) {
+    const result = await stockExchangHandler.getStockExchangeIndexQuote();
     res.json(result);
   }
 
-  return Object.freeze({
-    getByUser: asyncMiddleware(getByUser),
-  });
+  return {
+    'get /api/v1/stockexchange/getStockExchangeIndexQuote': {
+      authenticated: true,
+      controller: asyncMiddleware(getStockExchangeIndexQuote),
+    },
+  };
 };

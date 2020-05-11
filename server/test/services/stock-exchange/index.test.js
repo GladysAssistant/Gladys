@@ -26,7 +26,7 @@ describe.only('StockExchangeService', () => {
     await stockExchangeService.start();
   });
   it('should stop service', async () => {
-    await stockExchangeService.start();
+    await stockExchangeService.stop();
   });
   it('should return stock exchange index', async () => {
     await stockExchangeService.get();

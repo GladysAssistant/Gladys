@@ -14,7 +14,6 @@ const RoomController = require('./controllers/room.controller');
 const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
 const SceneController = require('./controllers/scene.controller');
-const StockExchangeController = require('./controllers/stockexchange.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
@@ -44,7 +43,6 @@ function getRoutes(gladys) {
   const sessionController = SessionController(gladys);
   const serviceController = ServiceController(gladys);
   const sceneController = SceneController(gladys);
-  const stockExchangeController = StockExchangeController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
 
@@ -407,11 +405,6 @@ function getRoutes(gladys) {
     'post /api/v1/scene/:scene_selector/start': {
       authenticated: true,
       controller: sceneController.start,
-    },
-    // stockexchange
-    'get /api/v1/stockexchange/:user_selector/get': {
-      authenticated: true,
-      controller: stockExchangeController.getByUser,
     },
     // system
     'get /api/v1/system/info': {
