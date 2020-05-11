@@ -171,34 +171,32 @@ class ArduinoDeviceBox extends Component {
                     </Localizer>
                   </div>
 
-                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433_CHACON && (
+                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value ===
+                    DEVICE_SUBSERVICE.EMIT_433_CHACON && (
                     <div class="form-group">
-                    <label class="form-label" for="codeOn">
-                      <Text id="integration.arduino.device.codeOnLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        id="codeOn"
-                        type="text"
-                        class="form-control"
-                        placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
-                      />
-                    </Localizer>
-                  </div>
-                  
-                  <div class="form-group">
-                  <label class="form-label" for="codeOff">
-                    <Text id="integration.arduino.device.codeOffLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      id="codeOff"
-                      type="text"
-                      class="form-control"
-                      placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
-                    />
-                  </Localizer>
-                </div>
+                      <label class="form-label" for="codeOn">
+                        <Text id="integration.arduino.device.codeOnLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="codeOn"
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
+                        />
+                      </Localizer>
+                      <label class="form-label" for="codeOff">
+                        <Text id="integration.arduino.device.codeOffLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="codeOff"
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
+                        />
+                      </Localizer>
+                    </div>
                   )}
                 </div>
                 <div class="form-group">
