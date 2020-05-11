@@ -27,25 +27,14 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   }
 
   /**
-   * @api {get} /api/v1/service/arduino/info Get Arduino Informations
-   * @apiName getInfos
+   * @api {post} /api/v1/service/arduin/send Send
+   * @apiName send
    * @apiGroup Arduino
    */
-  async function getInfos(req, res) {
-    const infos = arduinoManager.getInfos();
-    res.json(infos);
-  }
-
-  /**
-   * @api {get} /api/v1/service/arduino/status Get Arduino Status
-   * @apiName getStatus
-   * @apiGroup Arduino
-   */
-  async function getStatus(req, res) {
+  async function send(req, res) {
+    const device = await arduinoManager.send(req.body);
     res.json({
-      connected: arduinoManager.connected,
-      scanInProgress: arduinoManager.scanInProgress,
-      ready: arduinoManager.ready,
+      success: true,
     });
   }
 
@@ -58,13 +47,9 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(disconnect),
     },
-    'get /api/v1/service/arduino/info': {
+    'post /api/v1/service/arduino/send': {
       authenticated: true,
-      controller: asyncMiddleware(getInfos),
-    },
-    'get /api/v1/service/arduino/status': {
-      authenticated: true,
-      controller: asyncMiddleware(getStatus),
+      controller: asyncMiddleware(send),
     },
   };
 };
