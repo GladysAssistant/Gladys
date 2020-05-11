@@ -59,6 +59,18 @@ class ArduinoDeviceBox extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
+  updateCode = (e) => {
+    this.props.updateCode(this.props.deviceIndex, e.target.value);
+  };
+
+  updateCodeOn = (e) => {
+    this.props.updateCodeOn(this.props.deviceIndex, e.target.value);
+  };
+
+  updateCodeOff = (e) => {
+    this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
+  };
+
   render(props, { loading }) {
     return (
       <div class="col-md-6">
@@ -182,6 +194,7 @@ class ArduinoDeviceBox extends Component {
                           id="code"
                           type="text"
                           value={props.device.params.find((e) => e.name === 'CODE').value}
+                          onInput={this.updateCode}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.codeLabel" />}
                         />
@@ -202,6 +215,7 @@ class ArduinoDeviceBox extends Component {
                               id="codeOn"
                               type="text"
                               value={props.device.params.find((e) => e.name === 'CODE_ON').value}
+                              onInput={this.updateCodeOn}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
                             />
@@ -217,6 +231,7 @@ class ArduinoDeviceBox extends Component {
                               id="codeOff"
                               type="text"
                               value={props.device.params.find((e) => e.name === 'CODE_OFF').value}
+                              onInput={this.updateCodeOff}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
                             />

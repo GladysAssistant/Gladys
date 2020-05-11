@@ -223,6 +223,57 @@ const actions = (store) => {
         devices,
       });
     },
+    updateCode(state, index, newValue) {
+      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoCodeIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
+    updateCodeOn(state, index, newValue) {
+      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE_ON');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoCodeIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
+    updateCodeOff(state, index, newValue) {
+      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE_OFF');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoCodeIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
     async search(state, e) {
       store.setState({
         deviceSearch: e.target.value,
