@@ -205,6 +205,7 @@ class ArduinoDeviceBox extends Component {
                             />
                           </Localizer>
                         </div>
+
                         <div class="col">
                           <label class="form-label" for="codeOff">
                             <Text id="integration.arduino.device.codeOffLabel" />
