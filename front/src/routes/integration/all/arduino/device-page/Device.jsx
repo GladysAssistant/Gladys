@@ -155,7 +155,7 @@ class ArduinoDeviceBox extends Component {
                       class="form-control"
                       id="subservice"
                       value={props.device.params.find((e) => e.name === 'SUBSERVICE').value}
-                      onChange={this.updateSubservice}
+                      onChange={this.updateSubservice && (props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.RECV_433 && this.updateFeatureRecv433)}
                     >
                       <option value={DEVICE_SUBSERVICE.RECV_433}>
                         <Text id="integration.arduino.subservice.recv433" />
@@ -187,8 +187,6 @@ class ArduinoDeviceBox extends Component {
                       />
                     </Localizer>
                   </div>
-
-                  {props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.RECV_433 && this.updateFeatureRecv433}
 
                   {(props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_433 ||
                     props.device.params.find((e) => e.name === 'SUBSERVICE').value === DEVICE_SUBSERVICE.EMIT_IR) && (
