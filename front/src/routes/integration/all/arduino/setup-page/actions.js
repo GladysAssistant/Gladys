@@ -110,6 +110,10 @@ const actions = (store) => {
                 name: 'ARDUINO_MODEL',
                 value: null,
               },
+              {
+                name: 'ARDUINO_MANUFACTURER',
+                value: null,
+              },
             ],
           },
         ],
@@ -124,6 +128,23 @@ const actions = (store) => {
         [index]: {
           params: {
             [arduinoPathIndex]: {
+              value: {
+                $set: value,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        arduinoDevices,
+      });
+    },
+    updateArduinoManufacturer(state, index, value) {
+      let arduinoManufacturerIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_MANUFACTURER');
+      const arduinoDevices = update(state.arduinoDevices, {
+        [index]: {
+          params: {
+            [arduinoManufacturerIndex]: {
               value: {
                 $set: value,
               },
