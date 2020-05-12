@@ -14,7 +14,9 @@ const { send } = require('./send');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  const arduino = await this.gladys.device.getBySelector(device.params.find((param) => param.name === 'ARDUINO_LINKED').value);
+  const arduino = await this.gladys.device.getBySelector(
+    device.params.find((param) => param.name === 'ARDUINO_LINKED').value
+  );
   const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
   //Créer le JSON, message qui sera à transmettre à l'Arduino
@@ -24,7 +26,7 @@ async function setValue(device, deviceFeature, value) {
     function_name: functionName,
     parameters: {
       data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
-    }
+    },
   };
 
   switch (functionName) {
@@ -33,11 +35,11 @@ async function setValue(device, deviceFeature, value) {
       message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     case DEVICE_FUNCTION.EMIT_433_CHACON:
-      if (value === 1) {
-        message.parameters['code'] = device.params.find((param) => param.name === 'CODE_ON').value;
-      } else if (value === 0) {
-        message.parameters['code'] = device.params.find((param) => param.name === 'CODE_OFF').value;
-      }
+      message.parameters['code'] =
+        value === 1
+          ? device.params.find((param) => param.name === 'CODE_ON').value
+          : device.params.find((param) => param.name === 'CODE_OFF').value;
+      break;
     case DEVICE_FUNCTION.EMIT_IR:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
       break;
