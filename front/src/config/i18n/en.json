@@ -526,7 +526,7 @@
       "title": "Arduino",
       "deviceTab": "Devices",
       "setupTab": "Setup",
-      "codeInstruction": "In order to use this service, you need to use an Arduino card with the code written for. You can download this code <a href=\"/server/services/arduino/arduino-code/arduino-code.ino\" download>here</a>.",
+      "codeInstruction": "In order to use this service, you need to use an Arduino card with the code written for. You can download this code <a href=\"/src/routes/integration/all/arduino/arduino-code.ino\" download>here</a>.",
       "status": {
         "notConfigured": "Arduino service is not configured, please go to ",
         "notConnected": "Arduino card is not connected, please connect a card.",
