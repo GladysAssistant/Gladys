@@ -26,29 +26,24 @@ IRsend ir_send;                                                               //
 RCSwitch mySwitch = RCSwitch();                                               // Crée une instance pour la réception 433 MHz (pin 2)
 
 decode_results results;                                                       // Variable contenant le résultat des réceptions IR
-/*
-void sendIR_LED(unsigned long code){                                          // Fonction à appeler pour envoyer un code IR au ruban LED
-  ir_send.changePin(DATA_PIN_LED);
+
+void emit_ir(unsigned long code, int data_pin){                                          // Fonction à appeler pour envoyer un code IR au ruban LED
+  ir_send.changePin(data_pin);
   ir_send.sendNEC(code, 32); // code télécommande et nombre de bits
 }
 
-void sendIR_TELE(unsigned long code){                                         // Fonction à appeler pour envoyer un code IR à la télévision
-  ir_send.changePin(DATA_PIN_TV);
-  ir_send.sendNEC(code, 32); // code télécommande et nombre de bits
-}*/
-
-void emit_433(long code, int data_pin) {                                               // Fonction à appeler pour envoyer un code en 433 MHz
+void emit_433(long code, int bit_length, int data_pin) {                                               // Fonction à appeler pour envoyer un code en 433 MHz
   mySwitch.enableTransmit(data_pin);
-  mySwitch.send(code, 24);
+  mySwitch.send(code, bit_length);
   mySwitch.disableTransmit();
 }
-/*
-void sendChaconCode(unsigned long code){                                      // Fonction à appeler pour envoyer un code Chacon
+
+void emit_433_chacon(unsigned long code, int data_pin){                                      // Fonction à appeler pour envoyer un code Chacon
   for(int i = 0; i<5; i++){                                                   // Emission du code 5 fois
-    emit(code);
+    emit(code, data_pin);
   }
 }
-
+/*
 void detectIR_LED(){                                                          // Fonction à appeler dans void loop() pour permettre la détection de signaux IR du ruban LED
   if (irrecv_led.decode(&results)) {
     Serial.print("{\"action\":\"received\",\"value\":");
@@ -85,46 +80,46 @@ void detectRadio(){                                                             
     mySwitch.resetAvailable();
   }
 }
+*/
 
-
-void emit(unsigned long code){                                                 // Fonction permettant d'envoyer un signal radio Chacon
-  digitalWrite(DATA_EMIT_PIN, HIGH);
+void emit(unsigned long code, int data_pin){                                                 // Fonction permettant d'envoyer un signal radio Chacon
+  digitalWrite(data_pin, HIGH);
   delayMicroseconds(THIGH);
-  digitalWrite(DATA_EMIT_PIN, LOW); 
+  digitalWrite(data_pin, LOW); 
   delayMicroseconds(2675);
   for (int i = 0; i < 32; i++) {
     if (code & 0x80000000L) {
-      digitalWrite(DATA_EMIT_PIN, HIGH);
+      digitalWrite(data_pin, HIGH);
       delayMicroseconds(THIGH);
-      digitalWrite(DATA_EMIT_PIN, LOW);
+      digitalWrite(data_pin, LOW);
       delayMicroseconds(TLONG);
-      digitalWrite(DATA_EMIT_PIN, HIGH);
+      digitalWrite(data_pin, HIGH);
       delayMicroseconds(THIGH);
-      digitalWrite(DATA_EMIT_PIN, LOW);
+      digitalWrite(data_pin, LOW);
       delayMicroseconds(TSHORT);
     } else {
-      digitalWrite(DATA_EMIT_PIN, HIGH);
+      digitalWrite(data_pin, HIGH);
       delayMicroseconds(THIGH);
-      digitalWrite(DATA_EMIT_PIN, LOW);
+      digitalWrite(data_pin, LOW);
       delayMicroseconds(TSHORT);
-      digitalWrite(DATA_EMIT_PIN, HIGH);
+      digitalWrite(data_pin, HIGH);
       delayMicroseconds(THIGH);
-      digitalWrite(DATA_EMIT_PIN, LOW);
+      digitalWrite(data_pin, LOW);
       delayMicroseconds(TLONG);
     }
     code <<= 1;
   }
-  digitalWrite(DATA_EMIT_PIN, HIGH);
+  digitalWrite(data_pin, HIGH);
   delayMicroseconds(THIGH);
-  digitalWrite(DATA_EMIT_PIN, LOW);
+  digitalWrite(data_pin, LOW);
   delayMicroseconds(10600);
-  digitalWrite(DATA_EMIT_PIN, HIGH);
+  digitalWrite(data_pin, HIGH);
   delayMicroseconds(THIGH);
 
   //Remise à 0 pour ne pas interférer avec les télécommandes
-  digitalWrite(DATA_EMIT_PIN, LOW);
+  digitalWrite(data_pin, LOW);
 }
-*/
+
 // Serial buffer
 String command = "";
 
@@ -140,7 +135,10 @@ void executeFunction(String json_data) {
   JsonObject& v = jsonBuffer.parseObject(json_data);
   //on décompose la chaine de cartère
   if ( v["function"] == String("emit_433") ) {
-    emit_433(v["parameters"]["code"],v["parameters"]["data_pin"]);
+    emit_433(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
+  }
+  else if ( v["function"] == String("emit_433_chacon") ) {
+    emit_433(v["parameters"]["code"], v["parameters"]["data_pin"]);
   }
 }
 
@@ -199,17 +197,6 @@ unsigned long listenSignalDIO(){
 }
 */
 void setup() {
-  //pinMode(GND_EMIT_PIN, OUTPUT);
-  //pinMode(GND_PIN, OUTPUT);
-  //digitalWrite(GND_EMIT_PIN, LOW);
-  //digitalWrite(GND_PIN, LOW);
-
-  //pinMode(VCC_EMIT_PIN, OUTPUT);
-  //pinMode(VCC_PIN, OUTPUT);
-  //digitalWrite(VCC_EMIT_PIN, HIGH);
-  //digitalWrite(VCC_PIN, HIGH);
-
-  //pinMode(DATA_EMIT_PIN, OUTPUT);
   
   // Open serial communications and wait for port to open: 
   Serial.begin(9600);

@@ -11,7 +11,7 @@ async function send(device) {
   try {
     //const arduinoDevice = await 
     const path = device.params.findIndex((param) => param.name === 'ARDUINO_PATH');
-    var message = 'test';
+    var message = '{"function": "emit_433","parameters": {"code": "4464676","bit_length": "24","data_pin": "4"}}%';
 
     const port = new SerialPort(path, function (err) {
       if (err) {
