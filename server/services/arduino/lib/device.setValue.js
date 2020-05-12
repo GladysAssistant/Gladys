@@ -18,7 +18,7 @@ async function setValue(device, deviceFeature, value) {
   const arduinoSelector = device.params[arduinoSelectorIndex].value;
   //logger.debug(arduinoSelector);
 
-  const arduino = await this.gladys.device.get(arduinoSelector);
+  const arduino = await this.gladys.device.getBySelector(arduinoSelector);
 
   logger.debug(arduino);
 
