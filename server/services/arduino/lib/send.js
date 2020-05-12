@@ -11,7 +11,8 @@ async function send(path) {
   try {
     //const arduinoDevice = await
     var message = '{"function": "emit_433","parameters": {"code": "4464676","bit_length": "24","data_pin": "4"}}%';
-
+    logger.warn(`Path: ${path}`);
+    logger.warn(`Message: ${message}`);
     const port = new SerialPort(path, function (err) {
       if (err) {
         return logger.warn('Error: ', err.message);
