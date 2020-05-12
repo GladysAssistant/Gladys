@@ -12,17 +12,17 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  logger.debug(`arduino: Changing value !! New value => ${value}`);
+  //logger.debug(`arduino: Changing value !! New value => ${value}`);
 
   const arduinoSelectorIndex = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
   const arduinoSelector = device.params[arduinoSelectorIndex].value;
-  logger.debug(arduinoSelector);
+  //logger.debug(arduinoSelector);
 
   const arduino = await this.gladys.device.get({
     selector: arduinoSelector
   });
 
-  //logger.debug(arduino);
+  logger.debug(arduino);
 
   const path = arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH');
   //logger.debug(path);
