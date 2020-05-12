@@ -3,6 +3,8 @@ const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/consta
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
+const { send } = require('./send');
+
 /**
  * @description Change value of a device
  * @param {Object} device - The device to control.
@@ -48,7 +50,7 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(path);
   logger.debug(message);
 
-  this.ArduinoManager.send(path);
+  send(path);
 }
 
 module.exports = {
