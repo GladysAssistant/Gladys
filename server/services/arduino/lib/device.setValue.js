@@ -12,6 +12,7 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
+    logger.debug("arduino: Changing value !");
   /*logger.debug(`Changing state of light ${device.external_id} with value = ${value}`);
   const { lightId, bridgeSerialNumber } = parseExternalId(device.external_id);
   const hueApi = this.hueApisBySerialNumber.get(bridgeSerialNumber);
