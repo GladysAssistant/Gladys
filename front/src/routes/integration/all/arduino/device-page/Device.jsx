@@ -157,12 +157,14 @@ class ArduinoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {props.arduinoDevices &&
-                        props.arduinoDevices.map((arduino) => (
+                        props.arduinoDevices.map((device) => (
                           <option
-                            value={arduino.selector}
-                            selected={arduino.params[arduino.params.find((e) => e.name === 'ARDUINO_LINKED')].value}
+                            value={device.selector}
+                            selected={
+                              props.device.params.find((e) => e.name === 'ARDUINO_LINKED').value === device.selector
+                            }
                           >
-                            {arduino.name}
+                            {device.name}
                           </option>
                         ))}
                     </select>
