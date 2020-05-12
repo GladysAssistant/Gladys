@@ -12,13 +12,16 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-
+  //Récupérer l'Arduino rattaché au device                                                    --OK
   const arduinoSelectorIndex = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
   const arduinoSelector = device.params[arduinoSelectorIndex].value;
   const arduino = await this.gladys.device.getBySelector(arduinoSelector);
+
+  //En récupérer son path                                                                     --OK
   const pathIndex = arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH');
   const path = arduino.params[pathIndex].value;
 
+  //Créer le JSON, message qui sera à transmettre à l'Arduino
   const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
 
   var message = {
@@ -34,42 +37,20 @@ async function setValue(device, deviceFeature, value) {
       message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     case DEVICE_FUNCTION.EMIT_433_CHACON:
-      if(value === 1){
-      message.parameters['code'] = device.params.find((param) => param.name === 'CODE_ON').value;
-      }else if(value === 0){
-      message.parameters['code'] = device.params.find((param) => param.name === 'CODE_OFF').value;
+      if (value === 1) {
+        message.parameters['code'] = device.params.find((param) => param.name === 'CODE_ON').value;
+      } else if (value === 0) {
+        message.parameters['code'] = device.params.find((param) => param.name === 'CODE_OFF').value;
       }
     case DEVICE_FUNCTION.EMIT_IR:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
       break;
     default:
+      logger.debug(`Arduino : Function = "${functionName}" not handled`);
       break;
   }
 
   logger.debug(message);
-
-  //Récupérer l'Arduino rattaché au device                                                    --OK
-  //En récupérer son path                                                                     --OK
-  //Créer le JSON, message qui sera à transmettre à l'Arduino
-  //Appeler sendValue avec le path et le JSON
-
-  /*logger.debug(`Changing state of light ${device.external_id} with value = ${value}`);
-  const { lightId, bridgeSerialNumber } = parseExternalId(device.external_id);
-  const hueApi = this.hueApisBySerialNumber.get(bridgeSerialNumber);
-  if (!hueApi) {
-    throw new NotFoundError(`HUE_API_NOT_FOUND`);
-  }
-  let state;
-  switch (deviceFeature.type) {
-    case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
-      state = value === 1 ? new this.LightState().on() : new this.LightState().off();
-      break;
-    default:
-      logger.debug(`Philips Hue : Feature type = "${deviceFeature.type}" not handled`);
-      break;
-  }
-  await hueApi.lights.setLightState(lightId, state);*/
-}
 
 module.exports = {
   setValue,

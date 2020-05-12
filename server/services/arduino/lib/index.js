@@ -7,12 +7,12 @@ const { setValue } = require('./device.setValue');
 // we rate-limit the number of request per seconds to poll lights
 const pollLimiter = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 100, // 100 ms
+  minTime: 200, // 200 ms
 });
 
 // we rate-limit the number of request per seconds to control lights
 const setValueLimiter = new Bottleneck({
-  minTime: 100, // 100 ms
+  minTime: 400, // 400 ms
 });
 
 const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, serviceId) {
