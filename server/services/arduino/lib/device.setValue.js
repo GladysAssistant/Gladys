@@ -12,14 +12,8 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  //Récupérer l'Arduino rattaché au device                                                    --OK
-  const arduinoSelector = device.params.find((param) => param.name === 'ARDUINO_LINKED').value;
-  const arduino = await this.gladys.device.getBySelector(arduinoSelector);
-  logger.debug(arduino);
-
-  //En récupérer son path                                                                     --OK
+  const arduino = await this.gladys.device.getBySelector(device.params.find((param) => param.name === 'ARDUINO_LINKED').value);
   const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
-  logger.debug(path);
 
   //Créer le JSON, message qui sera à transmettre à l'Arduino
   const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
