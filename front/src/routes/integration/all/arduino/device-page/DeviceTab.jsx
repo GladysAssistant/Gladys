@@ -54,7 +54,7 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <p class="alert alert-info">
-            <Text id="arduino.codeInstruction" />
+            <Text id="integration.arduino.codeInstruction" />
           </p>
           {props.arduinoDevices && props.arduinoDevices.length > 0 && (
             <p class="alert alert-success">
