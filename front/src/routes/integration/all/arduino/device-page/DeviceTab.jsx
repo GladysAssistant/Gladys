@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
@@ -54,7 +54,7 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <p class="alert alert-info">
-            <Text id="integration.arduino.codeInstruction" />
+            <MarkupText id="integration.arduino.codeInstruction" />
           </p>
           {props.arduinoDevices && props.arduinoDevices.length > 0 && (
             <p class="alert alert-success">
