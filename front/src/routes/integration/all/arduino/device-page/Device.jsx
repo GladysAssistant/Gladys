@@ -255,7 +255,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="bitLength"
                               type="text"
-                              value="24"
+                              value={props.device.params.find((e) => e.name === 'BIT_LENGTH').value}
                               onInput={this.updateBitLength}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
