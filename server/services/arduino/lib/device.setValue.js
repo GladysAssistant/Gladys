@@ -14,7 +14,7 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 async function setValue(device, deviceFeature, value) {
   logger.debug(`arduino: Changing value !! New value => ${value}`);
   //logger.debug(device);
-  logger.debug(device.params);
+  logger.debug(device.params.findIndex((param) => param.name === 'ARDUINO_LINKED'));
 
   const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
 
