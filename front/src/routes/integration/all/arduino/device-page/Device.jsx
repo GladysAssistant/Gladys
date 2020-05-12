@@ -171,44 +171,47 @@ class ArduinoDeviceBox extends Component {
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="function">
-                      <Text id="integration.arduino.device.functionLabel" />
-                    </label>
-                    <select
-                      class="form-control"
-                      id="function"
-                      value={props.device.params.find((e) => e.name === 'FUNCTION').value}
-                      onChange={this.updateFunction}
-                    >
-                      <option value={DEVICE_FUNCTION.RECV_433}>
-                        <Text id="integration.arduino.function.recv433" />
-                      </option>
-                      <option value={DEVICE_FUNCTION.EMIT_433}>
-                        <Text id="integration.arduino.function.emit433" />
-                      </option>
-                      <option value={DEVICE_FUNCTION.EMIT_433_CHACON}>
-                        <Text id="integration.arduino.function.emit433Chacon" />
-                      </option>
-                      <option value={DEVICE_FUNCTION.EMIT_IR}>
-                        <Text id="integration.arduino.function.emitIR" />
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label" for="dataPin">
-                      <Text id="integration.arduino.device.dataPinLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        id="dataPin"
-                        type="text"
-                        value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
-                        onInput={this.updateDataPin}
-                        class="form-control"
-                        placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
-                      />
-                    </Localizer>
+                    <div class="row">
+                      <div class="col">
+                        <label class="form-label" for="function">
+                          <Text id="integration.arduino.device.functionLabel" />
+                        </label>
+                        <select
+                          class="form-control"
+                          id="function"
+                          value={props.device.params.find((e) => e.name === 'FUNCTION').value}
+                          onChange={this.updateFunction}
+                        >
+                          <option value={DEVICE_FUNCTION.RECV_433}>
+                            <Text id="integration.arduino.function.recv433" />
+                          </option>
+                          <option value={DEVICE_FUNCTION.EMIT_433}>
+                            <Text id="integration.arduino.function.emit433" />
+                          </option>
+                          <option value={DEVICE_FUNCTION.EMIT_433_CHACON}>
+                            <Text id="integration.arduino.function.emit433Chacon" />
+                          </option>
+                          <option value={DEVICE_FUNCTION.EMIT_IR}>
+                            <Text id="integration.arduino.function.emitIR" />
+                          </option>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label class="form-label" for="dataPin">
+                          <Text id="integration.arduino.device.dataPinLabel" />
+                        </label>
+                        <Localizer>
+                          <input
+                            id="dataPin"
+                            type="text"
+                            value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
+                            onInput={this.updateDataPin}
+                            class="form-control"
+                            placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
+                          />
+                        </Localizer>
+                      </div>
+                    </div>
                   </div>
 
                   {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
