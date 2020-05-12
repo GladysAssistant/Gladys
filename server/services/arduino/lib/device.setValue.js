@@ -13,9 +13,10 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  */
 async function setValue(device, deviceFeature, value) {
   //Récupérer l'Arduino rattaché au device                                                    --OK
-  const arduinoSelectorIndex = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
-  const arduinoSelector = device.params[arduinoSelectorIndex].value;
+  const arduinoSelector = device.params.find((param) => param.name === 'ARDUINO_LINKED').value;
+  //const arduinoSelector = device.params[arduinoSelectorIndex].value;
   const arduino = await this.gladys.device.getBySelector(arduinoSelector);
+  logger.debug(arduino);
 
   //En récupérer son path                                                                     --OK
   const pathIndex = arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH');
@@ -28,7 +29,7 @@ async function setValue(device, deviceFeature, value) {
     function_name: functionName,
     parameters: {
       data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
-    },
+    }
   };
 
   switch (functionName) {
