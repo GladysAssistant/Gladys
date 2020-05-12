@@ -24,7 +24,9 @@ async function setValue(device, deviceFeature, value) {
   });
 
   logger.debug(arduino);
-  //logger.debug(arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH'));
+
+  const path = arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH');
+  logger.debug(path);
 
   //Récupérer l'Arduino rattaché au device
   //En récupérer son path
