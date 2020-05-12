@@ -12,25 +12,23 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-    logger.debug(`arduino: Changing value !! New value => ${value}`);
-    logger.debug(device);
-    logger.debug(deviceFeature);
+  logger.debug(`arduino: Changing value !! New value => ${value}`);
+  logger.debug(device);
+  logger.debug(deviceFeature);
 
-    const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
+  const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
 
-    const arduino = await this.gladys.device.get({
-      selector: arduinoSelector,
-      model: 'card',
-    });
+  const arduino = await this.gladys.device.get({
+    selector: arduinoSelector,
+    model: 'card',
+  });
 
-    logger.device(arduino);
+  logger.debug(arduino);
 
-//Récupérer l'Arduino rattaché au device
-//En récupérer son path
-//Créer le JSON, message qui sera à transmettre à l'Arduino
-//Appeler sendValue avec le path et le JSON
-
-
+  //Récupérer l'Arduino rattaché au device
+  //En récupérer son path
+  //Créer le JSON, message qui sera à transmettre à l'Arduino
+  //Appeler sendValue avec le path et le JSON
 
   /*logger.debug(`Changing state of light ${device.external_id} with value = ${value}`);
   const { lightId, bridgeSerialNumber } = parseExternalId(device.external_id);
