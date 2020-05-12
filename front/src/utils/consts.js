@@ -88,6 +88,11 @@ export const GetWeatherStatus = {
   RequestToThirdPartyFailed: 'RequestToThirdPartyFailed'
 };
 
+export const GetStockExchangeStatus = {
+  ServiceNotConfigured: 'ServiceNotConfigured',
+  RequestToThirdPartyFailed: 'RequestToThirdPartyFailed'
+};
+
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
 

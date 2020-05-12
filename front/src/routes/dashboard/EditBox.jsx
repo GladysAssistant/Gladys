@@ -4,6 +4,7 @@ import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditR
 import EditCameraBox from '../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
+import EditStockExchangeBox from '../../components/boxs/stockexchange/EditStockExchangeBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -17,6 +18,8 @@ const Box = ({ children, ...props }) => {
       return <EditRoomTemperatureBox {...props} />;
     case 'devices-in-room':
       return <EditDevicesInRoom {...props} />;
+    case 'stockexchange':
+      return <EditStockExchangeBox {...props} />;
   }
 };
 
