@@ -50,7 +50,7 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(path);
   logger.debug(message);
 
-  send(path);
+  send(path, message);
 }
 
 module.exports = {
