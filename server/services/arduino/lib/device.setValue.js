@@ -19,9 +19,8 @@ async function setValue(device, deviceFeature, value) {
   const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
 
   const arduino = await this.gladys.device.get({
-    selector: arduinoSelector,
-    model: 'card',
-  })[0];
+    selector: arduinoSelector
+  });
 
   logger.debug(arduino);
 
