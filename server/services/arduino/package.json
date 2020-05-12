@@ -13,6 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "serialport": "^8.0.5"
   }
 }

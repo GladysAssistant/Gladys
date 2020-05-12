@@ -1,5 +1,19 @@
+const Bottleneck = require('bottleneck/es5');
+
 const { connect } = require('./connect');
 const { send } = require('./send');
+const { setValue } = require('./device.setValue');
+
+// we rate-limit the number of request per seconds to poll lights
+const pollLimiter = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 100, // 100 ms
+});
+
+// we rate-limit the number of request per seconds to control lights
+const setValueLimiter = new Bottleneck({
+  minTime: 100, // 100 ms
+});
 
 const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, serviceId) {
   this.gladys = gladys;
@@ -11,5 +25,6 @@ const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, ser
 
 ArduinoManager.prototype.connect = connect;
 ArduinoManager.prototype.send = send;
+ArduinoManager.prototype.setValue = setValueLimiter.wrap(setValue);
 
 module.exports = ArduinoManager;
