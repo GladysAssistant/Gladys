@@ -18,14 +18,16 @@ async function setValue(device, deviceFeature, value) {
 
   const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
 
+  logger.debug(arduinoSelector);
+
   const arduino = await this.gladys.device.get({
     selector: arduinoSelector
   });
 
-  logger.debug(arduino);
+  //logger.debug(arduino);
 
   const path = arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH');
-  logger.debug(path);
+  //logger.debug(path);
 
   //Récupérer l'Arduino rattaché au device
   //En récupérer son path
