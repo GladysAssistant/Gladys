@@ -13,8 +13,8 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  */
 async function setValue(device, deviceFeature, value) {
   logger.debug(`arduino: Changing value !! New value => ${value}`);
-  logger.debug(device);
-  logger.debug(deviceFeature);
+  //logger.debug(device);
+  //logger.debug(deviceFeature);
 
   const arduinoSelector = device.params.findIndex((param) => param.name === 'ARDUINO_LINKED');
 
@@ -23,7 +23,8 @@ async function setValue(device, deviceFeature, value) {
     model: 'card',
   });
 
-  logger.debug(arduino);
+  //logger.debug(arduino);
+  logger.debug(arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH'));
 
   //Récupérer l'Arduino rattaché au device
   //En récupérer son path
