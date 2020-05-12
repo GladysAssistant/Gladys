@@ -25,7 +25,7 @@ async function setValue(device, deviceFeature, value) {
   const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
 
   var message = {
-    function: functionName,
+    function_name: functionName,
     parameters: {
       data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
     },

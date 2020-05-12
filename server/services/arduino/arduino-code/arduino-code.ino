@@ -134,13 +134,13 @@ void executeFunction(String json_data) {
   StaticJsonBuffer<400> jsonBuffer;
   JsonObject& v = jsonBuffer.parseObject(json_data);
   //on décompose la chaine de cartère
-  if ( v["function"] == String("emit_433") ) {
+  if ( v["function_name"] == String("emit_433") ) {
     emit_433(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
   }
-  else if ( v["function"] == String("emit_433_chacon") ) {
+  else if ( v["function_name"] == String("emit_433_chacon") ) {
     emit_433_chacon(v["parameters"]["code"], v["parameters"]["data_pin"]);
   }
-  else if ( v["function"] == String("emit_ir") ) {
+  else if ( v["function_name"] == String("emit_ir") ) {
     emit_ir(v["parameters"]["code"], v["parameters"]["data_pin"]);
   }
 }
