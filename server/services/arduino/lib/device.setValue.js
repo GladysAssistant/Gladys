@@ -23,8 +23,8 @@ async function setValue(device, deviceFeature, value) {
     model: 'card',
   });
 
-  //logger.debug(arduino);
-  logger.debug(arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH'));
+  logger.debug(arduino);
+  //logger.debug(arduino.params.findIndex((param) => param.name === 'ARDUINO_PATH'));
 
   //Récupérer l'Arduino rattaché au device
   //En récupérer son path
