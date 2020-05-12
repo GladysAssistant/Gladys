@@ -27,6 +27,9 @@ const SetupTab = ({ children, ...props }) => {
         >
           <div class="loader" />
           <div class="dimmer-content">
+            <p class="alert alert-info">
+              <MarkupText id="integration.arduino.codeInstruction" />
+            </p>
             {props.arduinoConnected && (
               <p class="alert alert-success">
                 <Text id="integration.arduino.setup.connected" /> : {props.arduinoModel}
