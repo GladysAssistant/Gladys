@@ -80,6 +80,7 @@
     "fs-extra": "^8.0.1",
     "get-value": "^3.0.1",
     "handlebars": "^4.1.0",
+    "heatzy": "^1.0.2",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
     "lodash.clonedeep": "^4.5.0",

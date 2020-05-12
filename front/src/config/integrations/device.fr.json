@@ -34,5 +34,11 @@
     "name": "Tasmota",
     "description": "Contrôler vos appareils Tasmota.",
     "img": "/assets/integrations/cover/tasmota.jpg"
+  },
+  {
+    "key": "heatzy",
+    "name": "Heatzy",
+    "description": "Contrôler vos appareils Heatzy.",
+    "img": "/assets/integrations/cover/heatzy.jpg"
   }
 ]

@@ -79,6 +79,12 @@ import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
+// Heatzy integration
+import HeatzyDevicePage from '../routes/integration/all/heatzy/device-page';
+import HeatzyDeviceSetupPage from '../routes/integration/all/heatzy/device-page/setup';
+import HeatzyDiscoverPage from '../routes/integration/all/heatzy/discover-page';
+import HeatzySetupPage from '../routes/integration/all/heatzy/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -175,6 +181,11 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <HeatzyDevicePage path="/dashboard/integration/device/heatzy" />
+        <HeatzyDeviceSetupPage path="/dashboard/integration/device/heatzy/edit" />
+        <HeatzyDeviceSetupPage path="/dashboard/integration/device/heatzy/edit/:deviceSelector" />
+        <HeatzySetupPage path="/dashboard/integration/device/heatzy/setup" />
+        <HeatzyDiscoverPage path="/dashboard/integration/device/heatzy/discover" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
