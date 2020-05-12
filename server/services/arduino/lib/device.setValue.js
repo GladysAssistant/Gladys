@@ -31,6 +31,7 @@ async function setValue(device, deviceFeature, value) {
   switch (functionName) {
     case DEVICE_FUNCTION.EMIT_433:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+      message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     case DEVICE_FUNCTION.EMIT_IR:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
