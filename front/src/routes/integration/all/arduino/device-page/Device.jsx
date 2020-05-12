@@ -160,7 +160,7 @@ class ArduinoDeviceBox extends Component {
                         props.arduinoDevices.map((arduino) => (
                           <option
                             value={arduino.selector}
-                            selected={arduino.params.find((e) => e.name === 'ARDUINO_LINKED').value}
+                            selected={arduino.params[arduino.params.find((e) => e.name === 'ARDUINO_LINKED')].value}
                           >
                             {arduino.name}
                           </option>
