@@ -47,6 +47,8 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(arduino);
   logger.debug(path);
   logger.debug(message);
+
+  this.ArduinoManager.send(path);
 }
 
 module.exports = {
