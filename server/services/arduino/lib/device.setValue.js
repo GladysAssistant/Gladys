@@ -33,6 +33,12 @@ async function setValue(device, deviceFeature, value) {
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
       message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
+    case DEVICE_FUNCTION.EMIT_433_CHACON:
+      if(value === 1){
+      message.parameters['code'] = device.params.find((param) => param.name === 'CODE_ON').value;
+      }else if(value === 0){
+      message.parameters['code'] = device.params.find((param) => param.name === 'CODE_OFF').value;
+      }
     case DEVICE_FUNCTION.EMIT_IR:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
       break;
