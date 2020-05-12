@@ -51,6 +51,10 @@ class ArduinoDeviceBox extends Component {
     this.props.updateDataPin(this.props.deviceIndex, e.target.value);
   };
 
+  updateBitLength = (e) => {
+    this.props.updateBitLength(this.props.deviceIndex, e.target.value);
+  };
+
   updateFunction = (e) => {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
     switch (e.target.value) {
@@ -205,8 +209,7 @@ class ArduinoDeviceBox extends Component {
                     </Localizer>
                   </div>
 
-                  {(props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433 ||
-                    props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR) && (
+                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
                     <div class="form-group">
                       <label class="form-label" for="code">
                         <Text id="integration.arduino.device.codeLabel" />
@@ -221,6 +224,43 @@ class ArduinoDeviceBox extends Component {
                           placeholder={<Text id="integration.arduino.device.codeLabel" />}
                         />
                       </Localizer>
+                    </div>
+                  )}
+
+                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433 && (
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col">
+                          <label class="form-label" for="code">
+                            <Text id="integration.arduino.device.codeLabel" />
+                          </label>
+                          <Localizer>
+                            <input
+                              id="code"
+                              type="text"
+                              value={props.device.params.find((e) => e.name === 'CODE').value}
+                              onInput={this.updateCode}
+                              class="form-control"
+                              placeholder={<Text id="integration.arduino.device.codeLabel" />}
+                            />
+                          </Localizer>
+                        </div>
+                        <div class="col">
+                          <label class="form-label" for="bitLength">
+                            <Text id="integration.arduino.device.bitLengthLabel" />
+                          </label>
+                          <Localizer>
+                            <input
+                              id="bitLength"
+                              type="text"
+                              value="24"
+                              onInput={this.updateBitLength}
+                              class="form-control"
+                              placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
+                            />
+                          </Localizer>
+                        </div>
+                      </div>
                     </div>
                   )}
 

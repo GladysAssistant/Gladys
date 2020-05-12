@@ -557,7 +557,8 @@
         "arduinoLinkedLabel": "Arduino linked",
         "codeLabel": "Code",
         "codeOnLabel": "Code ON",
-        "codeOffLabel": "Code OFF"
+        "codeOffLabel": "Code OFF",
+        "bitLengthLabel": "Length of the code"
       },
       "setup": {
         "title": "Arduino Settings",

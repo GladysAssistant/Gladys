@@ -140,6 +140,10 @@ const actions = (store) => {
                 name: 'CODE_OFF',
                 value: '0',
               },
+              {
+                name: 'BIT_LENGTH',
+                value: '24',
+              },
             ],
           },
         ],
@@ -263,6 +267,23 @@ const actions = (store) => {
         [index]: {
           params: {
             [arduinoCodeIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
+    updateBitLength(state, index, newValue) {
+      let arduinoBitLengthIndex = state.devices[index].params.findIndex((param) => param.name === 'BIT_LENGTH');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoBitLengthIndex]: {
               value: {
                 $set: newValue,
               },

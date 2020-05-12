@@ -9,6 +9,7 @@ const SerialPort = require('serialport');
  */
 async function send(device) {
   try {
+    //const arduinoDevice = await 
     const path = device.params.findIndex((param) => param.name === 'ARDUINO_PATH');
     var message = 'test';
 
