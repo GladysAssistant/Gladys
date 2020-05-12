@@ -16,7 +16,7 @@ async function send(path, message) {
 
     if (!port.isOpen) {
       port.on('open', function () {
-        logger.warn('port opened');
+        logger.warn('Arduino: port opened');
         port.write(textToSend);
       });
     }

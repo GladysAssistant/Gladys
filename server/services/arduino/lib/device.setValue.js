@@ -48,10 +48,6 @@ async function setValue(device, deviceFeature, value) {
       break;
   }
 
-  logger.debug(arduino);
-  logger.debug(path);
-  logger.debug(message);
-
   send(path, message);
 }
 
