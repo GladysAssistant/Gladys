@@ -282,6 +282,18 @@ class ArduinoDeviceBox extends Component {
                           </Localizer>
                         </div>
                       </div>
+                      <label class="form-label" for="pulseLength">
+                        <Text id="integration.arduino.device.pulseLengthLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="pulseLength"
+                          type="text"
+                          value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                          class="form-control"
+                          placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
+                        />
+                      </Localizer>
                     </div>
                   )}
 
