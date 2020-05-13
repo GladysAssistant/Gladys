@@ -214,7 +214,7 @@ class ArduinoDeviceBox extends Component {
 
                   {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
                     <div class="form-group">
-                      <div xlass="row">
+                      <div class="row">
                         <div class="col">
                           <label class="form-label" for="code">
                             <Text id="integration.arduino.device.codeLabel" />
