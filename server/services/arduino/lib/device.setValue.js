@@ -42,6 +42,7 @@ async function setValue(device, deviceFeature, value) {
       break;
     case DEVICE_FUNCTION.EMIT_IR:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+      message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     default:
       logger.debug(`Arduino : Function = "${functionName}" not handled`);
