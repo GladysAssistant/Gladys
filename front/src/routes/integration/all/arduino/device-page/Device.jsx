@@ -216,7 +216,7 @@ class ArduinoDeviceBox extends Component {
                     </div>
                   </div>
 
-                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
+                  {/*props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
@@ -251,9 +251,10 @@ class ArduinoDeviceBox extends Component {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )*/}
 
-                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433 && (
+                  {(props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR ||
+                    props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433) && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
