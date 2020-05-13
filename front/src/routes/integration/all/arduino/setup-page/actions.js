@@ -86,7 +86,7 @@ const actions = (store) => {
     },
     getManufacturers(state) {
       store.setState({
-        arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs'],
+        arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs', 'Arduino (www.arduino.cc)'],
       });
     },
     async addDevice(state) {

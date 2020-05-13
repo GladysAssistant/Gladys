@@ -27,9 +27,9 @@ RCSwitch mySwitch = RCSwitch();                                               //
 
 decode_results results;                                                       // Variable contenant le résultat des réceptions IR
 
-void emit_ir(unsigned long code, int data_pin) {                                         // Fonction à appeler pour envoyer un code IR au ruban LED
+void emit_ir(unsigned long code, int bit_length, int data_pin) {                                         // Fonction à appeler pour envoyer un code IR au ruban LED
   ir_send.changePin(data_pin);
-  ir_send.sendNEC(code, 32); // code télécommande et nombre de bits
+  ir_send.sendNEC(code, bit_length); // code télécommande et nombre de bits
 }
 
 void emit_433(long code, int bit_length, int data_pin) {                                               // Fonction à appeler pour envoyer un code en 433 MHz
@@ -141,7 +141,7 @@ void executeFunction(String json_data) {
     emit_433_chacon(v["parameters"]["code"], v["parameters"]["data_pin"]);
   }
   else if ( v["function_name"] == String("emit_ir") ) {
-    emit_ir(v["parameters"]["code"], v["parameters"]["data_pin"]);
+    emit_ir(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
   }
 }
 
