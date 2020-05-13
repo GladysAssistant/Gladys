@@ -53,6 +53,10 @@ class ArduinoDeviceBox extends Component {
     this.props.updateBitLength(this.props.deviceIndex, e.target.value);
   };
 
+  updatePulseLength = (e) => {
+    this.props.updatePulseLength(this.props.deviceIndex, e.target.value);
+  };
+
   updateFunction = (e) => {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
     switch (e.target.value) {
@@ -239,6 +243,7 @@ class ArduinoDeviceBox extends Component {
                               id="pulseLength"
                               type="text"
                               value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                              onInput={this.updatePulseLength}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
                             />
@@ -290,6 +295,7 @@ class ArduinoDeviceBox extends Component {
                           id="pulseLength"
                           type="text"
                           value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                          onInput={this.updatePulseLength}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
                         />
@@ -341,6 +347,7 @@ class ArduinoDeviceBox extends Component {
                           id="pulseLength"
                           type="text"
                           value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                          onInput={this.updatePulseLength}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
                         />

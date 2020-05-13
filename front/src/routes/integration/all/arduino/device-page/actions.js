@@ -298,6 +298,23 @@ const actions = (store) => {
         devices,
       });
     },
+    updatePulseLength(state, index, newValue) {
+      let arduinoBitLengthIndex = state.devices[index].params.findIndex((param) => param.name === 'PULSE_LENGTH');
+      const devices = update(state.devices, {
+        [index]: {
+          params: {
+            [arduinoBitLengthIndex]: {
+              value: {
+                $set: newValue,
+              },
+            },
+          },
+        },
+      });
+      store.setState({
+        devices,
+      });
+    },
     updateFeature(state, index, featureIndex, property, newValue) {
       const devices = update(state.devices, {
         [index]: {
