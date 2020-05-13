@@ -559,7 +559,8 @@
         "codeLabel": "Code",
         "codeOnLabel": "Code ON",
         "codeOffLabel": "Code OFF",
-        "bitLengthLabel": "Length of the code"
+        "bitLengthLabel": "Length of the code",
+        "pulseLengthLabel": "Pulse length"
       },
       "setup": {
         "title": "Arduino Settings",

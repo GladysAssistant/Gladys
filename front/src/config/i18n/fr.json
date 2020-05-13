@@ -667,7 +667,8 @@
         "codeLabel": "Code",
         "codeOnLabel": "Code ON",
         "codeOffLabel": "Code OFF",
-        "bitLengthLabel": "Longueur du code"
+        "bitLengthLabel": "Longueur du code",
+        "pulseLengthLabel": "Nombre d'impulsions"
       },
       "setup": {
         "title": "Configuration Arduino",

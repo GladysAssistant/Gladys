@@ -5,7 +5,6 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import {
-  DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
@@ -143,6 +142,10 @@ const actions = (store) => {
               {
                 name: 'BIT_LENGTH',
                 value: '24',
+              },
+              {
+                name: 'PULSE_LENGTH',
+                value: '1',
               },
             ],
           },

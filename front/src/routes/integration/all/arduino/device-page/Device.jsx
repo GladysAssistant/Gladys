@@ -2,13 +2,11 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-import { Link } from 'preact-router/match';
 import {
   DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
-import get from 'get-value';
 
 class ArduinoDeviceBox extends Component {
   saveDevice = async () => {
@@ -216,19 +214,37 @@ class ArduinoDeviceBox extends Component {
 
                   {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
                     <div class="form-group">
-                      <label class="form-label" for="code">
-                        <Text id="integration.arduino.device.codeLabel" />
-                      </label>
-                      <Localizer>
-                        <input
-                          id="code"
-                          type="text"
-                          value={props.device.params.find((e) => e.name === 'CODE').value}
-                          onInput={this.updateCode}
-                          class="form-control"
-                          placeholder={<Text id="integration.arduino.device.codeLabel" />}
-                        />
-                      </Localizer>
+                      <div xlass="row">
+                        <div class="col">
+                          <label class="form-label" for="code">
+                            <Text id="integration.arduino.device.codeLabel" />
+                          </label>
+                          <Localizer>
+                            <input
+                              id="code"
+                              type="text"
+                              value={props.device.params.find((e) => e.name === 'CODE').value}
+                              onInput={this.updateCode}
+                              class="form-control"
+                              placeholder={<Text id="integration.arduino.device.codeLabel" />}
+                            />
+                          </Localizer>
+                        </div>
+                        <div class="col">
+                          <label class="form-label" for="pulseLength">
+                            <Text id="integration.arduino.device.pulseLengthLabel" />
+                          </label>
+                          <Localizer>
+                            <input
+                              id="pulseLength"
+                              type="text"
+                              value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                              class="form-control"
+                              placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
+                            />
+                          </Localizer>
+                        </div>
+                      </div>
                     </div>
                   )}
 
