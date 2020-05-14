@@ -7,8 +7,11 @@ const Avrgirl = require('avrgirl-arduino');
  * @example
  * setup(path);
  */
-async function setup(arduinoPath, model) {
+async function setup(device) {
   try {
+    const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
+    
     var avrgirl = new Avrgirl({
       board: model,
       path: arduinoPath,

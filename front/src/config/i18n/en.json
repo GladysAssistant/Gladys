@@ -576,7 +576,8 @@
         "notConnected": "Arduino card is not connected, please connect a card.",
         "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
         "connectButton": "Save",
-        "disconnectButton": "Delete"
+        "disconnectButton": "Delete",
+        "uploadButton": "Upload code"
       },
       "function": {
         "recv433": "Receive in 433 MHz",

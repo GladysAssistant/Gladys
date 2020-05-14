@@ -55,6 +55,7 @@ const SetupTab = ({ children, ...props }) => {
                     updateArduinoPath={props.updateArduinoPath}
                     updateArduinoManufacturer={props.updateArduinoManufacturer}
                     updateArduinoName={props.updateArduinoName}
+                    /*uploadCode={props.uploadCode}*/
                     saveDevice={props.saveDevice}
                     deleteDevice={props.deleteDevice}
                     arduinoModelsList={props.arduinoModelsList}

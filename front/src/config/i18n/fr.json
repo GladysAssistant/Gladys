@@ -684,7 +684,8 @@
         "notConnected": "Aucune carte Arduino n'est connectée, veuillez en brancher une.",
         "noDevices": "Aucun Arduino connecté. Veuillez configurer vos périphériques avec le bouton Nouveau.",
         "connectButton": "Sauvegarder",
-        "disconnectButton": "Supprimer"
+        "disconnectButton": "Supprimer",
+        "uploadButton": "Téléverser"
       },
       "function": {
         "recv433": "Réception 433 MHz",
