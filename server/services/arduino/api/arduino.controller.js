@@ -32,7 +32,19 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
    * @apiGroup Arduino
    */
   async function send(req, res) {
-    const device = await arduinoManager.send(req.body);
+    arduinoManager.send(req.body);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/arduin/setup Setup
+   * @apiName setup
+   * @apiGroup Arduino
+   */
+  async function setup(req, res) {
+    arduinoManager.setup(req.body);
     res.json({
       success: true,
     });
@@ -50,6 +62,10 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
     'post /api/v1/service/arduino/send': {
       authenticated: true,
       controller: asyncMiddleware(send),
+    },
+    'post /api/v1/service/arduino/setup': {
+      authenticated: true,
+      controller: asyncMiddleware(setup),
     },
   };
 };
