@@ -75,7 +75,7 @@ class ArduinoDeviceBox extends Component {
         break;
       case DEVICE_FUNCTION.EMIT_IR:
         this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
+        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
         this.props.updateBitLength(this.props.deviceIndex, "32");
         break;
     }
