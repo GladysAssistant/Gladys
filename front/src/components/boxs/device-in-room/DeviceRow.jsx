@@ -23,6 +23,19 @@ const DeviceRow = ({ children, ...props }) => {
         updateValue={props.updateValue}
       />
     );
+  } else if (props.deviceFeature.type === 'push') {
+    return (
+      <ButtonDeviceFeature
+        x={props.x}
+        y={props.y}
+        device={props.device}
+        deviceFeature={props.deviceFeature}
+        roomIndex={props.roomIndex}
+        deviceIndex={props.deviceIndex}
+        deviceFeatureIndex={props.deviceFeatureIndex}
+        updateValue={props.updateValue}
+      />
+    );
   }
   if (props.deviceFeature.type === 'dimmer') {
     return (
