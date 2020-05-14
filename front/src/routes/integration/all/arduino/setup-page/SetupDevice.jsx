@@ -144,7 +144,7 @@ class SetupDevice extends Component {
                   <Text id="integration.arduino.setup.disconnectButton" />
                 </button>
                 <button class="btn btn-info ml-2">
-                  <Text id="integration.arduino.setup.uploadCodeButton" />
+                  <Text id="integration.arduino.setup.uploadButton" />
                 </button>
               </div>
             </div>
