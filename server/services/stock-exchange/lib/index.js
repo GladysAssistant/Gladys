@@ -1,5 +1,4 @@
 const { getStockExchangeIndexQuote } = require('./getStockExchangeIndexQuote');
-const logger = require('../../../utils/logger');
 
 /**
  * @description Get the stock-exchange status.
@@ -11,7 +10,6 @@ const logger = require('../../../utils/logger');
 const StockExchangeHandler = function StockExchangeHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  
 };
 
 StockExchangeHandler.prototype.getStockExchangeIndexQuote = getStockExchangeIndexQuote;

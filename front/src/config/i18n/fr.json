@@ -174,7 +174,8 @@
       "temperature-in-room": "Température de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "stockexchange": "Mes informations boursières"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -205,6 +206,15 @@
         "neverSeenAtHome": "Jamais vu à la maison",
         "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
         "emptyText": "Il n'y a aucun utilisateurs à afficher ici. Vous pouvez ajouter des utilisateurs dans les paramètres Gladys."
+      },
+      "stockExchange": {
+        "description": "Cette box affiche des informations boursières.",
+        "error": "Une erreur réseau s'est produite lors de la récupération des informations boursières. Merci de rafraîchir la page.",
+        "emptyText": "Il n'y a aucune informations à afficher ici.",
+        "serviceNotConfigured": "The service is not configured.",
+        "requestToThirdPartyFailed": "The request to FPM API failed. Is your Gladys instance connected to the internet? ",
+        "clickHere": "Click here to access the FPM configuration panel.",
+        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href = \"https: //community.gladysassistant. com \"> Gladys community </a>. "
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -442,6 +452,12 @@
       "apiKeyPlaceholder": "Entrer la clé API DarkSky",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
+    },
+    "stockExchange": {
+      "title": "Financial Modeling Prep API",
+      "introduction": "Cette intégration vous aide à intégrer  <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">l'API Fmp</a> pour obtenir les informations boursières dans Gladys.",
+      "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box bourse.",
+      "saveButton": "Sauvegarder"
     },
     "mqtt": {
       "title": "MQTT",

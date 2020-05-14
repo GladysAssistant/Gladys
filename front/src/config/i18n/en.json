@@ -175,7 +175,7 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "stockexchange": "Stock Exchange Box"
+      "stockexchange": "My stock exchange datas"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -208,7 +208,7 @@
         "emptyText": "There are no users to display here. You can add users in Gladys settings."
       },
       "stockExchange": {
-        "description": "Stock description",
+        "description": "Display stock exchange informations.",
         "error": "There was a network error fetching stock exchange datas. Please refresh.",
         "emptyText": "There are no datas to display here.",
         "serviceNotConfigured": "The service is not configured.",
@@ -412,13 +412,10 @@
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "stockExchange": {
-      "title": "Stock Exchange API",
-      "introduction": "This integration helps you integrate with Fmp Cloud API to get the stock exchange indexes and values in Gladys.",
-      "instructions": "You first need to create an account on Fmp Cloud API website:",
-      "apiKeyLabel": "Then, enter your API key here:",
-      "apiKeyPlaceholder": "Enter Fmp Cloud API key",
-      "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a stock exchange box."
+      "title": "Financial Modeling Prep API",
+      "introduction": "This integration helps you integrate with <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">Fmp API</a> to get the stock exchange indexes and values in Gladys.",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a stock exchange box.",
+      "saveButton": "Save"
     },
     "mqtt": {
       "title": "MQTT",

@@ -1,18 +1,10 @@
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
-const { Error400 } = require('../../utils/httpErrors');
-const { ERROR_MESSAGES } = require('../../utils/constants');
 const StockExchangeController = require('./api/stockexchange.controller');
 const StockExchangeHandler = require('./lib');
-
-// Subscribe to https://fmpcloud.io/
-const FMP_API_KEY = 'FMP_API_KEY';
-
 
 module.exports = function StockEchangeService(gladys, serviceId) {
 
   const stockExchangeHandler = new StockExchangeHandler(gladys, serviceId);
-  let fmpApiKey;
 
   /**
    * @public
@@ -22,10 +14,6 @@ module.exports = function StockEchangeService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting stock exchange service');
-    fmpApiKey = await gladys.variable.getValue(FMP_API_KEY, serviceId);
-    if (!fmpApiKey) {
-      throw new ServiceNotConfiguredError('Stock Exchange Service not configured');
-    }
   }
 
   /**
@@ -37,8 +25,6 @@ module.exports = function StockEchangeService(gladys, serviceId) {
   async function stop() {
     logger.log('stopping stock exchange service');
   }
-
-
 
   return Object.freeze({
     start,

@@ -1,34 +1,20 @@
 const { expect } = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
-// const cac40Example = require('./cac40.json');
 
-const StockExchangeService = proxyquire('../../../services/stock-exchange/index');
-
-const gladys = {
-  variable: {
-    getValue: () => Promise.resolve('FMP_API_KEY'),
-  },
-};
+const StockExchangeService = require('../../../services/stock-exchange/index');
 
 describe.only('StockExchangeService', () => {
-  const stockExchangeService = StockExchangeService(gladys);
-  it('should have start function', () => {
+  it('should have controllers', () => {
+    const stockExchangeService = StockExchangeService();
     expect(stockExchangeService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
-  });
-  it('should have stop function', () => {
-    expect(stockExchangeService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
+      .to.have.property('controllers')
+      .and.be.instanceOf(Object);
   });
   it('should start service', async () => {
+    const stockExchangeService = StockExchangeService();
     await stockExchangeService.start();
   });
   it('should stop service', async () => {
+    const stockExchangeService = StockExchangeService();
     await stockExchangeService.stop();
-  });
-  it('should return stock exchange index', async () => {
-    await stockExchangeService.get();
   });
 });

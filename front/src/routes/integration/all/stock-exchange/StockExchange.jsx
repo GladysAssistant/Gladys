@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 const StockExchangePage = ({ children, ...props }) => (
@@ -21,11 +21,13 @@ const StockExchangePage = ({ children, ...props }) => (
                         <Text id="integration.stockExchange.title" />
                       </h2>
                       <p>
-                        <Text id="integration.stockExchange.introduction" />
+                        <MarkupText id="integration.stockExchange.introduction" />
                       </p>
                       <p>
-                        <Text id="integration.stockExchange.instructions" />{' '}
-                        <a href="https://fmpcloud.io/" target="_blank">Fmp Cloud</a>.
+                        <Text id="integration.stockExchange.instructions" />
+                      </p>
+                      <p>
+                        <Text id="integration.stockExchange.instructionsToUse" />
                       </p>
                     </div>
                   </div>

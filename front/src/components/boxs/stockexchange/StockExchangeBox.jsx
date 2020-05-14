@@ -12,36 +12,13 @@ import {
 import get from 'get-value';
 import DataList from './DataList';
 
-const padding = {
-  paddingLeft: '40px',
-  paddingRight: '40px',
-  paddingTop: '10px',
-  paddingBottom: '10px'
-};
 
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
 
 const StockExchangeBox = ({ children, ...props }) => (
     <div >
-    {props.boxStatus === GetStockExchangeStatus.ServiceNotConfigured && (
-      <div >
-        <div>
-          <h4 class="card-header">
-            <Text id="dashboard.boxTitle.stockexchange" />
-          </h4>
-          <div class="card-body">
-            <p class="alert alert-danger">
-              <i class="fe fe-bell" />
-              <span class="pl-2">
-                <Text id="dashboard.boxes.stockexchange.serviceNotConfigured" />
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    )}
-    {props.boxStatus === RequestStatus.Error && (
+      {props.boxStatus === RequestStatus.Error && (
       <div class="card">
         <div>
           <h4 class="card-header">
@@ -54,18 +31,6 @@ const StockExchangeBox = ({ children, ...props }) => (
                 <Text id="dashboard.boxes.stockexchange.unknownError" />
               </span>
             </p>
-          </div>
-        </div>
-      </div>
-    )}
-    {props.boxStatus === RequestStatus.Getting && !props.quote && (
-      <div class="card">
-        <div>
-          <div class="card-body">
-            <div class="dimmer active">
-              <div class="loader" />
-              <div class="dimmer-content" style={padding} />
-            </div>
           </div>
         </div>
       </div>

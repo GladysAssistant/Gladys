@@ -3,7 +3,7 @@ import BaseEditBox from '../baseEditBox';
 
 const StockExchangeBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.stockexchange">
-    <Text id="dashboard.boxes.stockeExchange.description" />
+    <Text id="dashboard.boxes.stockExchange.description" />
   </BaseEditBox>
 );
 
