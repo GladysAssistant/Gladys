@@ -160,7 +160,7 @@ class SetupDevice extends Component {
                 <button class="btn btn-danger ml-2" onClick={this.deleteDevice}>
                   <Text id="integration.arduino.setup.disconnectButton" />
                 </button>
-                <button class="btn btn-info ml-2">
+                <button class="btn btn-info ml-2" onClick={this.uploadCode}>
                   <Text id="integration.arduino.setup.uploadButton" />
                 </button>
               </div>
