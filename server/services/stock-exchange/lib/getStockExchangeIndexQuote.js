@@ -8,10 +8,10 @@ const fmp = require('financialmodelingprep');
  */
 async function getStockExchangeIndexQuote() {
   try {
-    const cac = await fmp.stock('^FCHI').quote();
+    const cac = await fmp.stock(['^FCHI', 'RNO.PA', 'ACA.PA', 'BN.PA', 'AC.PA']).quote();
     return cac;
   } catch (e) {
-    logger.warn('Unable to get CAC40 status');
+    logger.warn('Unable to get FMP datas');
     logger.debug(e);
   }
 }

@@ -13,14 +13,10 @@ function createActions(store) {
     async getIndex(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const stockexchangedata = await state.httpClient.get(`/api/v1/stockexchange/getStockExchangeIndexQuote`);
-
-        const name = stockexchangedata[0]["name"];
-        const index = stockexchangedata[0]["price"];
+        const stockexchangedatas = await state.httpClient.get(`/api/v1/stockexchange/getStockExchangeIndexQuote`);
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          name,
-          index
+          stockexchangedatas
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
