@@ -37,6 +37,22 @@ class SetupDevice extends Component {
     });
   };
 
+  uploadCode = async () => {
+    this.setState({
+      loading: true,
+    });
+    try {
+      await this.props.uploadCode(this.props.deviceIndex);
+    } catch (e) {
+      this.setState({
+        error: RequestStatus.Error,
+      });
+    }
+    this.setState({
+      loading: false,
+    });
+  };
+
   updateArduinoName = (e) => {
     this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
   };

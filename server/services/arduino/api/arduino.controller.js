@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 
 module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   /**
@@ -44,7 +45,8 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
    * @apiGroup Arduino
    */
   async function setup(req, res) {
-    arduinoManager.setup(req.body);
+    //arduinoManager.setup(req.body);
+    logger.warn("La requête est passée !");
     res.json({
       success: true,
     });

@@ -136,7 +136,9 @@ const actions = (store) => {
       });
     },
     updateArduinoManufacturer(state, index, value) {
-      let arduinoManufacturerIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_MANUFACTURER');
+      let arduinoManufacturerIndex = state.arduinoDevices[index].params.findIndex(
+        (param) => param.name === 'ARDUINO_MANUFACTURER'
+      );
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
@@ -196,6 +198,23 @@ const actions = (store) => {
       store.setState({
         arduinoDevices,
       });
+    },
+    async uploadCode(state, index) {
+      store.setState({
+        uploadingCode: RequestStatus.Getting,
+      });
+      try {
+        const device = state.arduinoDevices[index];
+        await state.httpClient.post(`/api/v1/service/arduino/setup`, device);
+
+        store.setState({
+          uploadingCode: RequestStatus.Success,
+        });
+      } catch (e) {
+        store.setState({
+          uploadingCode: RequestStatus.Error,
+        });
+      }
     },
   };
   actions.debouncedSearch = debounce(actions.search, 200);
