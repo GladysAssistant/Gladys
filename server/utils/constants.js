@@ -431,6 +431,101 @@ const ERROR_MESSAGES = {
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
 };
 
+const ARDUINO_MODEL = [
+  {
+    NAME: 'uno',
+    LABEL: 'Arduino Uno',
+  },
+  {
+    NAME: 'mega',
+    LABEL: 'Arduino Mega',
+  },
+  {
+    NAME: 'adk',
+    LABEL: 'Arduino ADK',
+  },
+  {
+    NAME: 'leonardo',
+    LABEL: 'Arduino Leonardo',
+  },
+  {
+    NAME: 'micro',
+    LABEL: 'Arduino Micro',
+  },
+  {
+    NAME: 'nano',
+    LABEL: 'Arduino Nano',
+  },
+  {
+    NAME: 'nano (new bootloader)',
+    LABEL: 'Arduino Nano (with new bootloader)',
+  },
+  {
+    NAME: 'lilypad-usb',
+    LABEL: 'Arduino Lilypad USB',
+  },
+  {
+    NAME: 'duemilanove168',
+    LABEL: 'Arduino Duemilanove',
+  },
+  {
+    NAME: 'yun',
+    LABEL: 'Arduino Yun',
+  },
+  {
+    NAME: 'esplora',
+    LABEL: 'Arduino Esplora',
+  },
+  {
+    NAME: 'blend-micro',
+    LABEL: 'RedBearLab Blend Micro',
+  },
+  {
+    NAME: 'tinyduino',
+    LABEL: 'Tiny Circuits Tinyduino',
+  },
+  {
+    NAME: 'sf-pro-micro',
+    LABEL: 'SparkFun Pro Micro',
+  },
+  {
+    NAME: 'qduino',
+    LABEL: 'Qtechknow Qduino',
+  },
+  {
+    NAME: 'pinoccio',
+    LABEL: 'Pinoccio Scout',
+  },
+  {
+    NAME: 'imuduino',
+    LABEL: 'Femtoduino IMUduino',
+  },
+  {
+    NAME: 'feather',
+    LABEL: 'Adafruit Feather 32u4 Basic Proto',
+  },
+  {
+    NAME: 'arduboy',
+    LABEL: 'Arduboy',
+  },
+  {
+    NAME: 'circuit-playground-classic',
+    LABEL: 'Adafruit Circuit Playground',
+  },
+  {
+    NAME: 'bqZum',
+    LABEL: 'BQ ZUM',
+  },
+  {
+    NAME: 'zumcore2',
+    LABEL: 'BQ ZUM Core 2',
+  },
+  {
+    NAME: 'zumjunior',
+    LABEL: 'BQ ZUM Junior',
+  },
+];
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -506,3 +601,5 @@ module.exports.DEVICE_FUNCTION = DEVICE_FUNCTION;
 module.exports.DEVICE_FUNCTION_LIST = DEVICE_FUNCTION_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.ARDUINO_MODEL = ARDUINO_MODEL;

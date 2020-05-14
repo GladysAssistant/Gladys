@@ -2,6 +2,7 @@ import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
+import { ARDUINO_MODEL } from '../../../../../../../server/utils/constants';
 
 class SetupDevice extends Component {
   saveDevice = async () => {
@@ -105,12 +106,12 @@ class SetupDevice extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {props.arduinoModelsList &&
-                      props.arduinoModelsList.map((model) => (
+                      ARDUINO_MODEL.map((model) => (
                         <option
-                          value={model}
-                          selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model}
+                          value={model.NAME}
+                          selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model.NAME}
                         >
-                          {model}
+                          {model.LABEL}
                         </option>
                       ))}
                   </select>
