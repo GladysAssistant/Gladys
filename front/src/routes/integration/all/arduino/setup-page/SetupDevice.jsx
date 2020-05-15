@@ -121,8 +121,7 @@ class SetupDevice extends Component {
                     <option>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {props.arduinoModelsList &&
-                      ARDUINO_MODEL.map((model) => (
+                    {ARDUINO_MODEL.map((model) => (
                         <option
                           value={model.NAME}
                           selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model.NAME}
