@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-//const { resolve } = require("path");
+const { resolve } = require("path");
 const Avrgirl = require('avrgirl-arduino');
 
 /**
@@ -18,7 +18,7 @@ async function setup(device) {
       path: arduinoPath,
     });
 
-    avrgirl.flash(require.resolve(`${model}/arduino-code.ino.hex`), function (error) {
+    avrgirl.flash(resolve(`./`,`${model}/arduino-code.ino.hex`), function (error) {
       if (error) {
         logger.warn(error);
       } else {
