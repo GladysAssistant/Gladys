@@ -59,6 +59,7 @@
     "set-value": "^3.0.0",
     "tabler-ui": "0.0.32",
     "unistore": "^3.2.1",
+    "useragent-parser-js": "^1.0.3",
     "uuid": "^3.3.2",
     "vis": "^4.21.0"
   },

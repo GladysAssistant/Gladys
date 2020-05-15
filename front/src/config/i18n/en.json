@@ -742,7 +742,7 @@
     "registered": "Registered:",
     "session": "Session",
     "revoke": "Revoke",
-    "device": "Device",
+    "unknowDevice": "Unknow device",
     "apiKey": "API Key"
   },
   "forgotPassword": {
