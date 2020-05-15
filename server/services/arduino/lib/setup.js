@@ -18,7 +18,7 @@ async function setup(device) {
       path: arduinoPath,
     });
 
-    avrgirl.flash(path.resolve(`./`,`${model}/arduino-code.ino.hex`), function (error) {
+    avrgirl.flash(path.resolve(`services/arduino/arduino-code/`,`${model}/arduino-code.ino.hex`), function (error) {
       if (error) {
         logger.warn(error);
       } else {
