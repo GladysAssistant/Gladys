@@ -3,14 +3,17 @@ const logger = require('../../../utils/logger');
 
  /**
   * @description Get the stock-exchange datas.
+  * @param {array} symbols - The ticker symbols of the quote.
   * @returns {Promise<Array>} Resolve with array of stock exchange datas.
   * @example
-  * getStockExchangeIndexQuote();
+  * getStockExchangeIndexQuote(['^FCHI', 'RNO.PA']);
   */
-async function getStockExchangeIndexQuote() {
+async function getStockExchangeIndexQuote(symbols=['^FCHI', 'GIB']) {
+
+  const STOCKEXCHANGE_TICKERS = await this.gladys.variable.getValue('STOCKEXCHANGE_TICKERS', this.serviceId);
+
   try {
-    const cac = await fmp.stock(['^FCHI', 'RNO.PA', 'ACA.PA', 'BN.PA', 'AC.PA']).quote();
-    logger.debug(`/=======> STOCKEXCHANGE : Call to FMP Api return results : {cac}`);
+    const cac = await fmp.stock(symbols).quote();
     return cac;
   } catch (e) {
     logger.warn('Unable to get FMP datas');

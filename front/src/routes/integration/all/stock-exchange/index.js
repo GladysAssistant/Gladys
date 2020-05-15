@@ -6,9 +6,13 @@ import actions from './actions';
 
 @connect('user', actions)
 class StockExchangeIntegration extends Component {
+  componentWillMount() {
+    this.props.getStockExchangeSetting();
+  }
 
   render(props, {}) {
-    const loading = null; // todo
+    const loading = props.stockexchangeSaveSettingsStatus === RequestStatus.Getting ||
+    props.stockexchangeGetSettingsStatus === RequestStatus.Getting;
     return <StockExchangePage {...props} loading={loading} />;
   }
 }

@@ -457,6 +457,8 @@
       "title": "Financial Modeling Prep API",
       "introduction": "Cette intégration vous aide à intégrer  <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">l'API Fmp</a> pour obtenir les informations boursières dans Gladys.",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box bourse.",
+      "selectTickerLabel": "Valeurs",
+      "selectTickerDescription": "Choisissez les valeurs à afficher.",
       "saveButton": "Sauvegarder"
     },
     "mqtt": {
