@@ -53,37 +53,6 @@ const actions = (store) => {
         });
       }
     },
-    /*getModels(state) {
-      store.setState({
-        arduinoModelsList: [
-          'Arduino Yun',
-          'Arduino Uno',
-          'Arduino Duemilanove or Diecimila',
-          'Arduino Nano',
-          'Arduino Mega or Mega 2560',
-          'Arduino Leonardo',
-          'Arduino Leonardo ETH',
-          'Arduino Micro',
-          'Arduino Esplora',
-          'Arduino Mini',
-          'Arduino Ethernet',
-          'Arduino Fio',
-          'Arduino BT',
-          'LilyPad Arduino USB',
-          'LilyPad Arduino',
-          'Arduino Pro or Pro Mini',
-          'Arduino NG or older',
-          'Arduino Robot Control',
-          'Arduino Robot Motor',
-          'Arduino Gemma',
-          'Arduino Circuit Playground',
-          'Arduino Yun Mini',
-          'Arduino Industrial 101',
-          'Linino One',
-          'Arduino Uno WiFi',
-        ],
-      });
-    },*/
     getManufacturers(state) {
       store.setState({
         arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs', 'Arduino (www.arduino.cc)'],
