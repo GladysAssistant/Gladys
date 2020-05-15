@@ -8,7 +8,7 @@ import SetupTab from './SetupTab';
 class ArduinoSetupPage extends Component {
   componentWillMount() {
     this.props.getArduinoDevices();
-    this.props.getModels();
+    //this.props.getModels();
     this.props.getManufacturers();
     this.props.getUsbPorts();
   }

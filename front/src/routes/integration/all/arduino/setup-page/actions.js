@@ -53,7 +53,7 @@ const actions = (store) => {
         });
       }
     },
-    getModels(state) {
+    /*getModels(state) {
       store.setState({
         arduinoModelsList: [
           'Arduino Yun',
@@ -83,7 +83,7 @@ const actions = (store) => {
           'Arduino Uno WiFi',
         ],
       });
-    },
+    },*/
     getManufacturers(state) {
       store.setState({
         arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs', 'Arduino (www.arduino.cc)'],

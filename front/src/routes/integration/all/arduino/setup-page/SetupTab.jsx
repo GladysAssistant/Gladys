@@ -30,11 +30,11 @@ const SetupTab = ({ children, ...props }) => {
             <p class="alert alert-info">
               <MarkupText id="integration.arduino.codeInstruction" />
             </p>
-            {props.arduinoConnected && (
+            {/*props.arduinoConnected && (
               <p class="alert alert-success">
                 <Text id="integration.arduino.setup.connected" /> : {props.arduinoModel}
               </p>
-            )}
+            )*/}
             {!props.arduinoDevices ||
               (props.arduinoDevices.length === 0 && (
                 <p class="alert alert-danger">
@@ -58,7 +58,7 @@ const SetupTab = ({ children, ...props }) => {
                     uploadCode={props.uploadCode}
                     saveDevice={props.saveDevice}
                     deleteDevice={props.deleteDevice}
-                    arduinoModelsList={props.arduinoModelsList}
+                    /*arduinoModelsList={props.arduinoModelsList}*/
                     usbPorts={props.usbPorts}
                   />
                 ))}
