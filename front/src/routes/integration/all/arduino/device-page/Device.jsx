@@ -230,7 +230,7 @@ class ArduinoDeviceBox extends Component {
                     <select
                       class="form-control"
                       id="feature"
-                      value={[props.device.features.category,props.device.features.type]}
+                      value={[props.device.features[0].category,props.device.features[0].type]}
                       onChange={this.updateFeature}
                     >
                       <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY]}>
