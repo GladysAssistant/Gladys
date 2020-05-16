@@ -67,12 +67,17 @@ class SetupTab extends Component {
                     class="custom-switch-input"
                     checked={props.useEmbeddedBroker}
                     onClick={this.updateDockerUsage}
-                    disabled={!props.dockerBased}
+                    disabled={!props.dockerBased || !props.networkModeValid}
                   />
                   <span class="custom-switch-indicator" />
                   <span class="custom-switch-description">
                     {!props.dockerBased && <Text id="integration.mqtt.setup.nonDockerEnv" />}
-                    {props.dockerBased && <Text id="integration.mqtt.setup.installBrokerContainer" />}
+                    {props.dockerBased && !props.networkModeValid && (
+                      <Text id="integration.mqtt.setup.invalidDockerNetwork" />
+                    )}
+                    {props.dockerBased && props.networkModeValid && (
+                      <Text id="integration.mqtt.setup.installBrokerContainer" />
+                    )}
                   </span>
                 </label>
               </div>

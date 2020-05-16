@@ -15,6 +15,7 @@ const createActions = store => {
           mqttPassword: configuration.mqttPassword,
           useEmbeddedBroker: configuration.useEmbeddedBroker,
           dockerBased: configuration.dockerBased,
+          networkModeValid: configuration.networkModeValid,
           brokerContainerAvailable: configuration.brokerContainerAvailable,
           passwordChanges: false,
           connected: false

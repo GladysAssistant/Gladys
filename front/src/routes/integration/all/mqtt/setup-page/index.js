@@ -6,7 +6,7 @@ import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,httpClient,mqttUrl,mqttUsername,mqttPassword,useEmbeddedBroker,brokerContainerAvailable,dockerBased,connectMqttStatus,mqttConnected,mqttConnectionError',
+  'user,session,httpClient,mqttUrl,mqttUsername,mqttPassword,useEmbeddedBroker,brokerContainerAvailable,dockerBased,networkModeValid,connectMqttStatus,mqttConnected,mqttConnectionError',
   actions
 )
 class MqttNodePage extends Component {
