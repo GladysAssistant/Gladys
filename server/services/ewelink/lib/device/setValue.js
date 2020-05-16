@@ -22,7 +22,8 @@ async function setValue(device, deviceFeature, value) {
 
   const { deviceId, channel } = parseExternalId(device.external_id);
   const eweLinkDevice = await connection.getDevice(deviceId);
-  this.throwErrorIfNeeded(eweLinkDevice);
+  await this.throwErrorIfNeeded(eweLinkDevice);
+
   if (!eweLinkDevice.online) {
     throw new NotFoundError('EWeLink error: Device is not currently online');
   }
@@ -33,7 +34,7 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
       state = value === STATE.ON ? 'on' : 'off';
       response = await connection.setDevicePowerState(deviceId, state, channel);
-      this.throwErrorIfNeeded(response);
+      await this.throwErrorIfNeeded(response);
       break;
     default:
       logger.warn(`EWeLink warning: Feature type "${deviceFeature.type}" not handled yet!`);

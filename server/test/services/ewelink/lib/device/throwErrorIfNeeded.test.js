@@ -24,7 +24,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
   it('should throws a error and not emit a message', async () => {
     try {
       const response = { error: 401, msg: 'Authentication error' };
-      eweLinkService.device.throwErrorIfNeeded(response);
+      await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
       expect(error.status).to.equal(401);
@@ -34,7 +34,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
   it('should throws an error and emit a message', async () => {
     try {
       const response = { error: 401, msg: 'Authentication error' };
-      eweLinkService.device.throwErrorIfNeeded(response, true);
+      await eweLinkService.device.throwErrorIfNeeded(response, true);
       assert.fail();
     } catch (error) {
       assert.calledOnceWithExactly(gladys.event.emit, 'websocket.send-all', {
@@ -49,7 +49,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
     eweLinkService.device.accessToken = 'NoMoreValidAccessToken';
     try {
       const response = { error: 401, msg: 'Authentication error' };
-      eweLinkService.device.throwErrorIfNeeded(response);
+      await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
       expect(eweLinkService.device.connected).to.equal(false);
@@ -60,7 +60,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
   it('should throws a error and not emit a message', async () => {
     try {
       const response = { error: 404, msg: 'Device does not exist' };
-      eweLinkService.device.throwErrorIfNeeded(response);
+      await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
       expect(error.status).to.equal(500);
@@ -70,7 +70,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
   it('should throws an error and emit a message', async () => {
     try {
       const response = { error: 404, msg: 'Device does not exist' };
-      eweLinkService.device.throwErrorIfNeeded(response, true);
+      await eweLinkService.device.throwErrorIfNeeded(response, true);
       assert.fail();
     } catch (error) {
       assert.calledOnceWithExactly(gladys.event.emit, 'websocket.send-all', {
@@ -84,7 +84,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
   it('should not reset authentication values', async () => {
     try {
       const response = { error: 500, msg: 'Device does not exist' };
-      eweLinkService.device.throwErrorIfNeeded(response);
+      await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
       expect(eweLinkService.device.connected).to.equal(true);

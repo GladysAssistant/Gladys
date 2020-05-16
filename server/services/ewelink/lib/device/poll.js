@@ -21,7 +21,7 @@ async function poll(device) {
   const { deviceId, channel } = parseExternalId(device.external_id);
   const connection = new this.EweLinkApi({ at: this.accessToken, region });
   const eWeLinkDevice = await connection.getDevice(deviceId);
-  this.throwErrorIfNeeded(eWeLinkDevice);
+  await this.throwErrorIfNeeded(eWeLinkDevice);
   if (!eWeLinkDevice.online) {
     throw new NotFoundError('EWeLink error: Device is not currently online');
   }
@@ -36,8 +36,7 @@ async function poll(device) {
 
   if (binaryFeature) {
     const response = await connection.getDevicePowerState(deviceId, channel);
-    // belt, suspenders ;)
-    this.throwErrorIfNeeded(response);
+    await this.throwErrorIfNeeded(response);
 
     const currentBinaryState = response.state === 'on' ? STATE.ON : STATE.OFF;
     // if the value is different from the value we have, save new state
@@ -52,8 +51,7 @@ async function poll(device) {
 
   if (powFeature) {
     const response = await connection.getDevicePowerUsage(deviceId);
-    // belt, suspenders ;)
-    this.throwErrorIfNeeded(response);
+    await this.throwErrorIfNeeded(response);
 
     const currentPowerState = response.monthly;
     // if the value is different from the value we have, save new state
@@ -68,8 +66,7 @@ async function poll(device) {
 
   if (tempFeature || humFeature) {
     const response = await connection.getDeviceCurrentTH(deviceId);
-    // belt, suspenders ;)
-    this.throwErrorIfNeeded(response);
+    await this.throwErrorIfNeeded(response);
 
     if (tempFeature && response.temperature) {
       const currentTemperature = response.temperature;
@@ -97,8 +94,7 @@ async function poll(device) {
 
   if (firmwareParam) {
     const response = await connection.getFirmwareVersion(deviceId);
-    // belt, suspenders ;)
-    this.throwErrorIfNeeded(response);
+    await this.throwErrorIfNeeded(response);
 
     const currentVersion = response.fwVersion;
     // if the value is different from the value we have, save new param

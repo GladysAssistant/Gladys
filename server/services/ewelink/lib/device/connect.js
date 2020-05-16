@@ -32,20 +32,11 @@ async function connect() {
     const connection = new this.EweLinkApi({ email, password });
     const response = await connection.getRegion();
     // belt, suspenders ;)
-    if (response.error) {
-      if (response.error === 406) {
-        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
-          payload: 'Service is not configured',
-        });
-        throw new ServiceNotConfiguredError('EWeLink error: Service is not configured');
-      }
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
-        payload: response.msg,
-      });
-      throw new Error500(`EWeLink error: ${response.msg}`);
+    if (response.error && [401, 406].indexOf(response.error) !== -1) {
+      response.msg = 'Service is not configured';
     }
+    await this.throwErrorIfNeeded(response, true, true);
+
     ({ region } = response);
     await this.gladys.variable.setValue(EWELINK_REGION_KEY, region, this.serviceId);
   }
@@ -54,17 +45,8 @@ async function connect() {
 
   const connection = new this.EweLinkApi({ email, password, region });
   const auth = await connection.getCredentials();
-  if (auth.error) {
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
-      payload: auth.msg,
-    });
-    // belt, suspenders ;)
-    if ([400, 401, 404].indexOf(auth.error) !== -1 || auth.error === 301) {
-      throw new Error401(`EWeLink error: ${auth.msg}`);
-    }
-    throw new Error500(`EWeLink error: ${auth.msg}`);
-  }
+  await this.throwErrorIfNeeded(auth, true, true);
+
   this.connected = true;
   this.accessToken = auth.at;
   this.apiKey = auth.user.apikey;

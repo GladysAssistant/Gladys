@@ -17,7 +17,7 @@ async function discover() {
   const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
   const connection = new this.EweLinkApi({ at: this.accessToken, region });
   const discoveredDevices = await connection.getDevices();
-  this.throwErrorIfNeeded(discoveredDevices, true);
+  await this.throwErrorIfNeeded(discoveredDevices, true);
 
   const unknownDevices = [];
 
@@ -33,8 +33,7 @@ async function discover() {
       if (Object.keys(models).includes(uiid)) {
         // ...if the model is supported, ...
         const channels = await connection.getDeviceChannelCount(discoveredDevice.deviceid);
-        // belt, suspenders ;)
-        this.throwErrorIfNeeded(channels, true);
+        await this.throwErrorIfNeeded(channels, true);
 
         // ...for each channel of the device...
         for (let channel = 1; channel <= channels.switchesAmount; channel += 1) {

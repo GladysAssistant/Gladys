@@ -1,5 +1,6 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { Error401, Error500 } = require('../../../../utils/httpErrors');
+const { EWELINK_EMAIL_KEY, EWELINK_PASSWORD_KEY, EWELINK_REGION_KEY } = require('../utils/constants');
 const { connect } = require('./connect');
 const { discover } = require('./discover');
 const { poll } = require('./poll');
@@ -33,7 +34,7 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
  * @example
  * const EweLinkHandler = new EweLinkHandler(gladys, client, serviceId);
  */
-function throwErrorIfNeeded(response, emit = false) {
+async function throwErrorIfNeeded(response, emit = false, config = false) {
   if (response.error) {
     if (response.error === 401) {
       this.connected = false;
@@ -44,6 +45,14 @@ function throwErrorIfNeeded(response, emit = false) {
           type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
           payload: response.msg,
         });
+      }
+      if (config) {
+        await Promise.all([
+          this.gladys.variable.setValue(EWELINK_EMAIL_KEY, '', this.serviceId),
+          this.gladys.variable.setValue(EWELINK_PASSWORD_KEY, '', this.serviceId),
+          this.gladys.variable.setValue(EWELINK_REGION_KEY, '', this.serviceId),
+        ]);
+        this.configured = false;
       }
       throw new Error401(`EWeLink error: ${response.msg}`);
     }
