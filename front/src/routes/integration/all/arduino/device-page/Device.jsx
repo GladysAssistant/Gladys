@@ -61,24 +61,29 @@ class ArduinoDeviceBox extends Component {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
     switch (e.target.value) {
       case DEVICE_FUNCTION.RECV_433:
-        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
         break;
       case DEVICE_FUNCTION.EMIT_433:
-        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
-        this.props.updateBitLength(this.props.deviceIndex, "24");
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
+        this.props.updateBitLength(this.props.deviceIndex, '24');
         break;
       case DEVICE_FUNCTION.EMIT_433_CHACON:
-        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SWITCH.BINARY);
         break;
       case DEVICE_FUNCTION.EMIT_IR:
-        this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
-        this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
-        this.props.updateBitLength(this.props.deviceIndex, "32");
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'category', DEVICE_FEATURE_CATEGORIES.SWITCH);
+        //this.props.updateFeature(this.props.deviceIndex, 0, 'type', DEVICE_FEATURE_TYPES.SENSOR.PUSH);
+        this.props.updateBitLength(this.props.deviceIndex, '32');
         break;
     }
+  };
+
+  updateFeature = (e) => {
+    this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value[0]);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value[1]);
   };
 
   updateArduino = (e) => {
@@ -216,6 +221,28 @@ class ArduinoDeviceBox extends Component {
                         </Localizer>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="feature">
+                      <Text id="integration.arduino.device.featuresLabel" />
+                    </label>
+                    <select
+                      class="form-control"
+                      id="feature"
+                      value={[props.device.feature.category,props.device.feature.type]}
+                      onChange={this.updateFeature}
+                    >
+                      <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY]}>
+                        <Text id="integration.arduino.features.lightButton" />
+                      </option>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY]}>
+                        <Text id="integration.arduino.features.switchButton" />
+                      </option>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SENSOR.PUSH]}>
+                        <Text id="integration.arduino.features.pushButton" />
+                      </option>
+                    </select>
                   </div>
 
                   {/*props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (

@@ -692,6 +692,11 @@
         "emit433": "Emision 433 MHz",
         "emit433Chacon": "Emission 433 MHz pour prises Chacon",
         "emitIR": "Emission IR"
+      },
+      "features": {
+        "lightButton": "Lumière",
+        "switchButton": "Interrupteur",
+        "pushButton": "Bouton"
       }
     },
     "xiaomi": {
