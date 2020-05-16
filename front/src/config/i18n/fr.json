@@ -634,7 +634,8 @@
       "title": "Arduino",
       "deviceTab": "Périphériques",
       "setupTab": "Configuration",
-      "codeInstruction": "Pour utiliser ce service, il vous faut une carte Arduino avec le code écrit dans ce but. Vous pouvez télécharger ce code <a href=\"https://github.com/billonalex/Gladys/blob/master/server/services/arduino/arduino-code/arduino-code.ino\" target=\"_blank\">ici</a>.",
+/*      "codeInstruction": "Pour utiliser ce service, il vous faut une carte Arduino avec le code écrit dans ce but. Vous pouvez télécharger ce code <a href=\"https://github.com/billonalex/Gladys/blob/master/server/services/arduino/arduino-code/arduino-code.ino\" target=\"_blank\">ici</a>.",*/
+      "codeInstruction": "Pour utiliser ce service, il vous faut une carte Arduino avec le code écrit dans ce but. Veillez donc à téléverser le code en cliquant sur le bouton Téléverser.",
       "status": {
         "notConfigured": "Arduino service is not configured, please go to ",
         "notConnected": "Arduino card is not connected, please connect a card.",
