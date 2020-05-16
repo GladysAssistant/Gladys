@@ -82,8 +82,8 @@ class ArduinoDeviceBox extends Component {
   };
 
   updateFeature = (e) => {
-    this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value[0]);
-    this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value[1]);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value.split(',')[0]);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value.split(',')[1]);
   };
 
   updateArduino = (e) => {
