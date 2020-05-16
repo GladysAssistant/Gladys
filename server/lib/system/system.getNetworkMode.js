@@ -1,3 +1,4 @@
+const get = require('get-value');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 const getConfig = require('../../utils/getConfig');
 
@@ -15,9 +16,9 @@ async function getNetworkMode() {
   }
 
   if (!this.networkMode) {
-    const containers = await this.getContainers();
-    const gladysContainer = containers.find((c) => c.image === config.dockerImage);
-    this.networkMode = gladysContainer.networkMode;
+    const containers = await this.dockerode.listContainers();
+    const gladysContainer = containers.find((c) => c.Image.startsWith(config.dockerImage));
+    this.networkMode = get(gladysContainer, 'HostConfig.NetworkMode', { default: 'unknown' });
   }
 
   return this.networkMode;
