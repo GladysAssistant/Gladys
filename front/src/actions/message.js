@@ -5,16 +5,7 @@ import uuid from 'uuid';
 const TYPING_MIN_TIME = 400;
 const TYPING_MAX_TIME = 600;
 
-const sortMessages = messages =>
-  messages.sort((a, b) => {
-    if (a.created_at < b.created_at) {
-      return -1;
-    }
-    if (a.created_at > b.created_at) {
-      return 1;
-    }
-    return 0;
-  });
+const sortMessages = messages => messages.sort((a, b) => a.created_at - b.created_at);
 
 function createActions(store) {
   const actions = {
@@ -32,6 +23,8 @@ function createActions(store) {
       });
       try {
         let messages = await state.httpClient.get('/api/v1/message');
+        // Force date usage
+        messages.forEach(message => (message.created_at = new Date(message.created_at)));
         messages = sortMessages(messages);
         store.setState({
           messages,
