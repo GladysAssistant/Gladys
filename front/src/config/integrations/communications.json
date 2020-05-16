@@ -1,8 +1,6 @@
 [
   {
     "key": "telegram",
-    "name": "Telegram",
-    "description": "Parlez à Gladys grâce à Telegram.",
     "img": "/assets/integrations/cover/telegram.jpg"
   }
 ]

@@ -222,6 +222,7 @@
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
       "menu": {
+        "all": "Toutes les integrations",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -233,6 +234,7 @@
     },
     "caldav": {
       "title": "CalDAV",
+      "description": "Synchonisez vos calendriers CalDAV.",
       "introduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
@@ -276,6 +278,7 @@
     },
     "telegram": {
       "title": "Telegram",
+      "description": "Parlez à Gladys grâce à Telegram.",
       "introduction": "Pour connecter Gladys à Telegram, vous devez d'abord créer un bot Telegram à l'aide du Botfather. Envoyez une commande <b>/newbot</b> au <a href=\"https://telegram.me/BotFather\"> @BotFather </a> dans Telegram. Ensuite, entrez la clé API qu'il vous a donné ci-dessous.",
       "link": "<b>ACTION REQUISE :</b> Pour parler à Gladys dans Telegram, cliquez sur <a href=\"{{link}}\"> ce lien </a>. Ne parlez pas à votre bot dans Telegram directement avant d'avoir cliqué sur ce lien, sinon votre bot ne pourra pas savoir que c'est vous qui envoyez un message.",
       "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
@@ -285,6 +288,7 @@
     },
     "philipsHue": {
       "title": "Philips Hue",
+      "description": "Contrôler les lumières Philips Hue.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration des Ponts",
       "setup": {
@@ -310,6 +314,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
+      "description": "Affichez vos caméras HTTP/RTSP.",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -332,6 +337,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
+      "description": "Contrôler vos appareils Tasmota.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte MQTT",
       "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
@@ -367,6 +373,7 @@
     },
     "zwave": {
       "title": "Z-Wave",
+      "description": "Contrôlez vos appareils Z-Wave.",
       "deviceTab": "Appareils",
       "networkTab": "Réseau",
       "settingsTab": "Paramètres",
@@ -435,7 +442,8 @@
       }
     },
     "darkSky": {
-      "title": "API DarkSky",
+      "title": "DarkSky",
+      "description": "Récupérer la météo dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API DarkSky pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky : <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
@@ -445,6 +453,7 @@
     },
     "mqtt": {
       "title": "MQTT",
+      "description": "Connexion à un serveur MQTT.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
       "status": {
@@ -510,6 +519,8 @@
       }
     },
     "xiaomi": {
+      "title": "Xiaomi Home",
+      "description": "Gérez les appareils Xiaomi.",
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",

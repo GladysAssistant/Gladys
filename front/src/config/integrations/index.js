@@ -1,44 +1,29 @@
-import deviceEn from './device.en.json';
-import communicationEn from './communication.en.json';
-import calendarEn from './calendar.en.json';
-import weatherEn from './weather.en.json';
+import devices from './devices.json';
+import communications from './communications.json';
+import calendars from './calendars.json';
+import weathers from './weathers.json';
 
-import deviceFr from './device.fr.json';
-import communicationFr from './communication.fr.json';
-import calendarFr from './calendar.fr.json';
-import weatherFr from './weather.fr.json';
+const integrations = [];
+const integrationsByType = {};
+const categories = [];
 
-const integrations = {
-  en: {
-    totalSize: deviceEn.length + communicationEn.length + weatherEn.length + calendarEn.length,
-    device: deviceEn,
-    communication: communicationEn,
-    calendar: calendarEn,
-    weather: weatherEn
-  },
-  fr: {
-    totalSize: deviceFr.length + communicationFr.length + weatherFr.length + calendarFr.length,
-    device: deviceFr,
-    communication: communicationFr,
-    calendar: calendarFr,
-    weather: weatherFr
-  }
+const pushAllWithType = (items, type, icon) => {
+  integrationsByType[type] = [];
+  categories.push({
+    type,
+    icon
+  });
+
+  items.forEach(item => {
+    const newItem = { ...item, type };
+    integrations.push(newItem);
+    integrationsByType[type].push(newItem);
+  });
 };
 
-communicationEn.forEach(integration => {
-  integrations.en[integration.key] = integration;
-});
+pushAllWithType(devices, 'device', 'toggle-right');
+pushAllWithType(communications, 'communication', 'message-square');
+pushAllWithType(calendars, 'calendar', 'calendar');
+pushAllWithType(weathers, 'weather', 'cloud');
 
-deviceEn.forEach(integration => {
-  integrations.en[integration.key] = integration;
-});
-
-calendarEn.forEach(integration => {
-  integrations.en[integration.key] = integration;
-});
-
-weatherEn.forEach(integration => {
-  integrations.en[integration.key] = integration;
-});
-
-export default integrations;
+export { integrations, integrationsByType, categories };
