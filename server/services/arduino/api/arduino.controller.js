@@ -45,8 +45,7 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
    * @apiGroup Arduino
    */
   async function setup(req, res) {
-    //arduinoManager.setup(req.body);
-    logger.warn("La requête est passée !");
+    arduinoManager.setup(req.body);
     res.json({
       success: true,
     });
