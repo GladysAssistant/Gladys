@@ -56,7 +56,8 @@
     "unistore": "^3.2.1",
     "useragent-parser-js": "^1.0.3",
     "uuid": "^3.3.2",
-    "vis": "^4.21.0"
+    "vis-data": "^6.5.2",
+    "vis-network": "^7.6.4"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
