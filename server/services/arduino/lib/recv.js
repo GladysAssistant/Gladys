@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
+//const Readline = SerialPort.parsers.Readline;
 
 /**
  * @description Send a message to the Arduino
@@ -10,14 +11,16 @@ const SerialPort = require('serialport');
 async function recv(device) {
   try {
     const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
-    const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
 
-    const port = new SerialPort(arduinoPath, { baudRate: 9600, lock: false });
+    const port = new SerialPort(arduinoPath, {
+      baudRate: 9600,
+      lock: false,
+      //parser: new Readline('\n'),
+    });
 
     if (!port.isOpen) {
       port.on('data', function (data) {
-        logger.warn(data);
-        
+        logger.warn(data.data.toString('utf8'));
       });
     }
   } catch (e) {
