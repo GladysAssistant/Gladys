@@ -49,9 +49,7 @@ async function setValue(device, deviceFeature, value) {
       break;
   }
 
-  for (var i = 0; i < device.params.find((param) => param.name === 'PULSE_LENGTH').value; i++) {
-    send(path, message);
-  }
+  send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
 }
 
 module.exports = {
