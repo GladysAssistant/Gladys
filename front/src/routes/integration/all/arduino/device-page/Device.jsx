@@ -234,12 +234,15 @@ class ArduinoDeviceBox extends Component {
                       onChange={this.updateFeature}
                     >
                       <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY]}>
+                        <i class="fe fe-toggle-right" />
                         <Text id="integration.arduino.features.lightButton" />
                       </option>
                       <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY]}>
+                        <i class="fe fe-toggle-right" />
                         <Text id="integration.arduino.features.switchButton" />
                       </option>
                       <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SENSOR.PUSH]}>
+                        <i class="fe fe-target" />
                         <Text id="integration.arduino.features.pushButton" />
                       </option>
                     </select>
