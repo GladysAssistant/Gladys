@@ -15,8 +15,8 @@ async function recv(device) {
     const port = new SerialPort(arduinoPath, { baudRate: 9600, lock: false });
 
     if (!port.isOpen) {
-      port.on('data', function () {
-        logger.warn('Test received');
+      port.on('data', function (data) {
+        logger.warn(data);
         
       });
     }
