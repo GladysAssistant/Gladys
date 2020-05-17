@@ -8,29 +8,24 @@ const SerialPort = require('serialport');
  * recv(device);
  */
 async function recv(device) {
-    try {
+  try {
+    const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
 
-        const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
-        const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
+    const port = new SerialPort(arduinoPath, { baudRate: 9600, lock: false });
 
-        const textToSend = JSON.stringify(message) + "%";
-
-        const port = new SerialPort(path, { baudRate: 9600, lock: false });
-
-        if (!port.isOpen) {
-            port.on('data', function () {
-                logger.warn('Arduino: port opened');
-                port.write(textToSend);
-            });
-        }
-
-
-    } catch (e) {
-        logger.warn('Unable to receive message');
-        logger.debug(e);
+    if (!port.isOpen) {
+      port.on('data', function () {
+        logger.warn('Test received');
+        
+      });
     }
+  } catch (e) {
+    logger.warn('Unable to receive message');
+    logger.debug(e);
+  }
 }
 
 module.exports = {
-    recv,
+  recv,
 };
