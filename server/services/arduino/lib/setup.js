@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const path = require("path");
+const path = require('path');
 const Avrgirl = require('avrgirl-arduino');
 
 /**
@@ -18,13 +18,16 @@ async function setup(device) {
       path: arduinoPath,
     });
 
-    avrgirl.flash(path.resolve(`services/arduino/arduino-code/`,`${model}/arduino-code.ino.hex`), function (error) {
-      if (error) {
-        logger.warn(error);
-      } else {
-        logger.warn('Flashing done!');
+    avrgirl.flash(
+      path.resolve(`services/arduino/arduino-code/`, `${model}/arduino-code.ino.with_bootloader.hex`),
+      function (error) {
+        if (error) {
+          logger.warn(error);
+        } else {
+          logger.warn('Flashing done!');
+        }
       }
-    });
+    );
   } catch (e) {
     logger.warn('Unable to flash the card');
     logger.debug(e);
