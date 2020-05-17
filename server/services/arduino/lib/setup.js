@@ -19,7 +19,7 @@ async function setup(device) {
     });
 
     avrgirl.flash(
-      path.resolve(`services/arduino/arduino-code/`, `${model}/arduino-code.ino.with_bootloader.hex`),
+      path.resolve(`services/arduino/arduino-code/`, `${model}/arduino-code.ino.hex`),
       function (error) {
         if (error) {
           logger.warn(error);
