@@ -20,7 +20,7 @@ async function recv(device) {
 
     if (!port.isOpen) {
       port.on('data', function (data) {
-        logger.warn(data.data.toString('utf8'));
+        logger.warn(data.toString('utf8'));
       });
     }
   } catch (e) {
