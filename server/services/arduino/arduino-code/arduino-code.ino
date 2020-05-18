@@ -2,90 +2,101 @@
 #include <RCSwitch.h>
 #include <IRremote.h>
 
-//const int DATA_EMIT_PIN = 6;                                                  // Pin DATA de l'émetteur 433 Mhz
-//const int DATA_EMIT_PIN = 50;                                                  // Pin DATA de l'émetteur 433 Mhz
-//const int VCC_EMIT_PIN = 48;
-//const int GND_EMIT_PIN = 46;
+bool recv433 = false;
+bool recvIR = false;
 
-//const int DATA_PIN = 8;                                                       // Pin DATA du récepteur
-//const int DATA_PIN = 3;                                                       // Pin DATA du récepteur
-//const int VCC_PIN = 2;
-//const int GND_PIN = 5;
+const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;       // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
-//const int DATA_PIN_LED = 10;                                                  // Pin DATA de l'émetteur IR du ruban LED
-//const int DATA_PIN_TV = 9;                                                    // Pin DATA de l'émetteur IR de la télévision
-//const int DATA_RECV_PIN_IR_LED = 11;                                          // Pin DATA du récepteur IR du ruban LED
-//const int DATA_RECV_PIN_IR_TV = 39;                                           // Pin DATA du récepteur IR de la TV
+// Serial buffer
+String command = "";
 
-const bool recv433 = false;
-const bool recvIR = false;
+// End of command marker
+char endMarker = '%';
 
-const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;                   // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
 //IRrecv irrecv_led(DATA_RECV_PIN_IR_LED);
 //IRrecv irrecv_tv(DATA_RECV_PIN_IR_TV);
 
-IRsend ir_send;                                                               // Crée une instance pour controler les led (pin 3 par défaut)
-RCSwitch mySwitch = RCSwitch();                                               // Crée une instance pour la réception 433 MHz (pin 2)
+IRsend ir_send;                                                  // Crée une instance pour controler les led (pin 3 par défaut)
+RCSwitch mySwitch = RCSwitch();                                  // Crée une instance pour la réception 433 MHz (pin 2)
 
-decode_results results;                                                       // Variable contenant le résultat des réceptions IR
+decode_results results;                                         // Variable contenant le résultat des réceptions IR
 
-void emit_ir(unsigned long code, int bit_length, int data_pin) {                                         // Fonction à appeler pour envoyer un code IR au ruban LED
+
+/*
+   Functions that will be called by Gladys
+*/
+
+void emit_ir(unsigned long code, int bit_length, int data_pin) {    // Fonction à appeler pour envoyer un code IR au ruban LED
   ir_send.changePin(data_pin);
-  ir_send.sendNEC(code, bit_length); // code télécommande et nombre de bits
+  ir_send.sendNEC(code, bit_length);                                // code télécommande et nombre de bits
 }
 
-void emit_433(long code, int bit_length, int data_pin) {                                               // Fonction à appeler pour envoyer un code en 433 MHz
+void emit_433(long code, int bit_length, int data_pin) {            // Fonction à appeler pour envoyer un code en 433 MHz
   mySwitch.enableTransmit(data_pin);
   mySwitch.send(code, bit_length);
   mySwitch.disableTransmit();
 }
 
-void emit_433_chacon(unsigned long code, int data_pin) {                                     // Fonction à appeler pour envoyer un code Chacon
-  for (int i = 0; i < 5; i++) {                                               // Emission du code 5 fois
+void emit_433_chacon(unsigned long code, int data_pin) {            // Fonction à appeler pour envoyer un code Chacon
+  for (int i = 0; i < 5; i++) {                                     // Emission du code 5 fois
     emit(code, data_pin);
   }
 }
+
+void enable_433(bool isEnabled, int data_pin){
+  mySwitch.enableReceive(data_pin);
+  recv433 = isEnabled;
+}
+
+
+
+
+
 /*
-  void detectIR_LED(){                                                          // Fonction à appeler dans void loop() pour permettre la détection de signaux IR du ruban LED
-  if (irrecv_led.decode(&results)) {
-    Serial.print("{\"action\":\"received\",\"value\":");
-    Serial.print(results.value, HEX);
-    Serial.println("}");
-    irrecv_led.resume(); // Receive the next value
-  }
-  delay(100);
-  }
-
-
-  void detectChacon(int data_pin){                                                           // Fonction à appeler dans void loop() pour permettre la détection de signaux Chacon
-  unsigned long sender = listenSignalDIO(data_pin);
-
-  if(sender != 0){
-    Serial.print("{\"action\":\"received\",\"value\":");
-    Serial.print(sender);
-    Serial.println("}");
-    delay(200);
-  }
-  }
-
-  void detectRadio(){                                                             // Fonction à appeler dans void loop() pour permettre la détection de signaux Radio
-  if (mySwitch.available()) {
-    int value = mySwitch.getReceivedValue();
-    if (value == 0) {
-      Serial.print("Unknown encoding");
-    } else {
+  void detectIR_LED(){                                              // Fonction à appeler dans void loop() pour permettre la détection de signaux IR du ruban LED
+    if (irrecv_led.decode(&results)) {
       Serial.print("{\"action\":\"received\",\"value\":");
-      Serial.print( mySwitch.getReceivedValue() );
+      Serial.print(results.value, HEX);
       Serial.println("}");
+      irrecv_led.resume(); // Receive the next value
     }
-    delay(200);
-    mySwitch.resetAvailable();
+    delay(100);
   }
+
+  void detectChacon(int data_pin){                                  // Fonction à appeler dans void loop() pour permettre la détection de signaux Chacon
+    unsigned long sender = listenSignalDIO(data_pin);
+
+    if(sender != 0){
+      Serial.print("{\"action\":\"received\",\"value\":");
+      Serial.print(sender);
+      Serial.println("}");
+      delay(200);
+    }
+  }
+
+  void detectRadio(){                                               // Fonction à appeler dans void loop() pour permettre la détection de signaux Radio
+    if (mySwitch.available()) {
+      int value = mySwitch.getReceivedValue();
+      if (value == 0) {
+        Serial.print("Unknown encoding");
+      } else {
+        Serial.print("{\"action\":\"received\",\"value\":");
+        Serial.print( mySwitch.getReceivedValue() );
+        Serial.println("}");
+      }
+      delay(200);
+      mySwitch.resetAvailable();
+    }
   }
 */
 
-void emit(unsigned long code, int data_pin) {                                                // Fonction permettant d'envoyer un signal radio Chacon
+
+/*
+   Fonction permettant d'envoyer un signal radio Chacon
+*/
+
+void emit(unsigned long code, int data_pin) {
   digitalWrite(data_pin, HIGH);
   delayMicroseconds(THIGH);
   digitalWrite(data_pin, LOW);
@@ -123,12 +134,6 @@ void emit(unsigned long code, int data_pin) {                                   
   digitalWrite(data_pin, LOW);
 }
 
-// Serial buffer
-String command = "";
-
-// End of command marker
-char endMarker = '%';
-
 /*
    Execute the right function
 */
@@ -145,6 +150,9 @@ void executeFunction(String json_data) {
   }
   else if ( v["function_name"] == String("emit_ir") ) {
     emit_ir(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
+  }
+  else if ( v["function_name"] == String("enable_433") ) {
+    enable_433(v["parameters"]["enable"], v["parameters"]["data_pin"]);
   }
 }
 
@@ -207,30 +215,22 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
 
-  /*// Receiver is connected on Arduino Pin #2
-    mySwitch.enableReceive(0);
-    // Transmitter is connected to Arduino Pin #10
-    mySwitch.enableTransmit(10);
-    // Optional set pulse length.
+  /*// Optional set pulse length.
     mySwitch.setPulseLength(310);
-    // Optional set protocol (default is 1, will work for most outlets)
-    mySwitch.setProtocol(1);
-    // Optional set number of transmission repetitions.
-    mySwitch.setRepeatTransmit(15);*/
 
   // Start the IR receivers
   //irrecv_led.enableIRIn();
   //irrecv_tv.enableIRIn();
 
-  //delay(1000);
+  //delay(1000);*/
 }
 
-void loop() {       // Fonction loop() simplifiée par les appels des fonctions respectives
+void loop() {
   //detectChacon();
   //detectRadio();
   //detectIR_LED();
 
-  if(recv433){
+  if(recv433){                                                     // Partie réception 433 MHz
     if (mySwitch.available()) {
       int value = mySwitch.getReceivedValue();
       if (value == 0) {
@@ -253,8 +253,6 @@ void loop() {       // Fonction loop() simplifiée par les appels des fonctions 
     Serial.println("}");
     delay(200);
   }
-
-  
 
   /*                                                             // Fonction à appeler dans void loop() pour permettre la détection de signaux IR de la TV
     if (irrecv_tv.decode(&results)) {
