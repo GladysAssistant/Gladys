@@ -465,7 +465,7 @@
       "receiver_id": "0cd30aef-9c4e-4a23-88e3-3547971296e5",
       "text": "It's a clear day today. Temperature outside is 26°C.",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:45:07.556Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
@@ -473,7 +473,7 @@
       "receiver_id": null,
       "text": "What's the weather like?",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:44:07.556Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
@@ -481,7 +481,7 @@
       "receiver_id": "0cd30aef-9c4e-4a23-88e3-3547971296e5",
       "text": "It's 24°C in the kitchen.",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:49:07.557Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
