@@ -465,7 +465,7 @@
       "receiver_id": "0cd30aef-9c4e-4a23-88e3-3547971296e5",
       "text": "It's a clear day today. Temperature outside is 26°C.",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:45:07.556Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
@@ -473,7 +473,7 @@
       "receiver_id": null,
       "text": "What's the weather like?",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:44:07.556Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
@@ -481,7 +481,7 @@
       "receiver_id": "0cd30aef-9c4e-4a23-88e3-3547971296e5",
       "text": "It's 24°C in the kitchen.",
       "is_read": true,
-      "created_at": "2019-02-12T07:49:07.556Z"
+      "created_at": "2019-02-12T07:49:07.557Z"
     },
     {
       "id": "247b1dd0-6fab-47a8-a9c8-1405deae0ae8",
@@ -903,8 +903,31 @@
       "valid_until": "2019-07-26T01:00:50.137Z",
       "last_seen": null,
       "revoked": false,
+      "useragent": "Mozilla/5.0 (Linux; Android 6.0.1; SHIELD Tablet K1 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/55.0.2883.91 Safari/537.36",
       "created_at": "2019-06-26T01:00:50.138Z",
       "updated_at": "2019-06-26T01:00:50.138Z"
+    },
+    {
+      "id": "2367a8cf-47a8-4db7-83b0-f89c2c6c34ac",
+      "token_type": "refresh_token",
+      "scope": ["dashboard:write", "dashboard:read"],
+      "valid_until": "2019-07-26T00:29:00.783Z",
+      "last_seen": null,
+      "revoked": false,
+      "useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1",
+      "created_at": "2019-06-26T00:29:00.783Z",
+      "updated_at": "2019-06-26T00:29:00.783Z"
+    },
+    {
+      "id": "2367a8cf-47a8-4db7-83b0-f89c2c6c34ac",
+      "token_type": "refresh_token",
+      "scope": ["dashboard:write", "dashboard:read"],
+      "valid_until": "2019-07-26T00:29:00.783Z",
+      "last_seen": null,
+      "revoked": false,
+      "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
+      "created_at": "2019-06-26T00:29:00.783Z",
+      "updated_at": "2019-06-26T00:29:00.783Z"
     },
     {
       "id": "2367a8cf-47a8-4db7-83b0-f89c2c6c34ac",
