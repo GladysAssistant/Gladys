@@ -83,7 +83,7 @@ const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,integrationCategories',
   actions
 )(props => (
   <div id="app">
@@ -142,13 +142,10 @@ const AppRouter = connect(
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
-        <IntegrationPage path="/dashboard/integration/device" />
-        <IntegrationPage path="/dashboard/integration/communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" />
-        <IntegrationPage path="/dashboard/integration/music" />
-        <IntegrationPage path="/dashboard/integration/health" />
-        <IntegrationPage path="/dashboard/integration/weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" />
+        {props.integrationCategories.map(category => (
+          <IntegrationPage path={`/dashboard/integration/${category.type}`} category={category.type} />
+        ))}
+
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
@@ -199,6 +196,7 @@ const AppRouter = connect(
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
+    this.props.getIntegrations();
   }
 
   render({ user }, {}) {

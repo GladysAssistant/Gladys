@@ -1,0 +1,28 @@
+[
+  {
+    "key": "zwave",
+    "img": "/assets/integrations/cover/zwave.jpg"
+  },
+  {
+    "key": "rtspCamera",
+    "link": "rtsp-camera",
+    "img": "/assets/integrations/cover/rtsp-camera.jpg"
+  },
+  {
+    "key": "xiaomi",
+    "img": "/assets/integrations/cover/xiaomi.jpg"
+  },
+  {
+    "key": "mqtt",
+    "img": "/assets/integrations/cover/mqtt.jpg"
+  },
+  {
+    "key": "philipsHue",
+    "link": "philips-hue",
+    "img": "/assets/integrations/cover/philips-hue.jpg"
+  },
+  {
+    "key": "tasmota",
+    "img": "/assets/integrations/cover/tasmota.jpg"
+  }
+]
