@@ -17,6 +17,9 @@
 //const int DATA_RECV_PIN_IR_LED = 11;                                          // Pin DATA du récepteur IR du ruban LED
 //const int DATA_RECV_PIN_IR_TV = 39;                                           // Pin DATA du récepteur IR de la TV
 
+const bool recv433 = false;
+const bool recvIR = false;
+
 const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;                   // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
 //IRrecv irrecv_led(DATA_RECV_PIN_IR_LED);
@@ -227,7 +230,21 @@ void loop() {       // Fonction loop() simplifiée par les appels des fonctions 
   //detectRadio();
   //detectIR_LED();
 
-  //unsigned long sender = listenSignalDIO();
+  if(recv433){
+    if (mySwitch.available()) {
+      int value = mySwitch.getReceivedValue();
+      if (value == 0) {
+        Serial.print("Unknown encoding");
+      } else {
+        Serial.print("{\"action\":\"received\",\"value\":");
+        Serial.print( mySwitch.getReceivedValue() );
+        Serial.println("}");
+      }
+      delay(200);
+      mySwitch.resetAvailable();
+    }
+  }
+  
   unsigned long sender = 0;
 
   if (sender != 0) {
@@ -237,18 +254,7 @@ void loop() {       // Fonction loop() simplifiée par les appels des fonctions 
     delay(200);
   }
 
-  if (mySwitch.available()) {
-    int value = mySwitch.getReceivedValue();
-    if (value == 0) {
-      Serial.print("Unknown encoding");
-    } else {
-      Serial.print("{\"action\":\"received\",\"value\":");
-      Serial.print( mySwitch.getReceivedValue() );
-      Serial.println("}");
-    }
-    delay(200);
-    mySwitch.resetAvailable();
-  }
+  
 
   /*                                                             // Fonction à appeler dans void loop() pour permettre la détection de signaux IR de la TV
     if (irrecv_tv.decode(&results)) {
