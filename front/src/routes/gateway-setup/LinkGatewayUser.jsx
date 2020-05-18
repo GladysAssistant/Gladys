@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../utils/consts';
 
@@ -20,7 +20,13 @@ const SignupLayout = ({ children, ...props }) => (
           >
             <div class="text-center mb-6">
               <h2>
-                <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+                <Localizer>
+                  <img
+                    src="/assets/icons/favicon-96x96.png"
+                    class="header-brand-img"
+                    alt={<Text id="global.logoAlt" />}
+                  />
+                </Localizer>
                 <Text id="login.title" />
               </h2>
             </div>
@@ -53,12 +59,17 @@ const SignupLayout = ({ children, ...props }) => (
                         <Text id="httpErrors.unknownError" />
                       </div>
                     )}
+                    <p>
+                      <Text id="gatewayLinkUser.description" />
+                    </p>
                     <div class="form-group">
                       <label>
                         <Text id="gatewayLinkUser.label" />
                       </label>
                       <select class="form-control" onChange={props.selectUser}>
-                        <option>--------</option>
+                        <option>
+                          <Text id="global.emptySelectOption" />
+                        </option>
                         {props.users && props.users.map(user => <option value={user.id}>{user.firstname}</option>)}
                       </select>
                     </div>
@@ -76,11 +87,7 @@ const SignupLayout = ({ children, ...props }) => (
               </div>
             </div>
             <div class="text-center">
-              <Text id="gatewayLinkUser.manageBilling" />{' '}
-              <a href="/dashboard/settings/billing">
-                <Text id="gatewayLinkUser.here" />
-              </a>
-              .
+              <MarkupText id="gatewayLinkUser.manageBilling" />
             </div>
           </div>
         </div>

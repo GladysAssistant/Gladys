@@ -1,0 +1,48 @@
+[
+  {
+    "label": "weather.get.success.snow",
+    "answers": ["Il neige dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.rain",
+    "answers": ["Il pleut dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.clear",
+    "answers": ["Le ciel est dégagé dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.cloud",
+    "answers": ["Il fait nuageux dehors et la température est de  {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.fog",
+    "answers": ["Il y a du brouillard dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.sleet",
+    "answers": ["Il fait {{ temperature }} {{ units }} dehors avec une pluie glaciale..."]
+  },
+  {
+    "label": "weather.get.success.wind",
+    "answers": ["Le temps est venteux aujourd'hui, et il fait {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.unknown",
+    "answers": ["La température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.fail",
+    "answers": ["Je n'ai pas réussi à récupérer la météo..."]
+  },
+  {
+    "label": "weather.get.fail.not-configured",
+    "answers": ["Vous devez configurer un service de météo avant de pouvoir utiliser cette fonctionnalité."]
+  },
+  {
+    "label": "weather.get.fail.no-house",
+    "answers": [
+      "Vous devez d'abord configurer votre maison et la positionner sur la carte pour utiliser cette fonctionnalité."
+    ]
+  }
+]

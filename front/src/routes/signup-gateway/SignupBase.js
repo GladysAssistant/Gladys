@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 
 const SignupBase = ({ children, ...props }) => (
   <div className="page">
@@ -8,7 +8,13 @@ const SignupBase = ({ children, ...props }) => (
           <div className="col col-login mx-auto">
             <div className="text-center mb-6">
               <h2 className="h-6">
-                <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+                <Localizer>
+                  <img
+                    src="/assets/icons/favicon-96x96.png"
+                    class="header-brand-img"
+                    alt={<Text id="global.logoAlt" />}
+                  />
+                </Localizer>
                 <Text id="gatewaySignup.title" />
               </h2>
             </div>

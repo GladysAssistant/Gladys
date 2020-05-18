@@ -111,6 +111,7 @@ module.exports = function GatewayController(gladys) {
   async function getRestoreStatus(req, res) {
     res.json({
       restore_in_progress: gladys.gateway.restoreInProgress,
+      restore_errored: gladys.gateway.restoreErrored,
     });
   }
 

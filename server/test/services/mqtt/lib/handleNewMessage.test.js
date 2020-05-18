@@ -34,6 +34,12 @@ describe('Mqtt handle message', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should create device', () => {
+    mqttHandler.handleNewMessage('gladys/master/device/create', '{}');
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW, {});
+  });
+
   it('should update device state', () => {
     mqttHandler.handleNewMessage(
       'gladys/master/device/my_device_external_id/feature/my_feature_external_id/state',
@@ -42,7 +48,7 @@ describe('Mqtt handle message', () => {
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'my_feature_external_id',
-      state: '19.8',
+      state: 19.8,
     });
   });
 

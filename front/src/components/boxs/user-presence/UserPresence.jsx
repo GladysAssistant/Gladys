@@ -73,7 +73,10 @@ const UserPresence = ({ children, ...props }) => (
                       )}
                       {!user.current_house_id && user.last_house_changed && (
                         <span class="badge badge-danger">
-                          <Text id="dashboard.boxes.userPresence.left" /> ({user.last_house_changed_relative_to_now})
+                          <Text
+                            id="dashboard.boxes.userPresence.left"
+                            fields={{ since: user.last_house_changed_relative_to_now }}
+                          />
                         </span>
                       )}
                       {!user.current_house_id && user.last_house_changed === null && (
