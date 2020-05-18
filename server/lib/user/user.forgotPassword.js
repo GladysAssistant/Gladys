@@ -6,10 +6,11 @@ const TOKEN_VALIDITY_IN_SECONDS = 60 * 60; // 1 hour
 /**
  * @description Generate a forgot password link and send it to the user.
  * @param {string} email - Email of the user who forgot his password.
+ * @param {Object} useragent - Device linked to this session.
  * @example
- * gladys.user.forgotPassword('test@test.fr');
+ * gladys.user.forgotPassword('test@test.fr', {});
  */
-async function forgotPassword(email) {
+async function forgotPassword(email, useragent) {
   // look  if the user exist
   const user = await db.User.findOne({
     where: {
@@ -23,7 +24,7 @@ async function forgotPassword(email) {
 
   // generate a session token
   const scope = ['reset-password:write'];
-  return this.session.create(user.id, scope, TOKEN_VALIDITY_IN_SECONDS);
+  return this.session.create(user.id, scope, TOKEN_VALIDITY_IN_SECONDS, useragent);
 }
 
 module.exports = {
