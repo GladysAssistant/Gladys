@@ -32,7 +32,7 @@ async function setValue(device, deviceFeature, value) {
 
   switch (functionName) {
     case DEVICE_FUNCTION.RECV_433:
-      message.parameters['enable'] = value === 1 ? 'true' : 'false';
+      message.parameters['enable'] = value === 1 ? true : false;
       break;
     case DEVICE_FUNCTION.EMIT_433:
       message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
@@ -55,10 +55,9 @@ async function setValue(device, deviceFeature, value) {
 
   send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
 
-  if(functionName === DEVICE_FUNCTION.RECV_433){
+  if (functionName === DEVICE_FUNCTION.RECV_433) {
     recv(arduino);
   }
-
 }
 
 module.exports = {
