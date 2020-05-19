@@ -350,7 +350,13 @@ const actions = (store) => {
       await state.httpClient.post(`/api/v1/device`, device);
       if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433){
         const arduino = await state.httpClient.get(`api/v1/device/${device.params.find((param) => param.name === 'ARDUINO_LINKED').value}`);
-        await state.httpClient.post(`/api/v1/service/arduino/send`, arduino.params.find((param) => param.name === 'ARDUINO_PATH').value, `{function_name:${DEVICE_FUNCTION.RECV_433}, parameters:{data_pin:${device.params.find((param) => param.name === 'DATA_PIN'.value)}}}`)
+        var message = {
+          function_name: DEVICE_FUNCTION.RECV_433,
+          parameters: {
+            data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
+          },
+        };
+        await state.httpClient.post(`/api/v1/service/arduino/send`, arduino.params.find((param) => param.name === 'ARDUINO_PATH').value, message)
         await state.httpClient.post(`/api/v1/service/arduino/recv`, arduino);
       }
     },
