@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline')
 //const Readline = SerialPort.parsers.Readline;
 
 /**
@@ -18,8 +19,10 @@ async function recv(device) {
       //parser: new Readline('\n'),
     });
 
+    const parser = port.pipe(new Readline({ delimiter: '\n' }));
+
     if (!port.isOpen) {
-      port.on('data', function (data) {
+      parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
       });
     }
