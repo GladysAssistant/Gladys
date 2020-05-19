@@ -5,6 +5,7 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 import {
+  DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } from '../../../../../../../server/utils/constants';
@@ -347,6 +348,9 @@ const actions = (store) => {
       const device = state.devices[index];
       device.features[0].name = device.name;
       await state.httpClient.post(`/api/v1/device`, device);
+      if (device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433){
+        await state.httpClient.post(`/api/v1/service/arduino/recv`, device)
+      }
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];

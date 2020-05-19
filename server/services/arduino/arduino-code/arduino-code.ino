@@ -44,7 +44,7 @@ void emit_433_chacon(unsigned long code, int data_pin) {            // Fonction 
   }
 }
 
-void enable_433(bool isEnabled, int data_pin){
+void recv_433(bool isEnabled, int data_pin){
   mySwitch.enableReceive(data_pin);
   recv433 = isEnabled;
 }
@@ -151,8 +151,8 @@ void executeFunction(String json_data) {
   else if ( v["function_name"] == String("emit_ir") ) {
     emit_ir(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
   }
-  else if ( v["function_name"] == String("enable_433") ) {
-    enable_433(v["parameters"]["enable"], v["parameters"]["data_pin"]);
+  else if ( v["function_name"] == String("recv_433") ) {
+    recv_433(v["parameters"]["enable"], v["parameters"]["data_pin"]);
   }
 }
 
