@@ -7,6 +7,9 @@ bool recvIR = false;
 
 const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;       // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
+//const int VCC_EMIT_PIN = 48;
+//const int GND_EMIT_PIN = 46;
+
 // Serial buffer
 String command = "";
 
@@ -215,6 +218,11 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
 
+  //pinMode(GND_EMIT_PIN, OUTPUT);
+  //pinMode(VCC_EMIT_PIN, OUTPUT);
+  //digitalWrite(VCC_EMIT_PIN, HIGH);
+  //digitalWrite(GND_EMIT_PIN, LOW);
+
   /*// Optional set pulse length.
     mySwitch.setPulseLength(310);
 
@@ -245,14 +253,14 @@ void loop() {
     }
   }
   
-  unsigned long sender = 0;
+  /*unsigned long sender = 0;
 
   if (sender != 0) {
     Serial.print("{\"action\":\"received\",\"value\":");
     Serial.print(sender);
     Serial.println("}");
     delay(200);
-  }
+  }*/
 
   /*                                                             // Fonction à appeler dans void loop() pour permettre la détection de signaux IR de la TV
     if (irrecv_tv.decode(&results)) {
