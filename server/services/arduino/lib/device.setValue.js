@@ -4,6 +4,7 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const { send } = require('./send');
+const { recv } = require('./recv');
 
 /**
  * @description Change value of a device
@@ -53,6 +54,11 @@ async function setValue(device, deviceFeature, value) {
   }
 
   send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+
+  if(functionName === DEVICE_FUNCTION.RECV_433){
+    recv(arduino);
+  }
+
 }
 
 module.exports = {
