@@ -348,7 +348,7 @@ const actions = (store) => {
       const device = state.devices[index];
       device.features[0].name = device.name;
       await state.httpClient.post(`/api/v1/device`, device);
-      if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433){
+     /* if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433){
         const arduino = await state.httpClient.get(`api/v1/device/${device.params.find((param) => param.name === 'ARDUINO_LINKED').value}`);
         var message = {
           function_name: DEVICE_FUNCTION.RECV_433,
@@ -358,7 +358,7 @@ const actions = (store) => {
         };
         await state.httpClient.post(`/api/v1/service/arduino/send`, arduino.params.find((param) => param.name === 'ARDUINO_PATH').value, message)
         await state.httpClient.post(`/api/v1/service/arduino/recv`, arduino);
-      }
+      }*/
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];
