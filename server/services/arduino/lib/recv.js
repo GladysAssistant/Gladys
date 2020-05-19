@@ -10,10 +10,7 @@ const SerialPort = require('serialport');
  */
 async function recv(device) {
   try {
-    const arduino = await this.gladys.device.getBySelector(
-      device.params.find((param) => param.name === 'ARDUINO_LINKED').value
-    );
-    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
     const port = new SerialPort(arduinoPath, {
       baudRate: 9600,
