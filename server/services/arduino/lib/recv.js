@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline')
+const Readline = require('@serialport/parser-readline');
 //const Readline = SerialPort.parsers.Readline;
 
 /**
