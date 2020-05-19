@@ -88,6 +88,9 @@ function Gladys(params = {}) {
     variable,
     weather,
     start: async () => {
+      // set wal mode
+      await db.sequelize.query('PRAGMA journal_mode=WAL;');
+
       // Execute DB migrations
       await db.umzug.up();
 
