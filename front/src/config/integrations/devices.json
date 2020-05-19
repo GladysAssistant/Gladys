@@ -1,5 +1,9 @@
 [
   {
+    "key": "arduino",
+    "img": "/assets/integrations/cover/arduino.jpg"
+  },
+  {
     "key": "zwave",
     "img": "/assets/integrations/cover/zwave.jpg"
   },

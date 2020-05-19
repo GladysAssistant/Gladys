@@ -524,6 +524,7 @@
     },
     "arduino": {
       "title": "Arduino",
+      "description": "Control your Arduino devices.",
       "deviceTab": "Devices",
       "setupTab": "Setup",
       "codeInstruction2": "In order to use this service, you need to use an Arduino card with the code written for. You can download this code <a href=\"https://github.com/billonalex/Gladys/blob/master/server/services/arduino/arduino-code/arduino-code.ino\" target=\"_blank\">here</a>.",
