@@ -10,13 +10,14 @@ module.exports = function UsbController({ list }) {
     const ports = await list();
 
     res.json(
-      ports.map(function(port) {
+      ports.map(function (port) {
         return {
           comPath: port.path,
           comName: port.path,
           manufacturer: port.manufacturer,
+          serialNumber: port.serialNumber,
         };
-      }),
+      })
     );
   }
 
