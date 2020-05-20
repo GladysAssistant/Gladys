@@ -3,7 +3,7 @@ const logger = require('../../../utils/logger');
 /**
  * @description Set a param
  * @param {Object} device - The device.
- * @param {Object} data - The data tl set.
+ * @param {Object} data - The data to set.
  * @example
  * setParam(device, data);
  */
