@@ -81,6 +81,21 @@ class SetupDevice extends Component {
         >
           <div class="loader" />
           <div class="dimmer-content">
+            {props.uploadingCode === RequestStatus.Getting && (
+              <p class="alert alert-info">
+                <Text id="integration.arduino.setup.flashing" />
+              </p>
+            )}
+            {props.uploadingCode === RequestStatus.Success && (
+              <p class="alert alert-success">
+                <Text id="integration.arduino.setup.flashingSuccess" />
+              </p>
+            )}
+            {props.uploadingCode === RequestStatus.Error && (
+              <p class="alert alert-danger">
+                <Text id="integration.arduino.setup.flashingError" />
+              </p>
+            )}
             {props.arduinoConnected === RequestStatus.Success && (
               <p class="alert alert-success">
                 <Text id="integration.arduino.setup.connected" />
@@ -144,7 +159,8 @@ class SetupDevice extends Component {
                         <option
                           value={[usbPort.comPath, usbPort.serialNumber, usbPort.productId, usbPort.vendorId]}
                           selected={
-                            props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath
+                            props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath ||
+                            props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value === usbPort.serialNumber
                           }
                         >
                           {usbPort.comName} - {usbPort.manufacturer}

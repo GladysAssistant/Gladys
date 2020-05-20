@@ -577,6 +577,9 @@
         "connectionError": "Error while connecting, please check your configuration.",
         "notConnected": "Arduino card is not connected, please connect a card.",
         "noDevices": "No Arduino devices added yet. Please configure your devices with the New button.",
+        "flashing": "Flashing card...",
+        "flashingSuccess": "Flashing done !",
+        "flashingError": "Flashing failed !",
         "connectButton": "Save",
         "disconnectButton": "Delete",
         "uploadButton": "Upload code"

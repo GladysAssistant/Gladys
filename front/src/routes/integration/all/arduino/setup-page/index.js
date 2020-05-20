@@ -4,7 +4,7 @@ import actions from './actions';
 import ArduinoPage from '../ArduinoPage';
 import SetupTab from './SetupTab';
 
-@connect('user,session,usbPorts,arduinoDevices,arduinoManufacturersList', actions)
+@connect('user,session,usbPorts,arduinoDevices,arduinoManufacturersList,uploadingCode', actions)
 class ArduinoSetupPage extends Component {
   componentWillMount() {
     this.props.getArduinoDevices();
