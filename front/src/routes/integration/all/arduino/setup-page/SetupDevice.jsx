@@ -171,8 +171,12 @@ class SetupDevice extends Component {
                           value={[usbPort.comPath, usbPort.serialNumber, usbPort.productId, usbPort.vendorId]}
                           selected={
                             props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath ||
-                            props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value ===
-                              usbPort.serialNumber
+                            (props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value ===
+                              usbPort.serialNumber &&
+                              props.device.params.find((e) => e.name === 'ARDUINO_PRODUCT_ID').value ===
+                                usbPort.productId &&
+                              props.device.params.find((e) => e.name === 'ARDUINO_VENDOR_ID').value ===
+                                usbPort.vendorId)
                           }
                         >
                           {usbPort.comName} - {usbPort.manufacturer}
