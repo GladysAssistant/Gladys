@@ -45,7 +45,7 @@ class SetupDevice extends Component {
     try {
       await this.props.uploadCode(this.props.deviceIndex);
       this.setState({
-        uploadingCode: RequestStatus.Success;
+        uploadingCode: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
