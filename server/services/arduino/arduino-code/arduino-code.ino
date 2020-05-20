@@ -2,13 +2,13 @@
 #include <RCSwitch.h>
 #include <IRremote.h>
 
-bool recv433 = false;
+bool recv433 = true;
 bool recvIR = false;
 
 const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;       // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
-//const int VCC_EMIT_PIN = 48;
-//const int GND_EMIT_PIN = 46;
+const int VCC_EMIT_PIN = 48;
+const int GND_EMIT_PIN = 46;
 
 // Serial buffer
 String command = "";
@@ -45,7 +45,7 @@ void emit_433_chacon(unsigned long code, int data_pin) {            // Fonction 
   }
 }
 
-void recv_433(bool isEnabled, int data_pin){
+void recv_433(bool isEnabled, int data_pin) {
   mySwitch.enableReceive(data_pin);
   recv433 = isEnabled;
 }
@@ -197,10 +197,12 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
 
-  //pinMode(GND_EMIT_PIN, OUTPUT);
-  //pinMode(VCC_EMIT_PIN, OUTPUT);
-  //digitalWrite(VCC_EMIT_PIN, HIGH);
-  //digitalWrite(GND_EMIT_PIN, LOW);
+  pinMode(GND_EMIT_PIN, OUTPUT);
+  pinMode(VCC_EMIT_PIN, OUTPUT);
+  digitalWrite(VCC_EMIT_PIN, HIGH);
+  digitalWrite(GND_EMIT_PIN, LOW);
+
+  recv_433(true,0);
 
   // Start the IR receivers
   //irrecv_led.enableIRIn();
@@ -210,7 +212,7 @@ void loop() {
   //detectChacon();
   //detectIR_LED();
 
-  if(recv433){                                                     // Partie réception 433 MHz
+  if (recv433) {                                                   // Partie réception 433 MHz
     if (mySwitch.available()) {
       int value = mySwitch.getReceivedValue();
       if (value == 0) {
@@ -224,15 +226,15 @@ void loop() {
       mySwitch.resetAvailable();
     }
   }
-  
+
   /*unsigned long sender = 0;
 
-  if (sender != 0) {
+    if (sender != 0) {
     Serial.print("{\"action\":\"received\",\"value\":");
     Serial.print(sender);
     Serial.println("}");
     delay(200);
-  }*/
+    }*/
 
   /*                                                             // Fonction à appeler dans void loop() pour permettre la détection de signaux IR de la TV
     if (irrecv_tv.decode(&results)) {

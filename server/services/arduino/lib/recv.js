@@ -5,13 +5,16 @@ const Readline = require('@serialport/parser-readline');
 
 /**
  * @description Send a message to the Arduino
- * @param {Object} device - The Arduino device.
+ * @param {Object} device - The device.
  * @example
  * recv(device);
  */
 async function recv(device) {
   try {
-    const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    const arduino = await this.gladys.device.getBySelector(
+      device.params.find((param) => param.name === 'ARDUINO_LINKED').value
+    );
+    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
     const port = new SerialPort(arduinoPath, {
       baudRate: 9600,
