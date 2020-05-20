@@ -14,7 +14,7 @@ const ButtonDeviceType = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class="fe fe-target" />
+        <i class="fe fe-circle" />
       </td>
       <td>{props.device.name}</td>
       <td class="text-right">
