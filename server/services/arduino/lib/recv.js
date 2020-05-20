@@ -5,7 +5,7 @@ const setParam = require('./setParam');
 //const Readline = SerialPort.parsers.Readline;
 
 /**
- * @description Send a message to the Arduino
+ * @description Receive a message from the Arduino
  * @param {Object} device - The device.
  * @example
  * recv(device);

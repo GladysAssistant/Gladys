@@ -1,13 +1,11 @@
 const logger = require('../../../utils/logger');
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
-//const Readline = SerialPort.parsers.Readline;
 
 /**
- * @description Send a message to the Arduino
+ * @description Set a param
  * @param {Object} device - The device.
+ * @param {Object} data - The data tl set.
  * @example
- * recv(device);
+ * setParam(device, data);
  */
 async function setParam(device, data) {
   try {
