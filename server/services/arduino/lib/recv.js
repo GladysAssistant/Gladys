@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const setParam = require('./setParam');
+const { setParam } = require('./setParam');
 //const Readline = SerialPort.parsers.Readline;
 
 /**
@@ -28,7 +28,7 @@ async function recv(device) {
     if (!port.isOpen) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
-        this.setParam({ id: device.id }, 'CODE', data.toString('utf8'));
+        setParam({ id: device.id }, 'CODE', data.toString('utf8'));
       });
     }
   } catch (e) {
