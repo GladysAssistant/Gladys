@@ -7,8 +7,8 @@ bool recvIR = false;
 
 const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;       // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
-const int VCC_EMIT_PIN = 48;
-const int GND_EMIT_PIN = 46;
+//const int VCC_EMIT_PIN = 48;
+//const int GND_EMIT_PIN = 46;
 
 // Serial buffer
 String command = "";
@@ -197,10 +197,10 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
 
-  pinMode(GND_EMIT_PIN, OUTPUT);
-  pinMode(VCC_EMIT_PIN, OUTPUT);
-  digitalWrite(VCC_EMIT_PIN, HIGH);
-  digitalWrite(GND_EMIT_PIN, LOW);
+  //pinMode(GND_EMIT_PIN, OUTPUT);
+  //pinMode(VCC_EMIT_PIN, OUTPUT);
+  //digitalWrite(VCC_EMIT_PIN, HIGH);
+  //digitalWrite(GND_EMIT_PIN, LOW);
 
   recv_433(true,0);
 
