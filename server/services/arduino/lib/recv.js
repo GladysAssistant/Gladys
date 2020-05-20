@@ -28,7 +28,7 @@ async function recv(device) {
     if (!port.isOpen) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
-        setParam({ id: device.id }, 'CODE', data.toString('utf8'));
+        setParam({ id: device.id }, data.toString('utf8'));
       });
     }
   } catch (e) {
