@@ -1,8 +1,6 @@
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-//const { setParam } = require('./setParam');
-//const Readline = SerialPort.parsers.Readline;
 
 /**
  * @description Receive a message from the Arduino
@@ -21,7 +19,6 @@ async function recv(device) {
     const port = new SerialPort(arduinoPath, {
       baudRate: 9600,
       lock: false,
-      //parser: new Readline('\n'),
     });
 
     const parser = port.pipe(new Readline({ delimiter: '\n' }));
@@ -29,7 +26,6 @@ async function recv(device) {
     if (!port.isOpen) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
-        //setParam(gladys, { id: device.id }, data.toString('utf8'));
         gladys.device.setParam({ id: device.id }, 'CODE', data.toString('utf8'));
       });
     }
