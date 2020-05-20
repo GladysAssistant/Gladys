@@ -340,6 +340,20 @@ class ArduinoDeviceBox extends Component {
                         </div>
                       </div>
 
+                      <label class="form-label" for="bitLength">
+                        <Text id="integration.arduino.device.bitLengthLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="bitLength"
+                          type="text"
+                          value={props.device.params.find((e) => e.name === 'BIT_LENGTH').value}
+                          onInput={this.updateBitLength}
+                          class="form-control"
+                          placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
+                        />
+                      </Localizer>
+
                       <label class="form-label" for="pulseLength">
                         <Text id="integration.arduino.device.pulseLengthLabel" />
                       </label>
