@@ -99,7 +99,7 @@ const actions = (store) => {
         arduinoDevices,
       });
     },
-    updateArduinoPath(state, index, value) {
+    updateArduinoPath(state, index, path, serialNumber, productId, vendorId) {
       let arduinoPathIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PATH');
       let arduinoSerialNumberIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_SERIAL_NUMBER');
       let arduinoProductIdIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PRODUCT_ID');
@@ -109,22 +109,22 @@ const actions = (store) => {
           params: {
             [arduinoPathIndex]: {
               value: {
-                $set: value.comPath,
+                $set: path,
               },
             },
             [arduinoSerialNumberIndex]: {
               value: {
-                $set: value.serialNumber,
+                $set: serialNumber,
               },
             },
             [arduinoProductIdIndex]: {
               value: {
-                $set: value.productId,
+                $set: productId,
               },
             },
             [arduinoVendorIdIndex]: {
               value: {
-                $set: value.vendorId,
+                $set: vendorId,
               },
             },
           },
