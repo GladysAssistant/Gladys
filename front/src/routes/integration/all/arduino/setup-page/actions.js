@@ -79,6 +79,18 @@ const actions = (store) => {
                 name: 'ARDUINO_MODEL',
                 value: null,
               },
+              {
+                name: 'ARDUINO_SERIAL_NUMBER',
+                value: null,
+              },
+              {
+                name: 'ARDUINO_PRODUCT_ID',
+                value: null,
+              },
+              {
+                name: 'ARDUINO_VENDOR_ID',
+                value: null,
+              },
             ],
           },
         ],
@@ -89,12 +101,30 @@ const actions = (store) => {
     },
     updateArduinoPath(state, index, value) {
       let arduinoPathIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PATH');
+      let arduinoSerialNumberIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_SERIAL_NUMBER');
+      let arduinoProductIdIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PRODUCT_ID');
+      let arduinoVendorIdIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_VENDOR_ID');
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
             [arduinoPathIndex]: {
               value: {
-                $set: value,
+                $set: value.comPath,
+              },
+            },
+            [arduinoSerialNumberIndex]: {
+              value: {
+                $set: value.serialNumber,
+              },
+            },
+            [arduinoProductIdIndex]: {
+              value: {
+                $set: value.productId,
+              },
+            },
+            [arduinoVendorIdIndex]: {
+              value: {
+                $set: value.vendorId,
               },
             },
           },

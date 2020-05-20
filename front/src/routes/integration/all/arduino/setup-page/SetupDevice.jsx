@@ -142,7 +142,7 @@ class SetupDevice extends Component {
                     {props.usbPorts &&
                       props.usbPorts.map((usbPort) => (
                         <option
-                          value={usbPort.comPath}
+                          value={usbPort}
                           selected={
                             props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath
                           }
