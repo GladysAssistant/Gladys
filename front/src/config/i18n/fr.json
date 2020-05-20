@@ -698,7 +698,8 @@
       "features": {
         "lightButton": "Lumière",
         "switchButton": "Interrupteur",
-        "pushButton": "Bouton"
+        "pushButton": "Bouton",
+        "sensor": "Capteur"
       }
     },
     "xiaomi": {
