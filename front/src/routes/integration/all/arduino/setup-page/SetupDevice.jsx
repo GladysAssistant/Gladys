@@ -40,16 +40,19 @@ class SetupDevice extends Component {
   uploadCode = async () => {
     this.setState({
       loading: true,
+      uploadingCode: RequestStatus.Getting,
     });
     try {
       await this.props.uploadCode(this.props.deviceIndex);
     } catch (e) {
       this.setState({
         error: RequestStatus.Error,
+        uploadingCode: RequestStatus.Success,
       });
     }
     this.setState({
       loading: false,
+      uploadingCode: RequestStatus.Error,
     });
   };
 
@@ -58,12 +61,18 @@ class SetupDevice extends Component {
   };
 
   updateArduinoPath = (e) => {
-    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value.split(',')[0], e.target.value.split(',')[1], e.target.value.split(',')[2], e.target.value.split(',')[3]);
+    this.props.updateArduinoPath(
+      this.props.deviceIndex,
+      e.target.value.split(',')[0],
+      e.target.value.split(',')[1],
+      e.target.value.split(',')[2],
+      e.target.value.split(',')[3]
+    );
   };
 
   updateArduinoManufacturer = (e) => {
     this.props.updateArduinoManufacturer(this.props.deviceIndex, e.target.value);
-  }
+  };
 
   updateArduinoModel = (e) => {
     this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
@@ -137,13 +146,13 @@ class SetupDevice extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {ARDUINO_MODEL.map((model) => (
-                        <option
-                          value={model.NAME}
-                          selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model.NAME}
-                        >
-                          {model.LABEL}
-                        </option>
-                      ))}
+                      <option
+                        value={model.NAME}
+                        selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model.NAME}
+                      >
+                        {model.LABEL}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div class="form-group">
@@ -160,7 +169,8 @@ class SetupDevice extends Component {
                           value={[usbPort.comPath, usbPort.serialNumber, usbPort.productId, usbPort.vendorId]}
                           selected={
                             props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath ||
-                            props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value === usbPort.serialNumber
+                            props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value ===
+                              usbPort.serialNumber
                           }
                         >
                           {usbPort.comName} - {usbPort.manufacturer}
