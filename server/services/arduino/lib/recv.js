@@ -12,7 +12,8 @@ const { setParam } = require('./setParam');
  */
 async function recv(device) {
   try {
-    const arduino = await this.gladys.device.getBySelector(
+    const gladys = this.gladys;
+    const arduino = await gladys.device.getBySelector(
       device.params.find((param) => param.name === 'ARDUINO_LINKED').value
     );
     const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
@@ -28,7 +29,7 @@ async function recv(device) {
     if (!port.isOpen) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
-        setParam({ id: device.id }, data.toString('utf8'));
+        setParam(gladys, { id: device.id }, data.toString('utf8'));
       });
     }
   } catch (e) {

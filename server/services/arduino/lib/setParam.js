@@ -7,9 +7,9 @@ const logger = require('../../../utils/logger');
  * @example
  * setParam(device, data);
  */
-async function setParam(device, data) {
+async function setParam(gladys, device, data) {
   try {
-    const done = await this.gladys.device.setParam({ id: device.id }, 'CODE', data.toString('utf8'));
+    const done = await gladys.device.setParam({ id: device.id }, 'CODE', data.toString('utf8'));
   } catch (e) {
     logger.warn('Unable to update param');
     logger.debug(e);
