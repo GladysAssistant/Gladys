@@ -254,45 +254,7 @@ class ArduinoDeviceBox extends Component {
                     </select>
                   </div>
 
-                  {/*props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR && (
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col">
-                          <label class="form-label" for="code">
-                            <Text id="integration.arduino.device.codeLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="code"
-                              type="text"
-                              value={props.device.params.find((e) => e.name === 'CODE').value}
-                              onInput={this.updateCode}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.codeLabel" />}
-                            />
-                          </Localizer>
-                        </div>
-                        <div class="col">
-                          <label class="form-label" for="pulseLength">
-                            <Text id="integration.arduino.device.pulseLengthLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="pulseLength"
-                              type="text"
-                              value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
-                              onInput={this.updatePulseLength}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
-                            />
-                          </Localizer>
-                        </div>
-                      </div>
-                    </div>
-                  )*/}
-
-                  {(props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_IR ||
-                    props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433) && (
+                  {(props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH) && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
@@ -342,7 +304,7 @@ class ArduinoDeviceBox extends Component {
                     </div>
                   )}
 
-                  {props.device.params.find((e) => e.name === 'FUNCTION').value === DEVICE_FUNCTION.EMIT_433_CHACON && (
+                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SWITCH.BINARY && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
