@@ -58,7 +58,7 @@ class SetupDevice extends Component {
   };
 
   updateArduinoPath = (e) => {
-    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value.split(',')[0], e.target.value.split(',')[1], e.target.value.productId, e.target.value.vendorId);
+    this.props.updateArduinoPath(this.props.deviceIndex, e.target.value.split(',')[0], e.target.value.split(',')[1], e.target.value.split(',')[2], e.target.value.split(',')[3]);
   };
 
   updateArduinoManufacturer = (e) => {
@@ -142,7 +142,7 @@ class SetupDevice extends Component {
                     {props.usbPorts &&
                       props.usbPorts.map((usbPort) => (
                         <option
-                          value={[usbPort.comPath, usbPort.serialNumber]}
+                          value={[usbPort.comPath, usbPort.serialNumber, usbPort.productId, usbPort.vendorId]}
                           selected={
                             props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath
                           }
