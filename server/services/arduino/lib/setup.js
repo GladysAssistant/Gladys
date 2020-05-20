@@ -23,6 +23,7 @@ async function setup(device) {
       function (error) {
         if (error) {
           logger.warn(error);
+          throw error;
         } else {
           logger.warn('Flashing done!');
         }
