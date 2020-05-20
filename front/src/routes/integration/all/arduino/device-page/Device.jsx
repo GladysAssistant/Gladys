@@ -247,7 +247,7 @@ class ArduinoDeviceBox extends Component {
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.pushButton" />
                       </option>
-                      <option value={[DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.INTEGER]}>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.INTEGER]}>
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.sensor" />
                       </option>
