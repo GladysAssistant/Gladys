@@ -118,7 +118,7 @@ const actions = (store) => {
             params: [
               {
                 name: 'DATA_PIN',
-                value: null,
+                value: '0',
               },
               {
                 name: 'FUNCTION',
