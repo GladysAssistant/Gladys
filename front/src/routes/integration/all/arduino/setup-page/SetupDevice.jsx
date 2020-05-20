@@ -80,7 +80,7 @@ class SetupDevice extends Component {
 
   componentWillMount() {}
 
-  render(props, { loading }) {
+  render(props, { loading, uploadingCode }) {
     return (
       <div class="card-body">
         <div
@@ -90,17 +90,17 @@ class SetupDevice extends Component {
         >
           <div class="loader" />
           <div class="dimmer-content">
-            {props.uploadingCode === RequestStatus.Getting && (
+            {uploadingCode === RequestStatus.Getting && (
               <p class="alert alert-info">
                 <Text id="integration.arduino.setup.flashing" />
               </p>
             )}
-            {props.uploadingCode === RequestStatus.Success && (
+            {uploadingCode === RequestStatus.Success && (
               <p class="alert alert-success">
                 <Text id="integration.arduino.setup.flashingSuccess" />
               </p>
             )}
-            {props.uploadingCode === RequestStatus.Error && (
+            {uploadingCode === RequestStatus.Error && (
               <p class="alert alert-danger">
                 <Text id="integration.arduino.setup.flashingError" />
               </p>

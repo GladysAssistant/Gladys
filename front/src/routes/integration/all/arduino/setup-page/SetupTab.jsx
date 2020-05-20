@@ -56,7 +56,7 @@ const SetupTab = ({ children, ...props }) => {
                     updateArduinoManufacturer={props.updateArduinoManufacturer}
                     updateArduinoName={props.updateArduinoName}
                     uploadCode={props.uploadCode}
-                    uploadingCode={props.uploadingCode}
+                    //uploadingCode={props.uploadingCode}
                     saveDevice={props.saveDevice}
                     deleteDevice={props.deleteDevice}
                     /*arduinoModelsList={props.arduinoModelsList}*/
