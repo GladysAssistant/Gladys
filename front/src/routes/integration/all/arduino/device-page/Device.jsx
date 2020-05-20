@@ -205,21 +205,23 @@ class ArduinoDeviceBox extends Component {
                           </option>
                         </select>
                       </div>
-                      <div class="col">
-                        <label class="form-label" for="dataPin">
-                          <Text id="integration.arduino.device.dataPinLabel" />
-                        </label>
-                        <Localizer>
-                          <input
-                            id="dataPin"
-                            type="text"
-                            value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
-                            onInput={this.updateDataPin}
-                            class="form-control"
-                            placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
-                          />
-                        </Localizer>
-                      </div>
+                      {props.device.params.find((e) => e.name === 'FUNCTION').value !== DEVICE_FUNCTION.RECV_433 && (
+                        <div class="col">
+                          <label class="form-label" for="dataPin">
+                            <Text id="integration.arduino.device.dataPinLabel" />
+                          </label>
+                          <Localizer>
+                            <input
+                              id="dataPin"
+                              type="text"
+                              value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
+                              onInput={this.updateDataPin}
+                              class="form-control"
+                              placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
+                            />
+                          </Localizer>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -230,7 +232,7 @@ class ArduinoDeviceBox extends Component {
                     <select
                       class="form-control"
                       id="feature"
-                      value={[props.device.features[0].category,props.device.features[0].type]}
+                      value={[props.device.features[0].category, props.device.features[0].type]}
                       onChange={this.updateFeature}
                     >
                       <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY]}>

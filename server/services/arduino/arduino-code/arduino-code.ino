@@ -16,7 +16,6 @@ String command = "";
 // End of command marker
 char endMarker = '%';
 
-
 //IRrecv irrecv_led(DATA_RECV_PIN_IR_LED);
 //IRrecv irrecv_tv(DATA_RECV_PIN_IR_TV);
 
@@ -24,7 +23,6 @@ IRsend ir_send;                                                  // Crée une in
 RCSwitch mySwitch = RCSwitch();                                  // Crée une instance pour la réception 433 MHz (pin 2)
 
 decode_results results;                                         // Variable contenant le résultat des réceptions IR
-
 
 /*
    Functions that will be called by Gladys
@@ -52,10 +50,6 @@ void recv_433(bool isEnabled, int data_pin){
   recv433 = isEnabled;
 }
 
-
-
-
-
 /*
   void detectIR_LED(){                                              // Fonction à appeler dans void loop() pour permettre la détection de signaux IR du ruban LED
     if (irrecv_led.decode(&results)) {
@@ -78,22 +72,7 @@ void recv_433(bool isEnabled, int data_pin){
     }
   }
 
-  void detectRadio(){                                               // Fonction à appeler dans void loop() pour permettre la détection de signaux Radio
-    if (mySwitch.available()) {
-      int value = mySwitch.getReceivedValue();
-      if (value == 0) {
-        Serial.print("Unknown encoding");
-      } else {
-        Serial.print("{\"action\":\"received\",\"value\":");
-        Serial.print( mySwitch.getReceivedValue() );
-        Serial.println("}");
-      }
-      delay(200);
-      mySwitch.resetAvailable();
-    }
-  }
 */
-
 
 /*
    Fonction permettant d'envoyer un signal radio Chacon
@@ -144,7 +123,7 @@ void emit(unsigned long code, int data_pin) {
 void executeFunction(String json_data) {
   StaticJsonBuffer<400> jsonBuffer;
   JsonObject& v = jsonBuffer.parseObject(json_data);
-  //on décompose la chaine de cartère
+  //on décompose la chaine de caractère
   if ( v["function_name"] == String("emit_433") ) {
     emit_433(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
   }
@@ -223,19 +202,12 @@ void setup() {
   //digitalWrite(VCC_EMIT_PIN, HIGH);
   //digitalWrite(GND_EMIT_PIN, LOW);
 
-  /*// Optional set pulse length.
-    mySwitch.setPulseLength(310);
-
   // Start the IR receivers
   //irrecv_led.enableIRIn();
-  //irrecv_tv.enableIRIn();
-
-  //delay(1000);*/
 }
 
 void loop() {
   //detectChacon();
-  //detectRadio();
   //detectIR_LED();
 
   if(recv433){                                                     // Partie réception 433 MHz
@@ -244,9 +216,9 @@ void loop() {
       if (value == 0) {
         Serial.print("Unknown encoding");
       } else {
-        Serial.print("{\"action\":\"received\",\"value\":");
+        Serial.print("{\"function_name\":\"recv_433\",\"parameters\":{\"value\":");
         Serial.print( mySwitch.getReceivedValue() );
-        Serial.println("}");
+        Serial.println("}}");
       }
       delay(200);
       mySwitch.resetAvailable();
