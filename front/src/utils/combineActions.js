@@ -8,7 +8,7 @@ function combineActions(...allActions) {
     allActions.reduce((combined, actions) => {
       actions = actions(store);
       for (let i in actions) {
-        if(actions.hasOwnProperty(i)) {
+        if (actions.hasOwnProperty(i)) {
           if (combined[i]) throw new Error('Have a repeat action name: ' + i);
           let action = actions[i];
           combined[i] = action;

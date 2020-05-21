@@ -16,7 +16,7 @@ const actions = store => ({
           const returnValue = await state.httpClient.post('/api/v1/service/oauth2/buildTokenAccessUri', {
             integrationName: 'withings',
             authorizationCode: queryParams.code,
-            serviceId,
+            serviceId
           });
 
           await state.httpClient.post('/api/v1/service/withings/init', {

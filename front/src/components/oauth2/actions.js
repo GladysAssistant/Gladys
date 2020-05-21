@@ -65,7 +65,7 @@ const actions = store => ({
       } else {
         store.setState({
           oauth2GetStatus: RequestStatus.Error,
-          oauth2ErrorMsg: 'errorServiceId',
+          oauth2ErrorMsg: 'errorServiceId'
         });
       }
 
@@ -73,7 +73,7 @@ const actions = store => ({
         clientId: state.clientId,
         secretId: state.secretId,
         integrationName: state.integrationName,
-        serviceId,
+        serviceId
       });
       if (returnValue.success === true) {
         window.location = returnValue.authorizationUri;
@@ -81,8 +81,8 @@ const actions = store => ({
         store.setState({
           oauth2GetStatus: RequestStatus.Error,
           oauth2ErrorMsg: 'errorAuthorizationUri'
-      });
-      return;
+        });
+        return;
       }
     } catch (e) {
       store.setState({
