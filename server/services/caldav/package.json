@@ -1,0 +1,22 @@
+{
+  "name": "gladys-caldav",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "bluebird": "^3.7.0",
+    "dav-request": "^1.8.0",
+    "ical": "^0.6.0",
+    "moment": "^2.24.0",
+    "xmldom": "^0.1.27"
+  }
+}

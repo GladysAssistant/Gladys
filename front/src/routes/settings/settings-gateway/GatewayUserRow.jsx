@@ -13,10 +13,10 @@ class GatewayUserRow extends Component {
         <td class={style.userNameCell}>
           {props.user.name}
           <div class="small text-muted">
-            <Text id="gateway.userRsaKey" />: {props.user.rsa_public_key}
+            <Text id="gateway.userRsaKey" /> {props.user.rsa_public_key}
           </div>
           <div class="small text-muted">
-            <Text id="gateway.userEcdsaKey" />: {props.user.ecdsa_public_key}
+            <Text id="gateway.userEcdsaKey" /> {props.user.ecdsa_public_key}
           </div>
         </td>
         <td class="text-right">

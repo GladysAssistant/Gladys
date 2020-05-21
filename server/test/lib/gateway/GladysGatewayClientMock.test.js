@@ -47,6 +47,18 @@ const GladysGatewayClientMock = function() {
     disconnect: fake.returns(null),
     newEventInstance: fake.returns(null),
     generateFingerprint: fake.resolves('fingerprint'),
+    getUsersInstance: fake.resolves([
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key:
+          'e1:6d:44:cb:f7:89:89:14:79:36:49:c1:65:3a:cc:ab:88:c7:20:93:55:c8:cf:a6:dd:d0:7e:b9:49:6f:56:f7',
+        ecdsa_public_key:
+          '85:22:77:36:a0:02:cd:0b:18:9d:bc:d7:df:ea:18:4d:c7:f1:70:b7:8e:7a:7d:e7:da:21:9e:55:62:67:54:3f',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+      },
+    ]),
   };
 };
 

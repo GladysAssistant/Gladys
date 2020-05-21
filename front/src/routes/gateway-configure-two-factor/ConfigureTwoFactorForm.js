@@ -1,3 +1,5 @@
+import { Text, MarkupText, Localizer } from 'preact-i18n';
+
 const ConfigureTwoFactorForm = ({ children, ...props }) => (
   <div class="page">
     <div class="page-single" style={{ marginTop: '40px' }}>
@@ -5,24 +7,27 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
         <div class="row">
           <div class="col col-login mx-auto">
             <div class="text-center mb-6">
-              <h2>Gladys Gateway</h2>
+              <h2>
+                <Text id="gatewayTwoFactorAuth.title" />
+              </h2>
             </div>
 
             {props.step === 1 && (
               <div class="card">
                 <div class="card-body p-6">
-                  <div class="card-title">Configure Two-Factor Authentication</div>
-                  <p>The security of your Gladys Gateway account is really important to us.</p>
+                  <div class="card-title">
+                    <Text id="gatewayTwoFactorAuth.configureTitle" />
+                  </div>
                   <p>
-                    To ensure that your account remains secure, please enable two-factor authentication using a
-                    two-factor app like Authy on{' '}
-                    <a href="https://itunes.apple.com/us/app/authy/id494168017?mt=8">iOS</a> or{' '}
-                    <a href="https://play.google.com/store/apps/details?id=com.authy.authy">Android</a>.
+                    <Text id="gatewayTwoFactorAuth.securityIsImportant" />
+                  </p>
+                  <p>
+                    <MarkupText id="gatewayTwoFactorAuth.securityApps" />
                   </p>
 
                   <div class="form-footer">
                     <button onClick={props.nextStep} class="btn btn-primary btn-block">
-                      Configure Two-Factor Authentication
+                      <Text id="gatewayTwoFactorAuth.configureTitle" />
                     </button>
                   </div>
                 </div>
@@ -33,19 +38,27 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
               <div class="card">
                 <form onSubmit={props.enableTwoFactor}>
                   <div class="card-body p-6">
-                    <div class="card-title">Configure Two-Factor Authentication</div>
+                    <div class="card-title">
+                      <Text id="gatewayTwoFactorAuth.configureTitle" />
+                    </div>
 
                     {props.errored && (
                       <div class="alert alert-danger" role="alert">
-                        The 2FA code you provided is not valid.
+                        <Text id="gatewayTwoFactorAuth.invalidCode" />
                       </div>
                     )}
 
                     <p>
                       <ul>
-                        <li>Open your 2FA app</li>
-                        <li>Click on "Add Account"</li>
-                        <li>Scan the QR Code below</li>
+                        <li>
+                          <Text id="gatewayTwoFactorAuth.app.open" />
+                        </li>
+                        <li>
+                          <Text id="gatewayTwoFactorAuth.app.addAccount" />
+                        </li>
+                        <li>
+                          <Text id="gatewayTwoFactorAuth.app.scanQRCode" />
+                        </li>
                       </ul>
                     </p>
 
@@ -56,19 +69,25 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Confirm Two Factor</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        aria-describedby="emailHelp"
-                        placeholder="Enter 6 digits code"
-                        value={props.twoFactorCode}
-                        onInput={props.updateTwoFactorCode}
-                      />
+                      <label class="form-label">
+                        <Text id="gatewayTwoFactorAuth.confirmCode" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="text"
+                          class="form-control"
+                          aria-describedby="emailHelp"
+                          placeholder={<Text id="gatewayTwoFactorAuth.enterCode" />}
+                          value={props.twoFactorCode}
+                          onInput={props.updateTwoFactorCode}
+                        />
+                      </Localizer>
                     </div>
 
                     <div class="form-footer">
-                      <button class="btn btn-primary btn-block">Enable Two-Factor Authentication</button>
+                      <button class="btn btn-primary btn-block">
+                        <Text id="gatewayTwoFactorAuth.enable" />
+                      </button>
                     </div>
                   </div>
                 </form>

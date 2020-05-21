@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import NetworkTab from './NetworkTab';
-import integrationConfig from '../../../../../config/integrations';
 
 @connect('user,zwaveNodesNeighbors,zwaveGetNeighborsStatus', actions)
 class ZwaveNodePage extends Component {
@@ -15,7 +14,7 @@ class ZwaveNodePage extends Component {
 
   render(props, {}) {
     return (
-      <ZwavePage integration={integrationConfig[props.user.language].zwave}>
+      <ZwavePage>
         <NetworkTab {...props} />
       </ZwavePage>
     );

@@ -8,6 +8,11 @@ module.exports = {
       underscored: true,
       freezeTableName: true,
     },
+    retry: {
+      match: [/SQLITE_BUSY/],
+      name: 'query',
+      max: 5,
+    },
     backupsFolder: './gladys-backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
     dockerImage: 'gladysassistant/gladys-4-playground',
@@ -15,12 +20,17 @@ module.exports = {
   },
   test: {
     dialect: 'sqlite',
-    storage: process.env.SQLITE_FILE_PATH || './gladys-test.db',
+    storage: process.env.SQLITE_FILE_PATH || ':memory:',
     operatorsAliases: false,
     logging: false,
     define: {
       underscored: true,
       freezeTableName: true,
+    },
+    retry: {
+      match: [/SQLITE_BUSY/],
+      name: 'query',
+      max: 5,
     },
     backupsFolder: './gladys-backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
@@ -35,6 +45,11 @@ module.exports = {
     define: {
       underscored: true,
       freezeTableName: true,
+    },
+    retry: {
+      match: [/SQLITE_BUSY/],
+      name: 'query',
+      max: 5,
     },
     backupsFolder: process.env.BACKUP_FOLDER || '/var/lib/gladysassistant/backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',

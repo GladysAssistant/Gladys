@@ -1,0 +1,45 @@
+{
+  "STATUS": {
+    "Status": {
+      "ButtonRetain": 0,
+      "ButtonTopic": "0",
+      "FriendlyName": ["Tasmota"],
+      "LedMask": "FFFF",
+      "LedState": 1,
+      "Module": 18,
+      "Power": 0,
+      "PowerOnState": 1,
+      "PowerRetain": 0,
+      "SaveData": 1,
+      "SaveState": 1,
+      "SensorRetain": 0,
+      "SwitchMode": [0, 0, 0, 0, 0, 0, 0, 0],
+      "SwitchRetain": 0,
+      "SwitchTopic": "0",
+      "Topic": "tasmota"
+    }
+  },
+  "STATUS11": {
+    "StatusSTS": {
+      "MqttCount": 1,
+      "Sleep": 50,
+      "SleepMode": "Dynamic",
+      "Wifi": {
+        "AP": 1,
+        "BSSId": "EC:BE:DD:85:1F:E0",
+        "Channel": 1,
+        "LinkCount": 1,
+        "SSId": "ALEX-NETWORK"
+      }
+    }
+  },
+  "STATUS8": {
+    "StatusSNS": {
+      "DHT11": {
+        "Humidity": 65,
+        "Temperature": 23
+      },
+      "TempUnit": "C"
+    }
+  }
+}

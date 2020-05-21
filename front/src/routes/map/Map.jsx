@@ -41,6 +41,7 @@ class MapComponent extends Component {
               zIndexOffset: 1000
             })
             .addTo(this.leafletMap);
+          this.markerArray.push(this.userMarkers[user.id]);
         }
       });
     }
@@ -62,6 +63,7 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
+          this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
@@ -75,6 +77,7 @@ class MapComponent extends Component {
     this.props = props;
     this.userMarkers = {};
     this.houseMarkers = {};
+    this.markerArray = [];
   }
 
   componentDidMount() {
@@ -82,8 +85,13 @@ class MapComponent extends Component {
   }
 
   componentDidUpdate() {
+    this.markerArray = [];
     this.displayHouses();
     this.displayUsers();
+    if (this.markerArray.length >= 1) {
+      const group = leaflet.featureGroup(this.markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
+    }
   }
 
   componentWillUnmount() {

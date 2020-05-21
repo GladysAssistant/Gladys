@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      useragent: {
+        type: DataTypes.TEXT,
+      },
     },
     {},
   );

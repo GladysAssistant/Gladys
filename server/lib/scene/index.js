@@ -3,6 +3,7 @@ const { addScene } = require('./scene.addScene');
 const { create } = require('./scene.create');
 const { checkTrigger } = require('./scene.checkTrigger');
 const { init } = require('./scene.init');
+const { cancelTriggers } = require('./scene.cancelTriggers');
 const { destroy } = require('./scene.destroy');
 const { execute } = require('./scene.execute');
 const { get } = require('./scene.get');
@@ -22,13 +23,13 @@ const SceneManager = function SceneManager(stateManager, event, device, message)
   // @ts-ignore
   this.queue = queue({
     autostart: true,
-    concurrency: 1,
   });
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;
+SceneManager.prototype.cancelTriggers = cancelTriggers;
 SceneManager.prototype.create = create;
 SceneManager.prototype.checkTrigger = checkTrigger;
 SceneManager.prototype.destroy = destroy;

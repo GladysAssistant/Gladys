@@ -12,35 +12,25 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getRtspCameraDevices(state, take, skip) {
+    async getRtspCameraDevices(state) {
       store.setState({
         getRtspCameraStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getRtspCameraOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getRtspCameraOrderDir || 'asc'
         };
         if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
           options.search = state.rtspCameraSearch;
         }
-        const rtspCamerasReceived = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
+        const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
         // find camera url
-        rtspCamerasReceived.forEach(camera => {
+        rtspCameras.forEach(camera => {
           const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
           if (cameraUrlParam) {
             camera.cameraUrl = cameraUrlParam;
           }
         });
-        let rtspCameras;
-        if (skip === 0) {
-          rtspCameras = rtspCamerasReceived;
-        } else {
-          rtspCameras = update(state.rtspCameras, {
-            $push: rtspCamerasReceived
-          });
-        }
         store.setState({
           rtspCameras,
           getRtspCameraStatus: RequestStatus.Success
@@ -195,13 +185,13 @@ function createActions(store) {
       store.setState({
         rtspCameraSearch: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState(), 20, 0);
+      await actions.getRtspCameraDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
         getRtspCameraOrderDir: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState(), 20, 0);
+      await actions.getRtspCameraDevices(store.getState());
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

@@ -1,13 +1,39 @@
 {
   "global": {
+    "logoAlt": "Gladys logo",
     "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>.",
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
-    "emptySelectOption": "---------"
+    "emptySelectOption": "---------",
+    "backButton": "◀️️ Back",
+    "requiredField": "*",
+    "listItem": "{{index}}.",
+    "percentValue": "{{value}}%",
+    "degreeValue": "{{value}}°",
+    "workInProgress": "Work in progress..."
+  },
+  "calendar": {
+    "allDay": "All Day",
+    "previous": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "agenda": "Agenda",
+    "date": "Date",
+    "time": "Time",
+    "event": "Event",
+    "noEventsInRange": "There are no events in this range."
   },
   "login": {
     "title": "Gladys Assistant",
+    "welcome": "Welcome",
+    "createAccountStep": "Create account",
+    "preferencesStep": "Your preferences",
+    "houseStep": "Configure house",
+    "success": "Success!",
     "cardTitle": "Login to your account",
     "loginWithGladysGatewayButton": "Login with Gladys Gateway",
     "emailLabel": "Email Address",
@@ -28,12 +54,11 @@
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the informations you'll enter are just saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
       "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
-      "buttonCreateAccountGladysGateway": "Create account with Gladys Gateway",
+      "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
     "createLocalAccount": {
       "title": "Create your local Gladys account",
-      "backButton": "Back",
       "description": "All informations entered here are only saved locally in Gladys database. You can update them later at any time.",
       "firstnameLabel": "Firstname",
       "firstnamePlaceHolder": "Enter your Firstname",
@@ -73,6 +98,24 @@
       "selectorAlreadyExistError": "A user with this firstname already exist.",
       "createAccountButton": "Create Account"
     },
+    "restoreBackupSetBackupKey": {
+      "title": "Enter your backup key",
+      "description": "As Gladys Plus backups are end-to-end encrypted, we need you to enter your backup key. Your local instance can only decrypt the backup with this backup key.",
+      "backupKeyLabel": "Backup key",
+      "backupKeyPlaceholder": "Enter your backup key",
+      "cancelButton": "Cancel",
+      "saveButton": "Save backup key"
+    },
+    "restoreBackupInProgress": {
+      "title": "Restore in progress...",
+      "description": "At the end of the restore process, Gladys will restart automatically.",
+      "errored": "Backup restore failed, maybe the restore key is not valid",
+      "updateRestoreKeyButton": "Update restore key"
+    },
+    "gatewayBackup": {
+      "title": "Choose a backup",
+      "description": "Choose the backup you want to restore in this list."
+    },
     "preferences": {
       "title": "Your preferences",
       "description": "You can modify those settings anytime later.",
@@ -82,7 +125,13 @@
       "distanceUnit": "Distance unit",
       "distanceUnitMeter": "SI (Meter)",
       "distanceUnitUs": "Imperial/US (Miles)",
-      "deviceStateHistoryDuration": "Keep Device State History",
+      "deviceStateHistoryDuration": {
+        "title": "Keep Device State History",
+        "durationOneWeek": "1 week",
+        "durationOneMonth": "1 month",
+        "durationThreeMonth": "3 months",
+        "unlimited": "Forever"
+      },
       "saveSettingsButton": "Save settings"
     },
     "configureHouse": {
@@ -101,7 +150,8 @@
       "cancelDeleteHouse": "Cancel",
       "conflictError": "A house with the same name already exist.",
       "roomConflictError": "A room with the same name already exist.",
-      "validationError": "Validation error: A house can't have an empty name."
+      "validationError": "House name should be between 1 and 40 characters",
+      "validationErrorRoom": "Room name should be between 1 and 40 characters"
     },
     "success": {
       "title": "Allow me to thank you 🙏",
@@ -127,6 +177,8 @@
       "devices-in-room": "Devices in room"
     },
     "boxes": {
+      "column": "Column {{index}}",
+      "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
@@ -138,7 +190,9 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noValue": "No value recorded"
+        "noValue": "No value recorded",
+        "deviceTitle": "{{name}} - {{type}}",
+        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -146,7 +200,7 @@
       },
       "userPresence": {
         "description": "Display who's at home and who is not.",
-        "left": "Left",
+        "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
         "error": "There was a network error fetching the list of user. Please refresh.",
@@ -163,7 +217,12 @@
   "integration": {
     "root": {
       "title": "Integrations",
+      "subtitle": "1 - {{length}} of {{total}} integrations",
+      "searchPlaceholder": "Search integrations",
+      "restartButton": "Restart",
+      "stopButton": "Stop",
       "menu": {
+        "all": "All integrations",
         "device": "Devices",
         "communication": "Communication",
         "calendar": "Calendar",
@@ -175,13 +234,17 @@
     },
     "telegram": {
       "title": "Telegram",
+      "description": "Talk to Gladys through Telegram.",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
       "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
       "note": "This link is unique to your account, do not send it to other users.",
-      "configurationError": "We were not able to configure your account. Are you sure this token is valid?"
+      "configurationError": "We were not able to configure your account. Are you sure this token is valid?",
+      "apiKey": "Telegram Bot API Key",
+      "saveButton": "Save"
     },
     "philipsHue": {
       "title": "Philips Hue",
+      "description": "Control Philips Hue Lights.",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
       "setup": {
@@ -200,12 +263,14 @@
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
         "search": "Search devices",
+        "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab."
       }
     },
     "rtspCamera": {
       "title": "Cameras",
+      "description": "HTTP/RTSP cameras in Gladys.",
       "search": "Search cameras",
       "new": "New",
       "nameLabel": "Camera Name",
@@ -226,46 +291,45 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
-    "sonoff": {
-      "title": "Sonoff",
+    "tasmota": {
+      "title": "Tasmota",
+      "description": "Control your Tasmota devices.",
       "deviceTab": "Devices",
       "discoverTab": "MQTT discover",
-      "prepareDeviceDescr": "Or manually prepare future or not discovered devices",
       "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
-        "title": "Sonoff devices in Gladys",
+        "title": "Tasmota devices in Gladys",
         "search": "Search devices",
-        "newButton": "New",
-        "noDeviceFound": "No Sonoff device found. You can add devices with following actions:"
+        "editButton": "Edit",
+        "noDeviceFound": "No Tasmota device found.",
+        "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Sonoff discover devices over MQTT",
-        "description": "Configured Sonoff devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Sonoff devices.",
-        "noDeviceFound": "No Sonoff device discovered.",
-        "documentation": "Sonoff documentation"
+        "title": "Tasmota discover devices over MQTT",
+        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+        "error": "Error discovering Tasmota devices.",
+        "noDeviceFound": "No Tasmota device discovered.",
+        "documentation": "Tasmota documentation",
+        "scan": "Scan"
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Topic (%topic% Sonoff MQTT)",
-      "topicPlaceholder": "Should starts with 'sonoff:'",
-      "modelLabel": "Sonoff Model",
-      "model": {
-        "sonoff-basic": "Basic",
-        "sonoff-pow": "Pow",
-        "sonoff-s2x": "S20/S26 Smart Plug"
-      },
+      "topicLabel": "Tasmota MQTT Topic",
       "saveButton": "Save",
+      "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
       "error": {
         "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current topic is already in use."
       }
     },
     "zwave": {
       "title": "Z-Wave",
+      "description": "Control your Z-Wave devices.",
       "deviceTab": "Devices",
       "networkTab": "Network",
       "settingsTab": "Settings",
@@ -276,11 +340,14 @@
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
+        "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit"
+        "editButton": "Edit",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "setup": {
         "title": "Z-Wave Devices",
@@ -291,6 +358,7 @@
         "scanButton": "Scan",
         "noZwaveDevices": "No Z-Wave devices found. Have you selected your dongle USB port in Settings?",
         "manufacturer": "Manufacturer",
+        "name": "Name",
         "type": "Type",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
@@ -300,6 +368,7 @@
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
+        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
         "deviceCreatedSuccess": "The device was added with success."
       },
       "network": {
@@ -329,9 +398,10 @@
       }
     },
     "darkSky": {
-      "title": "DarkSky API",
+      "title": "DarkSky",
+      "description": "Get the weather in Gladys.",
       "introduction": "This integration helps you integrate with DarkSky API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on DarkSky API website:",
+      "instructions": "You first need to create an account on DarkSky API website: <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
@@ -339,6 +409,7 @@
     },
     "mqtt": {
       "title": "MQTT",
+      "description": "Connect to MQTT server.",
       "deviceTab": "Devices",
       "setupTab": "Setup",
       "status": {
@@ -352,6 +423,7 @@
         "noDevices": "No MQTT devices added yet.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
+        "externalIdLabel": "External ID",
         "roomLabel": "Room",
         "featuresLabel": "Features",
         "noFeatures": "No features",
@@ -362,20 +434,28 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?"
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received."
       },
       "feature": {
         "nameLabel": "Name",
         "namePlaceholder": "Enter feature name",
         "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
         "maxPlaceholder": "Enter feature maximum value",
+        "readOnlyLabel": "Is it a sensor?",
+        "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
+        "mqttTopicExampleLabel": "MQTT Topic",
+        "copyMqttTopic": "Copy MQTT Topic",
+        "copied": "Copied!",
+        "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
       },
       "setup": {
@@ -390,10 +470,13 @@
         "saveLabel": "Save configuration",
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
-        "connected": "Connected to the MQTT broker with success !"
+        "connected": "Connected to the MQTT broker with success !",
+        "connectionError": "Error while connecting, please check your configuration."
       }
     },
     "xiaomi": {
+      "title": "Xiaomi Home",
+      "description": "Display Xiaomi home devices.",
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
@@ -404,7 +487,8 @@
         "featuresLabel": "Features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit details"
+        "editButton": "Edit details",
+        "noFeatures": "No features"
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
@@ -421,12 +505,56 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "caldav": {
+      "title": "CalDAV",
+      "description": "Sync your CalDAV calendars.",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "hostLabel": "CalDAV host",
+      "hostInfo": "Choose your calendar host to be helped during configuration.",
+      "services": {
+        "apple": {
+          "name": "iCloud Calendar",
+          "url": "iCloud URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Apple ID",
+          "usernameInfo": "Enter your Apple ID.",
+          "password": "Password",
+          "passwordInfo": "<a href=https://support.apple.com/en-us/HT204397 target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "other": {
+          "name": "Other",
+          "url": "CalDAV URL",
+          "username": "CalDAV Username",
+          "password": "CalDAV Password"
+        }
+      },
+      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
+      "configurationSuccess": "Auto-configuration done.",
+      "configurationDefaultError": "An error occured during auto-configuration.",
+      "configurationError": "Check settings and CalDAV server status.",
+      "configurationBadCredentialsError": "Check your username/password.",
+      "configurationBadUrlError": "Check your CalDAV server URL.",
+      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
+      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
+      "cleanUpSuccess": "Clean up completed.",
+      "cleanUpError": "An error occured while trying clean up.",
+      "synchronizationSuccess": "Synchronization completed.",
+      "synchronizationDefaultError": "An error occured while trying synchronization.",
+      "synchronizationError": "Check CalDAV server state.",
+      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
+      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
+      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
+      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "buttonSave": "Save",
+      "buttonCleanUp": "Clean Up",
+      "buttonSync": "Sync now"
     }
   },
   "editScene": {
-    "backButton": "Back",
     "startButton": "Start",
     "saveButton": "Save",
+    "runButton": "Run",
     "deleteButton": "Delete",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
@@ -441,6 +569,11 @@
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
+    "triggerCard": {
+      "title": "Triggers",
+      "searchPlaceholder": "Search triggers",
+      "leavingHomeTitle": "Leaving home"
+    },
     "actionsCard": {
       "delay": {
         "label": " This block will wait the specified duration.",
@@ -471,7 +604,7 @@
         "valueLabel": "Value",
         "removeLabel": "Remove",
         "orText": "OR",
-        "orButton": "OR"
+        "orButton": "+ OR"
       }
     },
     "actions": {
@@ -507,6 +640,9 @@
     "triggers": {
       "device": {
         "new-state": "Device state change"
+      },
+      "time": {
+        "changed": "Scheduled trigger"
       }
     },
     "triggersCard": {
@@ -520,6 +656,36 @@
         "valuePlaceholder": "Value",
         "on": "On",
         "off": "Off"
+      },
+      "scheduledTrigger": {
+        "typeLabel": "Type",
+        "everyMonth": "Every month",
+        "everyWeek": "Every week",
+        "everyDay": "Every day",
+        "interval": "Interval",
+        "customTime": "On a specific day",
+        "dateLabel": "Date",
+        "timeLabel": "Time",
+        "unitLabel": "Unit",
+        "intervalLabel": "Interval",
+        "daysOfTheWeekLabel": "Days of the week",
+        "dayOfTheMonthLabel": "Day of the month",
+        "dateFormat": "MM-dd-yyyy",
+        "timeCaption": "Time",
+        "units": {
+          "second": "seconds",
+          "minute": "minutes",
+          "hour": "hours"
+        },
+        "daysOfTheWeek": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        }
       }
     }
   },
@@ -528,6 +694,8 @@
     "editYourProfileTitle": "Edit your profile",
     "userRole": "User",
     "adminRole": "Administrator",
+    "invitationPending": "Pending",
+    "invitationSuccess": "Accepted",
     "firstnameLabel": "Firstname",
     "firstnamePlaceholder": "Enter your firstname",
     "lastnameLabel": "Lastname",
@@ -543,7 +711,6 @@
     "emailLabel": "Email",
     "emailPlaceholder": "Enter your email",
     "languageLabel": "Language",
-    "frenchComingSoon": "(French coming soon for release)",
     "english": "English",
     "french": "Français",
     "passwordLabel": "Password (min 8 characters)",
@@ -564,6 +731,7 @@
     "unknownError": "An unknown error occured. Please try again or contact Gladys community."
   },
   "settings": {
+    "title": "Settings",
     "housesTab": "Houses",
     "sessionsTab": "Sessions",
     "systemTab": "System",
@@ -582,16 +750,17 @@
     "noHouseFound": "No houses found."
   },
   "sessionsSettings": {
-    "registered": "Registered",
+    "registered": "Registered:",
     "session": "Session",
     "revoke": "Revoke",
-    "device": "Device",
+    "unknowDevice": "Unknow device",
     "apiKey": "API Key"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
     "cardTitle": "Recover your password",
     "emailLabel": "Email",
+    "backToLogin": "Back to login",
     "emailPlaceholder": "Enter your email",
     "button": "Recover my password",
     "wrongEmailError": "This is not a valid email",
@@ -599,7 +768,13 @@
     "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
     "success": "Success! You should see a reset password link in Gladys logs.",
     "userNotFound": "There is no account linked to this email.",
-    "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now."
+    "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
+    "invalidEmail": "We are unable to verify your email address.",
+    "validationLinkConfirmation": "Are you sure you clicked/copied the link correctly?",
+    "contactUs": "If it still not working, please contact us on <a href=\"https://twitter.com/gladysassistant\">Twitter</a> or on <a href=\"https://community.gladysassistant.com\">Gladys Community</a>.",
+    "emailConfirmed": "Email Confirmed",
+    "signIn": "Sign in",
+    "confirmationInProgress": "Confirmation in progress..."
   },
   "resetPassword": {
     "title": "Gladys Assistant",
@@ -614,7 +789,9 @@
     "resetTokenNotFound": "Reset token not found",
     "success": "Password reset with success.",
     "clickHereToLogin": "Click here to login",
-    "generateLinkAgain": "Generate new forgot password link"
+    "generateLinkAgain": "Generate new forgot password link",
+    "resetSuccess": "Password reset with success! Click <a href=\"/login\">here</a> to login.",
+    "alreadyHaveAccount": "Already have account? <a href=\"/login\">Sign in</a>"
   },
   "httpErrors": {
     "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
@@ -623,16 +800,15 @@
   },
   "systemSettings": {
     "connected": "Connected",
-    "ping": "ping",
+    "ping": "{{time}} ms ping",
     "disk": "Disk",
     "uptime": "Uptime",
     "gladysVersion": "Version",
+    "gladysVersionValue": "Gladys {{version}}",
     "operations": "Operations",
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
     "download": "Download",
-    "restartGladys": "Restart Gladys",
-    "restartButton": "Restart",
     "notAvailable": "Not available on custom install.",
     "containers": "Containers",
     "containerName": "Name",
@@ -661,6 +837,7 @@
     "sceneAlreadyExist": "A scene with that name already exist."
   },
   "scene": {
+    "title": "Scenes",
     "emptySceneSentenceTop": "Can't find any scenes.",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -684,11 +861,15 @@
     "usersListTitle": "Remote users",
     "userColumn": "User",
     "statusColumn": "Status",
-    "userRsaKey": "RSA key",
-    "userEcdsaKey": "ECDSA key",
+    "userRsaKey": "RSA key:",
+    "userEcdsaKey": "ECDSA key:",
     "usersListDescription": "To ensure that your local instance remains secure, you need to manually grant access to each users in this list.",
     "disconnectTitle": "Disconnect your Plus account",
-    "disconnectButton": "Disconnect"
+    "disconnectButton": "Disconnect",
+    "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
+    "gatewayConnectedSuccessDescription": "Your Gladys instance was connected with success.",
+    "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
+    "gatewayConnectedSuccessButton": "I saved the backup key!"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
@@ -724,7 +905,8 @@
     "unknownError": "An unknown error occurred. Please contact us for more informations.",
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
-    "loginTwoFactorButtonText": "Finalize Login"
+    "loginTwoFactorButtonText": "Finalize Login",
+    "invalidTwoFactorCode": "Two Factor code is invalid."
   },
   "gatewayBackup": {
     "title": "Backups",
@@ -742,11 +924,15 @@
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
-    "fahrenheit": "Fahrenheit (°F)"
+    "fahrenheit": "Fahrenheit (°F)",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
-    "fahrenheit": "°F"
+    "fahrenheit": "°F",
+    "percent": "%",
+    "ppm": "ppm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -756,7 +942,9 @@
       "color": "Light Color",
       "saturation": "Light Saturation",
       "temperature": "Light Temperature",
-      "power": "Light Power consumption"
+      "power": "Light Power consumption",
+      "effect-mode": "Effect mode",
+      "effect-speed": "Effect speed"
     },
     "battery": {
       "integer": "Battery"
@@ -778,12 +966,18 @@
     "camera": {
       "image": "Camera"
     },
+    "counter-sensor": {
+      "integer": "Counter"
+    },
     "access-control": {
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
       "binary": "Smoke",
       "decimal": "Density"
+    },
+    "co2-sensor": {
+      "decimal": "Co2"
     },
     "switch": {
       "voltage": "Switch Voltage",
@@ -835,13 +1029,16 @@
   },
   "chat": {
     "whatCanYouAsk": "What can I ask?",
-    "whatsTheWeatherLike": "What's the weather like?",
-    "whatsTheTemperatureKitchen": "What's the temperature in the kitchen?",
-    "showCameraImage": "Show me camera image in the kitchen",
     "emptyStateMessage": "Send me a message!",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
-    "typingInProgress": "Typing..."
+    "typingInProgress": "Typing...",
+    "gladysAlt": "Gladys",
+    "examples": {
+      "whatsTheWeatherLike": "\"What's the weather like?\"",
+      "whatsTheTemperatureKitchen": "\"What's the temperature in the kitchen?\"",
+      "showCameraImage": "\"Show me camera image in the kitchen\""
+    }
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
@@ -860,24 +1057,33 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
+    "description": "Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click ",
-    "here": "here"
+    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
   },
   "editDeviceForm": {
-    "returnButton": "Return back",
     "noName": "No name",
     "nameLabel": "Name",
     "roomLabel": "Room",
     "featuresLabel": "Features",
+    "noFeatures": "No features",
     "namePlaceholder": "Enter name",
     "externalIdLabel": "External ID",
     "externalIdPlaceholder": "Enter external ID",
     "unitLabel": "Unit",
     "saveButton": "Save",
-    "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API."
+    "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API.",
+    "minLabel": "Minimum value",
+    "minPlaceholder": "Enter feature minimum value",
+    "maxLabel": "Maximum value",
+    "maxPlaceholder": "Enter feature maximum value",
+    "addButton": "Add feature",
+    "deleteLabel": "Delete feature",
+    "saveError": "Error saving or deleting device",
+    "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+    "notFound": "Requested device not found."
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -896,8 +1102,9 @@
     "emailAddress": "Email Address",
     "emailAddressPlaceholder": "Enter Email",
     "cardInformations": "Card Informations",
-    "paymentSecuredBy": "Payment Secured by",
+    "paymentSecuredByStripe": "🔒 Payment Secured by <a href=\"https://stripe.com/docs/security/stripe\" target=\"_blank\" rel=\"noopener noreferrer\">Stripe</a>",
     "subscribeButton": "Subscribe (9.99€/month)",
+    "priceButton": "9.99€/month",
     "invalidEmailAddress": "Invalid Email Adress",
     "emailAlreadyExist": "An account with this email address already exist!",
     "paymentFailed": "Payment failed. Please try again or try with a different card.",
@@ -915,17 +1122,90 @@
   },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
-    "formTitle": "Gladys Plus - Reset Password"
+    "formTitle": "Gladys Plus - Reset Password",
+    "incompatibleBrowserLabel": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API as well as IndexedDB database.",
+    "errorLinkLabel": "We cannot retrieve your reset password link. Maybe it was already used or has expired!",
+    "passwordNotMatchingLabel": "Password are not matching.",
+    "passwordLabel": "Password (min 8 characters)",
+    "passwordPlaceholder": "Password",
+    "passwordInvalid": "Password should be 8 characters",
+    "repeatPasswordLabel": "Repeat Password",
+    "twoFactorCodeLabel": "Two factor code",
+    "twoFactorCodePlaceholder": "6 digits two factor code",
+    "resetPasswordButton": "Reset Password"
   },
   "gatewayOpenApi": {
     "title": "Open API",
     "description": "The Open API allows you to send informations to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "More informations.",
+    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/en/configuration#gateway-open-api\">More informations.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",
     "revoke": "Revoke",
     "generateButton": "Generate",
-    "registered": "Registered"
+    "registered": "Registered",
+    "keyNameLabel": "Name:",
+    "registeredLabel": "Registered:",
+    "neverUsed": "Never"
+  },
+  "gatewayTwoFactorAuth": {
+    "title": "Gladys Gateway",
+    "configureTitle": "Configure Two-Factor Authentication",
+    "securityIsImportant": "The security of your Gladys Gateway account is really important to us.",
+    "securityApps": "To ensure that your account remains secure, please enable two-factor authentication using a two-factor app like Authy on <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> or <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "invalidCode": "The 2FA code you provided is not valid.",
+    "confirmCode": "Confirm Two Factor",
+    "enterCode": "Enter 6 digits code",
+    "enable": "Enable Two-Factor Authentication",
+    "app": {
+      "open": "Open your 2FA app",
+      "addAccount": "Click on \"Add Account\"",
+      "scanQRCode": "Scan the QR Code below"
+    }
+  },
+  "gatewaySignUp": {
+    "generatingKey": "Generating your public/private keys...",
+    "complete": "Done! Please check your emails.",
+    "done": "Done! You can now login <a href=\"/login\" style=\"color: blue\">here</a>.",
+    "usernameLabel": "Name",
+    "usernamePlaceholder": "Enter name",
+    "usernameInvalid": "Name should be between 2 and 30 characters",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter email",
+    "emailInvalid": "Email is not valid",
+    "passwordLabel": "Password (min 8 characters)",
+    "passwordPlaceholder": "Password",
+    "passwordInvalid": "Password should be 8 characters",
+    "createAccountButton": "Create new account"
+  },
+  "gatewayUsers": {
+    "managerUsersLabel": "Manage your users",
+    "revokeError": "You cannot revoke this user.",
+    "columnName": "Name",
+    "columnRole": "Role",
+    "columnStatus": "Status",
+    "columnAddDate": "Added at",
+    "columnRevoke": "Revoke",
+    "emailPlaceholder": "Email",
+    "roleAdmin": "Administrator",
+    "roleUser": "User",
+    "inviteUserButton": "Invite User"
+  },
+  "gatewayBilling": {
+    "title": "Billing",
+    "informationTitle": "Your billing informations",
+    "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
+    "cardTypeLabel": "Type",
+    "cardLastDigitsLabel": "Last 4 digits",
+    "cardExpirationLabel": "Expiration date",
+    "updateInformationTitle": "Update Card Informations",
+    "updateInformationDescription": "If your card has expired, or you want to change credit card, you can update here your card information.",
+    "cancelSubscriptionTitle": "Cancel subscription",
+    "cancelSubscriptionError": "Warning: There was an error while trying to cancel your account. Please retry again later.",
+    "cancelSubscriptionSuccess": "Your subscription was canceled with success!",
+    "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
+    "cancelSubscriptionButton": "Cancel subscription",
+    "accountCancelled": "Your account was cancelled on {{date}}",
+    "subscriptionButton": "Subscribe again"
   }
 }

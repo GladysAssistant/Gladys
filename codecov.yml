@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      server:
+        target: 90%
+        flags:
+          - server
+
+flags:
+  server:
+    paths:
+      - server

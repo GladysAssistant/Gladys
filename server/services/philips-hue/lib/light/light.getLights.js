@@ -39,19 +39,22 @@ async function getLights() {
         case 'GL-C-008': // Non-hue LED Strip
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LLC001': // LivingColor lamp 2nd generation
         case 'LLC010': // Hue iris
           lightsToReturn.push(getPhilipsHueColorLight(philipsHueLight, serialNumber, this.serviceId));
           break;
-        case 'LWB010': // hue white bulb with fixed warming light (2700K)
+        case 'LWO001': // Hue White Filament Bulb G93 E27
+        case 'LWB010': // Hue white bulb with fixed warming light (2700K)
         case 'LWB006': // Hue white lamp
         case 'LWG004': // Hue white spot
         case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
         case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
-        case 'LTW012': // hue White Ambiance E12
-        case 'LTW010': // hue White & Ambiance Bulb
+        case 'LTW012': // Hue White Ambiance E12
+        case 'LTW010': // Hue White & Ambiance Bulb
         case 'LTW001': // Hue A19 White & Ambiance Bulb
+        case 'LTW013': // Hue White Ambiance GU10
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'SP 120': // Innr Smart Plug On/Off

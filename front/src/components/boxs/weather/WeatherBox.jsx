@@ -113,7 +113,7 @@ const WeatherBox = ({ children, ...props }) => (
               }}
               class="font-size-40 blue-grey-700"
             >
-              {props.temperature}°
+              <Text id="global.degreeValue" fields={{ value: props.temperature }} />
               <span
                 style={{
                   fontSize: '30px'

@@ -9,26 +9,28 @@ const DashboardPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="page-header">
-            <h1 class="page-title">Dashboard</h1>
+            <h1 class="page-title">
+              <Text id="dashboard.title" />
+            </h1>
             <div class="page-options d-flex">
               {!props.dashboardEditMode && (
                 <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
-                    Edit <i class="fe fe-edit" />
+                    <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />
                   </span>
                 </button>
               )}
               {props.dashboardEditMode && (
                 <button onClick={props.cancelDashboardEdit} class="btn btn-outline-danger btn-sm ml-2">
                   <span>
-                    Cancel <i class="fe fe-slash" />
+                    <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
                   </span>
                 </button>
               )}
               {props.dashboardEditMode && (
                 <button onClick={props.saveDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
-                    Save <i class="fe fe-check" />
+                    <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
                   </span>
                 </button>
               )}

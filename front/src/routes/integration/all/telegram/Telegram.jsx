@@ -1,4 +1,4 @@
-import { Text, MarkupText } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../utils/consts';
 import cx from 'classnames';
 
@@ -31,18 +31,22 @@ const TelegramPage = ({ children, ...props }) => (
                       )}
                       <form onSubmit={props.saveTelegramApiKey}>
                         <div class="form-group">
-                          <div class="form-label">Telegram Bot API Key</div>
+                          <div class="form-label">
+                            <Text id="integration.telegram.apiKey" />
+                          </div>
                           <div class="input-group">
-                            <input
-                              type="text"
-                              class="form-control"
-                              placeholder="Telegram Bot API Key"
-                              onInput={props.updateTelegramApiKey}
-                              value={props.telegramApiKey}
-                            />
+                            <Localizer>
+                              <input
+                                type="text"
+                                class="form-control"
+                                placeholder={<Text id="integration.telegram.apiKey" />}
+                                onInput={props.updateTelegramApiKey}
+                                value={props.telegramApiKey}
+                              />
+                            </Localizer>
                             <span class="input-group-append">
                               <button type="submit" class="btn btn-primary">
-                                Save
+                                <Text id="integration.telegram.saveButton" />
                               </button>
                             </span>
                           </div>
