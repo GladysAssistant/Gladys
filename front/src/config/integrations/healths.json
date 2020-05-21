@@ -1,8 +1,6 @@
 [
   {
     "key": "withings",
-    "name": "Withings",
-    "description": "Get Withings measures in Gladys.",
     "img": "/assets/integrations/cover/withings.jpg"
   }
 ]

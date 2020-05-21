@@ -26,6 +26,6 @@ pushAllWithType(devices, 'device', 'toggle-right');
 pushAllWithType(communications, 'communication', 'message-square');
 pushAllWithType(calendars, 'calendar', 'calendar');
 pushAllWithType(weathers, 'weather', 'cloud');
-pushAllWithType(weathers, 'health', 'heart');
+pushAllWithType(healths, 'health', 'heart');
 
 export { integrations, integrationsByType, categories };
