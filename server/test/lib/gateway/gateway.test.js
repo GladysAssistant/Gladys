@@ -133,6 +133,88 @@ describe('gateway', () => {
     });
   });
 
+  describe('gateway.getUsersKeys', () => {
+    it('should get users keys with no users in current list', async () => {
+      const variable = {
+        getValue: fake.resolves('[]'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const users = await gateway.getUsersKeys();
+      expect(users).to.deep.equal([
+        {
+          id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+          name: 'Tony',
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+          connected: false,
+          accepted: false,
+        },
+      ]);
+    });
+    it('should merge new user keys with old user', async () => {
+      const oldUsers = [
+        {
+          id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+          name: 'Tony',
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'not-the-fingerprint',
+          gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+          connected: false,
+          accepted: true,
+        },
+      ];
+      const variable = {
+        getValue: fake.resolves(JSON.stringify(oldUsers)),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const users = await gateway.getUsersKeys();
+      expect(users).to.deep.equal([
+        {
+          id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+          name: 'Tony',
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+          connected: false,
+          accepted: false,
+        },
+      ]);
+    });
+    it('should merge new user keys with old user', async () => {
+      const oldUsers = [
+        {
+          id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+          name: 'Tony',
+          rsa_public_key: 'not-the-fingerprint',
+          ecdsa_public_key: 'not-the-fingerprint',
+          gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+          connected: false,
+          accepted: true,
+        },
+      ];
+      const variable = {
+        getValue: fake.resolves(JSON.stringify(oldUsers)),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const users = await gateway.getUsersKeys();
+      expect(users).to.deep.equal([
+        {
+          id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+          name: 'Tony',
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+          connected: false,
+          accepted: false,
+        },
+      ]);
+    });
+  });
+
   describe('gateway.disconnect', () => {
     it('should disconnect Gateway', async () => {
       const variable = {

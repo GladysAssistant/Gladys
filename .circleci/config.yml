@@ -42,7 +42,18 @@ jobs:
       - run:
           name: Install system dependencies
           command: |
-            sudo apt-get install -y libudev-dev sqlite3 openssl openzwave libopenzwave1.5-dev
+            sudo apt-get install -y libudev-dev sqlite3 openssl
+      - run:
+          name: Install Openzwave 1.6 # Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
+          command: |
+            cd /tmp
+            git clone https://github.com/OpenZWave/open-zwave.git 
+            cd open-zwave
+            git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5
+            sudo make
+            sudo make install
+            sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openzwave.conf"
+            sudo ldconfig
       - run:
           name: Install global dependencies
           command: 'sudo npm install typescript node-gyp npm@latest -g'

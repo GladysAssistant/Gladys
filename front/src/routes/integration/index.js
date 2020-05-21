@@ -6,15 +6,11 @@ import actions from '../../actions/integration';
 @connect('', actions)
 class Integration extends Component {
   componentWillMount() {
-    this.props.getIntegrations();
+    this.props.getIntegrations(this.props.category);
   }
 
-  componentDidUpdate() {
-    this.props.getIntegrations();
-  }
-
-  render({}, {}) {
-    return <IntegrationPage />;
+  render({ category }, {}) {
+    return <IntegrationPage category={category} />;
   }
 }
 

@@ -1,12 +1,4 @@
-ARG target
-
-FROM $target/node:12-alpine
-
-LABEL \
-  org.label-schema.build-date=$BUILD_DATE \
-  org.label-schema.version=$VERSION
-
-COPY qemu-* /usr/bin/
+FROM node:lts-alpine as gladys
 
 # System dependencies
 RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip
@@ -25,13 +17,12 @@ RUN apk add --no-cache --virtual .build-deps make g++ git udev coreutils \
     && cd /tmp \
     && rm -rf /tmp/open-zwave
 
-
-# Install Gladys
 RUN mkdir /src
 WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
+
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers udev \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
