@@ -538,6 +538,47 @@
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
+    },
+    "oauth2": {
+      "buttonConnect": "Connect now",
+      "apiKeyLabel": "Then, enter your client_id and secret_id key here:",
+      "errorEmptyConfig": "Client Id and Secret Id must not be empty !",
+      "errorServiceId": "Service Id of current integration must not be found !",
+      "errorAuthorizationUri": "Error in authorization provider !",
+      "clientId": "Account client id",
+      "secretId": "Account secret id",
+      "instructions": "In this stage please fill in the given client_id and secret_id key below and click on connect button.",
+      "delete": "To delete your account configuration clic on 'Unconnect' button (all data will be deleted).",
+      "buttonUnConnect": "Unconnect"
+    },
+    "withings": {
+      "settings": {
+        "title": "Withings Settings",
+        "menu": "Settings",
+        "introduction": "To connect Withings account to Gladys, you first need to create a Withings user account in <a href=https://account.withings.com/connectionwou/account_login target=_blank >this link</a>.<br/><br/>To connect Withings measures to Gladys, you need to create a Withings partner account in <a href=https://account.withings.com/partner/add_oauth2 target=_blank >this link</a>. <br/>",
+        "instructionsToUse": "To use this integration, go to the dashboard and create a health box.",
+        "configurationError": "We were not able to configure your account. Are you sure your client_id and secret_id are valid?",
+        "complete": "Your account is now linked to Gladys with those parameters:",
+        "clientId": "Client Id: ",
+        "afterIntegration": "Go to devices page to see all devices automatically created."
+      },
+      "device": {
+        "title": "Withings Devices",
+        "empty": "No Withings devices available, go to the 'Settings' page to connect your account and create the devices.",
+        "menu": "Devices",
+        "noDevices": "No Withings devices available, go to the 'Settings' page to connect your account and create the devices.",
+        "nameLabel": "Name",
+        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+        "noValueReceived": "No value received.",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "saveButton": "Save"
+      },
+      "title": "Withings",
+      "documentation": "Documentation",
+      "configuration": "Configuration",
+      "officialWebSite": "Withings official website"
     }
   },
   "editScene": {
@@ -1006,6 +1047,25 @@
       "acceleration-y": "Acceleration Y",
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
+    },
+    "withings": {
+      "battery": "Battery",
+      "weight": "Weight",
+      "height": "Height",
+      "fat-free-mass": "Fat Free Mass",
+      "fat-ratio": "Fat Ratio",
+      "fat-mass-weight": "Fat Mass Weight",
+      "diastolic-blood-pressure": "Diastolic Blood Pressure",
+      "systolic-blood-pressure": "Systolic Blood Pressure",
+      "heart-pulse": "Heart Pulse",
+      "temperature": "Temperature",
+      "sp-o2": "Sp O2",
+      "body-temperature": "Body Temperature",
+      "skin-temperature": "Skin Temperature",
+      "muscle-mass": "Muscle Mass",
+      "hydration": "Hydration",
+      "bone-mass": "Bone Mass",
+      "pulse-wave-velocity": "Pulse Wave Velocity"
     },
     "unknown": {
       "unknown": "Unknown"

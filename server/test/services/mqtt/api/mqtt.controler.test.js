@@ -1,6 +1,8 @@
 const { assert, fake } = require('sinon');
 const MqttController = require('../../../../services/mqtt/api/mqtt.controller');
 
+const logger = require('../../../../utils/logger');
+
 const mqttHandler = {
   connect: fake.resolves(true),
   status: fake.resolves(true),
@@ -24,7 +26,7 @@ describe('POST /api/v1/service/mqtt/connect', () => {
     const res = {
       json: fake.returns(null),
     };
-
+    logger.debug(controller);
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
     assert.calledWith(mqttHandler.connect, 'url', 'username', 'password');
   });

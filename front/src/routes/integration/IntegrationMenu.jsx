@@ -59,18 +59,16 @@ const IntegrationMenu = connect(
         </Link>
       )}
 
-      {false && (
-        <Link
-          activeClassName="active"
-          href="/dashboard/integration/health"
-          class="list-group-item list-group-item-action d-flex align-items-center"
-        >
-          <span class="icon mr-3">
-            <i class="fe fe-heart" />
-          </span>
-          <Text id="integration.root.menu.health" />
-        </Link>
-      )}
+      <Link
+        activeClassName="active"
+        href="/dashboard/integration/health"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+      >
+        <span class="icon mr-3">
+          <i class="fe fe-heart" />
+        </span>
+        <Text id="integration.root.menu.health" />
+      </Link>
 
       <Link
         activeClassName="active"

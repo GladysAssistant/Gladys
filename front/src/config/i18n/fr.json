@@ -538,6 +538,47 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
+    },
+    "oauth2": {
+      "buttonConnect": "Connecter maintenant",
+      "apiKeyLabel": "Saisissez ensuite votre clé client_id et secret_id ici : ",
+      "errorEmptyConfig": "Client Id et Secret Id ne doivent pas être vide !",
+      "errorServiceId": "Service Id de l'intégration courante n'a pas été trouvé !",
+      "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
+      "clientId": "Client id du compte",
+      "secretId": "Secret id du compte",
+      "instructions": "À cette étape, veuillez remplir les champs client_id et secret_id ci-dessous et cliquez sur le bouton de connexion.",
+      "delete": "Pour supprimer vos configuration de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
+      "buttonUnConnect": "Déconnecter"
+    },
+    "withings": {
+      "settings": {
+        "title": "Withings Configuration",
+        "menu": "Configuration",
+        "introduction": "Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=https://account.withings.com/connectionwou/account_login target=_blank >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=https://account.withings.com/partner/add_oauth2 target=_blank >ce lien</a>. <br/>",
+        "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box de santé.",
+        "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que votre client_id et votre secret_id sont corrects ?",
+        "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres:",
+        "clientId": "Client Id: ",
+        "afterIntegration": "Allez à la page des appareils pour voir tous les appareils créés automatiquement."
+      },
+      "device": {
+        "title": "Appareils Withings",
+        "empty": "Aucun appareils Withings disponibles, allez sur la page 'Configuration' pour connecter votre compte et créer les appareils.",
+        "menu": "Appareils",
+        "noDevices": "Aucun appareils Withings disponibles, allez sur la page 'Configuration' pour connecter votre compte et créer les appareils.",
+        "nameLabel": "Nom",
+        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
+        "noValueReceived": "Aucune valeur reçue.",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "saveButton": "Sauvegarder"
+      },
+      "title": "Withings",
+      "documentation": "Documentation",
+      "configuration": "Configuration",
+      "officialWebSite": "Withings site officiel"
     }
   },
   "editScene": {
@@ -1006,6 +1047,25 @@
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
       "bed-activity": "Activité Lit"
+    },
+    "withings": {
+      "battery": "Battery",
+      "weight": "Poids",
+      "height": "Taille",
+      "fat-free-mass": "Masse sans graisse",
+      "fat-ratio": "Ratio de graisse",
+      "fat-mass-weight": "Poids de la masse grasse",
+      "diastolic-blood-pressure": "Pression artérielle diastolique",
+      "systolic-blood-pressure": "Pression artérielle systolique",
+      "heart-pulse": "Pouls cardiaque",
+      "temperature": "Température",
+      "sp-o2": "Sp O2",
+      "body-temperature": "Température corps",
+      "skin-temperature": "Température peau",
+      "muscle-mass": "Masse musculaire",
+      "hydration": "Hydratation",
+      "bone-mass": "Masse osseuse",
+      "pulse-wave-velocity": "Vélocité des ondes de pouls"
     },
     "unknown": {
       "unknown": "Inconnu"
