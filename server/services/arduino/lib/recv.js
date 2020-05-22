@@ -26,7 +26,9 @@ async function recv(device) {
     if (!port.isOpen) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
-        gladys.device.setParam(device, 'CODE', data.toString('utf8'));
+        //gladys.device.setParam(device, 'CODE', data.toString('utf8'));
+        var messageJSON = JSON.parse(data.toString('utf8'));
+        gladys.device.setParam(device, 'CODE', messageJSON.parameters.value);
         //gladys.device.setValue({ id: device.id }, device.features[0], data.toString('utf8'));
       });
     }
