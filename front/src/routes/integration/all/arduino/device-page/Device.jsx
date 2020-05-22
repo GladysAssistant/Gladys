@@ -84,6 +84,9 @@ class ArduinoDeviceBox extends Component {
   updateFeature = (e) => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value.split(',')[0]);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value.split(',')[1]);
+    if (e.target.value.split(',')[1] === DEVICE_FEATURE_TYPES.SENSOR.INTEGER){
+      this.props.updateFeature(this.props.deviceIndex, 0, 'max', e.target.value.split(',')[2]);
+    }
   };
 
   updateArduino = (e) => {
@@ -247,7 +250,7 @@ class ArduinoDeviceBox extends Component {
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.pushButton" />
                       </option>
-                      <option value={[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.INTEGER]}>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.INTEGER, 10000000000]}>
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.sensor" />
                       </option>
