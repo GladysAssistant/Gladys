@@ -33,13 +33,13 @@ async function recv(device) {
     const parser = port.pipe(new Readline({ delimiter: '\n' }));
 
     if (!port.isOpen) {
-      parser.on('data', function (data) {
+      parser.on('data', async function (data) {
         logger.warn(data.toString('utf8'));
         //gladys.device.setParam(device, 'CODE', data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
           //gladys.device.setParam(device, 'CODE', messageJSON.parameters.value);
-          gladys.device.setValue({ id: device.id }, device.features[0], messageJSON.parameters.value);
+          await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
         }
       });
     }

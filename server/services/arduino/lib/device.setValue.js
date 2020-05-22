@@ -54,7 +54,7 @@ async function setValue(device, deviceFeature, value) {
   }
 
   if (functionName === DEVICE_FUNCTION.RECV_433) {
-    recv(arduino);
+    recv(device);
   } else {
     send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
