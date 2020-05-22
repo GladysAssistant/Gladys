@@ -2,6 +2,15 @@ const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 /**
  * @description Receive a message from the Arduino
  * @param {Object} device - The device.
@@ -27,8 +36,10 @@ async function recv(device) {
       parser.on('data', function (data) {
         logger.warn(data.toString('utf8'));
         //gladys.device.setParam(device, 'CODE', data.toString('utf8'));
-        var messageJSON = JSON.parse(data.toString('utf8'));
-        gladys.device.setParam(device, 'CODE', messageJSON.parameters.value);
+        if (IsJsonString(data.toString('utf8'))) {
+          var messageJSON = JSON.parse(data.toString('utf8'));
+          gladys.device.setParam(device, 'CODE', messageJSON.parameters.value);
+        }
         //gladys.device.setValue({ id: device.id }, device.features[0], data.toString('utf8'));
       });
     }
