@@ -84,9 +84,8 @@ class ArduinoDeviceBox extends Component {
   updateFeature = (e) => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value.split(',')[0]);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value.split(',')[1]);
-    if (e.target.value.split(',')[1] === DEVICE_FEATURE_TYPES.SENSOR.INTEGER){
-      this.props.updateFeature(this.props.deviceIndex, 0, 'max', e.target.value.split(',')[2]);
-    }
+    this.props.updateFeature(this.props.deviceIndex, 0, 'min', e.target.value.split(',')[2]);
+    this.props.updateFeature(this.props.deviceIndex, 0, 'max', e.target.value.split(',')[3]);
   };
 
   updateArduino = (e) => {
@@ -235,29 +234,41 @@ class ArduinoDeviceBox extends Component {
                     <select
                       class="form-control"
                       id="feature"
-                      value={[props.device.features[0].category, props.device.features[0].type]}
+                      value={[
+                        props.device.features[0].category,
+                        props.device.features[0].type,
+                        props.device.features[0].min,
+                        props.device.features[0].max,
+                      ]}
                       onChange={this.updateFeature}
                     >
-                      <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY]}>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY, '0', '1']}>
                         <i class="fe fe-toggle-right" />
                         <Text id="integration.arduino.features.lightButton" />
                       </option>
-                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY]}>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY, '0', '1']}>
                         <i class="fe fe-toggle-right" />
                         <Text id="integration.arduino.features.switchButton" />
                       </option>
-                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SENSOR.PUSH]}>
+                      <option value={[DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SENSOR.PUSH, '0', '1']}>
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.pushButton" />
                       </option>
-                      <option value={[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.INTEGER, '10000000000']}>
+                      <option
+                        value={[
+                          DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+                          DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+                          '0',
+                          '1000000000000',
+                        ]}
+                      >
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.sensor" />
                       </option>
                     </select>
                   </div>
 
-                  {(props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH) && (
+                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH && (
                     <div class="form-group">
                       <div class="row">
                         <div class="col">
