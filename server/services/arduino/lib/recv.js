@@ -39,8 +39,8 @@ async function recv(device) {
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
           gladys.device.setParam(device, 'CODE', messageJSON.parameters.value);
+          gladys.device.setValue({ id: device.id }, device.features[0], messageJSON.parameters.value);
         }
-        //gladys.device.setValue({ id: device.id }, device.features[0], data.toString('utf8'));
       });
     }
   } catch (e) {
