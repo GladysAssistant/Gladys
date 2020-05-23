@@ -52,9 +52,7 @@ async function setValue(device, deviceFeature, value) {
       break;
   }
 
-  if (functionName === DEVICE_FUNCTION.RECV_433) {
-    //recv(device);
-  } else {
+  if (functionName !== DEVICE_FUNCTION.RECV_433) {
     send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
 }

@@ -8,6 +8,7 @@ import {
   DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_POLL_FREQUENCIES,
 } from '../../../../../../../server/utils/constants';
 
 const actions = (store) => {
@@ -347,10 +348,12 @@ const actions = (store) => {
     async saveDevice(state, index) {
       const device = state.devices[index];
       device.features[0].name = device.name;
-      await state.httpClient.post(`/api/v1/device`, device);
-      if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433){
-        await state.httpClient.post(`/api/v1/service/arduino/recv`, device);
+      if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433) {
+        device.should_poll = true;
+        device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_SECONDS;
+        //await state.httpClient.post(`/api/v1/service/arduino/recv`, device);
       }
+      await state.httpClient.post(`/api/v1/device`, device);
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];
