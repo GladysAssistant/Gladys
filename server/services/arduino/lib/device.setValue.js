@@ -20,7 +20,6 @@ async function setValue(device, deviceFeature, value) {
   );
   const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
-  //Créer le JSON, message qui sera à transmettre à l'Arduino
   const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
 
   var message = {
