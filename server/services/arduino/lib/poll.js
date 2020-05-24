@@ -1,8 +1,8 @@
+import { DEVICE_FUNCTION } from '../../../../server/utils/constants';
+
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-
-import { DEVICE_FUNCTION } from '../../../../server/utils/constants';
 
 const { send } = require('./send');
 const { recv } = require('./recv');
