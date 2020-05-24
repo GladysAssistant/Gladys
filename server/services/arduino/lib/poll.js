@@ -2,9 +2,7 @@ const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-import {
-  DEVICE_FUNCTION,
-} from '../../../../server/utils/constants';
+import { DEVICE_FUNCTION } from '../../../../server/utils/constants';
 
 const { send } = require('./send');
 const { recv } = require('./recv');
@@ -19,7 +17,7 @@ function IsJsonString(str) {
 }
 
 /**
- * @description Poll a camera
+ * @description Poll a device
  * @param {Object} device - The device to poll.
  * @example
  * poll(device);
@@ -37,15 +35,15 @@ async function poll(device) {
 
     const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
-    if (function_name !== DEVICE_FUNCTION.RECV_433){
+    if (function_name !== DEVICE_FUNCTION.RECV_433) {
       var message = {
         function_name: function_name,
         parameters: {
           data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
-          enable: 1
+          enable: 1,
         },
       };
-      send(arduinoPath,message,1);
+      send(arduinoPath, message, 1);
     }
 
     const port = new SerialPort(arduinoPath, {
@@ -60,8 +58,8 @@ async function poll(device) {
         logger.warn(data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
-          if(function_name === messageJSON.function_name){
-            switch(function_name){
+          if (function_name === messageJSON.function_name) {
+            switch (function_name) {
               case DEVICE_FUNCTION.RECV_433:
                 await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                 break;
@@ -72,9 +70,8 @@ async function poll(device) {
                 await gladys.device.setValue(device, device.features[0], messageJSON.parameters.humidity);
                 break;
             }
-            
           }
-          parser.on('close', async function(data){
+          parser.on('close', async function (data) {
             logger.warn('Port closed !');
           });
         }
