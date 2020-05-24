@@ -4,6 +4,9 @@
 #include <dht.h>
 #include <Servo.h>
 
+unsigned long previousMillis = 0;
+const long interval = 20000;
+
 dht DHT;
 
 IRsend ir_send;                                                  // Crée une instance pour controler les led (pin 3 par défaut)
@@ -59,7 +62,7 @@ void recv_433(bool isEnabled, int data_pin) {
   recv433 = isEnabled;
 }
 
-void recv_dht(bool enabled, int data_pin){
+void recv_dht(bool enabled, int data_pin) {
   dhtEnabled = enabled;
   dht_pin = data_pin;
 }
@@ -113,12 +116,12 @@ void emit(unsigned long code, int data_pin) {
 void executeFunction(String json_data) {
   StaticJsonDocument<400> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer, json_data);
-  if (error) {    
-    Serial.println(error.c_str());    
-    return;  
+  if (error) {
+    Serial.println(error.c_str());
+    return;
   }
   JsonObject v = jsonBuffer.as<JsonObject>();
-  
+
   //on décompose la chaine de caractère
   if ( v["function_name"] == String("emit_433") ) {
     emit_433(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
@@ -159,19 +162,27 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
 
-  recv_433(true,0);
+  recv_433(true, 0);
+  recv_dht(true, 8);
 
 }
 
 void loop() {
-  if(dhtEnabled){                                                  // Partie réception température/humidité via DHT11
-    int chk = DHT.read11(dht_pin);
+  unsigned long currentMillis = millis();
 
-    Serial.print("{\"function_name\":\"recv_dht\",\"parameters\":{\"temperature\":");
-    Serial.print(DHT.temperature);
-    Serial.print(", \"humidity\":");
-    Serial.print(DHT.humidity);
-    Serial.println("}}");
+  if (dhtEnabled) {                                                // Partie réception température/humidité via DHT11
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      int chk = DHT.read11(dht_pin);
+      
+      Serial.print("{\"function_name\":\"dht_temperature\",\"parameters\":{\"value\":");
+      Serial.print(DHT.temperature);
+      Serial.println("}}");
+      
+      Serial.print("{\"function_name\":\"dht_humidity\",\"parameters\":{\"value\":");
+      Serial.print(DHT.humidity);
+      Serial.println("}}");
+    }
   }
 
   if (recv433) {                                                   // Partie réception 433 MHz

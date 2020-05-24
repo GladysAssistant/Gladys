@@ -64,10 +64,10 @@ async function poll(device) {
                 await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                 break;
               case DEVICE_FUNCTION.DHT_TEMPERATURE:
-                await gladys.device.setValue(device, device.features[0], messageJSON.parameters.temperature);
+                await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                 break;
               case DEVICE_FUNCTION.DHT_HUMIDITY:
-                await gladys.device.setValue(device, device.features[0], messageJSON.parameters.humidity);
+                await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                 break;
             }
           }
