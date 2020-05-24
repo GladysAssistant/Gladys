@@ -256,7 +256,7 @@ class ArduinoDeviceBox extends Component {
                       </option>
                       <option
                         value={[
-                          DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+                          DEVICE_FEATURE_CATEGORIES.RADIO_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
                           '0',
                           '1000000000000',
