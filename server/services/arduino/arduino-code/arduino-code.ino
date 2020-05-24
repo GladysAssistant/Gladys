@@ -2,6 +2,7 @@
 #include <RCSwitch.h>
 #include <IRremote.h>
 #include <dht.h>
+#include <Servo.h>
 
 dht DHT;
 
@@ -15,6 +16,8 @@ bool recvIR = false;
 bool dhtEnabled = false;
 
 int dht_pin;
+
+Servo myServo;  // SERVO
 
 const unsigned int THIGH = 220, TSHORT = 350, TLONG = 1400;       // Temps des états (nécessaire à l'envoi de signaux Chacon)
 
@@ -43,6 +46,12 @@ void emit_433_chacon(unsigned long code, int data_pin) {            // Fonction 
   for (int i = 0; i < 5; i++) {                                     // Emission du code 5 fois
     emit(code, data_pin);
   }
+}
+
+void set_servo(int angle, int data_pin) {
+  // set the servo position
+  myServo.attach(data_pin); // attaches the servo on pin 9 to the servo object
+  myServo.write(angle);
 }
 
 void recv_433(bool isEnabled, int data_pin) {
@@ -102,8 +111,14 @@ void emit(unsigned long code, int data_pin) {
 */
 
 void executeFunction(String json_data) {
-  StaticJsonBuffer<400> jsonBuffer;
-  JsonObject& v = jsonBuffer.parseObject(json_data);
+  StaticJsonDocument<400> jsonBuffer;
+  DeserializationError error = deserializeJson(jsonBuffer, json_data);
+  if (error) {    
+    Serial.println(error.c_str());    
+    return;  
+  }
+  JsonObject v = jsonBuffer.as<JsonObject>();
+  
   //on décompose la chaine de caractère
   if ( v["function_name"] == String("emit_433") ) {
     emit_433(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
@@ -113,6 +128,9 @@ void executeFunction(String json_data) {
   }
   else if ( v["function_name"] == String("emit_ir") ) {
     emit_ir(v["parameters"]["code"], v["parameters"]["bit_length"], v["parameters"]["data_pin"]);
+  }
+  else if ( v["function_name"] == String("set_servo") ) {
+    set_servo(v["parameters"]["angle"], v["parameters"]["data_pin"]);
   }
   else if ( v["function_name"] == String("recv_433") ) {
     recv_433(v["parameters"]["enable"], v["parameters"]["data_pin"]);
