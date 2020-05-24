@@ -16,6 +16,8 @@ function setupPoll() {
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_2_SECONDS), DEVICE_POLL_FREQUENCIES.EVERY_2_SECONDS);
   // poll devices who need to be polled every 1 seconds
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_SECONDS), DEVICE_POLL_FREQUENCIES.EVERY_SECONDS);
+  // poll devices who need to be polled every 200 milliseconds
+  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_200_MILLISECONDS), DEVICE_POLL_FREQUENCIES.EVERY_200_MILLISECONDS);
 }
 
 module.exports = {

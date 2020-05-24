@@ -350,7 +350,7 @@ const actions = (store) => {
       device.features[0].name = device.name;
       if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433) {
         device.should_poll = true;
-        device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_SECONDS;
+        device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_200_MILLISECONDS;
         //await state.httpClient.post(`/api/v1/service/arduino/recv`, device);
       }
       await state.httpClient.post(`/api/v1/device`, device);

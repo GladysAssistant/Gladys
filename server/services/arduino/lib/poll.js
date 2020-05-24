@@ -23,6 +23,7 @@ async function poll(device) {
   try {
     logger.warn("I'm actually polling !!!");
 
+    const gladys = this.gladys;
     const arduino = await this.gladys.device.getBySelector(
       device.params.find((param) => param.name === 'ARDUINO_LINKED').value
     );
@@ -40,9 +41,10 @@ async function poll(device) {
         logger.warn(data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
-          await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+          await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
         }
       });
+      parser.close();
     }
 
     //recv(device);
