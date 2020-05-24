@@ -42,9 +42,11 @@ async function poll(device) {
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
           await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+          parser.on('close', async function(data){
+            logger.warn('Port closed !');
+          });
         }
       });
-      parser.close();
     }
 
     //recv(device);

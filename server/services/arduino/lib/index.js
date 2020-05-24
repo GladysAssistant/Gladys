@@ -27,7 +27,8 @@ const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, ser
 
 //ArduinoManager.prototype.connect = connect;
 ArduinoManager.prototype.send = send;
-ArduinoManager.prototype.poll = pollLimiter.wrap(poll);
+//ArduinoManager.prototype.poll = pollLimiter.wrap(poll);
+ArduinoManager.prototype.poll = poll;
 ArduinoManager.prototype.recv = pollLimiter.wrap(recv);
 ArduinoManager.prototype.setup = setup;
 ArduinoManager.prototype.setValue = setValueLimiter.wrap(setValue);
