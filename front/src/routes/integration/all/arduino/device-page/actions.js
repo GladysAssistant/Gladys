@@ -9,6 +9,7 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_POLL_FREQUENCIES,
+  DEVICE_FEATURE_UNITS,
 } from '../../../../../../../server/utils/constants';
 
 const actions = (store) => {
@@ -356,11 +357,13 @@ const actions = (store) => {
         device.features[0].read_only = true;
         device.should_poll = true;
         device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
+        device.features[0].unit = DEVICE_FEATURE_UNITS.CELSIUS;
         //await state.httpClient.post(`/api/v1/device/${device.selector}/:feature_category/:feature_type/value`);
       } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_HUMIDITY) {
         device.features[0].read_only = true;
         device.should_poll = true;
         device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
+        device.features[0].unit = DEVICE_FEATURE_UNITS.PERCENT;
         //await state.httpClient.post(`/api/v1/device/${device.selector}/:feature_category/:feature_type/value`);
       }
       await state.httpClient.post(`/api/v1/device`, device);
