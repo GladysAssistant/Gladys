@@ -353,6 +353,8 @@ const DEVICE_FUNCTION = {
   EMIT_433: 'emit_433',
   EMIT_433_CHACON: 'emit_433_chacon',
   EMIT_IR: 'emit_ir',
+  DHT_TEMPERATURE: 'dht_temperature',
+  DHT_HUMIDITY: 'dht_humidity',
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {

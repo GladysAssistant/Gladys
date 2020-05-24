@@ -263,7 +263,29 @@ class ArduinoDeviceBox extends Component {
                         ]}
                       >
                         <i class="fe fe-target" />
-                        <Text id="integration.arduino.features.sensor" />
+                        <Text id="integration.arduino.features.radioSensor" />
+                      </option>
+                      <option
+                        value={[
+                          DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+                          DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+                          '0',
+                          '100',
+                        ]}
+                      >
+                        <i class="fe fe-target" />
+                        <Text id="integration.arduino.features.temperatureSensor" />
+                      </option>
+                      <option
+                        value={[
+                          DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+                          DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+                          '0',
+                          '100',
+                        ]}
+                      >
+                        <i class="fe fe-target" />
+                        <Text id="integration.arduino.features.humiditySensor" />
                       </option>
                     </select>
                   </div>

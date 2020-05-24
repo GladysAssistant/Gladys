@@ -588,13 +588,17 @@
         "recv433": "Receive in 433 MHz",
         "emit433": "Emit in 433 MHz",
         "emit433Chacon": "Emit in 433 MHz for Chacon outlets",
-        "emitIR": "Emit in IR"
+        "emitIR": "Emit in IR",
+        "dhtTemperature": "Temperature through DHT11",
+        "dhtHumidity": "Humidity through DHT11"
       },
       "features": {
         "lightButton": "Light",
         "switchButton": "Switch",
         "pushButton": "Push button",
-        "sensor": "Sensor"
+        "radioSensor": "433 MHz sensor",
+        "temperatureSensor": "Temperature sensor",
+        "humiditySensor": "Humidity sensor"
       }
     },
     "xiaomi": {
