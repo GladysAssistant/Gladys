@@ -1,4 +1,4 @@
-import { DEVICE_FUNCTION } from '../../../../server/utils/constants';
+const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
