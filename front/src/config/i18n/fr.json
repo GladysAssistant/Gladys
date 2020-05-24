@@ -697,8 +697,8 @@
         "emit433": "Emision 433 MHz",
         "emit433Chacon": "Emission 433 MHz pour prises Chacon",
         "emitIR": "Emission IR",
-        "dhtTemperature": "Température through DHT11",
-        "dhtHumidity": "Humidity through DHT11"
+        "dhtTemperature": "Température via DHT11",
+        "dhtHumidity": "Humidité via DHT11"
       },
       "features": {
         "lightButton": "Lumière",

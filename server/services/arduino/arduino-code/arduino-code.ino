@@ -135,6 +135,9 @@ void executeFunction(String json_data) {
   else if ( v["function_name"] == String("recv_433") ) {
     recv_433(v["parameters"]["enable"], v["parameters"]["data_pin"]);
   }
+  else if ( v["function_name"] == String("recv_dht") ) {
+    recv_dht(v["parameters"]["enable"], v["parameters"]["data_pin"]);
+  }
 }
 
 /**

@@ -352,7 +352,11 @@ const actions = (store) => {
         device.features[0].read_only = true;
         device.should_poll = true;
         device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
-        //await state.httpClient.post(`/api/v1/service/arduino/recv`, device);
+      } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_TEMPERATURE){
+        device.features[0].read_only = true;
+        device.should_poll = true;
+        device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
+        //await state.httpClient.post(`/api/v1/device/${device.selector}/:feature_category/:feature_type/value`);
       }
       await state.httpClient.post(`/api/v1/device`, device);
     },
