@@ -174,14 +174,16 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
       int chk = DHT.read11(dht_pin);
-      
-      Serial.print("{\"function_name\":\"dht_temperature\",\"parameters\":{\"value\":");
-      Serial.print(DHT.temperature);
-      Serial.println("}}");
-      
-      Serial.print("{\"function_name\":\"dht_humidity\",\"parameters\":{\"value\":");
-      Serial.print(DHT.humidity);
-      Serial.println("}}");
+      for (int i = 0; i < 3; i++) {
+        Serial.print("{\"function_name\":\"dht_temperature\",\"parameters\":{\"value\":");
+        Serial.print(DHT.temperature);
+        Serial.println("}}");
+
+        Serial.print("{\"function_name\":\"dht_humidity\",\"parameters\":{\"value\":");
+        Serial.print(DHT.humidity);
+        Serial.println("}}");
+        delay(100);
+      }
     }
   }
 
