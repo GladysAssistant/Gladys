@@ -27,6 +27,9 @@ async function poll(device) {
     const arduino = await this.gladys.device.getBySelector(
       device.params.find((param) => param.name === 'ARDUINO_LINKED').value
     );
+
+    const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
+
     const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
     const port = new SerialPort(arduinoPath, {
@@ -41,7 +44,9 @@ async function poll(device) {
         logger.warn(data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
-          await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+          if(function_name === messageJSON.function_name){
+            await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+          }
           parser.on('close', async function(data){
             logger.warn('Port closed !');
           });
