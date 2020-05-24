@@ -205,6 +205,12 @@ class ArduinoDeviceBox extends Component {
                           <option value={DEVICE_FUNCTION.EMIT_IR}>
                             <Text id="integration.arduino.function.emitIR" />
                           </option>
+                          <option value={DEVICE_FUNCTION.DHT_TEMPERATURE}>
+                            <Text id="integration.arduino.function.dhtTemperature" />
+                          </option>
+                          <option value={DEVICE_FUNCTION.DHT_HUMIDITY}>
+                            <Text id="integration.arduino.function.dhtHumidity" />
+                          </option>
                         </select>
                       </div>
                       {props.device.params.find((e) => e.name === 'FUNCTION').value !== DEVICE_FUNCTION.RECV_433 && (
