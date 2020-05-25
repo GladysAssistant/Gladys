@@ -5,7 +5,6 @@ const logger = require('../../../utils/logger');
 /**
  * @description Setup the Arduino and copy the code in it.
  * @param {Object} device - The Arduino device.
- * @returns - Error if flashing is impossible.
  * @example
  * setup(device);
  */
@@ -24,7 +23,7 @@ async function setup(device) {
         logger.warn(error);
         return new Error(error);
       }
-      return 0;
+      return null;
     });
   } catch (e) {
     logger.warn('Unable to flash the card');
