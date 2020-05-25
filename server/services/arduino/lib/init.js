@@ -20,28 +20,28 @@ async function init() {
 
     const list = await this.gladys.device.get({
       service: 'arduino',
-      model: null
+      model: null,
     });
 
     let arduinoList = [];
-    list.forEach(element => {
+    list.forEach((element) => {
       if (element.model === 'card') {
         arduinoList.push(element);
       }
     });
 
     arduinoList.forEach(async function(arduino) {
-      const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
+      const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
       const list = await this.gladys.device.get({
         service: 'arduino',
-        model: null
+        model: null,
       });
 
       var deviceList = [];
-      list.forEach(element => {
+      list.forEach((element) => {
         if (
           element.model !== 'card' &&
-          element.params.find(param => param.name === 'ARDUINO_LINKED').value === arduino.selector
+          element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
         ) {
           deviceList.push(element);
         }
@@ -53,19 +53,19 @@ async function init() {
 
       this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
         baudRate: 9600,
-        lock: false
+        lock: false,
       });
 
       this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new Readline({ delimiter: '\n' }));
 
       if (!this.arduinosPorts[arduinoPath].isOpen) {
-        this.arduinoParsers[arduinoPath].on('data', async data => {
+        this.arduinoParsers[arduinoPath].on('data', async (data) => {
           logger.warn(data.toString('utf8'));
           if (IsJsonString(data.toString('utf8'))) {
             const messageJSON = JSON.parse(data.toString('utf8'));
 
-            deviceList.forEach(async device => {
-              const function_name = device.params.find(param => param.name === 'FUNCTION').value;
+            deviceList.forEach(async (device) => {
+              const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
               if (function_name === messageJSON.function_name) {
                 switch (function_name) {
                   case DEVICE_FUNCTION.RECV_433:
@@ -91,5 +91,5 @@ async function init() {
 }
 
 module.exports = {
-  init
+  init,
 };

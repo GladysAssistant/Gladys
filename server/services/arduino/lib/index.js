@@ -9,7 +9,7 @@ const { configure } = require('./device.configure');
 
 // we rate-limit the number of request per seconds to control lights
 const setValueLimiter = new Bottleneck({
-  minTime: 400 // 400 ms
+  minTime: 400, // 400 ms
 });
 
 const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, serviceId) {

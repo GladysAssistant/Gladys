@@ -13,7 +13,6 @@ const ports = [
   },
 ];
 
-
 const res = {
   json: fake.returns(null),
 };

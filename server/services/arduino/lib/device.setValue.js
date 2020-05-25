@@ -32,7 +32,7 @@ async function setValue(device, deviceFeature, value) {
       //message.parameters['enable'] = value === 1 ? true : false;
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
-      message.function_name = "recv_dht";
+      message.function_name = 'recv_dht';
       break;
     case DEVICE_FUNCTION.DHT_HUMIDITY:
       message.function_name = 'recv_dht';
@@ -80,7 +80,11 @@ async function setValue(device, deviceFeature, value) {
       break;
   }
 
-  if (functionName !== DEVICE_FUNCTION.RECV_433 && functionName !== DEVICE_FUNCTION.DHT_HUMIDITY && functionName !== DEVICE_FUNCTION.DHT_TEMPERATURE ) {
+  if (
+    functionName !== DEVICE_FUNCTION.RECV_433 &&
+    functionName !== DEVICE_FUNCTION.DHT_HUMIDITY &&
+    functionName !== DEVICE_FUNCTION.DHT_TEMPERATURE
+  ) {
     send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
 }

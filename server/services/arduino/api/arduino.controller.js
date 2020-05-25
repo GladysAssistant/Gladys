@@ -52,19 +52,19 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   return {
     'post /api/v1/service/arduino/listen': {
       authenticated: true,
-      controller: asyncMiddleware(listen)
+      controller: asyncMiddleware(listen),
     },
     'post /api/v1/service/arduino/send': {
       authenticated: true,
-      controller: asyncMiddleware(send)
+      controller: asyncMiddleware(send),
     },
     'post /api/v1/service/arduino/configure': {
       authenticated: true,
-      controller: asyncMiddleware(configure)
+      controller: asyncMiddleware(configure),
     },
     'post /api/v1/service/arduino/setup': {
       authenticated: true,
-      controller: asyncMiddleware(setup)
-    }
+      controller: asyncMiddleware(setup),
+    },
   };
 };

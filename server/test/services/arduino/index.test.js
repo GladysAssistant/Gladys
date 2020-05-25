@@ -6,7 +6,7 @@ const { stub } = require('sinon');
 class ArduinoManager {}
 
 const ArduinoService = proxyquire('../../../services/arduino', {
-  './lib': ArduinoManager
+  './lib': ArduinoManager,
 });
 
 describe('arduino', () => {
