@@ -4,8 +4,6 @@ const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-//const { send } = require('./send');
-
 function IsJsonString(str) {
   try {
     JSON.parse(str);
@@ -40,13 +38,16 @@ async function listen(arduino) {
       }
     });
 
+    if(this.arduinosPorts[arduinoPath].isOpen){
+      this.arduinosPorts[arduinoPath].close(function (err) {});
+    }
+
     this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
       baudRate: 9600,
       lock: false
     });
 
     this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new Readline({ delimiter: '\n' }));
-
 
     if (!this.arduinosPorts[arduinoPath].isOpen) {
       this.arduinoParsers[arduinoPath].on('data', async data => {
@@ -73,8 +74,6 @@ async function listen(arduino) {
         }
       });
     }
-
-    //recv(device);
   } catch (e) {
     logger.warn('Unable to listen to device');
     logger.debug(e);
