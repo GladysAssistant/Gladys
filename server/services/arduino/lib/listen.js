@@ -23,7 +23,7 @@ async function listen(arduino) {
   try {
     const gladys = this.gladys;
     const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
-    const list = await this.gladys.device.get({
+    const list = await gladys.device.get({
       service: 'arduino',
       model: null
     });
@@ -38,8 +38,8 @@ async function listen(arduino) {
       }
     });
 
-    if(this.arduinosPorts[arduinoPath].isOpen){
-      this.arduinosPorts[arduinoPath].close(function (err) {});
+    if (this.arduinosPorts[arduinoPath] !== undefined && this.arduinosPorts[arduinoPath].isOpen) {
+      this.arduinosPorts[arduinoPath].close(function(err) {});
     }
 
     this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
