@@ -354,13 +354,14 @@ const actions = store => {
       } else if (device.params.find(param => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_TEMPERATURE) {
         device.features[0].read_only = true;
         device.features[0].unit = DEVICE_FEATURE_UNITS.CELSIUS;
+      await state.httpClient.post(`/api/v1/service/arduino/configure`, device);
       } else if (device.params.find(param => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_HUMIDITY) {
         device.features[0].read_only = true;
         device.features[0].unit = DEVICE_FEATURE_UNITS.PERCENT;
+      await state.httpClient.post(`/api/v1/service/arduino/configure`, device);
       }
 
       await state.httpClient.post(`/api/v1/device`, device);
-      await state.httpClient.post(`/api/v1/service/arduino/configure`, device);
       const arduino = await state.httpClient.get(
         `/api/v1/device/${device.params.find(e => e.name === 'ARDUINO_LINKED').value}`
       );
