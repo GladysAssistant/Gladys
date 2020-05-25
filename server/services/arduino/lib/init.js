@@ -35,12 +35,11 @@ async function init() {
     });
 
     arduinoList.forEach(async function(arduino) {
-      const gladys = this.gladys;
       const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
       const list = await gladys.device.get({
         service: 'arduino',
         model: null
-      });
+      }, gladys);
 
       var deviceList = [];
       list.forEach(element => {
