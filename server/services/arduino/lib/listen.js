@@ -5,6 +5,14 @@ const { DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 
+/**
+ * @description Check if a string is parsable into JSON
+ * @param {string} str - the string to check
+ * @returns - true if parsable
+ * @example
+ * IsJsonString(str);
+ */
+
 function IsJsonString(str) {
   try {
     JSON.parse(str);
@@ -17,6 +25,7 @@ function IsJsonString(str) {
 /**
  * @description listen to an arduino
  * @param {Object} arduino - The arduino to listen.
+ * @returns - .
  * @example
  * listen(arduino);
  */
