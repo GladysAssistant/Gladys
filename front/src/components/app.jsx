@@ -114,32 +114,32 @@ const AppRouter = connect(
         {config.gatewayMode ? (
           <GatewayForgotPassword path="/forgot-password" />
         ) : (
-            <ForgotPassword path="/forgot-password" />
-          )}
+          <ForgotPassword path="/forgot-password" />
+        )}
         {config.gatewayMode ? (
           <GatewayResetPassword path="/reset-password" />
         ) : (
-            <ResetPassword path="/reset-password" />
-          )}
+          <ResetPassword path="/reset-password" />
+        )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
         ) : (
-            <Error type="404" default />
-          )}
+          <Error type="404" default />
+        )}
         {config.gatewayMode ? <GatewayConfirmEmail path="/confirm-email" /> : <Error type="404" default />}
         {config.gatewayMode ? <SettingsBilling path="/dashboard/settings/billing" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />
         ) : (
-            <Error type="404" default />
-          )}
+          <Error type="404" default />
+        )}
         {config.gatewayMode ? (
           <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />
         ) : (
-            <Error type="404" default />
-          )}
+          <Error type="404" default />
+        )}
 
         {!config.gatewayMode ? <SignupWelcomePage path="/signup" /> : <Error type="404" default />}
         <SignupCreateAccountLocal path="/signup/create-account-local" />
