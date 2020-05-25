@@ -285,9 +285,9 @@ class ArduinoDeviceBox extends Component {
                       <option
                         value={[
                           DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-                          DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+                          DEVICE_FEATURE_TYPES.SENSOR.BINARY,
                           '0',
-                          '1000000000000'
+                          '1'
                         ]}
                       >
                         <i class="fe fe-target" />
