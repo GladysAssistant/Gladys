@@ -3,6 +3,9 @@ import uuid from 'uuid';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
+import {
+  DEVICE_POLL_FREQUENCIES,
+} from '../../../../../../../server/utils/constants';
 
 const actions = (store) => {
   const integrationActions = createActionsIntegration(store);
@@ -70,6 +73,8 @@ const actions = (store) => {
             service_id: store.getState().currentIntegration.id,
             room_id: null,
             model: 'card',
+            should_poll: true,
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
             params: [
               {
                 name: 'ARDUINO_PATH',

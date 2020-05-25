@@ -193,10 +193,20 @@ void loop() {
       if (value == 0) {
         Serial.print("Unknown encoding");
       } else {
-        Serial.print("{\"function_name\":\"recv_433\",\"parameters\":{\"value\":");
-        Serial.print( mySwitch.getReceivedValue() );
-        Serial.println("}}");
-      }
+        /*if (mySwitch.getReceivedValue() >= 999000 && mySwitch.getReceivedValue() <= 999100) {
+          Serial.print("{\"function_name\":\"dht_temperature\",\"parameters\":{\"value\":");
+          Serial.print(mySwitch.getReceivedValue() - 999000);
+          Serial.println("}}");
+        } else if (mySwitch.getReceivedValue() >= 888000 && mySwitch.getReceivedValue() <= 888100) {
+          Serial.print("{\"function_name\":\"dht_humidity\",\"parameters\":{\"value\":");
+          Serial.print(mySwitch.getReceivedValue() - 888000);
+          Serial.println("}}");
+        } else {*/
+          Serial.print("{\"function_name\":\"recv_433\",\"parameters\":{\"value\":");
+          Serial.print( mySwitch.getReceivedValue() );
+          Serial.println("}}");
+        }
+      //}
       delay(200);
       mySwitch.resetAvailable();
     }
