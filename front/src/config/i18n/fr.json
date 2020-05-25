@@ -706,7 +706,9 @@
         "pushButton": "Bouton",
         "radioSensor": "Capteur 433 MHz",
         "temperatureSensor": "Capteur de température",
-        "humiditySensor": "Capteur d'humidité"
+        "humiditySensor": "Capteur d'humidité",
+        "motionSensor": "Capteur de mouvement",
+        "openingSensor": "Capteur d'ouverture de portes"
       }
     },
     "xiaomi": {

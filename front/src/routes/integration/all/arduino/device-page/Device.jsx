@@ -273,6 +273,28 @@ class ArduinoDeviceBox extends Component {
                       </option>
                       <option
                         value={[
+                          DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+                          DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+                          '0',
+                          '1000000000000'
+                        ]}
+                      >
+                        <i class="fe fe-target" />
+                        <Text id="integration.arduino.features.motionSensor" />
+                      </option>
+                      <option
+                        value={[
+                          DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+                          DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+                          '0',
+                          '1000000000000'
+                        ]}
+                      >
+                        <i class="fe fe-target" />
+                        <Text id="integration.arduino.features.openingSensor" />
+                      </option>
+                      <option
+                        value={[
                           DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
                           '0',

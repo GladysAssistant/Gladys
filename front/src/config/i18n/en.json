@@ -598,7 +598,9 @@
         "pushButton": "Push button",
         "radioSensor": "433 MHz sensor",
         "temperatureSensor": "Temperature sensor",
-        "humiditySensor": "Humidity sensor"
+        "humiditySensor": "Humidity sensor",
+        "motionSensor": "Motion sensor",
+        "openingSensor": "Opening sensor"
       }
     },
     "xiaomi": {
