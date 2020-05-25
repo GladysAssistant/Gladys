@@ -78,7 +78,7 @@ jobs:
           command: cd server && npm run coverage
       - run:
           name: Push coverage
-          command: bash <(curl -s https://codecov.io/bash)
+          command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
     docker: # run the steps with Docker
@@ -88,7 +88,7 @@ jobs:
           path: ~/gladys-test
       - run:
           name: Install global dependencies
-          command: "sudo npm install codecov npm@latest -g"
+          command: "sudo npm install npm@latest -g"
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package.json" }}-node-12
