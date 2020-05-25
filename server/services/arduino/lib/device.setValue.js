@@ -82,7 +82,7 @@ async function setValue(device, deviceFeature, value) {
       break;
   }
 
-  if (functionName !== DEVICE_FUNCTION.RECV_433 && functionName !== "recv_dht" ) {
+  if (functionName !== DEVICE_FUNCTION.RECV_433 && functionName !== DEVICE_FUNCTION.DHT_HUMIDITY && functionName !== DEVICE_FUNCTION.DHT_TEMPERATURE ) {
     send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
 }
