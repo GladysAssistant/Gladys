@@ -26,8 +26,11 @@ async function poll(arduino) {
     //logger.warn("I'm actually polling !!!");
 
     const gladys = this.gladys;
-    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
-    const list = this.gladys.device.get(arduino.service.id);
+    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value; 
+    const list = await this.gladys.device.get({
+      service: 'arduino',
+      model: null,
+    });
 
     var deviceList = [];
     list.forEach((element) => {
