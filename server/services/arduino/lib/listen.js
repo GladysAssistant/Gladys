@@ -21,7 +21,7 @@ function IsJsonString(str) {
  */
 async function listen(arduino) {
   try {
-    //const gladys = this.gladys;
+    const gladys = this.gladys;
     const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
     const list = await this.gladys.device.get({
       service: 'arduino',
