@@ -12,11 +12,11 @@ const { send } = require('./send');
  */
 async function configure(device) {
   const arduino = await this.gladys.device.getBySelector(
-    device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
+    device.params.find(param => param.name === 'ARDUINO_LINKED').value
   );
-  const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+  const path = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
 
-  var functionName = device.params.find((param) => param.name === 'FUNCTION').value;
+  var functionName = device.params.find(param => param.name === 'FUNCTION').value;
 
   if (functionName === DEVICE_FUNCTION.DHT_HUMIDITY || functionName === DEVICE_FUNCTION.DHT_TEMPERATURE) {
     functionName = 'recv_dht';
@@ -25,16 +25,16 @@ async function configure(device) {
   var message = {
     function_name: functionName,
     parameters: {
-      data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
-    },
+      data_pin: device.params.find(param => param.name === 'DATA_PIN').value
+    }
   };
 
   switch (functionName) {
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
-      message.parameters['enable'] = true;
+      message.parameters['enable'] = 'true';
       break;
     case DEVICE_FUNCTION.DHT_HUMIDITY:
-      message.parameters['enable'] = true;
+      message.parameters['enable'] = 'true';
       break;
     default:
       logger.debug(`Arduino : Function = "${functionName}" not handled`);
@@ -42,10 +42,10 @@ async function configure(device) {
   }
 
   if (functionName !== DEVICE_FUNCTION.RECV_433) {
-    send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+    send(path, message, device.params.find(param => param.name === 'PULSE_LENGTH').value);
   }
 }
 
 module.exports = {
-  configure,
+  configure
 };
