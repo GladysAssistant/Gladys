@@ -74,7 +74,7 @@ const actions = (store) => {
             room_id: null,
             model: 'card',
             should_poll: true,
-            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS;
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
             params: [
               {
                 name: 'ARDUINO_PATH',
