@@ -8,7 +8,6 @@ import {
   DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_POLL_FREQUENCIES,
   DEVICE_FEATURE_UNITS
 } from '../../../../../../../server/utils/constants';
 
@@ -45,7 +44,7 @@ const actions = store => {
         }
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
-        var arduinoDevices = [];
+        let arduinoDevices = [];
         list.forEach(element => {
           if (element.model === 'card') {
             arduinoDevices.push(element);
@@ -75,9 +74,9 @@ const actions = store => {
         }
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
-        var devices = [];
+        let devices = [];
         list.forEach(element => {
-          if (element.model != 'card') {
+          if (element.model !== 'card') {
             devices.push(element);
           }
         });
@@ -173,9 +172,7 @@ const actions = store => {
     updateName(state, index, value) {
       const devices = update(state.devices, {
         [index]: {
-          ['name']: {
-            $set: value
-          }
+          $set: value
         }
       });
       store.setState({

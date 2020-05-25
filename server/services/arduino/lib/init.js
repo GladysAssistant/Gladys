@@ -2,7 +2,15 @@ const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
+const { DEVICE_FUNCTION } = require('../../../utils/constants');
+
+/**
+ * @description Check if a string is parsable into JSON
+ * @param {string} str - the string to check
+ * @returns - true if parsable
+ * @example
+ * IsJsonString(str);
+ */
 
 function IsJsonString(str) {
   try {
@@ -12,36 +20,35 @@ function IsJsonString(str) {
   }
   return true;
 }
-const { listen } = require('./listen');
+
+/**
+ * @description Initialize the communication with the devices
+ * @example
+ * init();
+ */
 
 async function init() {
   try {
-    const gladys = this.gladys;
-
     const list = await this.gladys.device.get({
       service: 'arduino',
-      model: null,
+      model: null
     });
 
-    let arduinoList = [];
-    list.forEach((element) => {
+    const arduinoList = [];
+    list.forEach(element => {
       if (element.model === 'card') {
         arduinoList.push(element);
       }
     });
 
     arduinoList.forEach(async function(arduino) {
-      const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
-      const list = await this.gladys.device.get({
-        service: 'arduino',
-        model: null,
-      });
+      const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
 
-      var deviceList = [];
-      list.forEach((element) => {
+      const deviceList = [];
+      list.forEach(element => {
         if (
           element.model !== 'card' &&
-          element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
+          element.params.find(param => param.name === 'ARDUINO_LINKED').value === arduino.selector
         ) {
           deviceList.push(element);
         }
@@ -53,29 +60,31 @@ async function init() {
 
       this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
         baudRate: 9600,
-        lock: false,
+        lock: false
       });
 
       this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new Readline({ delimiter: '\n' }));
 
       if (!this.arduinosPorts[arduinoPath].isOpen) {
-        this.arduinoParsers[arduinoPath].on('data', async (data) => {
+        this.arduinoParsers[arduinoPath].on('data', async data => {
           logger.warn(data.toString('utf8'));
           if (IsJsonString(data.toString('utf8'))) {
             const messageJSON = JSON.parse(data.toString('utf8'));
 
-            deviceList.forEach(async (device) => {
-              const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
-              if (function_name === messageJSON.function_name) {
-                switch (function_name) {
+            deviceList.forEach(async device => {
+              const functionName = device.params.find(param => param.name === 'FUNCTION').value;
+              if (functionName === messageJSON.function_name) {
+                switch (functionName) {
                   case DEVICE_FUNCTION.RECV_433:
-                    await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                     break;
                   case DEVICE_FUNCTION.DHT_TEMPERATURE:
-                    await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                     break;
                   case DEVICE_FUNCTION.DHT_HUMIDITY:
-                    await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                    break;
+                  default:
                     break;
                 }
               }
@@ -91,5 +100,5 @@ async function init() {
 }
 
 module.exports = {
-  init,
+  init
 };

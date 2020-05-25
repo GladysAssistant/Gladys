@@ -1,8 +1,9 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
-
-const logger = require('../../../utils/logger');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
+
+const { DEVICE_FUNCTION } = require('../../../utils/constants');
+
+const logger = require('../../../utils/logger');
 
 function IsJsonString(str) {
   try {
@@ -21,18 +22,17 @@ function IsJsonString(str) {
  */
 async function listen(arduino) {
   try {
-    const gladys = this.gladys;
-    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    const arduinoPath = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
     const list = await this.gladys.device.get({
       service: 'arduino',
-      model: null,
+      model: null
     });
 
-    var deviceList = [];
-    list.forEach((element) => {
+    const deviceList = [];
+    list.forEach(element => {
       if (
         element.model !== 'card' &&
-        element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
+        element.params.find(param => param.name === 'ARDUINO_LINKED').value === arduino.selector
       ) {
         deviceList.push(element);
       }
@@ -44,29 +44,31 @@ async function listen(arduino) {
 
     this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
       baudRate: 9600,
-      lock: false,
+      lock: false
     });
 
     this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new Readline({ delimiter: '\n' }));
 
     if (!this.arduinosPorts[arduinoPath].isOpen) {
-      this.arduinoParsers[arduinoPath].on('data', async (data) => {
+      this.arduinoParsers[arduinoPath].on('data', async data => {
         logger.warn(data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           const messageJSON = JSON.parse(data.toString('utf8'));
 
-          deviceList.forEach(async (device) => {
-            const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
-            if (function_name === messageJSON.function_name) {
-              switch (function_name) {
+          deviceList.forEach(async device => {
+            const functionName = device.params.find(param => param.name === 'FUNCTION').value;
+            if (functionName === messageJSON.function_name) {
+              switch (functionName) {
                 case DEVICE_FUNCTION.RECV_433:
-                  await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                  await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                   break;
                 case DEVICE_FUNCTION.DHT_TEMPERATURE:
-                  await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                  await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                   break;
                 case DEVICE_FUNCTION.DHT_HUMIDITY:
-                  await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                  await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
+                  break;
+                default:
                   break;
               }
             }
@@ -81,5 +83,5 @@ async function listen(arduino) {
 }
 
 module.exports = {
-  listen,
+  listen
 };

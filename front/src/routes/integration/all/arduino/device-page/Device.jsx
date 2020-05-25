@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import {
   DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,

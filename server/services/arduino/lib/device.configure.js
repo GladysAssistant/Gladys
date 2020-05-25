@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
+const { DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 
@@ -22,7 +22,7 @@ async function configure(device) {
     functionName = 'recv_dht';
   }
 
-  let message = {
+  const message = {
     function_name: functionName,
     parameters: {
       data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,

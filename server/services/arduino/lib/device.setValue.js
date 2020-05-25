@@ -1,14 +1,14 @@
 const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 const { send } = require('./send');
 /**
- * @description Change value of a device
+ * @description Change value of a device.
  * @param {Object} device - The device to control.
  * @param {Object} deviceFeature - The binary deviceFeature to control.
  * @param {string|number} value - The new value.
+ * @returns {} - Nothing.
  * @example
  * setValue(device, deviceFeature, value);
  */
@@ -20,7 +20,7 @@ async function setValue(device, deviceFeature, value) {
 
   const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
 
-  var message = {
+  const message = {
     function_name: functionName,
     parameters: {
       data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
@@ -29,7 +29,7 @@ async function setValue(device, deviceFeature, value) {
 
   switch (functionName) {
     case DEVICE_FUNCTION.RECV_433:
-      //message.parameters['enable'] = value === 1 ? true : false;
+      // message.parameters['enable'] = value === 1 ? true : false;
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
       message.function_name = 'recv_dht';
@@ -47,6 +47,8 @@ async function setValue(device, deviceFeature, value) {
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
           message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+          break;
+        default:
           break;
       }
 
@@ -70,6 +72,8 @@ async function setValue(device, deviceFeature, value) {
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
           message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+          break;
+        default:
           break;
       }
 

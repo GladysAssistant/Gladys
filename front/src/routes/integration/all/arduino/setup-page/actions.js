@@ -21,7 +21,7 @@ const actions = store => {
         }
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
-        var arduinoDevices = [];
+        let arduinoDevices = [];
         list.forEach(element => {
           if (element.model === 'card') {
             arduinoDevices.push(element);
@@ -182,9 +182,7 @@ const actions = store => {
     updateArduinoName(state, index, value) {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
-          ['name']: {
-            $set: value
-          }
+          $set: value
         }
       });
       store.setState({

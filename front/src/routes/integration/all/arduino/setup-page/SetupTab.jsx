@@ -1,4 +1,4 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import SetupDevice from './SetupDevice';
@@ -44,7 +44,6 @@ const SetupTab = ({ children, ...props }) => {
             <p>
               <MarkupText id="integration.arduino.setup.arduinoDescription" />
             </p>
-            {props.getArduinoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
             <div class="row">
               {props.arduinoDevices &&
                 props.arduinoDevices.map((arduinoDevice, index) => (

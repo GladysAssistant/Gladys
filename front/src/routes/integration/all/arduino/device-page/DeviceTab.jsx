@@ -1,4 +1,4 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
