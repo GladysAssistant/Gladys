@@ -1,11 +1,11 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
+import get from 'get-value';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
-import translationFr from '../config/i18n/fr.json';
-import translationEn from '../config/i18n/en.json';
+import translations from '../config/i18n';
 import actions from '../actions/main';
 
 import { getDefaultState } from '../utils/getDefaultState';
@@ -200,7 +200,7 @@ class MainApp extends Component {
   }
 
   render({ user }, {}) {
-    const translationDefinition = user && user.language && user.language === 'fr' ? translationFr : translationEn;
+    const translationDefinition = get(translations, user.language, { default: translations.en });
     return (
       <IntlProvider definition={translationDefinition}>
         <AppRouter />
