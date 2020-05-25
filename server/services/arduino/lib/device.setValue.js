@@ -4,8 +4,6 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const { send } = require('./send');
-const { recv } = require('./recv');
-
 /**
  * @description Change value of a device
  * @param {Object} device - The device to control.
