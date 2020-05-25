@@ -87,7 +87,7 @@ async function init() {
           }
         });
       }
-    });
+    }, this);
   } catch (e) {
     logger.warn('Unable to init device');
     logger.debug(e);
