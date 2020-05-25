@@ -52,6 +52,18 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   }
 
   /**
+   * @api {post} /api/v1/service/arduin/configure Configure
+   * @apiName configure
+   * @apiGroup Arduino
+   */
+  async function configure(req, res) {
+    arduinoManager.configure(req.body);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {post} /api/v1/service/arduin/setup Setup
    * @apiName setup
    * @apiGroup Arduino
@@ -75,6 +87,10 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
     'post /api/v1/service/arduino/send': {
       authenticated: true,
       controller: asyncMiddleware(send),
+    },
+    'post /api/v1/service/arduino/configure': {
+      authenticated: true,
+      controller: asyncMiddleware(configure),
     },
     'post /api/v1/service/arduino/setup': {
       authenticated: true,

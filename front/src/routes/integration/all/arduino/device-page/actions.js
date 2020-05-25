@@ -351,21 +351,16 @@ const actions = (store) => {
       device.features[0].name = device.name;
       if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433) {
         device.features[0].read_only = true;
-        //device.should_poll = true;
-        //device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
       } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_TEMPERATURE) {
         device.features[0].read_only = true;
-        //device.should_poll = true;
-        //device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
         device.features[0].unit = DEVICE_FEATURE_UNITS.CELSIUS;
-        //await state.httpClient.post(`/api/v1/device/${device.selector}/:feature_category/:feature_type/value`);
       } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_HUMIDITY) {
         device.features[0].read_only = true;
-        //device.should_poll = true;
-        //device.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_MINUTES;
         device.features[0].unit = DEVICE_FEATURE_UNITS.PERCENT;
       }
+
       await state.httpClient.post(`/api/v1/device`, device);
+      await state.httpClient.post(`/api/v1/service/arduino/configure`, device);
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];

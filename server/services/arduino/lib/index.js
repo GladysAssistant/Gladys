@@ -5,6 +5,7 @@ const { poll } = require('./poll');
 const { recv } = require('./recv');
 const { setup } = require('./setup');
 const { setValue } = require('./device.setValue');
+const { configure } = require('./device.configure');
 
 // we rate-limit the number of request per seconds to poll lights
 const pollLimiter = new Bottleneck({
@@ -31,6 +32,7 @@ ArduinoManager.prototype.send = send;
 ArduinoManager.prototype.poll = poll;
 ArduinoManager.prototype.recv = pollLimiter.wrap(recv);
 ArduinoManager.prototype.setup = setup;
+ArduinoManager.prototype.configure = configure;
 ArduinoManager.prototype.setValue = setValueLimiter.wrap(setValue);
 
 module.exports = ArduinoManager;
