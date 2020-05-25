@@ -5,6 +5,7 @@ const logger = require('../../../utils/logger');
 /**
  * @description Setup the Arduino and copy the code in it.
  * @param {Object} device - The Arduino device.
+ * @returns {Promise} - .
  * @example
  * setup(device);
  */

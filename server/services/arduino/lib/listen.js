@@ -8,7 +8,7 @@ const logger = require('../../../utils/logger');
 /**
  * @description Check if a string is parsable into JSON.
  * @param {string} str - The string to check.
- * @returns - True if parsable.
+ * @returns {boolean} - True if parsable.
  * @example
  * IsJsonString(str);
  */
@@ -22,9 +22,9 @@ function IsJsonString(str) {
 }
 
 /**
- * @description listen to an arduino
+ * @description Listen to an arduino.
  * @param {Object} arduino - The arduino to listen.
- * @returns - .
+ * @returns {Promise} - .
  * @example
  * listen(arduino);
  */

@@ -13,8 +13,9 @@
   ],
   "scripts": {},
   "dependencies": {
+    "@serialport/parser-readline": "^9.0.0",
+    "avrgirl-arduino": "^4.2.2",
     "bottleneck": "^2.19.5",
-    "serialport": "^8.0.5",
-    "avrgirl-arduino": "^4.2.2"
+    "serialport": "^8.0.8"
   }
 }

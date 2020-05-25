@@ -5,13 +5,12 @@ const logger = require('../../../utils/logger');
 const { DEVICE_FUNCTION } = require('../../../utils/constants');
 
 /**
- * @description Check if a string is parsable into JSON
- * @param {string} str - the string to check
- * @returns - true if parsable
+ * @description Check if a string is parsable into JSON.
+ * @param {string} str - The string to check.
+ * @returns {boolean} - True if parsable.
  * @example
  * IsJsonString(str);
  */
-
 function IsJsonString(str) {
   try {
     JSON.parse(str);
@@ -22,11 +21,11 @@ function IsJsonString(str) {
 }
 
 /**
- * @description Initialize the communication with the devices
+ * @description Initialize the communication with the devices.
+ * @returns {Promise} - .
  * @example
  * init();
  */
-
 async function init() {
   try {
     const list = await this.gladys.device.get({

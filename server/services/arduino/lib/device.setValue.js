@@ -8,7 +8,7 @@ const { send } = require('./send');
  * @param {Object} device - The device to control.
  * @param {Object} deviceFeature - The binary deviceFeature to control.
  * @param {string|number} value - The new value.
- * @returns {} - Nothing.
+ * @returns {Promise} - .
  * @example
  * setValue(device, deviceFeature, value);
  */

@@ -7,7 +7,7 @@ const { send } = require('./send');
 /**
  * @description Change value of a device
  * @param {Object} device - The device to configure.
- * @returns - .
+ * @returns {Promise} - .
  * @example
  * configure(device);
  */
