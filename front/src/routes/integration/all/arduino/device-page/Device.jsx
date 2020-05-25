@@ -283,12 +283,7 @@ class ArduinoDeviceBox extends Component {
                         <Text id="integration.arduino.features.motionSensor" />
                       </option>
                       <option
-                        value={[
-                          DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-                          DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-                          '0',
-                          '1'
-                        ]}
+                        value={[DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.BINARY, '0', '1']}
                       >
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.openingSensor" />
@@ -368,71 +363,72 @@ class ArduinoDeviceBox extends Component {
                     </div>
                   )}
 
-                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SWITCH.BINARY && (
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col">
-                          <label class="form-label" for="codeOn">
-                            <Text id="integration.arduino.device.codeOnLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="codeOn"
-                              type="text"
-                              value={props.device.params.find(e => e.name === 'CODE_ON').value}
-                              onInput={this.updateCodeOn}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
-                            />
-                          </Localizer>
+                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
+                    props.device.features[0].category !== DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col">
+                            <label class="form-label" for="codeOn">
+                              <Text id="integration.arduino.device.codeOnLabel" />
+                            </label>
+                            <Localizer>
+                              <input
+                                id="codeOn"
+                                type="text"
+                                value={props.device.params.find(e => e.name === 'CODE_ON').value}
+                                onInput={this.updateCodeOn}
+                                class="form-control"
+                                placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
+                              />
+                            </Localizer>
+                          </div>
+
+                          <div class="col">
+                            <label class="form-label" for="codeOff">
+                              <Text id="integration.arduino.device.codeOffLabel" />
+                            </label>
+                            <Localizer>
+                              <input
+                                id="codeOff"
+                                type="text"
+                                value={props.device.params.find(e => e.name === 'CODE_OFF').value}
+                                onInput={this.updateCodeOff}
+                                class="form-control"
+                                placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
+                              />
+                            </Localizer>
+                          </div>
                         </div>
 
-                        <div class="col">
-                          <label class="form-label" for="codeOff">
-                            <Text id="integration.arduino.device.codeOffLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="codeOff"
-                              type="text"
-                              value={props.device.params.find(e => e.name === 'CODE_OFF').value}
-                              onInput={this.updateCodeOff}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
-                            />
-                          </Localizer>
-                        </div>
+                        <label class="form-label" for="bitLength">
+                          <Text id="integration.arduino.device.bitLengthLabel" />
+                        </label>
+                        <Localizer>
+                          <input
+                            id="bitLength"
+                            type="text"
+                            value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
+                            onInput={this.updateBitLength}
+                            class="form-control"
+                            placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
+                          />
+                        </Localizer>
+
+                        <label class="form-label" for="pulseLength">
+                          <Text id="integration.arduino.device.pulseLengthLabel" />
+                        </label>
+                        <Localizer>
+                          <input
+                            id="pulseLength"
+                            type="text"
+                            value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
+                            onInput={this.updatePulseLength}
+                            class="form-control"
+                            placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
+                          />
+                        </Localizer>
                       </div>
-
-                      <label class="form-label" for="bitLength">
-                        <Text id="integration.arduino.device.bitLengthLabel" />
-                      </label>
-                      <Localizer>
-                        <input
-                          id="bitLength"
-                          type="text"
-                          value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
-                          onInput={this.updateBitLength}
-                          class="form-control"
-                          placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
-                        />
-                      </Localizer>
-
-                      <label class="form-label" for="pulseLength">
-                        <Text id="integration.arduino.device.pulseLengthLabel" />
-                      </label>
-                      <Localizer>
-                        <input
-                          id="pulseLength"
-                          type="text"
-                          value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
-                          onInput={this.updatePulseLength}
-                          class="form-control"
-                          placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
-                        />
-                      </Localizer>
-                    </div>
-                  )}
+                    )}
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
