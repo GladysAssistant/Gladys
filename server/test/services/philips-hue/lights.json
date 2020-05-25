@@ -1153,8 +1153,8 @@
           "state": "noupdates",
           "lastinstall": "2020-04-25T10:55:36"
         },
-        "type":"On/Off plug-in unit",
-				"name":"Prise chauffage Piscine",
+        "type": "On/Off plug-in unit",
+        "name": "Prise chauffage Piscine",
         "modelid": "LOM002",
         "manufacturername": "Signify Netherlands B.V.",
         "productname": "Hue Smart plug",
@@ -1182,6 +1182,6 @@
       },
       "_id": 25,
       "id": 25
-    }	
+    }
   ]
 }
