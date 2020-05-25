@@ -24,7 +24,7 @@ async function init() {
     });
 
     arduinoList.forEach(async function(arduino) {
-      listen(arduino);
+      await listen(arduino);
     });
   } catch (e) {
     logger.warn('Unable to init device');
