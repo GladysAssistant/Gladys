@@ -194,7 +194,7 @@ const actions = store => {
     async saveDevice(state, index) {
       const arduino = state.arduinoDevices[index];
       await state.httpClient.post(`/api/v1/device`, arduino);
-      await state.httpClient.get(`/api/v1/service/arduino/init`);
+      await state.httpClient.post(`/api/v1/service/arduino/listen`, arduino);
     },
     async deleteDevice(state, index) {
       const device = state.arduinoDevices[index];

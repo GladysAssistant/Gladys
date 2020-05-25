@@ -1,6 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
-const logger = require('../../../utils/logger');
 
 module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   /**
@@ -28,12 +26,12 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   }
 
   /**
-   * @api {get} /api/v1/service/arduin/init Init
-   * @apiName init
+   * @api {post} /api/v1/service/arduin/listen Listen
+   * @apiName listen
    * @apiGroup Arduino
    */
-  async function init(req, res) {
-    arduinoManager.init(req.body);
+  async function listen(req, res) {
+    arduinoManager.listen(req.body);
     res.json({
       success: true,
     });
@@ -64,9 +62,9 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   }
 
   return {
-    'get /api/v1/service/arduino/init': {
+    'post /api/v1/service/arduino/listen': {
       authenticated: true,
-      controller: asyncMiddleware(init)
+      controller: asyncMiddleware(listen)
     },
     'post /api/v1/service/arduino/send': {
       authenticated: true,

@@ -1,6 +1,6 @@
-const logger = require('../../../utils/logger');
-const path = require('path');
 const Avrgirl = require('avrgirl-arduino');
+const path = require('path');
+const logger = require('../../../utils/logger');
 
 /**
  * @description Setup the Arduino and copy the code in it.
@@ -22,8 +22,6 @@ async function setup(device) {
       if (error) {
         logger.warn(error);
         return new Error(error);
-      } else {
-        logger.warn('Flashing done!');
       }
     });
   } catch (e) {
