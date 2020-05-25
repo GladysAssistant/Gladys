@@ -16,13 +16,13 @@ async function configure(device) {
   );
   const path = arduino.params.find(param => param.name === 'ARDUINO_PATH').value;
 
-  var functionName = device.params.find(param => param.name === 'FUNCTION').value;
+  let functionName = device.params.find(param => param.name === 'FUNCTION').value;
 
   if (functionName === DEVICE_FUNCTION.DHT_HUMIDITY || functionName === DEVICE_FUNCTION.DHT_TEMPERATURE) {
     functionName = 'recv_dht';
   }
 
-  var message = {
+  let message = {
     function_name: functionName,
     parameters: {
       data_pin: device.params.find(param => param.name === 'DATA_PIN').value
