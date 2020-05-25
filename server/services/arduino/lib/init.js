@@ -1,20 +1,6 @@
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
-
 const logger = require('../../../utils/logger');
 
 const { listen } = require('./listen');
-
-const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
-
-function IsJsonString(str) {
-  try {
-    JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
 
 /**
  * @description Init arduino devices
@@ -37,7 +23,7 @@ async function init() {
       }
     });
 
-    arduinoList.forEach(arduino => {
+    arduinoList.forEach(async function(arduino) {
       listen(arduino);
     });
   } catch (e) {
