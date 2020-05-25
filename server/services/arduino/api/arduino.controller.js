@@ -4,30 +4,6 @@ const logger = require('../../../utils/logger');
 
 module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   /**
-   * @api {post} /api/v1/service/arduino/connect Connect
-   * @apiName connect
-   * @apiGroup Arduino
-   */
-  async function connect(req, res) {
-    arduinoManager.connect(arduinoManager.device);
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
-   * @api {post} /api/v1/service/arduino/disconnect Disconnect
-   * @apiName disconnect
-   * @apiGroup Arduino
-   */
-  async function disconnect(req, res) {
-    arduinoManager.disconnect();
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
    * @api {post} /api/v1/service/arduin/send Send
    * @apiName send
    * @apiGroup Arduino
@@ -46,6 +22,18 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
    */
   async function recv(req, res) {
     arduinoManager.recv(req.body);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
+   * @api {get} /api/v1/service/arduin/init Init
+   * @apiName init
+   * @apiGroup Arduino
+   */
+  async function init(req, res) {
+    arduinoManager.init(req.body);
     res.json({
       success: true,
     });
@@ -76,29 +64,25 @@ module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
   }
 
   return {
-    'post /api/v1/service/arduino/connect': {
+    'get /api/v1/service/arduino/init': {
       authenticated: true,
-      controller: asyncMiddleware(connect),
-    },
-    'post /api/v1/service/arduino/disconnect': {
-      authenticated: true,
-      controller: asyncMiddleware(disconnect),
+      controller: asyncMiddleware(init)
     },
     'post /api/v1/service/arduino/send': {
       authenticated: true,
-      controller: asyncMiddleware(send),
+      controller: asyncMiddleware(send)
     },
     'post /api/v1/service/arduino/configure': {
       authenticated: true,
-      controller: asyncMiddleware(configure),
+      controller: asyncMiddleware(configure)
     },
     'post /api/v1/service/arduino/setup': {
       authenticated: true,
-      controller: asyncMiddleware(setup),
+      controller: asyncMiddleware(setup)
     },
     'post /api/v1/service/arduino/recv': {
       authenticated: true,
-      controller: asyncMiddleware(recv),
-    },
+      controller: asyncMiddleware(recv)
+    }
   };
 };
