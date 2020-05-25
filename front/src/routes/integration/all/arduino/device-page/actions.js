@@ -361,6 +361,10 @@ const actions = store => {
 
       await state.httpClient.post(`/api/v1/device`, device);
       await state.httpClient.post(`/api/v1/service/arduino/configure`, device);
+      const arduino = await state.httpClient.get(
+        `/api/v1/device/${device.params.find(e => e.name === 'ARDUINO_LINKED').value}`
+      );
+      await state.httpClient.post(`/api/v1/service/arduino/listen`, arduino);
     },
     async deleteDevice(state, index) {
       const device = state.devices[index];
