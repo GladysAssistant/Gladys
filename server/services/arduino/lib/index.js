@@ -1,5 +1,6 @@
 const Bottleneck = require('bottleneck/es5');
 
+const { init } = require('./init');
 const { send } = require('./send');
 const { poll } = require('./poll');
 const { recv } = require('./recv');
@@ -26,9 +27,8 @@ const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, ser
   this.connected = false;
 };
 
-//ArduinoManager.prototype.connect = connect;
+ArduinoManager.prototype.init = init;
 ArduinoManager.prototype.send = send;
-//ArduinoManager.prototype.poll = pollLimiter.wrap(poll);
 ArduinoManager.prototype.poll = poll;
 ArduinoManager.prototype.recv = pollLimiter.wrap(recv);
 ArduinoManager.prototype.setup = setup;

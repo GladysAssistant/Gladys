@@ -71,7 +71,7 @@ const actions = store => {
             service_id: store.getState().currentIntegration.id,
             room_id: null,
             model: 'card',
-            should_poll: true,
+            should_poll: false,
             poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
             params: [
               {

@@ -24,8 +24,6 @@ function IsJsonString(str) {
  */
 async function poll(device) {
   try {
-    //logger.warn("I'm actually polling !!!");
-
     const gladys = this.gladys;
     const arduino = await this.gladys.device.getBySelector(
       device.params.find((param) => param.name === 'ARDUINO_LINKED').value,

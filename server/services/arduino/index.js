@@ -14,6 +14,7 @@ module.exports = function ArduinoService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting Arduino service');
+    arduinoManager.init();
   }
 
   /**

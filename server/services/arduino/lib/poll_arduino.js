@@ -23,8 +23,6 @@ function IsJsonString(str) {
  */
 async function poll(arduino) {
   try {
-    //logger.warn("I'm actually polling !!!");
-
     const gladys = this.gladys;
     const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
     const list = this.gladys.device.get(arduino.service.id);
