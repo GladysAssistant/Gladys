@@ -18,7 +18,7 @@ const ButtonDeviceType = ({ children, ...props }) => {
       </td>
       <td>{props.device.name}</td>
       <td class="text-right">
-        <label class="btn btn-secondary btn-outline-light">
+        <label>
           <input
             type="button"
             name={props.deviceFeature.id}
