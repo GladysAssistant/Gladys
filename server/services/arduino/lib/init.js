@@ -30,7 +30,7 @@ async function init() {
       model: null
     });
 
-    var arduinoList = [];
+    let arduinoList = [];
     list.forEach(element => {
       if (element.model === 'card') {
         arduinoList.push(element);
