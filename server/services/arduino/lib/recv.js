@@ -21,7 +21,7 @@ async function recv(device) {
   try {
     const gladys = this.gladys;
     const arduino = await gladys.device.getBySelector(
-      device.params.find((param) => param.name === 'ARDUINO_LINKED').value
+      device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
     );
     const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 
@@ -33,7 +33,7 @@ async function recv(device) {
     const parser = port.pipe(new Readline({ delimiter: '\n' }));
 
     if (!port.isOpen) {
-      parser.on('data', async function (data) {
+      parser.on('data', async function(data) {
         logger.warn(data.toString('utf8'));
         //gladys.device.setParam(device, 'CODE', data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {

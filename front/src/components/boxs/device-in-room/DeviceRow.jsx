@@ -1,4 +1,4 @@
-import BinaryDeviceFeature from './device-features/BinaryDeviceFeature'; 
+import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ButtonDeviceFeature from './device-features/ButtonDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';

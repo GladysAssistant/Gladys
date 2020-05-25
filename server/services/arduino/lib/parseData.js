@@ -8,17 +8,14 @@ const SerialPort = require('serialport');
  * parseData(data);
  */
 async function parseData(data) {
-    try {
-
-        logger.warn("parseData to code !")
-
-
-    } catch (e) {
-        logger.warn('parseData to code ! (It\'s an error)');
-        logger.debug(e);
-    }
+  try {
+    logger.warn('parseData to code !');
+  } catch (e) {
+    logger.warn("parseData to code ! (It's an error)");
+    logger.debug(e);
+  }
 }
 
 module.exports = {
-    parseData,
+  parseData,
 };

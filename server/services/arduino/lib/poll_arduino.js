@@ -31,7 +31,10 @@ async function poll(arduino) {
 
     var deviceList = [];
     list.forEach((element) => {
-      if (element.model !== 'card' && element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector) {
+      if (
+        element.model !== 'card' &&
+        element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
+      ) {
         deviceList.push(element);
       }
     });
@@ -50,7 +53,7 @@ async function poll(arduino) {
           const messageJSON = JSON.parse(data.toString('utf8'));
 
           deviceList.forEach(async (device) => {
-            const function_name = device.params.find((param) => param.name === 'FUNCTION').value;     
+            const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
             if (function_name === messageJSON.function_name) {
               switch (function_name) {
                 case DEVICE_FUNCTION.RECV_433:
@@ -62,11 +65,11 @@ async function poll(arduino) {
                 case DEVICE_FUNCTION.DHT_HUMIDITY:
                   await gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
                   break;
-              }  
-            }     
+              }
+            }
           });
 
-          parser.on('close', async function (data) {
+          parser.on('close', async function(data) {
             logger.warn('Port closed !');
           });
         }

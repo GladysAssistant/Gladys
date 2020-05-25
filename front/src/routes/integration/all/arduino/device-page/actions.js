@@ -9,36 +9,36 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_POLL_FREQUENCIES,
-  DEVICE_FEATURE_UNITS,
+  DEVICE_FEATURE_UNITS
 } from '../../../../../../../server/utils/constants';
 
-const actions = (store) => {
+const actions = store => {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async getUsbPorts(state) {
       store.setState({
-        getArduinoUsbPortStatus: RequestStatus.Getting,
+        getArduinoUsbPortStatus: RequestStatus.Getting
       });
       try {
         const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
         store.setState({
           usbPorts,
-          getArduinoUsbPortStatus: RequestStatus.Success,
+          getArduinoUsbPortStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getArduinoUsbPortStatus: RequestStatus.Error,
+          getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
     },
     async getArduinoDevices(state) {
       store.setState({
-        getArduinoDevicesStatus: RequestStatus.Getting,
+        getArduinoDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getArduinoDevicesOrderDir || 'asc',
+          order_dir: state.getArduinoDevicesOrderDir || 'asc'
         };
         if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
           options.search = state.arduinoDevicesSearch;
@@ -46,7 +46,7 @@ const actions = (store) => {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var arduinoDevices = [];
-        list.forEach((element) => {
+        list.forEach(element => {
           if (element.model === 'card') {
             arduinoDevices.push(element);
           }
@@ -54,21 +54,21 @@ const actions = (store) => {
 
         store.setState({
           arduinoDevices,
-          getArduinoDevicesStatus: RequestStatus.Success,
+          getArduinoDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getArduinoDevices: RequestStatus.Error,
+          getArduinoDevices: RequestStatus.Error
         });
       }
     },
     async getDevices(state) {
       store.setState({
-        getDevicesStatus: RequestStatus.Getting,
+        getDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getDevicesOrderDir || 'asc',
+          order_dir: state.getDevicesOrderDir || 'asc'
         };
         if (state.devicesSearch && state.devicesSearch.length) {
           options.search = state.devicesSearch;
@@ -76,7 +76,7 @@ const actions = (store) => {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var devices = [];
-        list.forEach((element) => {
+        list.forEach(element => {
           if (element.model != 'card') {
             devices.push(element);
           }
@@ -84,11 +84,11 @@ const actions = (store) => {
 
         store.setState({
           devices,
-          getDevicesStatus: RequestStatus.Success,
+          getDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getDevicesStatus: RequestStatus.Error,
+          getDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -114,48 +114,48 @@ const actions = (store) => {
                 keep_history: false,
                 has_feedback: false,
                 min: 0,
-                max: 1,
-              },
+                max: 1
+              }
             ],
             params: [
               {
                 name: 'DATA_PIN',
-                value: '0',
+                value: '0'
               },
               {
                 name: 'FUNCTION',
-                value: null,
+                value: null
               },
               {
                 name: 'ARDUINO_LINKED',
-                value: null,
+                value: null
               },
               {
                 name: 'CODE',
-                value: '0',
+                value: '0'
               },
               {
                 name: 'CODE_ON',
-                value: '0',
+                value: '0'
               },
               {
                 name: 'CODE_OFF',
-                value: '0',
+                value: '0'
               },
               {
                 name: 'BIT_LENGTH',
-                value: '24',
+                value: '24'
               },
               {
                 name: 'PULSE_LENGTH',
-                value: '1',
-              },
-            ],
-          },
-        ],
+                value: '1'
+              }
+            ]
+          }
+        ]
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateDeviceProperty(state, index, property, value) {
@@ -163,10 +163,10 @@ const actions = (store) => {
         devices: {
           [index]: {
             [property]: {
-              $set: value,
-            },
-          },
-        },
+              $set: value
+            }
+          }
+        }
       });
       store.setState(newState);
     },
@@ -174,148 +174,148 @@ const actions = (store) => {
       const devices = update(state.devices, {
         [index]: {
           ['name']: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateDataPin(state, index, value) {
-      let arduinoDataPinIndex = state.devices[index].params.findIndex((param) => param.name === 'DATA_PIN');
+      let arduinoDataPinIndex = state.devices[index].params.findIndex(param => param.name === 'DATA_PIN');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoDataPinIndex]: {
               value: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateFunction(state, index, newValue) {
-      let arduinoFunctionIndex = state.devices[index].params.findIndex((param) => param.name === 'FUNCTION');
+      let arduinoFunctionIndex = state.devices[index].params.findIndex(param => param.name === 'FUNCTION');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoFunctionIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateArduino(state, index, newValue) {
-      let arduinoLinkedIndex = state.devices[index].params.findIndex((param) => param.name === 'ARDUINO_LINKED');
+      let arduinoLinkedIndex = state.devices[index].params.findIndex(param => param.name === 'ARDUINO_LINKED');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoLinkedIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateCode(state, index, newValue) {
-      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE');
+      let arduinoCodeIndex = state.devices[index].params.findIndex(param => param.name === 'CODE');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoCodeIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateCodeOn(state, index, newValue) {
-      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE_ON');
+      let arduinoCodeIndex = state.devices[index].params.findIndex(param => param.name === 'CODE_ON');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoCodeIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateCodeOff(state, index, newValue) {
-      let arduinoCodeIndex = state.devices[index].params.findIndex((param) => param.name === 'CODE_OFF');
+      let arduinoCodeIndex = state.devices[index].params.findIndex(param => param.name === 'CODE_OFF');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoCodeIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateBitLength(state, index, newValue) {
-      let arduinoBitLengthIndex = state.devices[index].params.findIndex((param) => param.name === 'BIT_LENGTH');
+      let arduinoBitLengthIndex = state.devices[index].params.findIndex(param => param.name === 'BIT_LENGTH');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoBitLengthIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updatePulseLength(state, index, newValue) {
-      let arduinoBitLengthIndex = state.devices[index].params.findIndex((param) => param.name === 'PULSE_LENGTH');
+      let arduinoBitLengthIndex = state.devices[index].params.findIndex(param => param.name === 'PULSE_LENGTH');
       const devices = update(state.devices, {
         [index]: {
           params: {
             [arduinoBitLengthIndex]: {
               value: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     updateFeature(state, index, featureIndex, property, newValue) {
@@ -324,37 +324,37 @@ const actions = (store) => {
           features: {
             [featureIndex]: {
               [property]: {
-                $set: newValue,
-              },
-            },
-          },
-        },
+                $set: newValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        devices,
+        devices
       });
     },
     async search(state, e) {
       store.setState({
-        deviceSearch: e.target.value,
+        deviceSearch: e.target.value
       });
       await actions.getDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getDeviceOrderDir: e.target.value,
+        getDeviceOrderDir: e.target.value
       });
       await actions.getDevices(store.getState());
     },
     async saveDevice(state, index) {
       const device = state.devices[index];
       device.features[0].name = device.name;
-      if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433) {
+      if (device.params.find(param => param.name === 'FUNCTION').value === DEVICE_FUNCTION.RECV_433) {
         device.features[0].read_only = true;
-      } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_TEMPERATURE) {
+      } else if (device.params.find(param => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_TEMPERATURE) {
         device.features[0].read_only = true;
         device.features[0].unit = DEVICE_FEATURE_UNITS.CELSIUS;
-      } else if (device.params.find((param) => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_HUMIDITY) {
+      } else if (device.params.find(param => param.name === 'FUNCTION').value === DEVICE_FUNCTION.DHT_HUMIDITY) {
         device.features[0].read_only = true;
         device.features[0].unit = DEVICE_FEATURE_UNITS.PERCENT;
       }
@@ -368,12 +368,12 @@ const actions = (store) => {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const devices = update(state.devices, {
-        $splice: [[index, 1]],
+        $splice: [[index, 1]]
       });
       store.setState({
-        devices,
+        devices
       });
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, integrationActions, actions);

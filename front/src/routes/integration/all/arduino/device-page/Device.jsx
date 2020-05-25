@@ -5,59 +5,59 @@ import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils
 import {
   DEVICE_FUNCTION,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_TYPES
 } from '../../../../../../../server/utils/constants';
 
 class ArduinoDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        error: RequestStatus.Error,
+        error: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
   deleteDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        error: RequestStatus.Error,
+        error: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateName(this.props.deviceIndex, e.target.value);
   };
 
-  updateDataPin = (e) => {
+  updateDataPin = e => {
     this.props.updateDataPin(this.props.deviceIndex, e.target.value);
   };
 
-  updateBitLength = (e) => {
+  updateBitLength = e => {
     this.props.updateBitLength(this.props.deviceIndex, e.target.value);
   };
 
-  updatePulseLength = (e) => {
+  updatePulseLength = e => {
     this.props.updatePulseLength(this.props.deviceIndex, e.target.value);
   };
 
-  updateFunction = (e) => {
+  updateFunction = e => {
     this.props.updateFunction(this.props.deviceIndex, e.target.value);
     switch (e.target.value) {
       case DEVICE_FUNCTION.RECV_433:
@@ -81,30 +81,30 @@ class ArduinoDeviceBox extends Component {
     }
   };
 
-  updateFeature = (e) => {
+  updateFeature = e => {
     this.props.updateFeature(this.props.deviceIndex, 0, 'category', e.target.value.split(',')[0]);
     this.props.updateFeature(this.props.deviceIndex, 0, 'type', e.target.value.split(',')[1]);
     this.props.updateFeature(this.props.deviceIndex, 0, 'min', e.target.value.split(',')[2]);
     this.props.updateFeature(this.props.deviceIndex, 0, 'max', e.target.value.split(',')[3]);
   };
 
-  updateArduino = (e) => {
+  updateArduino = e => {
     this.props.updateArduino(this.props.deviceIndex, e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  updateCode = (e) => {
+  updateCode = e => {
     this.props.updateCode(this.props.deviceIndex, e.target.value);
   };
 
-  updateCodeOn = (e) => {
+  updateCodeOn = e => {
     this.props.updateCodeOn(this.props.deviceIndex, e.target.value);
   };
 
-  updateCodeOff = (e) => {
+  updateCodeOff = e => {
     this.props.updateCodeOff(this.props.deviceIndex, e.target.value);
   };
 
@@ -115,7 +115,7 @@ class ArduinoDeviceBox extends Component {
           <div class="card-header">{props.device.name || <Text id="integration.arduino.device.noNameLabel" />}</div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -147,9 +147,9 @@ class ArduinoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {props.houses &&
-                        props.houses.map((house) => (
+                        props.houses.map(house => (
                           <optgroup label={house.name}>
-                            {house.rooms.map((room) => (
+                            {house.rooms.map(room => (
                               <option selected={room.id === props.device.room_id} value={room.id}>
                                 {room.name}
                               </option>
@@ -168,11 +168,11 @@ class ArduinoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {props.arduinoDevices &&
-                        props.arduinoDevices.map((device) => (
+                        props.arduinoDevices.map(device => (
                           <option
                             value={device.selector}
                             selected={
-                              props.device.params.find((e) => e.name === 'ARDUINO_LINKED').value === device.selector
+                              props.device.params.find(e => e.name === 'ARDUINO_LINKED').value === device.selector
                             }
                           >
                             {device.name}
@@ -190,7 +190,7 @@ class ArduinoDeviceBox extends Component {
                         <select
                           class="form-control"
                           id="function"
-                          value={props.device.params.find((e) => e.name === 'FUNCTION').value}
+                          value={props.device.params.find(e => e.name === 'FUNCTION').value}
                           onChange={this.updateFunction}
                         >
                           <option value={DEVICE_FUNCTION.RECV_433}>
@@ -213,7 +213,7 @@ class ArduinoDeviceBox extends Component {
                           </option>
                         </select>
                       </div>
-                      {props.device.params.find((e) => e.name === 'FUNCTION').value !== DEVICE_FUNCTION.RECV_433 && (
+                      {props.device.params.find(e => e.name === 'FUNCTION').value !== DEVICE_FUNCTION.RECV_433 && (
                         <div class="col">
                           <label class="form-label" for="dataPin">
                             <Text id="integration.arduino.device.dataPinLabel" />
@@ -222,7 +222,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="dataPin"
                               type="text"
-                              value={props.device.params.find((e) => e.name === 'DATA_PIN').value}
+                              value={props.device.params.find(e => e.name === 'DATA_PIN').value}
                               onInput={this.updateDataPin}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.dataPinLabel" />}
@@ -244,7 +244,7 @@ class ArduinoDeviceBox extends Component {
                         props.device.features[0].category,
                         props.device.features[0].type,
                         props.device.features[0].min,
-                        props.device.features[0].max,
+                        props.device.features[0].max
                       ]}
                       onChange={this.updateFeature}
                     >
@@ -265,7 +265,7 @@ class ArduinoDeviceBox extends Component {
                           DEVICE_FEATURE_CATEGORIES.RADIO_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
                           '0',
-                          '1000000000000',
+                          '1000000000000'
                         ]}
                       >
                         <i class="fe fe-target" />
@@ -276,7 +276,7 @@ class ArduinoDeviceBox extends Component {
                           DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
                           '0',
-                          '100',
+                          '100'
                         ]}
                       >
                         <i class="fe fe-target" />
@@ -287,7 +287,7 @@ class ArduinoDeviceBox extends Component {
                           DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
                           '0',
-                          '100',
+                          '100'
                         ]}
                       >
                         <i class="fe fe-target" />
@@ -307,7 +307,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="code"
                               type="text"
-                              value={props.device.params.find((e) => e.name === 'CODE').value}
+                              value={props.device.params.find(e => e.name === 'CODE').value}
                               onInput={this.updateCode}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeLabel" />}
@@ -322,7 +322,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="bitLength"
                               type="text"
-                              value={props.device.params.find((e) => e.name === 'BIT_LENGTH').value}
+                              value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
                               onInput={this.updateBitLength}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
@@ -337,7 +337,7 @@ class ArduinoDeviceBox extends Component {
                         <input
                           id="pulseLength"
                           type="text"
-                          value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                          value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
                           onInput={this.updatePulseLength}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
@@ -357,7 +357,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="codeOn"
                               type="text"
-                              value={props.device.params.find((e) => e.name === 'CODE_ON').value}
+                              value={props.device.params.find(e => e.name === 'CODE_ON').value}
                               onInput={this.updateCodeOn}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOnLabel" />}
@@ -373,7 +373,7 @@ class ArduinoDeviceBox extends Component {
                             <input
                               id="codeOff"
                               type="text"
-                              value={props.device.params.find((e) => e.name === 'CODE_OFF').value}
+                              value={props.device.params.find(e => e.name === 'CODE_OFF').value}
                               onInput={this.updateCodeOff}
                               class="form-control"
                               placeholder={<Text id="integration.arduino.device.codeOffLabel" />}
@@ -389,7 +389,7 @@ class ArduinoDeviceBox extends Component {
                         <input
                           id="bitLength"
                           type="text"
-                          value={props.device.params.find((e) => e.name === 'BIT_LENGTH').value}
+                          value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
                           onInput={this.updateBitLength}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
@@ -403,7 +403,7 @@ class ArduinoDeviceBox extends Component {
                         <input
                           id="pulseLength"
                           type="text"
-                          value={props.device.params.find((e) => e.name === 'PULSE_LENGTH').value}
+                          value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
                           onInput={this.updatePulseLength}
                           class="form-control"
                           placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}

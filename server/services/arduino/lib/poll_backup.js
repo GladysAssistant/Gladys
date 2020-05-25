@@ -28,7 +28,7 @@ async function poll(device) {
 
     const gladys = this.gladys;
     const arduino = await this.gladys.device.getBySelector(
-      device.params.find((param) => param.name === 'ARDUINO_LINKED').value
+      device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
     );
 
     const function_name = device.params.find((param) => param.name === 'FUNCTION').value;
@@ -54,7 +54,7 @@ async function poll(device) {
     const parser = port.pipe(new Readline({ delimiter: '\n' }));
 
     if (!port.isOpen) {
-      parser.on('data', async function (data) {
+      parser.on('data', async function(data) {
         logger.warn(data.toString('utf8'));
         if (IsJsonString(data.toString('utf8'))) {
           var messageJSON = JSON.parse(data.toString('utf8'));
@@ -71,7 +71,7 @@ async function poll(device) {
                 break;
             }
           }
-          parser.on('close', async function (data) {
+          parser.on('close', async function(data) {
             logger.warn('Port closed !');
           });
         }

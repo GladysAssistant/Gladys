@@ -14,7 +14,7 @@ async function send(path, message, pulse_length) {
     const port = new SerialPort(path, { baudRate: 9600, lock: false });
 
     if (!port.isOpen) {
-      port.on('open', function () {
+      port.on('open', function() {
         logger.warn('Arduino: port opened');
         for (var i = 0; i < pulse_length; i++) {
           port.write(textToSend);

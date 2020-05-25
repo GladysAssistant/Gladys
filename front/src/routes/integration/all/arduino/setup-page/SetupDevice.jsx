@@ -7,62 +7,62 @@ import { ARDUINO_MODEL } from '../../../../../../../server/utils/constants';
 class SetupDevice extends Component {
   saveDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error,
+        saveError: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
   deleteDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({
-        error: RequestStatus.Error,
+        error: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
   uploadCode = async () => {
     this.setState({
       loading: true,
-      uploadingCode: RequestStatus.Getting,
+      uploadingCode: RequestStatus.Getting
     });
     try {
       await this.props.uploadCode(this.props.deviceIndex);
       this.setState({
-        uploadingCode: RequestStatus.Success,
+        uploadingCode: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
         error: RequestStatus.Error,
-        uploadingCode: RequestStatus.Error,
+        uploadingCode: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
-  updateArduinoName = (e) => {
+  updateArduinoName = e => {
     this.props.updateArduinoName(this.props.deviceIndex, e.target.value);
   };
 
-  updateArduinoPath = (e) => {
+  updateArduinoPath = e => {
     this.props.updateArduinoPath(
       this.props.deviceIndex,
       e.target.value.split(',')[0],
@@ -72,11 +72,11 @@ class SetupDevice extends Component {
     );
   };
 
-  updateArduinoManufacturer = (e) => {
+  updateArduinoManufacturer = e => {
     this.props.updateArduinoManufacturer(this.props.deviceIndex, e.target.value);
   };
 
-  updateArduinoModel = (e) => {
+  updateArduinoModel = e => {
     this.props.updateArduinoModel(this.props.deviceIndex, e.target.value);
   };
 
@@ -87,7 +87,7 @@ class SetupDevice extends Component {
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.connectArduinoStatus === RequestStatus.Getting,
+            active: props.connectArduinoStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
@@ -147,10 +147,10 @@ class SetupDevice extends Component {
                     <option>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {ARDUINO_MODEL.map((model) => (
+                    {ARDUINO_MODEL.map(model => (
                       <option
                         value={model.NAME}
-                        selected={props.device.params.find((e) => e.name === 'ARDUINO_MODEL').value === model.NAME}
+                        selected={props.device.params.find(e => e.name === 'ARDUINO_MODEL').value === model.NAME}
                       >
                         {model.LABEL}
                       </option>
@@ -166,17 +166,16 @@ class SetupDevice extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {props.usbPorts &&
-                      props.usbPorts.map((usbPort) => (
+                      props.usbPorts.map(usbPort => (
                         <option
                           value={[usbPort.comPath, usbPort.serialNumber, usbPort.productId, usbPort.vendorId]}
                           selected={
-                            props.device.params.find((e) => e.name === 'ARDUINO_PATH').value === usbPort.comPath ||
-                            (props.device.params.find((e) => e.name === 'ARDUINO_SERIAL_NUMBER').value ===
+                            props.device.params.find(e => e.name === 'ARDUINO_PATH').value === usbPort.comPath ||
+                            (props.device.params.find(e => e.name === 'ARDUINO_SERIAL_NUMBER').value ===
                               usbPort.serialNumber &&
-                              props.device.params.find((e) => e.name === 'ARDUINO_PRODUCT_ID').value ===
+                              props.device.params.find(e => e.name === 'ARDUINO_PRODUCT_ID').value ===
                                 usbPort.productId &&
-                              props.device.params.find((e) => e.name === 'ARDUINO_VENDOR_ID').value ===
-                                usbPort.vendorId)
+                              props.device.params.find(e => e.name === 'ARDUINO_VENDOR_ID').value === usbPort.vendorId)
                           }
                         >
                           {usbPort.comName} - {usbPort.manufacturer}

@@ -26,7 +26,7 @@ async function poll(arduino) {
     //logger.warn("I'm actually polling !!!");
 
     const gladys = this.gladys;
-    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value; 
+    const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
     const list = await this.gladys.device.get({
       service: 'arduino',
       model: null,
@@ -34,7 +34,10 @@ async function poll(arduino) {
 
     var deviceList = [];
     list.forEach((element) => {
-      if (element.model !== 'card' && element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector) {
+      if (
+        element.model !== 'card' &&
+        element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
+      ) {
         deviceList.push(element);
       }
     });
@@ -69,7 +72,7 @@ async function poll(arduino) {
             }
           });
 
-          parser.on('close', async function (data) {
+          parser.on('close', async function(data) {
             logger.warn('Port closed !');
           });
         }

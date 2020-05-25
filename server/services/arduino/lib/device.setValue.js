@@ -16,7 +16,7 @@ const { recv } = require('./recv');
  */
 async function setValue(device, deviceFeature, value) {
   const arduino = await this.gladys.device.getBySelector(
-    device.params.find((param) => param.name === 'ARDUINO_LINKED').value
+    device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
   );
   const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
 

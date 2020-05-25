@@ -3,20 +3,18 @@ import uuid from 'uuid';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
-import {
-  DEVICE_POLL_FREQUENCIES,
-} from '../../../../../../../server/utils/constants';
+import { DEVICE_POLL_FREQUENCIES } from '../../../../../../../server/utils/constants';
 
-const actions = (store) => {
+const actions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async getArduinoDevices(state) {
       store.setState({
-        getArduinoDevicesStatus: RequestStatus.Getting,
+        getArduinoDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getArduinoDevicesOrderDir || 'asc',
+          order_dir: state.getArduinoDevicesOrderDir || 'asc'
         };
         if (state.arduinoDevicesSearch && state.arduinoDevicesSearch.length) {
           options.search = state.arduinoDevicesSearch;
@@ -24,7 +22,7 @@ const actions = (store) => {
         const list = await state.httpClient.get('/api/v1/service/arduino/device', options);
 
         var arduinoDevices = [];
-        list.forEach((element) => {
+        list.forEach(element => {
           if (element.model === 'card') {
             arduinoDevices.push(element);
           }
@@ -32,33 +30,33 @@ const actions = (store) => {
 
         store.setState({
           arduinoDevices,
-          getArduinoDevicesStatus: RequestStatus.Success,
+          getArduinoDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getArduinoDevices: RequestStatus.Error,
+          getArduinoDevices: RequestStatus.Error
         });
       }
     },
     async getUsbPorts(state) {
       store.setState({
-        getArduinoUsbPortStatus: RequestStatus.Getting,
+        getArduinoUsbPortStatus: RequestStatus.Getting
       });
       try {
         const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
         store.setState({
           usbPorts,
-          getArduinoUsbPortStatus: RequestStatus.Success,
+          getArduinoUsbPortStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getArduinoUsbPortStatus: RequestStatus.Error,
+          getArduinoUsbPortStatus: RequestStatus.Error
         });
       }
     },
     getManufacturers(state) {
       store.setState({
-        arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs', 'Arduino (www.arduino.cc)'],
+        arduinoManufacturersList: ['arduino', '1a86', 'qinheng', 'silicon_labs', 'Arduino (www.arduino.cc)']
       });
     },
     async addDevice(state) {
@@ -78,113 +76,119 @@ const actions = (store) => {
             params: [
               {
                 name: 'ARDUINO_PATH',
-                value: null,
+                value: null
               },
               {
                 name: 'ARDUINO_MODEL',
-                value: null,
+                value: null
               },
               {
                 name: 'ARDUINO_SERIAL_NUMBER',
-                value: null,
+                value: null
               },
               {
                 name: 'ARDUINO_PRODUCT_ID',
-                value: null,
+                value: null
               },
               {
                 name: 'ARDUINO_VENDOR_ID',
-                value: null,
-              },
-            ],
-          },
-        ],
+                value: null
+              }
+            ]
+          }
+        ]
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     updateArduinoPath(state, index, path, serialNumber, productId, vendorId) {
-      let arduinoPathIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PATH');
-      let arduinoSerialNumberIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_SERIAL_NUMBER');
-      let arduinoProductIdIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_PRODUCT_ID');
-      let arduinoVendorIdIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_VENDOR_ID');
+      let arduinoPathIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_PATH');
+      let arduinoSerialNumberIndex = state.arduinoDevices[index].params.findIndex(
+        param => param.name === 'ARDUINO_SERIAL_NUMBER'
+      );
+      let arduinoProductIdIndex = state.arduinoDevices[index].params.findIndex(
+        param => param.name === 'ARDUINO_PRODUCT_ID'
+      );
+      let arduinoVendorIdIndex = state.arduinoDevices[index].params.findIndex(
+        param => param.name === 'ARDUINO_VENDOR_ID'
+      );
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
             [arduinoPathIndex]: {
               value: {
-                $set: path,
-              },
+                $set: path
+              }
             },
             [arduinoSerialNumberIndex]: {
               value: {
-                $set: serialNumber,
-              },
+                $set: serialNumber
+              }
             },
             [arduinoProductIdIndex]: {
               value: {
-                $set: productId,
-              },
+                $set: productId
+              }
             },
             [arduinoVendorIdIndex]: {
               value: {
-                $set: vendorId,
-              },
-            },
-          },
-        },
+                $set: vendorId
+              }
+            }
+          }
+        }
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     updateArduinoManufacturer(state, index, value) {
       let arduinoManufacturerIndex = state.arduinoDevices[index].params.findIndex(
-        (param) => param.name === 'ARDUINO_MANUFACTURER'
+        param => param.name === 'ARDUINO_MANUFACTURER'
       );
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
             [arduinoManufacturerIndex]: {
               value: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     updateArduinoModel(state, index, value) {
-      let arduinoModelIndex = state.arduinoDevices[index].params.findIndex((param) => param.name === 'ARDUINO_MODEL');
+      let arduinoModelIndex = state.arduinoDevices[index].params.findIndex(param => param.name === 'ARDUINO_MODEL');
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           params: {
             [arduinoModelIndex]: {
               value: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     updateArduinoName(state, index, value) {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
           ['name']: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     async saveDevice(state, index) {
@@ -197,25 +201,25 @@ const actions = (store) => {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const arduinoDevices = update(state.arduinoDevices, {
-        $splice: [[index, 1]],
+        $splice: [[index, 1]]
       });
       store.setState({
-        arduinoDevices,
+        arduinoDevices
       });
     },
     async uploadCode(state, index) {
       store.setState({
-        uploadingCode: RequestStatus.Getting,
+        uploadingCode: RequestStatus.Getting
       });
       try {
         const device = state.arduinoDevices[index];
         await state.httpClient.post(`/api/v1/service/arduino/setup`, device);
       } catch (e) {
         store.setState({
-          uploadingCode: RequestStatus.Error,
+          uploadingCode: RequestStatus.Error
         });
       }
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 
