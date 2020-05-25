@@ -182,7 +182,9 @@ const actions = store => {
     updateArduinoName(state, index, value) {
       const arduinoDevices = update(state.arduinoDevices, {
         [index]: {
-          $set: value
+          ['name']: {
+            $set: value
+          }
         }
       });
       store.setState({

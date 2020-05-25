@@ -172,7 +172,9 @@ const actions = store => {
     updateName(state, index, value) {
       const devices = update(state.devices, {
         [index]: {
-          $set: value
+          ['name']: {
+            $set: value
+          }
         }
       });
       store.setState({
