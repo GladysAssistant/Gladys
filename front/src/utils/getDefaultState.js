@@ -27,7 +27,8 @@ function getDefaultState() {
 
   // if not available, load it from navigator language
   if (!language) {
-    language = navigator.language === AVAILABLE_LANGUAGES.FR ? AVAILABLE_LANGUAGES.FR : AVAILABLE_LANGUAGES.EN;
+    const navLanguage = (navigator.language || AVAILABLE_LANGUAGES.EN).split('-', 1)[0];
+    language = AVAILABLE_LANGUAGES_LIST.includes(navLanguage) ? navLanguage : AVAILABLE_LANGUAGES.EN;
   }
 
   const state = {
