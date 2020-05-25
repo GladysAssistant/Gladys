@@ -22,7 +22,12 @@ module.exports = function UserController(gladys) {
   async function create(req, res, next) {
     const user = await gladys.user.create(req.body);
     const scope = req.body.scope || ['dashboard:write', 'dashboard:read'];
-    const session = await gladys.session.create(user.id, scope, LOGIN_SESSION_VALIDITY_IN_SECONDS);
+    const session = await gladys.session.create(
+      user.id,
+      scope,
+      LOGIN_SESSION_VALIDITY_IN_SECONDS,
+      req.headers['user-agent'],
+    );
     const response = Object.assign({}, user, session);
     res.status(201).json(response);
   }
@@ -41,7 +46,12 @@ module.exports = function UserController(gladys) {
   async function login(req, res, next) {
     const user = await gladys.user.login(req.body.email, req.body.password);
     const scope = req.body.scope || ['dashboard:write', 'dashboard:read'];
-    const session = await gladys.session.create(user.id, scope, LOGIN_SESSION_VALIDITY_IN_SECONDS);
+    const session = await gladys.session.create(
+      user.id,
+      scope,
+      LOGIN_SESSION_VALIDITY_IN_SECONDS,
+      req.headers['user-agent'],
+    );
     const response = Object.assign({}, user, session);
     res.json(response);
   }
@@ -120,7 +130,7 @@ module.exports = function UserController(gladys) {
    * }
    */
   async function forgotPassword(req, res) {
-    const session = await gladys.user.forgotPassword(req.body.email);
+    const session = await gladys.user.forgotPassword(req.body.email, req.headers['user-agent']);
     const link = `${req.body.origin}/reset-password?token=${session.access_token}`;
     logger.info(`Forgot password initiated for user ${req.body.email}, link = ${link}`);
     res.json({

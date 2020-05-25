@@ -108,7 +108,7 @@ const Header = ({ ...props }) => {
                 </li>
                 <li class="nav-item">
                   <Link
-                    href="/dashboard/integration/device"
+                    href="/dashboard/integration"
                     class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                   >
                     <i class="fe fe-grid" /> <Text id="header.integrations" />
