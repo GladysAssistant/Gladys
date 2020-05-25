@@ -44,7 +44,17 @@ async function setValue(device, deviceFeature, value) {
           : device.params.find((param) => param.name === 'CODE_OFF').value;
       break;
     case DEVICE_FUNCTION.EMIT_IR:
-      message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+      switch(device.features[0].type){
+        case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
+          message.parameters['code'] =
+            value === 1
+              ? device.params.find((param) => param.name === 'CODE_ON').value
+              : device.params.find((param) => param.name === 'CODE_OFF').value;
+          break;
+        case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
+          message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+          break;
+      }
       message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     default:
