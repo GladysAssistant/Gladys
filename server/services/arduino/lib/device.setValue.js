@@ -40,23 +40,23 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FUNCTION.EMIT_433:
       switch (device.features[0].type) {
         case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
-          message.parameters['code'] =
+          message.parameters.code =
             value === 1
               ? device.params.find((param) => param.name === 'CODE_ON').value
               : device.params.find((param) => param.name === 'CODE_OFF').value;
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
-          message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+          message.parameters.code = device.params.find((param) => param.name === 'CODE').value;
           break;
         default:
           break;
       }
 
-      message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
+      message.parameters.bit_length = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
 
     case DEVICE_FUNCTION.EMIT_433_CHACON:
-      message.parameters['code'] =
+      message.parameters.code =
         value === 1
           ? device.params.find((param) => param.name === 'CODE_ON').value
           : device.params.find((param) => param.name === 'CODE_OFF').value;
@@ -65,19 +65,19 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FUNCTION.EMIT_IR:
       switch (device.features[0].type) {
         case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
-          message.parameters['code'] =
+          message.parameters.code =
             value === 1
               ? device.params.find((param) => param.name === 'CODE_ON').value
               : device.params.find((param) => param.name === 'CODE_OFF').value;
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
-          message.parameters['code'] = device.params.find((param) => param.name === 'CODE').value;
+          message.parameters.code = device.params.find((param) => param.name === 'CODE').value;
           break;
         default:
           break;
       }
 
-      message.parameters['bit_length'] = device.params.find((param) => param.name === 'BIT_LENGTH').value;
+      message.parameters.bit_length = device.params.find((param) => param.name === 'BIT_LENGTH').value;
       break;
     default:
       logger.debug(`Arduino : Function = "${functionName}" not handled`);
