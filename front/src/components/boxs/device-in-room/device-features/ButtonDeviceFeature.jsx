@@ -18,7 +18,7 @@ const ButtonDeviceType = ({ children, ...props }) => {
       </td>
       <td>{props.device.name}</td>
       <td class="text-right">
-        <label class="custom-switch">
+        <label class="btn btn-secondary btn-outline-light">
           <input
             type="button"
             name={props.deviceFeature.id}
@@ -27,7 +27,7 @@ const ButtonDeviceType = ({ children, ...props }) => {
             checked={props.deviceFeature.last_value}
             onClick={updateValue}
           />
-          <span class="custom-switch-indicator" />
+          <span class="fe fe-circle" />
         </label>
       </td>
     </tr>
