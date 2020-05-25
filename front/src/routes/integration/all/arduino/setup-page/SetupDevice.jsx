@@ -117,11 +117,7 @@ class SetupDevice extends Component {
                 <Text id="integration.arduino.setup.notConnected" />
               </p>
             )}
-            {props.arduinoConnectionError && (
-              <p class="alert alert-danger">
-                <Text id="integration.arduino.setup.connectionError" /> - {props.arduinoConnectionError}
-              </p>
-            )}
+
             <div class="row mt-5">
               <div class="col">
                 <div class="form-group">
@@ -178,7 +174,7 @@ class SetupDevice extends Component {
                               props.device.params.find(e => e.name === 'ARDUINO_VENDOR_ID').value === usbPort.vendorId)
                           }
                         >
-                          {usbPort.comName} - {usbPort.manufacturer}
+                          {`${usbPort.comName} - ${usbPort.manufacturer}`}
                         </option>
                       ))}
                   </select>
