@@ -224,8 +224,13 @@ class MainApp extends Component {
     this.props.getIntegrations();
   }
 
-  render({ }, { }) {
-    return <AppRouter />;
+  render({ user }, {}) {
+    const translationDefinition = get(translations, user.language, { default: translations.en });
+    return (
+      <IntlProvider definition={translationDefinition}>
+        <AppRouter />
+      </IntlProvider>
+    );
   }
 }
 
