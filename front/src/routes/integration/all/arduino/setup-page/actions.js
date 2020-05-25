@@ -204,6 +204,8 @@ const actions = store => {
       const arduinoDevices = update(state.arduinoDevices, {
         $splice: [[index, 1]]
       });
+
+      await state.httpClient.get(`/api/v1/service/arduino/init`);
       store.setState({
         arduinoDevices
       });
