@@ -41,7 +41,7 @@ async function configure(device) {
       break;
   }
 
-  if (functionName !== DEVICE_FUNCTION.RECV_433) {
+  if (functionName === DEVICE_FUNCTION.'recv_dht') {
     send(path, message, device.params.find(param => param.name === 'PULSE_LENGTH').value);
   }
 }
