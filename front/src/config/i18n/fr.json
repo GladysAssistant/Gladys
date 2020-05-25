@@ -52,8 +52,8 @@
       "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, une assistante à domicile respectueuse de la vie privée de votre maison.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
-      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\"> documentation </a> ou posez une question sur <a href = \"https: //community.gladysassistant. com \"> Gladys community </a>.",
-      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/pricing\"> Gladys Plus. </a>",
+      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
+      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/fr/pricing/\">Gladys Plus</a>.",
       "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
       "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
     },
@@ -157,7 +157,7 @@
       "title": "Merci 🙏",
       "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
       "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/pricing\"> Gladys Plus </a>.",
+      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/pricing\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -298,7 +298,7 @@
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
-        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href = \"https: //community.gladysassistant. com \"> Gladys community </a>.",
+        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
         "noBridgesConnected": "Aucun pont connecté",
         "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?"
       },
@@ -504,7 +504,7 @@
       },
       "setup": {
         "title": "Configuration MQTT",
-        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\"> ici </a>.",
+        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\">ici</a>.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -536,7 +536,7 @@
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
-        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\"> ici </a>.",
+        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://documentation.gladysassistant.com/fr/configuration#xiaomi-configuration\">ici</a>.",
         "createDeviceInGladys": "Connexion à Gladys",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys. ",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
@@ -562,12 +562,12 @@
     "selectTriggerLabel": "Sélectionnez un type de déclencheur",
     "newAction": "Nouvelle action",
     "selectActionType": "Sélectionnez un type d'action",
-    "addActionButton": "Ajouter une nouvelle action",
+    "addActionButton": "Nouvelle action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque l'un de ces déclencheurs est déclenché, la scène s'exécute.",
     "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
-    "addNewTriggerButton": "Ajouter un nouveau déclencheur",
+    "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "triggerCard": {
       "title": "Déclencheurs",
@@ -609,7 +609,7 @@
     },
     "actions": {
       "device": {
-        "get-value": "Chercher le dernier état"
+        "get-value": "Récupérer le dernier état"
       },
       "message": {
         "send": "Envoyer un message"
@@ -950,7 +950,7 @@
       "integer": "Batterie"
     },
     "temperature-sensor": {
-      "decimal": "Valeur température"
+      "decimal": "Température"
     },
     "motion-sensor": {
       "push": "Détecteur de mouvement",
@@ -974,7 +974,7 @@
     },
     "smoke-sensor": {
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur feeeumée détectée"
+      "decimal": "Valeur de fumée détectée"
     },
     "co2-sensor": {
       "decimal": "CO2"
@@ -1152,7 +1152,7 @@
     "title": "Gladys Gateway",
     "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
-    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
     "confirmCode": "Confirmer 2FA",
     "enterCode": "Entrez le code à 6 chiffres",
