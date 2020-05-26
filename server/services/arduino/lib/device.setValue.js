@@ -36,6 +36,7 @@ async function setValue(device, deviceFeature, value) {
         device.params.find((param) => param.name === 'CODE').value === value
       ) {
         this.gladys.device.setValue(device, deviceFeature, 1);
+        throw new Error('Device value must be binary');
       }
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
