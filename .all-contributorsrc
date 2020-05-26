@@ -1,0 +1,27 @@
+{
+  "projectName": "Gladys",
+  "projectOwner": "GladysAssistant",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "Pierre-Gilles",
+      "name": "Pierre-Gilles Leymarie",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7365207?v=4",
+      "profile": "https://pierregillesleymarie.com",
+      "contributions": [
+        "code",
+        "business",
+        "doc",
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
