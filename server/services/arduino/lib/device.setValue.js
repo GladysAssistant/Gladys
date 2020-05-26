@@ -32,8 +32,8 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FUNCTION.RECV_433:
       // message.parameters['enable'] = value === 1 ? true : false;
       if (
-        (device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR ||
-          device.features[0].category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) &&
+        (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR ||
+          deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) &&
         device.params.find(param => param.name === 'CODE').value == value
       ) {
         this.gladys.device.setValue(device, deviceFeature, 1);

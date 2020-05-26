@@ -272,12 +272,7 @@ class ArduinoDeviceBox extends Component {
                         <Text id="integration.arduino.features.radioSensor" />
                       </option>
                       <option
-                        value={[
-                          DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-                          DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-                          '0',
-                          '1'
-                        ]}
+                        value={[DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.BINARY, '0', '1']}
                       >
                         <i class="fe fe-target" />
                         <Text id="integration.arduino.features.motionSensor" />
@@ -367,7 +362,8 @@ class ArduinoDeviceBox extends Component {
                   )}
 
                   {props.device.features[0].type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
-                    props.device.features[0].category !== DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
+                    props.device.features[0].category !== DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR &&
+                    props.device.features[0].category !== DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
                       <div class="form-group">
                         <div class="row">
                           <div class="col">
