@@ -44,6 +44,15 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "bertrandda",
+      "name": "Bertrand d'Aure",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/18148265?v=4",
+      "profile": "https://github.com/bertrandda",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
