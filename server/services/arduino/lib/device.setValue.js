@@ -3,6 +3,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = req
 const logger = require('../../../utils/logger');
 
 const { send } = require('./send');
+
 /**
  * @description Change value of a device.
  * @param {Object} device - The device to control.
@@ -33,8 +34,9 @@ async function setValue(device, deviceFeature, value) {
       if (
         device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR &&
         device.params.find((param) => param.name === 'CODE').value === value
-      )
-        this.setValue(device, deviceFeature, 1);
+      ) {
+        this.gladys.device.setValue(device, deviceFeature, 1);
+      }
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
       message.function_name = 'recv_dht';
