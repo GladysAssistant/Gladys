@@ -25,6 +25,10 @@ async function getLightsInRoom(roomId) {
         model: db.Service,
         as: 'service',
       },
+      {
+        model: db.DeviceParam,
+        as: 'params',
+      },
     ],
     where: {
       room_id: roomId,
