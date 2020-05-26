@@ -63,6 +63,17 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "sescandell",
+      "name": "Stéphane",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1559970?v=4",
+      "profile": "https://github.com/sescandell",
+      "contributions": [
+        "code",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7
