@@ -57,6 +57,7 @@ async function getLights() {
         case 'LTW013': // Hue White Ambiance GU10
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LOM002': // Hue Smart Plug On/Off
         case 'SP 120': // Innr Smart Plug On/Off
         case 'Plug 01': // OSRAM Plug
           lightsToReturn.push(getPlugOnOff(philipsHueLight, serialNumber, this.serviceId));
