@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import BoxColumns from './BoxColumns';
 import EditBoxColumns from './EditBoxColumns';
 import EmptyState from './EmptyState';
+import EditActions from './EditActions';
 
 const DashboardPage = ({ children, ...props }) => (
   <div class="page">
@@ -17,20 +18,6 @@ const DashboardPage = ({ children, ...props }) => (
                 <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
                     <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />
-                  </span>
-                </button>
-              )}
-              {props.dashboardEditMode && (
-                <button onClick={props.cancelDashboardEdit} class="btn btn-outline-danger btn-sm ml-2">
-                  <span>
-                    <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
-                  </span>
-                </button>
-              )}
-              {props.dashboardEditMode && (
-                <button onClick={props.saveDashboard} class="btn btn-outline-primary btn-sm ml-2">
-                  <span>
-                    <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
                   </span>
                 </button>
               )}
@@ -57,6 +44,7 @@ const DashboardPage = ({ children, ...props }) => (
               removeBox={props.removeBox}
             />
           )}
+          {props.dashboardEditMode && <EditActions {...props} />}
         </div>
       </div>
     </div>
