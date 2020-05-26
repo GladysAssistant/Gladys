@@ -313,9 +313,9 @@ class ArduinoDeviceBox extends Component {
                     </select>
                   </div>
 
-                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH ||
+                  {(props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH ||
                     (props.device.params.find(e => e.name === "FUNCTION").value === DEVICE_FUNCTION.RECV_433 && 
-                    props.device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR) && (
+                    props.device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR)) && (
                       <div class="form-group">
                         <div class="row">
                           <div class="col">
