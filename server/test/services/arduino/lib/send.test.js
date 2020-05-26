@@ -3,7 +3,7 @@ const proxyquire = require('proxyquire').noCallThru();
 class ArduinoManager {}
 
 const ArduinoService = proxyquire('../../../../services/arduino', {
-  './lib': ArduinoManager
+  './lib': ArduinoManager,
 });
 
 describe('send', () => {

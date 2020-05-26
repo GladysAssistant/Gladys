@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 
@@ -30,6 +30,11 @@ async function setValue(device, deviceFeature, value) {
   switch (functionName) {
     case DEVICE_FUNCTION.RECV_433:
       // message.parameters['enable'] = value === 1 ? true : false;
+      if (
+        device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR &&
+        device.params.find((param) => param.name === 'CODE').value === value
+      )
+        this.setValue(device, deviceFeature, 1);
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
       message.function_name = 'recv_dht';
