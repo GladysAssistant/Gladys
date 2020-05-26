@@ -33,6 +33,17 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "atrovato",
+      "name": "Alexandre Trovato",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1839717?v=4",
+      "profile": "http://www.trovato.fr",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7
