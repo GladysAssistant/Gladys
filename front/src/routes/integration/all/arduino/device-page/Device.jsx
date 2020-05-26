@@ -276,7 +276,7 @@ class ArduinoDeviceBox extends Component {
                           DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
                           DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
                           '0',
-                          '1000000000000'
+                          '1'
                         ]}
                       >
                         <i class="fe fe-target" />
