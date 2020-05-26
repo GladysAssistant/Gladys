@@ -1,7 +1,4 @@
-// const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
-// const { stub } = require('sinon');
-// const SerialPortMock = require('./SerialPortMock.test');
 
 class ArduinoManager {}
 

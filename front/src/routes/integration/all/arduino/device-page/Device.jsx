@@ -313,55 +313,57 @@ class ArduinoDeviceBox extends Component {
                     </select>
                   </div>
 
-                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH && (
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col">
-                          <label class="form-label" for="code">
-                            <Text id="integration.arduino.device.codeLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="code"
-                              type="text"
-                              value={props.device.params.find(e => e.name === 'CODE').value}
-                              onInput={this.updateCode}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.codeLabel" />}
-                            />
-                          </Localizer>
+                  {props.device.features[0].type === DEVICE_FEATURE_TYPES.SENSOR.PUSH ||
+                    (props.device.params.find(e => e.name === "FUNCTION").value === DEVICE_FUNCTION.RECV_433 && 
+                    props.device.features[0].category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR) && (
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col">
+                            <label class="form-label" for="code">
+                              <Text id="integration.arduino.device.codeLabel" />
+                            </label>
+                            <Localizer>
+                              <input
+                                id="code"
+                                type="text"
+                                value={props.device.params.find(e => e.name === 'CODE').value}
+                                onInput={this.updateCode}
+                                class="form-control"
+                                placeholder={<Text id="integration.arduino.device.codeLabel" />}
+                              />
+                            </Localizer>
+                          </div>
+                          <div class="col">
+                            <label class="form-label" for="bitLength">
+                              <Text id="integration.arduino.device.bitLengthLabel" />
+                            </label>
+                            <Localizer>
+                              <input
+                                id="bitLength"
+                                type="text"
+                                value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
+                                onInput={this.updateBitLength}
+                                class="form-control"
+                                placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
+                              />
+                            </Localizer>
+                          </div>
                         </div>
-                        <div class="col">
-                          <label class="form-label" for="bitLength">
-                            <Text id="integration.arduino.device.bitLengthLabel" />
-                          </label>
-                          <Localizer>
-                            <input
-                              id="bitLength"
-                              type="text"
-                              value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
-                              onInput={this.updateBitLength}
-                              class="form-control"
-                              placeholder={<Text id="integration.arduino.device.bitLengthLabel" />}
-                            />
-                          </Localizer>
-                        </div>
+                        <label class="form-label" for="pulseLength">
+                          <Text id="integration.arduino.device.pulseLengthLabel" />
+                        </label>
+                        <Localizer>
+                          <input
+                            id="pulseLength"
+                            type="text"
+                            value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
+                            onInput={this.updatePulseLength}
+                            class="form-control"
+                            placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
+                          />
+                        </Localizer>
                       </div>
-                      <label class="form-label" for="pulseLength">
-                        <Text id="integration.arduino.device.pulseLengthLabel" />
-                      </label>
-                      <Localizer>
-                        <input
-                          id="pulseLength"
-                          type="text"
-                          value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
-                          onInput={this.updatePulseLength}
-                          class="form-control"
-                          placeholder={<Text id="integration.arduino.device.pulseLengthLabel" />}
-                        />
-                      </Localizer>
-                    </div>
-                  )}
+                    )}
 
                   {props.device.features[0].type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
                     props.device.features[0].category !== DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
