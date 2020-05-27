@@ -29,8 +29,9 @@ const res = {
 
 describe('post /api/v1/service/arduino/listen', () => {
   it('should send a message to the arduino', async () => {
-    const req = {};
-    await ArduinoController['post /api/v1/service/arduino/listen'].controller(req, res);
+    const arduinoController = ArduinoController(arduinoManager);
+    const req = arduinoData;
+    await arduinoController['post /api/v1/service/arduino/listen'].controller(req, res);
     // assert.calledWith('/dev/ttyACM0', );
   });
 });
