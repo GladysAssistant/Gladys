@@ -1,5 +1,5 @@
 const { fake } = require('sinon');
-const event = new EventEmitter();
+const EventEmitter = require('events');
 const ArduinoController = require('../../../../services/arduino/api/arduino.controller');
 const ArduinoManager = require('../../../../services/arduino/lib');
 const ArduinoMock = require('../ArduinoMock.test');
@@ -15,6 +15,8 @@ const ArduinoMock = require('../ArduinoMock.test');
     productId: undefined,
   },
 ]; */
+
+const event = new EventEmitter();
 
 const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
 
