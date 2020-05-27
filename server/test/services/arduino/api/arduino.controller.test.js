@@ -1,5 +1,8 @@
 const { fake } = require('sinon');
+const event = new EventEmitter();
 const ArduinoController = require('../../../../services/arduino/api/arduino.controller');
+const ArduinoManager = require('../../../../services/arduino/lib');
+const ArduinoMock = require('../ArduinoMock.test');
 
 /* const ports = [
   {
@@ -12,6 +15,8 @@ const ArduinoController = require('../../../../services/arduino/api/arduino.cont
     productId: undefined,
   },
 ]; */
+
+const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
 
 const dhtData = require('../lib/dhtData.json');
 
@@ -29,8 +34,9 @@ describe('post /api/v1/service/arduino/listen', () => {
 
 describe('post /api/v1/service/arduino/send', () => {
   it('should init the devices', async () => {
+    const arduinoController = ArduinoController(arduinoManager);
     const req = {};
-    await ArduinoController['post /api/v1/service/arduino/send'].controller(req, res);
+    await arduinoController['post /api/v1/service/arduino/send'].controller(req,res);
     // assert.calledOnce();
   });
 });

@@ -1,6 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function ArduinoController(gladys, arduinoManager, serviceId) {
+module.exports = function ArduinoController(arduinoManager) {
   /**
    * @api {post} /api/v1/service/arduin/send Send
    * @apiName send
