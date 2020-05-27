@@ -34,7 +34,7 @@ async function setValue(device, deviceFeature, value) {
       if (
         (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR ||
           deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) &&
-        parseInt(device.params.find((param) => param.name === 'CODE').value, 0) === value
+        parseInt(device.params.find((param) => param.name === 'CODE').value, 0) === parseInt(value, 0)
       ) {
         this.gladys.device.setValue(device, deviceFeature, STATE.ON);
       }
