@@ -31,6 +31,6 @@ module.exports = function ArduinoService(gladys, serviceId) {
     start,
     stop,
     device: arduinoManager,
-    controllers: ArduinoController(gladys, arduinoManager, serviceId),
+    controllers: ArduinoController(arduinoManager),
   });
 };
