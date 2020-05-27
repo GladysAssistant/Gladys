@@ -13,7 +13,6 @@ const ArduinoController = require('../../../../services/arduino/api/arduino.cont
   },
 ]; */
 
-
 const dhtData = require('../lib/dhtData.json');
 
 const res = {
