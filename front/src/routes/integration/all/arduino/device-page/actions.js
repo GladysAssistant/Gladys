@@ -335,13 +335,13 @@ const actions = store => {
     },
     async search(state, e) {
       store.setState({
-        deviceSearch: e.target.value
+        devicesSearch: e.target.value
       });
       await actions.getDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getDeviceOrderDir: e.target.value
+        getDevicesOrderDir: e.target.value
       });
       await actions.getDevices(store.getState());
     },
