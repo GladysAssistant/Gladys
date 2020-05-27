@@ -1,4 +1,4 @@
-// const { expect } = require('chai');
+const { expect } = require('chai');
 const { spy } = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
@@ -20,7 +20,7 @@ describe('arduino', () => {
   it('should start service', async () => {
     spy(arduinoService, 'init');
     await arduinoService.start();
-    // expect(arduinoService.init.calledOnce).to.be.true;
+    expect(arduinoService.init.calledOnce).to.be.true;
   });
   it('should stop service', async () => {
     await arduinoService.stop();
