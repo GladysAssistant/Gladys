@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION, STATE } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 
@@ -36,7 +36,7 @@ async function setValue(device, deviceFeature, value) {
           deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) &&
         parseInt(device.params.find((param) => param.name === 'CODE').value, 0) === value
       ) {
-        this.gladys.device.setValue(device, deviceFeature, 1);
+        this.gladys.device.setValue(device, deviceFeature, STATE.ON);
       }
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:

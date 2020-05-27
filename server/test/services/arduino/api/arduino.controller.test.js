@@ -1,7 +1,7 @@
-const { assert, fake } = require('sinon');
+const { fake } = require('sinon');
 const ArduinoController = require('../../../../services/arduino/api/arduino.controller');
 
-const ports = [
+/* const ports = [
   {
     comName: '/dev/tty.HC-05-DevB',
     manufacturer: undefined,
@@ -11,7 +11,7 @@ const ports = [
     vendorId: undefined,
     productId: undefined,
   },
-];
+]; */
 
 const res = {
   json: fake.returns(null),

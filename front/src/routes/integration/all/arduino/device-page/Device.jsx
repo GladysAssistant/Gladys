@@ -221,7 +221,7 @@ class ArduinoDeviceBox extends Component {
                           <Localizer>
                             <input
                               id="dataPin"
-                              type="text"
+                              type="number"
                               value={props.device.params.find(e => e.name === 'DATA_PIN').value}
                               onInput={this.updateDataPin}
                               class="form-control"
@@ -321,7 +321,7 @@ class ArduinoDeviceBox extends Component {
                           <Localizer>
                             <input
                               id="code"
-                              type="text"
+                              type="number"
                               value={props.device.params.find(e => e.name === 'CODE').value}
                               onInput={this.updateCode}
                               class="form-control"
@@ -336,7 +336,7 @@ class ArduinoDeviceBox extends Component {
                           <Localizer>
                             <input
                               id="bitLength"
-                              type="text"
+                              type="number"
                               value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
                               onInput={this.updateBitLength}
                               class="form-control"
@@ -351,7 +351,7 @@ class ArduinoDeviceBox extends Component {
                       <Localizer>
                         <input
                           id="pulseLength"
-                          type="text"
+                          type="number"
                           value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
                           onInput={this.updatePulseLength}
                           class="form-control"
@@ -373,7 +373,7 @@ class ArduinoDeviceBox extends Component {
                             <Localizer>
                               <input
                                 id="codeOn"
-                                type="text"
+                                type="number"
                                 value={props.device.params.find(e => e.name === 'CODE_ON').value}
                                 onInput={this.updateCodeOn}
                                 class="form-control"
@@ -389,7 +389,7 @@ class ArduinoDeviceBox extends Component {
                             <Localizer>
                               <input
                                 id="codeOff"
-                                type="text"
+                                type="number"
                                 value={props.device.params.find(e => e.name === 'CODE_OFF').value}
                                 onInput={this.updateCodeOff}
                                 class="form-control"
@@ -405,7 +405,7 @@ class ArduinoDeviceBox extends Component {
                         <Localizer>
                           <input
                             id="bitLength"
-                            type="text"
+                            type="number"
                             value={props.device.params.find(e => e.name === 'BIT_LENGTH').value}
                             onInput={this.updateBitLength}
                             class="form-control"
@@ -419,7 +419,7 @@ class ArduinoDeviceBox extends Component {
                         <Localizer>
                           <input
                             id="pulseLength"
-                            type="text"
+                            type="number"
                             value={props.device.params.find(e => e.name === 'PULSE_LENGTH').value}
                             onInput={this.updatePulseLength}
                             class="form-control"
