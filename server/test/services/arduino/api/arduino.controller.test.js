@@ -36,7 +36,7 @@ describe('post /api/v1/service/arduino/send', () => {
   it('should init the devices', async () => {
     const arduinoController = ArduinoController(arduinoManager);
     const req = {};
-    await arduinoController['post /api/v1/service/arduino/send'].controller(req,res);
+    await arduinoController['post /api/v1/service/arduino/send'].controller(req, res);
     // assert.calledOnce();
   });
 });
