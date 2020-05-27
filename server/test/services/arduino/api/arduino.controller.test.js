@@ -21,6 +21,7 @@ const event = new EventEmitter();
 const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
 
 const dhtData = require('../lib/dhtData.json');
+const arduinoData = require('../lib/arduinoData.json');
 
 const res = {
   json: fake.returns(null),
@@ -34,27 +35,20 @@ describe('post /api/v1/service/arduino/listen', () => {
   });
 });
 
-describe('post /api/v1/service/arduino/send', () => {
-  it('should init the devices', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const req = {};
-    await arduinoController['post /api/v1/service/arduino/send'].controller(req, res);
-    // assert.calledOnce();
-  });
-});
-
 describe('post /api/v1/service/arduino/configure', () => {
-  it('should init the devices', async () => {
+  it('should configure a device', async () => {
+    const arduinoController = ArduinoController(arduinoManager);
     const req = dhtData;
-    await ArduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
+    await arduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
     // assert.calledOnce();
   });
 });
 
 describe('post /api/v1/service/arduino/setup', () => {
-  it('should init the devices', async () => {
-    const req = {};
-    await ArduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
+  it('should upload an arduino code in the card', async () => {
+    const arduinoController = ArduinoController(arduinoManager);
+    const req = arduinoData;
+    await arduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
     // assert.calledOnce();
   });
 });

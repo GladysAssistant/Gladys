@@ -2,18 +2,6 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function ArduinoController(arduinoManager) {
   /**
-   * @api {post} /api/v1/service/arduin/send Send
-   * @apiName send
-   * @apiGroup Arduino
-   */
-  async function send(req, res) {
-    arduinoManager.send(req.body);
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
    * @api {post} /api/v1/service/arduin/listen Listen
    * @apiName listen
    * @apiGroup Arduino
@@ -53,10 +41,6 @@ module.exports = function ArduinoController(arduinoManager) {
     'post /api/v1/service/arduino/listen': {
       authenticated: true,
       controller: asyncMiddleware(listen),
-    },
-    'post /api/v1/service/arduino/send': {
-      authenticated: true,
-      controller: asyncMiddleware(send),
     },
     'post /api/v1/service/arduino/configure': {
       authenticated: true,
