@@ -13,6 +13,9 @@ const ArduinoController = require('../../../../services/arduino/api/arduino.cont
   },
 ]; */
 
+
+const dhtData = require('../lib/dhtData.json');
+
 const res = {
   json: fake.returns(null),
 };
@@ -28,15 +31,15 @@ describe('post /api/v1/service/arduino/listen', () => {
 describe('post /api/v1/service/arduino/send', () => {
   it('should init the devices', async () => {
     const req = {};
-    await ArduinoController['get /api/v1/service/arduino/send'].controller(req, res);
+    await ArduinoController['post /api/v1/service/arduino/send'].controller(req, res);
     // assert.calledOnce();
   });
 });
 
 describe('post /api/v1/service/arduino/configure', () => {
   it('should init the devices', async () => {
-    const req = {};
-    await ArduinoController['get /api/v1/service/arduino/configure'].controller(req, res);
+    const req = dhtData;
+    await ArduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
     // assert.calledOnce();
   });
 });
@@ -44,7 +47,7 @@ describe('post /api/v1/service/arduino/configure', () => {
 describe('post /api/v1/service/arduino/setup', () => {
   it('should init the devices', async () => {
     const req = {};
-    await ArduinoController['get /api/v1/service/arduino/setup'].controller(req, res);
+    await ArduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
     // assert.calledOnce();
   });
 });
