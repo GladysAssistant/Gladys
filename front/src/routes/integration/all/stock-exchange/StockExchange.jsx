@@ -54,7 +54,7 @@ const StockExchangePage = ({ children, ...props }) => (
                       <div class="form-group">
                         <span class="input-group-append">
                           <button class="btn btn-primary" onClick={props.saveStockExchangeSettings}>
-                            <Text id={`integration.stockexchange.buttonSave`} />
+                            <Text id={`integration.stockExchange.saveButton`} />
                           </button>
                         </span>
                       </div>

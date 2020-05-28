@@ -8,12 +8,7 @@
     "serve": "npm run build && preact serve",
     "dev": "preact watch -p 1444 --template src/template.html",
     "eslint": "eslint src --ext .json --ext .js --ext .jsx",
-    "compare-translations": "npm run compare-i18n && npm run compare-device-integrations && npm run compare-communication-integrations && npm run compare-weather-integrations && npm run compare-calendar-integrations",
-    "compare-i18n": "comparejson -e ./src/config/i18n/*.json",
-    "compare-device-integrations": "comparejson -e ./src/config/integrations/device.*.json",
-    "compare-communication-integrations": "comparejson -e ./src/config/integrations/communication.*.json",
-    "compare-weather-integrations": "comparejson -e ./src/config/integrations/weather.*.json",
-    "compare-calendar-integrations": "comparejson -e ./src/config/integrations/calendar.*.json",
+    "compare-translations": "comparejson -e ./src/config/i18n/*.json",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
     "test": "jest --coverage"
@@ -59,6 +54,7 @@
     "set-value": "^3.0.0",
     "tabler-ui": "0.0.32",
     "unistore": "^3.2.1",
+    "useragent-parser-js": "^1.0.3",
     "uuid": "^3.3.2",
     "vis": "^4.21.0"
   },

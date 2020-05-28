@@ -5,7 +5,7 @@ const StockExchangeHandler = require('./lib');
 module.exports = function StockEchangeService(gladys, serviceId) {
 
   const stockExchangeHandler = new StockExchangeHandler(gladys, serviceId);
-
+  let quote;
   /**
    * @public
    * @description This function starts the StockEchangeService service

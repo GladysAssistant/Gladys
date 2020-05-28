@@ -74,6 +74,7 @@ class StockExchangeBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}StockExchange.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}StockExchange.${props.x}_${props.y}`);
     const datas = get(boxData, 'stockexchangedatas');
+    console.log(datas);
     return (
       <StockExchangeBox {...props} datas={datas} />
     );

@@ -14,6 +14,7 @@ async function getStockExchangeIndexQuote(symbols=['^FCHI', 'GIB']) {
 
   try {
     const cac = await fmp.stock(symbols).quote();
+    logger.debug(cac);
     return cac;
   } catch (e) {
     logger.warn('Unable to get FMP datas');
