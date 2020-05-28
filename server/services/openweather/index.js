@@ -65,7 +65,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
     }
     const url = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
     try {
-      logger.log(`Url appel vers OpenWeather : ${url}`);
+      logger.log(`OpenWeather URL : ${url}`);
       const { data } = await axios.get(url);
       const weatherFormatted = formatResults(optionsMerged, data);
       return weatherFormatted;
