@@ -35,15 +35,20 @@ describe('CalDAV requests', () => {
       Request: sinon.stub().returns({ requestDate: 'request3' }),
     },
     ical: {
-      parseICS: sinon.stub().returns({
-        data: {
-          type: 'VEVENT',
-          uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
-          summary: 'Evenement 1',
-          start: new Date('2018-06-08'),
-          end: new Date('2018-06-09'),
-        },
-      }),
+      parseICS: sinon
+        .stub()
+        .onFirstCall()
+        .returns({
+          data: {
+            type: 'VEVENT',
+            uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+            summary: 'Evenement 1',
+            start: new Date('2018-06-08'),
+            end: new Date('2018-06-09'),
+          },
+        })
+        .onSecondCall()
+        .returns({}),
     },
     xmlDom: {
       DOMParser: sinon.stub().returns({
@@ -87,6 +92,19 @@ describe('CalDAV requests', () => {
                 .returns([
                   { tagName: 'href', childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] },
                 ]),
+            },
+            {
+              tagName: 'response',
+              getElementsByTagName: sinon.stub().returns([
+                {
+                  tagName: 'calendar-data',
+                  childNodes: [
+                    {
+                      data: '',
+                    },
+                  ],
+                },
+              ]),
             },
           ]),
         }),
