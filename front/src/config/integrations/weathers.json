@@ -1,6 +1,6 @@
 [
   {
-    "key": "darkSky",
-    "img": "/assets/integrations/cover/darksky.jpg"
+    "key": "openweather",
+    "img": "/assets/integrations/cover/openweather.jpg"
   }
 ]
