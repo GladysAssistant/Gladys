@@ -9,7 +9,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev
 
 WORKDIR /tmp
 
