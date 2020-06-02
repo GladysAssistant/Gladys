@@ -48,7 +48,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
    *   longitude: -2,
    *   offset: 0,
    *   language: 'fr',
-   *   units: 'si'
+   *   units: 'metric'
    * });
    */
   async function get(options) {

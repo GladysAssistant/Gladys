@@ -14,7 +14,7 @@ const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
  *   longitude: -2,
  *   offset: 0,
  *   language: 'fr',
- *   units: 'si'
+ *   units: 'metric'
  * });
  */
 function get(options) {
