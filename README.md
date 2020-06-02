@@ -75,6 +75,7 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/bertrandda"><img src="https://avatars1.githubusercontent.com/u/18148265?v=4" width="100px;" alt=""/><br /><sub><b>Bertrand d'Aure</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=bertrandda" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Terdious"><img src="https://avatars0.githubusercontent.com/u/35010958?v=4" width="100px;" alt=""/><br /><sub><b>Terdious</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Terdious" title="Code">💻</a> <a href="#ideas-Terdious" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/sescandell"><img src="https://avatars0.githubusercontent.com/u/1559970?v=4" width="100px;" alt=""/><br /><sub><b>Stéphane</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=sescandell" title="Code">💻</a> <a href="#infra-sescandell" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-sescandell" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://fischerdesign.co"><img src="https://avatars1.githubusercontent.com/u/8835133?v=4" width="100px;" alt=""/><br /><sub><b>Scott Fischer</b></sub></a><br /><a href="#translation-Scott-Fischer" title="Translation">🌍</a></td>
   </tr>
 </table>
 
