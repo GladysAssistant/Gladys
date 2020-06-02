@@ -74,7 +74,17 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "Scott-Fischer",
+      "name": "Scott Fischer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8835133?v=4",
+      "profile": "http://fischerdesign.co",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
