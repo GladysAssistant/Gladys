@@ -1,46 +1,44 @@
-// @ts-ignore
 // const { expect } = require('chai');
-// const { assert } = require('sinon');
+const { spy, assert } = require('sinon');
 const EventEmitter = require('events');
 
-// @ts-ignore
 const event = new EventEmitter();
 const ArduinoManager = require('../../../../services/arduino/lib');
 const ArduinoMock = require('../ArduinoMock.test');
-const arduinoData = require('./arduinoData.json');
-const deviceData = require('./deviceData.json');
-const dhtData = require('./dhtData.json');
+const arduinoData = require('./data/arduinoData.json');
+const deviceData = require('./data/deviceData.json');
+const dhtData = require('./data/dhtData.json');
 
 describe('arduinoManager commands', () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   it('should listen to arduino devices', () => {
-    // @ts-ignore
-    arduinoManager.listen();
-    // @ts-ignore
-    // assert.calledOnce(arduinoManager.listen);
+    const listenSpy = spy(arduinoManager, 'listen');
+    arduinoManager.listen(arduinoData);
+    assert.calledOnce(listenSpy);
   });
   it('should send a JSON to the arduino', () => {
+    const sendSpy = spy(arduinoManager, 'send');
     arduinoManager.send(
       '/dev/ttyACM0',
       { function_name: 'emit_433_chacon', parameters: { data_pin: '4', code: '1536116368' } },
       1,
     );
-    // @ts-ignore
-    // assert.calledOnce(arduinoManager.send);
+
+    assert.calledOnce(sendSpy);
   });
   it('should configure reception of an arduino (DHT)', () => {
-    // @ts-ignore
+    const configureSpy = spy(arduinoManager, 'configure');
     arduinoManager.configure(dhtData);
-    // @ts-ignore
-    // assert.calledOnce(arduinoManager.configure);
+    assert.calledOnce(configureSpy);
   });
   it('should set the value of a feature', () => {
+    const setValueSpy = spy(arduinoManager, 'setValue');
     arduinoManager.setValue(deviceData, deviceData.features[0], 1);
-    // assert.calledOnce(arduinoManager.setValue);
+    assert.calledOnce(setValueSpy);
   });
   it('should flash an arduino card', () => {
+    const setupSpy = spy(arduinoManager, 'setup');
     arduinoManager.setup(arduinoData);
-    // @ts-ignore
-    // assert.calledOnce(arduinoManager.setup);
+    assert.calledOnce(setupSpy);
   });
 });
