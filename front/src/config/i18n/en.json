@@ -48,10 +48,10 @@
   },
   "signup": {
     "welcome": {
-      "title": "Welcome in Gladys 🙋",
+      "title": "Welcome to Gladys 🙋",
       "introSentence": "First, thank you for choosing me. I'm Gladys, a privacy-friendly home assistant for your house.",
       "introTimeToCreateAccount": "It's time to create a local account for your Gladys setup.",
-      "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the informations you'll enter are just saved in the local database of Gladys.",
+      "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the information you'll enter is only saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
       "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
       "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
@@ -59,11 +59,11 @@
     },
     "createLocalAccount": {
       "title": "Create your local Gladys account",
-      "description": "All informations entered here are only saved locally in Gladys database. You can update them later at any time.",
-      "firstnameLabel": "Firstname",
-      "firstnamePlaceHolder": "Enter your Firstname",
-      "lastnameLabel": "Lastname",
-      "lastnamePlaceHolder": "Enter your Lastname",
+      "description": "All information entered here is only saved locally in Gladys database. You can update it later at any time.",
+      "firstnameLabel": "First Name",
+      "firstnamePlaceHolder": "Enter your first name",
+      "lastnameLabel": "Last Name",
+      "lastnamePlaceHolder": "Enter your last name",
       "languageLabel": "Language",
       "english": "English",
       "french": "Français",
@@ -87,15 +87,15 @@
       "passwordPlaceHolder": "Enter a password",
       "passwordRepeatLabel": "Repeat your password",
       "passwordRepeatPlaceHolder": "Repeat your password",
-      "firstnameError": "Firstname is required.",
-      "lastnameError": "Lastname is required.",
+      "firstnameError": "First name is required.",
+      "lastnameError": "Last name is required.",
       "emailError": "Email is not a valid email",
       "passwordError": "Password should be at least 8 characters.",
-      "passwordRepeatError": "Password are not matching.",
+      "passwordRepeatError": "Passwords do not match.",
       "birthdateError": "Birthdate is required.",
-      "networkError": "Network Error: We didn't succeeded in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
+      "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
       "emailAlreadyExistError": "A user with this email already exist.",
-      "selectorAlreadyExistError": "A user with this firstname already exist.",
+      "selectorAlreadyExistError": "A user with this first name already exist.",
       "createAccountButton": "Create Account"
     },
     "restoreBackupSetBackupKey": {
@@ -118,7 +118,7 @@
     },
     "preferences": {
       "title": "Your preferences",
-      "description": "You can modify those settings anytime later.",
+      "description": "You can modify those settings later.",
       "temperatureUnitsLabel": "Temperature unit",
       "temperatureUnitsCelsius": "Celsius (°C)",
       "temperatureUnitsFahrenheit": "Fahrenheit (°F)",
@@ -136,7 +136,7 @@
     },
     "configureHouse": {
       "title": "Configure your house",
-      "description": "All those informations are saved only in Gladys local database. If you have several houses, you can configure them later in Gladys.",
+      "description": "All information is only saved in Gladys local database. If you have several houses, you can configure them later in Gladys.",
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Enter your house name",
       "houseNameError": "House name is required",
@@ -157,7 +157,7 @@
       "title": "Allow me to thank you 🙏",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contribution to make this project substainable. If you want to access to additionnal features and support Gladys, read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to Dashboard"
     }
   },
@@ -356,7 +356,7 @@
         "healNetworkButton": "Heal",
         "removeNode": "Remove",
         "scanButton": "Scan",
-        "noZwaveDevices": "No Z-Wave devices found. Have you selected your dongle USB port in Settings?",
+        "noZwaveDevices": "No Z-Wave devices found. Have you selected your USB dongle port in Settings?",
         "manufacturer": "Manufacturer",
         "name": "Name",
         "type": "Type",
@@ -369,7 +369,7 @@
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
-        "deviceCreatedSuccess": "The device was added with success."
+        "deviceCreatedSuccess": "The device was successfully added"
       },
       "network": {
         "title": "Z-Wave Network"
@@ -394,14 +394,14 @@
         "seconds": "seconds remaining",
         "cancelButton": "Cancel",
         "nodeAddedTitle": "A new node was found",
-        "nodeAddedDescription": "Wait a few seconds while we get all informations from this node..."
+        "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }
     },
     "darkSky": {
       "title": "DarkSky",
       "description": "Get the weather in Gladys.",
-      "introduction": "This integration helps you integrate with DarkSky API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on DarkSky API website: <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
+      "introduction": "This integration helps you integrate with the DarkSky API to get the weather in Gladys.",
+      "instructions": "You first need to create an account on the DarkSky API website: <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter DarkSky API key",
       "saveButton": "Save",
@@ -434,7 +434,7 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received."
       },
@@ -492,10 +492,10 @@
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
-        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway need to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
+        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway needs to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
         "createDeviceInGladys": "Connect in Gladys",
-        "createDeviceError": "There was an error creating this device in Gladys. ",
-        "deviceCreatedSuccess": "The device was added with success."
+        "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "deviceCreatedSuccess": "The device was successfully added."
       },
       "models": {
         "motion": "Motion Sensor",
@@ -565,7 +565,7 @@
     "addActionButton": "Add action",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
-    "triggersDescription": "Every trigger is independent. When any of those triggers is triggered, the scene will run.",
+    "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
@@ -696,10 +696,10 @@
     "adminRole": "Administrator",
     "invitationPending": "Pending",
     "invitationSuccess": "Accepted",
-    "firstnameLabel": "Firstname",
-    "firstnamePlaceholder": "Enter your firstname",
-    "lastnameLabel": "Lastname",
-    "lastnamePlaceholder": "Enter your lastname",
+    "firstnameLabel": "First Name",
+    "firstnamePlaceholder": "Enter your first name",
+    "lastnameLabel": "Last Name",
+    "lastnamePlaceholder": "Enter your last name",
     "selectorLabel": "Selector",
     "birthdateLabel": "Birthdate",
     "year": "Year",
@@ -718,15 +718,15 @@
     "passwordRepeatLabel": "Repeat your password",
     "passwordRepeatPlaceholder": "Repeat your password",
     "saveButton": "Save your profile",
-    "firstnameError": "Firstname is required.",
-    "lastnameError": "Lastname is required.",
+    "firstnameError": "First name is required.",
+    "lastnameError": "Last name is required.",
     "emailError": "Email is not a valid email",
     "passwordError": "Password should be at least 8 characters.",
-    "passwordRepeatError": "Password are not matching.",
+    "passwordRepeatError": "Passwords do not match.",
     "birthdateError": "Birthdate is required.",
-    "networkError": "Network Error: We didn't succeeded in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
+    "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
     "emailAlreadyExistError": "A user with this email already exist.",
-    "selectorAlreadyExistError": "A user with this firstname already exist.",
+    "selectorAlreadyExistError": "A user with this first name already exist.",
     "instanceAlreadyConfiguredError": "This instance is already configured. You cannot create another account.",
     "unknownError": "An unknown error occured. Please try again or contact Gladys community."
   },
@@ -764,7 +764,7 @@
     "emailPlaceholder": "Enter your email",
     "button": "Recover my password",
     "wrongEmailError": "This is not a valid email",
-    "networkError": "Network Error: We didn't succeeded in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
+    "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
     "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
     "success": "Success! You should see a reset password link in Gladys logs.",
     "userNotFound": "There is no account linked to this email.",
@@ -796,7 +796,7 @@
   "httpErrors": {
     "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
     "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-    "networkError": "Network Error: We didn't succeeded in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?"
+    "networkError": "Network Error:  We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?"
   },
   "systemSettings": {
     "connected": "Connected",
@@ -867,13 +867,13 @@
     "disconnectTitle": "Disconnect your Plus account",
     "disconnectButton": "Disconnect",
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
-    "gatewayConnectedSuccessDescription": "Your Gladys instance was connected with success.",
+    "gatewayConnectedSuccessDescription": "Your Gladys instance was successfully connected.",
     "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
     "gatewayConnectedSuccessButton": "I saved the backup key!"
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
-    "pricingSentence": "Gladys Assistant is free to use, but if you can subscribe to Gladys Plus for additionnal features!",
+    "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features!",
     "free": "Free",
     "gladysPlus": "Gladys Plus",
     "currentPlan": "Current Plan",
@@ -900,9 +900,9 @@
     "invalidEmail": "Invalid email",
     "networkError": "Network Error: Are you sure your Gladys instance is connected to the internet?",
     "userNotAcceptedLocally": "Your user is not accepted locally, please go back to your Gladys instance and allow access to this user in settings.",
-    "gatewayNoInstanceFound": "No Instance found. You need to connect first your instance to Gladys.",
+    "gatewayNoInstanceFound": "No Instance found. You need to first connect your instance to Gladys.",
     "gatewayAccessBilling": "To access billing, click here.",
-    "unknownError": "An unknown error occurred. Please contact us for more informations.",
+    "unknownError": "An unknown error occurred. Please contact us for more information.",
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
     "loginTwoFactorButtonText": "Finalize Login",
@@ -1059,7 +1059,7 @@
     "label": "Select you Gladys user",
     "description": "Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
-    "error": "An error occurred. Is your user accepted locally in your Gladys instance ?",
+    "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
     "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
   },
@@ -1082,7 +1082,7 @@
     "addButton": "Add feature",
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
-    "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique ?",
+    "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
     "notFound": "Requested device not found."
   },
   "gatewaySignup": {
@@ -1092,23 +1092,23 @@
     "supportText": "Support at hello@gladysassistant.com",
     "createAccount": "Create your Gladys Plus account",
     "emailAlreadyExistError": "An account with that email already exist",
-    "browserNotCompatibleError": " Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API.",
+    "browserNotCompatibleError": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API.",
     "tokenError": "You have to subscribe to the Gladys Community Package on Gladys website first!",
     "unknownError": "An unknown error occured. Please retry later or contact me at hello@gladysassistant.com to understand what happened.",
-    "invalidInvitationError": "We cannot retrieve your invitation. Maybe it was already used or has expired! Please contact us at hello@gladysassistant.com."
+    "invalidInvitationError": "We cannot retrieve your invitation. Maybe it was already used or it has expired! Please contact us at hello@gladysassistant.com."
   },
   "gatewaySubscribe": {
     "registerGladysPlus": "Register to Gladys Plus",
     "emailAddress": "Email Address",
     "emailAddressPlaceholder": "Enter Email",
-    "cardInformations": "Card Informations",
+    "cardInformations": "Card Information",
     "paymentSecuredByStripe": "🔒 Payment Secured by <a href=\"https://stripe.com/docs/security/stripe\" target=\"_blank\" rel=\"noopener noreferrer\">Stripe</a>",
     "subscribeButton": "Subscribe (9.99€/month)",
     "priceButton": "9.99€/month",
-    "invalidEmailAddress": "Invalid Email Adress",
+    "invalidEmailAddress": "Invalid Email Address",
     "emailAlreadyExist": "An account with this email address already exist!",
     "paymentFailed": "Payment failed. Please try again or try with a different card.",
-    "paymentSuccess": "Congrats, you just suscribed to Gladys Plus. Check your email to get access to the Slack and the Gladys Gateway. Thanks for your support!"
+    "paymentSuccess": "Congrats, you just subscribed to Gladys Plus. Check your email to get access to the Slack and the Gladys Gateway. Thanks for your support!"
   },
   "gatewayForgotPassword": {
     "pageTitle": "Gladys Assistant",
@@ -1123,7 +1123,7 @@
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Reset Password",
-    "incompatibleBrowserLabel": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API as well as IndexedDB database.",
+    "incompatibleBrowserLabel": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API as well as IndexedDB databases.",
     "errorLinkLabel": "We cannot retrieve your reset password link. Maybe it was already used or has expired!",
     "passwordNotMatchingLabel": "Password are not matching.",
     "passwordLabel": "Password (min 8 characters)",
@@ -1136,8 +1136,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "The Open API allows you to send informations to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/en/configuration#gateway-open-api\">More informations.</a>",
+    "description": "The Open API allows you to send information to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
+    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/en/configuration#gateway-open-api\">More information.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",
@@ -1193,19 +1193,19 @@
   },
   "gatewayBilling": {
     "title": "Billing",
-    "informationTitle": "Your billing informations",
+    "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
     "cardTypeLabel": "Type",
     "cardLastDigitsLabel": "Last 4 digits",
     "cardExpirationLabel": "Expiration date",
-    "updateInformationTitle": "Update Card Informations",
+    "updateInformationTitle": "Update Card Information",
     "updateInformationDescription": "If your card has expired, or you want to change credit card, you can update here your card information.",
     "cancelSubscriptionTitle": "Cancel subscription",
     "cancelSubscriptionError": "Warning: There was an error while trying to cancel your account. Please retry again later.",
-    "cancelSubscriptionSuccess": "Your subscription was canceled with success!",
+    "cancelSubscriptionSuccess": "Your subscription was successfully canceled!",
     "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
     "cancelSubscriptionButton": "Cancel subscription",
-    "accountCancelled": "Your account was cancelled on {{date}}",
+    "accountCancelled": "Your account was canceled on {{date}}",
     "subscriptionButton": "Subscribe again"
   }
 }
