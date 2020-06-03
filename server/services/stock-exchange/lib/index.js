@@ -10,7 +10,6 @@ const { getStockExchangeIndexQuote } = require('./getStockExchangeIndexQuote');
 const StockExchangeHandler = function StockExchangeHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.quote = null;
 };
 
 StockExchangeHandler.prototype.getStockExchangeIndexQuote = getStockExchangeIndexQuote;

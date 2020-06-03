@@ -422,7 +422,10 @@
       "title": "Financial Modeling Prep API",
       "description": "Get the stock exchange indexes in Gladys.",
       "introduction": "This integration helps you integrate with <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">Fmp API</a> to get the stock exchange indexes and values in Gladys.",
+      "instructions": "You first need to create an account on <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">FMP API website</a>.",
       "instructionsToUse": "To use this integration, go to the dashboard and create a stock exchange box.",
+      "apiKeyLabel": "Then, enter your API key here:",
+      "apiKeyPlaceholder": "Enter FMP API key",
       "selectTickerLabel": "Tickers",
       "selectTickerDescription": "Choose the tickers that will be displayed.",
       "saveButton": "Save"

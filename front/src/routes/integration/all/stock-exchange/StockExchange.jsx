@@ -24,15 +24,34 @@ const StockExchangePage = ({ children, ...props }) => (
                         <MarkupText id="integration.stockExchange.introduction" />
                       </p>
                       <p>
-                        <Text id="integration.stockExchange.instructions" />
+                        <MarkupText id="integration.stockExchange.instructions" />
                       </p>
+
+                      <div class="form-group">
+                        <div class="form-label">
+                          <Text id="integration.stockExchange.apiKeyLabel" />
+                        </div>
+                        <div class="input-group">
+                          <Localizer>
+                            <input
+                              type="text"
+                              class="form-control"
+                              placeholder={<Text id="integration.stockExchange.apiKeyPlaceholder" />}
+                              onInput={props.updateApiKey}
+                              value={props.stockExchangeApiKey}
+                            />
+                          </Localizer>
+
+                        </div>
+                      </div>
+
 
                       <div class="form-group">
                         <div class="form-label">
                           <Text id="integration.stockExchange.selectTickerLabel" />
                         </div>
                         <Text id="integration.stockExchange.selectTickerDescription" />
-                        <select class="form-control" onChange={props.updateTickers} value={props.tickers}>
+                        <select class="form-control" onChange={props.updateTickers} value={props.stockExchangeTickers}>
                           <option value="^FCHI">
                             CAC40
                           </option>

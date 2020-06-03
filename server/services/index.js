@@ -9,4 +9,4 @@ module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports.tasmota = require('./tasmota');
-module.exports.tasmota = require('./stock-exchange');
+module.exports['stock-exchange'] = require('./stock-exchange');

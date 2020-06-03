@@ -32,7 +32,7 @@ module.exports = function StockExchangeController(stockExchangHandler) {
    * }
    */
   async function getStockExchangeIndexQuote(req, res) {
-    const result = await stockExchangHandler.getStockExchangeIndexQuote();
+    const result = await stockExchangHandler.getStockExchangeIndexQuote(req.user.id);
     res.json(result);
   }
 

@@ -14,7 +14,6 @@ function createActions(store) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         const stockexchangedatas = await state.httpClient.get(`/api/v1/stockexchange/getStockExchangeIndexQuote`);
-        console.log(stockexchangedatas);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           stockexchangedatas
         });
