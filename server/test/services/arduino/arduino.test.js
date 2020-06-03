@@ -56,9 +56,9 @@ const deviceManager = {
   ]),
 };
 
- const ArduinoService = proxyquire('../../../services/arduino', {
-  'serial': SerialPortMock,
-}); 
+const ArduinoService = proxyquire('../../../services/arduino', {
+  serial: SerialPortMock,
+});
 
 const event = new EventEmitter();
 
