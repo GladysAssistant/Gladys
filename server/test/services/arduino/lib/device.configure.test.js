@@ -1,21 +1,10 @@
-const { fake, assert, spy } = require('sinon');
+// const { expect } = require('chai');
+const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
-const ArduinoController = require('../../../../services/arduino/api/arduino.controller');
-const ArduinoManager = require('../../../../services/arduino/lib');
-const ArduinoMock = require('../ArduinoMock.test');
-
-/* const ports = [
-  {
-    comPath: '/dev/ttyACM0',
-    comName: '/dev/ttyACM0',
-    manufacturer: undefined,
-    serialNumber: undefined,
-  },
-]; */
 
 const event = new EventEmitter();
-
-const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+const ArduinoManager = require('../../../../services/arduino/lib');
+const ArduinoMock = require('../ArduinoMock.test');
 
 const arduinoData = {
   id: '8e25bf9a-4b24-4099-a08d-f4afe323c3a7',
@@ -197,38 +186,12 @@ const gladys = {
   },
 };
 
-arduinoManager.gladys = gladys;
-
-const res = {
-  json: fake.returns(null),
-};
-
-describe('post /api/v1/service/arduino/listen', async () => {
-  it('should listen to arduino devices', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/listen'], 'controller');
-    const req = arduinoData;
-    await arduinoController['post /api/v1/service/arduino/listen'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
-  });
-});
-
-describe('post /api/v1/service/arduino/configure', () => {
-  it('should configure a device', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/configure'], 'controller');
-    const req = dhtData;
-    await arduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
-  });
-});
-
-describe('post /api/v1/service/arduino/setup', async () => {
-  it('should upload an arduino code in the card', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/setup'], 'controller');
-    const req = arduinoData;
-    await arduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
+describe('configure function', async () => {
+  const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+  arduinoManager.gladys = gladys;
+  it('should configure the device (dht)', async () => {
+    const configureSpy = spy(arduinoManager, 'configure');
+    arduinoManager.configure(dhtData);
+    assert.calledOnce(configureSpy);
   });
 });
