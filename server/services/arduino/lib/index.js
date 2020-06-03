@@ -12,10 +12,8 @@ const setValueLimiter = new Bottleneck({
   minTime: 400, // 400 ms
 });
 
-const ArduinoManager = function ArduinoManager(gladys, serial, eventManager, serviceId) {
+const ArduinoManager = function ArduinoManager(gladys, serviceId) {
   this.gladys = gladys;
-  this.serial = serial;
-  this.eventManager = eventManager;
   this.serviceId = serviceId;
   this.arduinosPorts = {};
   this.arduinoParsers = {};

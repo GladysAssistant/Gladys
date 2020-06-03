@@ -1,8 +1,6 @@
 // const { expect } = require('chai');
 const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
-
-const event = new EventEmitter();
 const ArduinoManager = require('../../../../services/arduino/lib');
 const ArduinoMock = require('../ArduinoMock.test');
 
@@ -231,10 +229,10 @@ const gladys = {
 
 describe('setValue function', async () => {
   it('should set the value ON', async () => {
-    const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     arduinoManager.gladys = gladys;
     const setValueOnSpy = spy(arduinoManager, 'setValue');
-    await arduinoManager.setValue(
+    arduinoManager.setValue(
       {
         id: '779fa305-bb11-4b73-aa4a-accc79743e9b',
         service_id: '1dbaeb48-d6d2-4930-b7ca-f17d637a364b',
@@ -381,10 +379,10 @@ describe('setValue function', async () => {
     setValueOnSpy.restore();
   });
   it('should set the value OFF', async () => {
-    const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     arduinoManager.gladys = gladys;
     const setValueOffSpy = spy(arduinoManager, 'setValue');
-    await arduinoManager.setValue(
+    arduinoManager.setValue(
       {
         id: '779fa305-bb11-4b73-aa4a-accc79743e9b',
         service_id: '1dbaeb48-d6d2-4930-b7ca-f17d637a364b',

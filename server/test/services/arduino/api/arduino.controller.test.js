@@ -13,9 +13,7 @@ const ArduinoMock = require('../ArduinoMock.test');
   },
 ]; */
 
-const event = new EventEmitter();
-
-const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
 
 const arduinoData = {
   id: '8e25bf9a-4b24-4099-a08d-f4afe323c3a7',

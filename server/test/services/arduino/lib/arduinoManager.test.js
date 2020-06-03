@@ -2,7 +2,6 @@
 const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
 
-const event = new EventEmitter();
 const ArduinoManager = require('../../../../services/arduino/lib');
 const ArduinoMock = require('../ArduinoMock.test');
 // const arduinoData = require('./data/arduinoData.json');
@@ -310,7 +309,7 @@ const gladys = {
 };
 
 describe('arduinoManager commands', async () => {
-  const arduinoManager = new ArduinoManager(ArduinoMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+  const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
   it('should listen to arduino devices', async () => {
     const listenSpy = spy(arduinoManager, 'listen');
