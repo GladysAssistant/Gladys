@@ -173,7 +173,7 @@ const dhtData = {
 
 const deviceManager = {
   get: fake.resolves([arduinoData, dhtData]),
-  getBySelector: fake.resolves([arduinoData]),
+  getBySelector: fake.resolves(arduinoData),
   setValue: fake.resolves(null),
 };
 

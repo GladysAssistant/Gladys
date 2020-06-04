@@ -3,6 +3,7 @@ const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
 
 const ArduinoManager = require('../../../../services/arduino/lib');
+const SerialPort = require('../SerialPortMock.test');
 const ArduinoMock = require('../ArduinoMock.test');
 // const arduinoData = require('./data/arduinoData.json');
 // const deviceData = require('./data/deviceData.json');
@@ -296,7 +297,7 @@ const dhtData = {
 
 const deviceManager = {
   get: fake.resolves([arduinoData, deviceData, dhtData]),
-  getBySelector: fake.resolves([arduinoData]),
+  getBySelector: fake.resolves(arduinoData),
   setValue: fake.resolves(null),
 };
 
@@ -311,6 +312,8 @@ const gladys = {
 describe('arduinoManager commands', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
+  arduinoManager.arduinoParsers = { '/dev/ttyACM0': new SerialPort() };
+  arduinoManager.arduinosPorts = { '/dev/ttyACM0': new SerialPort() };
   it('should listen to arduino devices', async () => {
     const listenSpy = spy(arduinoManager, 'listen');
     await arduinoManager.listen(arduinoData);
@@ -318,7 +321,7 @@ describe('arduinoManager commands', async () => {
   });
   it('should send a JSON to the arduino', async () => {
     const sendSpy = spy(arduinoManager, 'send');
-    arduinoManager.send(
+    await arduinoManager.send(
       '/dev/ttyACM0',
       { function_name: 'emit_433_chacon', parameters: { data_pin: '4', code: '1536116368' } },
       1,
@@ -327,17 +330,17 @@ describe('arduinoManager commands', async () => {
   });
   it('should configure reception of an arduino (DHT)', async () => {
     const configureSpy = spy(arduinoManager, 'configure');
-    arduinoManager.configure(dhtData);
+    await arduinoManager.configure(dhtData);
     assert.calledOnce(configureSpy);
   });
   it('should set the value of a feature', async () => {
     const setValueSpy = spy(arduinoManager, 'setValue');
-    arduinoManager.setValue(deviceData, deviceData.features[0], 1);
+    await arduinoManager.setValue(deviceData, deviceData.features[0], 1);
     assert.calledOnce(setValueSpy);
   });
   it('should flash an arduino card', async () => {
     const setupSpy = spy(arduinoManager, 'setup');
-    arduinoManager.setup(arduinoData);
+    await arduinoManager.setup(arduinoData);
     assert.calledOnce(setupSpy);
   });
 });

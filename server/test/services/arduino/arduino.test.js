@@ -1,10 +1,11 @@
 const { expect } = require('chai');
 const { fake } = require('sinon');
 const EventEmitter = require('events');
-const proxyquire = require('proxyquire').noCallThru();
+// const proxyquire = require('proxyquire').noCallThru();
 // const ArduinoMock = require('./ArduinoMock.test');
-const SerialPortMock = require('./SerialPortMock.test');
+// const SerialPortMock = require('./SerialPortMock.test');
 const ArduinoManager = require('../../../services/arduino/lib');
+const ArduinoService = require('../../../services/arduino');
 // const ArduinoService = require('../../../services/arduino');
 
 const deviceManager = {
@@ -295,10 +296,6 @@ const deviceManager = {
     },
   ]),
 };
-
-const ArduinoService = proxyquire('../../../services/arduino', {
-  serial: SerialPortMock,
-});
 
 const gladys = {
   event: new EventEmitter(),
