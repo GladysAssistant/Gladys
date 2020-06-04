@@ -32,8 +32,6 @@ async function configure(device) {
 
   switch (functionName) {
     case 'recv_dht':
-      message.parameters.enable = '1';
-      break;
     case DEVICE_FUNCTION.DHT_HUMIDITY:
       message.parameters.enable = '1';
       break;

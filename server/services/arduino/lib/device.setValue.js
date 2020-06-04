@@ -40,8 +40,6 @@ async function setValue(device, deviceFeature, value) {
       }
       break;
     case DEVICE_FUNCTION.DHT_TEMPERATURE:
-      message.function_name = 'recv_dht';
-      break;
     case DEVICE_FUNCTION.DHT_HUMIDITY:
       message.function_name = 'recv_dht';
       break;

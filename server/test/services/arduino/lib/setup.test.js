@@ -97,7 +97,7 @@ const falseArduinoData = {
 
 const deviceManager = {
   get: fake.resolves([arduinoData, falseArduinoData]),
-  getBySelector: fake.resolves([arduinoData]),
+  getBySelector: fake.resolves(arduinoData),
 };
 
 const gladys = {
