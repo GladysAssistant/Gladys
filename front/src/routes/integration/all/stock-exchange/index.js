@@ -11,8 +11,9 @@ class StockExchangeIntegration extends Component {
   }
 
   render(props, {}) {
-    const loading = props.stockexchangeSetSettingsStatus === RequestStatus.Getting ||
-    props.stockexchangeGetSettingsStatus === RequestStatus.Getting;
+    const loading =
+      props.stockexchangeSetSettingsStatus === RequestStatus.Getting ||
+      props.stockexchangeGetSettingsStatus === RequestStatus.Getting;
     return <StockExchangePage {...props} loading={loading} />;
   }
 }

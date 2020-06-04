@@ -3,9 +3,10 @@ const logger = require('../../../utils/logger');
 
  /**
   * @description Get the stock-exchange datas.
+  * @param {string} userId - Gladys user to connect.
   * @returns {Promise<Array>} Resolve with array of stock exchange datas.
   * @example
-  * getStockExchangeIndexQuote();
+  * getStockExchangeIndexQuote("3ebd27cb-42cf-4b32-a33c-135af7d62a37");
   */
 async function getStockExchangeIndexQuote(userId) {
 
@@ -14,7 +15,7 @@ async function getStockExchangeIndexQuote(userId) {
 
   try {
     const fmp = new FinancialModelingPrep(apiKey);
-    const cac = await fmp.stock(tickers ? tickers : ['^FCHI', 'GIB']).quote();
+    const cac = await fmp.stock(tickers || ['^FCHI', 'GIB']).quote();
     return cac;
   } catch (e) {
     logger.warn('Unable to get FMP datas');
