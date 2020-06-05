@@ -26,7 +26,7 @@ const gladys = {
   },
 };
 
-describe.only('listen function', async () => {
+describe('listen function', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
   arduinoManager.arduinoParsers = { '/dev/ttyACM0': null };

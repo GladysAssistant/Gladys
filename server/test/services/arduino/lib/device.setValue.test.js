@@ -148,7 +148,7 @@ const gladys = {
   },
 };
 
-describe.only('setValue function', async () => {
+describe('setValue function', async () => {
   it('should set the value (ON for classic 433 - Binary)', async () => {
     const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     arduinoManager.gladys = gladys;

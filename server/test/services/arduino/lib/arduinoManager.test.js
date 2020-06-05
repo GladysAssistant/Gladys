@@ -29,7 +29,7 @@ const gladys = {
   },
 };
 
-describe.only('arduinoManager commands', async () => {
+describe('arduinoManager commands', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
   arduinoManager.arduinosParsers = { '/dev/ttyACM0': new SerialPortMock() };

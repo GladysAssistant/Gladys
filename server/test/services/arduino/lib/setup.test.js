@@ -65,7 +65,7 @@ const gladys = {
   },
 };
 
-describe.only('setup method', async () => {
+describe('setup method', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   it('Should upload an arduino code in the board', async () => {
     const setupSpy = spy(arduinoManager, 'setup');
