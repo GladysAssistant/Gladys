@@ -1,9 +1,7 @@
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 
-const Avrgirl = function Avrgirl(options) {
-  // return fake.resolves(null);
-};
+const Avrgirl = function Avrgirl(options) {};
 
 Avrgirl.prototype = Object.create(new EventEmitter());
 

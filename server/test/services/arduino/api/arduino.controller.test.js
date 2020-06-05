@@ -38,7 +38,7 @@ const res = {
   json: fake.returns(null),
 };
 
-describe('post /api/v1/service/arduino/listen', async () => {
+describe.only('post /api/v1/service/arduino/listen', async () => {
   it('should listen to arduino devices', async () => {
     const arduinoController = ArduinoController(arduinoManager);
     const req = { body: arduinoData };
@@ -49,7 +49,7 @@ describe('post /api/v1/service/arduino/listen', async () => {
   });
 });
 
-describe('post /api/v1/service/arduino/configure', () => {
+describe.only('post /api/v1/service/arduino/configure', () => {
   it('should configure a device', async () => {
     const arduinoController = ArduinoController(arduinoManager);
     const req = { body: dhtData };
@@ -60,7 +60,7 @@ describe('post /api/v1/service/arduino/configure', () => {
   });
 });
 
-describe('post /api/v1/service/arduino/setup', async () => {
+describe.only('post /api/v1/service/arduino/setup', async () => {
   it('should upload an arduino code in the card', async () => {
     const arduinoController = ArduinoController(arduinoManager);
     const req = { body: arduinoData };

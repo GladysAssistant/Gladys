@@ -22,12 +22,24 @@ const gladys = {
   },
 };
 
-describe('init method', async () => {
-  const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
-  arduinoManager.gladys = gladys;
-  it('Should init the connection with the arduino devices', () => {
+const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+arduinoManager.gladys = gladys;
+
+describe.only('init method', async () => {
+  it('Should init the connection with the arduino devices', async () => {
     const initSpy = spy(arduinoManager, 'init');
-    arduinoManager.init();
+    await arduinoManager.init();
     assert.calledOnce(initSpy);
+    initSpy.restore();
+  });
+  it('Should return "Unable to init device"', async () => {
+    // arduinoData.model = null;
+    // dhtData.model = 'card';
+    const initSpy = spy(arduinoManager, 'init');
+    await arduinoManager.init();
+    assert.calledOnce(initSpy);
+    initSpy.restore();
+    // arduinoData.model = 'card';
+    // dhtData.model = null;
   });
 });

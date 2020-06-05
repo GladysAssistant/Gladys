@@ -26,20 +26,22 @@ const gladys = {
   },
 };
 
-describe('listen function', async () => {
+describe.only('listen function', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
   arduinoManager.arduinoParsers = { '/dev/ttyACM0': null };
   it('should listen to arduino device', async () => {
     const listenSpy = spy(arduinoManager, 'listen');
-    arduinoManager.listen(arduinoData);
+    await arduinoManager.listen(arduinoData);
     assert.calledOnce(listenSpy);
     listenSpy.restore();
   });
-  it('should be unable to listen to arduino device', () => {
+  it('should be unable to listen to arduino device', async () => {
+    arduinoData.model = null;
     const listenSpy = spy(arduinoManager, 'listen');
-    arduinoManager.listen(arduinoData);
+    await arduinoManager.listen(arduinoData);
     assert.calledOnce(listenSpy);
     listenSpy.restore();
+    arduinoData.model = 'card';
   });
 });

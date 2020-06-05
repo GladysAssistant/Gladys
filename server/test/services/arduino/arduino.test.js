@@ -25,7 +25,7 @@ const gladys = {
   },
 };
 
-describe('Arduino Service', () => {
+describe.only('Arduino Service', () => {
   const arduinoService = ArduinoService(gladys, '1dbaeb48-d6d2-4930-b7ca-f17d637a364b');
   const arduinoManager = new ArduinoManager(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   before(async () => {

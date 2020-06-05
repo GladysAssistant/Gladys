@@ -35,6 +35,6 @@ SerialPort.on = () => {
 
 SerialPort.prototype.pipe = fake.returns(new ReadLine({ delimiter: '\n' }));
 SerialPort.prototype.open = fake.resolves(null);
-SerialPort.prototype.on = fake.resolves(null);
+SerialPort.prototype.write = fake.resolves(null);
 
 module.exports = SerialPort;
