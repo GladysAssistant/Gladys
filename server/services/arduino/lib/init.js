@@ -2,8 +2,9 @@
 // const Readline = require('@serialport/parser-readline');
 
 const logger = require('../../../utils/logger');
-const { DEVICE_FUNCTION } = require('../../../utils/constants');
-const { IsJsonString } = require('./isJsonString');
+// const { DEVICE_FUNCTION } = require('../../../utils/constants');
+// const { IsJsonString } = require('./isJsonString');
+const { onPortData } = require('./onPortData');
 
 /**
  * @description Initialize the communication with the devices.
@@ -51,29 +52,7 @@ async function init() {
 
       if (!this.arduinosPorts[arduinoPath].isOpen) {
         this.arduinoParsers[arduinoPath].on('data', async (data) => {
-          logger.warn(data.toString('utf8'));
-          if (IsJsonString(data.toString('utf8'))) {
-            const messageJSON = JSON.parse(data.toString('utf8'));
-
-            deviceList.forEach(async (device) => {
-              const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
-              if (functionName === messageJSON.function_name) {
-                switch (functionName) {
-                  case DEVICE_FUNCTION.RECV_433:
-                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
-                    break;
-                  case DEVICE_FUNCTION.DHT_TEMPERATURE:
-                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
-                    break;
-                  case DEVICE_FUNCTION.DHT_HUMIDITY:
-                    await this.gladys.device.setValue(device, device.features[0], messageJSON.parameters.value);
-                    break;
-                  default:
-                    break;
-                }
-              }
-            });
-          }
+          onPortData(data, this, deviceList);
         });
       }
     }, this);

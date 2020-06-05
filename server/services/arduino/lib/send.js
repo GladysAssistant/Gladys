@@ -1,6 +1,8 @@
 // const SerialPort = require('serialport');
 const logger = require('../../../utils/logger');
 
+const { onPortOpen } = require('./onPortOpen');
+
 /**
  * @description Send a message to the Arduino
  * @param {Object} path - The Arduino path.
@@ -12,7 +14,7 @@ const logger = require('../../../utils/logger');
 async function send(path, message, pulseLength) {
   try {
     const textToSend = `${JSON.stringify(message)}%`;
-    const gladysInstance = this.gladys;
+    // const gladysInstance = this.gladys;
     /* if(this.arduinosPorts[path] === undefined){
       this.arduinosPorts[path] = new this.SerialPort(path, { baudRate: 9600, lock: false });
     } */
@@ -21,13 +23,8 @@ async function send(path, message, pulseLength) {
     // const port = this.arduinosPorts[path];
 
     if (!port.isOpen) {
-      port.on('open', function() {
-        this.gladys = gladysInstance;
-        logger.warn('Arduino: port opened');
-        for (let i = 0; i < pulseLength; i += 1) {
-          port.write(textToSend);
-        }
-        this.gladys.event.emit('open');
+      port.on('open', () => {
+        onPortOpen(port, textToSend, pulseLength);
       });
     }
   } catch (e) {
