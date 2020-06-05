@@ -10,7 +10,7 @@ const ReadLineMock = require('../ReadLineMock.test');
 const ArduinoManager = proxyquire('../../../../services/arduino/lib', {
   'avrgirl-arduino': AvrgirlMock,
   serialport: SerialPortMock,
-  '@serialport/parser-readline': ReadLineMock,
+  '@serialport/parser-readline': ReadLineMock
 });
 
 const arduinoData = require('../lib/data/arduinoData.json');
@@ -21,52 +21,54 @@ const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-
 const deviceManager = {
   get: fake.resolves([arduinoData, dhtData]),
   getBySelector: fake.returns(arduinoData),
-  setValue: fake.resolves(null),
+  setValue: fake.resolves(null)
 };
 
 const gladys = {
   event: new EventEmitter(),
   device: deviceManager,
   variable: {
-    getValue: () => Promise.resolve('test'),
-  },
+    getValue: () => Promise.resolve('test')
+  }
 };
 
 arduinoManager.gladys = gladys;
 
 const res = {
-  json: fake.returns(null),
+  json: fake.returns(null)
 };
 
-describe('post /api/v1/service/arduino/listen', async () => {
-  it('should listen to arduino devices', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const req = { body: arduinoData };
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/listen'], 'controller');
-    arduinoController['post /api/v1/service/arduino/listen'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
-    arduinoSpy.restore();
+describe('Arduino Controller', async () => {
+  describe('post /api/v1/service/arduino/listen', async () => {
+    it('should listen to arduino devices', async () => {
+      const arduinoController = ArduinoController(arduinoManager);
+      const req = { body: arduinoData };
+      const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/listen'], 'controller');
+      arduinoController['post /api/v1/service/arduino/listen'].controller(req, res);
+      assert.calledOnce(arduinoSpy);
+      arduinoSpy.restore();
+    });
   });
-});
 
-describe('post /api/v1/service/arduino/configure', () => {
-  it('should configure a device', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const req = { body: dhtData };
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/configure'], 'controller');
-    arduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
-    arduinoSpy.restore();
+  describe('post /api/v1/service/arduino/configure', () => {
+    it('should configure a device', async () => {
+      const arduinoController = ArduinoController(arduinoManager);
+      const req = { body: dhtData };
+      const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/configure'], 'controller');
+      arduinoController['post /api/v1/service/arduino/configure'].controller(req, res);
+      assert.calledOnce(arduinoSpy);
+      arduinoSpy.restore();
+    });
   });
-});
 
-describe('post /api/v1/service/arduino/setup', async () => {
-  it('should upload an arduino code in the card', async () => {
-    const arduinoController = ArduinoController(arduinoManager);
-    const req = { body: arduinoData };
-    const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/setup'], 'controller');
-    arduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
-    assert.calledOnce(arduinoSpy);
-    arduinoSpy.restore();
+  describe('post /api/v1/service/arduino/setup', async () => {
+    it('should upload an arduino code in the card', async () => {
+      const arduinoController = ArduinoController(arduinoManager);
+      const req = { body: arduinoData };
+      const arduinoSpy = spy(arduinoController['post /api/v1/service/arduino/setup'], 'controller');
+      arduinoController['post /api/v1/service/arduino/setup'].controller(req, res);
+      assert.calledOnce(arduinoSpy);
+      arduinoSpy.restore();
+    });
   });
 });

@@ -3,22 +3,7 @@
 
 const logger = require('../../../utils/logger');
 const { DEVICE_FUNCTION } = require('../../../utils/constants');
-
-/**
- * @description Check if a string is parsable into JSON.
- * @param {string} str - The string to check.
- * @returns {boolean} - True if parsable.
- * @example
- * IsJsonString(str);
- */
-function IsJsonString(str) {
-  try {
-    JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
+const { IsJsonString } = require('./isJsonString');
 
 /**
  * @description Initialize the communication with the devices.
