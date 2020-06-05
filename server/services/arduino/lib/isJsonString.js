@@ -15,5 +15,5 @@ function IsJsonString(str) {
 }
 
 module.exports = {
-  IsJsonString
+  IsJsonString,
 };

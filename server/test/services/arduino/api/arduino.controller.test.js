@@ -10,7 +10,7 @@ const ReadLineMock = require('../ReadLineMock.test');
 const ArduinoManager = proxyquire('../../../../services/arduino/lib', {
   'avrgirl-arduino': AvrgirlMock,
   serialport: SerialPortMock,
-  '@serialport/parser-readline': ReadLineMock
+  '@serialport/parser-readline': ReadLineMock,
 });
 
 const arduinoData = require('../lib/data/arduinoData.json');
@@ -21,21 +21,21 @@ const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-
 const deviceManager = {
   get: fake.resolves([arduinoData, dhtData]),
   getBySelector: fake.returns(arduinoData),
-  setValue: fake.resolves(null)
+  setValue: fake.resolves(null),
 };
 
 const gladys = {
   event: new EventEmitter(),
   device: deviceManager,
   variable: {
-    getValue: () => Promise.resolve('test')
-  }
+    getValue: () => Promise.resolve('test'),
+  },
 };
 
 arduinoManager.gladys = gladys;
 
 const res = {
-  json: fake.returns(null)
+  json: fake.returns(null),
 };
 
 describe('Arduino Controller', async () => {
