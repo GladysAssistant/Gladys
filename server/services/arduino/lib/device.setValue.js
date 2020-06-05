@@ -2,8 +2,6 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION, STATE 
 
 const logger = require('../../../utils/logger');
 
-const { send } = require('./send');
-
 /**
  * @description Change value of a device.
  * @param {Object} device - The device to control.
@@ -95,7 +93,7 @@ async function setValue(device, deviceFeature, value) {
     functionName !== DEVICE_FUNCTION.DHT_HUMIDITY &&
     functionName !== DEVICE_FUNCTION.DHT_TEMPERATURE
   ) {
-    send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+    this.send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
 }
 

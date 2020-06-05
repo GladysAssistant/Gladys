@@ -1,5 +1,5 @@
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
+// const SerialPort = require('serialport');
+// const Readline = require('@serialport/parser-readline');
 
 const { DEVICE_FUNCTION } = require('../../../utils/constants');
 
@@ -50,12 +50,12 @@ async function listen(arduino) {
       this.arduinosPorts[arduinoPath].close(function(err) {});
     }
 
-    this.arduinosPorts[arduinoPath] = new SerialPort(arduinoPath, {
+    this.arduinosPorts[arduinoPath] = new this.SerialPort(arduinoPath, {
       baudRate: 9600,
       lock: false,
     });
 
-    this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new Readline({ delimiter: '\n' }));
+    this.arduinoParsers[arduinoPath] = this.arduinosPorts[arduinoPath].pipe(new this.Readline({ delimiter: '\n' }));
 
     if (!this.arduinosPorts[arduinoPath].isOpen) {
       this.arduinoParsers[arduinoPath].on('data', async (data) => {

@@ -2,8 +2,6 @@ const { DEVICE_FUNCTION } = require('../../../utils/constants');
 
 const logger = require('../../../utils/logger');
 
-const { send } = require('./send');
-
 /**
  * @description Change value of a device
  * @param {Object} device - The device to configure.
@@ -41,7 +39,7 @@ async function configure(device) {
   }
 
   if (functionName === 'recv_dht') {
-    send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+    this.send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
   }
 }
 

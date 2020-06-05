@@ -1,13 +1,15 @@
 const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
+const proxyquire = require('proxyquire').noCallThru();
 
-const ArduinoManager = require('../../../../services/arduino/lib');
-const SerialPort = require('../SerialPortMock.test');
+const SerialPortMock = require('../SerialPortMock.test');
 const ArduinoMock = require('../ArduinoMock.test');
 const arduinoData = require('./data/arduinoData.json');
 const deviceData = require('./data/deviceData.json');
 const dhtData = require('./data/dhtData.json');
 const messageData = require('./data/messageData.json');
+
+const ArduinoManager = proxyquire('../../../../services/arduino/lib', { serialport: SerialPortMock });
 
 const deviceManager = {
   get: fake.resolves([arduinoData, deviceData, dhtData]),
@@ -26,8 +28,8 @@ const gladys = {
 describe('arduinoManager commands', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
-  arduinoManager.arduinoParsers = { '/dev/ttyACM0': new SerialPort() };
-  arduinoManager.arduinosPorts = { '/dev/ttyACM0': new SerialPort() };
+  arduinoManager.arduinoParsers = { '/dev/ttyACM0': new SerialPortMock() };
+  arduinoManager.arduinosPorts = { '/dev/ttyACM0': new SerialPortMock() };
   it('should listen to arduino devices', async () => {
     const listenSpy = spy(arduinoManager, 'listen');
     await arduinoManager.listen(arduinoData);

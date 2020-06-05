@@ -1,14 +1,12 @@
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 
-const Avrgirl = function Avrgirl() {
-  return fake.resolves(null);
+const Avrgirl = function Avrgirl(options) {
+  // return fake.resolves(null);
 };
 
 Avrgirl.prototype = Object.create(new EventEmitter());
 
-Avrgirl.flash = () => {
-  return new Promise(null);
-};
+Avrgirl.prototype.flash = fake.resolves(null);
 
 module.exports = Avrgirl;

@@ -1,7 +1,10 @@
 const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
+const proxyquire = require('proxyquire').noCallThru();
+const SerialPortMock = require('../SerialPortMock.test');
 
-const ArduinoManager = require('../../../../services/arduino/lib');
+const ArduinoManager = proxyquire('../../../../services/arduino/lib', { serialport: SerialPortMock });
+
 const ArduinoMock = require('../ArduinoMock.test');
 const arduinoData = require('./data/arduinoData.json');
 const deviceData = require('./data/deviceData.json');

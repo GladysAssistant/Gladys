@@ -1,5 +1,5 @@
 const Bottleneck = require('bottleneck/es5');
-
+// const flash = require('avrgirl-arduino');
 const { init } = require('./init');
 const { send } = require('./send');
 const { listen } = require('./listen');
@@ -13,12 +13,16 @@ const setValueLimiter = new Bottleneck({
 });
 
 const ArduinoManager = function ArduinoManager(gladys, serviceId) {
+  this.SerialPort = require('serialport');
+  this.Readline = require('@serialport/parser-readline');
+  this.Avrgirl = require('avrgirl-arduino');
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.arduinosPorts = {};
   this.arduinoParsers = {};
 };
 
+// ArduinoManager.prototype.flash = flash;
 ArduinoManager.prototype.init = init;
 ArduinoManager.prototype.send = send;
 ArduinoManager.prototype.listen = listen;

@@ -1,4 +1,4 @@
-const Avrgirl = require('avrgirl-arduino');
+// const Avrgirl = require('avrgirl-arduino');
 const path = require('path');
 const logger = require('../../../utils/logger');
 
@@ -14,7 +14,7 @@ async function setup(device) {
     const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
     const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
 
-    const avrgirl = new Avrgirl({
+    const avrgirl = new this.Avrgirl({
       board: model,
       path: arduinoPath,
     });

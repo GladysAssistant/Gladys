@@ -70,14 +70,14 @@ describe('setup method', async () => {
   it('Should upload an arduino code in the board', async () => {
     const setupSpy = spy(arduinoManager, 'setup');
     arduinoManager.gladys = gladys;
-    await arduinoManager.setup(arduinoData);
+    arduinoManager.setup(arduinoData);
     assert.calledOnce(setupSpy);
     setupSpy.restore();
   });
   it('Should return an error', async () => {
     const setupSpy = spy(arduinoManager, 'setup');
     arduinoManager.gladys = gladys;
-    await arduinoManager.setup(falseArduinoData);
+    arduinoManager.setup(falseArduinoData);
     assert.calledOnce(setupSpy);
     setupSpy.restore();
   });

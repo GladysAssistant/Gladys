@@ -1,6 +1,8 @@
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 
+const ReadLine = require('./ReadLineMock.test');
+
 const SerialPort = function SerialPort() {};
 
 SerialPort.prototype = Object.create(new EventEmitter());
@@ -23,6 +25,15 @@ SerialPort.list = () => {
   });
 };
 
+SerialPort.pipe = () => {
+  return null;
+};
+
+SerialPort.on = () => {
+  return fake.resolves(null);
+};
+
+SerialPort.prototype.pipe = fake.returns(new ReadLine({ delimiter: '\n' }));
 SerialPort.prototype.open = fake.resolves(null);
 SerialPort.prototype.on = fake.resolves(null);
 

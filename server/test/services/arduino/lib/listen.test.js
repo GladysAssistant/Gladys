@@ -1,9 +1,16 @@
 const { spy, assert, fake } = require('sinon');
 const EventEmitter = require('events');
+const proxyquire = require('proxyquire').noCallThru();
+const SerialPortMock = require('../SerialPortMock.test');
+const ReadLineMock = require('../ReadLineMock.test');
 
-const ArduinoManager = require('../../../../services/arduino/lib');
 const ArduinoMock = require('../ArduinoMock.test');
 const arduinoData = require('./data/arduinoData.json');
+
+const ArduinoManager = proxyquire('../../../../services/arduino/lib', {
+  serialport: SerialPortMock,
+  '@serialport/parser-readline': ReadLineMock,
+});
 
 const deviceManager = {
   get: fake.resolves([arduinoData]),
@@ -27,10 +34,12 @@ describe('listen function', async () => {
     const listenSpy = spy(arduinoManager, 'listen');
     arduinoManager.listen(arduinoData);
     assert.calledOnce(listenSpy);
+    listenSpy.restore();
   });
-  /* it('should be unable to listen to arduino device', () => {
-        const listenSpy = spy(arduinoManager, 'listen');
-        arduinoManager.listen(arduinoData);
-        assert.calledOnce(listenSpy);
-    }); */
+  it('should be unable to listen to arduino device', () => {
+    const listenSpy = spy(arduinoManager, 'listen');
+    arduinoManager.listen(arduinoData);
+    assert.calledOnce(listenSpy);
+    listenSpy.restore();
+  });
 });

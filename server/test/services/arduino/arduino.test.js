@@ -1,15 +1,20 @@
 const { expect } = require('chai');
 const { fake } = require('sinon');
 const EventEmitter = require('events');
-const ArduinoManager = require('../../../services/arduino/lib');
+const proxyquire = require('proxyquire').noCallThru();
 const ArduinoService = require('../../../services/arduino');
 
 const arduinoData = require('./lib/data/arduinoData.json');
 const deviceData = require('./lib/data/deviceData.json');
 const dhtData = require('./lib/data/dhtData.json');
 
+const SerialPortMock = require('./SerialPortMock.test');
+
+const ArduinoManager = proxyquire('../../../services/arduino/lib', { serialport: SerialPortMock });
+
 const deviceManager = {
   get: fake.resolves([arduinoData, deviceData, dhtData]),
+  getBySelector: fake.resolves(arduinoData),
 };
 
 const gladys = {

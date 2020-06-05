@@ -1,4 +1,4 @@
-const SerialPort = require('serialport');
+// const SerialPort = require('serialport');
 const logger = require('../../../utils/logger');
 
 /**
@@ -13,7 +13,7 @@ async function send(path, message, pulseLength) {
   try {
     const textToSend = `${JSON.stringify(message)}%`;
 
-    const port = new SerialPort(path, { baudRate: 9600, lock: false });
+    const port = new this.SerialPort(path, { baudRate: 9600, lock: false });
 
     if (!port.isOpen) {
       port.on('open', function() {
