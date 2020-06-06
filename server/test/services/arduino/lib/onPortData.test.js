@@ -12,11 +12,13 @@ const ArduinoMock = require('../ArduinoMock.test');
 const arduinoData = require('./data/arduinoData.json');
 const deviceData = require('./data/deviceData.json');
 const dhtData = require('./data/dhtData.json');
+const dhtHumidityData = require('./data/dhtHumidityData.json');
 const deviceRecv433Data = require('./data/deviceRecv433Data.json');
 
 const deviceManager = {
-  get: fake.resolves([arduinoData, deviceData, dhtData, deviceRecv433Data]),
+  get: fake.resolves([arduinoData, deviceData, dhtData, dhtHumidityData, deviceRecv433Data]),
   getBySelector: fake.resolves(arduinoData),
+  setValue: fake.resolves(null),
 };
 
 const gladys = {
@@ -32,10 +34,24 @@ describe('onPortData function', async () => {
   const arduinoManager = new ArduinoManager(ArduinoMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   arduinoManager.gladys = gladys;
   arduinoManager.arduinosPorts['dev/ttyACM0'] = new arduinoManager.SerialPort();
-  it('should read data from the arduino', async () => {
-    const message = '{ "function_name": "emit_433_chacon", "parameters": { "data_pin": "4", "code": "1536116352" } }';
+  it('should read data from the arduino (recv_433)', async () => {
+    const message = '{"function_name":"recv_433","parameters":{"value":4464676}}';
     const onPortDataSpy = spy(portData, 'onPortData');
-    portData.onPortData(message, arduinoManager, [deviceData, dhtData, deviceRecv433Data]);
+    portData.onPortData(message, arduinoManager, [deviceData, dhtData, dhtHumidityData, deviceRecv433Data]);
+    assert.calledOnce(onPortDataSpy);
+    onPortDataSpy.restore();
+  });
+  it('should read data from the arduino (dht_temperature)', async () => {
+    const message = '{"function_name":"dht_temperature","parameters":{"value":23.00}}';
+    const onPortDataSpy = spy(portData, 'onPortData');
+    portData.onPortData(message, arduinoManager, [deviceData, dhtData, dhtHumidityData, deviceRecv433Data]);
+    assert.calledOnce(onPortDataSpy);
+    onPortDataSpy.restore();
+  });
+  it('should read data from the arduino (dht_humidity)', async () => {
+    const message = '{"function_name":"dht_humidity","parameters":{"value":56.00}}';
+    const onPortDataSpy = spy(portData, 'onPortData');
+    portData.onPortData(message, arduinoManager, [deviceData, dhtData, dhtHumidityData, deviceRecv433Data]);
     assert.calledOnce(onPortDataSpy);
     onPortDataSpy.restore();
   });
