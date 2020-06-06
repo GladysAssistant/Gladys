@@ -13,7 +13,7 @@ const falseArduinoData = {
   room_id: 'null',
   name: 'Arduino Mega',
   selector: 'arduino-false',
-  model: 'card',
+  model: null,
   external_id: '51bc71ad-816c-4682-9bc2-6840a5036b74',
   should_poll: 'false',
   poll_frequency: '30000',
@@ -33,7 +33,7 @@ const falseArduinoData = {
       id: '371e873b-b39e-4b84-a87e-e401ce3678ec',
       device_id: '8e25bf9a-4b24-4099-a08d-f4afe323c3a7',
       name: 'ARDUINO_MODEL',
-      value: 'mega',
+      value: 'fake',
       createdAt: '2020-05-25T17: 25: 45.169Z',
       updatedAt: '2020-05-25T17: 25: 45.169Z',
     },
@@ -77,7 +77,7 @@ describe('setup method', async () => {
   it('Should return an error', async () => {
     const setupSpy = spy(arduinoManager, 'setup');
     arduinoManager.gladys = gladys;
-    await arduinoManager.setup(falseArduinoData);
+    await arduinoManager.setup(new Error('fake'));
     assert.calledOnce(setupSpy);
     setupSpy.restore();
   });

@@ -1,14 +1,16 @@
-const { fake } = require('sinon');
+// const { fake } = require('sinon');
 const EventEmitter = require('events');
+
+// const logger = require('../../../utils/logger');
 
 const Avrgirl = function Avrgirl(options) {};
 
 Avrgirl.prototype = Object.create(new EventEmitter());
 
-/* const flash = (path, req) => {
-    return fake.rejects(null);
-}; */
+const flash = (path, callBack) => {
+  callBack();
+};
 
-Avrgirl.prototype.flash = fake.resolves(null);
+Avrgirl.prototype.flash = flash;
 
 module.exports = Avrgirl;
