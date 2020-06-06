@@ -6,7 +6,7 @@ const SerialPortMock = require('../SerialPortMock.test');
 
 const ArduinoManager = proxyquire('../../../../services/arduino/lib', {
   'avrgirl-arduino': AvrgirlMock,
-  serialport: SerialPortMock
+  serialport: SerialPortMock,
 });
 const ArduinoMock = require('../ArduinoMock.test');
 const arduinoData = require('./data/arduinoData.json');
@@ -16,15 +16,15 @@ const deviceRecv433Data = require('./data/deviceRecv433Data.json');
 
 const deviceManager = {
   get: fake.resolves([arduinoData, deviceData, dhtData, deviceRecv433Data]),
-  getBySelector: fake.resolves(arduinoData)
+  getBySelector: fake.resolves(arduinoData),
 };
 
 const gladys = {
   event: new EventEmitter(),
   device: deviceManager,
   variable: {
-    getValue: () => Promise.resolve('test')
-  }
+    getValue: () => Promise.resolve('test'),
+  },
 };
 const portData = require('../../../../services/arduino/lib/onPortData');
 
