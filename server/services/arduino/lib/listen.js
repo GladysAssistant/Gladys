@@ -1,10 +1,4 @@
-// const SerialPort = require('serialport');
-// const Readline = require('@serialport/parser-readline');
-
-// const { DEVICE_FUNCTION } = require('../../../utils/constants');
-
 const logger = require('../../../utils/logger');
-// const { IsJsonString } = require('./isJsonString');
 const { onPortData } = require('./onPortData');
 
 /**

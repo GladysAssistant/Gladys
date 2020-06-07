@@ -1,4 +1,3 @@
-// const Avrgirl = require('avrgirl-arduino');
 const path = require('path');
 const logger = require('../../../utils/logger');
 

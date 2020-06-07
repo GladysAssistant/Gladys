@@ -1,5 +1,4 @@
 const Bottleneck = require('bottleneck/es5');
-// const flash = require('avrgirl-arduino');
 const { init } = require('./init');
 const { send } = require('./send');
 const { listen } = require('./listen');
@@ -22,7 +21,6 @@ const ArduinoManager = function ArduinoManager(gladys, serviceId) {
   this.arduinoParsers = {};
 };
 
-// ArduinoManager.prototype.flash = flash;
 ArduinoManager.prototype.init = init;
 ArduinoManager.prototype.send = send;
 ArduinoManager.prototype.listen = listen;

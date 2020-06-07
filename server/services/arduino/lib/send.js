@@ -1,4 +1,3 @@
-// const SerialPort = require('serialport');
 const logger = require('../../../utils/logger');
 
 const { onPortOpen } = require('./onPortOpen');
@@ -14,13 +13,8 @@ const { onPortOpen } = require('./onPortOpen');
 async function send(path, message, pulseLength) {
   try {
     const textToSend = `${JSON.stringify(message)}%`;
-    // const gladysInstance = this.gladys;
-    /* if(this.arduinosPorts[path] === undefined){
-      this.arduinosPorts[path] = new this.SerialPort(path, { baudRate: 9600, lock: false });
-    } */
 
     const port = new this.SerialPort(path, { baudRate: 9600, lock: false });
-    // const port = this.arduinosPorts[path];
 
     if (!port.isOpen) {
       port.on('open', () => {

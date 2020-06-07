@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
 /**
- * @description Xiaomi onMessage callback.
+ * @description Arduino onPortData function.
  * @param {Object} port - The port.
  * @param {Object} textToSend - The text to send.
  * @param {number} pulseLength - The pulse length.
