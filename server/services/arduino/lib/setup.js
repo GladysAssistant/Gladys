@@ -1,4 +1,5 @@
 const path = require('path');
+const { getDeviceParam } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 
 /**
@@ -10,24 +11,26 @@ const logger = require('../../../utils/logger');
  */
 async function setup(device) {
   try {
-    const arduinoPath = device.params.find((param) => param.name === 'ARDUINO_PATH').value;
-    const model = device.params.find((param) => param.name === 'ARDUINO_MODEL').value;
+    const arduinoPath = getDeviceParam(device, 'ARDUINO_PATH');
+    const model = getDeviceParam(device, 'ARDUINO_MODEL');
 
     const avrgirl = new this.Avrgirl({
       board: model,
       path: arduinoPath,
     });
 
-    avrgirl.flash(path.resolve(`services/arduino/arduino-code/`, `${model}/arduino-code.ino.hex`), function(error) {
+    avrgirl.flash(path.resolve(`services/arduino/arduino-code/`, `${model}/arduino-code.ino.hex`), (error) => {
       if (error) {
         logger.warn(error);
         return new Error(error);
       }
       return null;
     });
+    return { success: true };
   } catch (e) {
     logger.warn('Unable to flash the card');
     logger.debug(e);
+    return { success: false };
   }
 }
 

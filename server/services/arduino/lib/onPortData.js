@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FUNCTION } = require('../../../utils/constants');
+const { getDeviceParam } = require('../../../utils/device');
 const { IsJsonString } = require('./isJsonString');
 /**
  * @description Arduino onPortData function.
@@ -16,7 +17,7 @@ async function onPortData(data, arduinoManager, deviceList) {
     const messageJSON = JSON.parse(data.toString('utf8'));
 
     deviceList.forEach(async (device) => {
-      const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
+      const functionName = getDeviceParam(device, 'FUNCTION');
       if (functionName === messageJSON.function_name) {
         switch (functionName) {
           case DEVICE_FUNCTION.RECV_433:

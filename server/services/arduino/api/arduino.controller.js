@@ -31,10 +31,8 @@ module.exports = function ArduinoController(arduinoManager) {
    * @apiGroup Arduino
    */
   async function setup(req, res) {
-    arduinoManager.setup(req.body);
-    res.json({
-      success: true,
-    });
+    const status = arduinoManager.setup(req.body);
+    res.json(status);
   }
 
   return {

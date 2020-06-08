@@ -1,5 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FUNCTION, STATE } = require('../../../utils/constants');
-
+const { getDeviceParam } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 
 /**
@@ -12,27 +12,24 @@ const logger = require('../../../utils/logger');
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  const arduino = await this.gladys.device.getBySelector(
-    device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
-  );
-  const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+  const arduino = await this.gladys.device.getBySelector(getDeviceParam(device, 'ARDUINO_LINKED'));
+  const path = getDeviceParam(arduino, 'ARDUINO_PATH');
 
-  const functionName = device.params.find((param) => param.name === 'FUNCTION').value;
+  const functionName = getDeviceParam(device, 'FUNCTION');
 
   const message = {
     function_name: functionName,
     parameters: {
-      data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
+      data_pin: getDeviceParam(device, 'DATA_PIN'),
     },
   };
 
   switch (functionName) {
     case DEVICE_FUNCTION.RECV_433:
-      // message.parameters['enable'] = value === 1 ? true : false;
       if (
         (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR ||
           deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) &&
-        parseInt(device.params.find((param) => param.name === 'CODE').value, 0) === parseInt(value, 0)
+        parseInt(getDeviceParam(device, 'CODE'), 0) === parseInt(value, 0)
       ) {
         this.gladys.device.setValue(device, deviceFeature, STATE.ON);
       }
@@ -45,43 +42,36 @@ async function setValue(device, deviceFeature, value) {
       switch (device.features[0].type) {
         case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
           message.parameters.code =
-            value === 1
-              ? device.params.find((param) => param.name === 'CODE_ON').value
-              : device.params.find((param) => param.name === 'CODE_OFF').value;
+            value === 1 ? getDeviceParam(device, 'CODE_ON') : getDeviceParam(device, 'CODE_OFF');
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
-          message.parameters.code = device.params.find((param) => param.name === 'CODE').value;
+          message.parameters.code = getDeviceParam(device, 'CODE');
           break;
         default:
           break;
       }
 
-      message.parameters.bit_length = device.params.find((param) => param.name === 'BIT_LENGTH').value;
+      message.parameters.bit_length = getDeviceParam(device, 'BIT_LENGTH');
       break;
 
     case DEVICE_FUNCTION.EMIT_433_CHACON:
-      message.parameters.code =
-        value === 1
-          ? device.params.find((param) => param.name === 'CODE_ON').value
-          : device.params.find((param) => param.name === 'CODE_OFF').value;
+      message.parameters.code = value === 1 ? getDeviceParam(device, 'CODE_ON') : getDeviceParam(device, 'CODE_OFF');
       break;
 
     case DEVICE_FUNCTION.EMIT_IR:
       switch (device.features[0].type) {
         case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
           message.parameters.code =
-            value === 1
-              ? device.params.find((param) => param.name === 'CODE_ON').value
-              : device.params.find((param) => param.name === 'CODE_OFF').value;
+            value === 1 ? getDeviceParam(device, 'CODE_ON') : getDeviceParam(device, 'CODE_OFF');
           break;
         case DEVICE_FEATURE_TYPES.SENSOR.PUSH:
-          message.parameters.code = device.params.find((param) => param.name === 'CODE').value;
+          message.parameters.code = getDeviceParam(device, 'CODE');
           break;
         default:
           break;
       }
 
-      message.parameters.bit_length = device.params.find((param) => param.name === 'BIT_LENGTH').value;
+      message.parameters.bit_length = getDeviceParam(device, 'BIT_LENGTH');
       break;
     default:
       logger.debug(`Arduino : Function = "${functionName}" not handled`);
@@ -93,7 +83,7 @@ async function setValue(device, deviceFeature, value) {
     functionName !== DEVICE_FUNCTION.DHT_HUMIDITY &&
     functionName !== DEVICE_FUNCTION.DHT_TEMPERATURE
   ) {
-    this.send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+    this.send(path, message, getDeviceParam(device, 'PULSE_LENGTH'));
   }
 }
 

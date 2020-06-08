@@ -1,5 +1,5 @@
 const { DEVICE_FUNCTION } = require('../../../utils/constants');
-
+const { getDeviceParam } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 
 /**
@@ -10,27 +10,22 @@ const logger = require('../../../utils/logger');
  * configure(device);
  */
 async function configure(device) {
-  const arduino = await this.gladys.device.getBySelector(
-    device.params.find((param) => param.name === 'ARDUINO_LINKED').value,
-  );
-  const path = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+  const arduino = await this.gladys.device.getBySelector(getDeviceParam(device, 'ARDUINO_LINKED'));
+  const path = getDeviceParam(arduino, 'ARDUINO_PATH');
 
-  let functionName = device.params.find((param) => param.name === 'FUNCTION').value;
-
-  if (functionName === DEVICE_FUNCTION.DHT_HUMIDITY || functionName === DEVICE_FUNCTION.DHT_TEMPERATURE) {
-    functionName = 'recv_dht';
-  }
+  let functionName = getDeviceParam(device, 'FUNCTION');
 
   const message = {
     function_name: functionName,
     parameters: {
-      data_pin: device.params.find((param) => param.name === 'DATA_PIN').value,
+      data_pin: getDeviceParam(device, 'DATA_PIN'),
     },
   };
 
   switch (functionName) {
-    case 'recv_dht':
+    case DEVICE_FUNCTION.DHT_TEMPERATURE:
     case DEVICE_FUNCTION.DHT_HUMIDITY:
+      functionName = 'recv_dht';
       message.parameters.enable = '1';
       break;
     default:
@@ -39,7 +34,7 @@ async function configure(device) {
   }
 
   if (functionName === 'recv_dht') {
-    this.send(path, message, device.params.find((param) => param.name === 'PULSE_LENGTH').value);
+    this.send(path, message, getDeviceParam(device, 'PULSE_LENGTH'));
   }
 }
 

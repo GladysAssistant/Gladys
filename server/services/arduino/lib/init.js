@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { getDeviceParam } = require('../../../utils/device');
 const { onPortData } = require('./onPortData');
 
 /**
@@ -21,21 +22,18 @@ async function init() {
       }
     });
 
-    arduinoList.forEach(async function(arduino) {
-      const arduinoPath = arduino.params.find((param) => param.name === 'ARDUINO_PATH').value;
+    arduinoList.forEach(async (arduino) => {
+      const arduinoPath = getDeviceParam(arduino, 'ARDUINO_PATH');
 
       const deviceList = [];
       list.forEach((element) => {
-        if (
-          element.model !== 'card' &&
-          element.params.find((param) => param.name === 'ARDUINO_LINKED').value === arduino.selector
-        ) {
+        if (element.model !== 'card' && getDeviceParam(element, 'ARDUINO_LINKED') === arduino.selector) {
           deviceList.push(element);
         }
       });
 
       if (this.arduinosPorts[arduinoPath] !== undefined && this.arduinosPorts[arduinoPath].isOpen) {
-        this.arduinosPorts[arduinoPath].close(function(err) {});
+        this.arduinosPorts[arduinoPath].close((err) => {});
       }
 
       this.arduinosPorts[arduinoPath] = new this.SerialPort(arduinoPath, {
