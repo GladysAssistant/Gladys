@@ -215,11 +215,11 @@ const actions = store => {
       try {
         const device = state.arduinoDevices[index];
         const res = await state.httpClient.post(`/api/v1/service/arduino/setup`, device);
-        if(res.success){
+        if (res.success) {
           store.setState({
             uploadingCode: RequestStatus.Success
           });
-        }else{
+        } else {
           store.setState({
             uploadingCode: RequestStatus.Error
           });
