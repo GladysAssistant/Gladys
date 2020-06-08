@@ -103,7 +103,7 @@ const GatewayPricing = ({ children, ...props }) => (
               </li>
             </ul>
             <div class="text-center mt-6">
-              <a href="https://gladysassistant.com/pricing" class="btn btn-green btn-block">
+              <a href={`https://gladysassistant.com/${props.user.language}/pricing`} class="btn btn-green btn-block">
                 <Text id="gatewayPricing.subscribeButton" />
               </a>
             </div>
@@ -113,11 +113,9 @@ const GatewayPricing = ({ children, ...props }) => (
     </div>
     <div class="row" style="margin-bottom: 30px">
       <div class="col text-center">
-        Already a Gladys Plus Subscriber? Click{' '}
         <a href="#" onClick={props.displayGatewayLoginForm}>
-          here
-        </a>{' '}
-        to login.
+          <Text id="gatewayPricing.alreadyGladysPlusSubscriber" />
+        </a>
       </div>
     </div>
   </div>

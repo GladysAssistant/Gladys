@@ -25,12 +25,12 @@ const EditHouse = ({ children, ...props }) => (
       )}
       {props.houseUpdateStatus === RequestStatus.NetworkError && (
         <div class="alert alert-danger">
-          <Text id="signup.httpErrors.networkError" />
+          <Text id="httpErrors.networkError" />
         </div>
       )}
       {props.houseUpdateStatus === RequestStatus.Error && (
         <div class="alert alert-danger">
-          <Text id="signup.httpErrors.unknownError" />
+          <Text id="httpErrors.unknownError" />
         </div>
       )}
       <div class="form-group">

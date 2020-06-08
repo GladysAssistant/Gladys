@@ -1,3 +1,4 @@
+const fse = require('fs-extra');
 const logger = require('../../utils/logger');
 const RtspCameraHandler = require('./lib');
 const RtspCameraController = require('./api/rtspCamera.controller');
@@ -13,6 +14,8 @@ module.exports = function RtspCameraService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting RTSP service');
+    // make sure the tempFolder exists
+    await fse.ensureDir(gladys.config.tempFolder);
   }
 
   /**

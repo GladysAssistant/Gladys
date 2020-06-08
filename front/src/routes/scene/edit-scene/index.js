@@ -74,7 +74,7 @@ class EditScene extends Component {
           }
         }
       });
-      if (newState.scene.actions[columnIndex].length === 0) {
+      if (columnIndex + 1 === newState.scene.actions.length && newState.scene.actions[columnIndex].length === 1) {
         newState = update(newState, {
           scene: {
             actions: {

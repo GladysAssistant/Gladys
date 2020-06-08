@@ -42,10 +42,21 @@ jobs:
       - run:
           name: Install system dependencies
           command: |
-            sudo apt-get install -y libudev-dev sqlite3 openssl openzwave libopenzwave1.5-dev
+            sudo apt-get install -y libudev-dev sqlite3 openssl
+      - run:
+          name: Install Openzwave 1.6 # Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
+          command: |
+            cd /tmp
+            git clone https://github.com/OpenZWave/open-zwave.git 
+            cd open-zwave
+            git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5
+            sudo make
+            sudo make install
+            sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openzwave.conf"
+            sudo ldconfig
       - run:
           name: Install global dependencies
-          command: 'sudo npm install typescript node-gyp npm@latest -g'
+          command: "sudo npm install typescript node-gyp npm@latest -g"
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "server/package.json" }}-node-12
@@ -67,7 +78,7 @@ jobs:
           command: cd server && npm run coverage
       - run:
           name: Push coverage
-          command: npm i && npm run push-coverage
+          command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
     docker: # run the steps with Docker
@@ -77,7 +88,7 @@ jobs:
           path: ~/gladys-test
       - run:
           name: Install global dependencies
-          command: 'sudo npm install codecov npm@latest -g'
+          command: "sudo npm install npm@latest -g"
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package.json" }}-node-12
@@ -94,6 +105,9 @@ jobs:
       - run:
           name: Run eslint
           command: npm run eslint
+      - run:
+          name: Run integration comparison
+          command: npm run compare-translations
   build-front:
     working_directory: ~/gladys-build
     docker:
@@ -102,7 +116,7 @@ jobs:
       - checkout
       - run:
           name: Build Front
-          command: 'cd front && npm install && npm run build'
+          command: "cd front && npm install && npm run build"
       - persist_to_workspace:
           root: ~/gladys-build
           paths:

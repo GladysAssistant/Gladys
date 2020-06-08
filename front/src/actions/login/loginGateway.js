@@ -92,8 +92,8 @@ function createActions(store) {
         }
       } catch (e) {
         console.log(e);
-        const error = get(e, 'response.error');
-        const errorMessage = get(e, 'response.error_message');
+        const error = get(e, 'response.data.error');
+        const errorMessage = get(e, 'response.data.error_message');
         // if user was previously linked to another instance, we reset the user id
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);

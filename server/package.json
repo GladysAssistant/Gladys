@@ -7,7 +7,6 @@
     "pretest": "npm run eslint",
     "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
-    "push-coverage": "codecov -F server",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.json'",
     "eslint-fix": "eslint . --fix",
@@ -43,7 +42,6 @@
     "apidoc": "^0.17.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "codecov": "^3.5.0",
     "dotenv": "^6.2.0",
     "eslint": "^5.13.0",
     "eslint-config-airbnb": "^17.1.0",
@@ -66,7 +64,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.2.4",
+    "@gladysassistant/gladys-gateway-js": "^3.2.6",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "bcrypt": "^3.0.3",

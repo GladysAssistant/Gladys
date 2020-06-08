@@ -4,7 +4,6 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
-const CAMERA_FILENAME = 'output.jpg';
 
 /**
  * @description Get camera image.
@@ -25,19 +24,20 @@ async function getImage(device) {
     }
     // we create a temp folder
     const now = new Date();
-    const tempFolder = path.join(
+    const filePath = path.join(
       this.gladys.config.tempFolder,
-      `camera-${device.id}-${now.getMilliseconds()}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}`,
+      `camera-${device.id}-${now.getMilliseconds()}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}.jpg`,
     );
-    await fse.ensureDir(tempFolder);
-    const filePath = path.join(tempFolder, CAMERA_FILENAME);
     // we create a writestream
     const writeStream = fse.createWriteStream(filePath);
     // and send a camera thumbnail to this stream
     this.ffmpeg(cameraUrlParam.value)
       .format('image2')
       .outputOptions('-vframes 1')
+      // resize the image with max width = 640
       .outputOptions('-vf scale=640:-1')
+      //  Effective range for JPEG is 2-31 with 31 being the worst quality.
+      .outputOptions('-qscale:v 15')
       .output(writeStream)
       .on('end', async () => {
         const image = await fse.readFile(filePath);
@@ -47,10 +47,11 @@ async function getImage(device) {
         resolve(cameraImage);
         await fse.remove(filePath);
       })
-      .on('error', (err, stdout, stderr) => {
+      .on('error', async (err, stdout, stderr) => {
         logger.debug(`Cannot process video: ${err.message}`);
         logger.debug(stderr);
         reject(err.message);
+        await fse.remove(filePath);
       })
       .run();
     return null;
