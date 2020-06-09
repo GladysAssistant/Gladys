@@ -200,6 +200,7 @@ const Profile = ({ children, ...props }) => {
               class="custom-file-input"
               onChange={props.updateProfilePicture}
               value={props.newProfilePictureFormValue}
+              lang={props.newUser.language}
             />
             <label class="custom-file-label">
               <Text id="profile.chooseFileLabel" />
