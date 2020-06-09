@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import actions from '../../../actions/dashboard/boxes/stockExchange';
 import {
@@ -16,9 +16,7 @@ import DataList from './DataList';
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
 
-const StockExchangeBox = ({ children, ...props }) => (
-    <div >
-      {props.boxStatus === RequestStatus.Error && (
+const StockExchangeErrorBox = ({ children, ...props }) => (
       <div class="card">
         <div>
           <h4 class="card-header">
@@ -28,14 +26,21 @@ const StockExchangeBox = ({ children, ...props }) => (
             <p class="alert alert-danger">
               <i class="fe fe-bell" />
               <span class="pl-2">
-                <Text id="dashboard.boxes.stockexchange.unknownError" />
+                <MarkupText id="dashboard.boxes.stockExchange.unknownError" />
               </span>
             </p>
           </div>
         </div>
       </div>
-    )}
-    {props.boxStatus === GetStockExchangeStatus.RequestToThirdPartyFailed && (
+);
+
+const StockExchangeBox = ({ children, ...props }) => (
+    <div>
+      {props.boxStatus === RequestStatus.Error && (
+        <StockExchangeErrorBox {...props}  />
+      )}
+    {(props.boxStatus === GetStockExchangeStatus.ServiceNotConfigured ||
+      props.boxStatus === GetStockExchangeStatus.RequestToThirdPartyFailed) && (
       <div class="card">
       <div>
         <h4 class="card-header">
@@ -45,11 +50,9 @@ const StockExchangeBox = ({ children, ...props }) => (
           <p class="alert alert-danger">
             <i class="fe fe-bell" />
             <span class="pl-2">
-              <Text id="dashboard.boxes.stockexchange.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/integration/stockexchange/stockexchange">
-                <Text id="dashboard.boxes.stockexchange.clickHere" />
-              </Link>
+              <Text id="dashboard.boxes.stockExchange.requestToThirdPartyFailed" />{' '}
             </span>
+            {props.error}
           </p>
         </div>
       </div>
@@ -74,9 +77,9 @@ class StockExchangeBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}StockExchange.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}StockExchange.${props.x}_${props.y}`);
     const datas = get(boxData, 'stockexchangedatas');
-    console.log(datas);
+    const error = get(boxData, 'error');
     return (
-      <StockExchangeBox {...props} datas={datas} />
+      <StockExchangeBox {...props} datas={datas} boxStatus={boxStatus} error={error} />
     );
   }
 }

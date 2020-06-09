@@ -1,7 +1,6 @@
-import { RequestStatus } from '../../../utils/consts';
+import { RequestStatus, GetStockExchangeStatus } from '../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../server/utils/constants';
 import createBoxActions from '../boxActions';
-import dayjs from 'dayjs';
 import get from 'get-value';
 
 const BOX_KEY = 'StockExchange';
@@ -14,13 +13,21 @@ function createActions(store) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         const stockexchangedatas = await state.httpClient.get(`/api/v1/stockexchange/getStockExchangeIndexQuote`);
-        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          stockexchangedatas
-        });
-        boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
+        const error = stockexchangedatas["Error Message"];
+        if (error) {
+            boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetStockExchangeStatus.ServiceNotConfigured);
+            boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+              error: error
+            });
+        } else {
+          boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+            stockexchangedatas
+          });
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
+        }
       } catch (e) {
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          quote: null
+          stockexchangedatas: null
         });
 
         const responseMessage = get(e, 'response.data.message');

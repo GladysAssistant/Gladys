@@ -14,7 +14,7 @@ const res = {
   }),
 };
 
-describe.only('get /api/v1/stockexchange/getStockExchangeIndexQuote', () => {
+describe('get /api/v1/stockexchange/getStockExchangeIndexQuote', () => {
   it('should return an array', async () => {
     const stockExchangeController = StockExchangeController(stockexchangeService);
     const req = {

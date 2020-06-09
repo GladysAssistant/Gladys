@@ -36,8 +36,9 @@ const StockExchangePage = ({ children, ...props }) => (
                             <input
                               type="text"
                               class="form-control"
+                              name="stockExchangeApiKey"
                               placeholder={<Text id="integration.stockExchange.apiKeyPlaceholder" />}
-                              onInput={props.updateApiKey}
+                              onInput={props.updateConfiguration}
                               value={props.stockExchangeApiKey}
                             />
                           </Localizer>
@@ -51,7 +52,11 @@ const StockExchangePage = ({ children, ...props }) => (
                           <Text id="integration.stockExchange.selectTickerLabel" />
                         </div>
                         <Text id="integration.stockExchange.selectTickerDescription" />
-                        <select class="form-control" onChange={props.updateTickers} value={props.stockExchangeTickers}>
+                        <select
+                          class="form-control"
+                          onChange={props.updateConfiguration}
+                          name="stockExchangeTickers"
+                          value={props.stockExchangeTickers}>
                           <option value="^FCHI">
                             CAC40
                           </option>
@@ -72,7 +77,7 @@ const StockExchangePage = ({ children, ...props }) => (
                       </p>
                       <div class="form-group">
                         <span class="input-group-append">
-                          <button class="btn btn-primary" onClick={props.saveStockExchangeSettings}>
+                          <button class="btn btn-primary" onClick={props.saveConfiguration}>
                             <Text id={`integration.stockExchange.saveButton`} />
                           </button>
                         </span>

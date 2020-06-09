@@ -1,6 +1,13 @@
 {
   "name": "stock-exchange",
   "main": "index.js",
+  "description": "A stock exchange data displayer for Gladys.",
+  "author": "Nicolas Geissel <nicolas@geissel.fr>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngeissel/Gladys.git#stock-exchange"
+  },
+  "license": "MIT",
   "os": [
     "darwin",
     "linux",

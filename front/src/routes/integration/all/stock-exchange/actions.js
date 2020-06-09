@@ -2,56 +2,29 @@ import { RequestStatus, GetStockExchangeStatus } from '../../../../utils/consts'
 import get from 'get-value';
 
 const actions = store => ({
-  updateApiKey(state, e) {
-    store.setState({
-      apiKey: e.target.value
-    });
-  },
-  updateTickers(state, e) {
-    store.setState({
-      tickers: e.target.value
-    });
-  },
-  async getStockExchangeSetting(state) {
-    store.setState({
-      stockexchangeGetSettingsStatus: GetStockExchangeStatus.Getting
-    });
-
-    let stockExchangeTickers = '^FCHI';
-    let stockExchangeApiKey = '';
-
-    store.setState({
-      stockExchangeApiKey,
-      stockExchangeTickers
-    });
-
+  async loadProps(state) {
+    let stockExchangeTickers;
+    let stockExchangeApiKey;
     try {
-
-      const { value: apiKey } = await state.httpClient.get('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_API_KEY', {
+      stockExchangeApiKey = await state.httpClient.get('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_API_KEY', {
         userRelated: true
       });
-      stockExchangeApiKey = apiKey;
-
-      const { value: tickers } = await state.httpClient.get('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_TICKERS', {
+      stockExchangeTickers = await state.httpClient.get('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_TICKERS', {
         userRelated: true
       });
-      stockExchangeTickers = tickers;
-
+    } finally {
       store.setState({
-        stockexchangeGetSettingsStatus: GetStockExchangeStatus.Success
-      });
-    } catch (e) {
-      store.setState({
-        stockexchangeGetSettingsStatus: GetStockExchangeStatus.Error
+        stockExchangeApiKey: (stockExchangeApiKey || {}).value,
+        stockExchangeTickers: (stockExchangeTickers || { value: '^FCHI' }).value,
       });
     }
-    store.setState({
-      stockExchangeApiKey,
-      stockExchangeTickers
-    });
   },
-
-  async saveStockExchangeSettings(state) {
+  updateConfiguration(state, e) {
+    const data = {};
+    data[e.target.name] = e.target.value;
+    store.setState(data);
+  },
+  async saveConfiguration(state) {
     event.preventDefault();
     store.setState({
       stockexchangeSetSettingsStatus: GetStockExchangeStatus.Getting
@@ -59,15 +32,16 @@ const actions = store => ({
     try {
       // save apiKey
       await state.httpClient.post('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_API_KEY', {
-        value: state.apiKey,
+        value: state.stockExchangeApiKey.trim(),
         userRelated: true
       });
 
       // save tickers
       await state.httpClient.post('/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_TICKERS', {
-        value: state.tickers,
+        value: state.stockExchangeTickers,
         userRelated: true
       });
+      await state.httpClient.post('/api/v1/service/stock-exchange/stop');
       // start service
       await state.httpClient.post('/api/v1/service/stock-exchange/start');
       store.setState({

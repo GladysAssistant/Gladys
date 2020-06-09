@@ -211,10 +211,9 @@
         "description": "Cette box affiche des informations boursières.",
         "error": "Une erreur réseau s'est produite lors de la récupération des informations boursières. Merci de rafraîchir la page.",
         "emptyText": "Il n'y a aucune informations à afficher ici.",
-        "serviceNotConfigured": "The service is not configured.",
-        "requestToThirdPartyFailed": "The request to FPM API failed. Is your Gladys instance connected to the internet? ",
-        "clickHere": "Click here to access the FPM configuration panel.",
-        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href = \"https: //community.gladysassistant. com \"> Gladys community </a>. "
+        "serviceNotConfigured": "Le service n'est pas correctement configuré.",
+        "requestToThirdPartyFailed": "La requête à l'API FMP a échouée :",
+        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href = \"https://community.gladysassistant.com\"> Gladys community </a>. "
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -239,7 +238,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "service": "Service"
       }
     },
     "caldav": {
@@ -467,6 +467,9 @@
       "title": "Financial Modeling Prep API",
       "introduction": "Cette intégration vous aide à intégrer  <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">l'API Fmp</a> pour obtenir les informations boursières dans Gladys.",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box bourse.",
+      "instructions": "Vous devez d'abord créer un compte sur le site Web de <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">FMP</a>.",
+      "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
+      "apiKeyPlaceholder": "Entrer la clé API FMP",
       "selectTickerLabel": "Valeurs",
       "selectTickerDescription": "Choisissez les valeurs à afficher.",
       "saveButton": "Sauvegarder"

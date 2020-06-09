@@ -7,7 +7,7 @@ import actions from './actions';
 @connect('user,stockExchangeApiKey,stockExchangeTickers,stockexchangeGetSettingsStatus,stockexchangeSetSettingsStatus', actions)
 class StockExchangeIntegration extends Component {
   componentWillMount() {
-    this.props.getStockExchangeSetting();
+    this.props.loadProps();
   }
 
   render(props, {}) {

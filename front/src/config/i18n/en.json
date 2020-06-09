@@ -212,9 +212,8 @@
         "error": "There was a network error fetching stock exchange datas. Please refresh.",
         "emptyText": "There are no datas to display here.",
         "serviceNotConfigured": "The service is not configured.",
-        "requestToThirdPartyFailed": "The request to FPM API failed. Is your Gladys instance connected to the internet? ",
-        "clickHere": "Click here to access the FPM configuration panel.",
-        "unknownError": "We are unable to get your stock exchange informations. "
+        "requestToThirdPartyFailed": "The request to FPM API failed :",
+        "unknownError": "An unknow error has occurred. Please try again or contact Gladys community."
       },
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
