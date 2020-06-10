@@ -64,7 +64,6 @@ function createActions(store) {
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           route('/link-gateway-user');
         } else {
-          console.log(e);
         }
       }
     },

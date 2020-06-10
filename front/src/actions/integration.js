@@ -20,9 +20,7 @@ const actions = store => ({
       store.setState({
         currentIntegration
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   },
   getIntegrationByCategory(state, category) {
     const selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
