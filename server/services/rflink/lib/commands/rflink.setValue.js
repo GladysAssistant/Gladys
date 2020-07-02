@@ -40,17 +40,23 @@ function setValue(device, deviceFeature, state) {
         break;
     }
   }
-
+  logger.debug(`device ${device.external_id}`);
+  logger.debug(`deviceFeature ${deviceFeature.external_id}`);
+  //rflink:milight:F746:1
   if (device.external_id.split(':')[1] === 'milight') {
     const id = device.external_id.split(':')[2];
     const channel = `0${device.external_id.split(':')[3]}`;
-    if (deviceFeature.external_id.split()[2].toLowerCase() === 'color') {
+    const feature = deviceFeature.external_id.split(':')[4].toLowerCase();
+    logger.debug(`id ${id}`);
+    logger.debug(`channel ${channel}`);
+    logger.debug(`feature ${feature}`);
+    if (feature === 'color') {
       msg = `10;MiLightv1;${id};${channel};${value};COLOR;`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'brightness') {
+    } else if (feature === 'brightness') {
       msg = `10;MiLightv1;${id};${channel};${value};BRIGHT;`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'power') {
+    } else if (feature === 'power') {
       msg = `10;MiLightv1;${id};${channel};34BC;${value};`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'milight-mode') {
+    } else if (feature === 'milight-mode') {
       msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};`;
     }
   } else {
