@@ -55,18 +55,26 @@ function setValue(device, deviceFeature, state) {
     } else if (feature === 'brightness') {
       msg = `10;MiLightv1;${id};${channel};${value};BRIGHT;`;
     } else if (feature === 'power') {
-      msg = `10;MiLightv1;${id};${channel};34BC;${value};`;
+      switch (state) {
+        case 0:
+        case false:
+          value = 'OFF';
+          break;
+        case 1:
+        case true:
+          value = 'ON';
+          break;
+      }
+      msg = `10;MiLightv1;${id};${channel};34BC;${value};\n`;
     } else if (feature === 'milight-mode') {
-      msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};`;
+      msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};\n`;
     }
   } else {
     msg = ObjToRF(device, deviceFeature, value);
   }
-  logger.log(msg);
+  logger.debug(`Message send to USB : "${msg}"`);
+  this.sendUsb.write(msg, (error) => {});
 
-  this.sendUsb.write(msg, (error) => {});
-  this.sendUsb.write(msg, (error) => {});
-  this.sendUsb.write(msg, (error) => {});
 }
 
 module.exports = {
