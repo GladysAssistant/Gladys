@@ -109,10 +109,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function sendDebug(req, res) {
-    const command = req.body.value + '\n';
+    const command = `${req.body.value}\n`;
     logger.debug(`Command send to port : ${command}`);
 
-    RFlinkManager.sendUsb.write(command, (error) => {logger.debug(error);});
+    RFlinkManager.sendUsb.write(command);
     res.json({
       succes: true,
     });

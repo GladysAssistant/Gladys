@@ -42,7 +42,7 @@ function setValue(device, deviceFeature, state) {
   }
   logger.debug(`device ${device.external_id}`);
   logger.debug(`deviceFeature ${deviceFeature.external_id}`);
-  //rflink:milight:F746:1
+
   if (device.external_id.split(':')[1] === 'milight') {
     const id = device.external_id.split(':')[2];
     const channel = `0${device.external_id.split(':')[3]}`;
@@ -64,6 +64,8 @@ function setValue(device, deviceFeature, state) {
         case true:
           value = 'ON';
           break;
+        default:
+          value = 'ON';
       }
       msg = `10;MiLightv1;${id};${channel};34BC;${value};\n`;
     } else if (feature === 'milight-mode') {
