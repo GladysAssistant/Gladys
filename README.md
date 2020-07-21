@@ -39,7 +39,7 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 ## Getting Started
 
-Right now we are migrating from Gladys 3 to Gladys 4, a new release rewrote from scratch. If you want to install Gladys 3, visit [our website](https://gladysassistant.com).
+Right now we are migrating from Gladys 3 to Gladys 4, a new release rewritten from scratch. If you want to install Gladys 3, visit [our website](https://gladysassistant.com).
 
 To install Gladys 4 Beta, read the following instructions.
 
