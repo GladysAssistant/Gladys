@@ -4,100 +4,37 @@ import { Link } from 'preact-router/match';
 import actions from '../../actions/integration';
 
 const IntegrationMenu = connect(
-  'integrations',
+  'integrationCategories',
   actions
-)(({ getIntegrationByCategory }) => {
+)(({ integrationCategories, getIntegrationByCategory }) => {
   const refreshIntegrations = category => () => getIntegrationByCategory(category);
 
   return (
     <div class="list-group list-group-transparent mb-0">
       <Link
         activeClassName="active"
-        onClick={refreshIntegrations('device')}
-        href="/dashboard/integration/device"
+        onClick={refreshIntegrations(null)}
+        href="/dashboard/integration"
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="fe fe-toggle-right" />
+          <i class="fe fe-hash" />
         </span>
-        <Text id="integration.root.menu.device" />
+        <Text id="integration.root.menu.all" />
       </Link>
-
-      <Link
-        activeClassName="active"
-        onClick={refreshIntegrations('communication')}
-        href="/dashboard/integration/communication"
-        class="list-group-item list-group-item-action d-flex align-items-center"
-      >
-        <span class="icon mr-3">
-          <i class="fe fe-message-square" />
-        </span>
-        <Text id="integration.root.menu.communication" />
-      </Link>
-
-      {false && (
+      {integrationCategories.map(category => (
         <Link
           activeClassName="active"
-          href="/dashboard/integration/calendar"
+          onClick={refreshIntegrations(category.type)}
+          href={`/dashboard/integration/${category.type}`}
           class="list-group-item list-group-item-action d-flex align-items-center"
         >
           <span class="icon mr-3">
-            <i class="fe fe-calendar" />
+            <i class={`fe fe-${category.icon}`} />
           </span>
-          <Text id="integration.root.menu.calendar" />
+          <Text id={`integration.root.menu.${category.type}`} />
         </Link>
-      )}
-
-      {false && (
-        <Link
-          activeClassName="active"
-          href="/dashboard/integration/music"
-          class="list-group-item list-group-item-action d-flex align-items-center"
-        >
-          <span class="icon mr-3">
-            <i class="fe fe-music" />
-          </span>
-          <Text id="integration.root.menu.music" />
-        </Link>
-      )}
-
-      {false && (
-        <Link
-          activeClassName="active"
-          href="/dashboard/integration/health"
-          class="list-group-item list-group-item-action d-flex align-items-center"
-        >
-          <span class="icon mr-3">
-            <i class="fe fe-heart" />
-          </span>
-          <Text id="integration.root.menu.health" />
-        </Link>
-      )}
-
-      <Link
-        activeClassName="active"
-        onClick={refreshIntegrations('device')}
-        href="/dashboard/integration/weather"
-        class="list-group-item list-group-item-action d-flex align-items-center"
-      >
-        <span class="icon mr-3">
-          <i class="fe fe-cloud" />
-        </span>
-        <Text id="integration.root.menu.weather" />
-      </Link>
-
-      {false && (
-        <Link
-          activeClassName="active"
-          href="/dashboard/integration/navigation"
-          class="list-group-item list-group-item-action d-flex align-items-center"
-        >
-          <span class="icon mr-3">
-            <i class="fe fe-navigation" />
-          </span>
-          <Text id="integration.root.menu.navigation" />
-        </Link>
-      )}
+      ))}
     </div>
   );
 });

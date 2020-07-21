@@ -8,15 +8,13 @@
 <h4 align="center">A privacy-first, open-source home assistant</h4>
 
 <p align="center">
-	
 </p>
 
 <p align="center">
   <a href="#the-project">The Project</a> •
   <a href="#getting-started">Getting Started</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="#support-financially">Support Financially</a> •
-  <a href="#links">Links</a> •
+   <a href="#links">Links</a> •
+  <a href="#contributors-">Contributors</a> •
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
@@ -55,30 +53,39 @@ Read our tutorial: [Install Gladys 4 on a Raspberry Pi](https://documentation.gl
 
 Read our tutorial: [Install Gladys 4 on MacOS/Windows](https://documentation.gladysassistant.com/en/installation#macos-windows)
 
-## Contributing
-
-Pull requests are welcomed!
-
-Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) for more details.
-
-## Support Financially
-
-My name is [Pierre-Gilles Leymarie](https://twitter.com/pierregillesl), I founded Gladys Assistant in 2013 and recently I decided to work almost full-time on open-source.
-
-It's only thanks to donation from the community that my open-source work is sustainable.
-
-To support the project, you can:
-
-- Support monthly, 9.99€/month with [Gladys Plus](https://gladysassistant.com/pricing).
-- Donate with Bitcoin: 3KQiX1FtbdXLXPH9UfLSyuzRMDRGY52EiA
-
 ## Links
 
 - [Website](https://gladysassistant.com)
 - [Community](https://community.gladysassistant.com/)
 - [Twitter](https://twitter.com/gladysassistant)
 - [Instagram](https://www.instagram.com/gladysassistant/)
-- [Facebook](https://www.facebook.com/gladysassistant)
+
+## Contributors ✨
+
+Thanks goes to these wonderful people 👏
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://pierregillesleymarie.com"><img src="https://avatars0.githubusercontent.com/u/7365207?v=4" width="100px;" alt=""/><br /><sub><b>Pierre-Gilles Leymarie</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Pierre-Gilles" title="Code">💻</a> <a href="#business-Pierre-Gilles" title="Business development">💼</a> <a href="https://github.com/GladysAssistant/Gladys/commits?author=Pierre-Gilles" title="Documentation">📖</a> <a href="#ideas-Pierre-Gilles" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/VonOx"><img src="https://avatars2.githubusercontent.com/u/1528694?v=4" width="100px;" alt=""/><br /><sub><b>Vincent KULAK</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=VonOx" title="Code">💻</a> <a href="#infra-VonOx" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/GladysAssistant/Gladys/commits?author=VonOx" title="Documentation">📖</a> <a href="#ideas-VonOx" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://www.trovato.fr"><img src="https://avatars2.githubusercontent.com/u/1839717?v=4" width="100px;" alt=""/><br /><sub><b>Alexandre Trovato</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=atrovato" title="Code">💻</a> <a href="https://github.com/GladysAssistant/Gladys/commits?author=atrovato" title="Documentation">📖</a> <a href="#ideas-atrovato" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/bertrandda"><img src="https://avatars1.githubusercontent.com/u/18148265?v=4" width="100px;" alt=""/><br /><sub><b>Bertrand d'Aure</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=bertrandda" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Terdious"><img src="https://avatars0.githubusercontent.com/u/35010958?v=4" width="100px;" alt=""/><br /><sub><b>Terdious</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Terdious" title="Code">💻</a> <a href="#ideas-Terdious" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/sescandell"><img src="https://avatars0.githubusercontent.com/u/1559970?v=4" width="100px;" alt=""/><br /><sub><b>Stéphane</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=sescandell" title="Code">💻</a> <a href="#infra-sescandell" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-sescandell" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://fischerdesign.co"><img src="https://avatars1.githubusercontent.com/u/8835133?v=4" width="100px;" alt=""/><br /><sub><b>Scott Fischer</b></sub></a><br /><a href="#translation-Scott-Fischer" title="Translation">🌍</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) for more details.
 
 ## Copyright & License
 

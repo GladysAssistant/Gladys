@@ -7,6 +7,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Connect to Rflink
  * @param {string} Path - Path to the Rflink gateway.
+ * @returns {string} Status.
  * @example
  * rflink.connect(Path);
  */
@@ -26,7 +27,7 @@ function connect(Path) {
       autoOpen: false,
     });
 
-    port.open((err) => {
+    port.open(function (err) {
       if (err) {
         logger.log('error');
         this.connected = false;
@@ -35,8 +36,10 @@ function connect(Path) {
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
         });
-        return logger.log(`Rflink : ${err}`);
+        return logger.log(`Error opening port: : ${err.message}`);
       }
+      logger.log('info');
+      return logger.log(`Success on opening port`);
     });
 
     const readline = new Readline({

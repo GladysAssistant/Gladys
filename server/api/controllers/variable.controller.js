@@ -10,8 +10,9 @@ module.exports = function VariableController(gladys) {
    * @apiParam {string} value value to save
    */
   async function setForLocalService(req, res) {
+    const userId = req.body.userRelated ? req.user.id : null;
     const service = await gladys.service.getLocalServiceByName(req.params.service_name);
-    const variable = await gladys.variable.setValue(req.params.variable_key, req.body.value, service.id);
+    const variable = await gladys.variable.setValue(req.params.variable_key, req.body.value, service.id, userId);
     res.json(variable);
   }
 
@@ -22,8 +23,9 @@ module.exports = function VariableController(gladys) {
    *
    */
   async function getByLocalService(req, res) {
+    const userId = req.query.userRelated ? req.user.id : null;
     const service = await gladys.service.getLocalServiceByName(req.params.service_name);
-    const value = await gladys.variable.getValue(req.params.variable_key, service.id);
+    const value = await gladys.variable.getValue(req.params.variable_key, service.id, userId);
     if (!value) {
       throw new NotFoundError('VARIABLE_NOT_FOUND');
     }

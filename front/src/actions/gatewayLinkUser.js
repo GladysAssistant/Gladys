@@ -14,9 +14,10 @@ function createActions(store) {
           usersGetStatus: RequestStatus.Success
         });
       } catch (e) {
-        const error = get(e, 'response.error');
-        const errorMessage = get(e, 'response.error_message');
-        const errorMessageOtherFormat = get(e, 'response.message');
+        console.log(e);
+        const error = get(e, 'response.data.error');
+        const errorMessage = get(e, 'response.data.error_message');
+        const errorMessageOtherFormat = get(e, 'response.data.message');
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);
           window.location = '/link-gateway-user';

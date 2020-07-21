@@ -5,7 +5,7 @@ import update from 'immutability-helper';
 import OpenApi from './OpenApi';
 import linkState from 'linkstate';
 
-@connect('session', {})
+@connect('session,user', {})
 class SettingsGatewayOpenApi extends Component {
   state = {
     apiKeys: [],
@@ -44,11 +44,12 @@ class SettingsGatewayOpenApi extends Component {
     this.getApiKeys();
   }
 
-  render({}, props) {
+  render({ user }, state) {
     return (
       <SettingsLayout>
         <OpenApi
-          {...props}
+          {...state}
+          user={user}
           createApiKey={this.createApiKey}
           revokeOpenApiKey={this.revokeOpenApiKey}
           updateNewApiKeyName={linkState(this, 'newApiKeyName')}

@@ -18,7 +18,7 @@ function message(msgRF) {
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_MESSAGE,
   });
-  logger.log('sending enw message');
+  logger.log(`sending new message ${msgRF}`);
   const msg = RFtoObj(msgRF);
   let newDevice;
   let doesntExistYet = true;

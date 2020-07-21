@@ -1,3 +1,4 @@
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import actions from '../../../actions/integration';
 import ActionColumn from './ActionColumn';
@@ -50,16 +51,18 @@ const ScenePage = connect(
               }}
             >
               <Link href="/dashboard/scene" class="btn btn-secondary btn-sm btn-block">
-                ◀️️ Back
+                <Text id="global.backButton" />
               </Link>
             </h1>
-            <h1 class="page-title">Leaving home</h1>
+            <h1 class="page-title">
+              <Text id="editScene.triggerCard.leavingHomeTitle" />
+            </h1>
             <div class="page-options d-flex">
               <button class="btn btn-sm btn-primary ml-2">
-                Run <i class="fe fe-play" />
+                <Text id="editScene.runButton" /> <i class="fe fe-play" />
               </button>
               <button class="btn btn-sm btn-danger ml-2">
-                Delete <i class="fe fe-trash" />
+                <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
               </button>
             </div>
           </div>

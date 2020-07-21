@@ -1,10 +1,11 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
+import get from 'get-value';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
-import translationEn from '../config/i18n/en.json';
+import translations from '../config/i18n';
 import actions from '../actions/main';
 
 import { getDefaultState } from '../utils/getDefaultState';
@@ -45,7 +46,6 @@ import TriggerPage from '../routes/trigger';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
-import SettingsAdvancedPage from '../routes/settings/settings-advanced';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
@@ -55,6 +55,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
+import CaldavPage from '../routes/integration/all/caldav';
 import DarkSkyPage from '../routes/integration/all/darksky';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
@@ -76,15 +77,16 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
-// Sonoff
-import SonoffPage from '../routes/integration/all/sonoff/device-page';
-import SonoffDiscoverPage from '../routes/integration/all/sonoff/discover-page';
+// Tasmota
+import TasmotaPage from '../routes/integration/all/tasmota/device-page';
+import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
+import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,integrationCategories',
   actions
 )(props => (
   <div id="app">
@@ -143,14 +145,12 @@ const AppRouter = connect(
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
-        <IntegrationPage path="/dashboard/integration/device" />
-        <IntegrationPage path="/dashboard/integration/communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" />
-        <IntegrationPage path="/dashboard/integration/music" />
-        <IntegrationPage path="/dashboard/integration/health" />
-        <IntegrationPage path="/dashboard/integration/weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" />
+        {props.integrationCategories.map(category => (
+          <IntegrationPage path={`/dashboard/integration/${category.type}`} category={category.type} />
+        ))}
+
         <TelegramPage path="/dashboard/integration/communication/telegram" />
+        <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <DarkSkyPage path="/dashboard/integration/weather/darksky" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
@@ -173,13 +173,13 @@ const AppRouter = connect(
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-        <SonoffPage path="/dashboard/integration/device/sonoff" />
-        <SonoffDiscoverPage path="/dashboard/integration/device/sonoff/discover" />
+        <TasmotaPage path="/dashboard/integration/device/tasmota" />
+        <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
+        <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
         <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
         <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
-
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <CalendarPage path="/dashboard/calendar" />
@@ -190,7 +190,6 @@ const AppRouter = connect(
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
-        <SettingsAdvancedPage path="/dashboard/settings/advanced" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsBackup path="/dashboard/settings/backup" />
@@ -200,22 +199,26 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('', actions)
+@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
+    this.props.getIntegrations();
   }
 
-  render({}, {}) {
-    return <AppRouter />;
+  render({ user }, {}) {
+    const translationDefinition = get(translations, user.language, { default: translations.en });
+    return (
+      <IntlProvider definition={translationDefinition}>
+        <AppRouter />
+      </IntlProvider>
+    );
   }
 }
 
 const App = () => (
   <Provider store={store}>
-    <IntlProvider definition={translationEn}>
-      <MainApp />
-    </IntlProvider>
+    <MainApp />
   </Provider>
 );
 

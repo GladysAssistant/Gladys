@@ -1,6 +1,7 @@
 /* eslint-disable prefer-destructuring */
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 
 module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   /**
@@ -12,10 +13,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     const NewDevices = RFlinkManager.getNewDevices();
     res.json(NewDevices);
     }
-  
+
 
   /**
-   * @api {get} /api/v1/service/rflink/connect connect to the gateway
+   * @api {post} /api/v1/service/rflink/connect connect to the gateway
    * @apiName connect
    * @apiGroup RFlink
    */
@@ -29,7 +30,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     res.json({ succes: true });
   }
   /**
-   * @api {get} /api/v1/service/rflink/disconnect discconnect the gateway
+   * @api {post} /api/v1/service/rflink/disconnect discconnect the gateway
    * @apiName disconnect
    * @apiGroup RFlink
    */
@@ -55,7 +56,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   }
 
   /**
-   * @api {get} /api/v1/service/rflink/pair send a milight pairing command
+   * @api {post} /api/v1/service/rflink/pair send a milight pairing command
    * @apiName pair
    * @apiGroup RFlink
    */
@@ -80,7 +81,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   }
 
   /**
-   * @api {get} /api/v1/service/rflink/pair send a milight unpairing command
+   * @api {post} /api/v1/service/rflink/pair send a milight unpairing command
    * @apiName unpair
    * @apiGroup RFlink
    */
@@ -103,14 +104,15 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     });
   }
   /**
-   * @api {get} /api/v1/service/rflink/debug send a rflink command
+   * @api {post} /api/v1/service/rflink/debug send a rflink command
    * @apiName debug
    * @apiGroup RFlink
    */
   async function sendDebug(req, res) {
-    const command = req.body.value;
-    RFlinkManager.sendUsb.write(command);
+    const command = `${req.body.value}\n`;
+    logger.debug(`Command send to port : ${command}`);
 
+    RFlinkManager.sendUsb.write(command);
     res.json({
       succes: true,
     });

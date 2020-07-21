@@ -7,7 +7,17 @@ const DEFAULT_OPTIONS = {
   order_dir: 'desc',
 };
 
-const FIELDS = ['id', 'token_type', 'scope', 'valid_until', 'last_seen', 'revoked', 'created_at', 'updated_at'];
+const FIELDS = [
+  'id',
+  'token_type',
+  'scope',
+  'valid_until',
+  'last_seen',
+  'revoked',
+  'useragent',
+  'created_at',
+  'updated_at',
+];
 
 /**
  * @description Get all sessions

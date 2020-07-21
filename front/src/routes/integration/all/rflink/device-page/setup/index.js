@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from '../actions';
 import FeatureTab from './FeatureTab';
 import RflinkPage from '../../RflinkPage';
-import integrationConfig from '../../../../../../config/integrations';
+import integrations from '../../../../../../config/integrations';
 import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
@@ -177,10 +177,10 @@ class RflinkDeviceSetupPage extends Component {
       loading: false
     });
   }
-
+  //<RflinkPage integration={integrationConfig[props.user.language].rflink}>
   render(props, state) {
     return (
-      <RflinkPage integration={integrationConfig[props.user.language].rflink}>
+      <RflinkPage>
         <FeatureTab
           {...props}
           {...state}

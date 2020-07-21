@@ -15,24 +15,30 @@ class RoomSelector extends Component {
 
   componentWillReceiveProps = newProps => {
     let selectedRoom;
-    const houseOptions = newProps.houses.map(house => {
-      return {
-        label: house.name,
-        options: house.rooms.map(room => {
-          const option = {
-            label: room.name,
-            value: room.selector,
-            room
-          };
+    let houseOptions = [];
+    if (newProps.houses) {
+      houseOptions = newProps.houses.map(house => {
+        return {
+          label: house.name,
+          options:
+            house && house.rooms
+              ? house.rooms.map(room => {
+                  const option = {
+                    label: room.name,
+                    value: room.selector,
+                    room
+                  };
 
-          if (newProps.selectedRoom === room.selector) {
-            selectedRoom = option;
-          }
+                  if (newProps.selectedRoom === room.selector) {
+                    selectedRoom = option;
+                  }
 
-          return option;
-        })
-      };
-    });
+                  return option;
+                })
+              : []
+        };
+      });
+    }
 
     this.setState({ houseOptions, selectedRoom });
   };

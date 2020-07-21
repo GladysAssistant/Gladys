@@ -1,22 +1,14 @@
 import get from 'get-value';
-import integrationsConfig from '../config/integrations';
-import { AVAILABLE_LANGUAGES_LIST, AVAILABLE_LANGUAGES } from '../../../server/utils/constants';
-
-const getLanguage = state => {
-  const foundLanguageInState = get(state, 'user.language');
-  const userLanguage =
-    AVAILABLE_LANGUAGES_LIST.indexOf(foundLanguageInState) !== -1 ? foundLanguageInState : AVAILABLE_LANGUAGES.EN;
-  return userLanguage;
-};
+import { integrations, integrationsByType, categories } from '../config/integrations';
 
 const actions = store => ({
-  getIntegrations(state) {
-    const userLanguage = getLanguage(state);
-    const currentIntegrationCategory = state.currentUrl.split('/').pop();
-    const integrations = integrationsConfig[userLanguage][currentIntegrationCategory] || [];
+  getIntegrations(state, category = null) {
+    const selectedIntegrations = integrationsByType[category] || integrations;
     store.setState({
-      integrations,
-      totalSize: integrationsConfig[userLanguage].totalSize
+      integrations: selectedIntegrations,
+      totalSize: selectedIntegrations.length,
+      integrationCategories: categories,
+      searchKeyword: ''
     });
   },
   async getIntegrationByName(state, name, podId = null) {
@@ -31,23 +23,26 @@ const actions = store => ({
     } catch (e) {}
   },
   getIntegrationByCategory(state, category) {
-    const userLanguage = getLanguage(state);
-    const integrations = integrationsConfig[userLanguage][category] || [];
+    const selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
     store.setState({
-      integrations
+      integrations: selectedIntegrations,
+      searchKeyword: ''
     });
   },
-  search(state, e) {
+  search(state, e, intl) {
     if (!e.target.value || e.target.value === '') {
-      return store.setState({
-        integrationsFiltered: null
+      this.getIntegrationByCategory(state.category);
+    } else {
+      const keyword = e.target.value.toLowerCase();
+      store.setState({
+        integrations: state.integrations.filter(integration => {
+          const name = get(intl.dictionary, `integration.${integration.key}.title`, { default: '' });
+          const description = get(intl.dictionary, `integration.${integration.key}.description`, { default: '' });
+          return name.toLowerCase().includes(keyword) || description.toLowerCase().includes(keyword);
+        }),
+        searchKeyword: keyword
       });
     }
-    store.setState({
-      integrationsFiltered: state.integrations.filter(integration =>
-        integration.name.toLowerCase().includes(e.target.value.toLowerCase())
-      )
-    });
   }
 });
 

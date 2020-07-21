@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
 const SignupLayout = ({ children, ...props }) => (
@@ -19,7 +19,13 @@ const SignupLayout = ({ children, ...props }) => (
           >
             <div class="text-center mb-6">
               <h2>
-                <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+                <Localizer>
+                  <img
+                    src="/assets/icons/favicon-96x96.png"
+                    class="header-brand-img"
+                    alt={<Text id="global.logoAlt" />}
+                  />
+                </Localizer>
                 <Text id="login.title" />
               </h2>
             </div>
@@ -31,7 +37,7 @@ const SignupLayout = ({ children, ...props }) => (
                       class={props.currentUrl && props.currentUrl === '/signup' ? 'active nav-link' : 'nav-link'}
                       href="#"
                     >
-                      Welcome
+                      <Text id="login.welcome" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -43,7 +49,7 @@ const SignupLayout = ({ children, ...props }) => (
                       }
                       href="#"
                     >
-                      Create account
+                      <Text id="login.createAccountStep" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -55,7 +61,7 @@ const SignupLayout = ({ children, ...props }) => (
                       }
                       href="#"
                     >
-                      Your preferences
+                      <Text id="login.preferencesStep" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -67,7 +73,7 @@ const SignupLayout = ({ children, ...props }) => (
                       }
                       href="#"
                     >
-                      Configure house
+                      <Text id="login.houseStep" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -79,7 +85,7 @@ const SignupLayout = ({ children, ...props }) => (
                       }
                       href="#"
                     >
-                      Success!
+                      <Text id="login.success" />
                     </Link>
                   </li>
                 </ul>

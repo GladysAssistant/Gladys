@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import SceneCards from './SceneCards';
@@ -27,12 +27,14 @@ const ScenePage = ({ children, ...props }) => (
                 <span class="input-icon-addon">
                   <i class="fe fe-search" />
                 </span>
-                <input
-                  type="text"
-                  class="form-control w-10"
-                  placeholder="Search scenes"
-                  onInput={props.debouncedSearch}
-                />
+                <Localizer>
+                  <input
+                    type="text"
+                    class="form-control w-10"
+                    placeholder={<Text id="scene.searchPlaceholder" />}
+                    onInput={props.debouncedSearch}
+                  />
+                </Localizer>
               </div>
               <Link href="/dashboard/scene/new" class="btn btn-outline-primary ml-2">
                 <Text id="scene.newButton" /> <i class="fe fe-plus" />

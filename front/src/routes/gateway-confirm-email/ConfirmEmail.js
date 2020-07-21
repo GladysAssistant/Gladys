@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 
 const ConfirmEmail = ({ children, ...props }) => (
   <div class="page">
@@ -8,7 +8,13 @@ const ConfirmEmail = ({ children, ...props }) => (
           <div class="col col-login mx-auto">
             <div class="text-center mb-6">
               <h2>
-                <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt="Gladys logo" />
+                <Localizer>
+                  <img
+                    src="/assets/icons/favicon-96x96.png"
+                    class="header-brand-img"
+                    alt={<Text id="global.logoAlt" />}
+                  />
+                </Localizer>
                 <Text id="forgotPassword.title" />
               </h2>
             </div>
@@ -17,31 +23,35 @@ const ConfirmEmail = ({ children, ...props }) => (
                 {props.error && (
                   <div>
                     <div class="alert alert-danger" role="alert">
-                      We are unable to verify your email address.
+                      <Text id="forgotPassword.invalidEmail" />
                     </div>
-                    <p>Are you sure you clicked/copied the link correctly?</p>
                     <p>
-                      If it still not working, please contact us on{' '}
-                      <a href="https://twitter.com/gladysassistant">Twitter</a> or on{' '}
-                      <a href="https://community.gladysassistant.com">Gladys Community</a>.
+                      <Text id="forgotPassword.validationLinkConfirmation" />
+                    </p>
+                    <p>
+                      <MarkupText id="forgotPassword.contactUs" />
                     </p>
                   </div>
                 )}
 
                 {props.emailConfirmed && (
                   <div>
-                    <div class="card-title">Email Confirmed</div>
+                    <div class="card-title">
+                      <Text id="forgotPassword.emailConfirmed" />
+                    </div>
 
                     <div class="form-footer">
                       <a href={'/login?email=' + props.email} class="btn btn-primary btn-block">
-                        Sign in
+                        <Text id="forgotPassword.signIn" />
                       </a>
                     </div>
                   </div>
                 )}
-                {/* prettier-ignore */ !props.emailConfirmed && !props.error && (
+                {!props.emailConfirmed && !props.error && (
                   <div>
-                    <div class="card-title">Confirmation in progress...</div>
+                    <div class="card-title">
+                      <Text id="forgotPassword.confirmationInProgress" />
+                    </div>
                   </div>
                 )}
               </div>

@@ -1,4 +1,5 @@
 import createActionsProfilePicture from './profilePicture';
+import createActionsIntegration from './integration';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -6,6 +7,7 @@ import { isUrlInArray } from '../utils/url';
 
 const OPEN_PAGES = [
   '/signup',
+  '/signup/create-account-gladys-gateway',
   '/login',
   '/forgot-password',
   '/reset-password',
@@ -17,6 +19,7 @@ const OPEN_PAGES = [
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
+  const integrations = createActionsIntegration(store);
 
   const actions = {
     handleRoute(state, e) {
@@ -52,11 +55,13 @@ function createActions(store) {
         });
       } catch (e) {
         const status = get(e, 'response.status');
-        const error = get(e, 'response.error');
-        if (status === 401) {
+        const error = get(e, 'response.data.error');
+        if (status === 401 || status === 403) {
           state.session.reset();
           route('/login');
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
+          route('/link-gateway-user');
+        } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           route('/link-gateway-user');
         } else {
         }
@@ -75,7 +80,7 @@ function createActions(store) {
     }
   };
 
-  return Object.assign(actions, actionsProfilePicture);
+  return Object.assign(actions, actionsProfilePicture, integrations);
 }
 
 export default createActions;

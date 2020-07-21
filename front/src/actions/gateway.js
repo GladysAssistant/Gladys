@@ -69,20 +69,26 @@ function createActions(store) {
           two_factor_token: state.gatewayLoginResults.two_factor_token,
           two_factor_code: state.gatewayLoginTwoFactorCode
         });
-        store.setState({
-          gatewayLoginStatus: RequestStatus.Success,
-          displayGatewayLogin: false,
-          gatewayLoginStep2: false
-        });
         await actions.getStatus(store.getState());
         await actions.getKeys(store.getState());
         await actions.getInstanceKeys(store.getState());
         await actions.getBackupKey(store.getState());
+        store.setState({
+          gatewayLoginStatus: RequestStatus.Success,
+          displayGatewayLogin: false,
+          gatewayLoginStep2: false,
+          displayConnectedSuccess: true
+        });
       } catch (e) {
         store.setState({
           gatewayLoginStatus: RequestStatus.Error
         });
       }
+    },
+    finalizeGatewaySetup() {
+      store.setState({
+        displayConnectedSuccess: false
+      });
     },
     async disconnect(state) {
       store.setState({
@@ -268,6 +274,7 @@ function createActions(store) {
         const restoreStatus = await state.httpClient.get('/api/v1/gateway/backup/restore/status');
         store.setState({
           gatewayRestoreInProgress: restoreStatus.restore_in_progress,
+          gatewayRestoreErrored: restoreStatus.restore_errored,
           gatewayRestoreStatusStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -283,6 +290,10 @@ function createActions(store) {
           setTimeout(() => {
             actions.waitForRestoreToFinish(state);
           }, 2000);
+        } else if (restoreStatus.restore_errored) {
+          store.setState({
+            gatewayRestoreErrored: true
+          });
         } else {
           window.location = '/dashboard';
         }
@@ -412,6 +423,27 @@ function createActions(store) {
       script.onload = () => {
         store.setState({ stripeLoaded: true });
       };
+    },
+    async tempSignupForRestore(state, language) {
+      await state.session.init();
+      if (state.session.isConnected()) {
+        return null;
+      }
+      const user = await state.httpClient.post(`/api/v1/signup`, {
+        firstname: 'temp-user',
+        lastname: 'temp-user',
+        password: 'temp-password',
+        role: 'admin',
+        email: 'temp-user@test.fr',
+        language,
+        birthdate: new Date()
+      });
+      store.setState({
+        user,
+        createLocalAccountStatus: RequestStatus.Success
+      });
+      await state.session.saveUser(user);
+      await state.session.init();
     }
   };
   return actions;

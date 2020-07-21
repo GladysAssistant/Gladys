@@ -14,7 +14,7 @@ function ObjToRF(device, deviceFeature, state) {
   const channel = device.external_id.split(':')[2];
 
   let Rfcode = `10;${device.model};${id};`;
-
+  logger.debug(`Send to RFLINK : ${Rfcode}`);
   if (channel !== undefined) {
     Rfcode += `${channel};`;
   } else {

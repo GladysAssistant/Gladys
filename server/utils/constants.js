@@ -11,6 +11,7 @@ const USER_ROLE = {
 
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
+  FR: 'fr',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -228,6 +229,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
+  CO2_SENSOR: 'co2-sensor',
+  COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
@@ -268,6 +271,8 @@ const DEVICE_FEATURE_TYPES = {
     COLOR: 'color',
     TEMPERATURE: 'temperature',
     POWER: 'power',
+    EFFECT_MODE: 'effect-mode',
+    EFFECT_SPEED: 'effect-speed',
     MODE: 'mode',
   },
   SENSOR: {
@@ -323,6 +328,9 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
+  AMPERE: 'ampere',
+  VOLT: 'volt',
+  PPM: 'ppm',
 };
 
 const ACTIONS_STATUS = {
@@ -391,6 +399,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
+  },
+  TASMOTA: {
+    NEW_DEVICE: 'tasmota.new-device',
   },
 };
 

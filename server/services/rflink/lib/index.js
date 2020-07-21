@@ -16,7 +16,6 @@ const { unpair } = require('./commands/rflink.milight.unpair');
 
 const RFlinkManager = function RFlinkManager(gladys, serviceId) {
   this.gladys = gladys;
-  this.scanInProgress = false;
   this.serviceId = serviceId;
   this.connected = false;
   this.ready = false;

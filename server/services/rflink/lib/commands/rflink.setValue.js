@@ -40,27 +40,43 @@ function setValue(device, deviceFeature, state) {
         break;
     }
   }
+  logger.debug(`device ${device.external_id}`);
+  logger.debug(`deviceFeature ${deviceFeature.external_id}`);
 
   if (device.external_id.split(':')[1] === 'milight') {
     const id = device.external_id.split(':')[2];
     const channel = `0${device.external_id.split(':')[3]}`;
-    if (deviceFeature.external_id.split()[2].toLowerCase() === 'color') {
+    const feature = deviceFeature.external_id.split(':')[4].toLowerCase();
+    logger.debug(`id ${id}`);
+    logger.debug(`channel ${channel}`);
+    logger.debug(`feature ${feature}`);
+    if (feature === 'color') {
       msg = `10;MiLightv1;${id};${channel};${value};COLOR;`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'brightness') {
+    } else if (feature === 'brightness') {
       msg = `10;MiLightv1;${id};${channel};${value};BRIGHT;`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'power') {
-      msg = `10;MiLightv1;${id};${channel};34BC;${value};`;
-    } else if (deviceFeature.external_id.split()[2].toLowerCase() === 'milight-mode') {
-      msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};`;
+    } else if (feature === 'power') {
+      switch (state) {
+        case 0:
+        case false:
+          value = 'OFF';
+          break;
+        case 1:
+        case true:
+          value = 'ON';
+          break;
+        default:
+          value = 'ON';
+      }
+      msg = `10;MiLightv1;${id};${channel};34BC;${value};\n`;
+    } else if (feature === 'milight-mode') {
+      msg = `10;MiLightv1;${id};${channel};34BC;MODE${value};\n`;
     }
   } else {
     msg = ObjToRF(device, deviceFeature, value);
   }
-  logger.log(msg);
+  logger.debug(`Message send to USB : "${msg}"`);
+  this.sendUsb.write(msg, (error) => {});
 
-  this.sendUsb.write(msg, (error) => {});
-  this.sendUsb.write(msg, (error) => {});
-  this.sendUsb.write(msg, (error) => {});
 }
 
 module.exports = {
