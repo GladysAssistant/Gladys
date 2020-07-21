@@ -150,7 +150,6 @@ function createActions(store) {
         });
         actions.getMySelf(state);
       } catch (e) {
-        console.log(e);
         store.setState({
           ProfilePatchStatus: RequestStatus.Error
         });

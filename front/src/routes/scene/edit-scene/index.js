@@ -49,7 +49,6 @@ class EditScene extends Component {
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
     } catch (e) {
-      console.log(e);
       this.setState({ error: true });
     }
     this.setState({ saving: false });

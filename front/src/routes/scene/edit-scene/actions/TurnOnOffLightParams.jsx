@@ -20,9 +20,7 @@ class TurnOnOffLight extends Component {
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
   handleChange = selectedOptions => {
     if (selectedOptions) {

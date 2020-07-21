@@ -68,6 +68,9 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
+import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
+import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -153,6 +156,7 @@ const AppRouter = connect(
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
+        <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
@@ -172,7 +176,10 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
-
+        <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
+        <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
+        <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
+        <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <CalendarPage path="/dashboard/calendar" />
