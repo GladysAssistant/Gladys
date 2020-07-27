@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-	<img src="https://gladysassistant.com/assets/images/external/github-gladys-logo.png" width="200">
+	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
   <br>
   Gladys Assistant
 </h1>
@@ -18,7 +18,7 @@
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
-<img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
+<img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
 
 ## The Project
 
@@ -39,7 +39,7 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 ## Getting Started
 
-To get started, you can read go to [our website](https://gladysassistant.com).
+To get started, you can go to [our website](https://gladysassistant.com).
 
 ## Contributors ✨
 
