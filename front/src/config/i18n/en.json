@@ -53,7 +53,7 @@
       "introTimeToCreateAccount": "It's time to create a local account for your Gladys setup.",
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the information you'll enter is only saved in the local database of Gladys.",
       "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
+      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com\">Gladys Plus.</a>",
       "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
@@ -157,7 +157,7 @@
       "title": "Allow me to thank you 🙏",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to Dashboard"
     }
   },
