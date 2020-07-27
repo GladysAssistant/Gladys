@@ -309,7 +309,8 @@
         "search": "Recherche d'appareils",
         "noDevices": "Aucun appareil Philips Hue ajouté.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
-        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration."
+        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration.",
+        "createGithubIssue": "Proposer ce périphérique"
       }
     },
     "rtspCamera": {

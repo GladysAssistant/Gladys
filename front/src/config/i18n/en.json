@@ -265,7 +265,8 @@
         "search": "Search devices",
         "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
-        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab."
+        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab.",
+        "createGithubIssue": "Suggest this device"
       }
     },
     "rtspCamera": {
