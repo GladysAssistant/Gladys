@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-	<img src="https://gladysassistant.com/assets/images/external/github-gladys-logo.png" width="200">
+	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
   <br>
   Gladys Assistant
 </h1>
@@ -18,7 +18,7 @@
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
-<img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
+<img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
 
 ## The Project
 
@@ -81,6 +81,7 @@ Thanks goes to these wonderful people 👏
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
