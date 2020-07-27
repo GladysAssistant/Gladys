@@ -58,7 +58,7 @@ const ForgotPassword = ({ children, ...props }) => (
             </form>
             <div class="text-center text-muted">
               <Text id="gatewayForgotPassword.dontHaveAccount" />{' '}
-              <a href="https://gladysassistant.com/pricing">
+              <a href="https://gladysassistant.com">
                 <Text id="gatewayForgotPassword.signupLink" />
               </a>
             </div>

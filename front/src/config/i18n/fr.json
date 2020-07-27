@@ -53,7 +53,7 @@
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
       "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/fr/pricing/\">Gladys Plus</a>.",
+      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
       "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
       "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
     },
