@@ -314,7 +314,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras HTTP/RTSP.",
+      "description": "Affichez vos caméras.",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -868,7 +868,7 @@
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",
-    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de cryptage quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
+    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de chiffrement quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
     "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !"
   },
   "gatewayPricing": {
