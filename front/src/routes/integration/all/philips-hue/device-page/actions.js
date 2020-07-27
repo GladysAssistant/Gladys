@@ -48,62 +48,8 @@ function createActions(store) {
           }
           return !state.philipsHueDevicesMap.has(device.external_id);
         });
-        const testData = [
-          {
-            name: 'Prise pompe Piscine',
-            service_id: '86b98c11-f85f-44e4-8f18-030576b3ee9d',
-            external_id: 'philips-hue-light:ecb5fa25a522:3',
-            selector: 'philips-hue-light:ecb5fa25a522:3',
-            should_poll: true,
-            model: 'LOM002',
-            poll_frequency: 60000,
-            features: [],
-            not_handled: true,
-            raw_philips_hue_device: {
-              _rawData: {
-                state: {
-                  on: false,
-                  alert: 'select',
-                  mode: 'homeautomation',
-                  reachable: true
-                },
-                swupdate: {
-                  state: 'noupdates',
-                  lastinstall: '2020-04-26T12:13:30'
-                },
-                type: 'On/Off plug-in unit',
-                name: 'Prise pompe Piscine',
-                modelid: 'LOM002',
-                manufacturername: 'Signify Netherlands B.V.',
-                productname: 'Hue Smart plug',
-                capabilities: {
-                  certified: true,
-                  control: {},
-                  streaming: {
-                    renderer: false,
-                    proxy: false
-                  }
-                },
-                config: {
-                  archetype: 'plug',
-                  function: 'functional',
-                  direction: 'omnidirectional',
-                  startup: {
-                    mode: 'safety',
-                    configured: true
-                  }
-                },
-                uniqueid: '00:17:88:01:08:9d:f7:5a-0b',
-                swversion: '1.65.9_hB3217DF',
-                swconfigid: '4303D274',
-                productid: 'SmartPlug_OnOff_v01-00_02'
-              },
-              _id: 3
-            }
-          }
-        ];
         store.setState({
-          philipsHueNewDevices: testData || philipsHueNewDevicesFiltered,
+          philipsHueNewDevices: philipsHueNewDevicesFiltered,
           getPhilipsHueNewDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
