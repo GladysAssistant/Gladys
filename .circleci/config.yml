@@ -162,7 +162,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
               ignore: /.*/
       - build-amd64:
@@ -170,7 +170,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
               ignore: /.*/
       - build-i386:
@@ -178,7 +178,7 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
               ignore: /.*/
       - build-arm64v8:
@@ -186,6 +186,6 @@ workflows:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
               ignore: /.*/
