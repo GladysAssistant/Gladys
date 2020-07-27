@@ -222,7 +222,7 @@
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
       "menu": {
-        "all": "Toutes les integrations",
+        "all": "Toutes les intégrations",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
