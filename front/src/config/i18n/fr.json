@@ -248,6 +248,24 @@
           "password": "Mot de passe",
           "passwordInfo": "<a href=https://support.apple.com/fr-fr/HT204397 target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
         },
+        "google": {
+          "name": "Google Agenda (déprécié)",
+          "url": "URL Google Agenda",
+          "urlInfo": "Laissez l'URL par défaut, il sera paramétré automatiquement.",
+          "username": "Email",
+          "usernameInfo": "Entrez l'adresse email de votre compte Google.",
+          "password": "Mot de passe",
+          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=fr target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+        },
+        "synology": {
+          "name": "Calendrier Synology",
+          "url": "URL CalDAV Synology",
+          "urlInfo": "Dans l'application Calendrier, cliquez sur 'Compte CalDAV' et copiez l'URL 'macOS/iOS'.",
+          "username": "Nom d'utilisateur Synology",
+          "usernameInfo": "Entrez votre nom d'utilisateur.",
+          "password": "Mot de passe",
+          "passwordInfo": "Entrez votre mot de passe."
+        },
         "other": {
           "name": "Autre",
           "url": "URL CalDAV",
