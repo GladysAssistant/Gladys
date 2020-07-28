@@ -11,7 +11,8 @@
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
     "degreeValue": "{{value}}°",
-    "workInProgress": "Travail en cours..."
+    "workInProgress": "Travail en cours...",
+    "save": "Enregistrer"
   },
   "calendar": {
     "allDay": "Toute la journée",
@@ -571,6 +572,7 @@
     }
   },
   "editScene": {
+    "editNamePlaceholder": "Entrez un nom de scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "runButton": "Jouer",
