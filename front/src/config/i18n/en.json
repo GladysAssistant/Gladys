@@ -52,8 +52,8 @@
       "introSentence": "First, thank you for choosing me. I'm Gladys, a privacy-friendly home assistant for your house.",
       "introTimeToCreateAccount": "It's time to create a local account for your Gladys setup.",
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the information you'll enter is only saved in the local database of Gladys.",
-      "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://documentation.gladysassistant.com\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus.</a>",
+      "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://gladysassistant.com/en/docs/\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
+      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com\">Gladys Plus.</a>",
       "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
       "buttonCreateAccountWithEmail": "Create local account with your Email"
     },
@@ -157,7 +157,7 @@
       "title": "Allow me to thank you 🙏",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/pricing\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to Dashboard"
     }
   },
@@ -265,7 +265,8 @@
         "search": "Search devices",
         "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
-        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab."
+        "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab.",
+        "createGithubIssue": "Suggest this device"
       }
     },
     "rtspCamera": {
@@ -442,7 +443,7 @@
         "nameLabel": "Name",
         "namePlaceholder": "Enter feature name",
         "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
         "unitLabel": "Unit",
         "minLabel": "Minimum value",
@@ -460,7 +461,7 @@
       },
       "setup": {
         "title": "MQTT configuration",
-        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
@@ -492,7 +493,7 @@
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
-        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway needs to be in developer mode. Learn more <a href=\"https://documentation.gladysassistant.com/en/configuration#xiaomi-configuration\">here</a>.",
+        "description": "Devices detected by the Xiaomi Gateway will be added here when they send data. Your Xiaomi Gateway needs to be in developer mode. Learn more <a href=\"https://gladysassistant.com/en/docs/integrations/xiaomi\">here</a>.",
         "createDeviceInGladys": "Connect in Gladys",
         "createDeviceError": "There was an error while creating this device in Gladys. ",
         "deviceCreatedSuccess": "The device was successfully added."
@@ -1137,7 +1138,7 @@
   "gatewayOpenApi": {
     "title": "Open API",
     "description": "The Open API allows you to send information to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/en/configuration#gateway-open-api\">More information.</a>",
+    "moreInformations": "<a href=\"https://gladysassistant.com/en/docs/integrations/owntracks\">More information.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",
