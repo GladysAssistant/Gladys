@@ -143,13 +143,13 @@ const AppRouter = connect(
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
 
-        <IntegrationPage path="/dashboard/integration/device" />
-        <IntegrationPage path="/dashboard/integration/communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" />
-        <IntegrationPage path="/dashboard/integration/music" />
-        <IntegrationPage path="/dashboard/integration/health" />
-        <IntegrationPage path="/dashboard/integration/weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" />
+        <IntegrationPage path="/dashboard/integration/device" category="device" />
+        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
+        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
+        <IntegrationPage path="/dashboard/integration/music" category="music" />
+        <IntegrationPage path="/dashboard/integration/health" category="health" />
+        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
+        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
