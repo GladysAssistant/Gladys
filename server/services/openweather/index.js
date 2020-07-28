@@ -4,23 +4,23 @@ const { formatResults } = require('./lib/formatResults');
 const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 
-const DARKSKY_API_KEY = 'DARKSKY_API_KEY';
+const OPENWEATHER_API_KEY = 'OPENWEATHER_API_KEY';
 
-module.exports = function DarkSkyService(gladys, serviceId) {
+module.exports = function OpenWeatherService(gladys, serviceId) {
   const { default: axios } = require('axios');
-  let darkSkyApiKey;
+  let openWeatherApiKey;
 
   /**
    * @public
    * @description This function starts the service
    * @example
-   * gladys.services.darksky.start();
+   * gladys.services.openWeather.start();
    */
   async function start() {
-    logger.info('Starting Dark Sky service');
-    darkSkyApiKey = await gladys.variable.getValue(DARKSKY_API_KEY, serviceId);
-    if (!darkSkyApiKey) {
-      throw new ServiceNotConfiguredError('Dark Sky Service not configured');
+    logger.info('Starting Open Weather service');
+    openWeatherApiKey = await gladys.variable.getValue(OPENWEATHER_API_KEY, serviceId);
+    if (!openWeatherApiKey) {
+      throw new ServiceNotConfiguredError('Open Weather Service not configured');
     }
   }
 
@@ -28,10 +28,10 @@ module.exports = function DarkSkyService(gladys, serviceId) {
    * @public
    * @description This function stops the service
    * @example
-   * gladys.services.darksky.stop();
+   * gladys.services.openWeather.stop();
    */
   async function stop() {
-    logger.log('stopping Dark Sky service');
+    logger.log('stopping Open Weather service');
   }
 
   /**
@@ -43,32 +43,34 @@ module.exports = function DarkSkyService(gladys, serviceId) {
    * @param {string} [options.language] - The language of the report.
    * @param {string} [options.units] - Unit of the weather [auto, si, us].
    * @example
-   * gladys.services.darksky.weather.get({
+   * gladys.services.openWeather.weather.get({
    *   latitude: 112,
    *   longitude: -2,
    *   offset: 0,
    *   language: 'fr',
-   *   units: 'si'
+   *   units: 'metric'
    * });
    */
   async function get(options) {
     const DEFAULT = {
       language: 'en',
-      units: 'si',
+      units: 'metric',
       offset: 0,
     };
     const optionsMerged = Object.assign({}, DEFAULT, options);
     const { latitude, longitude, language, units } = optionsMerged;
 
-    if (!darkSkyApiKey) {
-      throw new ServiceNotConfiguredError('Dark Sky API Key not found');
+    if (!openWeatherApiKey) {
+      throw new ServiceNotConfiguredError('Open Weather API Key not found');
     }
-    const url = `https://api.darksky.net/forecast/${darkSkyApiKey}/${latitude},${longitude}?language=${language}&units=${units}`;
+    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
     try {
+      logger.log(`OpenWeather URL : ${url}`);
       const { data } = await axios.get(url);
       const weatherFormatted = formatResults(optionsMerged, data);
       return weatherFormatted;
     } catch (e) {
+      logger.error(e);
       throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
     }
   }

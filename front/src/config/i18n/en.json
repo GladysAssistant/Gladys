@@ -183,9 +183,9 @@
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
         "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
-        "serviceNotConfigured": "The DarkSky service is not configured. Please go to the 'Integrations' tab, and configure the DarkSky service.",
-        "requestToThirdPartyFailed": "The request to DarkSKy API failed. Is your Gladys instance connected to the internet? Please go to the DarkSky configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the DarkSky configuration panel.",
+        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
+        "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
+        "clickHere": "Click here to access the OpenWeather configuration panel.",
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
       },
       "devicesInRoom": {
@@ -398,13 +398,13 @@
         "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }
     },
-    "darkSky": {
-      "title": "DarkSky",
+    "openWeather": {
+      "title": "OpenWeather API",
       "description": "Get the weather in Gladys.",
-      "introduction": "This integration helps you integrate with the DarkSky API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on the DarkSky API website: <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
+      "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
+      "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
-      "apiKeyPlaceholder": "Enter DarkSky API key",
+      "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
