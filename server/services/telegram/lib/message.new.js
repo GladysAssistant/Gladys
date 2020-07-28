@@ -12,18 +12,21 @@ const { EVENTS } = require('../../../utils/constants');
 async function newMessage(msg) {
   logger.debug(`new message from telegram, ${msg.text}`);
   logger.debug(msg);
+
   const telegramUserId = msg.from.id;
+  const telegramChatId = msg.chat.id;
 
   if (msg.text.startsWith('/start')) {
     const splitted = msg.text.split(' ');
     await this.linkUser(splitted[1], telegramUserId);
     return null;
   }
+
   const user = await this.gladys.user.getByTelegramUserId(telegramUserId);
 
   const message = {
     source: 'telegram',
-    source_user_id: telegramUserId,
+    source_user_id: telegramChatId,
     user_id: user.id,
     user,
     language: user.language,
