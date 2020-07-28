@@ -1,0 +1,43 @@
+{
+  "coord": {
+    "lon": -122.46,
+    "lat": 37.87
+  },
+  "weather": [
+    {
+      "id": 800,
+      "main": "Thunderstorm",
+      "description": "thunderstorm",
+      "icon": "01d"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 17.31,
+    "feels_like": 13.62,
+    "temp_min": 13.89,
+    "temp_max": 20,
+    "pressure": 1020,
+    "humidity": 48
+  },
+  "wind": {
+    "speed": 4.02,
+    "deg": 265,
+    "gust": 6.26
+  },
+  "clouds": {
+    "all": 0
+  },
+  "dt": 1553759418,
+  "sys": {
+    "type": 3,
+    "id": 2002962,
+    "country": "US",
+    "sunrise": 1588511452,
+    "sunset": 1588561339
+  },
+  "timezone": -25200,
+  "id": 5327490,
+  "name": "Belvedere Tiburon",
+  "cod": 200
+}

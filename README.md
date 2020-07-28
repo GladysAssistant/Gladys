@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-	<img src="https://gladysassistant.com/assets/images/external/github-gladys-logo.png" width="200">
+	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
   <br>
   Gladys Assistant
 </h1>
@@ -18,7 +18,7 @@
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
-<img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
+<img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
 
 ## The Project
 
@@ -39,26 +39,7 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 ## Getting Started
 
-Right now we are migrating from Gladys 3 to Gladys 4, a new release rewrote from scratch. If you want to install Gladys 3, visit [our website](https://gladysassistant.com).
-
-To install Gladys 4 Beta, read the following instructions.
-
-We use Docker to deploy Gladys 4, so it's easy to install it on any system.
-
-### On a Raspberry Pi
-
-Read our tutorial: [Install Gladys 4 on a Raspberry Pi](https://documentation.gladysassistant.com/en/installation#raspberry-pi)
-
-### On MacOS/Windows
-
-Read our tutorial: [Install Gladys 4 on MacOS/Windows](https://documentation.gladysassistant.com/en/installation#macos-windows)
-
-## Links
-
-- [Website](https://gladysassistant.com)
-- [Community](https://community.gladysassistant.com/)
-- [Twitter](https://twitter.com/gladysassistant)
-- [Instagram](https://www.instagram.com/gladysassistant/)
+To get started, you can go to [our website](https://gladysassistant.com).
 
 ## Contributors ✨
 
@@ -81,6 +62,7 @@ Thanks goes to these wonderful people 👏
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

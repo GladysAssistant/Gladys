@@ -1,7 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-const DarkSkyPage = ({ children, ...props }) => (
+const OpenWeatherPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -18,27 +18,27 @@ const DarkSkyPage = ({ children, ...props }) => (
                     <div class="loader" />
                     <div class="dimmer-content">
                       <h2>
-                        <Text id="integration.darkSky.title" />
+                        <Text id="integration.openWeather.title" />
                       </h2>
                       <p>
-                        <Text id="integration.darkSky.introduction" />
+                        <Text id="integration.openWeather.introduction" />
                       </p>
                       <p>
-                        <MarkupText id="integration.darkSky.instructions" />
+                        <MarkupText id="integration.openWeather.instructions" />
                       </p>
                       <form onSubmit={props.saveApiKey}>
                         <div class="form-group">
                           <div class="form-label">
-                            <Text id="integration.darkSky.apiKeyLabel" />
+                            <Text id="integration.openWeather.apiKeyLabel" />
                           </div>
                           <div class="input-group">
                             <Localizer>
                               <input
                                 type="text"
                                 class="form-control"
-                                placeholder={<Text id="integration.darkSky.apiKeyPlaceholder" />}
+                                placeholder={<Text id="integration.openWeather.apiKeyPlaceholder" />}
                                 onInput={props.updateApiKey}
-                                value={props.darkSkyApiKey}
+                                value={props.openWeatherApiKey}
                               />
                             </Localizer>
                             <span class="input-group-append">
@@ -48,7 +48,7 @@ const DarkSkyPage = ({ children, ...props }) => (
                                 })}
                                 type="submit"
                               >
-                                <Text id="integration.darkSky.saveButton" />
+                                <Text id="integration.openWeather.saveButton" />
                               </button>
                             </span>
                           </div>
@@ -56,7 +56,7 @@ const DarkSkyPage = ({ children, ...props }) => (
 
                         <div class="form-group">
                           <label>
-                            <Text id="integration.darkSky.instructionsToUse" />
+                            <Text id="integration.openWeather.instructionsToUse" />
                           </label>
                         </div>
                       </form>
@@ -72,4 +72,4 @@ const DarkSkyPage = ({ children, ...props }) => (
   </div>
 );
 
-export default DarkSkyPage;
+export default OpenWeatherPage;

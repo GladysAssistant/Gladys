@@ -169,7 +169,7 @@
     "humidity": 0.99,
     "pressure": 1005.09,
     "datetime": "2019-05-09T04:27:57.000Z",
-    "units": "si",
+    "units": "metric",
     "wind_speed": 1.96,
     "weather": "rain",
     "house": {

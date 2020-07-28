@@ -52,8 +52,8 @@
       "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, une assistante à domicile respectueuse de la vie privée de votre maison.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
-      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/fr/pricing/\">Gladys Plus</a>.",
+      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
+      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
       "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
       "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
     },
@@ -183,9 +183,9 @@
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service DarkSky n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service DarkSky.",
-        "requestToThirdPartyFailed": "La requête à l'API DarkSKy a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de DarkSky pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de DarkSky.",
+        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
+        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
+        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?"
       },
       "devicesInRoom": {
@@ -222,7 +222,7 @@
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
       "menu": {
-        "all": "Toutes les integrations",
+        "all": "Toutes les intégrations",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -327,12 +327,13 @@
         "search": "Recherche d'appareils",
         "noDevices": "Aucun appareil Philips Hue ajouté.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
-        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration."
+        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration.",
+        "createGithubIssue": "Proposer ce périphérique"
       }
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras HTTP/RTSP.",
+      "description": "Affichez vos caméras.",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -459,13 +460,13 @@
         "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
-    "darkSky": {
-      "title": "DarkSky",
+    "openWeather": {
+      "title": "API OpenWeather",
       "description": "Récupérer la météo dans Gladys.",
-      "introduction": "Cette intégration vous aide à intégrer l'API DarkSky pour obtenir la météo dans Gladys.",
-      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky : <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
+      "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
+      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
-      "apiKeyPlaceholder": "Entrer la clé API DarkSky",
+      "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
@@ -504,7 +505,7 @@
         "nameLabel": "Nom",
         "namePlaceholder": "Entrez un nom de fonctionnalité",
         "externalIdLabel": "ID externe de la fonctionnalité",
-        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\"> ici </a>.",
+        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api\"> ici </a>.",
         "externalIdPlaceholder": "Message clé de la fonctionnalité MQTT",
         "unitLabel": "Unité",
         "minLabel": "Valeur minimum",
@@ -522,7 +523,7 @@
       },
       "setup": {
         "title": "Configuration MQTT",
-        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\">ici</a>.",
+        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api\">ici</a>.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -554,7 +555,7 @@
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
-        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://documentation.gladysassistant.com/fr/configuration#xiaomi-configuration\">ici</a>.",
+        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://gladysassistant.com/fr/docs/integrations/xiaomi/\">ici</a>.",
         "createDeviceInGladys": "Connexion à Gladys",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys. ",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
@@ -886,7 +887,7 @@
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",
-    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de cryptage quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
+    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de chiffrement quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
     "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !"
   },
   "gatewayPricing": {
@@ -1155,7 +1156,7 @@
   "gatewayOpenApi": {
     "title": "Open API",
     "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
-    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/fr/configuration#gateway-open-api\">Plus d'informations.</a>",
+    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks\">Plus d'informations.</a>",
     "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
     "keyName": "Nom",
     "keyLastUsed": "Dernière utilisation",

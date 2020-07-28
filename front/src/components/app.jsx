@@ -56,7 +56,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
 import CaldavPage from '../routes/integration/all/caldav';
-import DarkSkyPage from '../routes/integration/all/darksky';
+import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -83,7 +83,7 @@ const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,integrationCategories',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
   actions
 )(props => (
   <div id="app">
@@ -142,13 +142,18 @@ const AppRouter = connect(
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
-        {props.integrationCategories.map(category => (
-          <IntegrationPage path={`/dashboard/integration/${category.type}`} category={category.type} />
-        ))}
+
+        <IntegrationPage path="/dashboard/integration/device" category="device" />
+        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
+        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
+        <IntegrationPage path="/dashboard/integration/music" category="music" />
+        <IntegrationPage path="/dashboard/integration/health" category="health" />
+        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
+        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
-        <DarkSkyPage path="/dashboard/integration/weather/darksky" />
+        <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"

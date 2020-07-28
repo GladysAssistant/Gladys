@@ -13,7 +13,7 @@ module.exports = function WeatherController(gladys) {
    *   "humidity": 0.58,
    *   "pressure": 1005.98,
    *   "datetime": "2019-05-09T04:26:42.000Z",
-   *   "units": "si",
+   *   "units": "metric",
    *   "wind_speed": 5.06,
    *   "weather": "cloud"
    * }
@@ -39,7 +39,7 @@ module.exports = function WeatherController(gladys) {
    *   "humidity": 0.58,
    *   "pressure": 1005.98,
    *   "datetime": "2019-05-09T04:26:42.000Z",
-   *   "units": "si",
+   *   "units": "metric",
    *   "wind_speed": 5.06,
    *   "weather": "cloud"
    * }
