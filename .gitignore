@@ -16,3 +16,4 @@ coverage
 # VSCode
 .vscode
 .tmp
+.DS_Store
