@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
@@ -20,7 +20,31 @@ const EditScenePage = ({ children, ...props }) => (
                 <Text id="global.backButton" />
               </Link>
             </h1>
-            <h1 class="page-title">{props.scene.name}</h1>
+            <h1 class="page-title">
+              {props.isNameEditable ? (
+                <form onSubmit={this.saveScene}>
+                  <div class="input-group">
+                    <Localizer>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm "
+                        onChange={props.updateSceneName}
+                        value={props.scene.name}
+                        ref={props.setNameInputRef}
+                        placeholder={<Text id="editScene.editNamePlaceholder" />}
+                      />
+                    </Localizer>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm" onClick={props.saveScene}>
+                        <Text id="global.save" />
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              ) : (
+                <span onClick={props.toggleIsNameEditable}>{props.scene.name}</span>
+              )}
+            </h1>
             <div class="page-options d-flex">
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
                 <Text id="editScene.startButton" /> <i class="fe fe-play" />
