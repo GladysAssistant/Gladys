@@ -462,7 +462,7 @@
       },
       "setup": {
         "title": "MQTT configuration",
-        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://documentation.gladysassistant.com/en/api#mqtt-api\">here</a>.",
+        "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "embeddedBrokerLabel": "Broker Docker container",
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
