@@ -1,8 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-
-const { fake } = sinon;
 const moment = require('moment');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
 const { formatCalendars, formatEvents } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
@@ -27,7 +25,7 @@ describe('CalDAV sync', () => {
         create: sinon.stub(),
         createEvent: sinon.stub(),
         get: sinon.stub(),
-        update: fake.resolves({}),
+        update: sinon.stub().resolves(),
         getEvents: sinon.stub(),
         destroyEvent: sinon
           .stub()
@@ -46,10 +44,6 @@ describe('CalDAV sync', () => {
       Credentials: sinon.stub(),
     },
   };
-
-  beforeEach(() => {
-    sinon.reset();
-  });
 
   it('should start sync', async () => {
     sync.gladys.variable.getValue

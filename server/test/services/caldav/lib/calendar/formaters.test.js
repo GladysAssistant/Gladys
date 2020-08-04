@@ -1,9 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const moment = require('moment');
-
-const { fake } = sinon;
-
 const {
   formatEvents,
   formatRecurringEvents,
@@ -80,11 +77,13 @@ const events = [
     summary: 'Anniversaire Pepper',
     location: 'Paris',
     rrule: {
-      between: fake.returns([
-        new Date('2019-09-27T00:00:00Z'),
-        new Date('2020-09-27T00:00:00Z'),
-        new Date('2021-09-27T00:00:00Z'),
-      ]),
+      between: sinon
+        .stub()
+        .returns([
+          new Date('2019-09-27T00:00:00Z'),
+          new Date('2020-09-27T00:00:00Z'),
+          new Date('2021-09-27T00:00:00Z'),
+        ]),
     },
     href: 'https://caldav.host.com/home/recur-event2',
   },
@@ -159,7 +158,7 @@ const recurrEvents = [
     summary: 'Cours de tennis',
     location: 'Stade Roland-Garros',
     rrule: {
-      between: fake.returns([new Date('2019-06-01T09:00:00Z'), new Date('2019-06-15T09:00:00Z')]),
+      between: sinon.stub().returns([new Date('2019-06-01T09:00:00Z'), new Date('2019-06-15T09:00:00Z')]),
     },
     recurrences: [
       '2017-06-02T12:00:00Z',
@@ -182,11 +181,13 @@ const recurrEvents = [
     summary: 'Anniversaire Pepper',
     location: 'Paris',
     rrule: {
-      between: fake.returns([
-        new Date('2019-09-27T00:00:00Z'),
-        new Date('2020-09-27T00:00:00Z'),
-        new Date('2021-09-27T00:00:00Z'),
-      ]),
+      between: sinon
+        .stub()
+        .returns([
+          new Date('2019-09-27T00:00:00Z'),
+          new Date('2020-09-27T00:00:00Z'),
+          new Date('2021-09-27T00:00:00Z'),
+        ]),
     },
     href: 'https://caldav.host.com/home/recur-event2',
   },
@@ -244,10 +245,6 @@ describe('CalDAV formaters', () => {
   };
   const start = new Date('2019-02-25T10:00:00Z');
   Object.defineProperty(start, 'tz', { value: 'Europe/London' });
-
-  beforeEach(() => {
-    sinon.reset();
-  });
 
   it('should format calendars', () => {
     const formattedCalendars = formatter.formatCalendars(caldavCalendars, '745d3ccc-ddc6-4dc5-a776-5d2ac7682d25');
