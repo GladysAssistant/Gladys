@@ -1,6 +1,9 @@
+const { promisify } = require('util');
 const { CONFIGURATION } = require('./constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const containerParams = require('../docker/eclipse-mosquitto-container');
+const containerParams = require('../docker/eclipse-mosquitto-container.json');
+
+const sleep = promisify(setTimeout);
 
 const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
   if (value !== undefined && value !== null && (typeof value !== 'string' || value.length > 0)) {
@@ -41,6 +44,8 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     const [container] = dockerContainers;
     if (container.state !== 'running') {
       await this.gladys.system.restartContainer(container.id);
+      // wait 5 seconds for the container to restart
+      await sleep(5 * 1000);
     }
 
     if (oldUser) {
@@ -58,6 +63,8 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     }
 
     await this.gladys.system.restartContainer(container.id);
+    // wait 5 seconds for the container to restart
+    await sleep(5 * 1000);
   }
 
   return this.connect({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker });

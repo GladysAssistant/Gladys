@@ -16,11 +16,15 @@ async function exec(containerId, options) {
   const container = await this.dockerode.getContainer(containerId);
   const executable = await container.exec(options);
   return new Promise((resolve, reject) => {
-    executable.start((err, data) => {
+    executable.start((err, stream) => {
       if (err) {
-        return reject(err);
+        reject(err);
+      } else {
+        stream.on('end', () => {
+          resolve(true);
+        });
+        this.dockerode.modem.demuxStream(stream, process.stdout, process.stderr);
       }
-      return resolve(true);
     });
   });
 }
