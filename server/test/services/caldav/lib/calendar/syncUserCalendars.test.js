@@ -12,38 +12,41 @@ const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 const serviceId = '5d6c666f-56be-4929-9104-718a78556844';
 
 describe('CalDAV sync', () => {
-  const sync = {
-    serviceId,
-    syncUserCalendars,
-    formatCalendars,
-    formatEvents,
-    requestCalendars: sinon.stub(),
-    requestChanges: sinon.stub(),
-    requestEventsData: sinon.stub(),
-    gladys: {
-      calendar: {
-        create: sinon.stub(),
-        createEvent: sinon.stub(),
-        get: sinon.stub(),
-        update: sinon.stub().resolves(),
-        getEvents: sinon.stub(),
-        destroyEvent: sinon
-          .stub()
-          .withArgs('event-to-delete')
-          .resolves(),
+  let sync;
+  before(() => {
+    sync = {
+      serviceId,
+      syncUserCalendars,
+      formatCalendars,
+      formatEvents,
+      requestCalendars: sinon.stub(),
+      requestChanges: sinon.stub(),
+      requestEventsData: sinon.stub(),
+      gladys: {
+        calendar: {
+          create: sinon.stub(),
+          createEvent: sinon.stub(),
+          get: sinon.stub(),
+          update: sinon.stub().resolves(),
+          getEvents: sinon.stub(),
+          destroyEvent: sinon
+            .stub()
+            .withArgs('event-to-delete')
+            .resolves(),
+        },
+        variable: {
+          getValue: sinon.stub(),
+        },
       },
-      variable: {
-        getValue: sinon.stub(),
+      moment,
+      dav: {
+        transport: {
+          Basic: sinon.stub(),
+        },
+        Credentials: sinon.stub(),
       },
-    },
-    moment,
-    dav: {
-      transport: {
-        Basic: sinon.stub(),
-      },
-      Credentials: sinon.stub(),
-    },
-  };
+    };
+  });
 
   it('should start sync', async () => {
     sync.gladys.variable.getValue
