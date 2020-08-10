@@ -83,6 +83,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "thib-rdr",
+      "name": "thib_rdr",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6746308?v=4",
+      "profile": "https://github.com/thib-rdr",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
