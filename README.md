@@ -59,12 +59,14 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="http://fischerdesign.co"><img src="https://avatars1.githubusercontent.com/u/8835133?v=4" width="100px;" alt=""/><br /><sub><b>Scott Fischer</b></sub></a><br /><a href="#translation-Scott-Fischer" title="Translation">🌍</a></td>
   </tr>
   <tr>
+    <td align="center"><a href="https://github.com/thib-rdr"><img src="https://avatars2.githubusercontent.com/u/6746308?v=4" width="100px;" alt=""/><br /><sub><b>thib_rdr</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thib-rdr" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.callum-macdonald.com/"><img src="https://avatars0.githubusercontent.com/u/690997?v=4" width="100px;" alt=""/><br /><sub><b>Callum Macdonald</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=chmac" title="Documentation">📖</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
