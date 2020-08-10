@@ -19,7 +19,8 @@ const MqttHandler = proxiquire('../../../../services/mqtt/lib', {
 
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
-describe('mqttHandler.installContainer', () => {
+describe('mqttHandler.installContainer', function Describe() {
+  this.timeout(8000);
   beforeEach(() => {
     sinon.reset();
   });
