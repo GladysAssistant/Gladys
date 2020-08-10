@@ -226,3 +226,7 @@ body {
 .custom-file-input:lang(fr) ~ .custom-file-label::after {
   content: 'Parcourir';
 }
+.cursor-pointer {
+  pointer-events: auto;
+  cursor: pointer;
+}

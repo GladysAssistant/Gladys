@@ -20,51 +20,53 @@ const namespace = {
 };
 
 describe('CalDAV requests', () => {
-  const requests = {
-    serviceId: '5d6c666f-56be-4929-9104-718a78556844',
-    requestCalendars,
-    requestChanges,
-    requestEventsData,
-    moment: moment.utc,
-    dav: {
-      ns: namespace,
-      request: {
-        propfind: sinon.stub(),
-        syncCollection: sinon.stub(),
+  let requests;
+  before(() => {
+    requests = {
+      serviceId: '5d6c666f-56be-4929-9104-718a78556844',
+      requestCalendars,
+      requestChanges,
+      requestEventsData,
+      moment: moment.utc,
+      dav: {
+        ns: namespace,
+        request: {
+          propfind: sinon.stub(),
+          syncCollection: sinon.stub(),
+        },
+        Request: sinon.stub().returns({ requestDate: 'request3' }),
       },
-      Request: sinon.stub().returns({ requestDate: 'request3' }),
-    },
-    ical: {
-      parseICS: sinon
-        .stub()
-        .onFirstCall()
-        .returns({
-          data: {
-            type: 'VEVENT',
-            uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
-            summary: 'Evenement 1',
-            start: new Date('2018-06-08'),
-            end: new Date('2018-06-09'),
-          },
-        })
-        .onSecondCall()
-        .returns({}),
-    },
-    xmlDom: {
-      DOMParser: sinon.stub().returns({
-        parseFromString: sinon.stub().returns({
-          getElementsByTagName: sinon.stub().returns([
-            {
-              tagName: 'response',
-              getElementsByTagName: sinon
-                .stub()
-                .onFirstCall()
-                .returns([
-                  {
-                    tagName: 'calendar-data',
-                    childNodes: [
-                      {
-                        data: `
+      ical: {
+        parseICS: sinon
+          .stub()
+          .onFirstCall()
+          .returns({
+            data: {
+              type: 'VEVENT',
+              uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+              summary: 'Evenement 1',
+              start: new Date('2018-06-08'),
+              end: new Date('2018-06-09'),
+            },
+          })
+          .onSecondCall()
+          .returns({}),
+      },
+      xmlDom: {
+        DOMParser: sinon.stub().returns({
+          parseFromString: sinon.stub().returns({
+            getElementsByTagName: sinon.stub().returns([
+              {
+                tagName: 'response',
+                getElementsByTagName: sinon
+                  .stub()
+                  .onFirstCall()
+                  .returns([
+                    {
+                      tagName: 'calendar-data',
+                      childNodes: [
+                        {
+                          data: `
                     BEGIN:VCALENDAR
                     VERSION:2.0
                     PRODID:+//IDN bitfire.at//DAVdroid/1.11.2-ose ical4j/2.2.0
@@ -84,33 +86,34 @@ describe('CalDAV requests', () => {
                     END:VEVENT
                     END:VCALENDAR
                     `,
+                        },
+                      ],
+                    },
+                  ])
+                  .onSecondCall()
+                  .returns([
+                    { tagName: 'href', childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] },
+                  ]),
+              },
+              {
+                tagName: 'response',
+                getElementsByTagName: sinon.stub().returns([
+                  {
+                    tagName: 'calendar-data',
+                    childNodes: [
+                      {
+                        data: '',
                       },
                     ],
                   },
-                ])
-                .onSecondCall()
-                .returns([
-                  { tagName: 'href', childNodes: [{ data: 'https://caldav.host.com/home/personal/event-1.ics' }] },
                 ]),
-            },
-            {
-              tagName: 'response',
-              getElementsByTagName: sinon.stub().returns([
-                {
-                  tagName: 'calendar-data',
-                  childNodes: [
-                    {
-                      data: '',
-                    },
-                  ],
-                },
-              ]),
-            },
-          ]),
+              },
+            ]),
+          }),
         }),
-      }),
-    },
-  };
+      },
+    };
+  });
 
   it('should request calendars', async () => {
     const xhr = {
