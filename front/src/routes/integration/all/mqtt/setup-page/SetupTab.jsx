@@ -49,9 +49,15 @@ class SetupTab extends Component {
                   <Text id="integration.mqtt.setup.connected" />
                 </p>
               )}
-              {props.mqttConnectionError && (
+              {props.mqttConnectionError && props.mqttConnectionError !== 'DISCONNECTED' && (
                 <p class="alert alert-danger">
                   <Text id="integration.mqtt.setup.connectionError" />
+                </p>
+              )}
+
+              {props.mqttConnectionError === 'DISCONNECTED' && (
+                <p class="alert alert-info">
+                  <Text id="integration.mqtt.setup.disconnected" />
                 </p>
               )}
 

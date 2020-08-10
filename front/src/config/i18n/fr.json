@@ -543,7 +543,8 @@
         "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "connecting": "Configuration enregistrée. Maintenant, connectez-vous à votre broker MQTT...",
         "connected": "Connecté au broker MQTT avec succès !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disconnected": "Déconnecté du broker MQTT."
       }
     },
     "xiaomi": {
