@@ -127,6 +127,14 @@ async function create(device) {
             id: deviceToReturn.params[paramIndex].id,
           },
         });
+
+        // if secret param without value, stay as is
+        if (param.secret && !param.value) {
+          return param;
+        }
+        // keep most strong security
+        param.secret = param.secret || deviceParam.secret;
+
         await deviceParam.update(param, { transaction });
         return deviceParam.get({ plain: true });
       }

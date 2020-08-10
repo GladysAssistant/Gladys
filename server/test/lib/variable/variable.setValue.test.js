@@ -39,6 +39,20 @@ describe('variable.setValue', () => {
     expect(result).to.have.property('name', 'SECURE_VARIABLE');
     expect(result).to.have.property('value', 'NEW_VALUE');
   });
+  it('should create global secrect variable', async () => {
+    const result = await variable.setValue('SECRET_VARIABLE', 'SECRET_VALUE', null, null, true);
+    expect(result).to.have.property('name', 'SECRET_VARIABLE');
+    expect(result).to.have.property('value', null);
+    const secretVariable = await variable.getValue('SECRET_VARIABLE', null, null, true);
+    expect(secretVariable).to.eq('SECRET_VALUE');
+  });
+  it('should update global secrect variable', async () => {
+    const result = await variable.setValue('SECRET_VARIABLE', 'UPDATED_SECRET_VALUE', null, null, true);
+    expect(result).to.have.property('name', 'SECRET_VARIABLE');
+    expect(result).to.have.property('value', null);
+    const secretVariable = await variable.getValue('SECRET_VARIABLE', null, null, true);
+    expect(secretVariable).to.eq('UPDATED_SECRET_VALUE');
+  });
   it('should not allow lowercase variable', async () => {
     const promise = variable.setValue('lowercasevariable', 'NEW_VALUE', 'a810b8db-6d04-4697-bed3-c4b72c996279');
     return assert.isRejected(promise, 'Validation error: Validation isUppercase on name failed');
