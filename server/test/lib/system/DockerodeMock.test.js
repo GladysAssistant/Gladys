@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const stream = require('stream');
 
 const { fake } = sinon;
 const { containers, images, networks } = require('./DockerApiMock.test');
@@ -7,6 +8,7 @@ class Docker {
   constructor() {
     this.modem = {
       followProgress: this.followProgress,
+      demuxStream: (oneStream) => oneStream.emit('end'),
     };
   }
 }
@@ -18,8 +20,9 @@ Docker.prototype.createContainer = fake.resolves({ id: containers[0].Id });
 Docker.prototype.getContainer = fake.returns({
   restart: fake.resolves(true),
   exec: ({ Cmd }) => {
+    const mockedStream = new stream.Readable();
     return fake.resolves({
-      start: sinon.stub().yields(Cmd[0] === 'fail' ? 'error' : null, 'success'),
+      start: sinon.stub().yields(Cmd[0] === 'fail' ? 'error' : null, mockedStream),
     })();
   },
 });
@@ -43,7 +46,7 @@ Docker.prototype.pull = (repoTag) => {
   return fake.rejects('ERROR')();
 };
 
-Docker.prototype.followProgress = (stream, onFinished, onProgress) => {
+Docker.prototype.followProgress = (onStream, onFinished, onProgress) => {
   onProgress({});
   onFinished(null, {});
 };
