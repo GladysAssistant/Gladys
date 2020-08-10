@@ -14,9 +14,7 @@ module.exports = function MqttService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting MQTT service');
-    mqttHandler.init();
-
-    await mqttHandler.connect();
+    await mqttHandler.init();
   }
 
   /**

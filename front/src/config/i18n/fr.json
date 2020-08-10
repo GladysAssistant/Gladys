@@ -524,7 +524,15 @@
       },
       "setup": {
         "title": "Configuration MQTT",
-        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api\">ici</a>.",
+        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\">ici</a>.",
+        "embeddedBrokerLabel": "Broker dans un conteneur Docker",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "installBrokerButton": "Installez le broker sur Docker",
+        "installingBrokerButton": "Installation en cours...",
+        "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -535,7 +543,8 @@
         "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "connecting": "Configuration enregistrée. Maintenant, connectez-vous à votre broker MQTT...",
         "connected": "Connecté au broker MQTT avec succès !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disconnected": "Déconnecté du broker MQTT."
       }
     },
     "xiaomi": {

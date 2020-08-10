@@ -31,7 +31,7 @@ describe('Mqtt handle message', () => {
   });
 
   it('should unsubscribe', async () => {
-    await mqttHandler.connect();
+    await mqttHandler.connect({ mqttUrl: 'url' });
     mqttHandler.unsubscribe('UNKNOWN_TOPIC');
 
     assert.calledWith(mqttApi.unsubscribe, 'UNKNOWN_TOPIC');
