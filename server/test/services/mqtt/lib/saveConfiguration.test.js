@@ -9,7 +9,9 @@ const MqttHandler = require('../../../../services/mqtt/lib');
 
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
-describe('mqttHandler.saveConfiguration', () => {
+describe('mqttHandler.saveConfiguration', function Describe() {
+  this.timeout(15000);
+
   beforeEach(() => {
     sinon.reset();
   });
