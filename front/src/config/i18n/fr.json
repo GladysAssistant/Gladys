@@ -479,7 +479,7 @@
       "setupTab": "Configuration",
       "status": {
         "notConfigured": "Le service MQTT n'est pas configuré, veuillez vous rendre sur la ",
-        "notConnected": "Le service MQTT n'a pas réussi à se connecter au réseau, veuillez accéder à ",
+        "notConnected": "Gladys n'a pas réussi à se connecter au serveur MQTT, plus d'informations sur la ",
         "setupPageLink": "page de configuration du service MQTT."
       },
       "device": {
@@ -495,7 +495,7 @@
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "returnButton": "Retour",
-        "editButton": "Editer les détails",
+        "editButton": "Editer",
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
@@ -511,9 +511,9 @@
         "externalIdPlaceholder": "Message clé de la fonctionnalité MQTT",
         "unitLabel": "Unité",
         "minLabel": "Valeur minimum",
-        "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
+        "minPlaceholder": "Entrez la valeur minimum",
         "maxLabel": "Valeur maximum",
-        "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+        "maxPlaceholder": "Entrez la valeur maximum",
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
@@ -525,7 +525,7 @@
       },
       "setup": {
         "title": "Configuration MQTT",
-        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\">ici</a>.",
+        "mqttDescription": "Vous pouvez connecter Gladys à un broker (serveur) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\">ici</a>.",
         "embeddedBrokerLabel": "Broker dans un conteneur Docker",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
@@ -967,6 +967,7 @@
   },
   "deviceFeatureCategory": {
     "light": {
+      "shortCategoryName": "Lumière",
       "binary": "Eclairage On/Off",
       "brightness": "Luminosité éclairage",
       "hue": "Teinte éclairage",
@@ -978,39 +979,50 @@
       "effect-speed": "Vitesse de l'effet"
     },
     "battery": {
+      "shortCategoryName": "Batterie",
       "integer": "Batterie"
     },
     "temperature-sensor": {
+      "shortCategoryName": "Capteur température",
       "decimal": "Température"
     },
     "motion-sensor": {
+      "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",
       "binary": "Détection mouvement Oui/Non"
     },
     "light-sensor": {
-      "integer": "Capteur de luminosité - Oui/Non",
-      "decimal": "Luminosité apparente"
+      "shortCategoryName": "Capteur de luminosité",
+      "integer": "Luminosité entière",
+      "decimal": "Luminosité décimale"
     },
     "sismic-sensor": {
-      "decimal": "Valeur sismique"
+      "shortCategoryName": "Capteur sismique",
+      "decimal": "Valeur sismique décimale"
     },
     "camera": {
-      "image": "Caméra"
+      "shortCategoryName": "Caméra",
+      "image": "Caméra (Image)"
     },
     "counter-sensor": {
-      "integer": "Compteur"
+      "shortCategoryName": "Compteur",
+      "integer": "Compteur entier"
     },
     "access-control": {
+      "shortCategoryName": "Mode de contrôle d'accès",
       "mode": "Mode de contrôle d'accès"
     },
     "smoke-sensor": {
+      "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée détectée"
+      "decimal": "Valeur de fumée décimale"
     },
     "co2-sensor": {
-      "decimal": "CO2"
+      "shortCategoryName": "Capteur de Co2",
+      "decimal": "Niveau de CO2"
     },
     "switch": {
+      "shortCategoryName": "Prise",
       "voltage": "Tension moyenne",
       "current": "Intensité consommée",
       "binary": "Commutateur",
@@ -1020,28 +1032,36 @@
       "energy": "Energie consommée"
     },
     "siren": {
+      "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off"
     },
     "cube": {
+      "shortCategoryName": "Cube",
       "mode": "Mode",
       "rotation": "Rotation"
     },
     "button": {
-      "click": "Clic bouton - Oui/Non"
+      "shortCategoryName": "Bouton",
+      "click": "Clic bouton"
     },
     "pressure-sensor": {
-      "decimal": "Valeur pression"
+      "shortCategoryName": "Capteur de pression",
+      "decimal": "Valeur décimale pression"
     },
     "leak-sensor": {
-      "binary": "Fuite"
+      "shortCategoryName": "Détecteur de fuite",
+      "binary": "Fuite (Oui/Non)"
     },
     "opening-sensor": {
-      "binary": "Ouverture"
+      "shortCategoryName": "Capteur d'ouverture",
+      "binary": "Ouverture (Oui/Non)"
     },
     "humidity-sensor": {
-      "decimal": "Humidité"
+      "shortCategoryName": "Capteur d'humidité",
+      "decimal": "Humidité (pourcentage)"
     },
     "vibration-sensor": {
+      "shortCategoryName": "Capteur de vibration",
       "status": "Etat",
       "tilt-angle": "Angle d'inclinaison",
       "acceleration-x": "Accélération X",
@@ -1050,6 +1070,7 @@
       "bed-activity": "Activité Lit"
     },
     "unknown": {
+      "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
     }
   },
@@ -1107,9 +1128,9 @@
     "saveButton": "Sauvegarder",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
     "minLabel": "Valeur minimum",
-    "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
+    "minPlaceholder": "Entrez la valeur minimum",
     "maxLabel": "Valeur maximum",
-    "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+    "maxPlaceholder": "Entrez la valeur maximum",
     "addButton": "Ajouter fonctionnalité",
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
