@@ -282,6 +282,9 @@ const DEVICE_FEATURE_TYPES = {
     MODE: 'mode',
     ROTATION: 'rotation',
   },
+  BATTERY: {
+    INTEGER: 'integer',
+  },
   VIBRATION_SENSOR: {
     STATUS: 'status',
     TILT_ANGLE: 'tilt-angle',
