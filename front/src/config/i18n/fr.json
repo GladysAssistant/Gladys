@@ -191,7 +191,8 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noValue": "Aucune valeur n'a encore été enregistrée.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seules les capteurs / et interrupteurs on/off sont supportés.",
+        "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
       },

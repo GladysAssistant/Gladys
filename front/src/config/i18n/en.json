@@ -191,6 +191,7 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."

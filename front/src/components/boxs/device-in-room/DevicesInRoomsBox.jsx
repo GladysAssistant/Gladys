@@ -54,19 +54,23 @@ const RoomCard = ({ children, ...props }) => {
           <tbody>
             {props.devices &&
               props.devices.map((device, deviceIndex) =>
-                device.features.map((deviceFeature, deviceFeatureIndex) => (
-                  <DeviceRow
-                    user={props.user}
-                    x={props.x}
-                    y={props.y}
-                    device={device}
-                    deviceFeature={deviceFeature}
-                    roomIndex={props.roomIndex}
-                    deviceIndex={deviceIndex}
-                    deviceFeatureIndex={deviceFeatureIndex}
-                    updateValue={props.updateValue}
-                  />
-                ))
+                device.features.map(
+                  (deviceFeature, deviceFeatureIndex) =>
+                    props.box &&
+                    props.box.device_features.indexOf(deviceFeature.selector) !== -1 && (
+                      <DeviceRow
+                        user={props.user}
+                        x={props.x}
+                        y={props.y}
+                        device={device}
+                        deviceFeature={deviceFeature}
+                        roomIndex={props.roomIndex}
+                        deviceIndex={deviceIndex}
+                        deviceFeatureIndex={deviceFeatureIndex}
+                        updateValue={props.updateValue}
+                      />
+                    )
+                )
               )}
           </tbody>
         </table>
