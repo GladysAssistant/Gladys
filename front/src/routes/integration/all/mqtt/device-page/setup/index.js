@@ -7,13 +7,22 @@ import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 
 @connect('session,user,httpClient,houses,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
-  selectFeature(e) {
-    this.setState({
-      selectedFeature: e.target.value
-    });
+  selectFeature(selectedFeatureOption) {
+    if (selectedFeatureOption && selectedFeatureOption.value) {
+      this.setState({
+        selectedFeature: selectedFeatureOption.value,
+        selectedFeatureOption
+      });
+    } else {
+      this.setState({
+        selectedFeature: null,
+        selectedFeatureOption: null
+      });
+    }
   }
 
   addFeature() {
@@ -147,6 +156,36 @@ class MqttDeviceSetupPage extends Component {
     }
   }
 
+  getDeviceFeaturesOptions = () => {
+    const deviceFeaturesOptions = [];
+    Object.keys(DEVICE_FEATURE_CATEGORIES).forEach(category => {
+      const categoryValue = DEVICE_FEATURE_CATEGORIES[category];
+      if (get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}`)) {
+        const categoryFeatureTypeOptions = [];
+
+        const types = Object.keys(get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}`));
+
+        types.forEach(type => {
+          const typeValue = type;
+          if (
+            get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
+            typeValue !== 'shortCategoryName'
+          ) {
+            categoryFeatureTypeOptions.push({
+              value: `${categoryValue}|${typeValue}`,
+              label: get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
+            });
+          }
+        });
+        deviceFeaturesOptions.push({
+          label: get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.shortCategoryName`),
+          options: categoryFeatureTypeOptions
+        });
+      }
+    });
+    this.setState({ deviceFeaturesOptions });
+  };
+
   constructor(props) {
     super(props);
 
@@ -164,6 +203,7 @@ class MqttDeviceSetupPage extends Component {
 
   async componentWillMount() {
     this.props.getHouses();
+    this.getDeviceFeaturesOptions();
     await this.props.getIntegrationByName('mqtt');
 
     let { deviceSelector } = this.props;
