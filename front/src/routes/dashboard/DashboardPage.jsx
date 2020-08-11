@@ -4,11 +4,15 @@ import EditBoxColumns from './EditBoxColumns';
 import EmptyState from './EmptyState';
 import EditActions from './EditActions';
 
+const marginBottom = {
+  marginBottom: '10rem'
+};
+
 const DashboardPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
-        <div class="container">
+        <div class="container" style={props.dashboardEditMode ? marginBottom : {}}>
           <div class="page-header">
             <h1 class="page-title">
               <Text id="dashboard.title" />
