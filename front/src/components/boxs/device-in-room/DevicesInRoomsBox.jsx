@@ -57,6 +57,7 @@ const RoomCard = ({ children, ...props }) => {
                 device.features.map(
                   (deviceFeature, deviceFeatureIndex) =>
                     props.box &&
+                    props.box.device_features &&
                     props.box.device_features.indexOf(deviceFeature.selector) !== -1 && (
                       <DeviceRow
                         user={props.user}
