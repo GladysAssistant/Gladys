@@ -45,7 +45,7 @@ function getNodes() {
       const commandClass = getCommandClass(comclass);
 
       Object.keys(values).forEach((idx) => {
-        const { min, max } = commandClass.getMinMax(node, comclass, idx);
+        const { min, max } = commandClass.getMinMax(node, comclass, parseInt(idx, 10));
 
         if (values[idx].genre === GENRES.USER) {
           const { category, type } = getCategory(node, values[idx]);

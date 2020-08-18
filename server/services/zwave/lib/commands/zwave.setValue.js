@@ -17,16 +17,17 @@ function setValue(device, deviceFeature, value) {
     return;
   }
 
-  logger.debug(`Zwave : Setting value ${deviceFeature.external_id} -> ${value}`);
-
-  node.classes[comclass][index].value = getCommandClass(comclass).getTransformedValue(
+  const transformedValue = getCommandClass(comclass).getTransformedValue(
     node,
     comclass,
     index,
-    instance,
     value,
   );
+  logger.debug(`Zwave : Setting value for device ${deviceFeature.external_id} `
+    + `(nodeId=${nodeId},class_id=${comclass},instance=${instance},index=${index}`
+    + `,type=${node.classes[comclass][index].type}) -> ${transformedValue} (from value ${value})`);
 
+  node.classes[comclass][index].value = transformedValue;
   this.zwave.setValue({ node_id: nodeId, class_id: comclass, instance, index }, node.classes[comclass][index].value);
 }
 

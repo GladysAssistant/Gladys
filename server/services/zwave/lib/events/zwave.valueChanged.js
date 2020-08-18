@@ -19,7 +19,7 @@ const { getCommandClass } = require('../comClass/factory');
  */
 function valueChanged(nodeId, comClass, value) {
   logger.debug(
-    `Zwave : Value Changed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${value.index}, value = ${value.value}`,
+    `Zwave : Value Changed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${value.index}, instance = ${value.instance}, value = ${value.value}`,
   );
   const node = this.nodes[nodeId];
   if (!node.ready) {
@@ -30,6 +30,7 @@ function valueChanged(nodeId, comClass, value) {
   const changedValue = commandClass.getChangedValue(node, value);
 
   if (changedValue === null) {
+    logger.debug('No matching changedValue.');
     return;
   }
 
