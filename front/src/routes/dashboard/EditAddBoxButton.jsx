@@ -24,7 +24,7 @@ const EditAddBoxButton = ({ children, ...props }) => (
         options={DASHBOARD_BOX_TYPE_LIST.map(dashboardBoxType => {
           return {
             value: dashboardBoxType,
-            label: <Text id={'dashboard.boxTitle.' + dashboardBoxType} />
+            label: <Text id={`dashboard.boxTitle.${dashboardBoxType}`} />
           };
         })}
       />

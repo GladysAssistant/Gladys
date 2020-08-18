@@ -219,13 +219,13 @@
         ]
       },
       {
-        "id": "b32daa9a-8f77-4394-b4f3-ffea215062d2",
+        "id": "b32daa9a-8f77-4394-b4f3-ffea215062d3",
         "name": "TV Lamp",
         "selector": "tv-lamp",
         "features": [
           {
             "name": "TV Lamp",
-            "selector": "main-lamp-binary",
+            "selector": "tv-lamp-binary",
             "category": "light",
             "type": "binary",
             "min": 0,

@@ -102,13 +102,7 @@ class Select extends Component {
 
     if (searchable && inputValue && typeof inputValue === 'string') {
       let optionLabel = downshiftProps.itemToString(option);
-      if (typeof optionLabel === 'object' && optionLabel.type === Text) {
-        optionLabel = get(this.context.intl.dictionary, optionLabel.props.id);
-      }
-
-      if (typeof optionLabel === 'string') {
-        return optionLabel.toLowerCase().includes(inputValue.toLowerCase());
-      }
+      return optionLabel.toLowerCase().includes(inputValue.toLowerCase());
     }
 
     return true;
@@ -125,7 +119,13 @@ class Select extends Component {
   };
 
   itemToString = item => {
-    return item ? `${get(item, this.props.itemLabelKey || 'label')}` : '';
+    const optionLabel = item ? get(item, this.props.itemLabelKey || 'label') : '';
+
+    if (typeof optionLabel === 'object' && optionLabel.type === Text) {
+      return get(this.context.intl.dictionary, optionLabel.props.id);
+    }
+
+    return `${optionLabel}`;
   };
 
   itemGroupToString = (downshiftProps, group) => {

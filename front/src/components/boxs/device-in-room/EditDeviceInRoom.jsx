@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
+import Select from '../../form/Select';
 
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
@@ -32,8 +32,8 @@ class EditDeviceInRoom extends Component {
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
 
-      const roomDeviceFeatures = [];
       room.devices.forEach(device => {
+        const roomDeviceFeatures = [];
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,
@@ -58,6 +58,7 @@ class EditDeviceInRoom extends Component {
           });
           deviceOptions.push({
             label: device.name,
+            value: device.selector,
             options: roomDeviceFeatures
           });
         }
@@ -91,20 +92,21 @@ class EditDeviceInRoom extends Component {
               </label>
               <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
             </div>
-            {deviceOptions && props.box.room && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
-                </label>
-                <Select
-                  defaultValue={[]}
-                  value={selectedDeviceFeaturesOptions}
-                  isMulti
-                  onChange={this.updateDeviceFeatures}
-                  options={deviceOptions}
-                />
-              </div>
-            )}
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
+              </label>
+              <Select
+                value={selectedDeviceFeaturesOptions}
+                onChange={this.updateDeviceFeatures}
+                options={deviceOptions}
+                loading={loading}
+                searchable
+                multiple
+                useGroups
+                uniqueKey="value"
+              />
+            </div>
           </div>
         </div>
       </BaseEditBox>
