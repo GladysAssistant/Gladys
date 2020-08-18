@@ -37,7 +37,7 @@
     "dayjs": "^1.8.14",
     "debounce": "^1.2.0",
     "dotenv": "^6.2.0",
-    "downshift": "^5.0.5",
+    "downshift": "^6.0.5",
     "get-value": "^3.0.1",
     "immutability-helper": "^3.0.0",
     "leaflet": "^1.4.0",

@@ -78,7 +78,7 @@ class Select extends Component {
     }
 
     if (changed) {
-      let callback = () => {
+      const callback = () => {
         if (onChange) {
           if (multiple) {
             onChange(selectedItems, e);
@@ -92,9 +92,9 @@ class Select extends Component {
     }
   };
 
-  getGroupItems(group) {
+  getGroupItems = group => {
     return get(group, this.props.groupItemsKey || 'options');
-  }
+  };
 
   filterItem = (downshiftProps, option) => {
     const { inputValue } = downshiftProps;
@@ -147,7 +147,7 @@ class Select extends Component {
   constructor(props) {
     super(props);
 
-    let selectedItems = this.transformPropsValue(props);
+    const selectedItems = this.transformPropsValue(props);
     this.state = {
       selectedItems
     };
@@ -155,7 +155,7 @@ class Select extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.props.value) {
-      let selectedItems = this.transformPropsValue(nextProps);
+      const selectedItems = this.transformPropsValue(nextProps);
 
       this.setState({
         selectedItems
@@ -285,7 +285,8 @@ class Select extends Component {
   }
 
   renderInputTags(downshiftProps) {
-    if (!this.props.multiple) {
+    const { multiple } = this.props;
+    if (!multiple) {
       return null;
     }
 
