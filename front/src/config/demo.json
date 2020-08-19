@@ -111,7 +111,8 @@
         },
         {
           "type": "devices-in-room",
-          "room": "living-room"
+          "room": "living-room",
+          "device_features": ["main-lamp-binary", "tv-lamp-binary", "mqtt-living-room-switch", "mqtt-living-room-temp"]
         }
       ],
       [
@@ -224,8 +225,8 @@
         "selector": "tv-lamp",
         "features": [
           {
-            "name": "TV Lamp",
-            "selector": "main-lamp-binary",
+            "name": "TV Lamp feature",
+            "selector": "tv-lamp-binary",
             "category": "light",
             "type": "binary",
             "min": 0,
@@ -243,6 +244,39 @@
           {
             "name": "Temperature",
             "selector": "temperature-living-room-celsius",
+            "category": "temperature-sensor",
+            "type": "decimal",
+            "unit": "celsius",
+            "min": -200,
+            "max": 200,
+            "read_only": true,
+            "last_value": 27,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          }
+        ]
+      },
+      {
+        "id": "81d637d2-b7f5-4cc3-a39e-2270fd069ee2",
+        "selector": "mqtt-living-room",
+        "name": "MQTT device",
+        "service": {
+          "name": "mqtt"
+        },
+        "features": [
+          {
+            "name": "Main Plug",
+            "selector": "mqtt-living-room-switch",
+            "category": "switch",
+            "type": "binary",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "last_value": 1,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "Window Temp",
+            "selector": "mqtt-living-room-temp",
             "category": "temperature-sensor",
             "type": "decimal",
             "unit": "celsius",
