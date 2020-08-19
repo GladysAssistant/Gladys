@@ -55,7 +55,7 @@ class Select extends Component {
     return newStateToSet;
   };
 
-  onChange = (item, e) => {
+  onChange = (item, downshift) => {
     const { multiple, onChange, required } = this.props;
     let selectedItems = [];
     let changed = true;
@@ -81,9 +81,9 @@ class Select extends Component {
       const callback = () => {
         if (onChange) {
           if (multiple) {
-            onChange(selectedItems, e);
+            onChange(selectedItems, downshift);
           } else {
-            onChange(item, e);
+            onChange(item, downshift);
           }
         }
       };
@@ -327,16 +327,14 @@ class Select extends Component {
   }
 
   render(props) {
-    const selectedItem = this.findSelected();
-
     return (
       <Downshift
         itemToString={this.itemToString}
         {...props}
         onChange={this.onChange}
-        selectedItem={selectedItem}
+        selectedItem={props.multiple ? null : this.findSelected()}
         stateReducer={this.stateReducer}
-        value={undefined}
+        value={null}
       >
         {downshiftProps => (
           <div class={cx('form-group', { 'mb-0': props.noMargin })}>
