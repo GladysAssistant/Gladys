@@ -241,7 +241,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
       ],
       params: [
         {
-          name: 'interface',
+          name: 'protocol',
           value: 'http',
         },
       ],
@@ -269,7 +269,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
       ],
       params: [
         {
-          name: 'interface',
+          name: 'protocol',
           value: 'http',
         },
       ],

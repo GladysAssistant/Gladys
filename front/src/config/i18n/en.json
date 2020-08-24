@@ -305,9 +305,9 @@
         "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
-        "interfaceLabel": "Interface",
-        "interfaceMQTT": "MQTT",
-        "interfaceHTTP": "HTTP",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
@@ -340,7 +340,7 @@
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "interfaceLabels": {
+      "protocolLabels": {
         "mqtt": "MQTT Topic",
         "http": "HTTP identifier"
       },

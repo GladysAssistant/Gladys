@@ -413,9 +413,9 @@
         "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
-        "interfaceLabel": "Interface",
-        "interfaceMQTT": "MQTT",
-        "interfaceHTTP": "HTTP",
+        "protocolLabel": "Protocole",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
@@ -430,7 +430,7 @@
         "http": {
           "title": "Découverte des appareils Tasmota en HTTP",
           "singleModeButton": "Recherche par IP",
-          "rangeModeButton": "Recherche par une plage d'IP",
+          "rangeModeButton": "Recherche par plage d'IP",
           "singleAddressLabel": "Adresse IP ou nom sur le réseau :",
           "singleAddressPlaceholer": "192.168.1.1, host",
           "firstAddressLabel": "De :",
@@ -448,7 +448,7 @@
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "roomLabel": "Pièce",
-      "interfaceLabels": {
+      "protocolLabels": {
         "mqtt": "Topic MQTT",
         "http": "Adresse HTTP"
       },
