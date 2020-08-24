@@ -62,6 +62,7 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/thib-rdr"><img src="https://avatars2.githubusercontent.com/u/6746308?v=4" width="100px;" alt=""/><br /><sub><b>thib_rdr</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thib-rdr" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.callum-macdonald.com/"><img src="https://avatars0.githubusercontent.com/u/690997?v=4" width="100px;" alt=""/><br /><sub><b>Callum Macdonald</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=chmac" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/Redshark30"><img src="https://avatars1.githubusercontent.com/u/38568609?v=4" width="100px;" alt=""/><br /><sub><b>Redshark30</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Redshark30" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/guillaumeLamanda"><img src="https://avatars0.githubusercontent.com/u/10440081?v=4" width="100px;" alt=""/><br /><sub><b>Lamanda </b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=guillaumeLamanda" title="Code">💻</a></td>
   </tr>
 </table>
 
