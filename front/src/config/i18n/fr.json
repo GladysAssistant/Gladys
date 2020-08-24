@@ -406,27 +406,53 @@
       "title": "Tasmota",
       "description": "Contrôler vos appareils Tasmota.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte MQTT",
+      "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte HTTP",
       "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
         "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "interfaceLabel": "Interface",
+        "interfaceMQTT": "MQTT",
+        "interfaceHTTP": "HTTP",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
-        "title": "Découverte des appareils Tasmota sur MQTT",
-        "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
-        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "noDeviceFound": "Aucun appareil Tasmota découvert.",
+        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "documentation": "Documentation Tasmota",
-        "scan": "Scanner"
+        "mqtt": {
+          "title": "Découverte des appareils Tasmota sur MQTT",
+          "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
+          "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Tasmota en HTTP",
+          "singleModeButton": "Recherche par IP",
+          "rangeModeButton": "Recherche par une plage d'IP",
+          "singleAddressLabel": "Adresse IP ou nom sur le réseau :",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "De :",
+          "lastAddressLabel": "A :",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Rechercher",
+          "usernameLabel": "Nom d'utilisateur",
+          "passwordLabel": "Mot de passe",
+          "needAuthenticationAlert": "L'apparail est protégé par nom d'utilisateur et mot de passe.",
+          "authenticateButton": "Se connecter et analyser",
+          "authError": "Nom d'utilisateur ou mot de passe incorrects."
+        }
       },
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "roomLabel": "Pièce",
-      "topicLabel": "Topic (%topic% Tasmota MQTT)",
+      "interfaceLabels": {
+        "mqtt": "Topic MQTT",
+        "http": "Adresse HTTP"
+      },
       "saveButton": "Sauvegarder",
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",

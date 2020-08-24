@@ -55,7 +55,7 @@ const TasmotaPage = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-book-open" />
                     </span>
-                    <Text id="integration.tasmota.discover.mqtt.documentation" />
+                    <Text id="integration.tasmota.discover.documentation" />
                   </DeviceConfigurationLink>
                 </div>
               </div>

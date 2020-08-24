@@ -314,10 +314,10 @@
       "discover": {
         "noDeviceFound": "No Tasmota device discovered.",
         "error": "Error discovering Tasmota devices.",
+        "documentation": "Tasmota documentation",
         "mqtt": {
           "title": "Tasmota discover devices over MQTT",
           "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
-          "documentation": "Tasmota documentation",
           "scan": "Scan"
         },
         "http": {
