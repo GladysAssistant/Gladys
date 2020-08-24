@@ -8,8 +8,7 @@ const { fake, assert } = sinon;
 
 const requestMock = {
   request: (url, dataCallback, authErrorCallback, errorCallback) => {
-    const [, , baseUrl] = url.split('/');
-    switch (baseUrl) {
+    switch (url) {
       case 'auth-error': {
         authErrorCallback();
         break;
@@ -25,7 +24,7 @@ const requestMock = {
     }
     fake.returns(null);
   },
-  buildUrl: (url, device) => {
+  buildUrl: (device) => {
     return device.name;
   },
 };
@@ -147,8 +146,8 @@ describe('Tasmota - HTTP - status', () => {
         },
       ],
     };
-    const username = 'user';
-    const password = 'pass';
+    const username = undefined;
+    const password = undefined;
     tasmotaHandler.status(address, username, password);
 
     expect(tasmotaHandler.discoveredDevices).deep.eq({

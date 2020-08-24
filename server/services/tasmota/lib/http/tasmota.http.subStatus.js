@@ -1,6 +1,6 @@
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { recursiveSearch, addFeature } = require('../features');
-const { request } = require('./tasmota.http.request');
+const { request, buildUrl } = require('./tasmota.http.request');
 
 /**
  * @description Try to discover HTTP device.
@@ -38,12 +38,7 @@ function subStatus(networkAddress, username, password, statusId) {
     delete this.discoveredDevices[networkAddress];
   };
 
-  request(
-    `http://${networkAddress}/cm?user=${username}&password=${password}&cmnd=Status ${statusId}`,
-    fillDevice,
-    authErrorCallback,
-    errorCallback,
-  );
+  request(buildUrl(device, `Status ${statusId}`), fillDevice, authErrorCallback, errorCallback);
 }
 
 module.exports = {

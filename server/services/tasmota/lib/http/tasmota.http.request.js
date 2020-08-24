@@ -1,27 +1,34 @@
 const http = require('http');
 const logger = require('../../../../utils/logger');
+const { DEVICE_PARAM_NAME } = require('../tasmota.constants');
 
 /**
  * @description Build URL from device.
- * @param {string} urlStr - URL as string.
  * @param {Object} device - Device.
+ * @param {string} command - Command to send.
  * @returns {string} The build URL.
  * @example
- * buildUrl('http://my-device');
+ * buildUrl({}, 'Status');
  */
-function buildUrl(urlStr, device) {
-  const url = new URL(urlStr);
+function buildUrl(device, command = undefined) {
+  const [, networkAddress] = device.external_id.split(':');
+  const url = new URL(`http://${networkAddress}`);
 
   if (device && device.params) {
-    const username = (device.params.find((param) => param.name === 'username') || {}).value;
+    const username = (device.params.find((param) => param.name === DEVICE_PARAM_NAME.USERNAME) || {}).value;
     if (username) {
-      url.username = username;
+      url.searchParams.append('user', username);
 
-      const password = (device.params.find((param) => param.name === 'password') || {}).value;
+      const password = (device.params.find((param) => param.name === DEVICE_PARAM_NAME.PASSWORD) || {}).value;
       if (password) {
-        url.password = password;
+        url.searchParams.append('password', password);
       }
     }
+  }
+
+  if (command) {
+    url.pathname = 'cm';
+    url.searchParams.append('cmnd', command);
   }
 
   return url.href;

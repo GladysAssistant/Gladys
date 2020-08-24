@@ -28,7 +28,7 @@ describe('Tasmota - poll', () => {
     sinon.reset();
   });
 
-  it('pomm value', () => {
+  it('poll value', () => {
     const device = {
       params: [
         {

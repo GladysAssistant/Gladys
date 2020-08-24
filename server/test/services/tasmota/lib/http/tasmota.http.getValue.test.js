@@ -19,7 +19,7 @@ const requestMock = {
     }
     fake.returns(null);
   },
-  buildUrl: (url, device) => {
+  buildUrl: (device) => {
     return device.name;
   },
 };
@@ -58,7 +58,7 @@ describe('Tasmota - HTTP - getValue', () => {
   it('getValue with success', () => {
     const device = {
       name: 'success',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     tasmotaHandler.getValue(device);
 
@@ -68,7 +68,7 @@ describe('Tasmota - HTTP - getValue', () => {
   it('getValue with auth-error', () => {
     const device = {
       name: 'auth-error',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     tasmotaHandler.getValue(device);
 
@@ -78,7 +78,7 @@ describe('Tasmota - HTTP - getValue', () => {
   it('getValue with error', () => {
     const device = {
       name: 'error',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     tasmotaHandler.getValue(device);
 

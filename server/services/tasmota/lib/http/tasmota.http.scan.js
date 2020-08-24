@@ -30,7 +30,7 @@ const ipToInt = (ipStr) => {
 function scan(options) {
   const { singleAddress, firstAddress, lastAddress, username, password } = options;
   if (singleAddress) {
-    logger.debug(`Tasmota: HTTP looking for ${singleAddress} ${username} ${password}`);
+    logger.debug(`Tasmota: HTTP looking for ${singleAddress}`);
     this.status(singleAddress, username, password);
   } else if (firstAddress && lastAddress) {
     logger.debug(`Tasmota: looing from ${firstAddress} to ${lastAddress}...`);

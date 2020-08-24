@@ -17,12 +17,7 @@ function setValue(device, networkAddress, command, value) {
 
   const errorCallback = () => {};
 
-  request(
-    buildUrl(`http://${networkAddress}/cm?cmnd=${command} ${value}`, device),
-    fillDevice,
-    errorCallback,
-    errorCallback,
-  );
+  request(buildUrl(device, `${command} ${value}`), fillDevice, errorCallback, errorCallback);
 }
 
 module.exports = {

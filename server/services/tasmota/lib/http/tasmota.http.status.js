@@ -1,5 +1,5 @@
 const { addSelector } = require('../../../../utils/addSelector');
-const { request } = require('./tasmota.http.request');
+const { request, buildUrl } = require('./tasmota.http.request');
 const logger = require('../../../../utils/logger');
 const { DEVICE_POLL_FREQUENCIES, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../tasmota.constants');
@@ -7,6 +7,7 @@ const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../tasmota.constants'
 const createDevice = (networkAddress, serviceId, username, password) => {
   const externalId = `tasmota:${networkAddress}`;
   const device = {
+    name: networkAddress,
     external_id: externalId,
     selector: externalId,
     features: [],
@@ -50,12 +51,12 @@ const createDevice = (networkAddress, serviceId, username, password) => {
  */
 function status(networkAddress, username, password) {
   delete this.discoveredDevices[networkAddress];
+  const device = createDevice(networkAddress, this.tasmotaHandler.serviceId, username, password);
 
   const storeDevice = (message) => {
     const statusMsg = JSON.parse(message);
 
     logger.debug(`Tasmota: HTTP receive message for ${networkAddress}: ${statusMsg}`);
-    const device = createDevice(networkAddress, this.tasmotaHandler.serviceId, username, password);
 
     const { FriendlyName, Module } = statusMsg.Status;
     const [name] = FriendlyName;
@@ -69,9 +70,6 @@ function status(networkAddress, username, password) {
   };
 
   const authErrorCallback = () => {
-    const device = createDevice(networkAddress, this.tasmotaHandler.serviceId);
-
-    device.name = networkAddress;
     device.needAuthentication = true;
 
     this.discoveredDevices[networkAddress] = device;
@@ -83,12 +81,7 @@ function status(networkAddress, username, password) {
     delete this.discoveredDevices[networkAddress];
   };
 
-  request(
-    `http://${networkAddress}/cm?user=${username}&password=${password}&cmnd=Status`,
-    storeDevice,
-    authErrorCallback,
-    errorCallback,
-  );
+  request(buildUrl(device, 'Status'), storeDevice, authErrorCallback, errorCallback);
 }
 
 module.exports = {

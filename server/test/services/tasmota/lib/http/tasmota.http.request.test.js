@@ -110,27 +110,19 @@ describe('Tasmota - HTTP - request', () => {
 });
 
 describe('Tasmota - HTTP - buildUrl', () => {
-  it('buildUrl without device', () => {
-    const url = 'http://my-url';
-    const device = null;
-
-    const result = buildUrl(url, device);
-    expect(result).to.eq('http://my-url/');
-  });
-
   it('buildUrl with device no username', () => {
-    const url = 'http://my-url';
     const device = {
+      external_id: 'tasmota:my-url',
       params: [],
     };
 
-    const result = buildUrl(url, device);
+    const result = buildUrl(device);
     expect(result).to.eq('http://my-url/');
   });
 
   it('buildUrl with device and username', () => {
-    const url = 'http://my-url';
     const device = {
+      external_id: 'tasmota:my-url',
       params: [
         {
           name: 'username',
@@ -139,13 +131,13 @@ describe('Tasmota - HTTP - buildUrl', () => {
       ],
     };
 
-    const result = buildUrl(url, device);
-    expect(result).to.eq('http://BOB@my-url/');
+    const result = buildUrl(device);
+    expect(result).to.eq('http://my-url/?user=BOB');
   });
 
   it('buildUrl with device and username/password', () => {
-    const url = 'http://my-url';
     const device = {
+      external_id: 'tasmota:my-url',
       params: [
         {
           name: 'username',
@@ -158,7 +150,7 @@ describe('Tasmota - HTTP - buildUrl', () => {
       ],
     };
 
-    const result = buildUrl(url, device);
-    expect(result).to.eq('http://BOB:PASS@my-url/');
+    const result = buildUrl(device, 'CMND');
+    expect(result).to.eq('http://my-url/cm?user=BOB&password=PASS&cmnd=CMND');
   });
 });

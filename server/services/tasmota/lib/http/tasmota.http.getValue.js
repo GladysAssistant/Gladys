@@ -8,7 +8,7 @@ const { request, buildUrl } = require('./tasmota.http.request');
  * getHttpValue({});
  */
 function getValue(device) {
-  const [, networkAddress] = device.externalId.split(':');
+  const [, networkAddress] = device.external_id.split(':');
 
   const fillSTSDevice = (statusMsg) => {
     featureStatus(networkAddress, statusMsg, this.tasmotaHandler.gladys.event);
@@ -19,8 +19,8 @@ function getValue(device) {
 
   const errorCallback = () => {};
 
-  request(buildUrl(`http://${networkAddress}/cm?cmnd=Status 11`, device), fillSTSDevice, errorCallback, errorCallback);
-  request(buildUrl(`http://${networkAddress}/cm?cmnd=Status 8`, device), fillSNSDevice, errorCallback, errorCallback);
+  request(buildUrl(device, 'Status 11'), fillSTSDevice, errorCallback, errorCallback);
+  request(buildUrl(device, 'Status 8'), fillSNSDevice, errorCallback, errorCallback);
 }
 
 module.exports = {

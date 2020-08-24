@@ -7,8 +7,7 @@ const { fake, assert } = sinon;
 
 const requestMock = {
   request: (url, dataCallback, authErrorCallback, errorCallback) => {
-    const [, , baseUrl] = url.split('/');
-    switch (baseUrl) {
+    switch (url) {
       case 'auth-error': {
         authErrorCallback();
         break;
@@ -24,7 +23,7 @@ const requestMock = {
     }
     fake.returns(null);
   },
-  buildUrl: (url, device) => {
+  buildUrl: (device) => {
     return device.name;
   },
 };
@@ -47,7 +46,6 @@ const gladys = {
   },
 };
 const serviceId = 'service-uuid-random';
-const device = {};
 
 describe('Tasmota - HTTP - status', () => {
   let tasmotaHandler;
@@ -63,48 +61,49 @@ describe('Tasmota - HTTP - status', () => {
 
   it('status with success (status = 11)', () => {
     const address = 'success';
-    tasmotaHandler.discoveredDevices[address] = device;
+    tasmotaHandler.discoveredDevices[address] = { name: address };
+
     const username = undefined;
     const password = undefined;
     tasmotaHandler.subStatus(address, username, password, 11);
 
     expect(tasmotaHandler.discoveredDevices).deep.eq({
-      [address]: device,
+      [address]: { name: address },
     });
     assert.calledOnce(gladys.event.emit);
   });
 
   it('status with success (status = 8)', () => {
     const address = 'success';
-    tasmotaHandler.discoveredDevices[address] = device;
+    tasmotaHandler.discoveredDevices[address] = { name: address };
 
     const username = undefined;
     const password = undefined;
     tasmotaHandler.subStatus(address, username, password, 8);
 
     expect(tasmotaHandler.discoveredDevices).deep.eq({
-      [address]: device,
+      [address]: { name: address },
     });
     assert.calledOnce(gladys.event.emit);
   });
 
   it('status with auth-error', () => {
     const address = 'auth-error';
-    tasmotaHandler.discoveredDevices[address] = device;
+    tasmotaHandler.discoveredDevices[address] = { name: address };
 
     const username = 'user';
     const password = 'pass';
     tasmotaHandler.subStatus(address, username, password, 11);
 
     expect(tasmotaHandler.discoveredDevices).deep.eq({
-      [address]: device,
+      [address]: { name: address, needAuthentication: true },
     });
     assert.calledOnce(gladys.event.emit);
   });
 
   it('status with error', () => {
     const address = 'error';
-    tasmotaHandler.discoveredDevices[address] = device;
+    tasmotaHandler.discoveredDevices[address] = { name: address };
 
     const username = undefined;
     const password = undefined;

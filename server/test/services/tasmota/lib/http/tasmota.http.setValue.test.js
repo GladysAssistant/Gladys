@@ -19,7 +19,7 @@ const requestMock = {
     }
     fake.returns(null);
   },
-  buildUrl: (url, device) => {
+  buildUrl: (device) => {
     return device.name;
   },
 };
@@ -58,7 +58,7 @@ describe('Tasmota - HTTP - setValue', () => {
   it('setValue with success', () => {
     const device = {
       name: 'success',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     const address = '192.168.1.1';
     const command = 'command';
@@ -71,7 +71,7 @@ describe('Tasmota - HTTP - setValue', () => {
   it('setValue with auth-error', () => {
     const device = {
       name: 'auth-error',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     const address = '192.168.1.1';
     const command = 'command';
@@ -84,7 +84,7 @@ describe('Tasmota - HTTP - setValue', () => {
   it('setValue with error', () => {
     const device = {
       name: 'error',
-      externalId: 'tasmota:network',
+      external_id: 'tasmota:network',
     };
     const address = '192.168.1.1';
     const command = 'command';
