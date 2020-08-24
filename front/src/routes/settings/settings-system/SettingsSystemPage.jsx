@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 import cx from 'classnames';
+import Select from 'react-select';
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -166,6 +167,15 @@ const SystemPage = ({ children, ...props }) => (
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-header">Configuration</h3>
+          <div class="card-body">
+            <form>
+              <label>Timezone</label>
+              <Select options={props.timezoneOptions} onChange={props.updateTimezone} value={props.selectedTimezone} />
+            </form>
           </div>
         </div>
       </div>
