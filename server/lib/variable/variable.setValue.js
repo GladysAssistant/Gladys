@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Set the value of a variable
@@ -19,9 +20,11 @@ async function setValue(key, value, serviceId = null, userId = null) {
     },
   });
 
+  let createdOrUpdatedVariable;
+
   // if variable doesn't exist, we create it
   if (variable === null) {
-    return db.Variable.create({
+    createdOrUpdatedVariable = await db.Variable.create({
       value,
       name: key,
       service_id: serviceId,
@@ -30,7 +33,15 @@ async function setValue(key, value, serviceId = null, userId = null) {
   }
 
   // if it exists, we update it
-  return variable.update({ value });
+  createdOrUpdatedVariable = await variable.update({ value });
+
+  // if the variable updated is the timezone settings, we send an event for the system
+  // to reload all timezone related code
+  if (key === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+    this.event.emit(EVENTS.SYSTEM.TIMEZONE_CHANGED);
+  }
+
+  return createdOrUpdatedVariable;
 }
 
 module.exports = {

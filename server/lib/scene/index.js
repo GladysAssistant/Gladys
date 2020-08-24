@@ -14,18 +14,24 @@ const { update } = require('./scene.update');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
-const SceneManager = function SceneManager(stateManager, event, device, message) {
+const DEFAULT_TIMEZONE = 'Europe/Paris';
+
+const SceneManager = function SceneManager(stateManager, event, device, message, variable) {
   this.stateManager = stateManager;
   this.event = event;
   this.device = device;
   this.message = message;
+  this.variable = variable;
   this.scenes = {};
+  this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore
   this.queue = queue({
     autostart: true,
   });
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
+  // on timezone change, reload all scenes
+  this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.init.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;
