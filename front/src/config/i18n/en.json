@@ -300,7 +300,6 @@
       "deviceTab": "Devices",
       "mqttDiscoverTab": "MQTT discover",
       "httpDiscoverTab": "HTTP discover",
-      "discoverDeviceDescr": "Automatically scan MQTT devices",
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
@@ -1224,7 +1223,15 @@
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-    "notFound": "Requested device not found."
+    "notFound": "Requested device not found.",
+    "pollFrequency": {
+      "label": "Refresh frequency",
+      "everyMinutes": "Every minutes",
+      "every30Seconds": "Every 30 seconds",
+      "every10Seconds": "Every 10 seconds",
+      "every2Seconds": "Every 2 seconds",
+      "every1Seconds": "Every second"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",

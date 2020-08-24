@@ -408,7 +408,6 @@
       "deviceTab": "Appareils",
       "mqttDiscoverTab": "Découverte MQTT",
       "httpDiscoverTab": "Découverte HTTP",
-      "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
         "search": "Chercher un appareil",
@@ -1224,7 +1223,15 @@
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
-    "notFound": "Appareil recherché introuvable."
+    "notFound": "Appareil recherché introuvable.",
+    "pollFrequency": {
+      "label": "Fréquence de rafraîchissement",
+      "everyMinutes": "Toutes les minutes (recommandé)",
+      "every30Seconds": "Toutes les 30 secondes",
+      "every10Seconds": "Toutes les 10 secondes",
+      "every2Seconds": "Toutes les 2 secondes",
+      "every1Seconds": "Chaque seconde"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",

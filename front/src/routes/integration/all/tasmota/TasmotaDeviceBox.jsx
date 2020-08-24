@@ -98,9 +98,9 @@ class TasmotaDeviceBox extends Component {
   };
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
-    const validModel = device.features.length > 0;
+    const validModel = device.features.length > 0 || device.needAuthentication;
     // default value is 'mqtt'
-    const deviceInterface = ((device.params || []).find(p => p.name === 'interface') || { value: 'mqtt' }).value;
+    const deviceInterface = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
 
     return (
       <div class="col-md-6">
