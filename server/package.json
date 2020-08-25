@@ -27,12 +27,17 @@
     "generate-jsdoc": "jsdoc lib/**/*.js services/**/*.js -d jsdoc"
   },
   "author": "Pierre-Gilles Leymarie",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "nodemonConfig": {
-    "ignore": ["test/*"]
+    "ignore": [
+      "test/*"
+    ]
   },
   "nyc": {
-    "exclude": ["migrations/**/*.js", "test/**/*.js"]
+    "exclude": [
+      "migrations/**/*.js",
+      "test/**/*.js"
+    ]
   },
   "devDependencies": {
     "apidoc": "^0.17.7",

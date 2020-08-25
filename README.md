@@ -41,6 +41,12 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 To get started, you can go to [our website](https://gladysassistant.com).
 
+## Pull requests are welcome
+
+If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
+
+Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people 👏
@@ -68,11 +74,12 @@ Thanks goes to these wonderful people 👏
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) for more details.
+Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) if you want to help us on Gladys Assistant.
 
 ## Copyright & License
 
