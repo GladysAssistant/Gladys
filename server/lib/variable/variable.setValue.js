@@ -30,10 +30,10 @@ async function setValue(key, value, serviceId = null, userId = null) {
       service_id: serviceId,
       user_id: userId,
     });
+  } else {
+    // if it exists, we update it
+    createdOrUpdatedVariable = await variable.update({ value });
   }
-
-  // if it exists, we update it
-  createdOrUpdatedVariable = await variable.update({ value });
 
   // if the variable updated is the timezone settings, we send an event for the system
   // to reload all timezone related code
