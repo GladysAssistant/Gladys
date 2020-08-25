@@ -170,10 +170,19 @@ const SystemPage = ({ children, ...props }) => (
           </div>
         </div>
         <div class="card">
-          <h3 class="card-header">Configuration</h3>
+          <h3 class="card-header">
+            <Text id="systemSettings.configurationTitle" />
+          </h3>
           <div class="card-body">
             <form>
-              <label>Timezone</label>
+              <label>
+                <Text id="systemSettings.timezone" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.timezoneText" />
+                </small>
+              </p>
               <Select options={props.timezoneOptions} onChange={props.updateTimezone} value={props.selectedTimezone} />
             </form>
           </div>
