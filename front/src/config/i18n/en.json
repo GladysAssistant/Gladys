@@ -847,6 +847,9 @@
     "containerStatus": "Status",
     "downloadFinished": "Download finished.",
     "restartingGladys": "Restarting Gladys...",
+    "configurationTitle": "Configuration",
+    "timezone": "Timezone",
+    "timezoneText": "The timezone is used in scheduled scene.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",

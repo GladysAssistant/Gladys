@@ -847,6 +847,9 @@
     "containerStatus": "État",
     "downloadFinished": "Téléchargement terminé",
     "restartingGladys": "Redémarrage de Gladys ...",
+    "configurationTitle": "Configuration",
+    "timezone": "Fuseau horaire",
+    "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
