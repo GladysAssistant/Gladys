@@ -23,6 +23,7 @@ const SESSION_TOKEN_TYPES = {
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
+  TIMEZONE: 'TIMEZONE',
 };
 
 const EVENTS = {
@@ -109,6 +110,7 @@ const EVENTS = {
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
+    TIMEZONE_CHANGED: 'system.timezone-changed',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
