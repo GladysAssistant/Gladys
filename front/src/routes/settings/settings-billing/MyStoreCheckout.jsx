@@ -1,3 +1,4 @@
+import { Text, MarkupText } from 'preact-i18n';
 import { CardElement, injectStripe } from 'react-stripe-elements';
 import { Component } from 'preact';
 
@@ -21,10 +22,10 @@ class MyStoreCheckout extends Component {
         <CardElement />
         <br />
         <label>
-          🔒 Payment secured by <a href="https://stripe.com/docs/security/stripe">Stripe</a>
+          <MarkupText id="gatewaySubscribe.paymentSecuredByStripe" />
         </label>
         <button class="btn btn-primary btn-block" style={{ marginTop: '15px' }}>
-          9.99€/month
+          <Text id="gatewaySubscribe.priceButton" />
         </button>
       </form>
     );

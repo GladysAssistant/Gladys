@@ -1,0 +1,18 @@
+[
+  {
+    "label": "light.turn-on.success",
+    "answers": ["La lumière est allumée !"]
+  },
+  {
+    "label": "light.turn-on.fail",
+    "answers": ["Je n'ai pas réussi à allumer la lumière."]
+  },
+  {
+    "label": "light.turn-off.success",
+    "answers": ["La lumière est éteinte !"]
+  },
+  {
+    "label": "light.turn-off.fail",
+    "answers": ["Je n'ai pas réussi à éteindre la lumière."]
+  }
+]

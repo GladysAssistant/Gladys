@@ -1,4 +1,5 @@
 import get from 'get-value';
+import { Text } from 'preact-i18n';
 
 import SettingsLayout from '../SettingsLayout';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
@@ -16,7 +17,7 @@ const GatewayPage = ({ children, ...props }) => (
       <div>
         <div class="row">
           <button onClick={props.cancelGatewayLogin} class="btn btn-secondary btn-sm">
-            ◀️️ Back
+            <Text id="global.backButton" />
           </button>
         </div>
         <div class="row mt-4">

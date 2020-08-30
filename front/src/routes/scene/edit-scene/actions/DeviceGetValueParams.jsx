@@ -56,7 +56,9 @@ class DeviceGetValue extends Component {
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.deviceGetValue.deviceLabel" />
-            <span class="form-required">*</span>
+            <span class="form-required">
+              <Text id="global.requiredField" />
+            </span>
           </label>
           <SelectDeviceFeature value={action.device_feature} onDeviceFeatureChange={this.onDeviceFeatureChange} />
         </div>

@@ -105,7 +105,7 @@ class CreateAccountGladysGateway extends Component {
               {step === 1 && (
                 <div class="col col-login mx-auto">
                   <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
-                    ◀️️ <Text id="signup.createLocalAccount.backButton" />
+                    <Text id="global.backButton" />
                   </Link>
 
                   <GatewayLoginForm {...this.props} external_forgot_password login={this.login} />

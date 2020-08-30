@@ -59,7 +59,7 @@ class MqttDeviceBox extends Component {
             {batteryLevel && (
               <div class="page-options d-flex">
                 <div class="tag tag-green">
-                  {batteryLevel}%
+                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
                   <span class="tag-addon">
                     <i class="fe fe-battery" />
                   </span>

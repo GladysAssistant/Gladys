@@ -13,7 +13,7 @@ describe('GET /api/v1/user/:selector/weather', () => {
           humidity: 0.76,
           pressure: 1019.4,
           datetime: '2019-03-28T07:50:18.000Z',
-          units: 'si',
+          units: 'metric',
           wind_speed: 5.25,
           weather: 'cloud',
         });
@@ -45,7 +45,7 @@ describe('GET /api/v1/house/:selector/weather', () => {
           humidity: 0.76,
           pressure: 1019.4,
           datetime: '2019-03-28T07:50:18.000Z',
-          units: 'si',
+          units: 'metric',
           wind_speed: 5.25,
           weather: 'cloud',
           house: {

@@ -8,11 +8,15 @@ const OpenApiKey = ({ children, ...props }) => {
     props.revokeOpenApiKey(props.apiKey.id, props.index);
   };
 
-  let createdAt = new Date(props.apiKey.created_at).toLocaleDateString('en-US', dateDisplayOptions);
+  let language = props.user && props.user.language ? props.user.language : 'en';
+
+  let createdAt = new Date(props.apiKey.created_at).toLocaleDateString(language, dateDisplayOptions);
   let lastUsed =
-    props.apiKey.last_used === null
-      ? 'never'
-      : new Date(props.apiKey.last_used).toLocaleDateString('en-US', dateDisplayOptions);
+    props.apiKey.last_used === null ? (
+      <Text id="gatewayOpenApi.neverUsed" />
+    ) : (
+      new Date(props.apiKey.last_used).toLocaleDateString(language, dateDisplayOptions)
+    );
 
   return (
     <tr>
@@ -20,11 +24,11 @@ const OpenApiKey = ({ children, ...props }) => {
         <div style="max-width: 400px; overflow: hidden">{props.apiKey.name}</div>
         {props.apiKey.api_key && (
           <div class="small">
-            <Text id="gatewayOpenApi.keyName" />: {props.apiKey.api_key}
+            <Text id="gatewayOpenApi.keyNameLabel" /> {props.apiKey.api_key}
           </div>
         )}
         <div class="small text-muted">
-          <Text id="gatewayOpenApi.registered" />: {createdAt}
+          <Text id="gatewayOpenApi.registeredLabel" /> {createdAt}
         </div>
       </td>
       <td>

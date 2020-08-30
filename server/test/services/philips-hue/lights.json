@@ -1139,6 +1139,111 @@
       },
       "_id": 24,
       "id": 24
+    },
+    {
+      "_rawData": {
+        "state": {
+          "on": true,
+          "bri": 254,
+          "alert": "none",
+          "mode": "homeautomation",
+          "reachable": false
+        },
+        "swupdate": {
+          "state": "noupdates",
+          "lastinstall": "2020-04-25T10:55:36"
+        },
+        "type": "On/Off plug-in unit",
+        "name": "Prise chauffage Piscine",
+        "modelid": "LOM002",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue Smart plug",
+        "capabilities": {
+          "certified": true,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "plug",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9f:97:bd-0c",
+        "swversion": "1.55.10_r29112",
+        "swconfigid": "4303D274",
+        "productid": "SmartPlug_OnOff_v01-00_02"
+      },
+      "_id": 25,
+      "id": 25
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": null
+      },
+      "type": "Dimmable light",
+      "name": "Hue white lamp 2",
+      "modelid": "LWA001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue white lamp",
+      "_rawData": {
+        "state": {
+          "on": true,
+          "bri": 254,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": true
+        },
+        "swupdate": {
+          "state": "transferring",
+          "lastinstall": null
+        },
+        "type": "Dimmable light",
+        "name": "Hue white lamp 2",
+        "modelid": "LWA001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue white lamp",
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 5000,
+            "maxlumen": 800
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9f:97:bd-0c",
+        "swversion": "1.53.3_r27175",
+        "swconfigid": "D6781B83",
+        "productid": "Philips-LWA001-1-A19DLv5"
+      },
+      "_id": 26,
+      "id": 26
     }
   ]
 }

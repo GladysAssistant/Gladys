@@ -18,7 +18,7 @@ const GatewayConnectedSuccess = ({ children, ...props }) => (
 
       <div class="form-group">
         <label class="form-label">
-          <Text id="gateway.backupKey" />
+          <Text id="gateway.backupKeyLabel" />
         </label>
         <Localizer>
           <input

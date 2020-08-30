@@ -113,8 +113,7 @@ async function syncUserCalendars(userId) {
           return this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
         }),
       );
-
-      logger.info(`CalDAV : ${savedEvents.length} events updated.`);
+      logger.info(`CalDAV : ${savedEvents.length} events updated for calendar ${calendarToUpdate.name}.`);
     },
     { concurrency: 1 },
   );

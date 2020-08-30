@@ -8,6 +8,10 @@ const logger = require('../../utils/logger');
  * init();
  */
 async function init() {
+  // Clean temp folder
+  await fse.emptyDir(this.config.tempFolder);
+  // Ensure temp directory exists
+  await fse.ensureDir(this.config.tempFolder);
   // we get Gladys version from package.json
   const packageJsonString = await fse.readFile(path.join(__dirname, '../../../package.json'), 'utf8');
   const packageJson = JSON.parse(packageJsonString);

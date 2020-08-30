@@ -1,8 +1,0 @@
-[
-  {
-    "key": "caldav",
-    "name": "CalDAV",
-    "description": "Sync your Gladys calendar using CalDAV.",
-    "img": "/assets/integrations/cover/caldav.jpg"
-  }
-]

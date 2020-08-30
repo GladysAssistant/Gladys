@@ -20,7 +20,7 @@ describe('Mqtt handle message', () => {
 
   beforeEach(async () => {
     mqttHandler.init();
-    await mqttHandler.connect();
+    await mqttHandler.connect({ mqttUrl: 'url' });
     sinon.reset();
   });
 
@@ -48,7 +48,7 @@ describe('Mqtt handle message', () => {
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'my_feature_external_id',
-      state: '19.8',
+      state: 19.8,
     });
   });
 

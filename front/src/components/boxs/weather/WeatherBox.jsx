@@ -87,7 +87,7 @@ const WeatherBox = ({ children, ...props }) => (
             <i class="fe fe-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/integration/weather/darksky">
+              <Link href="/dashboard/integration/weather/openweather">
                 <Text id="dashboard.boxes.weather.clickHere" />
               </Link>
             </span>
@@ -113,13 +113,13 @@ const WeatherBox = ({ children, ...props }) => (
               }}
               class="font-size-40 blue-grey-700"
             >
-              {props.temperature}°
+              <Text id="global.degreeValue" fields={{ value: props.temperature }} />
               <span
                 style={{
                   fontSize: '30px'
                 }}
               >
-                {props.units === 'si' ? 'C' : 'F'}
+                {props.units === 'metric' ? 'C' : 'F'}
               </span>
             </div>
           </div>
@@ -131,13 +131,13 @@ const WeatherBox = ({ children, ...props }) => (
           >
             {props.weather === 'rain' && (
               <i
-                class="fe fe-cloud-drizzle"
+                class="fe fe-cloud-rain"
                 style={{
                   fontSize: '60px'
                 }}
               />
             )}
-            {props.weather === 'sun' && (
+            {props.weather === 'clear' && (
               <i
                 class="fe fe-sun"
                 style={{
@@ -147,7 +147,39 @@ const WeatherBox = ({ children, ...props }) => (
             )}
             {props.weather === 'cloud' && (
               <i
+                class="fe fe-cloud"
+                style={{
+                  fontSize: '60px'
+                }}
+              />
+            )}
+            {props.weather === 'snow' && (
+              <i
+                class="fe fe-cloud-snow"
+                style={{
+                  fontSize: '60px'
+                }}
+              />
+            )}
+            {props.weather === 'fog' && (
+              <i
+                class="fe fe-cloud"
+                style={{
+                  fontSize: '60px'
+                }}
+              />
+            )}
+            {props.weather === 'drizzle' && (
+              <i
                 class="fe fe-cloud-drizzle"
+                style={{
+                  fontSize: '60px'
+                }}
+              />
+            )}
+            {props.weather === 'thunderstorm' && (
+              <i
+                class="fe fe-cloud-lightning"
                 style={{
                   fontSize: '60px'
                 }}
