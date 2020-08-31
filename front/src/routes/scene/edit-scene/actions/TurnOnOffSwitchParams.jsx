@@ -13,7 +13,12 @@ class TurnOnOffSwitch extends Component {
         device_feature_category: 'switch',
         device_feature_type: 'binary'
       });
-      const deviceOptions = devices.map(device => ({
+      // keep only write switches, not read only
+      const devicesFiltered = devices.filter(device => {
+        const writeSwitch = device.features.find(f => f.read_only === false);
+        return writeSwitch !== undefined;
+      });
+      const deviceOptions = devicesFiltered.map(device => ({
         value: device.selector,
         label: device.name
       }));
