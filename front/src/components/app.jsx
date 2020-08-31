@@ -1,10 +1,11 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
+import get from 'get-value';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
-import translationEn from '../config/i18n/en.json';
+import translations from '../config/i18n';
 import actions from '../actions/main';
 
 import { getDefaultState } from '../utils/getDefaultState';
@@ -45,7 +46,6 @@ import TriggerPage from '../routes/trigger';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
-import SettingsAdvancedPage from '../routes/settings/settings-advanced';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
@@ -55,7 +55,8 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
-import DarkSkyPage from '../routes/integration/all/darksky';
+import CaldavPage from '../routes/integration/all/caldav';
+import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -141,15 +142,18 @@ const AppRouter = connect(
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
-        <IntegrationPage path="/dashboard/integration/device" />
-        <IntegrationPage path="/dashboard/integration/communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" />
-        <IntegrationPage path="/dashboard/integration/music" />
-        <IntegrationPage path="/dashboard/integration/health" />
-        <IntegrationPage path="/dashboard/integration/weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" />
+
+        <IntegrationPage path="/dashboard/integration/device" category="device" />
+        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
+        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
+        <IntegrationPage path="/dashboard/integration/music" category="music" />
+        <IntegrationPage path="/dashboard/integration/health" category="health" />
+        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
+        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+
         <TelegramPage path="/dashboard/integration/communication/telegram" />
-        <DarkSkyPage path="/dashboard/integration/weather/darksky" />
+        <CaldavPage path="/dashboard/integration/calendar/caldav" />
+        <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
@@ -184,7 +188,6 @@ const AppRouter = connect(
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
-        <SettingsAdvancedPage path="/dashboard/settings/advanced" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsBackup path="/dashboard/settings/backup" />
@@ -194,22 +197,26 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('', actions)
+@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
+    this.props.getIntegrations();
   }
 
-  render({}, {}) {
-    return <AppRouter />;
+  render({ user }, {}) {
+    const translationDefinition = get(translations, user.language, { default: translations.en });
+    return (
+      <IntlProvider definition={translationDefinition}>
+        <AppRouter />
+      </IntlProvider>
+    );
   }
 }
 
 const App = () => (
   <Provider store={store}>
-    <IntlProvider definition={translationEn}>
-      <MainApp />
-    </IntlProvider>
+    <MainApp />
   </Provider>
 );
 

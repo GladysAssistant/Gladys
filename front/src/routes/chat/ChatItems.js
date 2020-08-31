@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import style from './style.css';
 
 import dayjs from 'dayjs';
@@ -10,7 +10,9 @@ const IncomingMessage = ({ children, ...props }) => (
   <div class={style.incoming_msg}>
     <div class={style.incoming_msg_img}>
       {' '}
-      <img src="/assets/icons/android-icon-192x192.png" alt="sunil" />{' '}
+      <Localizer>
+        <img src="/assets/icons/android-icon-192x192.png" alt={<Text id="chat.gladysAlt" />} />{' '}
+      </Localizer>
     </div>
     <div class={style.received_msg}>
       <div class={style.received_withd_msg}>

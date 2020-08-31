@@ -11,6 +11,7 @@ const USER_ROLE = {
 
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
+  FR: 'fr',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -22,6 +23,7 @@ const SESSION_TOKEN_TYPES = {
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
+  TIMEZONE: 'TIMEZONE',
 };
 
 const EVENTS = {
@@ -108,6 +110,7 @@ const EVENTS = {
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
+    TIMEZONE_CHANGED: 'system.timezone-changed',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -285,6 +288,9 @@ const DEVICE_FEATURE_TYPES = {
     MODE: 'mode',
     ROTATION: 'rotation',
   },
+  BATTERY: {
+    INTEGER: 'integer',
+  },
   VIBRATION_SENSOR: {
     STATUS: 'status',
     TILT_ANGLE: 'tilt-angle',
@@ -371,6 +377,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
+    INSTALLATION_STATUS: 'mqtt.install-status',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',

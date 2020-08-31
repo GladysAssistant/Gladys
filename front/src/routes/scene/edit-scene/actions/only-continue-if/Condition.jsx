@@ -59,7 +59,9 @@ class Condition extends Component {
             <div class="form-group">
               <label class="form-label">
                 <Text id="editScene.actionsCard.onlyContinueIf.variableLabel" />
-                <span class="form-required">*</span>
+                <span class="form-required">
+                  <Text id="global.requiredField" />
+                </span>
               </label>
               <Select
                 defaultValue={''}
@@ -73,10 +75,14 @@ class Condition extends Component {
             <div class="form-group">
               <label class="form-label">
                 <Text id="editScene.actionsCard.onlyContinueIf.operatorLabel" />
-                <span class="form-required">*</span>
+                <span class="form-required">
+                  <Text id="global.requiredField" />
+                </span>
               </label>
               <select class="form-control" value={props.condition.operator} onChange={this.handleOperatorChange}>
-                <option value="">-----</option>
+                <option value="">
+                  <Text id="global.emptySelectOption" />
+                </option>
                 <option value="=">
                   <Text id="editScene.triggersCard.newState.equal" />
                 </option>
@@ -102,7 +108,9 @@ class Condition extends Component {
             <div class="form-group">
               <label class="form-label">
                 <Text id="editScene.actionsCard.onlyContinueIf.valueLabel" />
-                <span class="form-required">*</span>
+                <span class="form-required">
+                  <Text id="global.requiredField" />
+                </span>
               </label>
               <Localizer>
                 <input
@@ -132,7 +140,7 @@ class Condition extends Component {
           <div class="col">
             {props.lastOne && (
               <button onClick={this.props.addCondition} class="btn btn-secondary btn-sm">
-                + <Text id="editScene.actionsCard.onlyContinueIf.orButton" />
+                <Text id="editScene.actionsCard.onlyContinueIf.orButton" />
               </button>
             )}
             {!props.lastOne && (

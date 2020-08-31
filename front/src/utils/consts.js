@@ -47,6 +47,25 @@ export const SceneGetStatus = {
   Error: 'Error'
 };
 
+export const CalDAVStatus = {
+  Getting: 'Getting',
+  Success: 'Success',
+  Error: 'Error',
+  BadCredentialsError: 'BadCredentialsError',
+  BadUrlError: 'BadUrlError',
+  RetrievePrincipalUrlError: 'RetrievePrincipalUrlError',
+  RetrieveHomeUrlError: 'RetrieveHomeUrlError',
+  RequestCalendarsError: 'RequestCalendarsError',
+  RequestChangesError: 'RequestChangesError',
+  RequestEventsError: 'RequestEventsError'
+};
+
+export const CalendarGetEventsStatus = {
+  Getting: 'Getting',
+  GetError: 'GetError',
+  Success: 'Success'
+};
+
 export const RequestStatus = {
   Getting: 'Getting',
   Success: 'Success',

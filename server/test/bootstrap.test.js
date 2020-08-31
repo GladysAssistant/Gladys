@@ -6,7 +6,7 @@ const Gladys = require('../lib');
 const db = require('../models');
 const logger = require('../utils/logger');
 const { seedDb, cleanDb } = require('./helpers/db.test');
-const fakeDarkSkyService = require('./services/darksky/fakeDarkSkyService');
+const fakeOpenWeatherService = require('./services/openweather/fakeOpenWeatherService');
 
 chai.use(chaiAsPromised);
 
@@ -15,7 +15,7 @@ const SERVER_PORT = 6500;
 process.env.JWT_SECRET = 'secret';
 
 before(async function before() {
-  this.timeout(8000);
+  this.timeout(16000);
   const config = {
     disableService: true,
     disableBrainLoading: true,
@@ -36,7 +36,7 @@ before(async function before() {
     throw e;
   }
   await gladys.start();
-  gladys.stateManager.setState('service', 'darksky', fakeDarkSkyService);
+  gladys.stateManager.setState('service', 'openweather', fakeOpenWeatherService);
   gladys.gateway.gladysGatewayClient.accessToken = 'access-token';
   gladys.gateway.gladysGatewayClient.refreshToken = 'refresh-token';
   // @ts-ignore
@@ -49,7 +49,7 @@ before(async function before() {
 
 // cleaning and filling database between each tests
 beforeEach(async function beforeEach() {
-  this.timeout(8000);
+  this.timeout(16000);
   try {
     await cleanDb();
     await seedDb();

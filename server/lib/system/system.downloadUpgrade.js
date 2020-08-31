@@ -22,42 +22,35 @@ async function downloadUpgrade(tag) {
   }
   const repoTag = `${config.dockerImage}:${tag}`;
   // pull upgrade
-  this.dockerode.pull(repoTag, (pullError, stream) => {
+  const onProgress = (event) => {
+    this.downloadUpgradeLastEvent = event;
+    this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS,
+      payload: {
+        event,
+      },
+    });
+  };
+
+  try {
+    await this.pull(repoTag, onProgress);
+    this.downloadUpgradeError = null;
+    this.downloadUpgradeFinished = true;
+
+    this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED,
+      payload: {},
+    });
+
+    this.installUpgrade();
+  } catch (pullError) {
     this.downloadUpgradeError = pullError;
-    if (pullError) {
-      logger.debug(pullError);
-      this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED,
-        payload: {},
-      });
-      return;
-    }
-    const onFinished = (err, output) => {
-      this.downloadUpgradeError = err;
-      this.downloadUpgradeFinished = true;
-      const type = err
-        ? WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED
-        : WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED;
-      this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type,
-        payload: {},
-      });
-      // if download was succcessfull, install upgrade
-      if (!err) {
-        this.installUpgrade();
-      }
-    };
-    const onProgress = (event) => {
-      this.downloadUpgradeLastEvent = event;
-      this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS,
-        payload: {
-          event,
-        },
-      });
-    };
-    this.dockerode.modem.followProgress(stream, onFinished, onProgress);
-  });
+    logger.debug(pullError);
+    this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED,
+      payload: {},
+    });
+  }
 }
 
 module.exports = {

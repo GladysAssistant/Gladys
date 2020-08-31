@@ -6,8 +6,9 @@ To ensure your Pull Request can be accepted as fast as possible, make sure to re
 - [ ] Are tests passing? (`npm test` on both front/server)
 - [ ] Is the linter passing? (`npm run eslint` on both front/server)
 - [ ] Did you run prettier? (`npm run prettier` on both front/server)
+- [ ] If you are adding a new features/services, did you run integration comparator? (`npm run compare-translations` on front)
 - [ ] If your changes modify the API (REST or Node.js), did you modify the API documentation? (Documentation is based on comments in code)
-- [ ] If you are adding a new features/services which needs explanation, did you modify the user documentation? See [the GitHub repo](https://github.com/GladysAssistant/gladys-4-docs) and the [website](https://documentation.gladysassistant.com).
+- [ ] If you are adding a new features/services which needs explanation, did you modify the user documentation? See [the GitHub repo](https://github.com/GladysAssistant/v4-website) and the [website](https://gladysassistant.com).
 - [ ] Did you add fake requests data for the demo mode (`front/src/config/demo.json`) so that the demo website is working without a backend? (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
 
 NOTE: these things are not required to open a PR and can be done afterwards / while the PR is open.

@@ -12,7 +12,8 @@ const db = require('../../models');
  * })
  */
 async function create(calendar) {
-  return db.Calendar.create(calendar);
+  const createdCalendar = await db.Calendar.create(calendar);
+  return createdCalendar.get({ plain: true });
 }
 
 module.exports = {

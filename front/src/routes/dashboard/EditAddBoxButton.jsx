@@ -9,15 +9,17 @@ const updateNewSelectedBox = (updateNewSelectedBoxFunction, x) => e => {
   updateNewSelectedBoxFunction(x, e.target.value);
 };
 
-const marginBottom30px = {
-  marginBottom: '30px'
+const marginBottom = {
+  marginBottom: '50px'
 };
 
 const EditAddBoxButton = ({ children, ...props }) => (
-  <div class="row" style={marginBottom30px}>
+  <div class="row" style={marginBottom}>
     <div class="col-8">
       <select onChange={updateNewSelectedBox(props.updateNewSelectedBox, props.x)} class="form-control">
-        <option>-------</option>
+        <option>
+          <Text id="global.emptySelectOption" />
+        </option>
         {DASHBOARD_BOX_TYPE_LIST.map(dashboardBoxType => (
           <option value={dashboardBoxType}>
             <Text id={'dashboard.boxTitle.' + dashboardBoxType} />

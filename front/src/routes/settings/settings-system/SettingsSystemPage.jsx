@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 import cx from 'classnames';
+import Select from 'react-select';
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -16,7 +17,7 @@ const SystemPage = ({ children, ...props }) => (
                 <Text id="systemSettings.connected" />
               </h4>
               <small class="text-muted">
-                {props.systemPing} ms <Text id="systemSettings.ping" />
+                <Text id="systemSettings.ping" fields={{ time: props.systemPing }} />
               </small>
             </div>
           </div>
@@ -33,7 +34,12 @@ const SystemPage = ({ children, ...props }) => (
               <h4 class="m-0">
                 <Text id="systemSettings.disk" />
               </h4>
-              <small class="text-muted">{props.systemDiskSpace && props.systemDiskSpace.capacity * 100}%</small>
+              <small class="text-muted">
+                <Text
+                  id="global.percentValue"
+                  fields={{ value: props.systemDiskSpace && props.systemDiskSpace.capacity * 100 }}
+                />
+              </small>
             </div>
           </div>
         </div>
@@ -113,7 +119,9 @@ const SystemPage = ({ children, ...props }) => (
                       <div>
                         <div class="clearfix">
                           <div class="float-left">
-                            <strong>{props.downloadUpgradeProgress}%</strong>
+                            <strong>
+                              <Text id="global.percentValue" fields={{ value: props.downloadUpgradeProgress }} />
+                            </strong>
                           </div>
                         </div>
                         <div class="progress progress-sm">
@@ -148,12 +156,35 @@ const SystemPage = ({ children, ...props }) => (
                       <Text id="systemSettings.upToDate" />
                     </td>
                     <td class="text-right">
-                      <span class="badge badge-success">Gladys {props.systemInfos.gladys_version}</span>
+                      <span class="badge badge-success">
+                        <Text
+                          id="systemSettings.gladysVersionValue"
+                          fields={{ version: props.systemInfos.gladys_version }}
+                        />
+                      </span>
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-header">
+            <Text id="systemSettings.configurationTitle" />
+          </h3>
+          <div class="card-body">
+            <form>
+              <label>
+                <Text id="systemSettings.timezone" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.timezoneText" />
+                </small>
+              </p>
+              <Select options={props.timezoneOptions} onChange={props.updateTimezone} value={props.selectedTimezone} />
+            </form>
           </div>
         </div>
       </div>

@@ -37,7 +37,7 @@
   },
   {
     "label": "weather.get.fail.not-configured",
-    "answers": ["You need to configure DarkSky API in the Integration tab before using this feature."]
+    "answers": ["You need to configure OpenWeather API in the Integration tab before using this feature."]
   },
   {
     "label": "weather.get.fail.no-house",

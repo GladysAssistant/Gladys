@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 
 const SignupForm = ({ children, ...props }) => (
   <form onSubmit={props.validateForm} className="card">
@@ -38,42 +38,60 @@ const SignupForm = ({ children, ...props }) => (
       {!props.invitationError && props.browserCompatible && (
         <div>
           <div className="form-group">
-            <label className="form-label">Name</label>
-            <input
-              type="text"
-              className={'form-control ' + (props.fieldsErrored.includes('name') ? 'is-invalid' : '')}
-              placeholder="Enter name"
-              value={props.name}
-              onInput={props.updateName}
-            />
-            <div class="invalid-feedback">Name should be between 2 and 30 characters</div>
+            <label className="form-label">
+              <Text id="gatewaySignUp.usernameLabel" />
+            </label>
+            <Localizer>
+              <input
+                type="text"
+                className={'form-control ' + (props.fieldsErrored.includes('name') ? 'is-invalid' : '')}
+                placeholder={<Text id="gatewaySignUp.usernamePlaceholder" />}
+                value={props.name}
+                onInput={props.updateName}
+              />
+            </Localizer>
+            <div class="invalid-feedback">
+              <Text id="gatewaySignUp.usernameInvalid" />
+            </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Email address</label>
-            <input
-              type="email"
-              className={'form-control ' + (props.fieldsErrored.includes('email') ? 'is-invalid' : '')}
-              placeholder="Enter email"
-              value={props.email}
-              disabled={props.token && 'disabled'}
-              onInput={props.updateEmail}
-            />
-            <div class="invalid-feedback">Email is not valid</div>
+            <label className="form-label">
+              <Text id="gatewaySignUp.emailLabel" />
+            </label>
+            <Localizer>
+              <input
+                type="email"
+                className={'form-control ' + (props.fieldsErrored.includes('email') ? 'is-invalid' : '')}
+                placeholder={<Text id="gatewaySignUp.emailPlaceholder" />}
+                value={props.email}
+                disabled={props.token && 'disabled'}
+                onInput={props.updateEmail}
+              />
+            </Localizer>
+            <div class="invalid-feedback">
+              <Text id="gatewaySignUp.emailInvalid" />
+            </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Password (min 8 characters)</label>
-            <input
-              type="password"
-              className={'form-control ' + (props.fieldsErrored.includes('password') ? 'is-invalid' : '')}
-              placeholder="Password"
-              value={props.password}
-              onInput={props.updatePassword}
-            />
-            <div class="invalid-feedback">Password should be 8 characters</div>
+            <label className="form-label">
+              <Text id="gatewaySignUp.passwordLabel" />
+            </label>
+            <Localizer>
+              <input
+                type="password"
+                className={'form-control ' + (props.fieldsErrored.includes('password') ? 'is-invalid' : '')}
+                placeholder={<Text id="gatewaySignUp.passwordPlaceholder" />}
+                value={props.password}
+                onInput={props.updatePassword}
+              />
+            </Localizer>
+            <div class="invalid-feedback">
+              <Text id="gatewaySignUp.passwordInvalid" />
+            </div>
           </div>
           <div className="form-footer">
             <button type="submit" className="btn btn-primary btn-block">
-              Create new account
+              <Text id="gatewaySignUp.createAccountButton" />
             </button>
           </div>
         </div>

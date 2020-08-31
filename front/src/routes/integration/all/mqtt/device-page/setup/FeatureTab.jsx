@@ -1,8 +1,10 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+
 import Feature from './Feature';
-import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
+import Select from 'react-select';
+import { RequestStatus } from '../../../../../../utils/consts';
+
 import MqttDeviceForm from '../DeviceForm';
 import cx from 'classnames';
 
@@ -11,7 +13,7 @@ const FeatureTab = ({ children, ...props }) => (
     <div class="card-header">
       <Link href="/dashboard/integration/device/mqtt">
         <button class="btn btn-secondary mr-2">
-          ◀️ <Text id="integration.mqtt.device.returnButton" />
+          <Text id="global.backButton" />
         </button>
       </Link>
       <h3 class="card-title">
@@ -55,26 +57,23 @@ const FeatureTab = ({ children, ...props }) => (
             <div>
               <MqttDeviceForm {...props} />
 
-              <div class="form-group form-inline">
-                <select class="form-control" onChange={props.selectFeature}>
-                  <option value="" selected={!props.selectedFeature}>
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
-                    Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
-                      <option value={`${category}|${type}`}>
-                        <Text id={`deviceFeatureCategory.${category}.${type}`} />
-                      </option>
-                    ))
-                  )}
-                </select>
-                <button
-                  onClick={props.addFeature}
-                  class="btn btn-outline-success ml-2"
-                  disabled={!props.selectedFeature}
-                >
-                  <Text id="integration.mqtt.feature.addButton" />
-                </button>
+              <div class="d-flex mb-4">
+                <div style={{ minWidth: '50%' }}>
+                  <Select
+                    onChange={props.selectFeature}
+                    value={props.selectedFeatureOption}
+                    options={props.deviceFeaturesOptions}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={props.addFeature}
+                    class="btn btn-outline-success ml-2"
+                    disabled={!props.selectedFeature}
+                  >
+                    <Text id="integration.mqtt.feature.addButton" />
+                  </button>
+                </div>
               </div>
 
               <div class="row">
@@ -87,7 +86,7 @@ const FeatureTab = ({ children, ...props }) => (
               <div class="form-group">
                 <Link href="/dashboard/integration/device/mqtt">
                   <button class="btn btn-secondary mr-2">
-                    ◀️ <Text id="integration.mqtt.device.returnButton" />
+                    <Text id="global.backButton" />
                   </button>
                 </Link>
                 <button onClick={props.saveDevice} class="btn btn-success mr-2">
