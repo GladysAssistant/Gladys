@@ -625,6 +625,12 @@
       "turnOffLights": {
         "label": "Select the lights you want to turn off"
       },
+      "turnOnSwitches": {
+        "label": "Select the switches you want to turn on"
+      },
+      "turnOffSwitches": {
+        "label": "Select the switches you want to turn off"
+      },
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
@@ -649,6 +655,10 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights"
+      },
+      "switch": {
+        "turn-on": "Turn On the Switches",
+        "turn-off": "Turn Off the Switches"
       },
       "scene": {
         "start": "Start scene"
