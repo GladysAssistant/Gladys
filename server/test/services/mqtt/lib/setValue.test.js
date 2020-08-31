@@ -30,7 +30,7 @@ describe('mqtt.setValue', () => {
   });
 
   it('should publish message', async () => {
-    await mqttHandler.connect();
+    await mqttHandler.connect({ mqttUrl: 'url' });
     await mqttHandler.setValue({ external_id: 'my-device' }, { external_id: 'my-device-light' }, 1);
 
     assert.calledWith(

@@ -15,7 +15,7 @@ const SERVER_PORT = 6500;
 process.env.JWT_SECRET = 'secret';
 
 before(async function before() {
-  this.timeout(8000);
+  this.timeout(16000);
   const config = {
     disableService: true,
     disableBrainLoading: true,
@@ -49,7 +49,7 @@ before(async function before() {
 
 // cleaning and filling database between each tests
 beforeEach(async function beforeEach() {
-  this.timeout(8000);
+  this.timeout(16000);
   try {
     await cleanDb();
     await seedDb();

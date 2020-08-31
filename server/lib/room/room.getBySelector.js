@@ -18,6 +18,7 @@ const DEVICE_FEATURES_ATTRIBUTES = [
   'last_value',
   'last_value_changed',
 ];
+const SERVICE_ATTRIBUTES = ['name'];
 
 /**
  * @description Get a room by selector
@@ -34,11 +35,18 @@ async function getBySelector(selector, options) {
       model: db.Device,
       as: 'devices',
       attributes: DEVICE_ATTRIBUTES,
-      include: {
-        model: db.DeviceFeature,
-        as: 'features',
-        attributes: DEVICE_FEATURES_ATTRIBUTES,
-      },
+      include: [
+        {
+          model: db.DeviceFeature,
+          as: 'features',
+          attributes: DEVICE_FEATURES_ATTRIBUTES,
+        },
+        {
+          model: db.Service,
+          as: 'service',
+          attributes: SERVICE_ATTRIBUTES,
+        },
+      ],
     });
   }
   const room = await db.Room.findOne({

@@ -17,29 +17,33 @@ const namespace = {
 };
 
 describe('CalDAV config', () => {
-  const send = sinon.stub();
-  const configEnv = {
-    serviceId: '5d6c666f-56be-4929-9104-718a78556844',
-    config,
-    gladys: {
-      variable: {
-        getValue: sinon.stub(),
-        setValue: sinon.stub(),
+  let send;
+  let configEnv;
+  before(() => {
+    send = sinon.stub();
+    configEnv = {
+      serviceId: '5d6c666f-56be-4929-9104-718a78556844',
+      config,
+      gladys: {
+        variable: {
+          getValue: sinon.stub(),
+          setValue: sinon.stub(),
+        },
       },
-    },
-    dav: {
-      ns: namespace,
-      transport: {
-        Basic: sinon.stub().returns({
-          send,
-        }),
+      dav: {
+        ns: namespace,
+        transport: {
+          Basic: sinon.stub().returns({
+            send,
+          }),
+        },
+        Credentials: sinon.stub(),
+        request: {
+          propfind: sinon.stub(),
+        },
       },
-      Credentials: sinon.stub(),
-      request: {
-        propfind: sinon.stub(),
-      },
-    },
-  };
+    };
+  });
 
   it('should config URLs', async () => {
     configEnv.gladys.variable.getValue

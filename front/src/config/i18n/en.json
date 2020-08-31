@@ -191,6 +191,7 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
@@ -463,6 +464,14 @@
       "setup": {
         "title": "MQTT configuration",
         "mqttDescription": "You can connect Gladys to a MQTT broker to send & receive MQTT messages. Learn more about Gladys MQTT API <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
+        "embeddedBrokerLabel": "Broker Docker container",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
+        "installBrokerContainer": "Use broker in a Docker container.",
+        "brokerDockerNotInstalled": "No broker is available yet on current Docker environment, continue to install and configure <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> broker inside a Docker container.",
+        "installBrokerButton": "Install broker on Docker",
+        "installingBrokerButton": "Installation in progress...",
+        "installBrokerError": "An error occured while installing Docker container, please consult Gladys logs.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
@@ -473,7 +482,8 @@
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
         "connected": "Connected to the MQTT broker with success !",
-        "connectionError": "Error while connecting, please check your configuration."
+        "connectionError": "Error while connecting, please check your configuration.",
+        "disconnected": "Disconnected from MQTT broker."
       }
     },
     "xiaomi": {
@@ -837,6 +847,9 @@
     "containerStatus": "Status",
     "downloadFinished": "Download finished.",
     "restartingGladys": "Restarting Gladys...",
+    "configurationTitle": "Configuration",
+    "timezone": "Timezone",
+    "timezoneText": "The timezone is used in scheduled scene.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
@@ -957,6 +970,7 @@
   },
   "deviceFeatureCategory": {
     "light": {
+      "shortCategoryName": "Light",
       "binary": "Light On/Off",
       "brightness": "Light Brightness",
       "hue": "Light Hue",
@@ -968,70 +982,89 @@
       "effect-speed": "Effect speed"
     },
     "battery": {
+      "shortCategoryName": "Battery",
       "integer": "Battery"
     },
     "temperature-sensor": {
+      "shortCategoryName": "Temperature sensor",
       "decimal": "Temperature"
     },
     "motion-sensor": {
-      "push": "Motion",
-      "binary": "Motion"
+      "shortCategoryName": "Motion sensor",
+      "push": "Motion (push)",
+      "binary": "Motion (binary)"
     },
     "light-sensor": {
-      "integer": "Luminosity",
-      "decimal": "Luminosity"
+      "shortCategoryName": "Luminosity sensor",
+      "integer": "Luminosity (integer)",
+      "decimal": "Luminosity (decimal)"
     },
     "sismic-sensor": {
-      "decimal": "Sismic"
+      "shortCategoryName": "Sismic sensor",
+      "decimal": "Sismic (decimal)"
     },
     "camera": {
+      "shortCategoryName": "Camera",
       "image": "Camera"
     },
     "counter-sensor": {
-      "integer": "Counter"
+      "shortCategoryName": "Counter",
+      "integer": "Counter (integer)"
     },
     "access-control": {
+      "shortCategoryName": "Access Control",
       "mode": "Access Control Mode"
     },
     "smoke-sensor": {
-      "binary": "Smoke",
-      "decimal": "Density"
+      "shortCategoryName": "Smoke sensor",
+      "binary": "Smoke (on/off)",
+      "decimal": "Density (decimal)"
     },
     "co2-sensor": {
-      "decimal": "Co2"
+      "shortCategoryName": "Co2 Sensor",
+      "decimal": "Co2 (decimal)"
     },
     "switch": {
+      "shortCategoryName": "Switch",
       "voltage": "Switch Voltage",
       "current": "Switch Current",
-      "binary": "Switch",
+      "binary": "Switch (On/Off)",
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
       "energy": "Energy consumption"
     },
     "siren": {
+      "shortCategoryName": "Siren",
       "binary": "Siren"
     },
     "cube": {
+      "shortCategoryName": "Cube",
       "mode": "Mode",
       "rotation": "Rotation"
     },
     "button": {
-      "click": "Button"
+      "shortCategoryName": "Button",
+      "click": "Button (click)"
     },
     "pressure-sensor": {
-      "decimal": "Pressure"
+      "shortCategoryName": "Pressure sensor",
+      "decimal": "Pressure (decimal)"
     },
     "leak-sensor": {
-      "binary": "Leak"
+      "shortCategoryName": "Leak sensor",
+      "binary": "Leak (yes/no)"
     },
     "opening-sensor": {
-      "binary": "Opening"
+      "shortCategoryName": "Opening sensor",
+      "binary": "Opening (open/closed)"
     },
     "humidity-sensor": {
-      "decimal": "Humidity"
+      "shortCategoryName": "Humidity sensor",
+      "decimal": "Humidity (decimal)"
     },
     "vibration-sensor": {
+      "shortCategoryName": "Vibration sensor",
       "status": "Status",
       "tilt-angle": "Tilt Angle",
       "acceleration-x": "Acceleration X",
@@ -1040,6 +1073,7 @@
       "bed-activity": "Bed Activity"
     },
     "unknown": {
+      "shortCategoryName": "Unknown",
       "unknown": "Unknown"
     }
   },

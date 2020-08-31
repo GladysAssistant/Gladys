@@ -20,7 +20,7 @@ describe('Mqtt handle message', () => {
 
   beforeEach(async () => {
     mqttHandler.init();
-    await mqttHandler.connect();
+    await mqttHandler.connect({ mqttUrl: 'url' });
     sinon.reset();
   });
 
