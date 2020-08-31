@@ -20,7 +20,7 @@ const CameraBox = ({ children, ...props }) => (
       </div>
     )}
     <div class="card-body d-flex flex-column">
-      {props.boxStatus === RequestStatus.Getting && (
+      {!props.image && props.boxStatus === RequestStatus.Getting && (
         <div class="dimmer active">
           <div class="dimmer-content" style={{ height: '100px' }} />
           <div class="loader" />
