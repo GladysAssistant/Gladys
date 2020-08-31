@@ -77,4 +77,30 @@ describe('scene.executeSingleAction', () => {
     });
     assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 0);
   });
+  it('should fail to setValue device but still resolves', async () => {
+    const device = {
+      setValue: fake.rejects(null),
+    };
+    const stateManager = new StateManager();
+    stateManager.setState('device', 'switch-1', switchDevice);
+    const sceneManager = new SceneManager(stateManager, event, device);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_OFF,
+      devices: ['switch-1'],
+    });
+    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 0);
+  });
+  it('should fail to setValue device but still resolves', async () => {
+    const device = {
+      setValue: fake.rejects(null),
+    };
+    const stateManager = new StateManager();
+    stateManager.setState('device', 'switch-1', switchDevice);
+    const sceneManager = new SceneManager(stateManager, event, device);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_ON,
+      devices: ['switch-1'],
+    });
+    assert.calledWith(device.setValue, switchDevice, deviceFeatureSwitchBinary, 1);
+  });
 });
