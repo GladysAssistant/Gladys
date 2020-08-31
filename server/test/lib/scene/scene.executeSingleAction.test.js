@@ -24,7 +24,7 @@ const switchDevice = {
   features: [deviceFeatureSwitchBinary],
 };
 
-describe.only('scene.executeSingleAction', () => {
+describe('scene.executeSingleAction', () => {
   it('should execute one action', async () => {
     const device = {
       setValue: fake.resolves(null),
