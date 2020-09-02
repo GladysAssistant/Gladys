@@ -20,6 +20,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "financialmodelingprep": "git+https://github.com/ngeissel/financialmodelingprep.git#apikey"
+    "financialmodelingprep": "^1.1.0"
   }
 }

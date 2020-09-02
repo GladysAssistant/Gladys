@@ -6,6 +6,7 @@
     "postinstall": "node ./cli/install_service_dependencies.js",
     "pretest": "npm run eslint",
     "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
+    "test-service": "cross-env SQLITE_FILE_PATH=/tmp/gladys-test.db NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/services/$npm_config_service/*.test.js\" \"./test/services/$npm_config_service/**/*.test.js\" --exit",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.json'",
@@ -26,7 +27,7 @@
     "generate-jsdoc": "jsdoc lib/**/*.js services/**/*.js -d jsdoc"
   },
   "author": "Pierre-Gilles Leymarie",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "nodemonConfig": {
     "ignore": [
       "test/*"

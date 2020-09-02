@@ -11,7 +11,8 @@
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
     "degreeValue": "{{value}}°",
-    "workInProgress": "Travail en cours..."
+    "workInProgress": "Travail en cours...",
+    "save": "Enregistrer"
   },
   "calendar": {
     "allDay": "Toute la journée",
@@ -52,8 +53,8 @@
       "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, une assistante à domicile respectueuse de la vie privée de votre maison.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
-      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://documentation.gladysassistant.com\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/fr/pricing/\">Gladys Plus</a>.",
+      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
+      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
       "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
       "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
     },
@@ -184,14 +185,15 @@
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service DarkSky n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service DarkSky.",
-        "requestToThirdPartyFailed": "La requête à l'API DarkSKy a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de DarkSky pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de DarkSky.",
+        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
+        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
+        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noValue": "Aucune valeur n'a encore été enregistrée.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seules les capteurs / et interrupteurs on/off sont supportés.",
+        "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
       },
@@ -231,7 +233,7 @@
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
       "menu": {
-        "all": "Toutes les integrations",
+        "all": "Toutes les intégrations",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -257,6 +259,24 @@
           "usernameInfo": "Entrez votre Apple ID.",
           "password": "Mot de passe",
           "passwordInfo": "<a href=https://support.apple.com/fr-fr/HT204397 target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+        },
+        "google": {
+          "name": "Google Agenda (déprécié)",
+          "url": "URL Google Agenda",
+          "urlInfo": "Laissez l'URL par défaut, il sera paramétré automatiquement.",
+          "username": "Email",
+          "usernameInfo": "Entrez l'adresse email de votre compte Google.",
+          "password": "Mot de passe",
+          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=fr target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+        },
+        "synology": {
+          "name": "Calendrier Synology",
+          "url": "URL CalDAV Synology",
+          "urlInfo": "Dans l'application Calendrier, cliquez sur 'Compte CalDAV' et copiez l'URL 'macOS/iOS'.",
+          "username": "Nom d'utilisateur Synology",
+          "usernameInfo": "Entrez votre nom d'utilisateur.",
+          "password": "Mot de passe",
+          "passwordInfo": "Entrez votre mot de passe."
         },
         "other": {
           "name": "Autre",
@@ -319,12 +339,13 @@
         "search": "Recherche d'appareils",
         "noDevices": "Aucun appareil Philips Hue ajouté.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
-        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration."
+        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration.",
+        "createGithubIssue": "Proposer ce périphérique"
       }
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras HTTP/RTSP.",
+      "description": "Affichez vos caméras.",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -451,13 +472,13 @@
         "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
-    "darkSky": {
-      "title": "DarkSky",
+    "openWeather": {
+      "title": "API OpenWeather",
       "description": "Récupérer la météo dans Gladys.",
-      "introduction": "Cette intégration vous aide à intégrer l'API DarkSky pour obtenir la météo dans Gladys.",
-      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API DarkSky : <a href=\"https://darksky.net/dev\">https://darksky.net/dev</a>.",
+      "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
+      "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
-      "apiKeyPlaceholder": "Entrer la clé API DarkSky",
+      "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
@@ -481,7 +502,7 @@
       "setupTab": "Configuration",
       "status": {
         "notConfigured": "Le service MQTT n'est pas configuré, veuillez vous rendre sur la ",
-        "notConnected": "Le service MQTT n'a pas réussi à se connecter au réseau, veuillez accéder à ",
+        "notConnected": "Gladys n'a pas réussi à se connecter au serveur MQTT, plus d'informations sur la ",
         "setupPageLink": "page de configuration du service MQTT."
       },
       "device": {
@@ -497,7 +518,7 @@
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "returnButton": "Retour",
-        "editButton": "Editer les détails",
+        "editButton": "Editer",
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
@@ -509,13 +530,13 @@
         "nameLabel": "Nom",
         "namePlaceholder": "Entrez un nom de fonctionnalité",
         "externalIdLabel": "ID externe de la fonctionnalité",
-        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\"> ici </a>.",
+        "externalIdMessage": "L'ID externe d'une fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys lors de l'envoi d'un message MQTT. Il doit commencer par \"mqtt:\". Pour en savoir plus, rendez-vous sur la documentation de l'API MQTT de Gladys <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api\"> ici </a>.",
         "externalIdPlaceholder": "Message clé de la fonctionnalité MQTT",
         "unitLabel": "Unité",
         "minLabel": "Valeur minimum",
-        "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
+        "minPlaceholder": "Entrez la valeur minimum",
         "maxLabel": "Valeur maximum",
-        "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+        "maxPlaceholder": "Entrez la valeur maximum",
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
@@ -527,7 +548,15 @@
       },
       "setup": {
         "title": "Configuration MQTT",
-        "mqttDescription": "Vous pouvez connecter Gladys à un broker (courtier) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://documentation.gladysassistant.com/fr/api#mqtt-api\">ici</a>.",
+        "mqttDescription": "Vous pouvez connecter Gladys à un broker (serveur) MQTT pour envoyer et recevoir des messages MQTT. En savoir plus sur l'API Gladys MQTT <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\">ici</a>.",
+        "embeddedBrokerLabel": "Broker dans un conteneur Docker",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "installBrokerButton": "Installez le broker sur Docker",
+        "installingBrokerButton": "Installation en cours...",
+        "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -538,7 +567,8 @@
         "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "connecting": "Configuration enregistrée. Maintenant, connectez-vous à votre broker MQTT...",
         "connected": "Connecté au broker MQTT avec succès !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disconnected": "Déconnecté du broker MQTT."
       }
     },
     "xiaomi": {
@@ -559,7 +589,7 @@
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
-        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://documentation.gladysassistant.com/fr/configuration#xiaomi-configuration\">ici</a>.",
+        "description": "Les appareils détectés par la passerelle Xiaomi seront ajoutés ici lorsqu'ils enverront des données. Votre passerelle Xiaomi doit être en mode développeur. En savoir plus <a href=\"https://gladysassistant.com/fr/docs/integrations/xiaomi/\">ici</a>.",
         "createDeviceInGladys": "Connexion à Gladys",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys. ",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
@@ -575,6 +605,7 @@
     }
   },
   "editScene": {
+    "editNamePlaceholder": "Entrez un nom de scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "runButton": "Jouer",
@@ -617,6 +648,12 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumière que vous souhaitez éteindre"
       },
+      "turnOnSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez allumer"
+      },
+      "turnOffSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
@@ -641,6 +678,10 @@
       "light": {
         "turn-on": "Allumer la lumière",
         "turn-off": "Eteindre les lumières"
+      },
+      "switch": {
+        "turn-on": "Allumer les prises",
+        "turn-off": "Eteindre les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
@@ -839,6 +880,9 @@
     "containerStatus": "État",
     "downloadFinished": "Téléchargement terminé",
     "restartingGladys": "Redémarrage de Gladys ...",
+    "configurationTitle": "Configuration",
+    "timezone": "Fuseau horaire",
+    "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -891,7 +935,7 @@
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",
-    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de cryptage quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
+    "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de chiffrement quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
     "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !"
   },
   "gatewayPricing": {
@@ -959,6 +1003,7 @@
   },
   "deviceFeatureCategory": {
     "light": {
+      "shortCategoryName": "Lumière",
       "binary": "Eclairage On/Off",
       "brightness": "Luminosité éclairage",
       "hue": "Teinte éclairage",
@@ -970,39 +1015,50 @@
       "effect-speed": "Vitesse de l'effet"
     },
     "battery": {
+      "shortCategoryName": "Batterie",
       "integer": "Batterie"
     },
     "temperature-sensor": {
+      "shortCategoryName": "Capteur température",
       "decimal": "Température"
     },
     "motion-sensor": {
+      "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",
       "binary": "Détection mouvement Oui/Non"
     },
     "light-sensor": {
-      "integer": "Capteur de luminosité - Oui/Non",
-      "decimal": "Luminosité apparente"
+      "shortCategoryName": "Capteur de luminosité",
+      "integer": "Luminosité entière",
+      "decimal": "Luminosité décimale"
     },
     "sismic-sensor": {
-      "decimal": "Valeur sismique"
+      "shortCategoryName": "Capteur sismique",
+      "decimal": "Valeur sismique décimale"
     },
     "camera": {
-      "image": "Caméra"
+      "shortCategoryName": "Caméra",
+      "image": "Caméra (Image)"
     },
     "counter-sensor": {
-      "integer": "Compteur"
+      "shortCategoryName": "Compteur",
+      "integer": "Compteur entier"
     },
     "access-control": {
+      "shortCategoryName": "Mode de contrôle d'accès",
       "mode": "Mode de contrôle d'accès"
     },
     "smoke-sensor": {
+      "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée détectée"
+      "decimal": "Valeur de fumée décimale"
     },
     "co2-sensor": {
-      "decimal": "CO2"
+      "shortCategoryName": "Capteur de Co2",
+      "decimal": "Niveau de CO2"
     },
     "switch": {
+      "shortCategoryName": "Prise",
       "voltage": "Tension moyenne",
       "current": "Intensité consommée",
       "binary": "Commutateur",
@@ -1012,28 +1068,36 @@
       "energy": "Energie consommée"
     },
     "siren": {
+      "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off"
     },
     "cube": {
+      "shortCategoryName": "Cube",
       "mode": "Mode",
       "rotation": "Rotation"
     },
     "button": {
-      "click": "Clic bouton - Oui/Non"
+      "shortCategoryName": "Bouton",
+      "click": "Clic bouton"
     },
     "pressure-sensor": {
-      "decimal": "Valeur pression"
+      "shortCategoryName": "Capteur de pression",
+      "decimal": "Valeur décimale pression"
     },
     "leak-sensor": {
-      "binary": "Fuite"
+      "shortCategoryName": "Détecteur de fuite",
+      "binary": "Fuite (Oui/Non)"
     },
     "opening-sensor": {
-      "binary": "Ouverture"
+      "shortCategoryName": "Capteur d'ouverture",
+      "binary": "Ouverture (Oui/Non)"
     },
     "humidity-sensor": {
-      "decimal": "Humidité"
+      "shortCategoryName": "Capteur d'humidité",
+      "decimal": "Humidité (pourcentage)"
     },
     "vibration-sensor": {
+      "shortCategoryName": "Capteur de vibration",
       "status": "Etat",
       "tilt-angle": "Angle d'inclinaison",
       "acceleration-x": "Accélération X",
@@ -1042,6 +1106,7 @@
       "bed-activity": "Activité Lit"
     },
     "unknown": {
+      "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
     }
   },
@@ -1099,9 +1164,9 @@
     "saveButton": "Sauvegarder",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
     "minLabel": "Valeur minimum",
-    "minPlaceholder": "Entrez la valeur minimum de la fonctionnalité",
+    "minPlaceholder": "Entrez la valeur minimum",
     "maxLabel": "Valeur maximum",
-    "maxPlaceholder": "Entrez la valeur maximum de la fonctionnalité",
+    "maxPlaceholder": "Entrez la valeur maximum",
     "addButton": "Ajouter fonctionnalité",
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
@@ -1160,7 +1225,7 @@
   "gatewayOpenApi": {
     "title": "Open API",
     "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
-    "moreInformations": "<a href=\"https://documentation.gladysassistant.com/fr/configuration#gateway-open-api\">Plus d'informations.</a>",
+    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks\">Plus d'informations.</a>",
     "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
     "keyName": "Nom",
     "keyLastUsed": "Dernière utilisation",

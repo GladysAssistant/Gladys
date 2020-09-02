@@ -44,10 +44,14 @@ class EditScene extends Component {
       this.setState({ saving: false });
     }
   };
-  saveScene = async () => {
+  saveScene = async e => {
+    if (e) {
+      e.preventDefault();
+    }
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
+      this.setState({ isNameEditable: false });
     } catch (e) {
       console.log(e);
       this.setState({ error: true });
@@ -231,11 +235,36 @@ class EditScene extends Component {
     });
   };
 
+  toggleIsNameEditable = async () => {
+    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable }));
+    if (this.state.isNameEditable) {
+      this.nameInput.focus();
+    }
+  };
+
+  setNameInputRef = nameInput => {
+    this.nameInput = nameInput;
+  };
+
+  updateSceneName = e => {
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          name: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   constructor(props) {
     super(props);
     this.state = {
       scene: null,
-      variables: {}
+      variables: {},
+      isNameEditable: false
     };
   }
 
@@ -249,7 +278,7 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving, error, variables, scene }) {
+  render(props, { saving, error, variables, scene, isNameEditable }) {
     return (
       scene && (
         <EditScenePage
@@ -268,6 +297,10 @@ class EditScene extends Component {
           error={error}
           variables={variables}
           setVariables={this.setVariables}
+          toggleIsNameEditable={this.toggleIsNameEditable}
+          isNameEditable={isNameEditable}
+          updateSceneName={this.updateSceneName}
+          setNameInputRef={this.setNameInputRef}
         />
       )
     );

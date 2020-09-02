@@ -8,13 +8,13 @@ const logger = require('../../../utils/logger');
   * getStockExchangeIndexQuote("3ebd27cb-42cf-4b32-a33c-135af7d62a37");
   */
 async function getStockExchangeIndexQuote(userId) {
-  const FinancialModelingPrep = require('financialmodelingprep');
+
   const apiKey = await this.gladys.variable.getValue('STOCKEXCHANGE_API_KEY', this.serviceId, userId);
+  const fmp = require('financialmodelingprep')(apiKey);
   const tickers = await this.gladys.variable.getValue('STOCKEXCHANGE_TICKERS', this.serviceId, userId);
   let quotes = [];
 
   try {
-    const fmp = new FinancialModelingPrep(apiKey);
     logger.debug(`FMP API KEY used ${apiKey}`);
     quotes = await fmp.stock(tickers || ['^FCHI', 'GIB']).quote();
   } catch (e) {

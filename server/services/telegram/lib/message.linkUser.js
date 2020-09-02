@@ -20,6 +20,10 @@ async function linkUser(apiKey, chatId) {
     telegram_user_id: chatId,
   });
   logger.debug(`Telegram user linked with success.`);
+  // sending message to confirm
+  await this.send(chatId, {
+    text: '👋',
+  });
 }
 
 module.exports = {

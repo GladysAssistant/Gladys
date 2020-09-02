@@ -9,7 +9,6 @@ class Scene extends Component {
   componentWillMount() {
     this.props.getScenes();
   }
-
   render(props, {}) {
     const loading = props.scenesGetStatus === RequestStatus.Getting;
     return <ScenePage {...props} loading={loading} />;

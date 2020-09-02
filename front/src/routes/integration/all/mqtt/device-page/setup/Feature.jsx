@@ -183,12 +183,6 @@ const MqttFeatureBox = ({ children, ...props }) => {
           </div>
 
           <div class="form-group">
-            <button onClick={props.copyMqttTopic} class="btn btn-outline-info mr-2">
-              {!props.clipboardCopiedStatus && <Text id="integration.mqtt.feature.copyMqttTopic" />}
-              {props.clipboardCopiedStatus === RequestStatus.Success && <Text id="integration.mqtt.feature.copied" />}
-              {props.clipboardCopiedStatus === RequestStatus.Error && <Text id="integration.mqtt.feature.copyFailed" />}
-            </button>
-
             <button onClick={props.deleteFeature} class="btn btn-outline-danger">
               <Text id="integration.mqtt.feature.deleteLabel" />
             </button>

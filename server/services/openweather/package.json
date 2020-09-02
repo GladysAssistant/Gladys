@@ -1,5 +1,5 @@
 {
-  "name": "gladys-darksky",
+  "name": "gladys-openweather",
   "main": "index.js",
   "os": [
     "darwin",
