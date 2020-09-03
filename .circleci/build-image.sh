@@ -1,8 +1,15 @@
 #!/bin/sh
 
-set -eu
+set -e
 
-export IMAGE_ID="${REGISTRY}/${IMAGE}:${VERSION}-${TAG}"
+echo "Github Repository: $GITHUB_REPO"
+echo "Image: $IMAGE"
+echo "DockerHub Registry: $REGISTRY"
+echo "Docker ImageID: $IMAGE_ID"
+echo "Building Target: $TARGET"
+echo "QEMU Arch: $QEMU_ARCH"
+echo "QEMU Version: $QEMU_VERSION"
+echo "Tag used: $VERSION"
 
 # ============
 # <qemu-support>
@@ -25,6 +32,13 @@ docker build -f ./docker/Dockerfile \
 
 # Login to Docker Hub.
 echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+
+if [ -n "$MAJOR_VERSION" ]; then
+  docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:${MAJOR_VERSION}-${TAG}
+  docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:latest-${TAG}
+  docker push ${REGISTRY}/${IMAGE}:${MAJOR_VERSION}-${TAG}
+  docker push ${REGISTRY}/${IMAGE}:latest-${TAG}
+fi
 
 # Push push push
 docker push ${IMAGE_ID}
