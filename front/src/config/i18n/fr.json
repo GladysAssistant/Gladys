@@ -625,6 +625,12 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumière que vous souhaitez éteindre"
       },
+      "turnOnSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez allumer"
+      },
+      "turnOffSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
@@ -649,6 +655,10 @@
       "light": {
         "turn-on": "Allumer la lumière",
         "turn-off": "Eteindre les lumières"
+      },
+      "switch": {
+        "turn-on": "Allumer les prises",
+        "turn-off": "Eteindre les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
