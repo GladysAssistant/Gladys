@@ -37,6 +37,7 @@ async function getLights() {
         case 'LCT010': // Hue A19 White & Color w/ Richer Colors
         case 'LCA001': // Hue color lamp
         case 'GL-C-008': // Non-hue LED Strip
+        case 'CLA60 TW OSRAM': // CLA60 TW OSRAM
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation

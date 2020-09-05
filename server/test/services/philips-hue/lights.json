@@ -1244,6 +1244,50 @@
       },
       "_id": 26,
       "id": 26
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "ct": 370,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2020-09-03T19:43:06"
+      },
+      "type": "Color temperature light",
+      "name": "Escalier",
+      "modelid": "CLA60 TW OSRAM",
+      "manufacturername": "OSRAM",
+      "productname": "Color temperature light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {
+            "ct": {
+              "min": 153,
+              "max": 370
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "7c:b0:3e:aa:0a:00:c2:b7-03",
+        "swversion": "V1.05.10"
+      },
+      "_id": 27,
+      "id": 27
     }
   ]
 }
