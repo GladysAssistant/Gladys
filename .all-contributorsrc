@@ -128,6 +128,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "hotfix31",
+      "name": "Frédéric Le Barzic",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1555884?v=4",
+      "profile": "http://lebarzic.fr",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
