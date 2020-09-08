@@ -23,9 +23,6 @@ function handleGladysMessage(topic, message) {
       state: parseFloat(message),
     };
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
-  } else if (topic.startsWith('owntracks/gladys/oneplus5')) {
-    logger.debug(`MQTT : Gladys has a message from Owntracks on ${topic} :${message}.`);
-    this.gladys.location.create('nicolas', {latitude: 48.5, longitude: 7.5, });
   } else {
     logger.warn(`MQTT : Gladys topic ${topic} not handled.`);
   }
