@@ -6,6 +6,7 @@ const { getById } = require('./user.getById');
 const { getPicture } = require('./user.getPicture');
 const { getUserCount } = require('./user.getUserCount');
 const { getByTelegramUserId } = require('./user.getByTelegramUserId');
+const { getBySlackUserId } = require('./user.getBySlackUserId');
 const { forgotPassword } = require('./user.forgotPassword');
 const { update } = require('./user.update');
 const { updatePassword } = require('./user.updatePassword');
@@ -25,6 +26,7 @@ User.prototype.getById = getById;
 User.prototype.getPicture = getPicture;
 User.prototype.getUserCount = getUserCount;
 User.prototype.getByTelegramUserId = getByTelegramUserId;
+User.prototype.getBySlackUserId = getBySlackUserId;
 User.prototype.update = update;
 User.prototype.updatePassword = updatePassword;
 

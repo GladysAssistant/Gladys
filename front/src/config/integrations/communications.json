@@ -2,5 +2,11 @@
   {
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg"
+  },
+  {
+    "key": "slack",
+    "name": "Slack",
+    "description": "Talk to Gladys through Slack.",
+    "img": "/assets/integrations/cover/slack.jpg"
   }
 ]
