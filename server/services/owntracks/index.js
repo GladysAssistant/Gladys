@@ -30,5 +30,6 @@ module.exports = function OwntracksService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    device: owntracksHandler,
   });
 };

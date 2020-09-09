@@ -20,21 +20,24 @@ function handleMqttMessage(topic, message) {
     if(obj['_type'] === 'location') {
 
        // TODO : check is user exists or get user id using the selector
-       const users = this.gladys.user.get({
-       'selector': user,
-       'take': 1,
-       'skip': 0
-       });
-       users.then( (result) => {
+      ;(async () => {
+         const users = await this.gladys.user.get({
+         'selector': user,
+         'take': 1,
+         'skip': 0 });
+
+         if (users) {
            const data = {
-            'user_id'  : result[0].id,
+            'user_id'  : users[0].id,
             'latitude' : obj.lat,
             'longitude': obj.lon,
             'accuracy' : obj.acc,
             'altitude' : obj.alt,
           };
-          this.gladys.location.handleNewGatewayOwntracksLocation(data);
-       }).catch(e => console.log(e));
+          await this.gladys.location.handleNewGatewayOwntracksLocation(data);
+         }
+
+       })();
    }
   }
 }
