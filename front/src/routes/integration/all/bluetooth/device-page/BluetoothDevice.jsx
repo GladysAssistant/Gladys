@@ -2,10 +2,14 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
+import { Link } from 'preact-router';
+
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
-class BluetoothDeviceBox extends Component {
+import style from '../style.css';
+
+class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
     if (!this.props.device.features) {
       return null;
@@ -50,12 +54,12 @@ class BluetoothDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, loading }) {
+  render({ device, houses, ...props }, { batteryLevel, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            {props.device.name}
+            {device.name}
             {batteryLevel && (
               <div class="page-options d-flex">
                 <div class="tag tag-green">
@@ -82,7 +86,7 @@ class BluetoothDeviceBox extends Component {
                   <Localizer>
                     <input
                       type="text"
-                      value={props.device.name}
+                      value={device.name}
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.bluetooth.device.namePlaceholder" />}
@@ -97,11 +101,11 @@ class BluetoothDeviceBox extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {props.houses &&
-                      props.houses.map(house => (
+                    {houses &&
+                      houses.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
+                            <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>
                           ))}
@@ -113,10 +117,9 @@ class BluetoothDeviceBox extends Component {
                   <label>
                     <Text id="integration.bluetooth.device.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
+                  {device.features && (
+                    <div class="tags">
+                      {device.features.map(feature => (
                         <span class="tag">
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
@@ -126,10 +129,13 @@ class BluetoothDeviceBox extends Component {
                           </div>
                         </span>
                       ))}
-                    {(!props.device.features || props.device.features.length === 0) && (
-                      <Text id="integration.bluetooth.device.noFeatures" />
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  {(!device.features || device.features.length === 0) && (
+                    <div class={cx('text-center', 'font-italic', 'mt-3', style.featureListBody)}>
+                      <Text id="integration.bluetooth.device.noFeatureDiscovered" />
+                    </div>
+                  )}
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
@@ -138,6 +144,11 @@ class BluetoothDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.bluetooth.device.deleteButton" />
                   </button>
+                  <Link href={`/dashboard/integration/device/bluetooth/${device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.bluetooth.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -148,4 +159,4 @@ class BluetoothDeviceBox extends Component {
   }
 }
 
-export default BluetoothDeviceBox;
+export default BluetoothDevice;

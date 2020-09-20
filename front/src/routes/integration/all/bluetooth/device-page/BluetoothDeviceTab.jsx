@@ -2,10 +2,11 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import Device from './Device';
-import style from './style.css';
+import BluetoothDevice from './BluetoothDevice';
+import EmptyState from '../EmptyState';
+import style from '../style.css';
 
-const NodeTab = ({ children, ...props }) => (
+const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevices, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
@@ -38,16 +39,16 @@ const NodeTab = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getBluetoothDevicesStatus === RequestStatus.Getting
+          active: getBluetoothDevicesStatus === RequestStatus.Getting,
+          [style.bluetoothListBody]: getBluetoothDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.getBluetoothDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.bluetoothDevices &&
-              props.bluetoothDevices.map((bluetoothDevice, index) => (
-                <Device
+            {bluetoothDevices &&
+              bluetoothDevices.map((bluetoothDevice, index) => (
+                <BluetoothDevice
                   device={bluetoothDevice}
                   deviceIndex={index}
                   houses={props.houses}
@@ -56,8 +57,8 @@ const NodeTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.bluetoothDevices && props.bluetoothDevices.length === 0 && (
-              <Text id="integration.bluetooth.device.noDevices" />
+            {(!bluetoothDevices || bluetoothDevices.length === 0) && (
+              <EmptyState id="integration.bluetooth.device.noDevices" />
             )}
           </div>
         </div>
@@ -66,4 +67,4 @@ const NodeTab = ({ children, ...props }) => (
   </div>
 );
 
-export default NodeTab;
+export default BluetoothDeviceTab;

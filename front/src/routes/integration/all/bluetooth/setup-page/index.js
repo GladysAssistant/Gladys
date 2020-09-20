@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import BluetoothPage from '../BluetoothPage';
-import PeripheralTab from './PeripheralTab';
+import BluetoothPeripheralTab from './BluetoothPeripheralTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect('user,session,bluetoothPeripheralUuids,bluetoothPeripherals,bluetoothStatus,bluetoothGetDriverStatus', actions)
@@ -11,18 +11,19 @@ class BluetoothSetupPage extends Component {
     this.props.getPeripherals();
     this.props.getStatus();
 
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, payload =>
-      this.props.updateStatus(payload)
-    );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, payload =>
-      this.props.addPeripheral(payload)
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.props.addPeripheral);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.props.addPeripheral);
   }
 
   render(props, {}) {
     return (
       <BluetoothPage>
-        <PeripheralTab {...props} />
+        <BluetoothPeripheralTab {...props} />
       </BluetoothPage>
     );
   }

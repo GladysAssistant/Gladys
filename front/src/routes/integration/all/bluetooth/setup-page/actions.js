@@ -1,5 +1,6 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import createActionsHouse from '../../../../../actions/house';
+import update from 'immutability-helper';
 
 const createActions = store => {
   const houseActions = createActionsHouse(store);
@@ -11,7 +12,7 @@ const createActions = store => {
       try {
         const bluetoothStatus = await state.httpClient.get('/api/v1/service/bluetooth/status');
         store.setState({
-          ...bluetoothStatus,
+          bluetoothStatus,
           bluetoothGetDriverStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -26,10 +27,8 @@ const createActions = store => {
       });
       try {
         const bluetoothPeripherals = await state.httpClient.get('/api/v1/service/bluetooth/peripheral');
-        const bluetoothPeripheralUuids = Object.keys(bluetoothPeripherals);
         store.setState({
           bluetoothPeripherals,
-          bluetoothPeripheralUuids,
           bluetoothGetPeripheralsStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -38,52 +37,61 @@ const createActions = store => {
         });
       }
     },
-    async scan(state) {
-      store.setState({
-        bluetoothScanStatus: RequestStatus.Getting
-      });
+    async scan(state, selector) {
+      const useSelector = typeof selector === 'string';
+
+      if (!useSelector) {
+        store.setState({
+          bluetoothScanStatus: RequestStatus.Getting
+        });
+      }
 
       let action;
-      if (state.bluetoothStatus === 'scanning') {
+      if (state.bluetoothStatus.scanning) {
         action = 'off';
       } else {
         action = 'on';
       }
 
       try {
-        const bluetoothStatus = await state.httpClient.post('/api/v1/service/bluetooth/scan', {
+        const uri = `/api/v1/service/bluetooth/scan${useSelector ? `/${selector}` : ''}`;
+        const bluetoothStatus = await state.httpClient.post(uri, {
           scan: action
         });
         store.setState({
-          ...bluetoothStatus,
+          bluetoothStatus,
           bluetoothScanStatus: RequestStatus.Success
         });
       } catch (e) {
-        store.setState({
-          bluetoothScanStatus: RequestStatus.Error
-        });
+        if (!useSelector) {
+          store.setState({
+            bluetoothScanStatus: RequestStatus.Error
+          });
+        }
       }
     },
     async updateStatus(state, bluetoothStatus) {
       store.setState({
-        ...bluetoothStatus
+        bluetoothStatus
       });
     },
     async addPeripheral(state, peripheral) {
-      let bluetoothPeripherals = {};
-      Object.assign(bluetoothPeripherals, state.bluetoothPeripherals);
-      const bluetoothPeripheralUuids = (state.bluetoothPeripheralUuids || []).slice();
-      const uuid = peripheral.uuid;
+      const peripheralKey = peripheral.selector;
+      const currentIndex = (state.bluetoothPeripherals || []).findIndex(p => p.selector === peripheralKey);
 
-      const foundPeripheral = bluetoothPeripherals[uuid];
-      if (!foundPeripheral) {
-        bluetoothPeripheralUuids.push(uuid);
+      let bluetoothPeripherals;
+      if (currentIndex >= 0) {
+        bluetoothPeripherals = update(state.bluetoothPeripherals, {
+          [currentIndex]: { $set: peripheral }
+        });
+      } else {
+        bluetoothPeripherals = update(state.bluetoothPeripherals, {
+          $push: [peripheral]
+        });
       }
 
-      bluetoothPeripherals[uuid] = peripheral;
       store.setState({
-        bluetoothPeripherals,
-        bluetoothPeripheralUuids
+        bluetoothPeripherals
       });
     },
     async resetSaveStatus() {
@@ -96,13 +104,7 @@ const createActions = store => {
         bluetoothSaveStatus: RequestStatus.Getting
       });
 
-      const { currentIntegration, httpClient } = state;
-
-      device.service_id = currentIntegration.id;
-      device.features.forEach(feature => {
-        feature.external_id = `${device.external_id}:${feature.type.replace(' ', '_')}`;
-        feature.selector = feature.external_id;
-      });
+      const { httpClient } = state;
 
       try {
         await httpClient.post(`/api/v1/device`, device);

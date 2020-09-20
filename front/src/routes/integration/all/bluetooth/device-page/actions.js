@@ -6,29 +6,19 @@ import debounce from 'debounce';
 function createActions(store) {
   const houseActions = createActionsHouse(store);
   const actions = {
-    async getBluetoothDevices(state, take, skip) {
+    async getBluetoothDevices(state) {
       store.setState({
         getBluetoothDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
           service: 'bluetooth',
-          order_dir: state.getBluetoothDeviceOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getBluetoothDeviceOrderDir || 'asc'
         };
         if (state.bluetoothDeviceSearch && state.bluetoothDeviceSearch.length) {
           options.search = state.bluetoothDeviceSearch;
         }
-        const bluetoothDevicesReceived = await state.httpClient.get('/api/v1/service/bluetooth/device', options);
-        let bluetoothDevices;
-        if (skip === 0) {
-          bluetoothDevices = bluetoothDevicesReceived;
-        } else {
-          bluetoothDevices = update(state.bluetoothDevices, {
-            $push: bluetoothDevicesReceived
-          });
-        }
+        const bluetoothDevices = await state.httpClient.get('/api/v1/service/bluetooth/device', options);
         store.setState({
           bluetoothDevices,
           getBluetoothDevicesStatus: RequestStatus.Success

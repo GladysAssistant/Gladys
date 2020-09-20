@@ -26,10 +26,7 @@ RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
     && rm -rf /tmp/open-zwave
 
 # Install Bluez dependencies
-RUN apk add --no-cache bluetooth bluez libbluetooth-dev libudev-dev
-
-# Grant acces to bluetooth
-RUN sudo setcap cap_net_raw+eip $(eval readlink -f $(which node))
+RUN apk add --no-cache bluez
 
 # Install Gladys
 RUN mkdir /src

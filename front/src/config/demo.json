@@ -1295,7 +1295,7 @@
     }
   ],
   "get /api/v1/service/bluetooth": {
-    "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+    "id": "a810b8db-6d04-4697-bed3-c4b72c996279",
     "name": "bluetooth",
     "enabled": true
   },
@@ -1305,7 +1305,7 @@
       "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "name": "Nut Smart Tracker",
-      "selector": "test-sensor",
+      "selector": "bluetooth-sensor",
       "external_id": "test-sensor-external",
       "should_poll": false,
       "poll_frequency": null,
@@ -1327,34 +1327,165 @@
       }
     }
   ],
+  "get /api/v1/device/bluetooth-sensor": {
+    "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "name": "Nut Smart Tracker",
+    "selector": "bluetooth-sensor",
+    "external_id": "bluetooth:external",
+    "should_poll": false,
+    "poll_frequency": null,
+    "created_at": "2019-02-12T07:49:07.556Z",
+    "updated_at": "2019-02-12T07:49:07.556Z",
+    "features": [
+      {
+        "name": "Battery",
+        "selector": "test-battery",
+        "category": "battery",
+        "type": "integer",
+        "last_value": "12"
+      }
+    ],
+    "room": {
+      "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "Living Room",
+      "selector": "living-room"
+    }
+  },
   "get /api/v1/service/bluetooth/status": {
     "bluetoothStatus": "ready"
   },
-  "get /api/v1/service/bluetooth/peripheral": {
-    "0011223341": {
-      "uuid": "0011223341",
+  "get /api/v1/service/bluetooth/peripheral": [
+    {
       "name": "BLE Device 1",
-      "address": "00:11:22:33:41",
-      "rssi": -48,
-      "connected": false,
-      "connectable": true,
-      "lastSeen": "2019-02-12T07:49:07.556Z"
+      "external_id": "bluetooth:0011223341",
+      "selector": "bluetooth-0011223341",
+      "params": [
+        {
+          "name": "loaded",
+          "value": false
+        }
+      ]
     },
-    "0011223342": {
-      "uuid": "0011223342",
-      "name": "BLE Device 2",
-      "address": "00:11:22:33:42",
-      "rssi": -60,
-      "connected": true,
-      "lastSeen": "2019-01-12T07:49:04.556Z"
+    {
+      "name": "SML c9",
+      "model": "smlc9",
+      "external_id": "bluetooth:0011223342",
+      "selector": "bluetooth-0011223342",
+      "params": [
+        {
+          "name": "loaded",
+          "value": true
+        },
+        {
+          "name": "manufacturer",
+          "value": "AwoX"
+        }
+      ]
+    },
+    {
+      "name": "Peanut temperature",
+      "external_id": "bluetooth:0011223343",
+      "selector": "bluetooth-0011223343",
+      "params": [
+        {
+          "name": "loaded",
+          "value": true
+        },
+        {
+          "name": "manufacturer",
+          "value": "Peanut"
+        }
+      ],
+      "features": [
+        {
+          "name": "Battery",
+          "category": "battery",
+          "type": "integer",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "Temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": -100,
+          "max": 250
+        }
+      ]
     }
-  },
-  "get /api/v1/service/bluetooth/peripheral/0011223341": {
-    "uuid": "0011223341",
+  ],
+  "get /api/v1/service/bluetooth/peripheral/bluetooth-0011223341": {
     "name": "BLE Device 1",
-    "address": "00:11:22:33:41",
-    "connected": false,
-    "connectable": true,
-    "lastSeen": "2019-02-12T07:49:04.556Z"
+    "external_id": "bluetooth:0011223341",
+    "selector": "bluetooth-0011223341",
+    "params": [
+      {
+        "name": "loaded",
+        "value": false
+      }
+    ]
+  },
+  "get /api/v1/service/bluetooth/peripheral/bluetooth-0011223342": {
+    "name": "SML c9",
+    "model": "smlc9",
+    "external_id": "bluetooth:0011223342",
+    "selector": "bluetooth-0011223342",
+    "params": [
+      {
+        "name": "loaded",
+        "value": true
+      },
+      {
+        "name": "manufacturer",
+        "value": "AwoX"
+      }
+    ]
+  },
+  "get /api/v1/service/bluetooth/peripheral/bluetooth-0011223343": {
+    "name": "Peanut temperature",
+    "external_id": "bluetooth:0011223343",
+    "selector": "bluetooth-0011223343",
+    "params": [
+      {
+        "name": "loaded",
+        "value": true
+      },
+      {
+        "name": "manufacturer",
+        "value": "Peanut"
+      }
+    ],
+    "features": [
+      {
+        "name": "Battery",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": -100,
+        "max": 250
+      }
+    ]
   }
 }

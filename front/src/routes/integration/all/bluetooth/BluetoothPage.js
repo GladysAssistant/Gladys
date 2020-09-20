@@ -14,7 +14,7 @@ const BluetoothPage = ({ children, ...props }) => (
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
-                    href="/dashboard/integration/device/bluetooth/device"
+                    href="/dashboard/integration/device/bluetooth"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >

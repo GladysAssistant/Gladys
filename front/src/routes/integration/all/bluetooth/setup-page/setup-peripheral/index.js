@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 import BluetoothPage from '../../BluetoothPage';
 import PeripheralNotFound from './PeripheralNotFound';
@@ -9,8 +10,38 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import actions from '../actions';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
 
+import style from '../../style.css';
+
 @connect('session,httpClient,houses,bluetoothStatus', actions)
 class BluetoothConnnectPage extends Component {
+  updatePeripheral = peripheral => {
+    if (peripheral.uuid === this.state.peripheral.uuid) {
+      this.setState({ peripheral });
+    }
+  };
+
+  loadDevice = async () => {
+    try {
+      const peripheral = await this.props.httpClient.get(`/api/v1/service/bluetooth/peripheral/${this.state.uuid}`);
+
+      this.setState({
+        peripheral,
+        status: RequestStatus.Success
+      });
+    } catch (e) {
+      this.setState({
+        status: RequestStatus.Error
+      });
+    }
+  };
+
+  reloadDevice = async () => {
+    try {
+      const bluetoothStatus = await this.props.httpClient.post(`/api/v1/service/bluetooth/scan/${this.state.uuid}`);
+      this.props.updateStatus(bluetoothStatus);
+    } catch (e) {}
+  };
+
   constructor(props) {
     super(props);
 
@@ -26,40 +57,36 @@ class BluetoothConnnectPage extends Component {
     this.props.getStatus();
     this.props.getHouses();
 
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, payload =>
-      this.props.updateStatus(payload)
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.updatePeripheral);
 
-    try {
-      const peripheral = await this.props.httpClient.get(`/api/v1/service/bluetooth/peripheral/${this.state.uuid}`);
-
-      this.setState({
-        peripheral,
-        status: RequestStatus.Success
-      });
-    } catch (e) {
-      this.setState({
-        status: RequestStatus.Error
-      });
-    }
+    await this.loadDevice();
   }
 
-  render() {
-    const { uuid, peripheral, status } = this.state;
-    const { bluetoothStatus } = this.props;
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.updatePeripheral);
+  }
 
+  render({ bluetoothStatus = {} }, { uuid, peripheral, status }) {
     let content;
-    if (bluetoothStatus !== 'poweredOff') {
+    if (bluetoothStatus.ready) {
       switch (status) {
         case RequestStatus.Getting:
           content = (
             <div class="dimmer active">
-              <div class="loader" />
+              <div class={cx('loader', style.emptyStateDivBox)} />
             </div>
           );
           break;
         case RequestStatus.Success:
-          content = <ConfigurePeripheral peripheral={peripheral} />;
+          content = (
+            <ConfigurePeripheral
+              peripheral={peripheral}
+              bluetoothStatus={bluetoothStatus}
+              reloadDevice={this.reloadDevice}
+            />
+          );
           break;
         case RequestStatus.Error:
         default:

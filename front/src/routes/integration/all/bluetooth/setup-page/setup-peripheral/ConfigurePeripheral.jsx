@@ -12,9 +12,7 @@ class ConfigurePeripheral extends Component {
     this.props.resetSaveStatus();
   }
 
-  render(props, {}) {
-    const { peripheral, bluetoothSaveStatus } = props;
-
+  render({ peripheral, bluetoothSaveStatus, bluetoothStatus, reloadDevice }) {
     return (
       <div>
         <h4>{peripheral.name || peripheral.address}</h4>
@@ -27,7 +25,14 @@ class ConfigurePeripheral extends Component {
 
         {bluetoothSaveStatus === RequestStatus.Success && <ConfigurePeripheralSuccess />}
 
-        {bluetoothSaveStatus !== RequestStatus.Success && <ConfigurePeripheralForm {...props} />}
+        {bluetoothSaveStatus !== RequestStatus.Success && (
+          <ConfigurePeripheralForm
+            peripheral={peripheral}
+            bluetoothSaveStatus={bluetoothSaveStatus}
+            bluetoothStatus={bluetoothStatus}
+            reloadDevice={reloadDevice}
+          />
+        )}
       </div>
     );
   }

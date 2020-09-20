@@ -2,79 +2,87 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
+import update from 'immutability-helper';
+
 import actions from '../actions';
 import { RequestStatus } from '../../../../../../utils/consts';
-import cx from 'classnames';
-
-import ConfigurePeripheralInput from './ConfigurePeripheralInput';
+import UpdateDeviceFeature from '../../../../../../components/device/UpdateDeviceFeature';
+import BluetoothPeripheralFeatures from '../BluetoothPeripheralFeatures';
 
 @connect('session,httpClient,houses,currentIntegration', actions)
 class ConfigurePeripheralForm extends Component {
-  updateName(e) {
+  updateName = e => {
     this.setState({
       device: {
         ...this.state.device,
         name: e.target.value
       }
     });
-  }
+  };
 
-  updateRoom(e) {
+  updateRoom = e => {
     this.setState({
       device: {
         ...this.state.device,
         room_id: e.target.value
       }
     });
-  }
+  };
 
-  updateFeatureName(e, index) {
-    e.preventDefault();
-
-    const { device } = this.state;
-    const features = device.features.slice();
-    features[index].name = e.target.value;
-
-    this.setState({
-      device: {
-        ...device,
-        features
+  updateFeatureProperty = (featureIndex, property, value) => {
+    if (
+      property === 'external_id' &&
+      this.props.requiredExternalIdBase &&
+      !value.startsWith(this.props.requiredExternalIdBase)
+    ) {
+      if (value.length < this.props.requiredExternalIdBase.length) {
+        value = this.props.requiredExternalIdBase;
+      } else {
+        value = `${this.props.requiredExternalIdBase}${value}`;
+      }
+    }
+    const device = update(this.state.device, {
+      features: {
+        [featureIndex]: {
+          [property]: {
+            $set: value
+          }
+        }
       }
     });
-  }
 
-  createDevice(e) {
+    this.setState({
+      device
+    });
+  };
+
+  createDevice = e => {
     e.preventDefault();
 
     this.props.createDevice(this.state.device);
-  }
+  };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      device: {
-        name: props.peripheral.name,
-        external_id: props.peripheral.uuid
-      }
+      device: props.peripheral
     };
 
     this.createDevice = this.createDevice.bind(this);
 
     this.updateName = this.updateName.bind(this);
     this.updateRoom = this.updateRoom.bind(this);
-    this.updateFeatureName = this.updateFeatureName.bind(this);
   }
 
   componentWillMount() {
     this.props.getIntegrationByName('bluetooth');
   }
 
-  render(props, {}) {
-    const { device, bluetoothSaveStatus } = this.state;
-    const { peripheral, houses } = props;
-
+  render({ houses, bluetoothStatus, reloadDevice }, { device, bluetoothSaveStatus }) {
     const disableForm = bluetoothSaveStatus === RequestStatus.Getting;
+    const deviceFeatures = device.features || [];
 
     return (
       <form>
@@ -109,9 +117,9 @@ class ConfigurePeripheralForm extends Component {
 
             <div class="form-group">
               <label class="form-label">
-                <Text id="integration.bluetooth.setup.addressLabel" />
+                <Text id="integration.bluetooth.device.externalIdLabel" />
               </label>
-              <input value={peripheral.address} class="form-control" disabled />
+              <input value={device.external_id} class="form-control" disabled />
             </div>
 
             <div class="form-group">
@@ -136,23 +144,15 @@ class ConfigurePeripheralForm extends Component {
             </div>
           </div>
 
-          {device.features && (
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.bluetooth.device.featuresLabel" />
-              </label>
-              <ul class="tags">
-                {device.features.map((feature, index) => (
-                  <ConfigurePeripheralInput
-                    feature={feature}
-                    index={index}
-                    disableForm={disableForm}
-                    updateFeatureName={this.updateFeatureName}
-                  />
-                ))}
-              </ul>
-            </div>
-          )}
+          <BluetoothPeripheralFeatures peripheral={device} bluetoothStatus={bluetoothStatus} scan={reloadDevice}>
+            {deviceFeatures.map((feature, index) => (
+              <UpdateDeviceFeature
+                feature={feature}
+                featureIndex={index}
+                updateFeatureProperty={this.updateFeatureProperty}
+              />
+            ))}
+          </BluetoothPeripheralFeatures>
 
           <div class="row mt-5">
             <div class="col">
