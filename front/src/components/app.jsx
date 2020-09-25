@@ -74,6 +74,13 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 
+// Zigbee2mqtt
+import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
+import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
+import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/settings-page';
+import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
+import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
+
 // Tasmota
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
@@ -178,6 +185,11 @@ const AppRouter = connect(
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
+        <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
+        <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
+        <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
+        <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
+        <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />

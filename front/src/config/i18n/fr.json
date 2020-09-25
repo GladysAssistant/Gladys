@@ -471,6 +471,62 @@
         "conflictError": "Le topic actuel est déjà utilisé."
       }
     },
+    "zigbee2mqtt": {
+      "title": "Zigbee2mqtt",
+      "description": "Contrôlez vos appareils Zigbee.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "settingsTab": "Settings",
+      "setupTab": "Setup",
+      "status": {
+        "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
+        "notConnected": "Zigbee2mqtt service failed to connect, please go to ",
+        "settingsPageLink": "USB dongle configuration page",
+        "setupPageLink": "Zigbee2mqtt configuration page"
+      },
+      "settings": {
+        "title": "Zigbee2mqtt USB dongle Settings",
+        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
+        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
+        "saveButton": "Save Settings",
+        "refreshButton": "Refresh USB list",
+        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
+        "attached": "Zigbee2mqtt USB Dongle configured.",
+        "saving": "Saving USB Dongle configuration..."
+      },
+      "setup": {
+        "title": "Zigbe2mqtt configuration",
+        "description": "This service uses two independant docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers. Learn more on the Zigbee2mqtt documentation page",
+        "enable": "Enable Zigbee2mqtt",
+        "containersTitle": " Zigbee2mqtt Docker containers",
+        "connected": "Zigbee2mqtt was started with success.",
+        "error": "An error occured while starting Zigbee2mqtt."
+      },
+      "device": {
+        "title": "Zigbee2mqtt devices",
+        "search": "Search devices",
+        "editButton": "Edit"
+      },
+      "discover": {
+        "title": "Zigbee2mqtt discover",
+        "noDeviceDiscovered": "No device discovered, please click on scan button.",
+        "scanButton": "Scan",
+        "noResponse": "Scan never answer, please check your network.",
+        "serverNoResponse": "Gladys server is not available."
+      },
+      "noDeviceFound": "No zigbee2mqtt device found.",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic",
+      "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
+      "featuresLabel": "Features",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "alreadyExistsButton": "Already created",
+      "saveError": "There was an error saving the device.",
+      "documentation": "Zigbee2mqtt documentation"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
