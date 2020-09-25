@@ -89,7 +89,6 @@ const createActions = store => {
         });
       }
     },
-
     async startContainer(state) {
       let dockerContainers = state.dockerContainers;
       let z2mEnabled = true;
