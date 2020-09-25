@@ -388,6 +388,74 @@
         "deleteError": "Error when deleting, please try again."
       }
     },
+    "zigbee2mqtt": {
+      "title": "Zigbee2mqtt",
+      "description": "Control your Zigbee devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "settingsTab": "Settings",
+      "setupTab": "Setup",
+      "status": {
+        "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
+        "notEnabled": "Zigbee2mqtt is not activated, please go to ",
+        "mqttNotInstalled": "MQTT broker failed to install",
+        "mqttNotRunning": "MQTT broker failed to start",
+        "zigbee2mqttNotInstalled": "Zigbee2mqtt failed to install",
+        "zigbee2mqttNotRunning": "Zigbee2mqtt failed to start",
+        "gladysNotConnected": "Gladys failed to connect to MQTT",
+        "zigbee2mqttNotConnected": "Zigbee2mqtt failed to connect to MQTT",
+        "settingsPageLink": "USB dongle configuration page",
+        "setupPageLink": "Zigbee2mqtt configuration page"
+      },
+      "settings": {
+        "title": "Zigbee2mqtt USB dongle Settings",
+        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
+        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
+        "saveButton": "Save Settings",
+        "refreshButton": "Refresh USB list",
+        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
+        "attached": "Zigbee2mqtt USB Dongle configured.",
+        "saving": "Saving USB Dongle configuration..."
+      },
+      "setup": {
+        "title": "Zigbe2mqtt configuration",
+        "description": "This service uses two independent docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
+        "enableLabel": "Zigbee2mqtt activation",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
+        "enableZigbee2mqtt": "Enable Zigbee2mqtt",
+        "containersTitle": " Zigbee2mqtt Docker containers",
+        "containersStatus": "Zigbee2mqtt status",
+        "connected": "Zigbee2mqtt was started with success.",
+        "error": "An error occured while starting Zigbee2mqtt."
+      },
+      "device": {
+        "title": "Zigbee2mqtt devices",
+        "search": "Search devices",
+        "editButton": "Edit"
+      },
+      "discover": {
+        "title": "Zigbee2mqtt discover",
+        "device": "Devices",
+        "permitJoin": "Permit joining",
+        "noDeviceDiscovered": "No device discovered, please click on scan button.",
+        "scanButton": "Scan",
+        "noResponse": "Scan never answer, please check your network.",
+        "serverNoResponse": "Gladys server is not available."
+      },
+      "noDeviceFound": "No zigbee2mqtt device found.",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "topicLabel": "Topic",
+      "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
+      "featuresLabel": "Features",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "alreadyExistsButton": "Already created",
+      "saveError": "There was an error saving the device.",
+      "documentation": "Zigbee2mqtt documentation"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",

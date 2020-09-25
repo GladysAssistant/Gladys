@@ -422,6 +422,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
   },
+  ZIGBEE2MQTT: {
+    DISCOVER: 'zigbee2mqtt.discover',
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
+    MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
+    PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+  },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },

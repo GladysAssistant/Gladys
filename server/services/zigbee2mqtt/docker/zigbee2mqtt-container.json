@@ -1,0 +1,29 @@
+{
+  "name": "zigbee2mqtt",
+  "Image": "koenkk/zigbee2mqtt:latest",
+  "ExposedPorts": {},
+  "HostConfig": {
+    "Binds": ["/var/lib/gladysassistant/zigbee2mqtt/z2m:/app/data"],
+    "PortBindings": {},
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": [
+      {
+        "PathOnHost": "/dev/ttyACM0",
+        "PathInContainer": "/dev/ttyACM0",
+        "CgroupPermissions": "rwm"
+      }
+    ]
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}
