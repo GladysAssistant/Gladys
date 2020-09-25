@@ -1,6 +1,5 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-
 /**
  * @description Initialize service with dependencies and connect to devices.
  * @example
@@ -40,9 +39,6 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
 
     // Subscribe to Zigbee2mqtt topics
 //      this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
-
-
-
   
 }
 

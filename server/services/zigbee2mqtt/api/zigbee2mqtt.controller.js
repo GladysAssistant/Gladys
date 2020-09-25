@@ -125,6 +125,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
       authenticated: true,
       controller: connect,
     },
+<<<<<<< HEAD
     'post /api/v1/service/zigbee2mqtt/mqtt/start': {
       authenticated: true,
       controller: asyncMiddleware(installMqttContainer),
@@ -149,5 +150,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
       authenticated: true,
       controller: getHostIP,
     },
+=======
+>>>>>>> Zigbee2mqtt : Server integration
   };
 };
