@@ -1,7 +1,7 @@
 {
   "global": {
     "logoAlt": "Logo Gladys",
-    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>.",
+    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "new": "Nouveau",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -45,7 +45,7 @@
     "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
     "invalidEmail": "E-mail invalide",
-    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
+    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
   "signup": {
     "welcome": {
@@ -248,7 +248,7 @@
           "username": "Apple ID",
           "usernameInfo": "Entrez votre Apple ID.",
           "password": "Mot de passe",
-          "passwordInfo": "<a href=https://support.apple.com/fr-fr/HT204397 target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+          "passwordInfo": "<a href=\"https://support.apple.com/fr-fr/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
         },
         "google": {
           "name": "Google Agenda (déprécié)",
@@ -257,7 +257,7 @@
           "username": "Email",
           "usernameInfo": "Entrez l'adresse email de votre compte Google.",
           "password": "Mot de passe",
-          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=fr target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=fr\" target=\"_blank\" rel=\"noopener noreferrer\">Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
         },
         "synology": {
           "name": "Calendrier Synology",
