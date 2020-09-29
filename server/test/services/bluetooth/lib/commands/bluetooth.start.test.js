@@ -25,12 +25,11 @@ describe('bluetooth.start command', () => {
 
   beforeEach(() => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
-
-    sinon.reset();
   });
 
   afterEach(() => {
     bluetooth.removeAllListeners();
+    sinon.reset();
   });
 
   it('check listeners well added', () => {

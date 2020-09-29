@@ -21,14 +21,13 @@ describe('bluetooth.getStatus command', () => {
   beforeEach(() => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
 
-    sinon.reset();
-
     eventWS = fake.returns(null);
     event.on(EVENTS.WEBSOCKET.SEND_ALL, eventWS);
   });
 
   afterEach(() => {
     event.removeAllListeners();
+    sinon.reset();
   });
 
   it('should get status not setted', () => {

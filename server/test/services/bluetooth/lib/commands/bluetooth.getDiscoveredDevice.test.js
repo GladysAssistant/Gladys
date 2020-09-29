@@ -17,31 +17,23 @@ const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 describe('bluetooth.getDiscoveredDevice command', () => {
   let bluetoothManager;
   let eventWS;
-  let now;
-  let clock;
 
   beforeEach(() => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
-
-    sinon.reset();
-
-    now = new Date();
-    clock = sinon.useFakeTimers(now.getTime());
 
     eventWS = fake.returns(null);
     event.on(EVENTS.WEBSOCKET.SEND_ALL, eventWS);
   });
 
   afterEach(() => {
-    clock.restore();
     event.removeAllListeners();
+    sinon.reset();
   });
 
   it('get peripheral by uuid', () => {
     bluetoothManager.discoveredDevices.uuid = {
       external_id: 'bluetooth:P1',
       features: [],
-      last_value_changed: now,
       name: 'P1',
       params: [
         {

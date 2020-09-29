@@ -53,6 +53,10 @@ describe('bluetooth.poll command', () => {
   });
 
   afterEach(() => {
+    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
+      bluetoothManager.scanPromise.cancel();
+    }
+
     sinon.reset();
   });
 

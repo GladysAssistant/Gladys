@@ -7,14 +7,11 @@ const { BadParameters } = require('../../../../../utils/coreErrors');
 
 const { connect } = require('../../../../../services/bluetooth/lib/utils/peripheral/bluetooth.connect');
 
-let clock;
-
 describe('Connect bluetooth peripherals', () => {
   let peripheral;
   let throwError;
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers();
     throwError = false;
 
     peripheral = {
@@ -35,7 +32,6 @@ describe('Connect bluetooth peripherals', () => {
   });
 
   afterEach(() => {
-    clock.restore();
     sinon.reset();
   });
 

@@ -55,6 +55,10 @@ describe('bluetooth.writeDevice', () => {
   });
 
   afterEach(() => {
+    if (bluetooth.scanPromise && bluetooth.scanPromise.isPending()) {
+      bluetooth.scanPromise.cancel();
+    }
+
     sinon.reset();
   });
 

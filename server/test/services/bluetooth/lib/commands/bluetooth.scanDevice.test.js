@@ -73,6 +73,10 @@ describe('bluetooth.scanDevice', () => {
   });
 
   afterEach(() => {
+    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
+      bluetoothManager.scanPromise.cancel();
+    }
+
     sinon.reset();
   });
 

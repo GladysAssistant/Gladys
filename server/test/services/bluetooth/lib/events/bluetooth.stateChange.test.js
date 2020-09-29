@@ -19,8 +19,6 @@ describe('bluetooth.stateChange event', () => {
   let bluetooth;
   let bluetoothManager;
   let eventWS;
-  let clock;
-  let now;
 
   beforeEach(() => {
     bluetooth = new BluetoothMock();
@@ -28,19 +26,13 @@ describe('bluetooth.stateChange event', () => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
 
-    sinon.reset();
-
     eventWS = fake.returns(null);
     event.on(EVENTS.WEBSOCKET.SEND_ALL, eventWS);
-
-    now = new Date();
-    clock = sinon.useFakeTimers(now.getTime());
   });
 
   afterEach(() => {
-    bluetooth.removeAllListeners();
-    clock.restore();
     event.removeAllListeners();
+    sinon.reset();
   });
 
   it('should handle state change power on', () => {

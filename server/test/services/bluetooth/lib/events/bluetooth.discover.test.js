@@ -26,8 +26,6 @@ describe('bluetooth.discover event', () => {
   let bluetooth;
   let bluetoothManager;
   let eventWS;
-  let clock;
-  let now;
 
   beforeEach(() => {
     bluetooth = new BluetoothMock();
@@ -35,19 +33,13 @@ describe('bluetooth.discover event', () => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
 
-    sinon.reset();
-
     eventWS = fake.returns(null);
     event.on(EVENTS.WEBSOCKET.SEND_ALL, eventWS);
-
-    now = new Date();
-    clock = sinon.useFakeTimers(now.getTime());
   });
 
   afterEach(() => {
-    bluetooth.removeAllListeners();
-    clock.restore();
     event.removeAllListeners();
+    sinon.reset();
   });
 
   it('should add discovered peripheral', () => {
