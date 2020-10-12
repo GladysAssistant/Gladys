@@ -1,7 +1,7 @@
 {
   "global": {
     "logoAlt": "Gladys logo",
-    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>.",
+    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -45,7 +45,7 @@
     "loginButtonText": "Log in",
     "wrongCredentials": "Wrong email/password.",
     "invalidEmail": "Invalid email",
-    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
+    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
   "signup": {
     "welcome": {
@@ -532,7 +532,7 @@
           "username": "Apple ID",
           "usernameInfo": "Enter your Apple ID.",
           "password": "Password",
-          "passwordInfo": "<a href=https://support.apple.com/en-us/HT204397 target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "google": {
           "name": "Google Calendar (deprecated)",
@@ -541,7 +541,7 @@
           "username": "Email",
           "usernameInfo": "Enter your Google email adress.",
           "password": "Password",
-          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=en target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "synology": {
           "name": "Synology Calendar",
