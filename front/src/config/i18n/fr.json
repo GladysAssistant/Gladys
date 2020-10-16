@@ -434,7 +434,9 @@
         "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
         "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
-        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
+        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
+        "unknowNode": "Noeud inconnu",
+        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page."
       },
       "network": {
         "title": "Réseau Z-Wave"
