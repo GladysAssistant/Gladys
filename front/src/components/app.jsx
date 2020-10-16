@@ -79,6 +79,12 @@ import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
+// Integrations Bluetooth
+import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
+import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
+import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
+import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -177,6 +183,11 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+
+        <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
+        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
+        <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
+        <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
