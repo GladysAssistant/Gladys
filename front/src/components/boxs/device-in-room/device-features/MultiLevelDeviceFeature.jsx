@@ -3,6 +3,9 @@ import { Text } from 'preact-i18n';
 const MultiLevelDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValue(
+      props.x,
+      props.y,
+      props.device,
       props.deviceFeature,
       props.roomIndex,
       props.deviceFeatureIndex,
@@ -36,7 +39,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             value={props.deviceFeature.lastValue}
             onChange={updateValue}
             class="form-control custom-range"
-            step={(props.deviceFeature.max - props.deviceFeature.min) / 100}
+            step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
           />

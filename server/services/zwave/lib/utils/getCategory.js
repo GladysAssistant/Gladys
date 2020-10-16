@@ -12,6 +12,7 @@ const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
  * }, {
  *  class_id: 49,
  *  index: 1,
+ *  instance: 1,
  * });
  */
 function getCategory(node, value) {
