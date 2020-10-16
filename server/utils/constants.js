@@ -387,6 +387,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TASMOTA: {
     NEW_DEVICE: 'tasmota.new-device',
   },
+  BLUETOOTH: {
+    STATE: 'bluetooth.status',
+    DISCOVER: 'bluetooth.discover',
+  },
 };
 
 const DASHBOARD_TYPE = {

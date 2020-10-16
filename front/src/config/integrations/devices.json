@@ -24,5 +24,9 @@
   {
     "key": "tasmota",
     "img": "/assets/integrations/cover/tasmota.jpg"
+  },
+  {
+    "key": "bluetooth",
+    "img": "/assets/integrations/cover/bluetooth.jpg"
   }
 ]

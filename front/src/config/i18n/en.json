@@ -581,6 +581,50 @@
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
+    },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Control your Bluetooth devices.",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "device": {
+        "title": "Bluetooth Devices",
+        "search": "Search devices",
+        "noDevices": "No Bluetooth devices added yet.",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter device name",
+        "roomLabel": "Room",
+        "externalIdLabel": "External ID",
+        "manufacturerLabel": "Fabricant",
+        "modelLabel": "Modèle",
+        "featuresLabel": "Features",
+        "noFeatureDiscovered": "No features discovered.",
+        "featureNamePlaceholder": "Enter feature name",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit"
+      },
+      "setup": {
+        "title": "Bluetooth Setup",
+        "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
+        "scanButton": "Scan",
+        "reloadButton": "Reload",
+        "noDeviceFound": "No bluetooth device discovered.",
+        "createDeviceInGladys": "Connect in Gladys",
+        "updateDeviceInGladys": "Update in Gladys",
+        "deviceCreatedSuccess": "The device was successfully added",
+        "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "saveSuccess": "Bluetooth device successfully created.",
+        "saveError": "There was an error creating the device.",
+        "peripheral": {
+          "title": "Bluetooth Peripheral Configuration",
+          "notAvailable": "Peripheral is not available, please scan again.",
+          "createLabel": "Create",
+          "cancelLabel": "Cancel",
+          "successLabel": "Done"
+        }
+      }
     }
   },
   "editScene": {

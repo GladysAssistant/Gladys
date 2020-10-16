@@ -3,6 +3,10 @@
   margin-bottom: 35px;
 }
 
-.rtspCameraListBody {
+.bluetoothListBody {
   min-height: 200px;
+}
+
+.featureListBody {
+  min-height: 50px;
 }
