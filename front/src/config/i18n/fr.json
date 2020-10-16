@@ -480,7 +480,8 @@
         "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
         "unknowNode": "Noeud inconnu",
-        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page."
+        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
+        "createGithubIssue": "Signaler un bug avec cet appareil"
       },
       "network": {
         "title": "Réseau Z-Wave"

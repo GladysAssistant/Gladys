@@ -5,6 +5,27 @@ import get from 'get-value';
 
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
+const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
+
+const createGithubUrl = node => {
+  const { rawZwaveNode } = node;
+  const deviceToSend = {
+    manufacturer: rawZwaveNode.manufacturer,
+    manufacturerid: rawZwaveNode.manufacturerid,
+    product: rawZwaveNode.product,
+    producttype: rawZwaveNode.producttype,
+    productid: rawZwaveNode.productid,
+    classes: Object.keys(rawZwaveNode.classes)
+  };
+  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.manufacturer} ${rawZwaveNode.product}"`);
+  const body = encodeURIComponent('```\n' + JSON.stringify(deviceToSend, null, 2) + '\n```');
+  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
+};
+
+const displayRawNode = node => () => {
+  console.log(node);
+};
+
 class ZwaveNode extends Component {
   createDevice = async () => {
     this.setState({ loading: true, error: undefined });
@@ -107,6 +128,16 @@ class ZwaveNode extends Component {
                     <button class="btn btn-success" onClick={this.createDevice}>
                       <Text id="integration.zwave.setup.createDeviceInGladys" />
                     </button>
+                  </div>
+                  <div>
+                    <a
+                      href={createGithubUrl(props.node)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={displayRawNode(props.node)}
+                    >
+                      <Text id="integration.zwave.setup.createGithubIssue" />
+                    </a>
                   </div>
                 </div>
               ) : (

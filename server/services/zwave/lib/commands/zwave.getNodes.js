@@ -27,11 +27,7 @@ function getNodes() {
         service_id: this.serviceId,
         external_id: `zwave:node_id:${node.id}`,
         ready: node.ready,
-        rawZwaveNode: {
-          id: node.id,
-          manufacturer: node.manufacturer,
-          type: node.type,
-        },
+        rawZwaveNode: node,
         features: [],
         params: [],
       };
