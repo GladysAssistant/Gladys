@@ -113,11 +113,12 @@ class ZWaveDeviceBox extends Component {
                     {props.houses &&
                       props.houses.map(house => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
+                          {house.rooms &&
+                            house.rooms.map(room => (
+                              <option selected={room.id === props.device.room_id} value={room.id}>
+                                {room.name}
+                              </option>
+                            ))}
                         </optgroup>
                       ))}
                   </select>
