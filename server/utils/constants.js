@@ -269,6 +269,7 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
+    POWERHOUR: 'power-hour',
     ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
@@ -313,6 +314,7 @@ const DEVICE_FEATURE_UNITS = {
   PERCENT: 'percent',
   PASCAL: 'pascal',
   LUX: 'lux',
+  WATT: 'watt',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
