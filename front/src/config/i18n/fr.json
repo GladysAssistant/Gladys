@@ -296,6 +296,50 @@
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
     },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Contrôler vos appareils Bluetooth.",
+      "deviceTab": "Appareils",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils Bluetooth",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil Bluetooth n'a encore été ajouté.",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "externalIdLabel": "ID externe",
+        "manufacturerLabel": "Manufacturer",
+        "modelLabel": "Model",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
+        "featureNamePlaceholder": "Nom de la fonctionnalité",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer"
+      },
+      "setup": {
+        "title": "Configuration Bluetooth",
+        "scanButton": "Rechercher",
+        "reloadButton": "Recharger",
+        "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
+        "noDeviceFound": "Aucun périphérique Bluetooth détecté.",
+        "createDeviceInGladys": "Connecter dans Gladys",
+        "updateDeviceInGladys": "Mettre à jour dans Gladys",
+        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
+        "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
+        "saveSuccess": "L'appareil Bluetooth a été créé avec succés.",
+        "saveError": "Une erreur est survenue lors de la création de l'appareil.",
+        "peripheral": {
+          "title": "Configuration d'un appareil Bluetooth",
+          "notAvailable": "L'appareil n'est pas disponible, merci de faire une nouvelle recherche.",
+          "createLabel": "Créer",
+          "cancelLabel": "Annuler",
+          "successLabel": "Effectué"
+        }
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "description": "Parlez à Gladys grâce à Telegram.",
