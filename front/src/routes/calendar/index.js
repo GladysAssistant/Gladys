@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/calendar';
+import { isBright } from '../../utils/color';
 
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -31,6 +32,13 @@ class Map extends Component {
     }
     this.props.getEventsInRange(from, to);
   };
+
+  eventPropGetter = event => ({
+    style: {
+      backgroundColor: event.color,
+      color: isBright(event.color) ? 'black' : 'white'
+    }
+  });
 
   componentWillMount() {
     const from = moment()
@@ -65,6 +73,7 @@ class Map extends Component {
                         culture={props.user.language}
                         messages={this.context.intl.dictionary.calendar}
                         scrollToTime={moment().subtract(2, 'hours')}
+                        eventPropGetter={this.eventPropGetter}
                       />
                     </div>
                   </div>

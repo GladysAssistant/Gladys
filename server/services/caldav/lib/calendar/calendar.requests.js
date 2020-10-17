@@ -28,6 +28,7 @@ async function requestCalendars(xhr, homeUrl) {
     props: [
       { name: 'calendar-description', namespace: this.dav.ns.CALDAV },
       { name: 'calendar-timezone', namespace: this.dav.ns.CALDAV },
+      { name: 'calendar-color', namespace: this.dav.ns.CALDAV_APPLE },
       { name: 'displayname', namespace: this.dav.ns.DAV },
       { name: 'getctag', namespace: this.dav.ns.CALENDAR_SERVER },
       { name: 'resourcetype', namespace: this.dav.ns.DAV },
@@ -53,6 +54,7 @@ async function requestCalendars(xhr, homeUrl) {
         data: res,
         description: res.props.calendarDescription,
         timezone: res.props.calendarTimezone,
+        color: res.props.calendarColor,
         url: url.resolve(homeUrl, res.href),
         ctag: res.props.getctag,
         displayName: res.props.displayname,

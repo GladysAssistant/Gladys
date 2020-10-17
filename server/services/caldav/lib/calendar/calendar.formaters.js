@@ -179,6 +179,7 @@ function formatCalendars(caldavCalendars, userId) {
       external_id: caldavCalendar.url,
       name: caldavCalendar.displayName,
       description: caldavCalendar.description || `Calendar ${caldavCalendar.displayName}`,
+      color: caldavCalendar.color || '#3174ad',
       service_id: this.serviceId,
       user_id: userId,
       ctag: caldavCalendar.ctag,

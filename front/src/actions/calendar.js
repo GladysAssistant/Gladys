@@ -11,12 +11,14 @@ function createActions(store) {
           from,
           to
         });
+        const calendars = await state.httpClient.get('/api/v1/calendar');
         const eventsFormated = events.map(event => {
           return {
             title: event.name,
             start: new Date(event.start),
             end: new Date(event.end),
-            allDay: event.full_day
+            allDay: event.full_day,
+            color: calendars.find(calendar => calendar.id === event.calendar_id).color
           };
         });
         store.setState({
