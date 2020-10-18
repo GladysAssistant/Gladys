@@ -70,6 +70,7 @@ describe('calendar.get', () => {
         selector: 'test-calendar',
         external_id: '750db5b7-233b-41d1-89eb-d3aa4e959295',
         description: 'Test calendar',
+        color: '#6c235f',
         sync: true,
         notify: false,
         ctag: null,
