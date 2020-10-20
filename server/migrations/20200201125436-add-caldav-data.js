@@ -10,10 +10,5 @@ module.exports = {
     ]);
   },
 
-  down: (queryInterface, Sequelize) => {
-    return Promise.all([
-      queryInterface.removeColumn('t_calendar', 'ctag'),
-      queryInterface.removeColumn('t_calendar', 'sync_token'),
-    ]);
-  },
+  down: (queryInterface, Sequelize) => {},
 };
