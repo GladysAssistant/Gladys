@@ -1,6 +1,6 @@
 const fse = require('fs-extra');
 const logger = require('../../utils/logger');
-
+const { exec } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
@@ -19,7 +19,7 @@ async function restoreBackup(backupFilePath) {
   // shutting down the DB
   await this.sequelize.close();
   // copy the backupFile to the new DB
-  await fse.copy(backupFilePath, this.config.storage);
+  await exec(`sqlite3 ${this.config.storage} ".restore '${backupFilePath}'"`);
   // done!
   logger.info(`Backup restored. Need reboot now.`);
 }
