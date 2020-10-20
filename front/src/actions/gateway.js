@@ -292,6 +292,7 @@ function createActions(store) {
           }, 2000);
         } else if (restoreStatus.restore_errored) {
           store.setState({
+            gatewayRestoreInProgress: false,
             gatewayRestoreErrored: true
           });
         } else {

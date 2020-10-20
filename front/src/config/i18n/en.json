@@ -1011,7 +1011,8 @@
     "restoreInProgressTitle": "Restoring backup in progress...",
     "backupNowButton": "Backup now",
     "backupStarted": "Backup started...",
-    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it."
+    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it.",
+    "restoreFailed": "Restoring the backup failed. Are you sure you have the same backup key used during the backup ? You can go to the Gladys Plus tab in settings to set another backup key."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",

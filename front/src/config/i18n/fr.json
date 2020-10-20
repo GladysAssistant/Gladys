@@ -1011,7 +1011,8 @@
     "restoreInProgressTitle": "Restauration de la sauvegarde en cours ...",
     "backupNowButton": "Sauvegarder maintenant",
     "backupStarted": "Début de la sauvegarde...",
-    "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer."
+    "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
+    "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
