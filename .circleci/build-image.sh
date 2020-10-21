@@ -11,28 +11,25 @@ echo "QEMU Arch: $QEMU_ARCH"
 echo "QEMU Version: $QEMU_VERSION"
 echo "Tag used: $VERSION"
 
-# ============
-# <qemu-support>
+# Download QEMU for cross platform build
 if [ $QEMU_ARCH == 'amd64' ]; then
   touch qemu-amd64-static
 else
   curl -L "https://github.com/multiarch/qemu-user-static/releases/download/${QEMU_VERSION}/qemu-${QEMU_ARCH}-static.tar.gz" | tar xz
   docker run --rm --privileged multiarch/qemu-user-static:register --reset
 fi
-# </qemu-support>
-# ============
 
-# Replace the repo's Dockerfile with our own.
+# Login to Docker Hub before pulling
+echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+
+# Build docker image
 docker build -f ./docker/Dockerfile \
   -t ${IMAGE_ID} \
-  --build-arg target=$TARGET \
+  --build-arg TARGET=$TARGET \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VERSION=$VERSION \
   .
-
-# Login to Docker Hub.
-echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-
+# Tag docker image
 if [ -n "$MAJOR_VERSION" ]; then
   docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:${MAJOR_VERSION}-${TAG}
   docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:latest-${TAG}
@@ -40,5 +37,5 @@ if [ -n "$MAJOR_VERSION" ]; then
   docker push ${REGISTRY}/${IMAGE}:latest-${TAG}
 fi
 
-# Push push push
+# Push docker image
 docker push ${IMAGE_ID}
