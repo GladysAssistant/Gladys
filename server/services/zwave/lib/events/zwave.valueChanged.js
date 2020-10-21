@@ -18,10 +18,10 @@ function valueChanged(nodeId, comClass, value) {
       nodeId,
       comClass,
       value.label,
-      this.nodes[nodeId].classes[comClass][value.index].value,
+      this.nodes[nodeId].classes[comClass][value.index][value.instance].value,
       value.value,
     );
-    this.nodes[nodeId].classes[comClass][value.index] = value;
+    this.nodes[nodeId].classes[comClass][value.index][value.instance] = value;
     this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: getDeviceFeatureExternalId(value),
       state: value.value,

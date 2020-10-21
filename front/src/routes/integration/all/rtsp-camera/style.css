@@ -1,7 +1,8 @@
 .emptyStateDivBox {
-  margin-top: 89px;
+  margin-top: 35px;
+  margin-bottom: 35px;
 }
 
 .rtspCameraListBody {
-  min-height: 200px
+  min-height: 200px;
 }

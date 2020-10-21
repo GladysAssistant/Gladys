@@ -1,7 +1,7 @@
 {
   "global": {
     "logoAlt": "Logo Gladys",
-    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>.",
+    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "new": "Nouveau",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -45,7 +45,7 @@
     "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
     "invalidEmail": "E-mail invalide",
-    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
+    "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
   "signup": {
     "welcome": {
@@ -248,7 +248,7 @@
           "username": "Apple ID",
           "usernameInfo": "Entrez votre Apple ID.",
           "password": "Mot de passe",
-          "passwordInfo": "<a href=https://support.apple.com/fr-fr/HT204397 target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+          "passwordInfo": "<a href=\"https://support.apple.com/fr-fr/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
         },
         "google": {
           "name": "Google Agenda (déprécié)",
@@ -257,7 +257,7 @@
           "username": "Email",
           "usernameInfo": "Entrez l'adresse email de votre compte Google.",
           "password": "Mot de passe",
-          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=fr target=_blank>Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=fr\" target=\"_blank\" rel=\"noopener noreferrer\">Générez un mot de passe application</a> et utilisez le à la place du mot de passe de votre compte."
         },
         "synology": {
           "name": "Calendrier Synology",
@@ -295,6 +295,50 @@
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
+    },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Contrôler vos appareils Bluetooth.",
+      "deviceTab": "Appareils",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils Bluetooth",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil Bluetooth n'a encore été ajouté.",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "externalIdLabel": "ID externe",
+        "manufacturerLabel": "Manufacturer",
+        "modelLabel": "Model",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
+        "featureNamePlaceholder": "Nom de la fonctionnalité",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer"
+      },
+      "setup": {
+        "title": "Configuration Bluetooth",
+        "scanButton": "Rechercher",
+        "reloadButton": "Recharger",
+        "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
+        "noDeviceFound": "Aucun périphérique Bluetooth détecté.",
+        "createDeviceInGladys": "Connecter dans Gladys",
+        "updateDeviceInGladys": "Mettre à jour dans Gladys",
+        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
+        "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
+        "saveSuccess": "L'appareil Bluetooth a été créé avec succés.",
+        "saveError": "Une erreur est survenue lors de la création de l'appareil.",
+        "peripheral": {
+          "title": "Configuration d'un appareil Bluetooth",
+          "notAvailable": "L'appareil n'est pas disponible, merci de faire une nouvelle recherche.",
+          "createLabel": "Créer",
+          "cancelLabel": "Annuler",
+          "successLabel": "Effectué"
+        }
+      }
     },
     "telegram": {
       "title": "Telegram",
@@ -434,7 +478,10 @@
         "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
         "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
-        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès."
+        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
+        "unknowNode": "Noeud inconnu",
+        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
+        "createGithubIssue": "Signaler un bug avec cet appareil"
       },
       "network": {
         "title": "Réseau Z-Wave"
@@ -625,6 +672,12 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumière que vous souhaitez éteindre"
       },
+      "turnOnSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez allumer"
+      },
+      "turnOffSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
@@ -649,6 +702,10 @@
       "light": {
         "turn-on": "Allumer la lumière",
         "turn-off": "Eteindre les lumières"
+      },
+      "switch": {
+        "turn-on": "Allumer les prises",
+        "turn-off": "Eteindre les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
@@ -847,6 +904,9 @@
     "containerStatus": "État",
     "downloadFinished": "Téléchargement terminé",
     "restartingGladys": "Redémarrage de Gladys ...",
+    "configurationTitle": "Configuration",
+    "timezone": "Fuseau horaire",
+    "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -951,7 +1011,8 @@
     "restoreInProgressTitle": "Restauration de la sauvegarde en cours ...",
     "backupNowButton": "Sauvegarder maintenant",
     "backupStarted": "Début de la sauvegarde...",
-    "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer."
+    "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
+    "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",

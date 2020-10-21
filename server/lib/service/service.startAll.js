@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 /**
  * @public
  * @description Start all services
@@ -6,7 +8,7 @@
  * service.startAll();
  */
 async function startAll() {
-  return Promise.all(Object.keys(this.getServices()).map((serviceKey) => this.start(serviceKey)));
+  return Promise.map(Object.keys(this.getServices()), (serviceKey) => this.start(serviceKey), { concurrency: 1 });
 }
 
 module.exports = {

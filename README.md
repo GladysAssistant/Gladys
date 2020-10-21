@@ -41,6 +41,12 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 To get started, you can go to [our website](https://gladysassistant.com).
 
+## Pull requests are welcome
+
+If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
+
+Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people 👏
@@ -61,17 +67,21 @@ Thanks goes to these wonderful people 👏
   <tr>
     <td align="center"><a href="https://github.com/thib-rdr"><img src="https://avatars2.githubusercontent.com/u/6746308?v=4" width="100px;" alt=""/><br /><sub><b>thib_rdr</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thib-rdr" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.callum-macdonald.com/"><img src="https://avatars0.githubusercontent.com/u/690997?v=4" width="100px;" alt=""/><br /><sub><b>Callum Macdonald</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=chmac" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/Redshark30"><img src="https://avatars1.githubusercontent.com/u/38568609?v=4" width="100px;" alt=""/><br /><sub><b>Redshark30</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Redshark30" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/guillaumeLamanda"><img src="https://avatars0.githubusercontent.com/u/10440081?v=4" width="100px;" alt=""/><br /><sub><b>Lamanda </b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=guillaumeLamanda" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/link39"><img src="https://avatars0.githubusercontent.com/u/2229692?v=4" width="100px;" alt=""/><br /><sub><b>Thibaut Courvoisier</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=link39" title="Code">💻</a></td>
+    <td align="center"><a href="http://lebarzic.fr"><img src="https://avatars2.githubusercontent.com/u/1555884?v=4" width="100px;" alt=""/><br /><sub><b>Frédéric Le Barzic</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=hotfix31" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/NickDub"><img src="https://avatars1.githubusercontent.com/u/32032645?v=4" width="100px;" alt=""/><br /><sub><b>NickDub</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=NickDub" title="Code">💻</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) for more details.
+Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) if you want to help us on Gladys Assistant.
 
 ## Copyright & License
 

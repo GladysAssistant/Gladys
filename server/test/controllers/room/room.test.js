@@ -82,6 +82,18 @@ describe('GET /api/v1/room/:room_selector', () => {
         });
       });
   });
+  it('should get a room by selector with expanded devices', async () => {
+    await authenticatedRequest
+      .get('/api/v1/room/test-room?expand=devices')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('devices');
+        res.body.devices.forEach((device) => {
+          expect(device).to.have.property('service');
+        });
+      });
+  });
 });
 
 describe('GET /api/v1/room', () => {

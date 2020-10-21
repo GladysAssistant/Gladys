@@ -89,7 +89,7 @@
       "name": "thib_rdr",
       "avatar_url": "https://avatars2.githubusercontent.com/u/6746308?v=4",
       "profile": "https://github.com/thib-rdr",
-       "contributions": [
+      "contributions": [
         "doc"
       ]
     },
@@ -100,6 +100,51 @@
       "profile": "http://www.callum-macdonald.com/",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "Redshark30",
+      "name": "Redshark30",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/38568609?v=4",
+      "profile": "https://github.com/Redshark30",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "guillaumeLamanda",
+      "name": "Lamanda ",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10440081?v=4",
+      "profile": "https://github.com/guillaumeLamanda",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "link39",
+      "name": "Thibaut Courvoisier",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/2229692?v=4",
+      "profile": "https://github.com/link39",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "hotfix31",
+      "name": "Frédéric Le Barzic",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1555884?v=4",
+      "profile": "http://lebarzic.fr",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "NickDub",
+      "name": "NickDub",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/32032645?v=4",
+      "profile": "https://github.com/NickDub",
+      "contributions": [
+        "code"
       ]
     }
   ],

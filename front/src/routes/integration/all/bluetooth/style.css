@@ -1,0 +1,12 @@
+.emptyStateDivBox {
+  margin-top: 35px;
+  margin-bottom: 35px;
+}
+
+.bluetoothListBody {
+  min-height: 200px;
+}
+
+.featureListBody {
+  min-height: 50px;
+}

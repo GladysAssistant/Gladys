@@ -1,7 +1,7 @@
 {
   "name": "gladys",
-  "version": "4.0.0-beta-10",
-  "description": "An open-source home assistant",
+  "version": "4.0.0-beta.18",
+  "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
   "scripts": {
     "postinstall": "run-p install-server:dev install-front:dev",
@@ -22,10 +22,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@personal:GladysAssistant/gladys-4-playground.git"
+    "url": "https://github.com/GladysAssistant/Gladys"
   },
   "author": "Pierre-Gilles Leymarie",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "all-contributors-cli": "^6.15.0",
     "npm-run-all": "^4.1.5",

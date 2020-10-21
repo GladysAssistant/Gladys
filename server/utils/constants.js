@@ -20,9 +20,19 @@ const SESSION_TOKEN_TYPES = {
   API_KEY: 'api_key',
 };
 
+const SERVICE_STATUS = {
+  UNKNOWN: 'UNKNOWN',
+  ENABLED: 'ENABLED',
+  DISABLED: 'DISABLED',
+  LOADING: 'LOADING',
+  READY: 'READY',
+  ERROR: 'ERROR',
+};
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
+  TIMEZONE: 'TIMEZONE',
 };
 
 const EVENTS = {
@@ -109,6 +119,7 @@ const EVENTS = {
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
+    TIMEZONE_CHANGED: 'system.timezone-changed',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -182,6 +193,10 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
+  },
+  SWITCH: {
+    TURN_ON: 'switch.turn-on',
+    TURN_OFF: 'switch.turn-off',
   },
   TIME: {
     DELAY: 'delay',
@@ -263,6 +278,7 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
+    POWERHOUR: 'power-hour',
     ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
@@ -307,6 +323,7 @@ const DEVICE_FEATURE_UNITS = {
   PERCENT: 'percent',
   PASCAL: 'pascal',
   LUX: 'lux',
+  WATT: 'watt',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
@@ -378,6 +395,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   TASMOTA: {
     NEW_DEVICE: 'tasmota.new-device',
+  },
+  BLUETOOTH: {
+    STATE: 'bluetooth.status',
+    DISCOVER: 'bluetooth.discover',
   },
 };
 
@@ -460,6 +481,9 @@ module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 
 module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
+
+module.exports.SERVICE_STATUS = SERVICE_STATUS;
+module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 

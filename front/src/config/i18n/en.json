@@ -1,7 +1,7 @@
 {
   "global": {
     "logoAlt": "Gladys logo",
-    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>.",
+    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
@@ -45,7 +45,7 @@
     "loginButtonText": "Log in",
     "wrongCredentials": "Wrong email/password.",
     "invalidEmail": "Invalid email",
-    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\"> Gladys Community</a>."
+    "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
   "signup": {
     "welcome": {
@@ -372,7 +372,10 @@
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
         "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
-        "deviceCreatedSuccess": "The device was successfully added"
+        "deviceCreatedSuccess": "The device was added with success.",
+        "unknowNode": "Unknow node",
+        "sleepingNodeMsg": "Node sleeping or dead. Wake it up then refresh this page.",
+        "createGithubIssue": "Report a bug with this device"
       },
       "network": {
         "title": "Z-Wave Network"
@@ -532,7 +535,7 @@
           "username": "Apple ID",
           "usernameInfo": "Enter your Apple ID.",
           "password": "Password",
-          "passwordInfo": "<a href=https://support.apple.com/en-us/HT204397 target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "google": {
           "name": "Google Calendar (deprecated)",
@@ -541,7 +544,7 @@
           "username": "Email",
           "usernameInfo": "Enter your Google email adress.",
           "password": "Password",
-          "passwordInfo": "<a href=https://support.google.com/accounts/answer/185833?hl=en target=_blank>Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
         "synology": {
           "name": "Synology Calendar",
@@ -579,6 +582,50 @@
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
+    },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Control your Bluetooth devices.",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "device": {
+        "title": "Bluetooth Devices",
+        "search": "Search devices",
+        "noDevices": "No Bluetooth devices added yet.",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter device name",
+        "roomLabel": "Room",
+        "externalIdLabel": "External ID",
+        "manufacturerLabel": "Fabricant",
+        "modelLabel": "Modèle",
+        "featuresLabel": "Features",
+        "noFeatureDiscovered": "No features discovered.",
+        "featureNamePlaceholder": "Enter feature name",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit"
+      },
+      "setup": {
+        "title": "Bluetooth Setup",
+        "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
+        "scanButton": "Scan",
+        "reloadButton": "Reload",
+        "noDeviceFound": "No bluetooth device discovered.",
+        "createDeviceInGladys": "Connect in Gladys",
+        "updateDeviceInGladys": "Update in Gladys",
+        "deviceCreatedSuccess": "The device was successfully added",
+        "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "saveSuccess": "Bluetooth device successfully created.",
+        "saveError": "There was an error creating the device.",
+        "peripheral": {
+          "title": "Bluetooth Peripheral Configuration",
+          "notAvailable": "Peripheral is not available, please scan again.",
+          "createLabel": "Create",
+          "cancelLabel": "Cancel",
+          "successLabel": "Done"
+        }
+      }
     }
   },
   "editScene": {
@@ -625,6 +672,12 @@
       "turnOffLights": {
         "label": "Select the lights you want to turn off"
       },
+      "turnOnSwitches": {
+        "label": "Select the switches you want to turn on"
+      },
+      "turnOffSwitches": {
+        "label": "Select the switches you want to turn off"
+      },
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
@@ -649,6 +702,10 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights"
+      },
+      "switch": {
+        "turn-on": "Turn On the Switches",
+        "turn-off": "Turn Off the Switches"
       },
       "scene": {
         "start": "Start scene"
@@ -847,6 +904,9 @@
     "containerStatus": "Status",
     "downloadFinished": "Download finished.",
     "restartingGladys": "Restarting Gladys...",
+    "configurationTitle": "Configuration",
+    "timezone": "Timezone",
+    "timezoneText": "The timezone is used in scheduled scene.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
@@ -951,7 +1011,8 @@
     "restoreInProgressTitle": "Restoring backup in progress...",
     "backupNowButton": "Backup now",
     "backupStarted": "Backup started...",
-    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it."
+    "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it.",
+    "restoreFailed": "Restoring the backup failed. Are you sure you have the same backup key used during the backup ? You can go to the Gladys Plus tab in settings to set another backup key."
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
