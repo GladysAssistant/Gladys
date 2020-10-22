@@ -1394,6 +1394,125 @@
       },
       "_id": 29,
       "id": 29
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "hue": 23922,
+        "sat": 254,
+        "effect": "none",
+        "xy": [0.2042, 0.6743],
+        "ct": 153,
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-03T13:22:09"
+      },
+      "type": "Extended color light",
+      "name": "Hue go",
+      "modelid": "LLC020",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue go",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 40,
+            "maxlumen": 300,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "huego",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:04:7b:94:67-0b",
+        "swversion": "5.130.1.30000"
+      },
+      "_id": 28,
+      "id": 28,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 1,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": "1980-01-01T00:00:14"
+      },
+      "type": "Dimmable light",
+      "name": "Hue filament bulb 1",
+      "modelid": "LWG001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue white spot",
+      "_rawData": {
+        "state": {
+          "on": true,
+          "bri": 1,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": false
+        },
+        "swupdate": {
+          "state": "noupdates",
+          "lastinstall": "2020-04-11T12:18:47"
+        },
+        "type": "Dimmable light",
+        "name": "Hue filament bulb 1",
+        "modelid": "LWV001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue filament bulb",
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 550
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "vintagebulb",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9e:80:8c-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "EE0A6503",
+        "productid": "Philips-LWV001-1-ST64CFDLv1"
+      },
+      "_id": 30,
+      "id": 30
     }
   ]
 }

@@ -51,6 +51,7 @@ async function getLights() {
         case 'LWB006': // Hue white lamp
         case 'LWG001': // Hue white spot 1
         case 'LWG004': // Hue white spot
+        case 'LWV001': // Hue White Filament Bulb ST64 E27
         case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
         case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
