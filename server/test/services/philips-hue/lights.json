@@ -1513,6 +1513,58 @@
       },
       "_id": 30,
       "id": 30
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 144,
+        "ct": 443,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-02T21:43:51"
+      },
+      "type": "Color temperature light",
+      "name": "Hue ambiance spot 1",
+      "modelid": "LTG002",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue ambiance spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 200,
+            "maxlumen": 350,
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "functional",
+          "direction": "downwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:06:ba:d3:6c-0b",
+        "swversion": "1.65.11_hB798F2",
+        "swconfigid": "EB7E2352",
+        "productid": "Philips-LTG002-1-GU10CTv2"
+      },
+      "_id": 31,
+      "id": 31
     }
   ]
 }
