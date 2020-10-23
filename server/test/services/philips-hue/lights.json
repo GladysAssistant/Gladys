@@ -1565,6 +1565,68 @@
       },
       "_id": 31,
       "id": 31
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "hue": 8402,
+        "sat": 140,
+        "effect": "none",
+        "xy": [
+          0.4575,
+          0.4099
+        ],
+        "ct": 366,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-05T13:27:07"
+      },
+      "type": "Extended color light",
+      "name": "Hue color candle 1",
+      "modelid": "LCT012",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue color candle",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 450,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "candlebulb",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:04:44:b0:de-0b",
+        "swversion": "1.50.2_r30933",
+        "swconfigid": "A9AFB57A",
+        "productid": "Philips-LCT012-1-E14ECLv1"
+      },
+      "_id": 32,
+      "id": 32,
+      "mappedColorGamut": "C"
     }
   ]
 }

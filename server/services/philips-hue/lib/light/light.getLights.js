@@ -39,6 +39,7 @@ async function getLights() {
         case 'GL-C-008': // Non-hue LED Strip
         case 'CLA60 TW OSRAM': // CLA60 TW OSRAM
         case 'LLC020': // Hue go
+        case 'LCT012': // Hue White and Color Ambiance Candle E12
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation
