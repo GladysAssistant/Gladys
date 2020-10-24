@@ -38,6 +38,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
