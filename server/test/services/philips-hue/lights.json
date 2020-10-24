@@ -1624,6 +1624,58 @@
       "_id": 32,
       "id": 32,
       "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "ct": 443,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-10-17T13:13:50"
+      },
+      "type": "Color temperature light",
+      "name": "Master bedroom left",
+      "modelid": "LTA001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue ambiance lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 200,
+            "maxlumen": 800,
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "wallshade",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:ae:75:6e-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "DF3903E5",
+        "productid": "Philips-LTA001-2-A19CTv3"
+      },
+      "_id": 33,
+      "id": 33
     }
   ]
 }
