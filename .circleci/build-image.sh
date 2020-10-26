@@ -2,9 +2,7 @@
 
 set -e
 
-echo "Github Repository: $GITHUB_REPO"
-echo "Image: $IMAGE"
-echo "DockerHub Registry: $REGISTRY"
+echo "DockerHub Registry: $DOCKERHUB_REPO"
 echo "Docker ImageID: $IMAGE_ID"
 echo "Building Target: $TARGET"
 echo "QEMU Arch: $QEMU_ARCH"
@@ -31,10 +29,10 @@ docker build -f ./docker/Dockerfile \
   .
 # Tag docker image
 if [ -n "$MAJOR_VERSION" ]; then
-  docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:${MAJOR_VERSION}-${TAG}
-  docker tag ${IMAGE_ID} ${REGISTRY}/${IMAGE}:latest-${TAG}
-  docker push ${REGISTRY}/${IMAGE}:${MAJOR_VERSION}-${TAG}
-  docker push ${REGISTRY}/${IMAGE}:latest-${TAG}
+  docker tag ${IMAGE_ID} ${DOCKERHUB_REPO}:${MAJOR_VERSION}-${TAG}
+  docker tag ${IMAGE_ID} ${DOCKERHUB_REPO}:latest-${TAG}
+  docker push ${DOCKERHUB_REPO}:${MAJOR_VERSION}-${TAG}
+  docker push ${DOCKERHUB_REPO}:latest-${TAG}
 fi
 
 # Push docker image
