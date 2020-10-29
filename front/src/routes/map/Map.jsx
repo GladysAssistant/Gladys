@@ -20,7 +20,7 @@ class MapComponent extends Component {
       })
       .addTo(this.leafletMap);
 
-    this.displayHouses();
+    this.displayAreas();
     this.displayUsers();
   };
 
@@ -69,6 +69,28 @@ class MapComponent extends Component {
     }
   };
 
+  displayAreas = () => {
+    if (this.props.areas) {
+      this.props.areas.forEach(area => {
+        if (this.areaMarkers[area.id]) {
+          this.areaMarkers[area.id].remove();
+        }
+        if (area.latitude && area.longitude) {
+          this.areaMarkers[area.id] = leaflet
+            .circle([area.latitude, area.longitude], {
+              color: "red",
+          fillColor: "#f03",
+          fillOpacity: 0.5,
+          radius: 500.0
+              })
+
+            .addTo(this.leafletMap);
+          this.markerArray.push(this.areaMarkers[area.id]);
+        }
+      });
+    }
+  };
+
   setMapRef = map => {
     this.map = map;
   };
@@ -77,6 +99,7 @@ class MapComponent extends Component {
     this.props = props;
     this.userMarkers = {};
     this.houseMarkers = {};
+    this.areaMarkers = {};
     this.markerArray = [];
   }
 
@@ -87,6 +110,7 @@ class MapComponent extends Component {
   componentDidUpdate() {
     this.markerArray = [];
     this.displayHouses();
+    this.displayAreas();
     this.displayUsers();
     if (this.markerArray.length >= 1) {
       const group = leaflet.featureGroup(this.markerArray);

@@ -35,6 +35,22 @@ function createActions(store) {
           getHousesWithLocation: RequestStatus.Error
         });
       }
+    },
+    async getAreasWithLocation(state) {
+      store.setState({
+        getAreasWithLocation: RequestStatus.Getting
+      });
+      try {
+        const areasWithLocation = await state.httpClient.get('/api/v1/area');
+        store.setState({
+          areasWithLocation,
+          getAreasWithLocation: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getAreasWithLocation: RequestStatus.Error
+        });
+      }
     }
   };
   return actions;
