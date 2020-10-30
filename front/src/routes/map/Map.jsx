@@ -40,6 +40,7 @@ class MapComponent extends Component {
               }),
               zIndexOffset: 1000
             })
+            .bindTooltip(`${user.firstname} ${user.lastname}`)
             .addTo(this.leafletMap);
           this.markerArray.push(this.userMarkers[user.id]);
         }
@@ -78,13 +79,14 @@ class MapComponent extends Component {
         if (area.latitude && area.longitude) {
           this.areaMarkers[area.id] = leaflet
             .circle([area.latitude, area.longitude], {
-              color: "red",
-          fillColor: "#f03",
-          fillOpacity: 0.5,
-          radius: 500.0
+              color: "${area.color}",
+              fillColor: "${area.color}",
+              fillOpacity: 0.5,
+              radius: area.radius
               })
-
+            .bindTooltip(`${area.name}`)
             .addTo(this.leafletMap);
+
           this.markerArray.push(this.areaMarkers[area.id]);
         }
       });
