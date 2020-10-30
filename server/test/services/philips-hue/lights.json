@@ -1394,6 +1394,288 @@
       },
       "_id": 29,
       "id": 29
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "hue": 23922,
+        "sat": 254,
+        "effect": "none",
+        "xy": [0.2042, 0.6743],
+        "ct": 153,
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-03T13:22:09"
+      },
+      "type": "Extended color light",
+      "name": "Hue go",
+      "modelid": "LLC020",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue go",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 40,
+            "maxlumen": 300,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "huego",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:04:7b:94:67-0b",
+        "swversion": "5.130.1.30000"
+      },
+      "_id": 28,
+      "id": 28,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 1,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": "1980-01-01T00:00:14"
+      },
+      "type": "Dimmable light",
+      "name": "Hue filament bulb 1",
+      "modelid": "LWG001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue white spot",
+      "_rawData": {
+        "state": {
+          "on": true,
+          "bri": 1,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": false
+        },
+        "swupdate": {
+          "state": "noupdates",
+          "lastinstall": "2020-04-11T12:18:47"
+        },
+        "type": "Dimmable light",
+        "name": "Hue filament bulb 1",
+        "modelid": "LWV001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue filament bulb",
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 550
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "vintagebulb",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9e:80:8c-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "EE0A6503",
+        "productid": "Philips-LWV001-1-ST64CFDLv1"
+      },
+      "_id": 30,
+      "id": 30
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 144,
+        "ct": 443,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-02T21:43:51"
+      },
+      "type": "Color temperature light",
+      "name": "Hue ambiance spot 1",
+      "modelid": "LTG002",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue ambiance spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 200,
+            "maxlumen": 350,
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "functional",
+          "direction": "downwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:06:ba:d3:6c-0b",
+        "swversion": "1.65.11_hB798F2",
+        "swconfigid": "EB7E2352",
+        "productid": "Philips-LTG002-1-GU10CTv2"
+      },
+      "_id": 31,
+      "id": 31
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "hue": 8402,
+        "sat": 140,
+        "effect": "none",
+        "xy": [0.4575, 0.4099],
+        "ct": 366,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2018-12-05T13:27:07"
+      },
+      "type": "Extended color light",
+      "name": "Hue color candle 1",
+      "modelid": "LCT012",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue color candle",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 2000,
+            "maxlumen": 450,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "candlebulb",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:04:44:b0:de-0b",
+        "swversion": "1.50.2_r30933",
+        "swconfigid": "A9AFB57A",
+        "productid": "Philips-LCT012-1-E14ECLv1"
+      },
+      "_id": 32,
+      "id": 32,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "ct": 443,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-10-17T13:13:50"
+      },
+      "type": "Color temperature light",
+      "name": "Master bedroom left",
+      "modelid": "LTA001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue ambiance lamp",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 200,
+            "maxlumen": 800,
+            "ct": {
+              "min": 153,
+              "max": 454
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "wallshade",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:ae:75:6e-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "DF3903E5",
+        "productid": "Philips-LTA001-2-A19CTv3"
+      },
+      "_id": 33,
+      "id": 33
     }
   ]
 }
