@@ -28,5 +28,9 @@
   {
     "key": "rflink",
     "img": "/assets/integrations/cover/rflink.png"
+  },
+  {
+    "key": "bluetooth",
+    "img": "/assets/integrations/cover/bluetooth.jpg"
   }
 ]

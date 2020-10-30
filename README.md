@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-	<img src="https://gladysassistant.com/assets/images/external/github-gladys-logo.png" width="200">
+	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
   <br>
   Gladys Assistant
 </h1>
@@ -18,7 +18,7 @@
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
-<img src="https://gladysassistant.com/assets/images/external/github-gladys-4-mockups-devices.jpg" />
+<img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
 
 ## The Project
 
@@ -39,26 +39,13 @@ This is just a simple scenario, possibilities with Gladys are just endless. Don'
 
 ## Getting Started
 
-Right now we are migrating from Gladys 3 to Gladys 4, a new release rewrote from scratch. If you want to install Gladys 3, visit [our website](https://gladysassistant.com).
+To get started, you can go to [our website](https://gladysassistant.com).
 
-To install Gladys 4 Beta, read the following instructions.
+## Pull requests are welcome
 
-We use Docker to deploy Gladys 4, so it's easy to install it on any system.
+If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
 
-### On a Raspberry Pi
-
-Read our tutorial: [Install Gladys 4 on a Raspberry Pi](https://documentation.gladysassistant.com/en/installation#raspberry-pi)
-
-### On MacOS/Windows
-
-Read our tutorial: [Install Gladys 4 on MacOS/Windows](https://documentation.gladysassistant.com/en/installation#macos-windows)
-
-## Links
-
-- [Website](https://gladysassistant.com)
-- [Community](https://community.gladysassistant.com/)
-- [Twitter](https://twitter.com/gladysassistant)
-- [Instagram](https://www.instagram.com/gladysassistant/)
+Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
 
 ## Contributors ✨
 
@@ -77,6 +64,15 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/sescandell"><img src="https://avatars0.githubusercontent.com/u/1559970?v=4" width="100px;" alt=""/><br /><sub><b>Stéphane</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=sescandell" title="Code">💻</a> <a href="#infra-sescandell" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-sescandell" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="http://fischerdesign.co"><img src="https://avatars1.githubusercontent.com/u/8835133?v=4" width="100px;" alt=""/><br /><sub><b>Scott Fischer</b></sub></a><br /><a href="#translation-Scott-Fischer" title="Translation">🌍</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/thib-rdr"><img src="https://avatars2.githubusercontent.com/u/6746308?v=4" width="100px;" alt=""/><br /><sub><b>thib_rdr</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thib-rdr" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://www.callum-macdonald.com/"><img src="https://avatars0.githubusercontent.com/u/690997?v=4" width="100px;" alt=""/><br /><sub><b>Callum Macdonald</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=chmac" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/Redshark30"><img src="https://avatars1.githubusercontent.com/u/38568609?v=4" width="100px;" alt=""/><br /><sub><b>Redshark30</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Redshark30" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/guillaumeLamanda"><img src="https://avatars0.githubusercontent.com/u/10440081?v=4" width="100px;" alt=""/><br /><sub><b>Lamanda </b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=guillaumeLamanda" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/link39"><img src="https://avatars0.githubusercontent.com/u/2229692?v=4" width="100px;" alt=""/><br /><sub><b>Thibaut Courvoisier</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=link39" title="Code">💻</a></td>
+    <td align="center"><a href="http://lebarzic.fr"><img src="https://avatars2.githubusercontent.com/u/1555884?v=4" width="100px;" alt=""/><br /><sub><b>Frédéric Le Barzic</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=hotfix31" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/NickDub"><img src="https://avatars1.githubusercontent.com/u/32032645?v=4" width="100px;" alt=""/><br /><sub><b>NickDub</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=NickDub" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
@@ -85,7 +81,7 @@ Thanks goes to these wonderful people 👏
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) for more details.
+Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) if you want to help us on Gladys Assistant.
 
 ## Copyright & License
 

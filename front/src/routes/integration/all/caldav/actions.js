@@ -11,6 +11,10 @@ const actions = store => ({
       store.setState({
         caldavUrl: 'https://caldav.icloud.com'
       });
+    } else if (e.target.value === 'google') {
+      store.setState({
+        caldavUrl: 'https://www.google.com/calendar/dav'
+      });
     }
   },
   updateCaldavUrl(state, e) {

@@ -13,7 +13,7 @@ const fakeWeather = {
   humidity: 0.76,
   pressure: 1019.4,
   datetime: new Date('2019-03-28T07:50:18.000Z'),
-  units: 'si',
+  units: 'metric',
   windSpeed: 5.25,
   weather: 'cloud',
 };
@@ -21,17 +21,17 @@ const fakeWeather = {
 const Weather = require('../../../lib/weather');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
-const darkSky = {
+const openWeather = {
   weather: {
     get: fake.resolves(fakeWeather),
   },
 };
 
 const service = {
-  getService: () => darkSky,
+  getService: () => openWeather,
 };
 
-const serviceWithoutDarkSky = {
+const serviceWithoutOpenWeather = {
   getService: () => null,
 };
 
@@ -43,7 +43,7 @@ describe('weather.get', () => {
       longitude: -2,
       offset: 0,
       language: 'fr',
-      units: 'si',
+      units: 'metric',
     };
     const result = await weather.get(options);
     expect(result).to.deep.equal({
@@ -51,23 +51,23 @@ describe('weather.get', () => {
       humidity: 0.76,
       pressure: 1019.4,
       datetime: new Date('2019-03-28T07:50:18.000Z'),
-      units: 'si',
+      units: 'metric',
       windSpeed: 5.25,
       weather: 'cloud',
     });
-    assert.calledWith(darkSky.weather.get, options);
+    assert.calledWith(openWeather.weather.get, options);
   });
   it('should throw an error, service not configured', async () => {
-    const weather = new Weather(serviceWithoutDarkSky, event);
+    const weather = new Weather(serviceWithoutOpenWeather, event);
     const options = {
       latitude: 112,
       longitude: -2,
       offset: 0,
       language: 'fr',
-      units: 'si',
+      units: 'metric',
     };
     expect(() => {
       weather.get(options);
-    }).to.throw(ServiceNotConfiguredError, 'Service darksky is not found or not configured');
+    }).to.throw(ServiceNotConfiguredError, 'Service openweather is not found or not configured');
   });
 });

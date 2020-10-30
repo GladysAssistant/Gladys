@@ -37,6 +37,8 @@ async function getLights() {
         case 'LCT010': // Hue A19 White & Color w/ Richer Colors
         case 'LCA001': // Hue color lamp
         case 'GL-C-008': // Non-hue LED Strip
+        case 'CLA60 TW OSRAM': // CLA60 TW OSRAM
+        case 'LLC020': // Hue go
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation
@@ -44,8 +46,10 @@ async function getLights() {
           lightsToReturn.push(getPhilipsHueColorLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LWO001': // Hue White Filament Bulb G93 E27
+        case 'LWA001': // Hue White Bulb E27 (Dimmable light 2700K)
         case 'LWB010': // Hue white bulb with fixed warming light (2700K)
         case 'LWB006': // Hue white lamp
+        case 'LWG001': // Hue white spot 1
         case 'LWG004': // Hue white spot
         case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
         case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp

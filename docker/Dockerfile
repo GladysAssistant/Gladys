@@ -1,6 +1,8 @@
-ARG target
+ARG TARGET
+ARG VERSION
+ARG BUILD_DATE
 
-FROM $target/node:12-alpine
+FROM $TARGET/node:12-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
@@ -25,6 +27,8 @@ RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
     && cd /tmp \
     && rm -rf /tmp/open-zwave
 
+# Install Bluez dependencies
+RUN apk add --no-cache bluez
 
 # Install Gladys
 RUN mkdir /src

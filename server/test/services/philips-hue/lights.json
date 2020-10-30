@@ -1194,6 +1194,218 @@
       },
       "_id": 25,
       "id": 25
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "select",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": null
+      },
+      "type": "Dimmable light",
+      "name": "Hue white lamp 2",
+      "modelid": "LWA001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue white lamp",
+      "_rawData": {
+        "state": {
+          "on": true,
+          "bri": 254,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": true
+        },
+        "swupdate": {
+          "state": "transferring",
+          "lastinstall": null
+        },
+        "type": "Dimmable light",
+        "name": "Hue white lamp 2",
+        "modelid": "LWA001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue white lamp",
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 5000,
+            "maxlumen": 800
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:9f:97:bd-0c",
+        "swversion": "1.53.3_r27175",
+        "swconfigid": "D6781B83",
+        "productid": "Philips-LWA001-1-A19DLv5"
+      },
+      "_id": 26,
+      "id": 26
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "ct": 370,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2020-09-03T19:43:06"
+      },
+      "type": "Color temperature light",
+      "name": "Escalier",
+      "modelid": "CLA60 TW OSRAM",
+      "manufacturername": "OSRAM",
+      "productname": "Color temperature light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {
+            "ct": {
+              "min": 153,
+              "max": 370
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "7c:b0:3e:aa:0a:00:c2:b7-03",
+        "swversion": "V1.05.10"
+      },
+      "_id": 27,
+      "id": 27
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "hue": 23922,
+        "sat": 254,
+        "effect": "none",
+        "xy": [0.2042, 0.6743],
+        "ct": 153,
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-03T13:22:09"
+      },
+      "type": "Extended color light",
+      "name": "Hue go",
+      "modelid": "LLC020",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue go",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 40,
+            "maxlumen": 300,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "huego",
+          "function": "decorative",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:04:7b:94:67-0b",
+        "swversion": "5.130.1.30000"
+      },
+      "_id": 28,
+      "id": 28,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 1,
+        "alert": "none",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "transferring",
+        "lastinstall": "1980-01-01T00:00:14"
+      },
+      "type": "Dimmable light",
+      "name": "Hue white spot 1",
+      "modelid": "LWG001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue white spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 5000,
+            "maxlumen": 300
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "functional",
+          "direction": "downwards",
+          "startup": {
+            "mode": "custom",
+            "configured": true,
+            "customsettings": {
+              "bri": 101
+            }
+          }
+        },
+        "uniqueid": "00:17:88:01:04:c3:d1:88-0b",
+        "swversion": "1.46.13_r26312",
+        "swconfigid": "ACCF4E76",
+        "productid": "Philips-LWG001-1-GU10DLv1"
+      },
+      "_id": 29,
+      "id": 29
     }
   ]
 }

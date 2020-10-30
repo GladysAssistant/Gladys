@@ -8,6 +8,14 @@ const createDevice = (props, device) => () => {
   props.createDevice(device);
 };
 
+const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
+
+const createGithubUrl = device => {
+  const title = encodeURIComponent(`Philips Hue: Add device ${device.model}`);
+  const body = encodeURIComponent('```\n' + JSON.stringify(device, null, 2) + '\n```');
+  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
+};
+
 const FoundDevices = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
@@ -48,8 +56,18 @@ const FoundDevices = ({ children, ...props }) => (
                         </button>
                       )}
                       {device.not_handled && (
-                        <div class="alert alert-warning">
-                          <Text id="integration.philipsHue.device.deviceNotHandled" />
+                        <div>
+                          <div class="alert alert-warning">
+                            <Text id="integration.philipsHue.device.deviceNotHandled" />
+                          </div>
+                          <a
+                            class="btn btn-primary"
+                            href={createGithubUrl(device)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Text id="integration.philipsHue.device.createGithubIssue" />
+                          </a>
                         </div>
                       )}
                     </div>

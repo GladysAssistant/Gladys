@@ -38,6 +38,7 @@ function addScene(sceneRaw) {
       trigger.key = uuid.v4();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = new schedule.RecurrenceRule();
+        rule.tz = this.timezone;
         switch (trigger.scheduler_type) {
           case 'every-month':
             rule.date = trigger.day_of_the_month;

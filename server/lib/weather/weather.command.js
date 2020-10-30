@@ -21,7 +21,7 @@ async function command(message, classification, context) {
       case 'weather.get':
         weather = await this.get(house);
         context.temperature = weather.temperature;
-        context.units = weather.units === 'si' ? '°C' : '°F';
+        context.units = weather.units === 'metric' ? '°C' : '°F';
         await this.messageManager.replyByIntent(message, `weather.get.success.${weather.weather}`, context);
         break;
       default:
