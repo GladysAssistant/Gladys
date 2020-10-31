@@ -38,7 +38,7 @@ async function start(name) {
     try {
       await service.start();
       // Once service started, set service status to ready
-      status = SERVICE_STATUS.READY;
+      status = SERVICE_STATUS.RUNNING;
     } catch (e) {
       // If service fails to start, set service status to error
       status = SERVICE_STATUS.ERROR;
