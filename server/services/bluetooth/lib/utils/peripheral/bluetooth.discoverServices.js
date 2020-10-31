@@ -13,36 +13,12 @@ const { TIMERS } = require('./../bluetooth.constants');
  * @example
  * await discoverServices(peripheral, ['2a29']);
  */
-async function discoverServices(peripheral, serviceUuids = []) {
+async function discoverServices(peripheral, serviceUuids) {
   const serviceMap = {};
-  let notMapped = serviceUuids;
-  const filtering = serviceUuids.length && peripheral.services;
-
-  if (filtering) {
-    logger.debug(`Bluetooth: filtering services for ${peripheral.uuid}`);
-
-    notMapped = serviceUuids.filter((uuid) => {
-      const found = peripheral.services.filter((service) => {
-        const filtered = service.uuid === uuid;
-        if (filtered) {
-          serviceMap[service.uuid] = service;
-        }
-        return filtered;
-      });
-
-      return found.length === 0;
-    });
-  }
-
-  if (filtering && notMapped.length === 0) {
-    logger.debug(`Bluetooth: all services found for ${peripheral.uuid}`);
-    return serviceMap;
-  }
-
-  logger.trace(`Bluetooth: discovering services on ${peripheral.uuid}`, notMapped);
+  logger.trace(`Bluetooth: discovering services on ${peripheral.uuid}`, serviceUuids);
 
   return new Promise((resolve, reject) => {
-    peripheral.discoverServices(notMapped, (error, services) => {
+    peripheral.discoverServices(serviceUuids, (error, services) => {
       if (error) {
         reject(new Error(`Bluetooth: error discovering services on ${peripheral.uuid} - ${error}`));
       }
