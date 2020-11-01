@@ -217,6 +217,7 @@ const ACTIONS = {
     GET_VALUE: 'device.get-value',
   },
   LIGHT: {
+    SET_BRIGHTNESS: 'light.set-brightness',
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
   },
@@ -401,6 +402,11 @@ const DEVICE_POLL_FREQUENCIES = {
   EVERY_SECONDS: 1 * 1000,
 };
 
+const DIMMER_VALUES = {
+  MIN: 0,
+  MAX: 100
+};
+
 const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
@@ -547,6 +553,7 @@ module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
+module.exports.DIMMER_VALUES = DIMMER_VALUES;
 
 module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 

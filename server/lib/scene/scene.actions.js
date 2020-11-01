@@ -58,6 +58,21 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.LIGHT.SET_BRIGHTNESS]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        );
+        await self.device.setValue(device, deviceFeature, action.value);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
