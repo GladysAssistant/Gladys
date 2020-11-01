@@ -1,9 +1,10 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
-import Device from './Device';
+import IntegrationDeviceCard from '../../../../../components/integration/IntegrationDeviceCard';
+import IntegrationDeviceListOptions from '../../../../../components/integration/IntegrationDeviceListOptions';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -12,27 +13,7 @@ const DeviceTab = ({ children, ...props }) => (
         <Text id="integration.philipsHue.device.title" />
       </h3>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.philipsHue.device.search" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <IntegrationDeviceListOptions changeOrderDir={props.changeOrderDir} debouncedSearch={props.debouncedSearch} />
       </div>
     </div>
     <div class="card-body">
@@ -46,15 +27,10 @@ const DeviceTab = ({ children, ...props }) => (
           {props.getPhilipsHueDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.philipsHueDevices &&
-              props.philipsHueDevices.map((device, index) => (
-                <Device
-                  device={device}
-                  deviceIndex={index}
-                  houses={props.houses}
-                  updateDeviceProperty={props.updateDeviceProperty}
-                  saveDevice={props.saveDevice}
-                  deleteDevice={props.deleteDevice}
-                />
+              props.philipsHueDevices.map(device => (
+                <div class="col-md-6">
+                  <IntegrationDeviceCard device={device} houses={props.houses} />
+                </div>
               ))}
             {props.philipsHueDevices && props.philipsHueDevices.length === 0 && (
               <Text id="integration.philipsHue.device.noDevices" />

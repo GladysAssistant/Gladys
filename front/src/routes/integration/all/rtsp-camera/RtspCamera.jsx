@@ -1,10 +1,10 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import RtspCameraBox from './RtspCameraBox';
-import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
-import style from './style.css';
+import IntegrationDeviceListOptions from '../../../../components/integration/IntegrationDeviceListOptions';
+import IntegrationEmptyState from '../../../../components/integration/IntegrationEmptyState';
 
 const RtspCameraPage = ({ children, ...props }) => (
   <div class="page">
@@ -19,27 +19,10 @@ const RtspCameraPage = ({ children, ...props }) => (
                     <Text id="integration.rtspCamera.title" />
                   </h1>
                   <div class="page-options d-flex">
-                    <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-                      <option value="asc">
-                        <Text id="global.orderDirAsc" />
-                      </option>
-                      <option value="desc">
-                        <Text id="global.orderDirDesc" />
-                      </option>
-                    </select>
-                    <div class="input-icon ml-2">
-                      <span class="input-icon-addon">
-                        <i class="fe fe-search" />
-                      </span>
-                      <Localizer>
-                        <input
-                          type="text"
-                          class="form-control w-10"
-                          placeholder={<Text id="integration.rtspCamera.search" />}
-                          onInput={props.debouncedSearch}
-                        />
-                      </Localizer>
-                    </div>
+                    <IntegrationDeviceListOptions
+                      changeOrderDir={props.changeOrderDir}
+                      debouncedSearch={props.debouncedSearch}
+                    />
                     <button onClick={props.addCamera} class="btn btn-outline-primary ml-2">
                       <Text id="scene.newButton" /> <i class="fe fe-plus" />
                     </button>
@@ -52,7 +35,7 @@ const RtspCameraPage = ({ children, ...props }) => (
                     })}
                   >
                     <div class="loader" />
-                    <div class={cx('dimmer-content', style.rtspCameraListBody)}>
+                    <div class="dimmer-content deviceList">
                       <div class="row">
                         {props.rtspCameras &&
                           props.rtspCameras.map((camera, index) => (
@@ -67,7 +50,11 @@ const RtspCameraPage = ({ children, ...props }) => (
                               deleteCamera={props.deleteCamera}
                             />
                           ))}
-                        {props.rtspCameras && props.rtspCameras.length === 0 && <EmptyState />}
+                        {props.rtspCameras && props.rtspCameras.length === 0 && (
+                          <IntegrationEmptyState>
+                            <Text id="integration.rtspCamera.noCameraFound" />
+                          </IntegrationEmptyState>
+                        )}
                       </div>
                     </div>
                   </div>

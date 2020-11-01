@@ -232,6 +232,11 @@
         "health": "Health",
         "weather": "Weather",
         "navigation": "navigation"
+      },
+      "device": {
+        "title": "{{integration}} devices",
+        "search": "Search devices",
+        "noDevices": "No {{integration}} devices added yet."
       }
     },
     "telegram": {
@@ -303,7 +308,6 @@
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
-        "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
         "featuresLabel": "Features"
       },
@@ -315,14 +319,9 @@
         "documentation": "Tasmota documentation",
         "scan": "Scan"
       },
-      "nameLabel": "Device Name",
-      "namePlaceholder": "Enter the name of your device",
-      "roomLabel": "Room",
       "topicLabel": "Tasmota MQTT Topic",
-      "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
-      "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed",
       "error": {
         "defaultError": "There was an error saving the device.",
@@ -337,21 +336,6 @@
       "networkTab": "Network",
       "settingsTab": "Settings",
       "setupTab": "Setup",
-      "device": {
-        "title": "Z-Wave Devices",
-        "search": "Search devices",
-        "noDevices": "No Z-Wave devices added yet.",
-        "scanButton": "Scan",
-        "nameLabel": "Name",
-        "roomLabel": "Room",
-        "featuresLabel": "Features",
-        "noFeatures": "No features",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit",
-        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
-      },
       "setup": {
         "title": "Z-Wave Devices",
         "addNodeButton": "Add",
@@ -427,22 +411,7 @@
         "title": "MQTT Devices",
         "search": "Search devices",
         "noDevices": "No MQTT devices added yet.",
-        "noNameLabel": "No name",
-        "nameLabel": "Name",
-        "externalIdLabel": "External ID",
-        "roomLabel": "Room",
-        "featuresLabel": "Features",
-        "noFeatures": "No features",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "returnButton": "Return back",
-        "editButton": "Edit details",
-        "notFound": "Requested device not found.",
-        "backToList": "Back to device list",
-        "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
+        "notFound": "Requested device not found."
       },
       "feature": {
         "nameLabel": "Name",
@@ -495,15 +464,8 @@
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
-        "searchPlaceholder": "Search Xiaomi devices",
         "sidLabel": "Xiaomi SID",
-        "ipLabel": "IP Address",
-        "roomLabel": "Room",
-        "featuresLabel": "Features",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit details",
-        "noFeatures": "No features"
+        "ipLabel": "IP Address"
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
@@ -592,19 +554,8 @@
         "title": "Bluetooth Devices",
         "search": "Search devices",
         "noDevices": "No Bluetooth devices added yet.",
-        "noFeatures": "No features",
-        "nameLabel": "Name",
-        "namePlaceholder": "Enter device name",
-        "roomLabel": "Room",
-        "externalIdLabel": "External ID",
         "manufacturerLabel": "Fabricant",
-        "modelLabel": "Modèle",
-        "featuresLabel": "Features",
-        "noFeatureDiscovered": "No features discovered.",
-        "featureNamePlaceholder": "Enter feature name",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit"
+        "noFeatureDiscovered": "No features discovered."
       },
       "setup": {
         "title": "Bluetooth Setup",
@@ -1180,6 +1131,7 @@
     "noName": "No name",
     "nameLabel": "Name",
     "roomLabel": "Room",
+    "modelLabel": "Model",
     "featuresLabel": "Features",
     "noFeatures": "No features",
     "namePlaceholder": "Enter name",
@@ -1187,6 +1139,8 @@
     "externalIdPlaceholder": "Enter external ID",
     "unitLabel": "Unit",
     "saveButton": "Save",
+    "deleteButton": "Delete",
+    "editButton": "Edit",
     "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API.",
     "minLabel": "Minimum value",
     "minPlaceholder": "Enter feature minimum value",
@@ -1196,7 +1150,9 @@
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-    "notFound": "Requested device not found."
+    "notFound": "Requested device not found.",
+    "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
+    "noValueReceived": "No value received."
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",

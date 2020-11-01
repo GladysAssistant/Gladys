@@ -185,7 +185,7 @@ const AppRouter = connect(
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
-        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
+        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/edit/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
 

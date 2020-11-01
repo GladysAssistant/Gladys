@@ -47,7 +47,7 @@ class BluetoothPeripheral extends Component {
           <div class="card-body">
             <div class="form-group">
               <label>
-                <Text id="integration.bluetooth.device.externalIdLabel" />
+                <Text id="editDeviceForm.externalIdLabel" />
               </label>
               <input type="text" class="form-control" disabled value={peripheral.external_id} />
             </div>
@@ -59,7 +59,7 @@ class BluetoothPeripheral extends Component {
             </div>
             <div class="form-group">
               <label>
-                <Text id="integration.bluetooth.device.modelLabel" />
+                <Text id="editDeviceForm.modelLabel" />
               </label>
               <input type="text" class="form-control" disabled value={peripheral.model} />
             </div>

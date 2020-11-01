@@ -1,23 +1,12 @@
-import { Component } from 'preact';
-import { connect } from 'unistore/preact';
-import actions from './actions';
 import ZwavePage from '../ZwavePage';
-import NodeTab from './NodeTab';
+import IntegrationDeviceList from '../../../../../components/integration/IntegrationDeviceList';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
-class ZwaveNodePage extends Component {
-  componentWillMount() {
-    this.props.getZWaveDevices();
-    this.props.getHouses();
-  }
-
-  render(props, {}) {
-    return (
-      <ZwavePage>
-        <NodeTab {...props} />
-      </ZwavePage>
-    );
-  }
-}
+const ZwaveNodePage = () => {
+  return (
+    <ZwavePage>
+      <IntegrationDeviceList integrationName="zwave" />
+    </ZwavePage>
+  );
+};
 
 export default ZwaveNodePage;

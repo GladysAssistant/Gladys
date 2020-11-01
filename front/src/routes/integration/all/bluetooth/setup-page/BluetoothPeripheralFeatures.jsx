@@ -4,10 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-
 import { PARAMS } from '../../../../../../../server/services/bluetooth/lib/utils/bluetooth.constants';
-
-import style from '../style.css';
 
 class BluetoothPeripheralFeatures extends Component {
   scan = () => {
@@ -22,7 +19,7 @@ class BluetoothPeripheralFeatures extends Component {
     return (
       <div class="form-group">
         <label>
-          <Text id="integration.bluetooth.device.featuresLabel" />
+          <Text id="editDeviceForm.featuresLabel" />
         </label>
         <div class="row mb-3">
           <button
@@ -35,7 +32,7 @@ class BluetoothPeripheralFeatures extends Component {
           </button>
         </div>
         <div class={cx('dimmer', { active: !loadedValue && loadedParam })}>
-          <div class={cx('dimmer-content', style.featureListBody)}>
+          <div class="dimmer-content featureListBody">
             {loadedParam && (!peripheral.features || peripheral.features.length === 0) && (
               <div class="text-center font-italic">
                 <Text id="integration.bluetooth.device.noFeatureDiscovered" />

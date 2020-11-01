@@ -1,10 +1,9 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import EmptyState from './EmptyState';
-import style from './style.css';
 import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
+import IntegrationEmptyState from '../../../../../components/integration/IntegrationEmptyState';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -30,7 +29,7 @@ const DeviceTab = ({ children, ...props }) => (
         })}
       >
         <div class="loader" />
-        <div class={cx('dimmer-content', style.tasmotaListBody)}>
+        <div class="dimmer-content deviceList">
           {props.errorLoading && (
             <p class="alert alert-danger">
               <Text id="integration.tasmota.discover.error" />
@@ -50,7 +49,11 @@ const DeviceTab = ({ children, ...props }) => (
                   listName="discoveredDevices"
                 />
               ))}
-            {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}
+            {(!props.discoveredDevices || props.discoveredDevices.length === 0) && (
+              <IntegrationEmptyState>
+                <Text id="integration.tasmota.discover.noDeviceFound" />
+              </IntegrationEmptyState>
+            )}
           </div>
         </div>
       </div>

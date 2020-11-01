@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import cx from 'classnames';
 
 import BluetoothPage from '../../BluetoothPage';
 import PeripheralNotFound from './PeripheralNotFound';
@@ -9,8 +8,6 @@ import ConfigurePeripheral from './ConfigurePeripheral';
 import { RequestStatus } from '../../../../../../utils/consts';
 import actions from '../actions';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
-
-import style from '../../style.css';
 
 @connect('session,httpClient,houses,bluetoothStatus', actions)
 class BluetoothConnnectPage extends Component {
@@ -75,7 +72,7 @@ class BluetoothConnnectPage extends Component {
         case RequestStatus.Getting:
           content = (
             <div class="dimmer active">
-              <div class={cx('loader', style.emptyStateDivBox)} />
+              <div class="loader emptyStateDivBox" />
             </div>
           );
           break;

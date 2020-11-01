@@ -1,8 +1,9 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../utils/consts';
-import Device from './Device';
+import IntegrationDeviceCard from '../../../../components/integration/IntegrationDeviceCard';
+import IntegrationDeviceListOptions from '../../../../components/integration/IntegrationDeviceListOptions';
 import style from './style.css';
 
 const DevicePanel = ({ children, ...props }) => (
@@ -12,28 +13,7 @@ const DevicePanel = ({ children, ...props }) => (
         <Text id="integration.xiaomi.device.title" />
       </h3>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
-              value={props.xiaomiDeviceSearch}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <IntegrationDeviceListOptions changeOrderDir={props.changeOrderDir} debouncedSearch={props.debouncedSearch} />
       </div>
     </div>
     <div class="card-body">
@@ -47,15 +27,36 @@ const DevicePanel = ({ children, ...props }) => (
           {props.getXiaomiDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.xiaomiDevices &&
-              props.xiaomiDevices.map((xiaomiDevice, index) => (
-                <Device
-                  device={xiaomiDevice}
-                  deviceIndex={index}
-                  houses={props.houses}
-                  updateDeviceProperty={props.updateDeviceProperty}
-                  saveDevice={props.saveDevice}
-                  deleteDevice={props.deleteDevice}
-                />
+              props.xiaomiDevices.map(xiaomiDevice => (
+                <div class="col-md-4">
+                  <IntegrationDeviceCard
+                    device={xiaomiDevice}
+                    houses={props.houses}
+                    editUrl={`/dashboard/integration/device/xiaomi/edit/${xiaomiDevice.selector}`}
+                  >
+                    <div>
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.xiaomi.device.sidLabel" />
+                        </label>
+                        <input
+                          type="text"
+                          value={xiaomiDevice.external_id.split(':')[1]}
+                          class="form-control"
+                          disabled
+                        />
+                      </div>
+                      {xiaomiDevice.model === 'xiaomi-gateway' && (
+                        <div class="form-group">
+                          <label class="form-label">
+                            <Text id="integration.xiaomi.device.ipLabel" />
+                          </label>
+                          <input type="text" value={this.getGatewayIp()} class="form-control" disabled />
+                        </div>
+                      )}
+                    </div>
+                  </IntegrationDeviceCard>
+                </div>
               ))}
             {props.xiaomiDevices && props.xiaomiDevices.length === 0 && (
               <p class="text-center">

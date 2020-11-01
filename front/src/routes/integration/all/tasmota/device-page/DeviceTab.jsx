@@ -1,11 +1,12 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import { Link } from 'preact-router/match';
 
-import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
-import style from './style.css';
 import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
+import IntegrationDeviceListOptions from '../../../../../components/integration/IntegrationDeviceListOptions';
+import IntegrationEmptyState from '../../../../../components/integration/IntegrationEmptyState';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -14,27 +15,7 @@ const DeviceTab = ({ children, ...props }) => (
         <Text id="integration.tasmota.device.title" />
       </h1>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.tasmota.device.search" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <IntegrationDeviceListOptions changeOrderDir={props.changeOrderDir} debouncedSearch={props.debouncedSearch} />
       </div>
     </div>
     <div class="card-body">
@@ -46,7 +27,7 @@ const DeviceTab = ({ children, ...props }) => (
         })}
       >
         <div class="loader" />
-        <div class={cx('dimmer-content', style.tasmotaListBody)}>
+        <div class="dimmer-content deviceList">
           <div class="row">
             {props.tasmotaDevices &&
               props.tasmotaDevices.length > 0 &&
@@ -62,7 +43,20 @@ const DeviceTab = ({ children, ...props }) => (
                   listName="tasmotaDevices"
                 />
               ))}
-            {!props.tasmotaDevices || (props.tasmotaDevices.length === 0 && <EmptyState />)}
+            {(!props.tasmotaDevices || props.tasmotaDevices.length === 0) && (
+              <IntegrationEmptyState>
+                <Text id="integration.tasmota.device.noDeviceFound" />
+
+                <div class="mt-5">
+                  <Text id="integration.tasmota.discoverDeviceDescr" />
+                  <Link href="/dashboard/integration/device/tasmota/discover">
+                    <button class="btn btn-outline-primary ml-2">
+                      <Text id="integration.tasmota.discoverTab" /> <i class="fe fe-radio" />
+                    </button>
+                  </Link>
+                </div>
+              </IntegrationEmptyState>
+            )}
           </div>
         </div>
       </div>

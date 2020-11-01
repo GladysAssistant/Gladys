@@ -1317,7 +1317,8 @@
           "selector": "test-battery",
           "category": "battery",
           "type": "integer",
-          "last_value": "12"
+          "last_value": "12",
+          "last_value_changed": "2019-02-12T07:49:07.556Z"
         }
       ],
       "room": {

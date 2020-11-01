@@ -230,3 +230,13 @@ body {
   pointer-events: auto;
   cursor: pointer;
 }
+.featureList {
+  min-height: 50px;
+}
+.deviceList {
+  min-height: 200px;
+}
+.emptyStateDivBox {
+  margin-top: 35px;
+  margin-bottom: 35px;
+}

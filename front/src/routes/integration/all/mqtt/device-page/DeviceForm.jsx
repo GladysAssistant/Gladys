@@ -22,7 +22,7 @@ class MqttDeviceForm extends Component {
       <div>
         <div class="form-group">
           <label class="form-label" for="deviceName">
-            <Text id="integration.mqtt.device.nameLabel" />
+            <Text id="editDeviceForm.nameLabel" />
           </label>
           <Localizer>
             <input
@@ -31,14 +31,14 @@ class MqttDeviceForm extends Component {
               value={props.device.name}
               onInput={this.updateName}
               class="form-control"
-              placeholder={<Text id="integration.mqtt.device.nameLabel" />}
+              placeholder={<Text id="editDeviceForm.nameLabel" />}
             />
           </Localizer>
         </div>
 
         <div class="form-group">
           <label class="form-label">
-            <Text id="integration.mqtt.device.externalIdLabel" />
+            <Text id="editDeviceForm.externalIdLabel" />
           </label>
           <Localizer>
             <input
@@ -47,14 +47,14 @@ class MqttDeviceForm extends Component {
               onInput={this.updateExternalId}
               disabled={props.device.created_at !== undefined}
               class="form-control"
-              placeholder={<Text id="integration.mqtt.device.externalIdLabel" />}
+              placeholder={<Text id="editDeviceForm.externalIdLabel" />}
             />
           </Localizer>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="room">
-            <Text id="integration.mqtt.device.roomLabel" />
+            <Text id="editDeviceForm.roomLabel" />
           </label>
           <select onChange={this.updateRoom} class="form-control" id="room">
             <option value="">
@@ -75,7 +75,7 @@ class MqttDeviceForm extends Component {
 
         <div class="form-group">
           <label class="form-label">
-            <Text id="integration.mqtt.device.featuresLabel" />
+            <Text id="editDeviceForm.featuresLabel" />
           </label>
           <div class="tags">
             {props.device &&
@@ -88,14 +88,12 @@ class MqttDeviceForm extends Component {
                   </div>
                 </span>
               ))}
-            {(!props.device.features || props.device.features.length === 0) && (
-              <Text id="integration.mqtt.device.noFeatures" />
-            )}
+            {(!props.device.features || props.device.features.length === 0) && <Text id="editDeviceForm.noFeatures" />}
           </div>
           <p class="mt-4">
             {props.mostRecentValueAt ? (
               <Text
-                id="integration.mqtt.device.mostRecentValueAt"
+                id="editDeviceForm.mostRecentValueAt"
                 fields={{
                   mostRecentValueAt: dayjs(props.mostRecentValueAt)
                     .locale(props.user.language)
@@ -103,7 +101,7 @@ class MqttDeviceForm extends Component {
                 }}
               />
             ) : (
-              <Text id="integration.mqtt.device.noValueReceived" />
+              <Text id="editDeviceForm.noValueReceived" />
             )}
           </p>
         </div>

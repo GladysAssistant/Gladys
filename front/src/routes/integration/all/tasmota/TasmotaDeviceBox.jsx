@@ -1,9 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import get from 'get-value';
 import { Link } from 'preact-router';
+import IntegrationDeviceFields from '../../../../components/integration/IntegrationDeviceFields';
 
 class TasmotaDeviceBox extends Component {
   updateName = e => {
@@ -80,83 +79,28 @@ class TasmotaDeviceBox extends Component {
                     <Text id={errorMessage} />
                   </div>
                 )}
-                <div class="form-group">
-                  <label class="form-label" for={`name_${deviceIndex}`}>
-                    <Text id="integration.tasmota.nameLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      id={`name_${deviceIndex}`}
-                      type="text"
-                      value={device.name}
-                      onInput={this.updateName}
-                      class="form-control"
-                      placeholder={<Text id="integration.tasmota.namePlaceholder" />}
-                      disabled={!editable || !validModel}
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.tasmota.roomLabel" />
-                  </label>
-                  <select
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    id={`room_${deviceIndex}`}
-                    disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`topic_${deviceIndex}`}>
-                    <Text id="integration.tasmota.topicLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      id={`topic_${deviceIndex}`}
-                      type="text"
-                      value={device.external_id.substring(8)}
-                      class="form-control"
-                      disabled="true"
-                    />
-                  </Localizer>
-                </div>
-
-                {device.features && device.features.length > 0 && (
+                <IntegrationDeviceFields
+                  disableForm={!editable || !validModel}
+                  houses={housesWithRooms}
+                  device={device}
+                  updateName={this.updateName}
+                  updateRoom={this.updateRoom}
+                >
                   <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.tasmota.device.featuresLabel" />
+                    <label class="form-label" for={`topic_${deviceIndex}`}>
+                      <Text id="integration.tasmota.topicLabel" />
                     </label>
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <Localizer>
+                      <input
+                        id={`topic_${deviceIndex}`}
+                        type="text"
+                        value={device.external_id.substring(8)}
+                        class="form-control"
+                        disabled="true"
+                      />
+                    </Localizer>
                   </div>
-                )}
+                </IntegrationDeviceFields>
 
                 <div class="form-group">
                   {validModel && props.alreadyCreatedButton && (
@@ -173,13 +117,13 @@ class TasmotaDeviceBox extends Component {
 
                   {validModel && props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.tasmota.saveButton" />
+                      <Text id="editDeviceForm.saveButton" />
                     </button>
                   )}
 
                   {validModel && props.deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
-                      <Text id="integration.tasmota.deleteButton" />
+                      <Text id="editDeviceForm.deleteButton" />
                     </button>
                   )}
 
@@ -192,7 +136,7 @@ class TasmotaDeviceBox extends Component {
                   {validModel && props.editButton && (
                     <Link href={`/dashboard/integration/device/tasmota/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
-                        <Text id="integration.tasmota.device.editButton" />
+                        <Text id="editDeviceForm.editButton" />
                       </button>
                     </Link>
                   )}

@@ -100,7 +100,7 @@ class ConfigurePeripheralForm extends Component {
               })}
             >
               <label for="name" class="form-label">
-                <Text id="integration.bluetooth.device.nameLabel" />
+                <Text id="editDeviceForm.nameLabel" />
               </label>
               <Localizer>
                 <input
@@ -108,7 +108,7 @@ class ConfigurePeripheralForm extends Component {
                   value={device.name}
                   onChange={this.updateName}
                   class="form-control"
-                  placeholder={<Text id="integration.bluetooth.device.namePlaceholder" />}
+                  placeholder={<Text id="editDeviceForm.namePlaceholder" />}
                   disabled={disableForm}
                   required
                 />
@@ -117,14 +117,14 @@ class ConfigurePeripheralForm extends Component {
 
             <div class="form-group">
               <label class="form-label">
-                <Text id="integration.bluetooth.device.externalIdLabel" />
+                <Text id="editDeviceForm.externalIdLabel" />
               </label>
               <input value={device.external_id} class="form-control" disabled />
             </div>
 
             <div class="form-group">
               <label for="room" class="form-label">
-                <Text id="integration.bluetooth.device.roomLabel" />
+                <Text id="editDeviceForm.roomLabel" />
               </label>
               <select name="room" onChange={this.updateRoom} class="form-control" disabled={disableForm}>
                 <option value="">

@@ -16,9 +16,7 @@ const FeatureTab = ({ children, ...props }) => (
           <Text id="global.backButton" />
         </button>
       </Link>
-      <h3 class="card-title">
-        {(props.device && props.device.name) || <Text id="integration.mqtt.device.noNameLabel" />}
-      </h3>
+      <h3 class="card-title">{(props.device && props.device.name) || <Text id="editDeviceForm.noName" />}</h3>
     </div>
     <div
       class={cx('dimmer', {
@@ -33,12 +31,12 @@ const FeatureTab = ({ children, ...props }) => (
           </div>
           {props.saveStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              <Text id="integration.mqtt.device.saveError" />
+              <Text id="editDeviceForm.saveError" />
             </div>
           )}
           {props.saveStatus === RequestStatus.ConflictError && (
             <div class="alert alert-danger">
-              <Text id="integration.mqtt.device.saveConflictError" />
+              <Text id="editDeviceForm.saveConflictError" />
             </div>
           )}
           {!props.loading && !props.device && (
@@ -48,7 +46,7 @@ const FeatureTab = ({ children, ...props }) => (
               </p>
               <Link href="/dashboard/integration/device/mqtt">
                 <button type="button" class="btn btn-outline-secondary btn-sm">
-                  <Text id="integration.mqtt.device.backToList" />
+                  <Text id="global.backButton" />
                 </button>
               </Link>
             </div>
@@ -90,7 +88,7 @@ const FeatureTab = ({ children, ...props }) => (
                   </button>
                 </Link>
                 <button onClick={props.saveDevice} class="btn btn-success mr-2">
-                  <Text id="integration.mqtt.device.saveButton" />
+                  <Text id="editDeviceForm.saveButton" />
                 </button>
               </div>
             </div>
