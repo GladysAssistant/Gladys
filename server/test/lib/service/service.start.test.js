@@ -42,7 +42,7 @@ describe('service.start', () => {
     sinon.reset();
   });
 
-  it('should start a service, and set status to READY', async () => {
+  it('should start a service, and set status to RUNNING', async () => {
     serviceImpl.start = fake.resolves(null);
 
     await service.start(serviceName);
@@ -53,7 +53,7 @@ describe('service.start', () => {
       },
     });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.READY);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.RUNNING);
     assert.calledOnce(serviceImpl.start);
   });
 
