@@ -4,9 +4,9 @@ const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 
 const FUNC_BY_EVENT = {
-  [EVENTS.DEVICE.CREATE]: 'onNewDevice',
-  [EVENTS.DEVICE.UPDATE]: 'onUpdateDevice',
-  [EVENTS.DEVICE.DELETE]: 'onDeleteDevice',
+  [EVENTS.DEVICE.CREATE]: 'postCreate',
+  [EVENTS.DEVICE.UPDATE]: 'postUpdate',
+  [EVENTS.DEVICE.DELETE]: 'postDelete',
 };
 
 /**
@@ -16,7 +16,7 @@ const FUNC_BY_EVENT = {
  * @example
  * device.notify({ service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279'}, 'device.create');
  */
-function notify(device, event) {
+async function notify(device, event) {
   logger.debug(`Notify device ${device.selector} creation`);
 
   const serviceFuncName = FUNC_BY_EVENT[event];
@@ -34,7 +34,11 @@ function notify(device, event) {
     } else if (typeof get(service, `device.${serviceFuncName}`) !== 'function') {
       logger.info(`Function device.${serviceFuncName} in service ${service.name} does not exist.`);
     } else {
-      service.device[serviceFuncName](device);
+      try {
+        await service.device[serviceFuncName](device);
+      } catch (e) {
+        logger.error(`Failed to execute device.${serviceFuncName} function on service ${device.name}:`, e);
+      }
     }
   }
 }
