@@ -5,7 +5,7 @@
  * const devices = bluetoothManager.getDiscoveredDevices();
  */
 function getDiscoveredDevices() {
-  return Object.values(this.discoveredDevices);
+  return Object.values(this.discoveredDevices).map((device) => this.completeDevice(device));
 }
 
 module.exports = {

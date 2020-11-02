@@ -72,28 +72,4 @@ describe('Discover bluetooth characteristics', () => {
       expect(discovered).is.eq(true);
     }
   });
-
-  it('Discover service characteristics all already discovered', async () => {
-    const tmpCharacteristcs = [{ uuid: 'fff2' }];
-    service.characteristics = tmpCharacteristcs;
-
-    const result = await discoverCharacteristics(service, ['fff2']);
-
-    const expectedResult = { fff2: tmpCharacteristcs[0] };
-
-    expect(result).deep.eq(expectedResult);
-    expect(discovered).is.eq(false);
-  });
-
-  it('Discover service characteristics half already discovered', async () => {
-    const tmpCharacteristcs = [{ uuid: 'fff2' }];
-    service.characteristics = tmpCharacteristcs;
-
-    const result = await discoverCharacteristics(service, ['fff1', 'fff2']);
-
-    const expectedResult = { fff2: tmpCharacteristcs[0], [characteristic.uuid]: characteristic };
-
-    expect(result).deep.eq(expectedResult);
-    expect(discovered).is.eq(true);
-  });
 });

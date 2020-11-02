@@ -57,7 +57,7 @@ describe('bluetooth.readDevice', () => {
       lastSeen: 'D1',
       connectable: true,
       connect: fake.yields(null),
-      disconnectAsync: fake.resolves(null),
+      disconnect: fake.resolves(null),
       discoverServices: fake.yields(null, [service]),
     };
 
@@ -95,7 +95,7 @@ describe('bluetooth.readDevice', () => {
     expect(readValue).deep.eq(expectedResult);
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -110,7 +110,7 @@ describe('bluetooth.readDevice', () => {
     await bluetoothManager.readDevice(device);
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -125,7 +125,7 @@ describe('bluetooth.readDevice', () => {
     await bluetoothManager.readDevice(device);
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -140,7 +140,7 @@ describe('bluetooth.readDevice', () => {
     await bluetoothManager.readDevice(device);
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
