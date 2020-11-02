@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const event = new EventEmitter();
@@ -11,6 +11,9 @@ const { EVENTS } = require('../../../../../utils/constants');
 
 const gladys = {
   event,
+  stateManager: {
+    get: fake.returns(null),
+  },
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
@@ -50,10 +53,12 @@ describe('bluetooth.getDiscoveredDevice command', () => {
 
     const result = bluetoothManager.getDiscoveredDevice('uuid');
     expect(result).deep.eq(bluetoothManager.discoveredDevices.uuid);
+    assert.calledOnce(gladys.stateManager.get);
   });
 
   it('get not existing peripheral by uuid', () => {
     const result = bluetoothManager.getDiscoveredDevice('uuid');
-    expect(undefined).eq(result);
+    expect(result).eq(null);
+    assert.notCalled(gladys.stateManager.get);
   });
 });

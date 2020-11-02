@@ -51,7 +51,7 @@ describe('bluetooth.scanDevice', () => {
       lastSeen: 'D1',
       connectable: true,
       connect: fake.yields(null),
-      disconnectAsync: fake.resolves(null),
+      disconnect: fake.resolves(null),
       discoverServices: fake.yields(null, services),
     };
 
@@ -100,7 +100,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
     assert.callCount(gladys.event.emit, 3);
 
@@ -136,7 +136,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -173,7 +173,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -214,7 +214,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -252,7 +252,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -287,7 +287,7 @@ describe('bluetooth.scanDevice', () => {
           unit: DEVICE_FEATURE_UNITS.PERCENT,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: 0,
           max: 100,
           external_id: 'bluetooth:uuid:180f:2a19',
@@ -305,7 +305,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -338,7 +338,7 @@ describe('bluetooth.scanDevice', () => {
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -100,
           max: 250,
           external_id: 'bluetooth:uuid:1809:2a6e',
@@ -354,7 +354,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -388,7 +388,7 @@ describe('bluetooth.scanDevice', () => {
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -100,
           max: 250,
           external_id: 'bluetooth:uuid:1809:2a1f',
@@ -404,7 +404,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -438,7 +438,7 @@ describe('bluetooth.scanDevice', () => {
           unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -200,
           max: 500,
           external_id: 'bluetooth:uuid:1809:2a20',
@@ -454,7 +454,7 @@ describe('bluetooth.scanDevice', () => {
     });
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnectAsync);
+    assert.calledOnce(peripheral.disconnect);
     assert.callCount(peripheral.discoverServices, expectedCount);
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {

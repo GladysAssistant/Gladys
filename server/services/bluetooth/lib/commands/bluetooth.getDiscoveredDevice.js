@@ -6,7 +6,7 @@
  * const device = bluetoothManager.getDiscoveredDevice('99dd77cba4');
  */
 function getDiscoveredDevice(uuid) {
-  return this.discoveredDevices[uuid];
+  return this.completeDevice(this.discoveredDevices[uuid]);
 }
 
 module.exports = {

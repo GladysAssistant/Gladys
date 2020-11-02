@@ -3,12 +3,14 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import BluetoothPage from '../../BluetoothPage';
-import PeripheralNotFound from './PeripheralNotFound';
-import ConfigurePeripheral from './ConfigurePeripheral';
 import { RequestStatus } from '../../../../../../utils/consts';
 import actions from '../actions';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
+
+import BluetoothPage from '../../BluetoothPage';
+import PeripheralNotFound from './PeripheralNotFound';
+import ConfigurePeripheral from './ConfigurePeripheral';
+import CheckBluetoothPanel from '../../commons/CheckBluetoothPanel';
 
 import style from '../../style.css';
 
@@ -36,10 +38,12 @@ class BluetoothConnnectPage extends Component {
   };
 
   reloadDevice = async () => {
+    let bluetoothStatus;
     try {
-      const bluetoothStatus = await this.props.httpClient.post(`/api/v1/service/bluetooth/scan/${this.state.uuid}`);
+      bluetoothStatus = await this.props.httpClient.post(`/api/v1/service/bluetooth/scan/${this.state.uuid}`);
+    } finally {
       this.props.updateStatus(bluetoothStatus);
-    } catch (e) {}
+    }
   };
 
   constructor(props) {
@@ -57,14 +61,12 @@ class BluetoothConnnectPage extends Component {
     this.props.getStatus();
     this.props.getHouses();
 
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.updatePeripheral);
 
     await this.loadDevice();
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.updatePeripheral);
   }
 
@@ -92,12 +94,6 @@ class BluetoothConnnectPage extends Component {
         default:
           content = <PeripheralNotFound uuid={uuid} />;
       }
-    } else {
-      content = (
-        <div class="alert alert-warning">
-          <Text id="integration.bluetooth.setup.bluetoothNotReadyError" />
-        </div>
-      );
     }
 
     return (
@@ -108,7 +104,10 @@ class BluetoothConnnectPage extends Component {
               <Text id="integration.bluetooth.setup.peripheral.title" />
             </h3>
           </div>
-          <div class="card-body">{content}</div>
+          <div class="card-body">
+            <CheckBluetoothPanel />
+            <div>{content}</div>
+          </div>
         </div>
       </BluetoothPage>
     );

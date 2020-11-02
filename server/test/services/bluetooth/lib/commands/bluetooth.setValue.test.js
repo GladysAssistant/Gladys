@@ -1,8 +1,6 @@
 const sinon = require('sinon');
 
-const { fake, assert } = sinon;
-
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
+const { assert, fake } = sinon;
 
 const BluetoothManager = require('../../../../../services/bluetooth/lib');
 const BluetoothMock = require('../../BluetoothMock.test');
@@ -14,28 +12,35 @@ const gladys = {
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
-describe('bluetooth.poll command', () => {
+describe('bluetooth.setValue command', () => {
+  let characteristic;
+  let service;
+  let peripheral;
+
   let bluetooth;
   let bluetoothManager;
 
-  let peripheral;
-  let service;
-  let characteristic;
-
   beforeEach(() => {
     characteristic = {
-      uuid: '2a6e',
-      properties: ['read'],
-      read: fake.yields(null, 'd'),
+      uuid: '2a00',
+      properties: ['write'],
+      write: fake.yields(null),
     };
 
     service = {
-      uuid: '1809',
+      uuid: '1800',
       discoverCharacteristics: fake.yields(null, [characteristic]),
     };
 
     peripheral = {
       uuid: 'uuid',
+      address: 'A1',
+      addressType: 'public',
+      rssi: 'R1',
+      advertisement: {
+        localName: 'P1',
+      },
+      lastSeen: 'D1',
       connectable: true,
       connect: fake.yields(null),
       disconnect: fake.resolves(null),
@@ -43,9 +48,9 @@ describe('bluetooth.poll command', () => {
     };
 
     bluetooth = new BluetoothMock();
-
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
+
     bluetooth.startScanning = () => {
       bluetooth.emit('discover', peripheral);
       bluetooth.emit('scanStop');
@@ -53,37 +58,24 @@ describe('bluetooth.poll command', () => {
   });
 
   afterEach(() => {
-    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-      bluetoothManager.scanPromise.cancel();
-    }
-
     sinon.reset();
   });
 
-  it('feature read value', async () => {
-    const device = {
-      external_id: 'bluetooth:uuid',
-      features: [
-        {
-          external_id: 'bluetooth:uuid:1809:2a6e',
-        },
-      ],
+  it('should write on peripheral', async () => {
+    const device = {};
+    const feature = {
+      external_id: 'bluetooth:uuid:1800:2a00',
     };
+    const value = 1;
 
-    await bluetoothManager.poll(device);
+    await bluetoothManager.setValue(device, feature, value);
 
     assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(peripheral.disconnect);
+    assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
-    assert.calledOnce(characteristic.read);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
-    });
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'bluetooth:uuid:1809:2a6e',
-      state: 13,
-    });
+    assert.calledOnce(characteristic.write);
+
+    assert.calledOnce(gladys.event.emit);
   });
 });
