@@ -1354,12 +1354,13 @@
     }
   },
   "get /api/v1/service/bluetooth/status": {
-    "bluetoothStatus": "ready"
+    "ready": true
   },
   "get /api/v1/service/bluetooth/peripheral": [
     {
       "name": "BLE Device 1",
       "external_id": "bluetooth:0011223341",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
       "selector": "bluetooth-0011223341",
       "params": [
         {
@@ -1387,6 +1388,10 @@
     {
       "name": "Peanut temperature",
       "external_id": "bluetooth:0011223343",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996278",
+      "service": {
+        "name": "peanut"
+      },
       "selector": "bluetooth-0011223343",
       "params": [
         {

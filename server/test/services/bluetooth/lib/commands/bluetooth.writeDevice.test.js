@@ -96,4 +96,18 @@ describe('bluetooth.writeDevice', () => {
       expect(e).is.instanceOf(BadParameters);
     }
   });
+
+  it('bluetooth.writeDevice with error', async () => {
+    throwError = true;
+
+    try {
+      await bluetooth.writeDevice(peripheral, '1800', '2a00', [0x01]);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.calledOnce(peripheral.discoverServices);
+      assert.calledOnce(service.discoverCharacteristics);
+
+      expect(e).is.instanceOf(Error);
+    }
+  });
 });
