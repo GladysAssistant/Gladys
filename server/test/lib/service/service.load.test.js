@@ -36,6 +36,6 @@ describe('service.load', () => {
     });
     expect(serviceByName.example.status).eq(SERVICE_STATUS.ENABLED);
     expect(serviceByName['fake-service'].status).eq(SERVICE_STATUS.DISABLED);
-    expect(serviceByName['test-service'].status).eq(SERVICE_STATUS.READY);
+    expect(serviceByName['test-service'].status).eq(SERVICE_STATUS.RUNNING);
   });
 });
