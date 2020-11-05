@@ -31,6 +31,15 @@ async function discoverCharacteristics(service, characteristicUuids) {
         characteristicMap[characteristic.uuid] = characteristic;
       });
 
+      if (characteristicUuids) {
+        const characteristicKeys = Object.keys(characteristicMap);
+        if (!characteristicUuids.every((s) => characteristicKeys.includes(s))) {
+          reject(
+            new NotFoundError(`Bluetooth: requested ${characteristicUuids} services not found for ${service.uuid}`),
+          );
+        }
+      }
+
       logger.debug(`Bluetooth: all characteristics already found for service ${service.uuid}`);
       resolve(characteristicMap);
     });

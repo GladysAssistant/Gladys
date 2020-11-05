@@ -31,6 +31,13 @@ async function discoverServices(peripheral, serviceUuids) {
         serviceMap[service.uuid] = service;
       });
 
+      if (serviceUuids) {
+        const serviceKeys = Object.keys(serviceMap);
+        if (!serviceUuids.every((s) => serviceKeys.includes(s))) {
+          reject(new NotFoundError(`Bluetooth: requested ${serviceUuids} services not found for ${peripheral.uuid}`));
+        }
+      }
+
       logger.debug(`Bluetooth: all services found for ${peripheral.uuid}`);
       resolve(serviceMap);
     });

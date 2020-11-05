@@ -1,6 +1,8 @@
 const Promise = require('bluebird');
 
 const logger = require('../../../../utils/logger');
+const { EVENTS } = require('../../../../utils/constants');
+const { decodeValue } = require('../device/bluetooth.information');
 
 /**
  * @description Look for Gladys Bluetooth devices and subscribe to notifications.
@@ -24,7 +26,15 @@ async function connectDevices() {
           device.features,
           (feature) => {
             const [, , serviceUuid, characteristicUuid] = feature.external_id.split(':');
-            return this.subscribePeripheral(peripheral, serviceUuid, characteristicUuid, feature);
+
+            const onNotify = (value) => {
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                device_feature_external_id: feature.external_id,
+                state: decodeValue(serviceUuid, characteristicUuid, feature, value),
+              });
+            };
+
+            return this.subscribeDevice(peripheral, serviceUuid, characteristicUuid, onNotify);
           },
           { concurrency: 1 },
         ).catch((e) => {

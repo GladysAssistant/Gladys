@@ -14,12 +14,14 @@ const { getDiscoveredDevice } = require('./commands/bluetooth.getDiscoveredDevic
 const { getDiscoveredDevices } = require('./commands/bluetooth.getDiscoveredDevices');
 const { getStatus } = require('./commands/bluetooth.getStatus');
 const { readDevice } = require('./commands/bluetooth.readDevice');
+const { poll } = require('./commands/bluetooth.poll');
 const { setValue } = require('./commands/bluetooth.setValue');
 const { writeDevice } = require('./commands/bluetooth.writeDevice');
 const { scanDevice } = require('./commands/bluetooth.scanDevice');
 const { connectDevices } = require('./commands/bluetooth.connectDevices');
-const { subscribePeripheral } = require('./commands/bluetooth.subscribePeripheral');
+const { subscribeDevice } = require('./commands/bluetooth.subscribeDevice');
 const { applyOnPeripheral } = require('./commands/bluetooth.applyOnPeripheral');
+const { getCharacteristic } = require('./commands/bluetooth.getCharacteristic');
 
 const BluetoothManager = function BluetoothManager(gladys, serviceId) {
   this.bluetooth = undefined;
@@ -55,10 +57,12 @@ BluetoothManager.prototype.readDevice = readDevice;
 BluetoothManager.prototype.writeDevice = writeDevice;
 BluetoothManager.prototype.scanDevice = scanDevice;
 BluetoothManager.prototype.connectDevices = connectDevices;
-BluetoothManager.prototype.subscribePeripheral = subscribePeripheral;
+BluetoothManager.prototype.subscribeDevice = subscribeDevice;
 BluetoothManager.prototype.applyOnPeripheral = applyOnPeripheral;
+BluetoothManager.prototype.getCharacteristic = getCharacteristic;
+
 // Gladys commands
 BluetoothManager.prototype.setValue = setValue;
-BluetoothManager.prototype.poll = readDevice;
+BluetoothManager.prototype.poll = poll;
 
 module.exports = BluetoothManager;

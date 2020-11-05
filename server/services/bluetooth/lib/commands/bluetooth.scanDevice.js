@@ -7,7 +7,6 @@ const { setDeviceParam } = require('../../../../utils/setDeviceParam');
 const { INFORMATION_SERVICES } = require('../device/bluetooth.information');
 const { PARAMS } = require('../utils/bluetooth.constants');
 const { read } = require('../utils/characteristic/bluetooth.read');
-const { getCharacteristic } = require('../utils/bluetooth.getCharacteristic');
 
 /**
  * @description Look for peripheral details.
@@ -34,7 +33,7 @@ async function scanDevice(peripheralUuid) {
         Promise.map(
           Object.keys(INFORMATION_SERVICES[serviceUuid]),
           (characteristicUuid) => {
-            return getCharacteristic(peripheral, serviceUuid, characteristicUuid)
+            return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid)
               .then((characteristic) => {
                 const actionMapper = INFORMATION_SERVICES[serviceUuid][characteristicUuid];
 
