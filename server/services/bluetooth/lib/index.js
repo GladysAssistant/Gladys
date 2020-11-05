@@ -20,8 +20,11 @@ const { writeDevice } = require('./commands/bluetooth.writeDevice');
 const { scanDevice } = require('./commands/bluetooth.scanDevice');
 const { connectDevices } = require('./commands/bluetooth.connectDevices');
 const { subscribeDevice } = require('./commands/bluetooth.subscribeDevice');
+const { unsubscribeDevice } = require('./commands/bluetooth.unsubscribeDevice');
 const { applyOnPeripheral } = require('./commands/bluetooth.applyOnPeripheral');
 const { getCharacteristic } = require('./commands/bluetooth.getCharacteristic');
+const { postCreate } = require('./commands/bluetooth.postCreate');
+const { postDelete } = require('./commands/bluetooth.postDelete');
 
 const BluetoothManager = function BluetoothManager(gladys, serviceId) {
   this.bluetooth = undefined;
@@ -58,11 +61,14 @@ BluetoothManager.prototype.writeDevice = writeDevice;
 BluetoothManager.prototype.scanDevice = scanDevice;
 BluetoothManager.prototype.connectDevices = connectDevices;
 BluetoothManager.prototype.subscribeDevice = subscribeDevice;
+BluetoothManager.prototype.unsubscribeDevice = unsubscribeDevice;
 BluetoothManager.prototype.applyOnPeripheral = applyOnPeripheral;
 BluetoothManager.prototype.getCharacteristic = getCharacteristic;
 
 // Gladys commands
 BluetoothManager.prototype.setValue = setValue;
 BluetoothManager.prototype.poll = poll;
+BluetoothManager.prototype.postCreate = postCreate;
+BluetoothManager.prototype.postDelete = postDelete;
 
 module.exports = BluetoothManager;

@@ -4,7 +4,6 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 
 const { decodeValue } = require('../device/bluetooth.information');
-const { read } = require('../utils/characteristic/bluetooth.read');
 
 /**
  * @description Poll value of a Bluetooth device
@@ -20,8 +19,7 @@ async function poll(device) {
     const featureExternalId = feature.external_id;
     const [, , serviceUuid, characteristicUuid] = featureExternalId.split(':');
 
-    return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid)
-      .then((characteristic) => read(characteristic))
+    return this.readDevice(peripheral, serviceUuid, characteristicUuid)
       .then((value) => {
         const state = decodeValue(serviceUuid, characteristicUuid, feature, value);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {

@@ -6,35 +6,32 @@ const { BadParameters } = require('../../../../../utils/coreErrors');
 const { TIMERS } = require('../bluetooth.constants');
 
 /**
- * @description Try to subscribe to Noble characteristic.
+ * @description Try to unsubscribe to Noble characteristic.
  * @param {Object} characteristic - Noble characteristic.
- * @param {Object} onNotify - Value callback.
- * @returns {Promise<Object>} Subscrption status.
+ * @returns {Promise<Object>} Unscribsciption status.
  * @example
- * await subscribe(characteristic, (value) => console.log(value));
+ * await subscribe(characteristic);
  */
-async function subscribe(characteristic, onNotify) {
+async function unsubscribe(characteristic) {
   const properties = characteristic.properties || [];
   if (!properties.includes('notify') && !properties.includes('indicate')) {
     throw new BadParameters(`Bluetooth: not notify characteristic ${characteristic.uuid}`);
   }
 
-  logger.trace(`Bluetooth: subscribing characteristic ${characteristic.uuid}`);
+  logger.trace(`Bluetooth: unsubscribing characteristic ${characteristic.uuid}`);
 
   return new Promise((resolve, reject) => {
-    characteristic.subscribe((error) => {
+    characteristic.unsubscribe((error) => {
       if (error) {
-        return reject(new Error(`Bluetooth: failed to subscribe characteristic ${characteristic.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: failed to unsubscribe characteristic ${characteristic.uuid} - ${error}`));
       }
 
-      characteristic.on('notify', (value) => onNotify(value));
-
-      logger.debug(`Bluetooth: subscribed to characteristic ${characteristic.uuid}`);
+      logger.debug(`Bluetooth: unsubscribed to characteristic ${characteristic.uuid}`);
       return resolve();
     });
   }).timeout(TIMERS.READ);
 }
 
 module.exports = {
-  subscribe,
+  unsubscribe,
 };

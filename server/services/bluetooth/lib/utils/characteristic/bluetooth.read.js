@@ -22,11 +22,11 @@ async function read(characteristic) {
   return new Promise((resolve, reject) => {
     characteristic.read((error, data) => {
       if (error) {
-        reject(new Error(`Bluetooth: failed to read characteristic ${characteristic.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: failed to read characteristic ${characteristic.uuid} - ${error}`));
       }
 
       logger.debug(`Bluetooth: read ${data.toString('hex')} on characteristic ${characteristic.uuid}`);
-      resolve(data);
+      return resolve(data);
     });
   }).timeout(TIMERS.READ);
 }

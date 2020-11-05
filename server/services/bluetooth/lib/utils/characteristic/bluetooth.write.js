@@ -25,7 +25,7 @@ async function write(characteristic, value, withoutResponse = false) {
   return new Promise((resolve, reject) => {
     characteristic.write(commandBuffer, withoutResponse, (error) => {
       if (error) {
-        reject(
+        return reject(
           new Error(
             `Bluetooth: failed to write ${value.toString('hex')} on characteristic ${characteristic.uuid} - ${error}`,
           ),
@@ -33,7 +33,7 @@ async function write(characteristic, value, withoutResponse = false) {
       }
 
       logger.debug(`Bluetooth: write ${value.toString('hex')} on characteristic ${characteristic.uuid}`);
-      resolve(value);
+      return resolve(value);
     });
   }).timeout(TIMERS.WRITE);
 }

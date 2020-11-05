@@ -20,11 +20,11 @@ async function discoverServices(peripheral, serviceUuids) {
   return new Promise((resolve, reject) => {
     peripheral.discoverServices(serviceUuids, (error, services) => {
       if (error) {
-        reject(new Error(`Bluetooth: error discovering services on ${peripheral.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: error discovering services on ${peripheral.uuid} - ${error}`));
       }
 
       if (services.length === 0) {
-        reject(new NotFoundError(`Bluetooth: no services found for ${peripheral.uuid}`));
+        return reject(new NotFoundError(`Bluetooth: no services found for ${peripheral.uuid}`));
       }
 
       services.forEach((service) => {
@@ -34,12 +34,14 @@ async function discoverServices(peripheral, serviceUuids) {
       if (serviceUuids) {
         const serviceKeys = Object.keys(serviceMap);
         if (!serviceUuids.every((s) => serviceKeys.includes(s))) {
-          reject(new NotFoundError(`Bluetooth: requested ${serviceUuids} services not found for ${peripheral.uuid}`));
+          return reject(
+            new NotFoundError(`Bluetooth: requested ${serviceUuids} services not found for ${peripheral.uuid}`),
+          );
         }
       }
 
       logger.debug(`Bluetooth: all services found for ${peripheral.uuid}`);
-      resolve(serviceMap);
+      return resolve(serviceMap);
     });
   }).timeout(TIMERS.DISCOVER);
 }

@@ -26,11 +26,11 @@ async function connect(peripheral) {
     peripheral.connect((error) => {
       if (error) {
         logger.error(`Bluetooth: connection to peripheral ${peripheral.uuid} failed`);
-        reject(error);
+        return reject(error);
       }
 
       logger.debug(`Bluetooth: connected to peripheral ${peripheral.uuid}`);
-      resolve(peripheral);
+      return resolve(peripheral);
     });
   }).timeout(TIMERS.CONNECT);
 }

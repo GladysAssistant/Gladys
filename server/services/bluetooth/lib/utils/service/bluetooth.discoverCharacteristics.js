@@ -20,11 +20,11 @@ async function discoverCharacteristics(service, characteristicUuids) {
   return new Promise((resolve, reject) => {
     service.discoverCharacteristics(characteristicUuids, (error, characteristics) => {
       if (error) {
-        reject(new Error(`Bluetooth: error discovering characteristics for service ${service.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: error discovering characteristics for service ${service.uuid} - ${error}`));
       }
 
       if (characteristics.length === 0) {
-        reject(new NotFoundError(`Bluetooth: no characteristics found for service ${service.uuid}`));
+        return reject(new NotFoundError(`Bluetooth: no characteristics found for service ${service.uuid}`));
       }
 
       characteristics.forEach((characteristic) => {
@@ -34,14 +34,14 @@ async function discoverCharacteristics(service, characteristicUuids) {
       if (characteristicUuids) {
         const characteristicKeys = Object.keys(characteristicMap);
         if (!characteristicUuids.every((s) => characteristicKeys.includes(s))) {
-          reject(
+          return reject(
             new NotFoundError(`Bluetooth: requested ${characteristicUuids} services not found for ${service.uuid}`),
           );
         }
       }
 
       logger.debug(`Bluetooth: all characteristics already found for service ${service.uuid}`);
-      resolve(characteristicMap);
+      return resolve(characteristicMap);
     });
   }).timeout(TIMERS.DISCOVER);
 }

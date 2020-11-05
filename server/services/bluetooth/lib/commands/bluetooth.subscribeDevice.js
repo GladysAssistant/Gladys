@@ -11,7 +11,7 @@ const { read } = require('../utils/characteristic/bluetooth.read');
  * @param {Object} onNotify - Value callback.
  * @returns {Promise<Object>} The write value.
  * @example
- * await subscribeDevice({ uuid: 'peripheral' }, 'service1', 'char1', () => console.log)
+ * await subscribeDevice({ uuid: 'peripheral' }, 'service1', 'char1', () => console.log('done'))
  */
 async function subscribeDevice(peripheral, serviceUuid, characteristicUuid, onNotify) {
   return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid).then((characteristic) =>
