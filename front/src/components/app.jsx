@@ -46,6 +46,7 @@ import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
 import SettingsSystemPage from '../routes/settings/settings-system';
+import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
@@ -201,6 +202,7 @@ const AppRouter = connect(
         <SettingsHousePage path="/dashboard/settings/house" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
+        <SettingsServicePage path="/dashboard/settings/service" />
         <SettingsBackup path="/dashboard/settings/backup" />
         <Error type="404" default />
       </Router>

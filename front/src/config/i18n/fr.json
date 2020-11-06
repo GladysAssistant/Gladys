@@ -852,6 +852,7 @@
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
+    "serviceTab": "Services",
     "billingTab": "Facturation",
     "gatewayUsersTab": "Utilisateurs",
     "gatewayOpenApiTab": "Open API"
@@ -870,6 +871,47 @@
     "revoke": "Révoquer",
     "unknowDevice": "Appareil inconnu",
     "apiKey": "Clé API"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Sélecteur : {{key}}",
+    "integrationLinkTitle": "Aller à la page de l'intégration",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Inconnu",
+        "detail": "Service non trouvé"
+      },
+      "DISABLED": {
+        "title": "Désactivé",
+        "detail": "Service désactivé"
+      },
+      "ENABLED": {
+        "title": "Activé",
+        "detail": "Service activé"
+      },
+      "RUNNING": {
+        "title": "Démarré",
+        "detail": "Service en cours d'exécution"
+      },
+      "STOPPED": {
+        "title": "Arrêté",
+        "detail": "Service arrêté par un utilsateur"
+      },
+      "NOT_CONFIGURED": {
+        "title": "Mal configuré",
+        "detail": "Service probablement mal configuré"
+      },
+      "ERROR": {
+        "title": "Erreur",
+        "detail": "Service impossible a démarrer, consultez les logs"
+      },
+      "LOADING": {
+        "title": "Erreur",
+        "detail": "Service impossible a démarrer, consultez les logs"
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
