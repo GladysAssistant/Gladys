@@ -401,6 +401,8 @@
       },
       "discover": {
         "title": "Zigbee2mqtt discover",
+        "device": "Devices",
+        "permitJoin": "Permit joining",
         "noDeviceDiscovered": "No device discovered, please click on scan button.",
         "scanButton": "Scan",
         "noResponse": "Scan never answer, please check your network.",

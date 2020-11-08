@@ -474,58 +474,60 @@
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
       "description": "Contrôlez vos appareils Zigbee.",
-      "deviceTab": "Devices",
-      "discoverTab": "Discover",
-      "settingsTab": "Settings",
-      "setupTab": "Setup",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Zigbee",
+      "settingsTab": "Paramètres",
+      "setupTab": "Configuration",
       "status": {
-        "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
-        "notConnected": "Zigbee2mqtt service failed to connect, please go to ",
-        "settingsPageLink": "USB dongle configuration page",
-        "setupPageLink": "Zigbee2mqtt configuration page"
+        "notConfigured": "Aucun dongle USB Zigbee2mqtt configuré, rendez-vous sur ",
+        "notConnected": "Le service Zigbee2mqtt n'a pas réussi à se connecter, Cliquez sur ",
+        "settingsPageLink": "la page de paramétrage du dongle USB",
+        "setupPageLink": "la page de configuration de Zigbee2mqtt"
       },
       "settings": {
-        "title": "Zigbee2mqtt USB dongle Settings",
-        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
-        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
-        "saveButton": "Save Settings",
-        "refreshButton": "Refresh USB list",
-        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
-        "attached": "Zigbee2mqtt USB Dongle configured.",
-        "saving": "Saving USB Dongle configuration..."
+        "title": "Paramétrage du dongle USB Zigbee2mqtt",
+        "description": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee2mqtt.",
+        "zigbee2mqttUsbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee2mqtt est inséré",
+        "saveButton": "Sauvegarde",
+        "refreshButton": "Rafraîchir la liste des appareils USB",
+        "notAttached": "Aucun dongle USB Zigbee2mqtt n'est attaché à Gladys.",
+        "attached": "Le dongle USB Zigbee2mqtt est configuré.",
+        "saving": "Sauvegarde de la configuration du Dongle USB Zigbee2mqtt..."
       },
       "setup": {
-        "title": "Zigbe2mqtt configuration",
-        "description": "This service uses two independant docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers. Learn more on the Zigbee2mqtt documentation page",
-        "enable": "Enable Zigbee2mqtt",
-        "containersTitle": " Zigbee2mqtt Docker containers",
-        "connected": "Zigbee2mqtt was started with success.",
-        "error": "An error occured while starting Zigbee2mqtt."
+        "title": "Configuration du service Zigbe2mqtt",
+        "description": "Ce service utilise deux containers docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers. Pour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
+        "enable": "Activer Zigbee2mqtt",
+        "containersTitle": " Containers associés au service Zigbee2mqtt",
+        "connected": "Zigbee2mqtt démarré avec succès.",
+        "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt."
       },
       "device": {
-        "title": "Zigbee2mqtt devices",
-        "search": "Search devices",
-        "editButton": "Edit"
+        "title": "Appareils Zigbee",
+        "search": "Chercher un appareil",
+        "editButton": "Editer"
       },
       "discover": {
-        "title": "Zigbee2mqtt discover",
-        "noDeviceDiscovered": "No device discovered, please click on scan button.",
-        "scanButton": "Scan",
-        "noResponse": "Scan never answer, please check your network.",
-        "serverNoResponse": "Gladys server is not available."
+        "title": "Découverte du réseau Zigbee",
+        "device": "Appareils",
+        "permitJoin": "Autoriser l'association",
+        "noDeviceDiscovered": "Aucun appareil trouvé. Veuillez autoriser l'association des appareils et appairez les.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
+        "scanButton": "Scanner",
+        "noResponse": "Aucune réponse au scan, veuillez vérifier le bon fonctionnement du service sur la page de configuration.",
+        "serverNoResponse": "Gladys n'est pas accessible."
       },
-      "noDeviceFound": "No zigbee2mqtt device found.",
-      "nameLabel": "Device Name",
-      "namePlaceholder": "Enter the name of your device",
-      "roomLabel": "Room",
-      "topicLabel": "Topic",
+      "noDeviceFound": "Auncun appareil zigbee2mqtt n'a encore été ajouté.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Donner un nom à l'appareil",
+      "roomLabel": "Pièce",
+      "topicLabel": "Sujet MQTT",
       "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
-      "featuresLabel": "Features",
-      "saveButton": "Save",
-      "deleteButton": "Delete",
-      "alreadyExistsButton": "Already created",
-      "saveError": "There was an error saving the device.",
-      "documentation": "Zigbee2mqtt documentation"
+      "featuresLabel": "Fonctionnalités",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "alreadyExistsButton": "Déjà créé",
+      "saveError": "Une erreur s'est produite lors de la sauvegarde.",
+      "documentation": "Documentation Zigbee2mqtt"
     },
     "zwave": {
       "title": "Z-Wave",
