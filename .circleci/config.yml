@@ -226,12 +226,12 @@ workflows:
   build_and_test:
     jobs:
       - test-server:
-          filters:
-            tags:
+#          filters:
+#            tags:
 #              only: /.*/
       - test-front:
-          filters:
-            tags:
+#          filters:
+#            tags:
 #              only: /.*/
       - build-front:
           requires:
