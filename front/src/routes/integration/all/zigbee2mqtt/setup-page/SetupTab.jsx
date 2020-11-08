@@ -7,20 +7,20 @@ import CheckStatus from '../commons/CheckStatus.js';
 class SetupTab extends Component {
   toggle = e => {
     let checked = this.props.z2mEnabled;
+    checked = !checked;
+    console.log('toggle : ', checked);
+    console.log(this.props.dockerContainers)
 
-    if (this.props.zigbee2mqttContainerStatus !== RequestStatus.Getting && this.props.dockerContainers) {
-      checked = !checked;
-
-      console.log('toggle : ', checked);
-
-      if (checked) {
-        this.props.startContainer();
-      } else {
-        this.props.stopContainer();
-      }
-
-      this.props.z2mEnabled = checked;
+    if (checked) {
+      console.log('Starting Containers :');
+      this.props.startContainer();
+    } else {
+      console.log('Stopping Containers :');
+      this.props.stopContainer();
     }
+
+    this.props.z2mEnabled = checked;
+
   };
 
   render(props, {}) {
@@ -51,12 +51,18 @@ class SetupTab extends Component {
           <tr>
             <td class="text-right">
               <label>
-                <input type="radio" class="custom-switch-input" checked={props.z2mEnabled} onClick={this.toggle} />
+                <input
+                  type="checkbox"
+                  class="custom-switch-input"
+                  checked={props.z2mEnabled}
+                  onClick={this.toggle}
+                  disabled={this.props.zigbee2mqttContainerStatus === RequestStatus.Getting}
+                />
                 <span class="custom-switch-indicator" />
               </label>
             </td>
             <td>
-              <Text id="integration.zigbee2mqtt.setup.enable" />
+              &nbsp;<Text id="integration.zigbee2mqtt.setup.enable" />
             </td>
           </tr>
 
@@ -73,13 +79,13 @@ class SetupTab extends Component {
               <thead>
                 <tr>
                   <th>
-                    <Text id="docker.containerName" />
+                    <Text id="systemSettings.containerName" />
                   </th>
                   <th>
-                    <Text id="docker.containerCreated" />
+                    <Text id="systemSettings.containerCreated" />
                   </th>
                   <th>
-                    <Text id="docker.containerStatus" />
+                    <Text id="systemSettings.containerStatus" />
                   </th>
                   <th />
                 </tr>
@@ -97,7 +103,7 @@ class SetupTab extends Component {
                             'badge-warning': container.state !== 'running'
                           })}
                         >
-                          <Text id={`docker.containerState.${container.state}`} />
+                          <Text id={`systemSettings.containerState.${container.state}`} />
                         </span>
                       </td>
                       <td>

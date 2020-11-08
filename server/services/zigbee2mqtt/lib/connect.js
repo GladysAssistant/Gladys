@@ -1,41 +1,24 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+
 /**
  * @description Initialize service with dependencies and connect to devices.
  * @example
  * connect();
  */
-async function connect() {
-  const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
-  const usb = this.gladys.service.getService('usb');
-  let dongleOK = false;
-
-  if (driverPath) {
-    const usbList = await usb.list();
-    usbList.forEach((usbPort) => {
-      if (driverPath === usbPort.path) {
-        dongleOK = true;
-      }
-    });
-  }
-
-  if (dongleOK) {
-    logger.info(`Zigbee2mqtt USB dongle attached to ${driverPath}`);
-    this.usbConfigured = true;
-  } else {
-    logger.info(`Zigbee2mqtt USB dongle not attached`);
-    this.usbConfigured = false;
-  }
+async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
 
   // Loads MQTT service
-  logger.log('starting MQTT service for Zigbee2mqtt');
+  logger.log('Connecting Gladys to ', mqttUrl, mqttUsername, mqttPassword);
   // set LAN IP instead of mqtt4z2m for development tests
-  this.mqttClient = this.mqttLibrary.connect('mqtt://localhost:1883', {
-    username: '',
-    password: '',
+  this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
+    username: mqttUsername,
+    password: mqttPassword,
+    reconnectPeriod: 5000,
+    clientId: 'gladys',
   });
   this.mqttClient.on('connect', () => {
-    logger.info('Connected to MQTT container mqtt://localhost:1883');
+    logger.info('Connected to MQTT container', mqttUrl);
     Object.keys(this.topicBinds).forEach((topic) => {
       this.subscribe(topic, this.topicBinds[topic]);
     });
@@ -55,8 +38,12 @@ async function connect() {
     this.handleMqttMessage(topic, message.toString());
   });
 
-  // Subscribe to Zigbee2mqtt topics
-  this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
+    // Subscribe to Zigbee2mqtt topics
+//      this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
+
+
+
+  
 }
 
 module.exports = {

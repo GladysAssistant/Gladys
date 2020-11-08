@@ -1,0 +1,31 @@
+{
+  "name": "z2m-mqtt",
+  "Image": "eclipse-mosquitto:latest",
+  "ExposedPorts": { 
+    "1884/tcp": {} 
+  },
+  "HostConfig": {
+    "Binds": ["/var/lib/gladysassistant/zigbee2mqtt/mqtt:/mosquitto/config"],
+    "PortBindings": {
+      "1884/tcp": [
+        {
+          "HostPort": "1884"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

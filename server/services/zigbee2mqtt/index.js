@@ -1,7 +1,6 @@
 const logger = require('../../utils/logger');
 const Zigbee2mqttManager = require('./lib');
 const Zigbee2mqttController = require('./api/zigbee2mqtt.controller');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 module.exports = function Zigbee2mqttService(gladys, serviceId) {
   const mqtt = require('mqtt');
@@ -15,12 +14,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
    */
   async function start() {
     logger.log('Starting Zigbee2mqtt service');
-    const zigbee2mqttDriverPath = await gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', serviceId);
-    if (!zigbee2mqttDriverPath) {
-      throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
-    }
-
-    zigbee2mqttManager.connect(zigbee2mqttDriverPath);
+    await zigbee2mqttManager.init();
   }
 
   /**
