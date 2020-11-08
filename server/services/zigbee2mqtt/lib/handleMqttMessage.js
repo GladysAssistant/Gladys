@@ -28,6 +28,16 @@ function handleMqttMessage(topic, message) {
       });
       break;
     }
+    case 'zigbee2mqtt/bridge/config': {
+      // Keep only "permit_join" value
+      const config = JSON.parse(message);
+      this.z2mPermitJoin = config.permit_join;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+        payload: this.z2mPermitJoin,
+      });
+      break;
+    }
     default: {
       const splittedTopic = topic.split('/');
       if (splittedTopic.length === 2) {
