@@ -45,7 +45,7 @@ async function installMqttContainer() {
       const containerMqtt = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerMqtt);
 
-      await this.gladys.system.restartContainer(container.id);
+      await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
 
@@ -53,13 +53,13 @@ async function installMqttContainer() {
       logger.info(`Creating user/pass...`);
       const z2mMqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
       const z2mMqttPass = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
-      const z2mCreatePw = await this.gladys.system.exec(container.id, {
+      const z2mCreatePw = await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUser, z2mMqttPass],
       });
 
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
       const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-      const createPw = await this.gladys.system.exec(container.id, {
+      const createPw = await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
       });
     } catch (e) {
