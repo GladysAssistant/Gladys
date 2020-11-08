@@ -248,7 +248,7 @@ workflows:
               only: /.*/
             branches:
               only: zigbee2mqtt-service
-              ignore: /.*/
+#              ignore: /.*/
       - build-amd64:
           requires:
             - build-front
@@ -257,7 +257,7 @@ workflows:
               only: /.*/
             branches:
               only: zigbee2mqtt-service
-              ignore: /.*/
+#              ignore: /.*/
       - build-i386:
           requires:
             - build-front
@@ -266,7 +266,7 @@ workflows:
               only: /.*/
             branches:
               only: zigbee2mqtt-service
-              ignore: /.*/
+#              ignore: /.*/
       - build-arm64v8:
           requires:
             - build-front
@@ -275,7 +275,7 @@ workflows:
               only: /.*/
             branches:
               only: zigbee2mqtt-service
-              ignore: /.*/
+#              ignore: /.*/
       - build-arm32v7:
           requires:
             - build-front
@@ -284,7 +284,7 @@ workflows:
               only: /.*/
             branches:
               only: zigbee2mqtt-service
-              ignore: /.*/
+#              ignore: /.*/
       - docker_manifest:
           requires:
             - build-amd64
@@ -296,4 +296,5 @@ workflows:
             tags:
               only: /.*/
             branches:
-              ignore: /.*/
+              only: zigbee2mqtt-service
+#              ignore: /.*/
