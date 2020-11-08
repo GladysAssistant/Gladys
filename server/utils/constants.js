@@ -217,6 +217,7 @@ const ACTIONS = {
     GET_VALUE: 'device.get-value',
   },
   LIGHT: {
+    FADE_IN: 'light.fade-in',
     SET_BRIGHTNESS: 'light.set-brightness',
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',

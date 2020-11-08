@@ -885,6 +885,15 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "fadeInLights": {
+        "duration": "Duration",
+        "label": "Select the lights you want to fade in",
+        "targetIntensity": "Target Intensity",
+        "inputPlaceholder": "Duration",
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours"
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -959,6 +968,7 @@
       },
       "delay": "Wait",
       "light": {
+        "fade-in": "Fade In the Lights",
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights"
       },

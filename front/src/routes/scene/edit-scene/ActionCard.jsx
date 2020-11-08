@@ -16,12 +16,14 @@ import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
+import LightFadeInParams from './actions/LightFadeInParams';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
 };
 
 const ACTION_ICON = {
+  [ACTIONS.LIGHT.FADE_IN]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
@@ -102,6 +104,14 @@ const ActionCard = ({ children, ...props }) => (
         )}
         {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
           <TurnOnOffLightParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.LIGHT.FADE_IN && (
+          <LightFadeInParams
             action={props.action}
             columnIndex={props.columnIndex}
             index={props.index}
