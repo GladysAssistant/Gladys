@@ -34,7 +34,7 @@ function createActions(store) {
     },
     async getHostIP(state) {
       const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/host_ip');
-      const HostIP = "http://"+value+":8080"
+      const HostIP = 'http://' + value + ':8080';
       store.setState({
         zigbee2mqttFrontend: HostIP
       });

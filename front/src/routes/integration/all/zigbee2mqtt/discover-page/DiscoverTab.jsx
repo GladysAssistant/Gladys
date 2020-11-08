@@ -13,10 +13,16 @@ const DiscoverTab = ({ children, ...props }) => (
       <h1 class="card-title">
         <tr>
           <td class="text-right">
-            <a href={props.zigbee2mqttFrontend} target="_blank"><Text id="integration.zigbee2mqtt.discover.title" /></a> 
+            <a href={props.zigbee2mqttFrontend} target="_blank">
+              <Text id="integration.zigbee2mqtt.discover.title" />
+            </a>
           </td>
           <td>
-            {props.zigbee2mqttDevices && <div>&nbsp;( {props.zigbee2mqttDevices.length} <Text id="integration.zigbee2mqtt.discover.device" /> )</div>}
+            {props.zigbee2mqttDevices && (
+              <div>
+                &nbsp;( {props.zigbee2mqttDevices.length} <Text id="integration.zigbee2mqtt.discover.device" /> )
+              </div>
+            )}
           </td>
         </tr>
       </h1>
@@ -34,7 +40,8 @@ const DiscoverTab = ({ children, ...props }) => (
             </label>
           </td>
           <td>
-            &nbsp;<Text id="integration.zigbee2mqtt.discover.permitJoin" />
+            &nbsp;
+            <Text id="integration.zigbee2mqtt.discover.permitJoin" />
             &nbsp;&nbsp;&nbsp;
           </td>
           <td>

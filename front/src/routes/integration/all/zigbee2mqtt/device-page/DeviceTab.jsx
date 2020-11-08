@@ -16,7 +16,11 @@ const DeviceTab = ({ children, ...props }) => (
             <Text id="integration.zigbee2mqtt.device.title" />
           </td>
           <td>
-            {props.zigbee2mqttDevices && <div>&nbsp;( {props.zigbee2mqttDevices.length} <Text id="integration.zigbee2mqtt.discover.device" /> )</div>}
+            {props.zigbee2mqttDevices && (
+              <div>
+                &nbsp;( {props.zigbee2mqttDevices.length} <Text id="integration.zigbee2mqtt.discover.device" /> )
+              </div>
+            )}
           </td>
         </tr>
       </h1>

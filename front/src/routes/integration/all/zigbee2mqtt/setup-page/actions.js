@@ -9,7 +9,6 @@ dayjs.extend(relativeTime);
 const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-
     async loadProps(state) {
       let z2mEnabled = false;
       store.setState({
@@ -35,7 +34,7 @@ const createActions = store => {
       let z2mContainerExists = false;
       let mqtt4z2mContainerRunning = false;
       let z2mContainerRunning = false;
-//      let z2mEnabled = state.z2mEnabled;
+      //      let z2mEnabled = state.z2mEnabled;
       let dockerContainers = [];
       store.setState({
         DockerGetContainersStatus: RequestStatus.Getting
@@ -60,18 +59,17 @@ const createActions = store => {
             }
             dockerContainers.push(container);
           }
-//          dockerContainers.push(container);
-
+          //          dockerContainers.push(container);
         });
-//        if (z2mEnabled && (!mqtt4z2mContainerRunning || !z2mContainerRunning)) {
-//          this.startContainer();
-//        }
-//        if (mqtt4z2mContainerRunning && z2mContainerRunning) {
-//          z2mEnabled = true;
-//        }
+        //        if (z2mEnabled && (!mqtt4z2mContainerRunning || !z2mContainerRunning)) {
+        //          this.startContainer();
+        //        }
+        //        if (mqtt4z2mContainerRunning && z2mContainerRunning) {
+        //          z2mEnabled = true;
+        //        }
         store.setState({
           dockerContainers,
-//          z2mEnabled,
+          //          z2mEnabled,
           z2mContainerExists,
           mqtt4z2mContainerExists,
           z2mContainerRunning,
@@ -80,7 +78,7 @@ const createActions = store => {
         });
       } catch (e) {
         store.setState({
-//          z2mEnabled,
+          //          z2mEnabled,
           z2mContainerExists,
           mqtt4z2mContainerExists,
           z2mContainerRunning,
@@ -133,7 +131,7 @@ const createActions = store => {
       } catch (e) {
         error = error | get(e, 'response.status');
       }
- 
+
       // If an error occurs
       if (error) {
         z2mEnabled = false;
@@ -172,26 +170,26 @@ const createActions = store => {
         z2mEnabled,
         zigbee2mqttContainerStatus: RequestStatus.Getting
       });
-//       // if Zigbee2mqtt container is running, we just need to stop it
-//       if (z2mContainerRunning) {
-//         try {
-//           await state.httpClient.post('/api/v1/service/zigbee2mqtt/z2m/stop');
-// //          await state.httpClient.post('/api/v1/docker/container/zigbee2mqtt/stop');
-//           z2mContainerRunning = false;
-//         } catch (e) {
-//           error = get(e, 'response.status');
-//         }
-//       }
-//       // if Mqtt4Z2m container is running, we just need to stop it
-//       if (mqtt4z2mContainerRunning) {
-//         try {
-//           await state.httpClient.post('/api/v1/service/zigbee2mqtt/mqtt/stop');
-// //          await state.httpClient.post('/api/v1/docker/container/mqtt4z2m/stop');
-//           mqtt4z2mContainerRunning = false;
-//         } catch (e) {
-//           error = error | get(e, 'response.status');
-//         }
-//       }
+      //       // if Zigbee2mqtt container is running, we just need to stop it
+      //       if (z2mContainerRunning) {
+      //         try {
+      //           await state.httpClient.post('/api/v1/service/zigbee2mqtt/z2m/stop');
+      // //          await state.httpClient.post('/api/v1/docker/container/zigbee2mqtt/stop');
+      //           z2mContainerRunning = false;
+      //         } catch (e) {
+      //           error = get(e, 'response.status');
+      //         }
+      //       }
+      //       // if Mqtt4Z2m container is running, we just need to stop it
+      //       if (mqtt4z2mContainerRunning) {
+      //         try {
+      //           await state.httpClient.post('/api/v1/service/zigbee2mqtt/mqtt/stop');
+      // //          await state.httpClient.post('/api/v1/docker/container/mqtt4z2m/stop');
+      //           mqtt4z2mContainerRunning = false;
+      //         } catch (e) {
+      //           error = error | get(e, 'response.status');
+      //         }
+      //       }
 
       try {
         await state.httpClient.post('/api/v1/service/zigbee2mqtt/disconnect');

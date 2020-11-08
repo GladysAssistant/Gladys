@@ -9,7 +9,7 @@ class SetupTab extends Component {
     let checked = this.props.z2mEnabled;
     checked = !checked;
     console.log('toggle : ', checked);
-    console.log(this.props.dockerContainers)
+    console.log(this.props.dockerContainers);
 
     if (checked) {
       console.log('Starting Containers :');
@@ -20,7 +20,6 @@ class SetupTab extends Component {
     }
 
     this.props.z2mEnabled = checked;
-
   };
 
   render(props, {}) {
@@ -62,7 +61,8 @@ class SetupTab extends Component {
               </label>
             </td>
             <td>
-              &nbsp;<Text id="integration.zigbee2mqtt.setup.enable" />
+              &nbsp;
+              <Text id="integration.zigbee2mqtt.setup.enable" />
             </td>
           </tr>
 
