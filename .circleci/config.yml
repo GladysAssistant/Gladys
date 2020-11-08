@@ -252,24 +252,28 @@ workflows:
       - build-amd64:
           requires:
             - build-front
+          filters:
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
       - build-i386:
           requires:
             - build-front
+          filters:
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
       - build-arm64v8:
           requires:
             - build-front
+          filters:
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
       - build-arm32v7:
           requires:
             - build-front
+          filters:
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
@@ -280,6 +284,7 @@ workflows:
             - build-i386
             - build-armhf
             - build-arm32v7
+          filters:
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
