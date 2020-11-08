@@ -16,6 +16,7 @@ const { exec } = require('./system.exec');
 const { createContainer } = require('./system.createContainer');
 const { restartContainer } = require('./system.restartContainer');
 const { removeContainer } = require('./system.removeContainer');
+const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
 
 const { shutdown } = require('./system.shutdown');
@@ -47,6 +48,7 @@ System.prototype.exec = exec;
 System.prototype.createContainer = createContainer;
 System.prototype.restartContainer = restartContainer;
 System.prototype.removeContainer = removeContainer;
+System.prototype.stopContainer = stopContainer;
 System.prototype.getNetworkMode = getNetworkMode;
 
 System.prototype.shutdown = shutdown;
