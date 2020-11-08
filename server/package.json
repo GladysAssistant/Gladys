@@ -16,7 +16,7 @@
     "prettier": "prettier --write '**/*.js' '**/*.json'",
     "eslint-fix": "eslint . --fix",
     "eslint": "eslint .",
-    "start": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=development nodemon index.js --config nodemon.json",
     "start:prod": "cross-env NODE_ENV=production node index.js",
     "db-reset:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate:undo:all",
     "db-migrate:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate",
