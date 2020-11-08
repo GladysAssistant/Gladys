@@ -41,10 +41,6 @@ async function installMqttContainer() {
       const brokerEnv = await exec('sh ./services/zigbee2mqtt/docker/z2m-mqtt-env.sh');
       logger.trace(brokerEnv);
 
-      logger.info(`Creating Zigbee2mqtt containers' network...`);
-      const network = await this.gladys.system.createNetwork({ Name: 'zigbee2mqtt' });
-      logger.trace(network);
-
       logger.info(`Creating container...`);
       const containerMqtt = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerMqtt);
