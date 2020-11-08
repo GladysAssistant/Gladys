@@ -26,10 +26,6 @@ function createActions(store) {
     },
     setDiscoveredDevices(state, zigbee2mqttDevices) {
       clearTimeout(scanTimer);
-<<<<<<< HEAD
-=======
-
->>>>>>> Zigbee2mqtt : Front integration
       store.setState({
         zigbee2mqttDevices,
         discoverZigbee2mqtt: false,
