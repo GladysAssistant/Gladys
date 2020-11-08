@@ -1,24 +1,17 @@
-<<<<<<< HEAD
 const { init } = require('./init');
 const { connect } = require('./connect');
 const { getConfiguration } = require('./getConfiguration');
-=======
-const { connect } = require('./connect');
->>>>>>> Zigbee2mqtt : Server integration
 const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { discoverDevices } = require('./discoverDevices');
 const { setValue } = require('./setValue');
 const { status } = require('./status');
 const { subscribe } = require('./subscribe');
-<<<<<<< HEAD
 const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
 const { getHostIP } = require('./getHostIP');
-=======
->>>>>>> Zigbee2mqtt : Server integration
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
