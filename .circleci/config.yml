@@ -80,15 +80,15 @@ jobs:
       - run:
           name: Run prettier
           command: cd server && npm run prettier-check
-      - run:
-          name: Run eslint
-          command: cd server && npm run eslint
-      - run:
-          name: Tests with coverage
-          command: cd server && npm run coverage
-      - run:
-          name: Push coverage
-          command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
+      # - run:
+      #     name: Run eslint
+      #     command: cd server && npm run eslint
+      # - run:
+      #     name: Tests with coverage
+      #     command: cd server && npm run coverage
+      # - run:
+      #     name: Push coverage
+      #     command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
     docker: # run the steps with Docker
@@ -112,9 +112,9 @@ jobs:
       - run:
           name: Run prettier
           command: npm run prettier-check
-      - run:
-          name: Run eslint
-          command: npm run eslint
+      # - run:
+      #     name: Run eslint
+      #     command: npm run eslint
       - run:
           name: Run integration comparison
           command: npm run compare-translations
@@ -247,6 +247,7 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only: zigbee2mqtt-service
               ignore: /.*/
       - build-amd64:
           requires:
@@ -255,6 +256,7 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only: zigbee2mqtt-service
               ignore: /.*/
       - build-i386:
           requires:
@@ -263,6 +265,7 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only: zigbee2mqtt-service
               ignore: /.*/
       - build-arm64v8:
           requires:
@@ -271,6 +274,7 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only: zigbee2mqtt-service
               ignore: /.*/
       - build-arm32v7:
           requires:
@@ -279,6 +283,7 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only: zigbee2mqtt-service
               ignore: /.*/
       - docker_manifest:
           requires:
