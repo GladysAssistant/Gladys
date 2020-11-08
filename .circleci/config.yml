@@ -27,7 +27,9 @@ shared: &shared
             echo "export VERSION=$CIRCLE_TAG" >> $BASH_ENV ;
             echo "export MAJOR_VERSION=$(echo $CIRCLE_TAG | cut -d'.' -f 1)" >> $BASH_ENV ;
           fi
-          echo 'export VERSION="dev"' >> $BASH_ENV ;
+          if [[ $CIRCLE_BRANCH = "master" ]]; then
+            echo 'export VERSION="dev"' >> $BASH_ENV ;
+          fi
     - run:
         name: Add dynamic shared vars to env.
         command: |
@@ -142,7 +144,9 @@ jobs:
               echo "export VERSION=$CIRCLE_TAG" >> $BASH_ENV ;
               echo "export MAJOR_VERSION=$(echo $CIRCLE_TAG | cut -d'.' -f 1)" >> $BASH_ENV ;
             fi
-            echo 'export VERSION="dev"' >> $BASH_ENV ;
+            if [[ $CIRCLE_BRANCH = "master" ]]; then
+              echo 'export VERSION="dev"' >> $BASH_ENV ;
+            fi
       - run:
           name: Add dynamic shared vars to env.
           command: |
