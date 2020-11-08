@@ -73,6 +73,35 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.LIGHT.FADE_IN]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.FADE_IN,
+        );
+        let durationMilliseconds;
+        switch (action.duration) {
+          case 'seconds':
+            durationMilliseconds = action.value * 1000;
+            break;
+          case 'minutes':
+            durationMilliseconds = action.value * 1000 * 60;
+            break;
+          case 'hours':
+            durationMilliseconds = action.value * 1000 * 60 * 60;
+            break;
+          default:
+            throw new Error(`Unit ${action.unit} not recognized`);
+        }
+        await self.device.scenario(device, deviceFeature, { ...action, duration: durationMilliseconds });
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {

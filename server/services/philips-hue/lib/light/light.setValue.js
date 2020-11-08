@@ -2,30 +2,12 @@ const Promise = require('bluebird');
 
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { intToRgb } = require('../../../../utils/colors');
-const { LIGHT_BRIGHTNESS } = require('../utils/consts');
 
 const logger = require('../../../../utils/logger');
 const { STATE } = require('../../../../utils/constants');
-const { DIMMER_VALUES } = require('../../../../utils/constants');
 const { parseExternalId } = require('../utils/parseExternalId');
+const { transformBrightnessValue } = require('../utils/transformBrightnessValue');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-
-/**
- * @description Transform dimmer value into Philips Hue Light Brightness value.
- * @param {Object} value - The value to transform.
- * @returns {number} Philips Hue Light Brightness value.
- * @example
- * transformBrightnessValue(9);
- */
-function transformBrightnessValue(value) {
-  if (Number(value) >= DIMMER_VALUES.MAX) {
-    return LIGHT_BRIGHTNESS.MAX;
-  }
-  if (Number(value) <= DIMMER_VALUES.MIN) {
-    return LIGHT_BRIGHTNESS.MIN;
-  }
-  return Math.round(Number(value) * LIGHT_BRIGHTNESS.MAX / DIMMER_VALUES.MAX);
-}
 
 /**
  * @description Sets last value of brightness to the light.
