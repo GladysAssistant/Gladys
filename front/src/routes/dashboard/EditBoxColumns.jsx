@@ -3,7 +3,7 @@ import EditBox from './EditBox';
 import EditAddBoxButton from './EditAddBoxButton';
 
 const EditBoxColumns = ({ children, ...props }) => (
-  <div class="d-flex flex-row flex-wrap justify-content-center">
+  <div class="d-flex flex-row flex-wrap justify-content-center pb-9">
     {props.homeDashboard &&
       props.homeDashboard.boxes.map((column, x) => (
         <div class="d-flex flex-column col-lg-4">
