@@ -245,7 +245,7 @@ workflows:
             - build-front
           filters:
             tags:
-#              only: /.*/
+              only: /.*/
             branches:
               only: zigbee2mqtt-service
 #              ignore: /.*/
