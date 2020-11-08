@@ -1,8 +1,8 @@
 {
   "name": "z2m-mqtt",
   "Image": "eclipse-mosquitto:latest",
-  "ExposedPorts": { 
-    "1884/tcp": {} 
+  "ExposedPorts": {
+    "1884/tcp": {}
   },
   "HostConfig": {
     "Binds": ["/var/lib/gladysassistant/zigbee2mqtt/mqtt:/mosquitto/config"],

@@ -15,24 +15,31 @@ const sleep = promisify(setTimeout);
  * getConfiguration();
  */
 async function getConfiguration() {
+  let brokerContainerAvailable = false;
+  //   const dockerBased = await this.gladys.system.isDocker();
 
-   let brokerContainerAvailable = false;
-//   const dockerBased = await this.gladys.system.isDocker();
+  let networkModeValid = false;
 
-   let networkModeValid = false;
+  dockerBased = true;
 
-   dockerBased = true
-  
   if (dockerBased) {
-    networkModeValid = (await this.gladys.system.getNetworkMode() === 'host');
+    networkModeValid = (await this.gladys.system.getNetworkMode()) === 'host';
 
     // Creation of credentials for Gladys & Z2M for connection to broker
     const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
     if (!mqttPw) {
       await this.gladys.variable.setValue(CONFIGURATION.MQTT_URL_KEY, CONFIGURATION.MQTT_URL_VALUE, this.serviceId);
-      await this.gladys.variable.setValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, CONFIGURATION.Z2M_MQTT_USERNAME_VALUE, this.serviceId);
+      await this.gladys.variable.setValue(
+        CONFIGURATION.Z2M_MQTT_USERNAME_KEY,
+        CONFIGURATION.Z2M_MQTT_USERNAME_VALUE,
+        this.serviceId,
+      );
       await this.gladys.variable.setValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, generate(), this.serviceId);
-      await this.gladys.variable.setValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE, this.serviceId);
+      await this.gladys.variable.setValue(
+        CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
+        CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE,
+        this.serviceId,
+      );
       await this.gladys.variable.setValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, generate(), this.serviceId);
       await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
     }
@@ -54,8 +61,7 @@ async function getConfiguration() {
         await sleep(5 * 1000);
       }
       this.mqttContainerRunning = true;
-    }
-    else this.mqttContainerRunning = false;
+    } else this.mqttContainerRunning = false;
 
     // Look for zigbee2mqtt docker container
     dockerContainer = await this.gladys.system.getContainers({
@@ -70,8 +76,7 @@ async function getConfiguration() {
         await sleep(5 * 1000);
       }
       this.z2mContainerRunning = true;
-    }
-    else this.z2mContainerRunning = false;
+    } else this.z2mContainerRunning = false;
 
     if (!this.mqttContainerRunning || !this.z2mContainerRunning) {
       await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
@@ -79,7 +84,7 @@ async function getConfiguration() {
     }
 
     // Test if donglez is present
-    let dongleOK=false;
+    let dongleOK = false;
     this.usbConfigured = false;
     const zigbee2mqttDriverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
     if (!zigbee2mqttDriverPath) {
@@ -87,22 +92,21 @@ async function getConfiguration() {
       if (zigbee2mqttEnabled) {
         await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
       }
-    }
-    else {
+    } else {
       const usb = this.gladys.service.getService('usb');
       const usbList = await usb.list();
       usbList.forEach((usbPort) => {
         if (zigbee2mqttDriverPath === usbPort.path) {
-          dongleOK=true;
+          dongleOK = true;
           this.usbConfigured = true;
           logger.info(`Zigbee2mqtt USB dongle attached to ${zigbee2mqttDriverPath}`);
         }
-      })
+      });
     }
     if (!dongleOK) {
       throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
     }
-  
+
     const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
     const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
     const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
@@ -114,12 +118,9 @@ async function getConfiguration() {
       mqttPassword,
       zigbee2mqttEnabled,
     };
-  }
-  else {
+  } else {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
-
-
 }
 
 module.exports = {

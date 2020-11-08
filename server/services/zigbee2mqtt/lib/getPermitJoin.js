@@ -7,9 +7,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * init();
  */
 async function getPermitJoin() {
-
   return this.z2mPermitJoin;
-  
 }
 
 module.exports = {

@@ -7,7 +7,6 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * connect();
  */
 async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
-
   // Loads MQTT service
   logger.log('Connecting Gladys to ', mqttUrl, mqttUsername, mqttPassword);
   // set LAN IP instead of mqtt4z2m for development tests
@@ -38,9 +37,8 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
     this.handleMqttMessage(topic, message.toString());
   });
 
-    // Subscribe to Zigbee2mqtt topics
-//      this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
-  
+  // Subscribe to Zigbee2mqtt topics
+  //      this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
 }
 
 module.exports = {

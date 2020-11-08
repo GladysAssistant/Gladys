@@ -18,7 +18,6 @@ const sleep = promisify(setTimeout);
  * installZ2mContainer();
  */
 async function installZ2mContainer() {
-
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { ancestor: [containerDescriptor.Image] },
@@ -40,7 +39,9 @@ async function installZ2mContainer() {
 
       logger.info(`Creating container...`);
       const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
-      await exec(`sed -i 's%^"PathOnHost":.*%"PathOnHost": "${driverPath}",%' ./services/zigbee2mqtt/docker/zigbee2mqtt-container.json`);
+      await exec(
+        `sed -i 's%^"PathOnHost":.*%"PathOnHost": "${driverPath}",%' ./services/zigbee2mqtt/docker/zigbee2mqtt-container.json`,
+      );
 
       const containerLog = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerLog);
@@ -76,7 +77,6 @@ async function installZ2mContainer() {
       status: DEFAULT.INSTALLATION_STATUS.DONE,
     },
   });
-
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 const CONFIGURATION = {
   MQTT_URL_KEY: 'Z2M_MQTT_URL',
-//  MQTT_URL_VALUE: 'mqtt://z2m-mqtt:1884',
+  //  MQTT_URL_VALUE: 'mqtt://z2m-mqtt:1884',
   MQTT_URL_VALUE: 'mqtt://localhost:1884',
   Z2M_MQTT_USERNAME_KEY: 'Z2M_MQTT_USERNAME',
   Z2M_MQTT_USERNAME_VALUE: 'z2m',
