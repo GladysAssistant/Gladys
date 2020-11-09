@@ -43,7 +43,7 @@ To get started, you can go to [our website](https://gladysassistant.com).
 
 ## Pull requests are welcome
 
-If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
+If you want to help us develop on Gladys Assistant, you need to first [setup your development environment locally](https://gladysassistant.com/en/docs/api/setup-development-environment).
 
 Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
 
