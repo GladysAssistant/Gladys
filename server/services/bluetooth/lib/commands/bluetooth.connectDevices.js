@@ -11,7 +11,7 @@ const logger = require('../../../../utils/logger');
 async function connectDevices() {
   logger.debug(`Bluetooth: subscribing to existing devices...`);
   const devices = await this.gladys.device.get({
-    service_id: this.serviceId,
+    service: 'bluetooth',
   });
 
   return Promise.map(devices, (device) => this.postCreate(device), { concurrency: 1 });
