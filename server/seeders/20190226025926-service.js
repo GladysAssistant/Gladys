@@ -9,7 +9,7 @@ module.exports = {
           selector: 'test-service',
           pod_id: null,
           version: '0.1.0',
-          status: 'READY',
+          status: 'RUNNING',
           has_message_feature: false,
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',

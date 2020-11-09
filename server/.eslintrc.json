@@ -122,7 +122,7 @@
     "jsdoc/require-returns-type": 2,
     "jsdoc/valid-types": 2,
     "require-jsdoc": 2,
-    "no-call/no-call": [2, ["queryInterface.removeColumn"]]
+    "no-call/no-call": [2, ["queryInterface.removeColumn", "queryInterface.changeColumn"]]
   },
   "overrides": [
     {

@@ -588,6 +588,7 @@
       "description": "Control your Bluetooth devices.",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
         "search": "Search devices",
@@ -597,8 +598,8 @@
         "namePlaceholder": "Enter device name",
         "roomLabel": "Room",
         "externalIdLabel": "External ID",
-        "manufacturerLabel": "Fabricant",
-        "modelLabel": "Modèle",
+        "manufacturerLabel": "Manufacturer",
+        "modelLabel": "Model",
         "featuresLabel": "Features",
         "noFeatureDiscovered": "No features discovered.",
         "featureNamePlaceholder": "Enter feature name",
@@ -608,7 +609,6 @@
       },
       "setup": {
         "title": "Bluetooth Setup",
-        "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
         "scanButton": "Scan",
         "reloadButton": "Reload",
         "noDeviceFound": "No bluetooth device discovered.",
@@ -616,6 +616,8 @@
         "updateDeviceInGladys": "Update in Gladys",
         "deviceCreatedSuccess": "The device was successfully added",
         "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "notManagedByBluteoothButton": "Managed by \"{{service}}\" service",
+        "notManagedByBluteooth": "You cannot manage this device here as it is already manager by \"{{service}}\" service.",
         "saveSuccess": "Bluetooth device successfully created.",
         "saveError": "There was an error creating the device.",
         "peripheral": {
