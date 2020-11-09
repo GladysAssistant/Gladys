@@ -21,6 +21,16 @@ shared: &shared
         name: Install build dependencies.
         command: apk add --no-cache bash curl git jq make perl
     - run:
+        name: Setting variables.
+        command: |
+          if [ -n "$CIRCLE_TAG" ]; then
+            echo "export VERSION=$CIRCLE_TAG" >> $BASH_ENV ;
+            echo "export MAJOR_VERSION=$(echo $CIRCLE_TAG | cut -d'.' -f 1)" >> $BASH_ENV ;
+          fi
+          if [[ $CIRCLE_BRANCH = "master" ]]; then
+            echo 'export VERSION="dev"' >> $BASH_ENV ;
+          fi
+    - run:
         name: Add dynamic shared vars to env.
         command: |
           .circleci/load_env.sh
@@ -78,7 +88,7 @@ jobs:
           command: cd server && npm run coverage
       - run:
           name: Push coverage
-          command: npm i && npm run push-coverage
+          command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
     docker: # run the steps with Docker
@@ -88,7 +98,7 @@ jobs:
           path: ~/gladys-test
       - run:
           name: Install global dependencies
-          command: 'sudo npm install codecov npm@latest -g'
+          command: 'sudo npm install npm@latest -g'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package.json" }}-node-12
@@ -111,7 +121,7 @@ jobs:
   build-front:
     working_directory: ~/gladys-build
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
@@ -121,6 +131,64 @@ jobs:
           root: ~/gladys-build
           paths:
             - front/build
+  docker_manifest:
+    machine:
+      enabled: true
+      image: circleci/classic:201808-01
+    steps:
+      - checkout
+      - run:
+          name: Setting variables.
+          command: |
+            if [ -n "$CIRCLE_TAG" ]; then
+              echo "export VERSION=$CIRCLE_TAG" >> $BASH_ENV ;
+              echo "export MAJOR_VERSION=$(echo $CIRCLE_TAG | cut -d'.' -f 1)" >> $BASH_ENV ;
+            fi
+            if [[ $CIRCLE_BRANCH = "master" ]]; then
+              echo 'export VERSION="dev"' >> $BASH_ENV ;
+            fi
+      - run:
+          name: Add dynamic shared vars to env.
+          command: |
+            .circleci/load_env.sh
+      - run:
+          name: Creating docker manifest
+          command: |
+            # Turn on Experimental features
+            sudo mkdir $HOME/.docker
+            sudo sh -c 'echo "{ \"experimental\": \"enabled\" }" >> $HOME/.docker/config.json'
+            echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin
+            if [ -n "$CIRCLE_TAG" ]; then
+              sudo docker manifest create --amend $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 $DOCKERHUB_REPO:$CIRCLE_TAG-i386 $DOCKERHUB_REPO:$CIRCLE_TAG-arm $DOCKERHUB_REPO:$CIRCLE_TAG-arm32v7 $DOCKERHUB_REPO:$CIRCLE_TAG-arm64v8;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-amd64 --os linux --arch amd64;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-i386 --os linux --arch 386;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm --os linux --arch arm --variant v6;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm32v7 --os linux --arch arm --variant v7;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$CIRCLE_TAG $DOCKERHUB_REPO:$CIRCLE_TAG-arm64v8 --os linux --arch arm64 --variant v8;
+              sudo docker manifest push $DOCKERHUB_REPO:$CIRCLE_TAG -p;
+              sudo docker manifest create --amend $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-amd64 $DOCKERHUB_REPO:$MAJOR_VERSION-i386 $DOCKERHUB_REPO:$MAJOR_VERSION-arm $DOCKERHUB_REPO:$MAJOR_VERSION-arm32v7 $DOCKERHUB_REPO:$MAJOR_VERSION-arm64v8;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-amd64 --os linux --arch amd64;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-i386 --os linux --arch 386;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-arm --os linux --arch arm --variant v6;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-arm32v7 --os linux --arch arm --variant v7;
+              sudo docker manifest annotate $DOCKERHUB_REPO:$MAJOR_VERSION $DOCKERHUB_REPO:$MAJOR_VERSION-arm64v8 --os linux --arch arm64 --variant v8;
+              sudo docker manifest push $DOCKERHUB_REPO:$MAJOR_VERSION -p;
+              sudo docker manifest create --amend $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-amd64 $DOCKERHUB_REPO:latest-i386 $DOCKERHUB_REPO:latest-arm $DOCKERHUB_REPO:latest-arm32v7 $DOCKERHUB_REPO:latest-arm64v8;
+              sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-amd64 --os linux --arch amd64;
+              sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-i386 --os linux --arch 386;
+              sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm --os linux --arch arm --variant v6;
+              sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm32v7 --os linux --arch arm --variant v7;
+              sudo docker manifest annotate $DOCKERHUB_REPO:latest $DOCKERHUB_REPO:latest-arm64v8 --os linux --arch arm64 --variant v8;
+              sudo docker manifest push $DOCKERHUB_REPO:latest -p;
+            elif [[ $CIRCLE_BRANCH = "master" ]]; then
+              sudo docker manifest create --amend $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-amd64 $DOCKERHUB_REPO:dev-i386 $DOCKERHUB_REPO:dev-arm $DOCKERHUB_REPO:dev-arm32v7 $DOCKERHUB_REPO:dev-arm64v8;
+              sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-amd64 --os linux --arch amd64;
+              sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-i386 --os linux --arch 386;
+              sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm --os linux --arch arm --variant v6;
+              sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm32v7 --os linux --arch arm --variant v7;
+              sudo docker manifest annotate $DOCKERHUB_REPO:dev $DOCKERHUB_REPO:dev-arm64v8 --os linux --arch arm64 --variant v8;
+              sudo docker manifest push $DOCKERHUB_REPO:dev -p;
+            fi
 
   build-armhf:
     <<: *shared
@@ -146,46 +214,81 @@ jobs:
       QEMU_ARCH: aarch64
       TAG: arm64v8
       TARGET: arm64v8
+  build-arm32v7:
+    <<: *shared
+    environment:
+      QEMU_ARCH: arm
+      TAG: arm32v7
+      TARGET: arm32v7
 
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - test-server
-      - test-front
+      - test-server:
+          filters:
+            tags:
+              only: /.*/
+      - test-front:
+          filters:
+            tags:
+              only: /.*/
       - build-front:
           requires:
             - test-server
             - test-front
+          filters:
+            tags:
+              only: /.*/
       - build-armhf:
           requires:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
-              only: master
+              ignore: /.*/
       - build-amd64:
           requires:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
-              only: master
+              ignore: /.*/
       - build-i386:
           requires:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
-              only: master
+              ignore: /.*/
       - build-arm64v8:
           requires:
             - build-front
           filters:
             tags:
-              only: /v*/
+              only: /.*/
             branches:
-              only: master
+              ignore: /.*/
+      - build-arm32v7:
+          requires:
+            - build-front
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - docker_manifest:
+          requires:
+            - build-amd64
+            - build-arm64v8
+            - build-i386
+            - build-armhf
+            - build-arm32v7
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/

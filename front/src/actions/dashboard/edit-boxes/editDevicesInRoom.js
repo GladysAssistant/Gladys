@@ -8,6 +8,11 @@ function createActions(store) {
       boxActions.updateBoxConfig(state, x, y, {
         room
       });
+    },
+    updateBoxDeviceFeatures(state, x, y, deviceFeatures) {
+      boxActions.updateBoxConfig(state, x, y, {
+        device_features: deviceFeatures
+      });
     }
   };
   return actions;

@@ -13,6 +13,9 @@ const gladys = {
   variable: {
     getValue: fake.resolves('result'),
   },
+  system: {
+    isDocker: fake.resolves(false),
+  },
 };
 
 describe('MqttService', () => {
@@ -37,14 +40,10 @@ describe('MqttService', () => {
   });
 
   it('should stop service', async () => {
+    const { mqttClient } = mqttService.device;
     mqttService.stop();
-    assert.calledOnce(mqttService.device.mqttClient.internalEnd);
-    expect(mqttService.device.mqttClient.disconnected).to.eq(true);
-  });
-
-  it('should stop service while already stopped', async () => {
-    mqttService.stop();
-    assert.notCalled(mqttService.device.mqttClient.internalEnd);
-    expect(mqttService.device.mqttClient.disconnected).to.eq(true);
+    assert.calledOnce(mqttClient.internalEnd);
+    expect(mqttService.device.mqttClient).to.eq(null);
+    expect(mqttClient.disconnected).to.eq(true);
   });
 });

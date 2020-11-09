@@ -14,7 +14,9 @@ const getLightStatus = room => {
     device.features.forEach(feature => {
       // if it's a light
       const isLight =
-        feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY;
+        feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
+        feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY &&
+        feature.read_only === false;
       // if it's a light and it's turned on, we consider that the light
       // is on in the room
       if (isLight && feature.last_value === 1) {

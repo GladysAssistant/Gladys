@@ -38,7 +38,7 @@ const TasmotaPage = ({ children, user }) => (
 
                   <DeviceConfigurationLink
                     user={user}
-                    documentKey="tasmota-configuration"
+                    documentKey="tasmota"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">

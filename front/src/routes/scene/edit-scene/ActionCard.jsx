@@ -9,6 +9,7 @@ import DeviceGetValueParams from './actions/DeviceGetValueParams';
 import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
 import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
+import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -17,6 +18,8 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
+  [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.TIME.DELAY]: 'fe fe-clock',
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
@@ -82,6 +85,22 @@ const ActionCard = ({ children, ...props }) => (
         )}
         {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
           <TurnOnOffLightParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.SWITCH.TURN_ON && (
+          <TurnOnOffSwitchParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
+          <TurnOnOffSwitchParams
             action={props.action}
             columnIndex={props.columnIndex}
             index={props.index}

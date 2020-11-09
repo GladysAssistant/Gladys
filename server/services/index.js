@@ -1,6 +1,6 @@
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
-module.exports.darksky = require('./darksky');
+module.exports.openweather = require('./openweather');
 module.exports.mqtt = require('./mqtt');
 module.exports['philips-hue'] = require('./philips-hue');
 module.exports['rtsp-camera'] = require('./rtsp-camera');
@@ -9,4 +9,5 @@ module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports.tasmota = require('./tasmota');
-module.exports.withings = require('./withings');
+module.exports.bluetooth = require('./bluetooth');
+module.exports.withings = require('./withings'); 

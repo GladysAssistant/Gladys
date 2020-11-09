@@ -1,11 +1,14 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon');
+
+const { assert, fake } = sinon;
 const MqttController = require('../../../../services/mqtt/api/mqtt.controller');
 
-const logger = require('../../../../utils/logger');
-
+const configuration = {};
 const mqttHandler = {
-  connect: fake.resolves(true),
   status: fake.resolves(true),
+  getConfiguration: fake.returns(configuration),
+  saveConfiguration: fake.returns(true),
+  installContainer: fake.returns(true),
 };
 
 describe('POST /api/v1/service/mqtt/connect', () => {
@@ -13,6 +16,7 @@ describe('POST /api/v1/service/mqtt/connect', () => {
 
   beforeEach(() => {
     controller = MqttController(mqttHandler);
+    sinon.reset();
   });
 
   it('Connect test', async () => {
@@ -28,7 +32,7 @@ describe('POST /api/v1/service/mqtt/connect', () => {
     };
     logger.debug(controller);
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
-    assert.calledWith(mqttHandler.connect, 'url', 'username', 'password');
+    assert.calledWith(mqttHandler.saveConfiguration, req.body);
   });
 });
 
@@ -37,6 +41,7 @@ describe('GET /api/v1/service/mqtt/status', () => {
 
   beforeEach(() => {
     controller = MqttController(mqttHandler);
+    sinon.reset();
   });
 
   it('Status test', async () => {
@@ -47,6 +52,97 @@ describe('GET /api/v1/service/mqtt/status', () => {
 
     await controller['get /api/v1/service/mqtt/status'].controller(req, res);
     assert.calledOnce(mqttHandler.status);
+    assert.calledOnce(res.json);
+  });
+});
+
+describe('GET /api/v1/service/mqtt/config', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+    sinon.reset();
+  });
+
+  it('getConfiguration test', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/config'].controller(req, res);
+    assert.calledOnce(mqttHandler.getConfiguration);
+    assert.calledWith(res.json, configuration);
+  });
+
+  it('getConfiguration test (hide password)', async () => {
+    configuration.useEmbeddedBroker = false;
+    configuration.mqttPassword = 'my_password';
+
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/config'].controller(req, res);
+    assert.calledOnce(mqttHandler.getConfiguration);
+    assert.calledWith(res.json, {
+      useEmbeddedBroker: false,
+      mqttPassword: '*********',
+    });
+  });
+
+  it('getConfiguration test (no password)', async () => {
+    configuration.useEmbeddedBroker = false;
+    configuration.mqttPassword = null;
+
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/config'].controller(req, res);
+    assert.calledOnce(mqttHandler.getConfiguration);
+    assert.calledWith(res.json, {
+      useEmbeddedBroker: false,
+      mqttPassword: null,
+    });
+  });
+
+  it('getConfiguration test (display password)', async () => {
+    configuration.useEmbeddedBroker = true;
+    configuration.mqttPassword = 'my_password';
+
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/config'].controller(req, res);
+    assert.calledOnce(mqttHandler.getConfiguration);
+    assert.calledWith(res.json, {
+      useEmbeddedBroker: true,
+      mqttPassword: 'my_password',
+    });
+  });
+});
+
+describe('POST /api/v1/service/mqtt/config/docker', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+    sinon.reset();
+  });
+
+  it('Install container', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/mqtt/config/docker'].controller(req, res);
+    assert.calledOnce(mqttHandler.installContainer);
     assert.calledOnce(res.json);
   });
 });

@@ -48,6 +48,36 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.SWITCH,
+          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        );
+        await self.device.setValue(device, deviceFeature, 1);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
+  [ACTIONS.SWITCH.TURN_OFF]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.SWITCH,
+          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        );
+        await self.device.setValue(device, deviceFeature, 0);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
       let timeToWaitMilliseconds;

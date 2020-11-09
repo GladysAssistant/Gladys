@@ -13,7 +13,10 @@ function valueAdded(nodeId, comClass, valueId) {
   if (!this.nodes[nodeId].classes[comClass]) {
     this.nodes[nodeId].classes[comClass] = {};
   }
-  this.nodes[nodeId].classes[comClass][valueId.index] = valueId;
+  if (!this.nodes[nodeId].classes[comClass][valueId.index]) {
+    this.nodes[nodeId].classes[comClass][valueId.index] = {};
+  }
+  this.nodes[nodeId].classes[comClass][valueId.index][valueId.instance] = valueId;
 }
 
 module.exports = {

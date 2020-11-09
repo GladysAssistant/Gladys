@@ -1,6 +1,8 @@
-ARG target
+ARG TARGET
+ARG VERSION
+ARG BUILD_DATE
 
-FROM $target/node:12-alpine
+FROM $TARGET/node:12-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
@@ -9,12 +11,12 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev
 
 WORKDIR /tmp
 
 # Install OZW in a dedicated RUN to benefit from Docker cache on local dev'
-RUN apk add --no-cache --virtual .build-deps make g++ git udev coreutils \
+RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
     # Install OZW 1.6 - Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
     && git clone https://github.com/OpenZWave/open-zwave.git \
     && cd open-zwave \
@@ -25,6 +27,8 @@ RUN apk add --no-cache --virtual .build-deps make g++ git udev coreutils \
     && cd /tmp \
     && rm -rf /tmp/open-zwave
 
+# Install Bluez dependencies
+RUN apk add --no-cache bluez
 
 # Install Gladys
 RUN mkdir /src
@@ -32,7 +36,7 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers udev \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps

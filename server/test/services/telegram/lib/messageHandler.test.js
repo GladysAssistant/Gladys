@@ -35,6 +35,9 @@ describe('Telegram.message', () => {
       from: {
         id: '89798374Z7',
       },
+      chat: {
+        id: '89798374Z7',
+      },
       text: 'Hey',
       date: new Date(),
     });
@@ -42,6 +45,9 @@ describe('Telegram.message', () => {
   it('should handle new start message', async () => {
     await messageHandler.newMessage({
       from: {
+        id: '89798374Z7',
+      },
+      chat: {
         id: '89798374Z7',
       },
       text: '/start testapikey',

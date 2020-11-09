@@ -30,6 +30,25 @@ describe('scene.executeActions', () => {
     );
     assert.calledOnce(device.setValue);
   });
+  it('should execute switch turn on', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const stateManager = new StateManager(event);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_ON,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnce(device.setValue);
+  });
   it('should execute wait 5 ms', async () => {
     await executeActions(
       { event },
@@ -144,10 +163,22 @@ describe('scene.executeActions', () => {
             devices: ['light-1'],
           },
         ],
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_ON,
+            devices: ['switch-1'],
+          },
+        ],
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_OFF,
+            devices: ['switch-1'],
+          },
+        ],
       ],
       {},
     );
-    assert.calledTwice(device.setValue);
+    assert.callCount(device.setValue, 4);
   });
   it('should throw error, action type does not exist', async () => {
     const light = {

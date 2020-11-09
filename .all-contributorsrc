@@ -1,0 +1,153 @@
+{
+  "projectName": "Gladys",
+  "projectOwner": "GladysAssistant",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "Pierre-Gilles",
+      "name": "Pierre-Gilles Leymarie",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7365207?v=4",
+      "profile": "https://pierregillesleymarie.com",
+      "contributions": [
+        "code",
+        "business",
+        "doc",
+        "ideas"
+      ]
+    },
+    {
+      "login": "VonOx",
+      "name": "Vincent KULAK",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1528694?v=4",
+      "profile": "https://github.com/VonOx",
+      "contributions": [
+        "code",
+        "infra",
+        "doc",
+        "ideas"
+      ]
+    },
+    {
+      "login": "atrovato",
+      "name": "Alexandre Trovato",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1839717?v=4",
+      "profile": "http://www.trovato.fr",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
+    },
+    {
+      "login": "bertrandda",
+      "name": "Bertrand d'Aure",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/18148265?v=4",
+      "profile": "https://github.com/bertrandda",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Terdious",
+      "name": "Terdious",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/35010958?v=4",
+      "profile": "https://github.com/Terdious",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "sescandell",
+      "name": "Stéphane",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1559970?v=4",
+      "profile": "https://github.com/sescandell",
+      "contributions": [
+        "code",
+        "infra",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Scott-Fischer",
+      "name": "Scott Fischer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8835133?v=4",
+      "profile": "http://fischerdesign.co",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "thib-rdr",
+      "name": "thib_rdr",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6746308?v=4",
+      "profile": "https://github.com/thib-rdr",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "chmac",
+      "name": "Callum Macdonald",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/690997?v=4",
+      "profile": "http://www.callum-macdonald.com/",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "Redshark30",
+      "name": "Redshark30",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/38568609?v=4",
+      "profile": "https://github.com/Redshark30",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "guillaumeLamanda",
+      "name": "Lamanda ",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10440081?v=4",
+      "profile": "https://github.com/guillaumeLamanda",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "link39",
+      "name": "Thibaut Courvoisier",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/2229692?v=4",
+      "profile": "https://github.com/link39",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "hotfix31",
+      "name": "Frédéric Le Barzic",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1555884?v=4",
+      "profile": "http://lebarzic.fr",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "NickDub",
+      "name": "NickDub",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/32032645?v=4",
+      "profile": "https://github.com/NickDub",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true
+}

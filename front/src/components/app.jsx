@@ -1,11 +1,11 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
+import get from 'get-value';
 import config from '../../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
-import translationFr from '../config/i18n/fr.json';
-import translationEn from '../config/i18n/en.json';
+import translations from '../config/i18n';
 import actions from '../actions/main';
 
 import { getDefaultState } from '../utils/getDefaultState';
@@ -56,7 +56,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
 import CaldavPage from '../routes/integration/all/caldav';
-import DarkSkyPage from '../routes/integration/all/darksky';
+import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -81,11 +81,17 @@ import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
 import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
 
+// Integrations Bluetooth
+import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
+import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
+import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
+import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,integrationCategories',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
   actions
 )(props => (
   <div id="app">
@@ -144,13 +150,18 @@ const AppRouter = connect(
         <Dashboard path="/dashboard" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
-        {props.integrationCategories.map(category => (
-          <IntegrationPage path={`/dashboard/integration/${category.type}`} category={category.type} />
-        ))}
+
+        <IntegrationPage path="/dashboard/integration/device" category="device" />
+        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
+        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
+        <IntegrationPage path="/dashboard/integration/music" category="music" />
+        <IntegrationPage path="/dashboard/integration/health" category="health" />
+        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
+        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
-        <DarkSkyPage path="/dashboard/integration/weather/darksky" />
+        <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
@@ -177,6 +188,11 @@ const AppRouter = connect(
         <WithingsDevicePage path="/dashboard/integration/health/withings/device" />
         <WithingsSettingsPage path="/dashboard/integration/health/withings/settings" />
         <Redirect path="/dashboard/integration/health/withings" to="/dashboard/integration/health/withings/device" />
+
+        <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
+        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
+        <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
+        <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
@@ -205,7 +221,7 @@ class MainApp extends Component {
   }
 
   render({ user }, {}) {
-    const translationDefinition = user && user.language && user.language === 'fr' ? translationFr : translationEn;
+    const translationDefinition = get(translations, user.language, { default: translations.en });
     return (
       <IntlProvider definition={translationDefinition}>
         <AppRouter />

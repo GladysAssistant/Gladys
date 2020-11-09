@@ -20,6 +20,11 @@ const GatewayPage = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
+      {props.gatewayRestoreErrored && (
+        <div class="alert alert-danger" role="alert">
+          <Text id="gatewayBackup.restoreFailed" />
+        </div>
+      )}
       <p>
         <Text id="gatewayBackup.description" />
       </p>
