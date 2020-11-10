@@ -1733,6 +1733,48 @@
       "_id": 34,
       "id": 34,
       "mappedColorGamut": "B"
+    },
+    {
+      "_rawData": {
+        "state": {
+          "on": false,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": true
+        },
+        "swupdate": {
+          "state": "noupdates",
+          "lastinstall": "2020-02-04T21:24:15"
+        },
+        "type": "On/Off plug-in unit",
+        "name": "Cuisine",
+        "modelid": "LOM001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue Smart plug",
+        "capabilities": {
+          "certified": true,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "plug",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:04:12:af-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "A641B5AB",
+        "productid": "SmartPlug_OnOff_v01-00_01"
+      },
+      "_id": 35,
+      "id": 35
     }
   ]
 }
