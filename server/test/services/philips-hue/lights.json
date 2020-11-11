@@ -1676,6 +1676,105 @@
       },
       "_id": 33,
       "id": 33
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 16,
+        "hue": 62343,
+        "sat": 30,
+        "effect": "none",
+        "xy": [0.4048, 0.3646],
+        "ct": 283,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-06-13T17:34:02"
+      },
+      "type": "Extended color light",
+      "name": "Spot 1",
+      "modelid": "LCT003",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue color spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 5000,
+            "maxlumen": 250,
+            "colorgamuttype": "B",
+            "colorgamut": [[0.675, 0.322], [0.409, 0.518], [0.167, 0.04]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "spotbulb",
+          "function": "mixed",
+          "direction": "downwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:02:5e:7b:e4-0b",
+        "swversion": "5.130.1.30000"
+      },
+      "_id": 34,
+      "id": 34,
+      "mappedColorGamut": "B"
+    },
+    {
+      "_rawData": {
+        "state": {
+          "on": false,
+          "alert": "select",
+          "mode": "homeautomation",
+          "reachable": true
+        },
+        "swupdate": {
+          "state": "noupdates",
+          "lastinstall": "2020-02-04T21:24:15"
+        },
+        "type": "On/Off plug-in unit",
+        "name": "Cuisine",
+        "modelid": "LOM001",
+        "manufacturername": "Signify Netherlands B.V.",
+        "productname": "Hue Smart plug",
+        "capabilities": {
+          "certified": true,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "plug",
+          "function": "functional",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:04:12:af-0b",
+        "swversion": "1.65.9_hB3217DF",
+        "swconfigid": "A641B5AB",
+        "productid": "SmartPlug_OnOff_v01-00_01"
+      },
+      "_id": 35,
+      "id": 35
     }
   ]
 }

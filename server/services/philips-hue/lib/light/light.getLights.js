@@ -40,6 +40,7 @@ async function getLights() {
         case 'CLA60 TW OSRAM': // CLA60 TW OSRAM
         case 'LLC020': // Hue go
         case 'LCT012': // Hue White and Color Ambiance Candle E12
+        case 'LCT003': // Hue White and Color Ambiance Spot GU10
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation
@@ -65,6 +66,7 @@ async function getLights() {
         case 'LTA001': // Hue White E27 with Bluetooth
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LOM001': // Hue Smart Plug On/Off
         case 'LOM002': // Hue Smart Plug On/Off
         case 'SP 120': // Innr Smart Plug On/Off
         case 'Plug 01': // OSRAM Plug
