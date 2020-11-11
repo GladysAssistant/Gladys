@@ -51,7 +51,7 @@ function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, to
   const uniqueBatFeatureId = uuid.v4();
   const currentDate = new Date();
   let currentBatValueString = `${withingsDevice.battery}`;
-  let currentBatValue = 100; 
+  let currentBatValue = 100;
   switch (currentBatValueString) {
     case 'low':
       currentBatValueString = `${currentBatValueString} (< 30%)`;
@@ -80,22 +80,24 @@ function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, to
     type: DEVICE_FEATURE_TYPES.WITHINGS.BATTERY,
     read_only: false,
     keep_history: false,
-    has_feedback: false, 
+    has_feedback: false,
     min: 0,
     max: 0,
     unit: '%',
     last_value_changed: currentDate,
     last_value: currentBatValue,
     last_value_string: currentBatValueString,
-    feature_state: [{
-      id: uuid.v4(),
-      device_feature_id: uniqueBatFeatureId,
-      value: currentBatValue, 
-      created_at: currentDate,
-      updated_at: currentDate,
-    }],
+    feature_state: [
+      {
+        id: uuid.v4(),
+        device_feature_id: uniqueBatFeatureId,
+        value: currentBatValue,
+        created_at: currentDate,
+        updated_at: currentDate,
+      },
+    ],
   });
-  logger.trace('Battery feature: ', newFeatures); 
+  logger.trace('Battery feature: ', newFeatures);
 
   const newDevice = {
     id: uniqueId,
@@ -274,12 +276,11 @@ function buildFeature(currentGroup, device, currentFeatures) {
 
       tmpFeature.feature_state.push(featureState);
 
-      if(!tmpFeature.last_value || tmpFeature.last_value_changed < createDate ){
+      if (!tmpFeature.last_value || tmpFeature.last_value_changed < createDate) {
         tmpFeature.last_value_changed = createDate;
         tmpFeature.last_value = featureState.value;
         tmpFeature.last_value_string = `${featureState.value}`;
-
-      } 
+      }
 
       if (isNewFeature) {
         features.push(tmpFeature);

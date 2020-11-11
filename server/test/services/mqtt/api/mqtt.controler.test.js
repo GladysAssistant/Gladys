@@ -30,7 +30,7 @@ describe('POST /api/v1/service/mqtt/connect', () => {
     const res = {
       json: fake.returns(null),
     };
-    
+
     await controller['post /api/v1/service/mqtt/connect'].controller(req, res);
     assert.calledWith(mqttHandler.saveConfiguration, req.body);
   });

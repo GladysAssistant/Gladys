@@ -11,7 +11,6 @@ const logger = require('../../../utils/logger');
  * poll(device);
  */
 async function poll(device) {
-
   logger.debug('Device to poll:', device);
   if (device.features) {
     const oauth2Manager = new OAuth2Manager();
@@ -24,7 +23,6 @@ async function poll(device) {
 
     const { gladys } = this;
     device.features.forEach(async (feat) => {
-
       logger.trace('Current feature : ', feat);
       // Convert type to int wihings
       // (cf https://developer.withings.com/oauth2/#tag/measure%2Fpaths%2Fhttps%3A~1~1wbsapi.withings.net~1measure%3Faction%3Dgetmeas%2Fget)
@@ -89,7 +87,7 @@ async function poll(device) {
       }
 
       if (withingsType > 0) {
-        logger.debug('Current feature last value changed: ', feat.last_value_changed); 
+        logger.debug('Current feature last value changed: ', feat.last_value_changed);
 
         const measureResult = await oauth2Manager.executeQuery(
           accessToken,
@@ -97,9 +95,10 @@ async function poll(device) {
           tokenType,
           'get',
           `${this.withingsUrl}/measure`,
-          `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${(feat.last_value_changed.getTime()/1000)+1}`,
+          `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${feat.last_value_changed.getTime() / 1000 +
+            1}`,
         );
-        
+
         // logger.trace('Poll result : ', measureResult);
         const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
         await measureResult.data.body.measuregrps.forEach((element) => {
@@ -117,7 +116,7 @@ async function poll(device) {
         await mapOfMeasuresGrpsByWithingsDeviceId.forEach(function buildFeatureByGrps(value, key) {
           value.forEach(function(currentGroup) {
             if (key) {
-              logger.debug('currentGroup: ', currentGroup );
+              logger.debug('currentGroup: ', currentGroup);
 
               currentGroup.measures.forEach((element) => {
                 // Build a feature state
@@ -126,12 +125,12 @@ async function poll(device) {
                 const featureState = {
                   id: uniqueSateId,
                   device_feature_id: feat.id,
-                  value: element.value * 10 ** element.unit, 
+                  value: element.value * 10 ** element.unit,
                   created_at: createDate,
                   updated_at: new Date(),
                 };
                 gladys.device.saveHistoricalState(device, feat, featureState);
-              });       
+              });
             }
           });
         });
@@ -152,10 +151,10 @@ async function poll(device) {
         await userResult.data.body.devices.forEach((element) => {
           logger.debug('withingsDeviceId: ', withingsDeviceId);
           logger.debug('featureBattery: ', featureBattery);
-          if (element.deviceid === withingsDeviceId) { 
+          if (element.deviceid === withingsDeviceId) {
             const currentDate = new Date();
             let currentBatValueString = `${element.battery}`;
-            let currentBatValue = 100; 
+            let currentBatValue = 100;
             switch (currentBatValueString) {
               case 'low':
                 currentBatValueString = `${currentBatValueString} (< 30%)`;
@@ -174,7 +173,7 @@ async function poll(device) {
                 currentBatValue = 0;
                 break;
             }
- 
+
             featureBattery.last_value_changed = currentDate;
             featureBattery.last_value = currentBatValue;
             featureBattery.last_value_string = currentBatValueString;
@@ -182,17 +181,15 @@ async function poll(device) {
             const featureState = {
               id: uniqueSateId,
               device_feature_id: feat.id,
-              value: currentBatValue, 
+              value: currentBatValue,
               created_at: currentDate,
               updated_at: currentDate,
             };
             gladys.device.saveHistoricalState(device, featureBattery, featureState);
           }
         });
-
       }
-
-    }); 
+    });
   }
 }
 

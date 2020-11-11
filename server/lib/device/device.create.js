@@ -118,7 +118,6 @@ async function create(device) {
       // if feature state are attached, save feature state
       if (feature.feature_state) {
         feature.feature_state.forEach(async (state) => {
-          
           if (state.created_at) {
             await db.DeviceFeatureState.update(
               { created_at: state.created_at },
