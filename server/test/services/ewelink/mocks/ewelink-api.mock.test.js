@@ -26,7 +26,7 @@ class EwelinkApi {
         region: 'eu',
       });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   getRegion() {
@@ -36,14 +36,14 @@ class EwelinkApi {
         region: 'eu',
       });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   getDevices() {
     if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
       return Promise.resolve(fakeDevices);
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   getDevice(deviceId) {
@@ -54,7 +54,7 @@ class EwelinkApi {
       }
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   getDeviceChannelCount(deviceId) {
@@ -67,7 +67,7 @@ class EwelinkApi {
       }
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   async setDevicePowerState(deviceId, state, channel = 0) {
@@ -146,7 +146,7 @@ class EwelinkApi {
       }
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 
   checkDeviceUpdate(deviceId) {
@@ -159,7 +159,7 @@ class EwelinkApi {
       }
       return Promise.resolve({ error: false, msg: 'Device does not exist' });
     }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
+    return Promise.resolve({ error: 406, msg: 'Authentication error' });
   }
 }
 

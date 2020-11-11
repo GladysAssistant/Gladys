@@ -663,10 +663,10 @@
       }
     },
     "eWeLink": {
-      "title": "EWeLink",
-      "description": "Control your EWeLink devices.",
+      "title": "eWeLink",
+      "description": "Control your eWeLink devices.",
       "deviceTab": "Devices",
-      "discoverTab": "EWeLink discover",
+      "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
       "discoverDeviceDescr": "Automatically scan eWeLink devices",
       "nameLabel": "Device Name",
@@ -678,6 +678,10 @@
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed",
+      "status": {
+        "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
+        "setupPageLink": "eWeLink configuration page."
+      },
       "device": {
         "title": "Devices in Gladys",
         "search": "Search devices",
@@ -688,13 +692,13 @@
       },
       "discover": {
         "title": "Devices detected on your eWeLink cloud account",
-        "description": "EWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "description": "eWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
         "error": "Error discovering eWeLink devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No eWeLink device discovered.",
         "scan": "Scan"
       },
       "setup": {
-        "title": "EWeLink configuration",
+        "title": "eWeLink configuration",
         "eweLinkDescription": "You can connect Gladys to your eWeLink cloud account to command the associated devices.",
         "userLabel": "Username",
         "userPlaceholder": "Enter eWeLink username",

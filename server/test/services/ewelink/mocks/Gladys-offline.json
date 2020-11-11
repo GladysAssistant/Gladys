@@ -1,6 +1,6 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Inter 2",
+  "name": "Switch 2",
   "model": "MINI",
   "external_id": "ewelink:10004532ae:0",
   "selector": "ewelink:10004532ae:0",
@@ -8,7 +8,7 @@
   "poll_frequency": 60000,
   "features": [
     {
-      "name": "Inter 2 On/Off",
+      "name": "Switch 2 On/Off",
       "external_id": "ewelink:10004532ae:0:binary",
       "selector": "ewelink:10004532ae:0:binary",
       "category": "switch",

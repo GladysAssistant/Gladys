@@ -39,7 +39,7 @@ describe('EweLinkHandler setValue', () => {
       await eweLinkService.device.setValue(GladysOfflineDevice, { category: 'switch', type: 'binary' }, 1);
       assert.fail();
     } catch (error) {
-      expect(error.message).to.equal('EWeLink error: Device is not currently online');
+      expect(error.message).to.equal('eWeLink: Error, device is not currently online');
     }
   });
   it('should throw an error when AccessToken is no more valid', async () => {
@@ -49,8 +49,8 @@ describe('EweLinkHandler setValue', () => {
       await eweLinkService.device.setValue(Gladys2Ch1Device, { category: 'switch', type: 'binary' }, 1);
       assert.fail();
     } catch (error) {
-      expect(error.status).to.equal(401);
-      expect(error.message).to.equal('EWeLink error: Authentication error');
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal('eWeLink: Authentication error');
     }
   });
 });

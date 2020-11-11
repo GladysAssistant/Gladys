@@ -1,5 +1,4 @@
-const chai = require('chai');
-const deepEqualInAnyOrder = require('deep-equal-in-any-order');
+const { expect } = require('chai');
 const models = require('../../../../../services/ewelink/lib/models');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
@@ -13,24 +12,21 @@ const eweLinkThDevice = require('../../mocks/eweLink-th.json');
 const eweLink2ChDevice = require('../../mocks/eweLink-2ch.json');
 const eweLinkUnhandledDevice = require('../../mocks/eweLink-unhandled.json');
 
-chai.use(deepEqualInAnyOrder);
-const { expect } = chai;
-
-describe('EweLink models getDevice', () => {
+describe('eWeLink models getDevice', () => {
   it('should return device and features for a Basic model', () => {
     const device = models[eweLinkOfflineDevice.uiid].getDevice(
       'a810b8db-6d04-4697-bed3-c4b72c996279',
       eweLinkOfflineDevice,
     );
-    expect(device).to.deep.equalInAnyOrder(GladysOfflineDevice);
+    expect(device).to.deep.equal(GladysOfflineDevice);
   });
   it('should return device and features for a Pow model', () => {
     const device = models[eweLinkPowDevice.uiid].getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkPowDevice);
-    expect(device).to.deep.equalInAnyOrder(GladysPowDevice);
+    expect(device).to.deep.equal(GladysPowDevice);
   });
   it('should return device and features for a Th model', () => {
     const device = models[eweLinkThDevice.uiid].getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkThDevice);
-    expect(device).to.deep.equalInAnyOrder(GladysThDevice);
+    expect(device).to.deep.equal(GladysThDevice);
   });
   it('should return device and features for a 2CH model', () => {
     const device1 = models[eweLink2ChDevice.uiid].getDevice(
@@ -43,12 +39,12 @@ describe('EweLink models getDevice', () => {
       eweLink2ChDevice,
       2,
     );
-    expect(device1).to.deep.equalInAnyOrder(Gladys2Ch1Device);
-    expect(device2).to.deep.equalInAnyOrder(Gladys2Ch2Device);
+    expect(device1).to.deep.equal(Gladys2Ch1Device);
+    expect(device2).to.deep.equal(Gladys2Ch2Device);
   });
   it('should return device and features for an unhandled model', () => {
     const model = 'unhandled';
     const device = models[model].getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkUnhandledDevice);
-    expect(device).to.deep.equalInAnyOrder(GladysUnhandledDevice);
+    expect(device).to.deep.equal(GladysUnhandledDevice);
   });
 });

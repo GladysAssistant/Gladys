@@ -22,11 +22,8 @@ async function discover() {
   const unknownDevices = [];
 
   // If devices are found...
-  logger.info(`${discoveredDevices.length || 0} device(s) found while retrieving from the cloud !`);
+  logger.info(`eWeLink: ${discoveredDevices.length} device(s) found while retrieving from the cloud !`);
   if (discoveredDevices.length) {
-    // TODO to use i18n (exp: ${i18n[systemLanguage].device.binarySuffix})
-    // const systemLanguage = this.gladys.stateManager.get('system', 'SYSTEM_LANGUAGE') || 'en';
-
     // ...check, for each of them, ...
     await Promise.map(discoveredDevices, async (discoveredDevice) => {
       const uiid = discoveredDevice.uiid.toString();
@@ -45,10 +42,10 @@ async function discover() {
           // ...if it is already in Gladys...
           const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', deviceId);
           if (deviceInGladys) {
-            logger.debug(`Device "${discoveredDevice.deviceid}" is already in Gladys !`);
+            logger.debug(`eWeLink: Device "${discoveredDevice.deviceid}" is already in Gladys !`);
           } else {
             logger.debug(
-              `Device "${discoveredDevice.deviceid}" found, uiid: ${uiid}, model: "${discoveredDevice.productModel}", channel: ${channel}/${channels.switchesAmount}"`,
+              `eWeLink: Device "${discoveredDevice.deviceid}" found, uiid: ${uiid}, model: "${discoveredDevice.productModel}", channel: ${channel}/${channels.switchesAmount}"`,
             );
             if (channels.switchesAmount === 1) {
               unknownDevices.push(models[uiid].getDevice(this.serviceId, discoveredDevice));
@@ -59,7 +56,7 @@ async function discover() {
         }
       } else {
         // ...else the device is not yet handled.
-        logger.info(`Device model "${discoveredDevice.model}" not handled yet !`);
+        logger.info(`eWeLink: Device model "${discoveredDevice.model}" not handled yet !`);
         unknownDevices.push(models.unhandled.getDevice(this.serviceId, discoveredDevice));
       }
     });

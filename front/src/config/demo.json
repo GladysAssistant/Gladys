@@ -1800,7 +1800,7 @@
     {
       "id": "28e8ad03-70a8-431f-93cb-df916019c509",
       "room_id": "568981d0-1a4d-40ea-af97-dd4037d2b344",
-      "name": "Inter 1",
+      "name": "Switch 1",
       "selector": "ewelink-1000768322-0",
       "model": "MINI",
       "external_id": "ewelink:1000768322:0",
@@ -1810,7 +1810,7 @@
         {
           "id": "6f8172ed-37e5-4785-94ad-ec33706a31f3",
           "device_id": "28e8ad03-70a8-431f-93cb-df916019c509",
-          "name": "Inter 1 On/Off",
+          "name": "Switch 1 On/Off",
           "selector": "ewelink-1000768322-0-binary",
           "external_id": "ewelink:1000768322:0:binary",
           "category": "switch",
@@ -1836,9 +1836,9 @@
         }
       ],
       "room": {
-        "id": "568981d0-1a4d-40ea-af97-dd4037d2b344",
-        "name": "Salon",
-        "selector": "salon"
+        "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "name": "Living Room",
+        "selector": "living-room"
       },
       "service": {
         "id": "45c792a5-051b-4e6f-b746-2dd4c77d9d31",
@@ -1850,7 +1850,7 @@
   "get api/v1/service/ewelink/discover": [
     {
       "service_id": "45c792a5-051b-4e6f-b746-2dd4c77d9d31",
-      "name": "Inter 2",
+      "name": "Switch 2",
       "model": "Basic",
       "external_id": "ewelink:10004636bf:0",
       "selector": "ewelink:10004636bf:0",
@@ -1858,7 +1858,7 @@
       "poll_frequency": 60000,
       "features": [
         {
-          "name": "Inter 2 On/Off",
+          "name": "Switch 2 On/Off",
           "external_id": "ewelink:10004636bf:0:binary",
           "selector": "ewelink:10004636bf:0:binary",
           "category": "switch",

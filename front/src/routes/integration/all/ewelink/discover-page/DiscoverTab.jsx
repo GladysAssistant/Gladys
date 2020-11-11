@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -33,8 +34,11 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="loader" />
         <div class={cx('dimmer-content', style.eweLinkListBody)}>
           {props.errorLoading && (
-            <p class="alert alert-danger">
-              <Text id="integration.eWeLink.discover.error" />
+            <p class="alert alert-warning">
+              <Text id="integration.eWeLink.status.notConnected" />
+              <Link href="/dashboard/integration/device/ewelink/setup">
+                <Text id="integration.eWeLink.status.setupPageLink" />
+              </Link>
             </p>
           )}
           <div class="row">

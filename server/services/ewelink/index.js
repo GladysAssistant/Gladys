@@ -4,9 +4,8 @@ const EwelinkController = require('./api/ewelink.controller');
 
 module.exports = function EwelinkService(gladys, serviceId) {
   // require the eWeLink module
-  // @ts-ignore
-  const eweLinkApi = require('ewelink-api');
-  const eweLinkHandler = new EweLinkHandler(gladys, eweLinkApi, serviceId);
+  const eWeLinkApi = require('ewelink-api');
+  const eWeLinkHandler = new EweLinkHandler(gladys, eWeLinkApi, serviceId);
 
   /**
    * @public
@@ -16,7 +15,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting eWeLink service');
-    await eweLinkHandler.connect();
+    await eWeLinkHandler.connect();
   }
 
   /**
@@ -32,7 +31,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    device: eweLinkHandler,
-    controllers: EwelinkController(eweLinkHandler),
+    device: eWeLinkHandler,
+    controllers: EwelinkController(eWeLinkHandler),
   });
 };

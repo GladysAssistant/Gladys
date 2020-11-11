@@ -1,6 +1,6 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Inter 3 Ch2",
+  "name": "Switch 3 Ch2",
   "model": "2CH",
   "external_id": "ewelink:10004533ae:2",
   "selector": "ewelink:10004533ae:2",
@@ -8,7 +8,7 @@
   "poll_frequency": 60000,
   "features": [
     {
-      "name": "Inter 3 Ch2 On/Off",
+      "name": "Switch 3 Ch2 On/Off",
       "external_id": "ewelink:10004533ae:2:binary",
       "selector": "ewelink:10004533ae:2:binary",
       "category": "switch",

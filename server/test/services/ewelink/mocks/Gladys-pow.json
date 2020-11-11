@@ -1,6 +1,6 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Inter 1",
+  "name": "Switch 1",
   "model": "Pow",
   "external_id": "ewelink:10004531ae:0",
   "selector": "ewelink:10004531ae:0",
@@ -8,7 +8,7 @@
   "poll_frequency": 60000,
   "features": [
     {
-      "name": "Inter 1 On/Off",
+      "name": "Switch 1 On/Off",
       "external_id": "ewelink:10004531ae:0:binary",
       "selector": "ewelink:10004531ae:0:binary",
       "category": "switch",
@@ -19,7 +19,7 @@
       "max": 1
     },
     {
-      "name": "Inter 1 Power",
+      "name": "Switch 1 Power",
       "external_id": "ewelink:10004531ae:0:power",
       "selector": "ewelink:10004531ae:0:power",
       "category": "switch",

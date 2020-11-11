@@ -22,7 +22,7 @@ const SetupTab = ({ children, ...props }) => {
             <p>
               <Text id="integration.eWeLink.setup.eweLinkDescription" />
             </p>
-            {props.connectEweLinkStatus === RequestStatus.Error && (
+            {props.connectEweLinkStatus === RequestStatus.Error && !props.eweLinkConnectionError && (
               <p class="alert alert-danger">
                 <Text id="integration.eWeLink.setup.error" />
               </p>
@@ -42,6 +42,7 @@ const SetupTab = ({ children, ...props }) => {
                 <Text id="integration.eWeLink.setup.connectionError" />
               </p>
             )}
+
             <form>
               <div class="form-group">
                 <label for="eweLinkUsername" class="form-label">

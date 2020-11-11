@@ -10,7 +10,7 @@ const EwelinkService = proxyquire('../../../../../services/ewelink/index', {
   'ewelink-api': EweLinkApi,
 });
 
-describe('EwelinkHandler throwErrorIfNeeded', () => {
+describe('EweLinkHandler throwErrorIfNeeded', () => {
   const gladys = { event };
   const eweLinkService = EwelinkService(gladys, serviceId);
 
@@ -23,17 +23,17 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
 
   it('should throws a error and not emit a message', async () => {
     try {
-      const response = { error: 401, msg: 'Authentication error' };
+      const response = { error: 406, msg: 'Authentication error' };
       await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
-      expect(error.status).to.equal(401);
-      expect(error.message).to.equal('EWeLink error: Authentication error');
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal('eWeLink: Authentication error');
     }
   });
   it('should throws an error and emit a message', async () => {
     try {
-      const response = { error: 401, msg: 'Authentication error' };
+      const response = { error: 406, msg: 'Authentication error' };
       await eweLinkService.device.throwErrorIfNeeded(response, true);
       assert.fail();
     } catch (error) {
@@ -41,14 +41,14 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
         type: 'ewelink.error',
         payload: 'Authentication error',
       });
-      expect(error.status).to.equal(401);
-      expect(error.message).to.equal('EWeLink error: Authentication error');
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal('eWeLink: Authentication error');
     }
   });
   it('should reset authentication values when authentication fail', async () => {
     eweLinkService.device.accessToken = 'NoMoreValidAccessToken';
     try {
-      const response = { error: 401, msg: 'Authentication error' };
+      const response = { error: 406, msg: 'Authentication error' };
       await eweLinkService.device.throwErrorIfNeeded(response);
       assert.fail();
     } catch (error) {
@@ -64,7 +64,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
       assert.fail();
     } catch (error) {
       expect(error.status).to.equal(500);
-      expect(error.error).to.equal('EWeLink error: Device does not exist');
+      expect(error.error).to.equal('eWeLink: Device does not exist');
     }
   });
   it('should throws an error and emit a message', async () => {
@@ -78,7 +78,7 @@ describe('EwelinkHandler throwErrorIfNeeded', () => {
         payload: 'Device does not exist',
       });
       expect(error.status).to.equal(500);
-      expect(error.error).to.equal('EWeLink error: Device does not exist');
+      expect(error.error).to.equal('eWeLink: Device does not exist');
     }
   });
   it('should not reset authentication values', async () => {

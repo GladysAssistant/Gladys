@@ -1,6 +1,6 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Inter 5",
+  "name": "Switch 5",
   "model": "TH",
   "external_id": "ewelink:10004535ae:0",
   "selector": "ewelink:10004535ae:0",
@@ -8,7 +8,7 @@
   "poll_frequency": 60000,
   "features": [
     {
-      "name": "Inter 5 On/Off",
+      "name": "Switch 5 On/Off",
       "external_id": "ewelink:10004535ae:0:binary",
       "selector": "ewelink:10004535ae:0:binary",
       "category": "switch",
@@ -19,7 +19,7 @@
       "max": 1
     },
     {
-      "name": "Inter 5 Temperature",
+      "name": "Switch 5 Temperature",
       "external_id": "ewelink:10004535ae:0:temperature-sensor",
       "selector": "ewelink:10004535ae:0:temperature-sensor",
       "category": "temperature-sensor",
@@ -31,7 +31,7 @@
       "unit": "celsius"
     },
     {
-      "name": "Inter 5 Humidity",
+      "name": "Switch 5 Humidity",
       "external_id": "ewelink:10004535ae:0:humidity-sensor",
       "selector": "ewelink:10004535ae:0:humidity-sensor",
       "category": "humidity-sensor",

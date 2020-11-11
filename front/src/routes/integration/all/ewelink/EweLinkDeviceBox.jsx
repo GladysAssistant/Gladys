@@ -9,18 +9,10 @@ import { Link } from 'preact-router';
 class EweLinkDeviceBox extends Component {
   updateName = e => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'name', e.target.value);
-
-    this.setState({
-      loading: false
-    });
   };
 
   updateRoom = e => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
-
-    this.setState({
-      loading: false
-    });
   };
 
   saveDevice = async () => {
@@ -62,7 +54,7 @@ class EweLinkDeviceBox extends Component {
   };
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
-    const validModel = device.features.length > 0;
+    const validModel = device.features && device.features.length > 0;
 
     return (
       <div class="col-md-6">
@@ -146,7 +138,7 @@ class EweLinkDeviceBox extends Component {
                   </select>
                 </div>
 
-                {device.features && device.features.length > 0 && (
+                {validModel && (
                   <div class="form-group">
                     <label class="form-label">
                       <Text id="integration.eWeLink.device.featuresLabel" />

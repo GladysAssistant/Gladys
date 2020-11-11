@@ -25,7 +25,7 @@ async function setValue(device, deviceFeature, value) {
   await this.throwErrorIfNeeded(eweLinkDevice);
 
   if (!eweLinkDevice.online) {
-    throw new NotFoundError('EWeLink error: Device is not currently online');
+    throw new NotFoundError('eWeLink: Error, device is not currently online');
   }
 
   let response;
@@ -37,7 +37,7 @@ async function setValue(device, deviceFeature, value) {
       await this.throwErrorIfNeeded(response);
       break;
     default:
-      logger.warn(`EWeLink warning: Feature type "${deviceFeature.type}" not handled yet!`);
+      logger.warn(`eWeLink: Warning, feature type "${deviceFeature.type}" not handled yet!`);
       break;
   }
 }

@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { EWELINK_EMAIL_KEY, EWELINK_PASSWORD_KEY, EWELINK_REGION_KEY, EWELINK_REGIONS } = require('../utils/constants');
@@ -12,20 +11,16 @@ async function connect() {
   this.configured = false;
   this.connected = false;
 
-  /* eslint-disable prefer-const */
-  let [email, password, region] = await Promise.all([
-    this.gladys.variable.getValue(EWELINK_EMAIL_KEY, this.serviceId),
-    this.gladys.variable.getValue(EWELINK_PASSWORD_KEY, this.serviceId),
-    this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId),
-  ]);
-  /* eslint-enable prefer-const */
+  const email = await this.gladys.variable.getValue(EWELINK_EMAIL_KEY, this.serviceId);
+  const password = await this.gladys.variable.getValue(EWELINK_PASSWORD_KEY, this.serviceId);
+  let region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
 
   if (!email || !password) {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
       payload: 'Service is not configured',
     });
-    throw new ServiceNotConfiguredError('EWeLink error: Service is not configured');
+    throw new ServiceNotConfiguredError('eWeLink: Error, service is not configured');
   }
 
   if (!Object.values(EWELINK_REGIONS).includes(region)) {

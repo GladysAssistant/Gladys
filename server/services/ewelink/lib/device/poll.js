@@ -23,7 +23,7 @@ async function poll(device) {
   const eWeLinkDevice = await connection.getDevice(deviceId);
   await this.throwErrorIfNeeded(eWeLinkDevice);
   if (!eWeLinkDevice.online) {
-    throw new NotFoundError('EWeLink error: Device is not currently online');
+    throw new NotFoundError('eWeLink: Error, device is not currently online');
   }
 
   const [binaryFeature, powFeature, tempFeature, humFeature, firmwareParam] = await Promise.all([
@@ -41,7 +41,7 @@ async function poll(device) {
     const currentBinaryState = response.state === 'on' ? STATE.ON : STATE.OFF;
     // if the value is different from the value we have, save new state
     if (binaryFeature.last_value !== currentBinaryState) {
-      logger.debug(`Polling eWeLink ${deviceId}, new value = ${currentBinaryState}`);
+      logger.debug(`eWeLink: Polling device ${deviceId}, new value = ${currentBinaryState}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `${binaryFeature.external_id}`,
         state: currentBinaryState,
@@ -56,7 +56,7 @@ async function poll(device) {
     const currentPowerState = response.monthly;
     // if the value is different from the value we have, save new state
     if (powFeature.last_value !== currentPowerState) {
-      logger.debug(`Polling eWeLink ${deviceId}, new value = ${currentPowerState}`);
+      logger.debug(`eWeLink: Polling device ${deviceId}, new value = ${currentPowerState}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `${powFeature.external_id}`,
         state: currentPowerState,
@@ -72,7 +72,7 @@ async function poll(device) {
       const currentTemperature = response.temperature;
       // if the value is different from the value we have, save new state
       if (tempFeature.last_value !== currentTemperature) {
-        logger.debug(`Polling eWeLink ${deviceId}, new value = ${currentTemperature}`);
+        logger.debug(`eWeLink: Polling device ${deviceId}, new value = ${currentTemperature}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${tempFeature.external_id}`,
           state: currentTemperature,
@@ -83,7 +83,7 @@ async function poll(device) {
       const currentHumidity = response.humidity;
       // if the value is different from the value we have, save new state
       if (tempFeature.last_value !== currentHumidity) {
-        logger.debug(`Polling eWeLink ${deviceId}, new value = ${currentHumidity}`);
+        logger.debug(`eWeLink: Polling device ${deviceId}, new value = ${currentHumidity}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${humFeature.external_id}`,
           state: currentHumidity,
@@ -99,7 +99,7 @@ async function poll(device) {
     const currentVersion = response.fwVersion;
     // if the value is different from the value we have, save new param
     if (firmwareParam !== currentVersion) {
-      logger.debug(`Polling eWeLink ${deviceId}, new value = ${currentVersion}`);
+      logger.debug(`eWeLink: Polling device ${deviceId}, new value = ${currentVersion}`);
       this.gladys.event.emit(EVENTS.DEVICE.ADD_PARAM, {
         name: DEVICE_FIRMWARE,
         value: currentVersion,

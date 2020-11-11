@@ -663,7 +663,7 @@
       }
     },
     "eWeLink": {
-      "title": "EWeLink",
+      "title": "eWeLink",
       "description": "Contrôlez vos appareils eWeLink.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
@@ -678,6 +678,10 @@
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
+        "setupPageLink": "page de configuration eWeLink."
+      },
       "device": {
         "title": "Appareils eWeLink dans Gladys",
         "search": "Rechercher les appareils",

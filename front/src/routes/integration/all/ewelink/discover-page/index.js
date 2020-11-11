@@ -18,6 +18,13 @@ class EweLinkIntegration extends Component {
     );
   }
 
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EWELINK.NEW_DEVICE,
+      this.props.addDiscoveredDevice
+    );
+  }
+
   render(props) {
     return (
       <EweLinkPage user={props.user}>

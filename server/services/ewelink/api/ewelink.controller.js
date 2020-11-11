@@ -20,7 +20,6 @@ module.exports = function EwelinkController(eweLinkHandler) {
    */
   async function status(req, res) {
     const response = eweLinkHandler.status();
-    console.log('>>> status', response);
     res.json(response);
   }
 
@@ -31,7 +30,6 @@ module.exports = function EwelinkController(eweLinkHandler) {
    */
   async function discover(req, res) {
     const devices = await eweLinkHandler.discover();
-    console.log('>>> devices', devices);
     res.json(devices);
   }
 
