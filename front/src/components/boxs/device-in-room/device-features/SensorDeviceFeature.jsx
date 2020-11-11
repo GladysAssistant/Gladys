@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
+import cx from 'classnames';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -23,7 +24,7 @@ const SensorDeviceType = ({ children, ...props }) => (
     </td>
     <td>{props.deviceFeature.name}</td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
-      <td class="text-right">
+      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
         {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
         {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value !== null && (
@@ -51,7 +52,7 @@ const SensorDeviceType = ({ children, ...props }) => (
       </td>
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
-      <td class="text-right">
+      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value_changed })}>
         {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value_changed &&
           dayjs(props.deviceFeature.last_value_changed)
