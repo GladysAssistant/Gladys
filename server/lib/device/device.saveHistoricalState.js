@@ -31,10 +31,12 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
   logger.debug(deviceFeature.id, deviceFeatureInDB);
 
   await db.DeviceFeatureState.create(historicalState);
-
+  logger.trace('historicalState.created_at): ', historicalState.created_at);
+  logger.trace('deviceFeatureInDB.last_value_changed): ', deviceFeatureInDB.last_value_changed);
   if (new Date(historicalState.created_at) > new Date(deviceFeatureInDB.last_value_changed)) {
     await db.DeviceFeature.update(
       {
+        last_value: historicalState.value,
         last_value_string: historicalState.value,
         last_value_changed: historicalState.created_at,
       },
@@ -45,7 +47,8 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
       },
     );
 
-    deviceFeature.last_value_string = historicalState.value;
+    deviceFeature.last_value = historicalState.value;
+    deviceFeature.last_value_string = deviceFeature.last_value_string;
     deviceFeature.last_value_changed = historicalState.updated_at;
 
     // save local state in RAM
@@ -56,6 +59,7 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
       type: WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       payload: {
         device: device.selector,
+        last_value: historicalState.value,
         last_value_string: historicalState.value,
         last_value_changed: historicalState.updated_at,
       },

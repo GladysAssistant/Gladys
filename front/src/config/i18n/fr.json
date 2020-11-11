@@ -666,6 +666,7 @@
         "saveButton": "Sauvegarder"
       },
       "title": "Withings",
+      "description": "Synchronisez vos appareils Withings.",
       "documentation": "Documentation",
       "configuration": "Configuration",
       "officialWebSite": "Withings site officiel"

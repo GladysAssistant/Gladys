@@ -1,7 +1,6 @@
 const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
-const logger = require('../../utils/logger');
 
 const getByExternalId = async (externalId) => {
   return db.Device.findOne({
@@ -119,8 +118,7 @@ async function create(device) {
       // if feature state are attached, save feature state
       if (feature.feature_state) {
         feature.feature_state.forEach(async (state) => {
-          const featureStateCreated = await db.DeviceFeatureState.create(state, { transaction });
-          logger.debug(state.created_at, featureStateCreated.created_at);
+          
           if (state.created_at) {
             await db.DeviceFeatureState.update(
               { created_at: state.created_at },

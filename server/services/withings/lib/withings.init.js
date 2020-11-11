@@ -48,7 +48,30 @@ function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, to
   // Build features
   const newFeatures = [];
   // Feature allow in each device = battery
+  const uniqueBatFeatureId = uuid.v4();
+  const currentDate = new Date();
+  let currentBatValueString = `${withingsDevice.battery}`;
+  let currentBatValue = 100; 
+  switch (currentBatValueString) {
+    case 'low':
+      currentBatValueString = `${currentBatValueString} (< 30%)`;
+      currentBatValue = 20;
+      break;
+    case 'medium':
+      currentBatValueString = `${currentBatValueString} (> 30%)`;
+      currentBatValue = 30;
+      break;
+    case 'high':
+      currentBatValueString = `${currentBatValueString} (> 75%)`;
+      currentBatValue = 75;
+      break;
+    default:
+      currentBatValueString = `No value`;
+      currentBatValue = 0;
+      break;
+  }
   newFeatures.push({
+    id: uniqueBatFeatureId,
     name: 'Battery',
     selector: `withings-battery-${uniqueId}`,
     device_id: uniqueId,
@@ -57,17 +80,29 @@ function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, to
     type: DEVICE_FEATURE_TYPES.WITHINGS.BATTERY,
     read_only: false,
     keep_history: false,
-    has_feedback: false,
-    unit: '%',
+    has_feedback: false, 
     min: 0,
-    max: 100,
+    max: 0,
+    unit: '%',
+    last_value_changed: currentDate,
+    last_value: currentBatValue,
+    last_value_string: currentBatValueString,
+    feature_state: [{
+      id: uuid.v4(),
+      device_feature_id: uniqueBatFeatureId,
+      value: currentBatValue, 
+      created_at: currentDate,
+      updated_at: currentDate,
+    }],
   });
+  logger.trace('Battery feature: ', newFeatures); 
 
   const newDevice = {
     id: uniqueId,
     external_id: uniqueId,
     selector: `withings-${withingsDevice.model}-${uniqueId}`,
     name: `Withings - ${withingsDevice.model}`,
+    model: withingsDevice.model,
     room_id: null,
     service_id: serviceId,
     should_poll: true,
@@ -100,7 +135,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
     features = [];
   }
 
-  // Consider only real measures (not objectives) => category = 1
+  // Consider only real measures (not user objectives) => category = 1
   if (currentGroup.category === 1) {
     currentGroup.measures.forEach((element) => {
       const gladysDeviceId = device.id;
@@ -219,7 +254,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
           has_feedback: false,
           unit: featureUnit,
           min: 0,
-          max: 0,
+          max: 100000,
           feature_state: [],
         };
       }
@@ -238,6 +273,13 @@ function buildFeature(currentGroup, device, currentFeatures) {
       };
 
       tmpFeature.feature_state.push(featureState);
+
+      if(!tmpFeature.last_value || tmpFeature.last_value_changed < createDate ){
+        tmpFeature.last_value_changed = createDate;
+        tmpFeature.last_value = featureState.value;
+        tmpFeature.last_value_string = `${featureState.value}`;
+
+      } 
 
       if (isNewFeature) {
         features.push(tmpFeature);

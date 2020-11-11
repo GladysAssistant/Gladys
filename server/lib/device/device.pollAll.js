@@ -1,4 +1,4 @@
-const Promise = require('bluebird');
+const Promise = require('bluebird'); 
 
 /**
  * @description Poll all devices of one frequency.
@@ -8,8 +8,8 @@ const Promise = require('bluebird');
  * pollAll(60000);
  */
 function pollAll(pollFrequency) {
-  return async () => {
-    if (this.devicesByPollFrequency[pollFrequency]) {
+  return async () => { 
+    if (this.devicesByPollFrequency[pollFrequency]) { 
       return Promise.map(this.devicesByPollFrequency[pollFrequency], (device) => this.poll(device));
     }
     return Promise.resolve();

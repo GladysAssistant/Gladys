@@ -64,9 +64,7 @@ async function executeQuery(accessToken, refreshToken, tokenType, queryType, que
 
     return result;
   } catch (error) {
-    logger.debug('Access Token Error', error.message);
-    // logger.debug(error);
-
+    logger.warn('Execute query error: ', error.message);
     return null;
   }
 }
