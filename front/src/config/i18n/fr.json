@@ -175,7 +175,8 @@
       "temperature-in-room": "Température de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "health": "Santé"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -213,6 +214,12 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "health": {
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "noValue": "Aucune valeur enregistrée.",
+        "deviceTitle": "{{name}} - {{type}}",
+        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
       }
     }
   },

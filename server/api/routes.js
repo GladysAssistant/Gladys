@@ -17,6 +17,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const HealthController = require('./controllers/health.controller');
 const OAuth2Controller = require('./controllers/oauth2.controller');
 
 /**
@@ -46,6 +47,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const healthController = HealthController(gladys);
   const oauth2Controller = OAuth2Controller(gladys);
 
   const routes = {};
@@ -446,6 +448,11 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    // health
+    'get /api/v1/user/:user_selector/health': {
+      authenticated: true,
+      controller: healthController.getByUser,
     },
     // oauth2
     'post /api/v1/service/oauth2/buildAuthorizationUri': {

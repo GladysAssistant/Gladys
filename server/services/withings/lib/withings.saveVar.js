@@ -1,25 +1,18 @@
 const OAuth2Manager = require('../../../lib/oauth2');
-/*
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_POLL_FREQUENCIES,
-  DEVICE_FEATURE_TYPES
- } = require('../../../utils/constants');
-*/
 
 /**
  * @description Build and save withings device with access_token response and init feature values.
  * @param {string} clientId - The client_id of oauth2.
  * @param {string} secretId - The secret_id of oauth2.
  * @param {string} integrationName - Name of oauth2 integration.
- * @param {string} userId - Gladys userId.
+ * @param {string} userId - Gladys userId of current session.
  * @returns {Promise} Resolve with withings service id.
  * @example
  * withings.saveVar(
- *  clientId: 'b2f2c27f0bf3414e0fe3facfba7be9455109409a',
- *  secretId: '9d41fe14fz23414e0fe3facfba7be9455109409a',
- *  integrationName: 'withings',
- *  userId: fd81vs687f0bf3414e0fe3facfba7be9455109409a'
+ *  'b2f2c27f0bf3414e0fe3facfba7be9455109409a',
+ *  '9d41fe14fz23414e0fe3facfba7be9455109409a',
+ *  'withings'
+ *  'fsd1fe14fz23414e0fe3facfba7be9455109409a',
  *  }
  * );
  */

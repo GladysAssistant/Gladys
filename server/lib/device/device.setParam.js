@@ -1,3 +1,4 @@
+const uuid = require('uuid');
 const db = require('../../models');
 
 /**
@@ -21,7 +22,9 @@ async function setParam(device, name, value) {
     await deviceParam.save();
   } else if (deviceParam === null) {
     // if it doesn't exist we create it
+    const id = uuid.v4();
     deviceParam = await db.DeviceParam.create({
+      id,
       name,
       value,
       device_id: device.id,

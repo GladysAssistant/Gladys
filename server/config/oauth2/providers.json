@@ -1,8 +1,8 @@
 {
   "test": {
-    "tokenHost": "https://localhost:9191",
+    "tokenHost": "http://localhost:9292",
     "tokenPath": "/oauth2/token",
-    "authorizeHost": "https://localhost:9191",
+    "authorizeHost": "http://localhost:9292",
     "authorizePath": "/oauth2_user/authorize2",
     "integrationScope": "user.info,user.metrics,user.activity,user.sleepevents",
     "grantType": "authorization_code"

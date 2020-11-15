@@ -119,6 +119,7 @@ async function create(device) {
       if (feature.feature_state) {
         feature.feature_state.forEach(async (state) => {
           if (state.created_at) {
+            state.device_feature_id = featureCreated.id;
             await db.DeviceFeatureState.update(
               { created_at: state.created_at },
               { where: { id: state.id } },

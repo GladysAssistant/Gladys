@@ -41,11 +41,8 @@ const actions = store => ({
       withingsGetStatus: RequestStatus.Getting
     });
     try {
-      // TODO get all device with selector withings
       const options = {};
-
-      const withingsDevicesReceived = await state.httpClient.get('/api/v1/service/withings/device', options);
-      console.log(withingsDevicesReceived);
+      const withingsDevicesReceived = await state.httpClient.get('/api/v1/service/withings/device', options); 
 
       // Build map of device image by device name
       const mapOfDeviceImgByName = new Map();

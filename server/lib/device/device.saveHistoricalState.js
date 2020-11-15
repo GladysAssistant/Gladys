@@ -28,12 +28,12 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
       id: deviceFeature.id,
     },
   });
-  logger.debug(deviceFeature.id, deviceFeatureInDB);
+  // logger.debug(deviceFeature.id, deviceFeatureInDB);
 
   await db.DeviceFeatureState.create(historicalState);
-  logger.trace('historicalState.created_at): ', historicalState.created_at);
-  logger.trace('deviceFeatureInDB.last_value_changed): ', deviceFeatureInDB.last_value_changed);
-  if (new Date(historicalState.created_at) > new Date(deviceFeatureInDB.last_value_changed)) {
+  if (new Date(historicalState.created_at) > new Date(deviceFeatureInDB.last_value_changed)
+    || !(deviceFeatureInDB.last_value_changed instanceof Date 
+      && !Number.isNaN(deviceFeatureInDB.last_value_changed.getTime()))) {
     await db.DeviceFeature.update(
       {
         last_value: historicalState.value,
@@ -63,6 +63,14 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
         last_value_string: historicalState.value,
         last_value_changed: historicalState.updated_at,
       },
+    });
+
+    // check if there is a trigger matching
+    this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: deviceFeature.selector,
+      last_value: historicalState.value,
+      last_value_changed: historicalState.updated_at,
     });
   }
 }

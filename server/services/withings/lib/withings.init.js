@@ -1,4 +1,3 @@
-// @ts-nocheck
 const uuid = require('uuid');
 const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
@@ -13,32 +12,16 @@ const {
  *
  * @param {Object} withingsDevice - Withings device to transform.
  * @param {string} serviceId - Withings service id.
- * @param {string} accessToken - Access token of oauth2.
- * @param {string} refreshToken - Refresh token of oauth2.
- * @param {string} tokenType - Token type of oauth2.
  * @returns {Object} Return a gladys device.
  * @example
- * withings.buildNewDevice({...}, '7fdsf4s68r4gfr68f4r63csd7f6f4c3r85', '78v4f3df83g74v1fsd8375f63gvrf5c',
- * '4635fgv68s45dfs5d8f4cr','Bearer');
+ * withings.buildNewDevice('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85', '78v4f3df83g74v1fsd8375f63gvrf5c');
  */
-function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, tokenType) {
+function buildNewDevice(withingsDevice, serviceId) {
   // Build unique id for the device
   const uniqueId = uuid.v4();
 
   // Build params for all device
   const newParams = [
-    {
-      name: 'accessToken',
-      value: accessToken,
-    },
-    {
-      name: 'refreshToken',
-      value: refreshToken,
-    },
-    {
-      name: 'tokenType',
-      value: tokenType,
-    },
     {
       name: 'withingsDeviceId',
       value: withingsDevice.deviceid,
@@ -117,8 +100,7 @@ function buildNewDevice(withingsDevice, serviceId, accessToken, refreshToken, to
 }
 
 /**
- * @description  Build features of gladys device.
- *
+ * @description  Build features of gladys device. 
  * @param {Object} currentGroup - Withings measure groups to transform.
  * @param {Object} device - Current device.
  * @param {Array} currentFeatures - CurrentFeature array to update if exist.
@@ -292,55 +274,41 @@ function buildFeature(currentGroup, device, currentFeatures) {
 }
 
 /**
- * @description Build and save withings device with access_token response and init feature values.
- * @param {Object} accessTokenResponse - The access token response give by oauth2 controller buildTokenAccessUri.
+ * @description Build and save withings device and init feature values.
+ * @param {string} userId - Gladys userId of current session.
  * @returns {Promise} Resolve with withings device added.
  * @example
- * withings.init(
- *  accessTokenResponse: {
- *    token_type: 'Bearer',
- *    access_token: 'b2f2c27f0bf3414e0fe3facfba7be9455109409a',
- *    refresh_token: 'f58e6331f741v5fe3facfba7be9455109409ae87',
- *  });
+ * withings.init('b2f2c27f0bf3414e0fe3facfba7be9455109409a');
  */
-async function init(accessTokenResponse) {
-  const tokenType = accessTokenResponse.token_type;
-  const accessToken = accessTokenResponse.access_token;
-  const refreshToken = accessTokenResponse.refresh_token;
-  const clientId = await this.gladys.variable.getValue(`WITHINGS_CLIENT_ID`, this.serviceId);
-  const secretId = await this.gladys.variable.getValue(`WITHINGS_SECRET_ID`, this.serviceId);
-  // logger.warn(accessTokenResponse);
+async function init(userId) {
 
   const { serviceId } = this;
-
-  const oauth2Manager = new OAuth2Manager();
-
+  const oauth2Manager = new OAuth2Manager(this.gladys);
+  
   const userResult = await oauth2Manager.executeQuery(
-    accessToken,
-    refreshToken,
-    tokenType,
+    serviceId,
+    userId,
+    this.integrationName,
     'get',
     `${this.withingsUrl}/v2/user`,
     'action=getdevice',
   );
-
-  logger.warn(userResult.data.body.devices);
 
   const devices = [];
   const mapOfDeviceByWithingsDeviceId = new Map();
   await userResult.data.body.devices.forEach((element) => {
     if (element) {
       // Build one gladys device for each withings device found
-      const newDevice = buildNewDevice(element, serviceId, accessToken, refreshToken, tokenType, clientId, secretId);
+      const newDevice = buildNewDevice(element, serviceId);
       devices.push(newDevice);
       mapOfDeviceByWithingsDeviceId.set(element.deviceid, newDevice);
     }
   });
 
   const measureResult = await oauth2Manager.executeQuery(
-    accessToken,
-    refreshToken,
-    tokenType,
+    serviceId,
+    userId,
+    this.integrationName,
     'get',
     `${this.withingsUrl}/measure`,
     'action=getmeas',
@@ -362,7 +330,7 @@ async function init(accessTokenResponse) {
 
   const mapOfFeatureByWithingsDeviceId = new Map();
   await mapOfMeasuresGrpsByWithingsDeviceId.forEach(function buildFeatureByGrps(value, key) {
-    value.forEach(function(currentGroup) {
+    value.forEach(function parseMeasureGroups(currentGroup) {
       if (key) {
         const currentFeatures = mapOfFeatureByWithingsDeviceId.get(key);
         const features = buildFeature(currentGroup, mapOfDeviceByWithingsDeviceId.get(key), currentFeatures);

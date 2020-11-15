@@ -1,5 +1,5 @@
 /**
- * @description Delete all devices of withings integration.
+ * @description Delete all devices (and variables) of withings integration.
  * @returns {Promise} Resolve with succes result.
  * @example
  * withings.deleteDevices();

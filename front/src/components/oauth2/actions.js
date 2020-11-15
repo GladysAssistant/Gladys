@@ -32,10 +32,12 @@ const actions = store => ({
       // Case of config found
       store.setState({
         clientIdInDb: returnGetConfig.clientId,
+        oauth2ErrorMsg: null,
         oauth2GetStatus: RequestStatus.Success
       });
     } else {
       store.setState({
+        oauth2ErrorMsg: null,
         oauth2GetStatus: RequestStatus.Success
       });
     }
@@ -55,7 +57,7 @@ const actions = store => ({
 
       const returnSaveVar = await state.httpClient.post(`/api/v1/service/${state.integrationName}/savevar`, {
         clientId: state.clientId,
-        secretId: state.secretId,
+        secretId: state.secretId, 
         integrationName: state.integrationName
       });
 
@@ -97,11 +99,11 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
 
-    // const returnServiceId= await state.httpClient.get(`/api/v1/service/${state.integrationName}/getServiceId`);
     await state.httpClient.get(`/api/v1/service/${state.integrationName}/deleteConfig`);
 
     store.setState({
       clientIdInDb: null,
+      oauth2ErrorMsg: null,
       oauth2GetStatus: RequestStatus.Success
     });
   }

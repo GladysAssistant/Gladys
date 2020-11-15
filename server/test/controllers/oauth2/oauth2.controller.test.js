@@ -1,39 +1,36 @@
 const { expect } = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
-// const sinon = require('sinon');
-// const { assert, expect } = require('chai');
 
 const { buildOauth2Request } = require('./oauth2.request.test');
-
-// const { fake } = sinon;
-
-// const Gladys = require('../../../lib');
-// const OAuth2Controller = require('../../../api/controllers/oauth2.controller');
-// const express = require('express');
-// const { expect } = require('chai');
 const logger = require('../../../utils/logger');
 
 const server = new OAuth2Server();
 
-before(async function before() {
-  // Generate a new RSA key and add it to the keystore
-  server.issuer.keys.generateRSA();
-  // Start the server
-  await server.start(9191, 'localhost');
-  logger.debug('Issuer URL:', server.issuer.url);
-});
-
-after(async function after() {
-  await server.stop();
-});
 
 describe('POST /api/v1/service/oauth2/buildAuthorizationUri', () => {
+
+  before(async function testBefore() {
+    // Generate a new RSA key and add it to the keystore
+    await server.issuer.keys.generateRSA();
+    // Start the server
+    await server.start(9292, 'localhost');
+    logger.debug('Issuer URL:', server.issuer.url);
+  });
+
+  after(async function testAfter() {
+    await server.stop();
+  });
+
   it('should get authorization uri', async () => {
     const req = {
+      header: {
+        referer: 'fake-referer'
+      },
       integrationName: 'test',
-      clientId: 'fake-cient_id',
-      secretId: 'facke_secret_id',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      user: {
+        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
     };
 
     await buildOauth2Request
@@ -54,6 +51,30 @@ describe('POST /api/v1/service/oauth2/buildTokenAccessUri', () => {
       integrationName: 'test',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       authorizationCode: 'fake-code',
+      user: {
+        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+    };
+
+    await buildOauth2Request
+      .post('/api/v1/service/oauth2/buildTokenAccessUri')
+      .send(req)
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success');
+        expect(res.body).to.have.property('result');
+      });
+  });
+});
+
+// failled call
+describe('POST /api/v1/service/oauth2/buildTokenAccessUri', () => {
+  it('should get token access uri', async () => {
+    const req = {
+      integrationName: 'test',
+      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      authorizationCode: 'fake-code', 
     };
 
     await buildOauth2Request
@@ -73,6 +94,9 @@ describe('GET /api/v1/service/oauth2/getCurrentConfig', () => {
     const req = {
       integrationName: 'test',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      user: {
+        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
     };
 
     await buildOauth2Request

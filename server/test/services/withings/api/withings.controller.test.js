@@ -44,6 +44,9 @@ describe('POST /api/v1/service/withings/saveVar', () => {
         secretId: '45f7sd452f4181fsdf2sdfhgyrjy152',
         integrationName: 'withings',
       },
+      user: {
+        id: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
+      },
     };
 
     controller['post /api/v1/service/withings/saveVar'].controller(req, res);
@@ -62,11 +65,9 @@ describe('POST /api/v1/service/withings/init', () => {
     const res = {
       json: fake.returns(null),
     };
-    const req = {
-      body: {
-        token_type: '78sdfds7fsd7f8d3sf5sd4fds24vfd',
-        access_token: '45f7sd452f4181fsdf2sdfhgyrjy152',
-        refresh_token: 'test',
+    const req = { 
+      user: {
+        id: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
       },
     };
 
@@ -87,8 +88,8 @@ describe('GET /api/v1/service/withings/deleteConfig', () => {
     };
     const req = {
       query: {
-        integrationName: 'withings',
-      },
+        userId: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
+      }, 
     };
 
     controller['get /api/v1/service/withings/deleteConfig'].controller(req, res);

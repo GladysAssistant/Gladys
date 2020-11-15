@@ -1,10 +1,11 @@
-const oauth2 = require('simple-oauth2');
+const { AuthorizationCode } = require('simple-oauth2');
 const logger = require('../../utils/logger');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const providers = require('../../config/oauth2/providers.json');
 
 module.exports = function OAuth2Controller(gladys) {
   /**
+   * @description uild an authorization uri (to get authorizationcode).
    * @api {post} /api/v1/service/oauth2/buildAuthorizationUri Build an authorization uri (to get authorizationcode)
    * @apiName BuildAuthorizationUri
    * @apiGroup OAuth2
@@ -15,17 +16,16 @@ module.exports = function OAuth2Controller(gladys) {
     const { tokenHost } = currentProvider;
     const { authorizeHost } = currentProvider;
     const { authorizePath } = currentProvider;
-    const { integrationScope } = currentProvider;
-    logger.debug(currentProvider);
+    const { integrationScope } = currentProvider; 
 
     // Get variale client_id and secret_id
     const clientId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_CLIENT_ID`,
-      req.body.serviceId,
+      req.body.serviceId, req.user.id
     );
     const secretId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_SECRET_ID`,
-      req.body.serviceId,
+      req.body.serviceId, req.user.id
     );
 
     // Init credentials based on integration name
@@ -41,9 +41,8 @@ module.exports = function OAuth2Controller(gladys) {
       },
     };
 
-    const oauth2Instance = await oauth2.create(credentials);
-
-    const authorizationUriResult = await oauth2Instance.authorizationCode.authorizeURL({
+    const client = new AuthorizationCode(credentials);
+    const authorizationUriResult = await client.authorizeURL({
       redirect_uri: req.headers.referer,
       scope: integrationScope,
       state: `gladys_state_${req.body.integrationName}`,
@@ -56,6 +55,7 @@ module.exports = function OAuth2Controller(gladys) {
   }
 
   /**
+   * @description Build an authorization uri to get an access token.
    * @api {post} /api/v1/service/oauth2/buildTokenAccessUri Build an getToken uri (to get token access)
    * @apiName buildTokenAccessUri
    * @apiGroup OAuth2
@@ -73,11 +73,11 @@ module.exports = function OAuth2Controller(gladys) {
 
     const clientId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_CLIENT_ID`,
-      req.body.serviceId,
+      req.body.serviceId, req.user.id
     );
     const secretId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_SECRET_ID`,
-      req.body.serviceId,
+      req.body.serviceId, req.user.id
     );
 
     // Init credentials based on integration name
@@ -102,9 +102,17 @@ module.exports = function OAuth2Controller(gladys) {
       redirect_uri: req.headers.referer.substring(0, req.headers.referer.indexOf('?')),
     };
 
+    logger.debug('tokenConfig: ', tokenConfig);
+    logger.debug('credentials: ', credentials);
+
     try {
-      const oauth2Instance = await oauth2.create(credentials);
-      const authResult = await oauth2Instance.authorizationCode.getToken(tokenConfig, { json: true });
+      const client = new AuthorizationCode(credentials); 
+      const authResult = await client.getToken(tokenConfig, { json: true });
+
+      logger.trace('authResult: ', authResult);
+      // Save accessToken
+      await gladys.variable.setValue(`${req.body.integrationName.toUpperCase()}_ACCESS_TOKEN`, JSON.stringify(authResult), 
+          req.body.serviceId, req.user.id);
 
       res.json({
         success: true,
@@ -130,7 +138,7 @@ module.exports = function OAuth2Controller(gladys) {
     const { integrationName } = req.query;
     const { serviceId } = req.query;
 
-    const resultClientId = await gladys.variable.getValue(`${integrationName.toUpperCase()}_CLIENT_ID`, serviceId);
+    const resultClientId = await gladys.variable.getValue(`${integrationName.toUpperCase()}_CLIENT_ID`, serviceId, req.user.id);
 
     res.json({
       success: true,
