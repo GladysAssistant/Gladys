@@ -4,7 +4,7 @@ const { assert } = require('chai');
 const EventEmitter = require('events');
 const ServerMock = require('mock-http-server');
 
-const logger = require('../../../../utils/logger');
+// const logger = require('../../../../utils/logger');
 
 const WithingsHandler = require('../../../../services/withings/lib');
 
@@ -48,7 +48,25 @@ describe('WithingsHandler', () => {
                 type: 'string',
                 model: 'string',
                 model_id: 0,
-                battery: 'string',
+                battery: 'low',
+                deviceid: 'string',
+                timezone: 'string',
+                last_session_date: 0,
+              },
+              {
+                type: 'string',
+                model: 'string',
+                model_id: 0,
+                battery: 'medium',
+                deviceid: 'string',
+                timezone: 'string',
+                last_session_date: 0,
+              },
+              {
+                type: 'string',
+                model: 'string',
+                model_id: 0,
+                battery: 'high',
                 deviceid: 'string',
                 timezone: 'string',
                 last_session_date: 0,
@@ -76,12 +94,140 @@ describe('WithingsHandler', () => {
                 attrib: 0,
                 date: 0,
                 created: 0,
-                category: 0,
+                category: 1,
                 deviceid: 'string',
                 measures: [
                   {
                     value: 0,
+                    type: 1,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
                     type: 0,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 4,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 5,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 6,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 8,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 9,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 10,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 11,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 12,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 54,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 71,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 73,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 76,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 77,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 88,
+                    unit: 0,
+                    algo: 0,
+                    fm: 0,
+                    fw: 0,
+                  },
+                  {
+                    value: 0,
+                    type: 91,
                     unit: 0,
                     algo: 0,
                     fm: 0,
@@ -147,37 +293,23 @@ describe('WithingsHandler', () => {
     return assert.equal(result.success, true);
   });
 
-  it('withings init is good', async () => {
-    const result = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
-    logger.debug(result);
-    return assert.isNotNull(result);
-  });
+  it('withings init/poll is good', async () => {
+    const resultInit = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
+    // logger.debug(resultInit);
+    await assert.isNotNull(resultInit);
 
-  it('withings poll is not good', async () => {
-    const testDevice = {
-      id: 'cfsmb47f-4d25-4381-8923-2633b23192sm',
-      name: 'Test withings',
-      selector: 'test-withings',
-      external_id: 'test-withings-external',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
-      created_at: '2019-02-12 07:49:07.556 +00:00',
-      updated_at: '2019-02-12 07:49:07.556 +00:00',
-    };
-    const result = await withingsHandler.poll(testDevice);
-    logger.debug(result);
-    return assert.isNotNull(result);
+    const resultPoll = await withingsHandler.poll(resultInit.next());
+    // logger.debug(resultPoll);
+    return assert.isNotNull(resultPoll);
   });
 
   it('withings deleteVar is good', async () => {
     const result = await withingsHandler.deleteVar('req', undefined);
-    logger.debug(result);
     return assert.isNotNull(result);
   });
 
   it('withings deleteDevices is not good', async () => {
     const result = await withingsHandler.deleteDevices();
-    logger.debug(result);
     return assert.isNotNull(result);
   });
 });

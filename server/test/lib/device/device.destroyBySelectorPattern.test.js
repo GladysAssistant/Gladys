@@ -12,10 +12,15 @@ describe('Device', () => {
     stateManager.setState('device', 'test-device', {
       id: 'cfsmb47f-4d25-4381-8923-2633b23192sm',
       name: 'test',
-      selector: 'testSelectorPattern',
+      selector: 'test-delete',
     });
 
     const device = new Device(event, {}, stateManager);
-    await device.destroyBySelectorPattern('testSelectorPattern');
+    device.devicesByPollFrequency[60000] = [
+      {
+        selector: 'test-delete',
+      },
+    ];
+    await device.destroyBySelectorPattern('test-delete');
   });
 });

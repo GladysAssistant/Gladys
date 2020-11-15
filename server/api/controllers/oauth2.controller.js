@@ -106,14 +106,14 @@ module.exports = function OAuth2Controller(gladys) {
       redirect_uri: req.headers.referer.substring(0, req.headers.referer.indexOf('?')),
     };
 
-    logger.debug('tokenConfig: ', tokenConfig);
-    logger.debug('credentials: ', credentials);
+    // logger.debug('tokenConfig: ', tokenConfig);
+    // logger.debug('credentials: ', credentials);
 
     try {
       const client = new AuthorizationCode(credentials);
       const authResult = await client.getToken(tokenConfig, { json: true });
 
-      logger.trace('authResult: ', authResult);
+      // logger.trace('authResult: ', authResult);
       // Save accessToken
       await gladys.variable.setValue(
         `${req.body.integrationName.toUpperCase()}_ACCESS_TOKEN`,

@@ -12,6 +12,7 @@ module.exports = {
           room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
+          should_poll: false,
         },
         {
           id: 'a1ce3d5a-dd7c-4452-9a23-d44ba3d9b072',
@@ -22,6 +23,7 @@ module.exports = {
           room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
+          should_poll: false,
         },
         {
           id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
@@ -32,6 +34,7 @@ module.exports = {
           room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
+          should_poll: false,
         },
         {
           id: 'cfsmb47f-4d25-4381-8923-2633b23192sm',
@@ -42,6 +45,19 @@ module.exports = {
           room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
+          should_poll: false,
+        },
+        {
+          id: 'cdfsqdfdssmb47f-4d25-4381fdsqsdf-2633b23192sm',
+          name: 'Test delet',
+          selector: 'test-delete',
+          external_id: 'test-delete-external',
+          service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+          room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+          should_poll: true,
+          poll_frequency: 86400000,
         },
       ],
       {},

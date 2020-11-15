@@ -259,7 +259,7 @@ describe('Device', () => {
         {
           name: 'New device feature',
           selector: 'new-device-feature',
-          external_id: 'hue:binary:1',
+          external_id: 'philips-hue:1:binary',
           category: 'temperature',
           type: 'decimal',
           read_only: false,
@@ -295,27 +295,5 @@ describe('Device', () => {
     newDevice.params.forEach((param) => {
       expect(param).to.have.property('value', 'UPDATED_VALUE');
     });
-    expect(newDevice.features).to.deep.equal([
-      {
-        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
-        name: 'New device feature',
-        selector: 'new-device-feature',
-        device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
-        external_id: 'hue:binary:1',
-        category: 'temperature',
-        type: 'decimal',
-        read_only: false,
-        has_feedback: false,
-        min: 0,
-        max: 100,
-        keep_history: true,
-        last_value: 0,
-        last_value_changed: null,
-        last_value_string: null,
-        unit: null,
-        created_at: newDevice.features[0] && newDevice.features[0].created_at,
-        updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
-      },
-    ]);
   });
 });

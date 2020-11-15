@@ -4,9 +4,9 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
 module.exports = function WeatherController(gladys) {
   /**
-   * @api {get} /api/v1/user/:user_selector/health get health user
-   * @apiName getWeatherUser
-   * @apiGroup Weather
+   * @api {get} /api/v1/user/:user_selector/health get health of user
+   * @apiName getHealthUser
+   * @apiGroup Health
    * @apiSuccessExample {json} Success-Example
    * {
    *   "temperature": 27.28,
@@ -19,14 +19,19 @@ module.exports = function WeatherController(gladys) {
    * }
    */
   async function getByUser(req, res) {
+    // Get all device for health
+    /*
     const lastLocation = await gladys.location.getLast(req.params.user_selector);
     const options = {
       latitude: lastLocation.latitude,
       longitude: lastLocation.longitude,
       language: req.user.language,
     };
-    const healthResult = await gladys.health.get(options);
-    res.json(healthResult);
+    */
+    // const healthResult = await gladys.health.get(options);
+
+    // res.json(healthResult);
+    res.json({});
   }
 
   return Object.freeze({

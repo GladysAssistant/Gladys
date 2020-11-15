@@ -109,10 +109,6 @@ function buildNewDevice(withingsDevice, serviceId) {
  * withings.buildFeature({...}, {....}, null);
  */
 function buildFeature(currentGroup, device, currentFeatures) {
-  if (!device) {
-    return null;
-  }
-
   // Build (or get) feature corresponding to the measure
   let features = currentFeatures;
   if (!features) {
@@ -349,11 +345,7 @@ async function init(userId) {
       // Assign features to device
       value.features = value.features.concat(arrayOfFeatures);
       // Save all device (with feature)
-      try {
-        gladys.device.create(value);
-      } catch (error) {
-        logger.error(error);
-      }
+      gladys.device.create(value);
     }
   });
 
