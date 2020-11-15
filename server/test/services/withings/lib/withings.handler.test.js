@@ -33,7 +33,8 @@ const gladys = {
 };
 
 describe('WithingsHandler', () => {
-  before(async function before() {
+  
+  before(function testBefore(done) {
     server.on({
       method: 'GET',
       path: '/v2/user',
@@ -98,18 +99,18 @@ describe('WithingsHandler', () => {
       },
     });
 
-    await server.start();
+    server.start(done);
 
     // Start fake oatuh2 server
     // Generate a new RSA key and add it to the keystore
-    await serverOauth2.issuer.keys.generateRSA();
+    serverOauth2.issuer.keys.generateRSA();
     // Start the server
-    await serverOauth2.start(9292, 'localhost');
+    serverOauth2.start(9292, 'localhost');
   });
 
-  after(async function after() {
-    await server.stop();
-    await serverOauth2.stop();
+  after(function testAfter(done) {
+    server.stop(done);
+    serverOauth2.stop();
   });
 
   const withingsHandler = new WithingsHandler(
