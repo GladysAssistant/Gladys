@@ -28,7 +28,6 @@ async function disconnect() {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
   });
 
-
   // Stop broker container
   let dockerContainer = await this.gladys.system.getContainers({
     all: true,
@@ -41,7 +40,6 @@ async function disconnect() {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
   });
 
-
   // Stop zigbee2mqtt container
   dockerContainer = await this.gladys.system.getContainers({
     all: true,
@@ -53,7 +51,6 @@ async function disconnect() {
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
   });
-
 }
 
 module.exports = {

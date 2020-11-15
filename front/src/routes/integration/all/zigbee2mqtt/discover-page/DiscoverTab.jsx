@@ -35,7 +35,7 @@ const DiscoverTab = ({ children, ...props }) => (
             class="custom-switch-input"
             checked={props.permitJoin}
             onClick={props.togglePermitJoin}
-            disabled={!props.zigbee2mqttConnected || !props.gladysConnected }
+            disabled={!props.zigbee2mqttConnected || !props.gladysConnected}
           />
           <span class="custom-switch-indicator" />
           <span class="custom-switch-description">

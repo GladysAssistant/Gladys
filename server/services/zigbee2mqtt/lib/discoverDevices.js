@@ -6,7 +6,7 @@ const logger = require('../../../utils/logger');
  * discoverDevices();
  */
 function discoverDevices() {
-  logger.log("Ask for devices enumeration")
+  logger.log('Ask for devices enumeration');
   this.mqttClient.publish('zigbee2mqtt/bridge/config/devices/get');
 }
 

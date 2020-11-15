@@ -36,7 +36,7 @@ const createActions = store => {
           z2mEnabled: zigbee2mqttStatus.z2mEnabled,
           dockerBased: zigbee2mqttStatus.dockerBased,
           networkModeValid: zigbee2mqttStatus.networkModeValid
-          });
+        });
       }
     },
     async getContainers(state) {
@@ -106,13 +106,13 @@ const createActions = store => {
         z2mEnabled,
         zigbee2mqttStatus: RequestStatus.Getting
       });
-      
+
       await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_ENABLED', {
         value: z2mEnabled
       });
 
       try {
-//        await state.httpClient.post('/api/v1/service/zigbee2mqtt/mqtt/start');
+        //        await state.httpClient.post('/api/v1/service/zigbee2mqtt/mqtt/start');
         await state.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
       } catch (e) {
         error = error | get(e, 'response.status');
@@ -158,7 +158,6 @@ const createActions = store => {
       }
 
       await this.checkStatus();
-
     },
 
     displayConnectedMessage(state) {

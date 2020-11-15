@@ -9,14 +9,13 @@ const { ServiceNotConfiguredError, PlatformNotCompatible } = require('../../../u
  * init();
  */
 async function init() {
-
   const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
     this.dockerBased = false;
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-//  const networkMode = await this.gladys.system.getNetworkMode();
+  //  const networkMode = await this.gladys.system.getNetworkMode();
   // For testing
   const networkMode = 'host';
   if (networkMode !== 'host') {
@@ -26,8 +25,8 @@ async function init() {
 
   const z2mEnabled = await this.gladys.variable.getValue('ZIGBEE2MQTT_ENABLED', this.serviceId);
   this.z2mEnabled = z2mEnabled !== '0';
-  logger.log("Reading z2mEnabled state :", this.z2mEnabled)
-  if ( z2mEnabled == null) {
+  logger.log('Reading z2mEnabled state :', this.z2mEnabled);
+  if (z2mEnabled == null) {
     await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
     this.z2mEnabled = false;
   }
@@ -58,9 +57,9 @@ async function init() {
       }
     }
   }
-//  if (!this.usbConfigured) {
-//    throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
-//  }
+  //  if (!this.usbConfigured) {
+  //    throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
+  //  }
 
   // Generate credentials for Gladys & Z2M for connection to broker
   const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
@@ -80,12 +79,12 @@ async function init() {
     await this.gladys.variable.setValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, generate(), this.serviceId);
     await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
   }
-  
+
   if (this.usbConfigured) {
     const configuration = await this.getConfiguration();
     if (this.z2mEnabled) {
       await this.connect(configuration);
-    }  
+    }
   }
 }
 

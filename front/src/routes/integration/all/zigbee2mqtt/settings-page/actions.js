@@ -49,14 +49,13 @@ const actions = store => {
       try {
         // If DriverPath contains '---------' then we remove ZIGBEE2MQTT_DRIVER_PATH variable
         if (state.zigbee2mqttDriverPath.indexOf('/dev/') === -1) {
-          console.log("Dongle detached")
-//          await state.httpClient.delete('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH');
+          console.log('Dongle detached');
+          //          await state.httpClient.delete('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH');
           await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH', {
-            value: ""
+            value: ''
           });
-
         } else {
-          console.log("Dongle attached")
+          console.log('Dongle attached');
           await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH', {
             value: state.zigbee2mqttDriverPath
           });
@@ -65,11 +64,11 @@ const actions = store => {
         const zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
         store.setState({
           zigbee2mqttStatus,
-          zigbee2mqttSaveStatus: RequestStatus.Success,
+          zigbee2mqttSaveStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          zigbee2mqttSaveStatus: RequestStatus.Error,
+          zigbee2mqttSaveStatus: RequestStatus.Error
         });
       }
       store.setState({

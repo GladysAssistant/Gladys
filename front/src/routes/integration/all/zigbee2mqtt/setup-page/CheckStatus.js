@@ -4,7 +4,10 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 
-@connect('user,session,usbConfigured,mqttExist,mqttRunning,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected', actions)
+@connect(
+  'user,session,usbConfigured,mqttExist,mqttRunning,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected',
+  actions
+)
 class CheckStatus extends Component {
   componentWillMount() {
     this.props.checkStatus();
@@ -21,15 +24,15 @@ class CheckStatus extends Component {
     } else if (props.z2mEnabled) {
       if (!props.mqttExist) {
         messageKey = 'integration.zigbee2mqtt.status.mqttNotInstalled';
-      }else if (!props.mqttRunning) {
+      } else if (!props.mqttRunning) {
         messageKey = 'integration.zigbee2mqtt.status.mqttNotRunning';
-      }else if (!props.zigbee2mqttExist) {
+      } else if (!props.zigbee2mqttExist) {
         messageKey = 'integration.zigbee2mqtt.status.zigbee2mqttNotInstalled';
-      }else if (!props.zigbee2mqttRunning) {
+      } else if (!props.zigbee2mqttRunning) {
         messageKey = 'integration.zigbee2mqtt.status.zigbee2mqttNotRunning';
-      }else if (!props.gladysConnected) {
+      } else if (!props.gladysConnected) {
         messageKey = 'integration.zigbee2mqtt.status.gladysNotConnected';
-      }else if (!props.zigbee2mqttConnected) {
+      } else if (!props.zigbee2mqttConnected) {
         messageKey = 'integration.zigbee2mqtt.status.zigbee2mqttNotConnected';
       }
     } else {

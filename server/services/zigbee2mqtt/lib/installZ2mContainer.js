@@ -54,7 +54,7 @@ async function installZ2mContainer() {
       throw e;
     }
   }
-   
+
   try {
     logger.info('Zigbee2mqtt is starting...');
     dockerContainers = await this.gladys.system.getContainers({

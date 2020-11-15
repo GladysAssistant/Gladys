@@ -15,7 +15,7 @@ function status() {
     zigbee2mqttConnected: this.zigbee2mqttConnected,
     z2mEnabled: this.z2mEnabled,
     dockerBased: this.dockerBased,
-    networkModeValid: this.networkModeValid
+    networkModeValid: this.networkModeValid,
   };
   return zigbee2mqttStatus;
 }

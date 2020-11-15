@@ -29,14 +29,13 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function connect(req, res) {
-
-    logger.log("Entering connect step")
+    logger.log('Entering connect step');
     await zigbee2mqttManager.init();
-//    zigbee2mqttManager.z2mEnabled = true;
-//    const configuration = await zigbee2mqttManager.getConfiguration();
-//    if (configuration.z2mEnabled) {
-//      await zigbee2mqttManager.connect(configuration);
-//    }
+    //    zigbee2mqttManager.z2mEnabled = true;
+    //    const configuration = await zigbee2mqttManager.getConfiguration();
+    //    if (configuration.z2mEnabled) {
+    //      await zigbee2mqttManager.connect(configuration);
+    //    }
 
     res.json({
       success: true,
@@ -49,20 +48,18 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Mqtt
    */
   async function installMqttContainer(req, res) {
-    
     try {
       await zigbee2mqttManager.installMqttContainer();
 
-//      const mqttUrl = await gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, serviceId);
-//      const mqttUsername = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, serviceId);
-//      const mqttPassword = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, serviceId);
+      //      const mqttUrl = await gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, serviceId);
+      //      const mqttUsername = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, serviceId);
+      //      const mqttPassword = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, serviceId);
 
-//      await zigbee2mqttManager.connect({ mqttUrl, mqttUsername, mqttPassword });
+      //      await zigbee2mqttManager.connect({ mqttUrl, mqttUsername, mqttPassword });
       //await zigbee2mqttManager.init();
 
       response = true;
-    }
-    catch (e) {
+    } catch (e) {
       logger.error('Error while connecting to MQTT:', e);
       response = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -94,7 +91,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function disconnect(req, res) {
-    logger.log("Entering disconnect step")
+    logger.log('Entering disconnect step');
     await zigbee2mqttManager.disconnect();
     res.json({
       success: true,

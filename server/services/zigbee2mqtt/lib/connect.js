@@ -8,7 +8,6 @@ const { DEFAULT } = require('./constants');
  * connect();
  */
 async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
-
   if (this.mqttRunning) {
     // Loads MQTT service
     logger.log('Connecting Gladys to ', mqttUrl);
@@ -36,7 +35,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
         payload: err,
       });
       this.gladysConnected = false;
-//      this.disconnect();
+      //      this.disconnect();
     });
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);
@@ -50,9 +49,8 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
     this.mqttClient.on('message', (topic, message) => {
       this.handleMqttMessage(topic, message.toString());
     });
-
   } else {
-    logger.warn("Can't connect Gladys cause MQTT not running !")
+    logger.warn("Can't connect Gladys cause MQTT not running !");
   }
 
   // Subscribe to Zigbee2mqtt topics
