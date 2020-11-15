@@ -554,6 +554,26 @@
         "magnet": "Magnet Sensor"
       }
     },
+    "domoticz": {
+      "title": "Domoticz",
+      "description": "Control your devices through a Domoticz server.",
+      "deviceTab": "Devices",
+      "setupTab": "Configuration",
+      "settingsTab": "Settings",
+      "settings": {
+        "title": "Domoticz settings",
+        "description": "To start using Domoticz inside Gladys, you need an instance of Domoticz running on the same local host or remotely.",
+        "serveraddress": "IP address of the Domoticz server",
+        "serveraddressplaceholder": "http://127.0.0.1, http://localhost",
+        "serverport": "Port used by the server",
+        "serverportplaceholder": "8080",
+        "connectButton": "Connect",
+        "disconnectButton": "Disconnect",
+        "notConnected": "No domoticz server connected.",
+        "connectedWithSuccess": "The Domoticz server version {{version}} is connected.",
+        "connectionFailed": "Connection with the Domoticz server has failed. Please verify information below."
+      }
+    },
     "caldav": {
       "title": "CalDAV",
       "description": "Sync your CalDAV calendars.",

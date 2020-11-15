@@ -661,6 +661,26 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
+    },
+    "domoticz": {
+      "title": "Domoticz",
+      "description": "Contrôler vos appareils à travers un serveur Domoticz.",
+      "deviceTab": "Appareils",
+      "setupTab": "Configuration",
+      "settingsTab": "Paramètres",
+      "settings": {
+        "title": "Paramètres Domoticz",
+        "description": "Pour utiliser Domoticz dans Gladys, vous avez besoin d'une instance Domoticz tournant sur un serveur local ou distant.",
+        "serveraddress": "Adresse IP du serveur Domoticz",
+        "serveraddressplaceholder": "http://127.0.0.1, http://localhost",
+        "serverport": "Port utilisé par le serveur",
+        "serverportplaceholder": "8080",
+        "connectButton": "Connecter",
+        "disconnectButton": "Déconnecter",
+        "notConnected": "Aucun serveur Domoticz connecté.",
+        "connectedWithSuccess": "Le serveur Domoticz version {{version}} est connecté.",
+        "connectionFailed": "La connection avec le serveur Domoticz a échoué. Merci de vérifier les informations."
+      }
     }
   },
   "editScene": {

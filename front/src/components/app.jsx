@@ -86,6 +86,9 @@ import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-pa
 import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
 import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
 
+// Integration Domoticz
+import DomoticzSettingsPage from '../routes/integration/all/domoticz/settings-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -189,6 +192,8 @@ const AppRouter = connect(
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
+
+        <DomoticzSettingsPage path="/dashboard/integration/device/domoticz" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
