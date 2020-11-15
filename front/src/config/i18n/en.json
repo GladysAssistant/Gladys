@@ -372,7 +372,13 @@
       "setupTab": "Setup",
       "status": {
         "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
-        "notConnected": "Zigbee2mqtt service failed to connect, please go to ",
+        "notEnabled": "Zigbee2mqtt is not activated, please go to ",
+        "mqttNotInstalled": "MQTT broker failed to install",
+        "mqttNotRunning": "MQTT broker failed to start",
+        "zigbee2mqttNotInstalled": "Zigbee2mqtt failed to install",
+        "zigbee2mqttNotRunning": "Zigbee2mqtt failed to start",
+        "gladysNotConnected": "Gladys failed to connect to MQTT",
+        "zigbee2mqttNotConnected": "Zigbee2mqtt failed to connect to MQTT",
         "settingsPageLink": "USB dongle configuration page",
         "setupPageLink": "Zigbee2mqtt configuration page"
       },
@@ -388,9 +394,13 @@
       },
       "setup": {
         "title": "Zigbe2mqtt configuration",
-        "description": "This service uses two independant docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers. Learn more on the Zigbee2mqtt documentation page",
-        "enable": "Enable Zigbee2mqtt",
+        "description": "This service uses two independent docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
+        "enableLabel": "Zigbee2mqtt activation",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
+        "enableZigbee2mqtt": "Enable Zigbee2mqtt",
         "containersTitle": " Zigbee2mqtt Docker containers",
+        "containersStatus": "Zigbee2mqtt status",
         "connected": "Zigbee2mqtt was started with success.",
         "error": "An error occured while starting Zigbee2mqtt."
       },
