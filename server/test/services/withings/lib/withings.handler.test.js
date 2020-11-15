@@ -33,7 +33,6 @@ const gladys = {
 };
 
 describe('WithingsHandler', () => {
-  
   before(function testBefore(done) {
     server.on({
       method: 'GET',
