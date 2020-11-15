@@ -6,9 +6,7 @@ const logger = require('../../../utils/logger');
 
 const server = new OAuth2Server();
 
-
 describe('POST /api/v1/service/oauth2/buildAuthorizationUri', () => {
-
   before(async function testBefore() {
     // Generate a new RSA key and add it to the keystore
     await server.issuer.keys.generateRSA();
@@ -24,7 +22,7 @@ describe('POST /api/v1/service/oauth2/buildAuthorizationUri', () => {
   it('should get authorization uri', async () => {
     const req = {
       header: {
-        referer: 'fake-referer'
+        referer: 'fake-referer',
       },
       integrationName: 'test',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
@@ -74,7 +72,7 @@ describe('POST /api/v1/service/oauth2/buildTokenAccessUri', () => {
     const req = {
       integrationName: 'test',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      authorizationCode: 'fake-code', 
+      authorizationCode: 'fake-code',
     };
 
     await buildOauth2Request

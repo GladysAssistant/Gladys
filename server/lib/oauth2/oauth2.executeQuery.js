@@ -5,8 +5,8 @@ const logger = require('../../utils/logger');
 const providers = require('../../config/oauth2/providers.json');
 
 /**
- * @description Refresh Oauth2 token in case of it expired . 
- * @param {string} serviceId - Gladys service id call method. 
+ * @description Refresh Oauth2 token in case of it expired .
+ * @param {string} serviceId - Gladys service id call method.
  * @param {string} integrationName - Name of oauth2 integration.
  * @param {Object} gladys - Current gladys instance.
  * @param {string} userId - Gladys userId of current session.
@@ -16,13 +16,14 @@ const providers = require('../../config/oauth2/providers.json');
  *    'withings', {...}, '78v4f3df83g74v1fsd8375f63gvrf5c');
  */
 async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
-
   const clientId = await gladys.variable.getValue(`${integrationName.toUpperCase()}_CLIENT_ID`, serviceId, userId);
   const secretId = await gladys.variable.getValue(`${integrationName.toUpperCase()}_SECRET_ID`, serviceId, userId);
-  const accessToken = JSON.parse(await gladys.variable.getValue(`${integrationName.toUpperCase()}_ACCESS_TOKEN`, serviceId, userId));
-  
+  const accessToken = JSON.parse(
+    await gladys.variable.getValue(`${integrationName.toUpperCase()}_ACCESS_TOKEN`, serviceId, userId),
+  );
+
   logger.trace('accessToken: ', accessToken);
-  // Find provider configuration 
+  // Find provider configuration
   const currentProvider = providers[integrationName];
   const { tokenHost } = currentProvider;
   const { tokenPath } = currentProvider;
@@ -41,7 +42,7 @@ async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
       tokenPath,
       authorizeHost,
       authorizePath,
-    }, 
+    },
     http: {
       json: true,
     },
@@ -49,26 +50,29 @@ async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
 
   try {
     const client = new ClientCredentials(credentials);
-    let authResult = await client.createToken(accessToken); 
+    let authResult = await client.createToken(accessToken);
 
-    if(authResult.expired()){
+    if (authResult.expired()) {
       logger.trace('Refresh token is requiered');
       // Refresh token
       try {
-
         const refreshParams = {
           client_id: clientId,
           client_secret: secretId,
-          scope: integrationScope, 
-        }; 
+          scope: integrationScope,
+        };
 
         authResult = await authResult.refresh(refreshParams);
 
         logger.trace(authResult);
 
         // Save new  accessToken
-        await gladys.variable.setValue(`${integrationName.toUpperCase()}_ACCESS_TOKEN`, JSON.stringify(authResult), serviceId, userId);
-
+        await gladys.variable.setValue(
+          `${integrationName.toUpperCase()}_ACCESS_TOKEN`,
+          JSON.stringify(authResult),
+          serviceId,
+          userId,
+        );
       } catch (error) {
         logger.error('Error refreshing access token: ', error);
       }
@@ -76,18 +80,16 @@ async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
 
     logger.trace('authResult: ', authResult);
     return authResult;
-
   } catch (error) {
     logger.error(error);
     return null;
   }
-
 }
 
 /**
- * @description Execute a query to Oauth2 API. 
+ * @description Execute a query to Oauth2 API.
  * @param {string} serviceId - Gladys service id call method.
- * @param {string} userId - Gladys userId of current session. 
+ * @param {string} userId - Gladys userId of current session.
  * @param {string} integrationName - Oauth2 integration name.
  * @param {string} queryType - Method of call ('get' or 'post').
  * @param {string} queryUrl - Url to send query.
@@ -98,8 +100,7 @@ async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
  *  'Bearer', 'get', 'http://localhost/apiname',[...]);
  */
 async function executeQuery(serviceId, userId, integrationName, queryType, queryUrl, queryParams) {
-  
-  // Refresh token access if needed  
+  // Refresh token access if needed
   const accesToken = await refreshTokenAccess(serviceId, integrationName, this.gladys, userId);
 
   const headerConfig = {

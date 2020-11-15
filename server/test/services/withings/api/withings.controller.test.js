@@ -65,7 +65,7 @@ describe('POST /api/v1/service/withings/init', () => {
     const res = {
       json: fake.returns(null),
     };
-    const req = { 
+    const req = {
       user: {
         id: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
       },
@@ -89,7 +89,7 @@ describe('GET /api/v1/service/withings/deleteConfig', () => {
     const req = {
       query: {
         userId: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
-      }, 
+      },
     };
 
     controller['get /api/v1/service/withings/deleteConfig'].controller(req, res);

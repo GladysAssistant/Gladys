@@ -16,16 +16,18 @@ module.exports = function OAuth2Controller(gladys) {
     const { tokenHost } = currentProvider;
     const { authorizeHost } = currentProvider;
     const { authorizePath } = currentProvider;
-    const { integrationScope } = currentProvider; 
+    const { integrationScope } = currentProvider;
 
     // Get variale client_id and secret_id
     const clientId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_CLIENT_ID`,
-      req.body.serviceId, req.user.id
+      req.body.serviceId,
+      req.user.id,
     );
     const secretId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_SECRET_ID`,
-      req.body.serviceId, req.user.id
+      req.body.serviceId,
+      req.user.id,
     );
 
     // Init credentials based on integration name
@@ -73,11 +75,13 @@ module.exports = function OAuth2Controller(gladys) {
 
     const clientId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_CLIENT_ID`,
-      req.body.serviceId, req.user.id
+      req.body.serviceId,
+      req.user.id,
     );
     const secretId = await gladys.variable.getValue(
       `${req.body.integrationName.toUpperCase()}_SECRET_ID`,
-      req.body.serviceId, req.user.id
+      req.body.serviceId,
+      req.user.id,
     );
 
     // Init credentials based on integration name
@@ -106,13 +110,17 @@ module.exports = function OAuth2Controller(gladys) {
     logger.debug('credentials: ', credentials);
 
     try {
-      const client = new AuthorizationCode(credentials); 
+      const client = new AuthorizationCode(credentials);
       const authResult = await client.getToken(tokenConfig, { json: true });
 
       logger.trace('authResult: ', authResult);
       // Save accessToken
-      await gladys.variable.setValue(`${req.body.integrationName.toUpperCase()}_ACCESS_TOKEN`, JSON.stringify(authResult), 
-          req.body.serviceId, req.user.id);
+      await gladys.variable.setValue(
+        `${req.body.integrationName.toUpperCase()}_ACCESS_TOKEN`,
+        JSON.stringify(authResult),
+        req.body.serviceId,
+        req.user.id,
+      );
 
       res.json({
         success: true,
@@ -138,7 +146,11 @@ module.exports = function OAuth2Controller(gladys) {
     const { integrationName } = req.query;
     const { serviceId } = req.query;
 
-    const resultClientId = await gladys.variable.getValue(`${integrationName.toUpperCase()}_CLIENT_ID`, serviceId, req.user.id);
+    const resultClientId = await gladys.variable.getValue(
+      `${integrationName.toUpperCase()}_CLIENT_ID`,
+      serviceId,
+      req.user.id,
+    );
 
     res.json({
       success: true,

@@ -6,7 +6,7 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
-describe.only('Device', () => {
+describe('Device', () => {
   it('should create device alone', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager);
@@ -257,7 +257,6 @@ describe.only('Device', () => {
       updated_at: '2019-02-12 07:49:07.556 +00:00',
       features: [
         {
-          
           name: 'New device feature',
           selector: 'new-device-feature',
           external_id: 'hue:binary:1',
@@ -270,12 +269,14 @@ describe.only('Device', () => {
           last_value_string: null,
           min: 0,
           max: 100,
-          feature_state: [{
-            id: uniqueId, 
-            value: 20.0,
-            created_at: '2019-02-12 07:49:07.556 +00:00',
-            updated_at: '2019-02-12 07:49:07.556 +00:00'
-          }]
+          feature_state: [
+            {
+              id: uniqueId,
+              value: 20.0,
+              created_at: '2019-02-12 07:49:07.556 +00:00',
+              updated_at: '2019-02-12 07:49:07.556 +00:00',
+            },
+          ],
         },
       ],
       params: [
@@ -315,7 +316,6 @@ describe.only('Device', () => {
         created_at: newDevice.features[0] && newDevice.features[0].created_at,
         updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
       },
-    ]); 
+    ]);
   });
-
 });

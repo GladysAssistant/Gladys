@@ -100,7 +100,7 @@ function buildNewDevice(withingsDevice, serviceId) {
 }
 
 /**
- * @description  Build features of gladys device. 
+ * @description  Build features of gladys device.
  * @param {Object} currentGroup - Withings measure groups to transform.
  * @param {Object} device - Current device.
  * @param {Array} currentFeatures - CurrentFeature array to update if exist.
@@ -281,10 +281,9 @@ function buildFeature(currentGroup, device, currentFeatures) {
  * withings.init('b2f2c27f0bf3414e0fe3facfba7be9455109409a');
  */
 async function init(userId) {
-
   const { serviceId } = this;
   const oauth2Manager = new OAuth2Manager(this.gladys);
-  
+
   const userResult = await oauth2Manager.executeQuery(
     serviceId,
     userId,

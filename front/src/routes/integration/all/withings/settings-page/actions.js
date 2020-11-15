@@ -12,11 +12,10 @@ const actions = store => ({
       if (state.currentUrl) {
         const queryParams = queryString.parse(state.currentUrl.substring(state.currentUrl.indexOf('?')));
         if (queryParams && queryParams.code) {
-
           const returnServiceId = await state.httpClient.get('/api/v1/service/withings/getServiceId');
           const serviceId = returnServiceId.result.serviceId;
 
-          const returnValue = await state.httpClient.post('/api/v1/service/oauth2/buildTokenAccessUri', {
+          await state.httpClient.post('/api/v1/service/oauth2/buildTokenAccessUri', {
             integrationName: 'withings',
             authorizationCode: queryParams.code,
             serviceId

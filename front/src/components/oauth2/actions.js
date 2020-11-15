@@ -57,7 +57,7 @@ const actions = store => ({
 
       const returnSaveVar = await state.httpClient.post(`/api/v1/service/${state.integrationName}/savevar`, {
         clientId: state.clientId,
-        secretId: state.secretId, 
+        secretId: state.secretId,
         integrationName: state.integrationName
       });
 

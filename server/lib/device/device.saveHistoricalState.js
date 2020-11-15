@@ -31,9 +31,13 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
   // logger.debug(deviceFeature.id, deviceFeatureInDB);
 
   await db.DeviceFeatureState.create(historicalState);
-  if (new Date(historicalState.created_at) > new Date(deviceFeatureInDB.last_value_changed)
-    || !(deviceFeatureInDB.last_value_changed instanceof Date 
-      && !Number.isNaN(deviceFeatureInDB.last_value_changed.getTime()))) {
+  if (
+    new Date(historicalState.created_at) > new Date(deviceFeatureInDB.last_value_changed) ||
+    !(
+      deviceFeatureInDB.last_value_changed instanceof Date &&
+      !Number.isNaN(deviceFeatureInDB.last_value_changed.getTime())
+    )
+  ) {
     await db.DeviceFeature.update(
       {
         last_value: historicalState.value,

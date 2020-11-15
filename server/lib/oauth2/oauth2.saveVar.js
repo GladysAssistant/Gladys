@@ -3,7 +3,7 @@ const logger = require('../../utils/logger');
 /**
  * @description Save client_id and secrei_id of current oauth2 integration.
  * @param {string} clientId - The client_id of oauth2.
- * @param {string} secretId - The secret_id of oauth2. 
+ * @param {string} secretId - The secret_id of oauth2.
  * @param {string} integrationName - Name of oauth2 integration.
  * @param {string} serviceId - Gladys serviceId of current integration.
  * @param {string} userId - Gladys userId of current session.

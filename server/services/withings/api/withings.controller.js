@@ -1,4 +1,4 @@
-const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware'); 
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function WithingsController(withingsHandler) {
   /**
@@ -22,8 +22,12 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function saveVar(req, res) {
-    const resultSaveVar = await withingsHandler.saveVar(req.body.clientId, req.body.secretId, 
-          req.body.integrationName, req.user.id);
+    const resultSaveVar = await withingsHandler.saveVar(
+      req.body.clientId,
+      req.body.secretId,
+      req.body.integrationName,
+      req.user.id,
+    );
     res.json({
       success: true,
       result: resultSaveVar,

@@ -14,12 +14,14 @@ const server = new ServerMock({ host: 'localhost', port: 9192 }, null);
 
 const gladys = {
   variable: {
-    getValue: fake.returns('{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,'+
-    '"token_type":"Bearer",'+
-    '"scope":"user.info,user.metrics,user.activity,user.sleepevents",'+
-    '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",'+
-    '"userid":"33669966",'+
-    '"expires_at":"2020-11-13T20:46:50.042Z"}'),
+    getValue: fake.returns(
+      '{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,' +
+        '"token_type":"Bearer",' +
+        '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
+        '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
+        '"userid":"33669966",' +
+        '"expires_at":"2020-11-13T20:46:50.042Z"}',
+    ),
     setValue: fake.returns(null),
     destroy: fake.returns(null),
   },
@@ -31,9 +33,7 @@ const gladys = {
 };
 
 describe('WithingsHandler', () => {
-
   before(async function before() {
-
     server.on({
       method: 'GET',
       path: '/v2/user',
@@ -58,7 +58,7 @@ describe('WithingsHandler', () => {
         }),
       },
     });
-  
+
     server.on({
       method: 'GET',
       path: '/measure',
@@ -97,23 +97,27 @@ describe('WithingsHandler', () => {
         }),
       },
     });
-  
+
     await server.start();
-  
+
     // Start fake oatuh2 server
     // Generate a new RSA key and add it to the keystore
     await serverOauth2.issuer.keys.generateRSA();
     // Start the server
-    await serverOauth2.start(9292, 'localhost'); 
-  
+    await serverOauth2.start(9292, 'localhost');
   });
-  
+
   after(async function after() {
     await server.stop();
     await serverOauth2.stop();
   });
 
-  const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4', 'http://localhost:9192', 'test');
+  const withingsHandler = new WithingsHandler(
+    gladys,
+    '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
+    'http://localhost:9192',
+    'test',
+  );
 
   it('withings serviceId is good', async () => {
     const result = await withingsHandler.getServiceId();
@@ -131,7 +135,7 @@ describe('WithingsHandler', () => {
       badGladys,
       '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       'http://localhost:9192',
-      'test'
+      'test',
     );
 
     const result = await badWithingsHandler.saveVar('789dsfds452fsdq27fze2ds', 'fdsf847f5re3f92d1', 'test', null);

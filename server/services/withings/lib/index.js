@@ -19,9 +19,9 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId, withingsServ
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.withingsUrl = withingsServerUrl;
-  if(integrationName){
+  if (integrationName) {
     this.integrationName = integrationName;
-  }else{
+  } else {
     this.integrationName = 'withings';
   }
 };

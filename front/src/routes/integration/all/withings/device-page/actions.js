@@ -42,7 +42,7 @@ const actions = store => ({
     });
     try {
       const options = {};
-      const withingsDevicesReceived = await state.httpClient.get('/api/v1/service/withings/device', options); 
+      const withingsDevicesReceived = await state.httpClient.get('/api/v1/service/withings/device', options);
 
       // Build map of device image by device name
       const mapOfDeviceImgByName = new Map();
