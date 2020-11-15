@@ -6,7 +6,7 @@ import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,zigbee2mqttFrontend',
+  'user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,zigbee2mqttFrontend',
   actions
 )
 class Zigbee2mqttIntegration extends Component {
@@ -19,6 +19,7 @@ class Zigbee2mqttIntegration extends Component {
     );
 
     this.props.getHostIP();
+    this.props.checkStatus();
     this.props.getPermitJoin();
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();

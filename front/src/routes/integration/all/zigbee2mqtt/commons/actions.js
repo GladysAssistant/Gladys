@@ -3,14 +3,20 @@ const createActions = store => {
     async checkStatus(state) {
       let zigbee2mqttStatus = {
         usbConfigured: false,
-        mqttConnected: false
+        mqttExist: false,
+        mqttRunning: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+        gladysConnected: false,
+        zigbee2mqttConnected: false,
+        z2mEnabled: false
       };
       try {
         zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
       } finally {
         store.setState({
-          zigbee2mqttStatusUsbConfigured: zigbee2mqttStatus.usbConfigured,
-          zigbee2mqttStatusMqttConnected: zigbee2mqttStatus.mqttConnected
+          usbConfigured: zigbee2mqttStatus.usbConfigured,
+          z2mEnabled: zigbee2mqttStatus.z2mEnabled
         });
       }
     }

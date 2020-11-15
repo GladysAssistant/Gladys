@@ -27,29 +27,26 @@ const DiscoverTab = ({ children, ...props }) => (
         </tr>
       </h1>
       <div class="page-options d-flex">
-        <tr>
-          <td class="text-right">
-            <label>
-              <input
-                type="checkbox"
-                class="custom-switch-input"
-                checked={props.permitJoin}
-                onClick={props.togglePermitJoin}
-              />
-              <span class="custom-switch-indicator" />
-            </label>
-          </td>
-          <td>
-            &nbsp;
+        <label class="custom-switch">
+          <input
+            type="checkbox"
+            id="permitJoin"
+            name="permitJoin"
+            class="custom-switch-input"
+            checked={props.permitJoin}
+            onClick={props.togglePermitJoin}
+            disabled={!props.zigbee2mqttConnected || !props.gladysConnected }
+          />
+          <span class="custom-switch-indicator" />
+          <span class="custom-switch-description">
             <Text id="integration.zigbee2mqtt.discover.permitJoin" />
-            &nbsp;&nbsp;&nbsp;
-          </td>
-          <td>
-            <button class="btn btn-outline-primary" onClick={props.discover} disabled={props.discoverZigbee2mqtt}>
-              <Text id="integration.zigbee2mqtt.discover.scanButton" /> <i class="fe fe-radio" />
-            </button>
-          </td>
-        </tr>
+          </span>
+        </label>
+      </div>
+      <div class="page-options d-flex">
+        <button class="btn btn-outline-primary" onClick={props.discover} disabled={props.discoverZigbee2mqtt}>
+          <Text id="integration.zigbee2mqtt.discover.scanButton" /> <i class="fe fe-radio" />
+        </button>
       </div>
     </div>
     <div class="card-body">
