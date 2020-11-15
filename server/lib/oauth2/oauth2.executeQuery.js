@@ -64,8 +64,6 @@ async function refreshTokenAccess(serviceId, integrationName, gladys, userId) {
 
         authResult = await authResult.refresh(refreshParams);
 
-        logger.trace(authResult);
-
         // Save new  accessToken
         await gladys.variable.setValue(
           `${integrationName.toUpperCase()}_ACCESS_TOKEN`,

@@ -1,6 +1,7 @@
 const { OAuth2Server } = require('oauth2-mock-server');
 const { fake } = require('sinon');
 const { assert } = require('chai');
+const uuid = require('uuid');
 const EventEmitter = require('events');
 const ServerMock = require('mock-http-server');
 
@@ -29,6 +30,9 @@ const gladys = {
     create: fake.returns(null),
     destroyBySelectorPattern: fake.returns(null),
   },
+  user: {
+    get: fake.returns([{ id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }]),
+  },
   event: new EventEmitter(),
 };
 
@@ -49,7 +53,16 @@ describe('WithingsHandler', () => {
                 model: 'string',
                 model_id: 0,
                 battery: 'low',
-                deviceid: 'string',
+                deviceid: 'withingsDevideId',
+                timezone: 'string',
+                last_session_date: 0,
+              },
+              {
+                type: 'string',
+                model: 'string',
+                model_id: 0,
+                battery: 'no',
+                deviceid: 'withingsDevideId2',
                 timezone: 'string',
                 last_session_date: 0,
               },
@@ -58,7 +71,7 @@ describe('WithingsHandler', () => {
                 model: 'string',
                 model_id: 0,
                 battery: 'medium',
-                deviceid: 'string',
+                deviceid: 'withingsDevideId3',
                 timezone: 'string',
                 last_session_date: 0,
               },
@@ -67,7 +80,7 @@ describe('WithingsHandler', () => {
                 model: 'string',
                 model_id: 0,
                 battery: 'high',
-                deviceid: 'string',
+                deviceid: 'withingsDevideId4',
                 timezone: 'string',
                 last_session_date: 0,
               },
@@ -95,7 +108,7 @@ describe('WithingsHandler', () => {
                 date: 0,
                 created: 0,
                 category: 1,
-                deviceid: 'string',
+                deviceid: 'withingsDevideId',
                 measures: [
                   {
                     value: 0,
@@ -298,7 +311,103 @@ describe('WithingsHandler', () => {
     // logger.debug(resultInit);
     await assert.isNotNull(resultInit);
 
-    const resultPoll = await withingsHandler.poll(resultInit.next());
+    const deviceToPoll = resultInit.next();
+    deviceToPoll.features = [
+      {
+        id: uuid.v4(),
+        type: 91,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 88,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 77,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 76,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 73,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 71,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 54,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 12,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 11,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 10,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 9,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 8,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 6,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 5,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 4,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 0,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: 1,
+        last_value_changed: new Date(),
+      },
+    ];
+    deviceToPoll.params = [
+      {
+        device_id: deviceToPoll.id,
+        name: 'withingsDeviceId',
+        value: 'withingsDevideId',
+      },
+    ];
+
+    const resultPoll = await withingsHandler.poll(deviceToPoll);
     // logger.debug(resultPoll);
     return assert.isNotNull(resultPoll);
   });

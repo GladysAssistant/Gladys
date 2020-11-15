@@ -31,7 +31,7 @@ async function poll(device) {
 
         if (withingsClienId) {
           device.features.forEach(async (feat) => {
-            logger.trace('Current feature : ', feat);
+            // logger.trace('Current feature : ', feat);
             // Convert type to int wihings
             // (cf https://developer.withings.com/oauth2/#tag/measure%2Fpaths%2Fhttps%3A~1~1wbsapi.withings.net~1measure%3Faction%3Dgetmeas%2Fget)
             let withingsType;
