@@ -393,7 +393,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   ZIGBEE2MQTT: {
     DISCOVER: 'zigbee2mqtt.discover',
-    MQTT_CONNECTED: 'zigbee2mqtt.mqtt-connected',
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
     MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
   },

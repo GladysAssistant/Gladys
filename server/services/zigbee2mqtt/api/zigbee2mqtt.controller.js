@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { CONFIGURATION } = require('../lib/constants');
+const logger = require('../../../utils/logger');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serviceId) {
   /**
@@ -28,7 +29,15 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function connect(req, res) {
+
+    logger.log("Entering connect step")
     await zigbee2mqttManager.init();
+//    zigbee2mqttManager.z2mEnabled = true;
+//    const configuration = await zigbee2mqttManager.getConfiguration();
+//    if (configuration.z2mEnabled) {
+//      await zigbee2mqttManager.connect(configuration);
+//    }
+
     res.json({
       success: true,
     });
@@ -40,16 +49,30 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Mqtt
    */
   async function installMqttContainer(req, res) {
-    await zigbee2mqttManager.installMqttContainer();
+    
+    try {
+      await zigbee2mqttManager.installMqttContainer();
 
-    const mqttUrl = await gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, serviceId);
-    const mqttUsername = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, serviceId);
-    const mqttPassword = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, serviceId);
+//      const mqttUrl = await gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, serviceId);
+//      const mqttUsername = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, serviceId);
+//      const mqttPassword = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, serviceId);
 
-    await zigbee2mqttManager.connect({ mqttUrl, mqttUsername, mqttPassword });
-    res.json({
-      success: true,
-    });
+//      await zigbee2mqttManager.connect({ mqttUrl, mqttUsername, mqttPassword });
+      //await zigbee2mqttManager.init();
+
+      response = true;
+    }
+    catch (e) {
+      logger.error('Error while connecting to MQTT:', e);
+      response = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
+        payload: e,
+      });
+      throw e;
+    }
+
+    res.json(response);
   }
 
   /**
@@ -71,6 +94,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function disconnect(req, res) {
+    logger.log("Entering disconnect step")
     await zigbee2mqttManager.disconnect();
     res.json({
       success: true,
@@ -79,10 +103,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
 
   /**
    * @api {post} /api/v1/service/zigbee2mqtt/permit_join Permit joining Zigbee devices
-   * @apiName permit_join
+   * @apiName togglePermitJoin
    * @apiGroup Zigbee2mqtt
    */
-  async function setPermitJoin(req, res) {
+  async function togglePermitJoin(req, res) {
     zigbee2mqttManager.setPermitJoin();
     res.json({
       success: true,
@@ -95,7 +119,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function getPermitJoin(req, res) {
-    const response = zigbee2mqttManager.getPermitJoin();
+    const response = await zigbee2mqttManager.getPermitJoin();
     res.json(response);
   }
 
@@ -136,7 +160,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     },
     'post /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
-      controller: setPermitJoin,
+      controller: togglePermitJoin,
     },
     'get /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,

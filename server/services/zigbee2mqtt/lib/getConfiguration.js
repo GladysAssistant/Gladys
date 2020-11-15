@@ -1,6 +1,5 @@
 const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
-const { generate } = require('../../../utils/password');
 const mqttContainerDescriptor = require('../docker/z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/zigbee2mqtt-container.json');
 const { ServiceNotConfiguredError, PlatformNotCompatible } = require('../../../utils/coreErrors');
@@ -15,96 +14,91 @@ const sleep = promisify(setTimeout);
  * getConfiguration();
  */
 async function getConfiguration() {
-  let brokerContainerAvailable = false;
-  //   const dockerBased = await this.gladys.system.isDocker();
-
-  let networkModeValid = false;
-
-  dockerBased = true;
-
-  if (dockerBased) {
-    networkModeValid = (await this.gladys.system.getNetworkMode()) === 'host';
-
-    // Creation of credentials for Gladys & Z2M for connection to broker
-    const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-    if (!mqttPw) {
-      await this.gladys.variable.setValue(CONFIGURATION.MQTT_URL_KEY, CONFIGURATION.MQTT_URL_VALUE, this.serviceId);
-      await this.gladys.variable.setValue(
-        CONFIGURATION.Z2M_MQTT_USERNAME_KEY,
-        CONFIGURATION.Z2M_MQTT_USERNAME_VALUE,
-        this.serviceId,
-      );
-      await this.gladys.variable.setValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, generate(), this.serviceId);
-      await this.gladys.variable.setValue(
-        CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
-        CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE,
-        this.serviceId,
-      );
-      await this.gladys.variable.setValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, generate(), this.serviceId);
-      await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-    }
 
     // Run existing containers if Zigbee2mqtt is enabled
-    let mqttRunning, zigbee2mqttRunning;
-    let zigbee2mqttEnabled = await this.gladys.variable.getValue('ZIGBEE2MQTT_ENABLED', this.serviceId);
+    logger.log("z2mEnabled state :", this.z2mEnabled)
+    if (this.z2mEnabled) {
+      logger.log("Installing & starting containers")
+      
+      await this.installMqttContainer();
 
-    // Look for broker docker container
-    let dockerContainer = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [mqttContainerDescriptor.name] },
-    });
-    if (dockerContainer.length > 0) {
-      [container] = dockerContainer;
-      if (container.state !== 'running' && zigbee2mqttEnabled) {
-        await this.gladys.system.restartContainer(container.id);
-        // wait 5 seconds for the container to restart
-        await sleep(5 * 1000);
-      }
-      this.mqttContainerRunning = true;
-    } else this.mqttContainerRunning = false;
+      // // Look for broker docker container
+      // let dockerContainer = await this.gladys.system.getContainers({
+      //   all: true,
+      //   filters: { name: [mqttContainerDescriptor.name] },
+      // });
+      // if (dockerContainer.length > 0) {
+      //   this.mqttExist = true;
+      //   [container] = dockerContainer;
+      //   if (container.state !== 'running' && this.z2mEnabled) {
+      //     try {
+      //       await this.gladys.system.restartContainer(container.id);
+      //       // wait 5 seconds for the container to restart
+      //       await sleep(5 * 1000);
+      //     } catch (e) {
+      //       logger.error('MQTT broker failed to start:', e);
+      //       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      //         type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
+      //         payload: {
+      //           status: DEFAULT.INSTALLATION_STATUS.ERROR,
+      //           detail: e,
+      //         },
+      //       });
+      //       this.mqttRunning = false;
+      //       this.z2mEnabled = false;
+      //       throw e;
+      //     }
+      //   }
+      //   this.mqttRunning = true;
+      // } else {
+      //   this.mqttRunning = false;
+      //   this.z2mEnabled = false;
+      // }
 
-    // Look for zigbee2mqtt docker container
-    dockerContainer = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [zigbee2mqttContainerDescriptor.name] },
-    });
-    if (dockerContainer.length > 0) {
-      [container] = dockerContainer;
-      if (container.state !== 'running' && zigbee2mqttEnabled) {
-        await this.gladys.system.restartContainer(container.id);
-        // wait 5 seconds for the container to restart
-        await sleep(5 * 1000);
-      }
-      this.z2mContainerRunning = true;
-    } else this.z2mContainerRunning = false;
+      await this.installZ2mContainer();
+      // Look for zigbee2mqtt docker container
+      // dockerContainer = await this.gladys.system.getContainers({
+      //   all: true,
+      //   filters: { name: [zigbee2mqttContainerDescriptor.name] },
+      // });
+      // if (dockerContainer.length > 0) {
+      //   this.zigbee2mqttExist = true;
+      //   if (this.mqttContainerRunning) {
+      //     [container] = dockerContainer;
+      //     if (container.state !== 'running' && this.z2mEnabled) {
+      //       try {
+      //         await this.gladys.system.restartContainer(container.id);
+      //         // wait 5 seconds for the container to restart
+      //         await sleep(5 * 1000);
+      //       } catch (e) {
+      //         logger.error('MQTT broker failed to start:', e);
+      //         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      //           type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
+      //           payload: {
+      //             status: DEFAULT.INSTALLATION_STATUS.ERROR,
+      //             detail: e,
+      //           },
+      //         });
+      //         this.zigbee2mqttRunning = false;
+      //         this.z2mEnabled = false;
+      //         throw e;
+      //       }
+      //     }
+      //     this.zigbee2mqttRunning = true;
+      //   } else {
+      //     this.zigbee2mqttRunning = false;
+      //     this.z2mEnabled = false;
+      //   }
+      //}
 
-    if (!this.mqttContainerRunning || !this.z2mContainerRunning) {
-      await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-      zigbee2mqttEnabled = false;
-    }
-
-    // Test if donglez is present
-    let dongleOK = false;
-    this.usbConfigured = false;
-    const zigbee2mqttDriverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
-    if (!zigbee2mqttDriverPath) {
-      logger.info(`Zigbee2mqtt USB dongle not attached`);
-      if (zigbee2mqttEnabled) {
+      if (this.mqttRunning && this.zigbee2mqttRunning) {
+        await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', true, this.serviceId);
+        this.z2mEnabled = true;
+      } else {
         await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+        this.z2mEnabled = false;
       }
-    } else {
-      const usb = this.gladys.service.getService('usb');
-      const usbList = await usb.list();
-      usbList.forEach((usbPort) => {
-        if (zigbee2mqttDriverPath === usbPort.path) {
-          dongleOK = true;
-          this.usbConfigured = true;
-          logger.info(`Zigbee2mqtt USB dongle attached to ${zigbee2mqttDriverPath}`);
-        }
-      });
-    }
-    if (!dongleOK) {
-      throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
+      const z2mEnabled = this.z2mEnabled;
     }
 
     const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
@@ -115,12 +109,9 @@ async function getConfiguration() {
     return {
       mqttUrl,
       mqttUsername,
-      mqttPassword,
-      zigbee2mqttEnabled,
+      mqttPassword
     };
-  } else {
-    throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
-  }
+
 }
 
 module.exports = {

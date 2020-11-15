@@ -31,8 +31,9 @@ async function installMqttContainer() {
   let [container] = dockerContainers;
 
   if (dockerContainers.length === 0) {
+    let containerMqtt;
     try {
-      logger.info('Zigbee2MQTT MQTT broker is being installed as Docker container...');
+      logger.info('MQTT broker is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
       await this.gladys.system.pull(containerDescriptor.Image);
 
@@ -42,9 +43,20 @@ async function installMqttContainer() {
       logger.trace(brokerEnv);
 
       logger.info(`Creating container...`);
-      const containerMqtt = await this.gladys.system.createContainer(containerDescriptor);
+      containerMqtt = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerMqtt);
+      this.mqttExist = true;
+    } catch (e) {
+      logger.error('MQTT broker failed to install as Docker container:', e);
+      this.mqttExist = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      });
+      throw e;
+    }
 
+    try {
+      logger.info('Zigbee2MQTT MQTT broker is starting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
@@ -56,44 +68,52 @@ async function installMqttContainer() {
       const z2mCreatePw = await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUser, z2mMqttPass],
       });
-
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
       const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
       const createPw = await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
       });
+      logger.info('MQTT broker container successfully started');
+      this.mqttRunning = true;
+      this.mqttExist = true;
     } catch (e) {
-      logger.error('MQTT broker failed to install as Docker container:', e);
+      logger.error('MQTT broker container failed to start:', e);
+      this.mqttRunning = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
-        payload: {
-          status: DEFAULT.INSTALLATION_STATUS.ERROR,
-          detail: e,
-        },
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      });
+      throw e;
+    }
+  } else {
+    this.mqttExist = true;
+    try {
+      logger.info('Zigbee2MQTT MQTT broker is starting...');
+      dockerContainers = await this.gladys.system.getContainers({
+        all: true,
+        filters: { name: [containerDescriptor.name] },
+      });
+      [container] = dockerContainers;
+      if (container.state !== 'running') {
+        await this.gladys.system.restartContainer(container.id);
+        // wait 5 seconds for the container to restart
+        await sleep(5 * 1000);
+      }
+
+      logger.info('MQTT broker container successfully started');
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      });
+      this.mqttRunning = true;
+      this.mqttExist = true;
+    } catch (e) {
+      logger.error('MQTT broker container failed to start:', e);
+      this.mqttRunning = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       });
       throw e;
     }
   }
-
-  logger.info('Zigbee2MQTT MQTT broker is starting...');
-  dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
-  [container] = dockerContainers;
-  if (container.state !== 'running') {
-    await this.gladys.system.restartContainer(container.id);
-    // wait 5 seconds for the container to restart
-    await sleep(5 * 1000);
-  }
-
-  logger.info('MQTT broker successfully installed as Docker container');
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
-    payload: {
-      status: DEFAULT.INSTALLATION_STATUS.DONE,
-    },
-  });
 }
 
 module.exports = {

@@ -30,13 +30,17 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
 
   this.topicBinds = {};
   this.usbConfigured = false;
-  this.mqttContainerPresent = false;
-  this.z2mContainerPresent = false;
+  this.mqttExist = false;
+  this.mqttRunning = false;
   this.mqttContainerRunning = false;
-  this.z2mContainerRunning = false;
-  this.mqttConnected = false;
-  this.z2mConnected = false;
+  this.zigbee2mqttExist = false;
+  this.zigbee2mqttRunning = false;
+  this.gladysConnected = false;
+  this.zigbee2mqttConnected = false;
+  this.z2mEnabled = false;
   this.z2mPermitJoin = false;
+  this.networkModeValid = true;
+  this.dockerBased = true;
 };
 
 Zigbee2mqttManager.prototype.init = init;
