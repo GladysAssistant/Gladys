@@ -77,6 +77,23 @@ describe('oauth2manager test', () => {
     return assert.equal(result, null);
   });
 
+  it('oauth manager get error executeQuery test (bad integration name) ', async () => {
+    const queryType = 'get';
+    const queryUrl = 'http://localhost:9292/revoke';
+    const queryParams = 'param1=testParam';
+
+    const result = await manager.executeQuery(
+      serviceId,
+      'fakeUserId',
+      integrationName,
+      queryType,
+      queryUrl,
+      queryParams,
+    );
+
+    return assert.equal(result, null);
+  });
+
   it('oauth manager get error saveVar test ', async () => {
     const result = await manager.saveVar(clientId, secretId, integrationName, serviceId, userId);
     logger.debug(result);

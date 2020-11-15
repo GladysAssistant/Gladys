@@ -4,6 +4,7 @@ const { assert } = require('chai');
 const uuid = require('uuid');
 const EventEmitter = require('events');
 const ServerMock = require('mock-http-server');
+const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 // const logger = require('../../../../utils/logger');
 
@@ -315,87 +316,87 @@ describe('WithingsHandler', () => {
     deviceToPoll.features = [
       {
         id: uuid.v4(),
-        type: 91,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.WEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 88,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.UNKNOWN,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 77,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 76,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.SYSTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 73,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.SPO2,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 71,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.SKIN_TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 54,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.PULSE_WAVE_VELOCITY,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 12,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.MUSCLE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 11,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.HYDRATION,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 10,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.HEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 9,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.HEARTH_PULSE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 8,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_RATIO,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 6,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_MASS_WEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 5,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_FREE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 4,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.DIASTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 0,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.BONE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: 1,
+        type: DEVICE_FEATURE_TYPES.WITHINGS.BODY_TEMPERATURE,
         last_value_changed: new Date(),
       },
     ];
