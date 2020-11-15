@@ -1,0 +1,20 @@
+{
+  "name": "gladys-tplink",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "bottleneck": "^2.19.5",
+    "tplink-smarthome-api": "^3.1.0"
+  }
+}
