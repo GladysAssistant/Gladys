@@ -225,15 +225,21 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - test-server
-      - test-front
+      - test-server:
+          filters:
+            tags:
+              only: /.*/
+      - test-front:
+          filters:
+            tags:
+              only: /.*/
       - build-front:
           requires:
             - test-server
             - test-front
           filters:
             tags:
-#              only: /.*/
+              only: /.*/
       - build-armhf:
           requires:
             - build-front
