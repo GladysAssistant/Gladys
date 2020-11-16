@@ -317,7 +317,8 @@
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "navigation",
+        "task": "Task"
       }
     },
     "telegram": {

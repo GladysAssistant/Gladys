@@ -203,7 +203,8 @@
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
-      "ecowatt": "Ecowatt ( France )"
+      "ecowatt": "Ecowatt ( France )",
+      "todoist": "Todoist"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -290,6 +291,11 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      },
+      "todoist": {
+        "editNameLabel": "Titre de la box",
+        "editProjectLabel": "Projet pour filtrer les tâches (facultatif)",
+        "unknownError": "Impossible de récupérer la liste des tâches."
       }
     }
   },
@@ -317,7 +323,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "task": "Tâche"
       }
     },
     "caldav": {
@@ -1035,6 +1042,16 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "todoist": {
+      "title": "Todoist",
+      "description": "Lister vos tâches Todoist",
+      "introduction": "Cette intégration vous aide à intégrer l'API Todoist pour faire remonter vos tâches dans Gladys.",
+      "instructions": "Vous devez d'abord créer une clé d'API sur <a href=\"https://todoist.com/prefs/integrations\">https://todoist.com/prefs/integrations</a>.",
+      "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
+      "apiKeyPlaceholder": "Entrer la clé API Todoist",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box Todoist."
     }
   },
   "editScene": {
