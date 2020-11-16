@@ -17,11 +17,19 @@ const padding = {
 
 const BOX_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
-const Task = ({ task }) => (
-  <div class={style.todoistTask}>
-    {task.content}
-  </div>
-)
+const Task = ({ task, onclick }) => {
+  const icon = task.pending ? 'check-circle' : 'circle';
+  const textStyle = {
+    verticalAlign: 'text-bottom',
+    textDecoration: task.pending ? 'line-through' : undefined
+  };
+  return (
+    <div class={style.todoistTask} onclick={onclick}>
+      <i className={`fe fe-${icon}`} style={{ marginRight: '10px' }} />
+      <span style={textStyle}>{task.content}</span>
+    </div>
+  );
+}
 
 const TodoistBox = ({ children, ...props }) => (
   <div class="card">
@@ -54,8 +62,13 @@ const TodoistBox = ({ children, ...props }) => (
           <div class="row">
             <div class="col-12">
               {props.tasks.map(task => (
-                <Task key={task.id} task={task} />
+                <Task key={task.id} task={task} onclick={() => props.onTaskClick(task)} />
               ))}
+              {!props.tasks.length && (
+                <i>
+                  <Text id="dashboard.boxes.todoist.emptyTasks" />
+                </i>
+              )}
             </div>
           </div>
         </div>
@@ -90,6 +103,7 @@ class TodoistBoxComponent extends Component {
         tasks={tasks}
         name={this.props.box.name}
         boxStatus={boxStatus}
+        onTaskClick={task => this.props.completeTask(task.id, this.props.x, this.props.y)}
       />
     );
   }
