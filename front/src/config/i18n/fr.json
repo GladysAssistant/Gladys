@@ -218,7 +218,8 @@
       "todoist": {
         "editNameLabel": "Titre de la box",
         "editProjectLabel": "Projet pour filtrer les tâches (facultatif)",
-        "unknownError": "Impossible de récupérer la liste des tâches."
+        "unknownError": "Impossible de récupérer la liste des tâches.",
+        "emptyTasks": "Aucune tâche"
       }
     }
   },

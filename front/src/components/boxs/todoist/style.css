@@ -1,6 +1,7 @@
 .todoistTask {
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
+  cursor: pointer;
 }
 .todoistTask:first-of-type {
   padding-top: 0;
