@@ -316,87 +316,92 @@ describe('WithingsHandler', () => {
     deviceToPoll.features = [
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.WEIGHT,
+        type: DEVICE_FEATURE_TYPES.HEALTH.WEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.UNKNOWN,
+        type: DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.TEMPERATURE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.SYSTOLIC_BLOOD_PRESSURE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.SYSTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.SPO2,
+        type: DEVICE_FEATURE_TYPES.HEALTH.SPO2,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.SKIN_TEMPERATURE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.SKIN_TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.PULSE_WAVE_VELOCITY,
+        type: DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.MUSCLE_MASS,
+        type: DEVICE_FEATURE_TYPES.HEALTH.MUSCLE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.HYDRATION,
+        type: DEVICE_FEATURE_TYPES.HEALTH.HYDRATION,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.HEIGHT,
+        type: DEVICE_FEATURE_TYPES.HEALTH.HEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.HEARTH_PULSE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.HEARTH_PULSE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_RATIO,
+        type: DEVICE_FEATURE_TYPES.HEALTH.FAT_RATIO,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_MASS_WEIGHT,
+        type: DEVICE_FEATURE_TYPES.HEALTH.FAT_MASS_WEIGHT,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.FAT_FREE_MASS,
+        type: DEVICE_FEATURE_TYPES.HEALTH.FAT_FREE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.DIASTOLIC_BLOOD_PRESSURE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.DIASTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.BONE_MASS,
+        type: DEVICE_FEATURE_TYPES.HEALTH.BONE_MASS,
         last_value_changed: new Date(),
       },
       {
         id: uuid.v4(),
-        type: DEVICE_FEATURE_TYPES.WITHINGS.BODY_TEMPERATURE,
+        type: DEVICE_FEATURE_TYPES.HEALTH.BODY_TEMPERATURE,
+        last_value_changed: new Date(),
+      },
+      {
+        id: uuid.v4(),
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         last_value_changed: new Date(),
       },
     ];
@@ -408,7 +413,41 @@ describe('WithingsHandler', () => {
       },
     ];
 
-    const resultPoll = await withingsHandler.poll(deviceToPoll);
+    let resultPoll = await withingsHandler.poll(deviceToPoll);
+    await assert.isNotNull(resultPoll);
+
+    deviceToPoll.params = [
+      {
+        device_id: deviceToPoll.id,
+        name: 'withingsDeviceId',
+        value: 'withingsDevideId2',
+      },
+    ];
+
+    resultPoll = await withingsHandler.poll(deviceToPoll);
+    await assert.isNotNull(resultPoll);
+
+    deviceToPoll.params = [
+      {
+        device_id: deviceToPoll.id,
+        name: 'withingsDeviceId',
+        value: 'withingsDevideId3',
+      },
+    ];
+
+    resultPoll = await withingsHandler.poll(deviceToPoll);
+    await assert.isNotNull(resultPoll);
+
+    deviceToPoll.params = [
+      {
+        device_id: deviceToPoll.id,
+        name: 'withingsDeviceId',
+        value: 'withingsDevideId4',
+      },
+    ];
+
+    resultPoll = await withingsHandler.poll(deviceToPoll);
+
     // logger.debug(resultPoll);
     return assert.isNotNull(resultPoll);
   });

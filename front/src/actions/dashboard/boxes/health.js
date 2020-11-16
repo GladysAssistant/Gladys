@@ -3,60 +3,30 @@ import createBoxActions from '../boxActions';
 // import createDeviceActions from '../../device';
 import update from 'immutability-helper';
 import get from 'get-value';
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../../server/utils/constants');
 
-const BOX_KEY = 'DevicesInRoom';
-
-const getLightStatus = room => {
-  let roomLightStatus = 0;
-  let hasBinaryLightDeviceFeature = false;
-  room.devices.forEach(device => {
-    device.features.forEach(feature => {
-      // if it's a light
-      const isLight =
-        feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
-        feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY &&
-        feature.read_only === false;
-      // if it's a light and it's turned on, we consider that the light
-      // is on in the room
-      if (isLight && feature.last_value === 1) {
-        roomLightStatus = 1;
-      }
-      if (isLight) {
-        hasBinaryLightDeviceFeature = true;
-      }
-    });
-  });
-  return {
-    roomLightStatus,
-    hasBinaryLightDeviceFeature
-  };
-};
+const BOX_KEY = 'Health';
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
 
   const actions = {
-    async getHealth(state, box, x, y) {
+    async getHealthData(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        // TODO recup les info de type health pourles afficher
-        const room = await state.httpClient.get(`/api/v1/room/${box.room}?expand=devices`);
-        // we test if there are lights ON/OFF device features to control in this room
-        const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(room);
+        // we get the all health data
+        const healthData = await state.httpClient.get(`/api/v1/health`);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          room,
-          hasBinaryLightDeviceFeature,
-          roomLightStatus
+          healthData
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
+        console.log(e);
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }
     },
     deviceFeatureWebsocketEvent(state, x, y, payload) {
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
-      const devices = get(data, 'room.devices');
+      const devices = get(data, 'healthData.devices');
       if (devices) {
         let found = false;
         let currentDeviceIndex = 0;
@@ -68,7 +38,7 @@ function createActions(store) {
             ) {
               found = true;
               const newData = update(data, {
-                room: {
+                healthData: {
                   devices: {
                     [currentDeviceIndex]: {
                       features: {
@@ -85,11 +55,8 @@ function createActions(store) {
                   }
                 }
               });
-              const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
               boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-                room: newData.room,
-                hasBinaryLightDeviceFeature,
-                roomLightStatus
+                healthData: newData.healthData
               });
             }
             currentFeatureIndex += 1;

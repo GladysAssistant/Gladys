@@ -20,7 +20,6 @@ const DEFAULT_OPTIONS = {
  */
 async function get(options) {
   const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
-
   const queryParams = {
     include: [
       {

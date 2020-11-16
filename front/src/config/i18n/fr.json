@@ -652,7 +652,7 @@
       "settings": {
         "title": "Withings Configuration",
         "menu": "Configuration",
-        "introduction": "Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=https://account.withings.com/connectionwou/account_login target=_blank >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=https://account.withings.com/partner/add_oauth2 target=_blank >ce lien</a>. <br/>",
+        "introduction": "Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=https://account.withings.com/connectionwou/account_login target=_blank >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=https://account.withings.com/partner/add_oauth2 target=_blank >ce lien</a></br>(dans le champ url de callback mettre http://gladys.local/dashboard/integration/health/withings/settings, dans le champs environnement choisir Dev, vous pouvez utiliser Prod avec gladys plus url et le protocole https, voir le lien Documentation pour plus de détails). <br/>",
         "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box de santé.",
         "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que votre client_id et votre secret_id sont corrects ?",
         "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres:",
@@ -1181,7 +1181,7 @@
       "acceleration-z": "Accélération Z",
       "bed-activity": "Activité Lit"
     },
-    "withings": {
+    "health": {
       "battery": "Battery",
       "weight": "Poids",
       "height": "Taille",

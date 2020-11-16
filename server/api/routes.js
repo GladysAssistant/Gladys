@@ -450,9 +450,9 @@ function getRoutes(gladys) {
       controller: weatherController.getByHouse,
     },
     // health
-    'get /api/v1/user/:user_selector/health': {
+    'get /api/v1/health': {
       authenticated: true,
-      controller: healthController.getByUser,
+      controller: healthController.getHealthData,
     },
     // oauth2
     'post /api/v1/service/oauth2/buildAuthorizationUri': {

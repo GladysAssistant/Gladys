@@ -87,8 +87,8 @@ describe('GET /api/v1/service/withings/deleteConfig', () => {
       json: fake.returns(null),
     };
     const req = {
-      query: {
-        userId: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
+      user: {
+        id: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd',
       },
     };
 

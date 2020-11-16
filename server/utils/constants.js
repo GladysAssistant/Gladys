@@ -253,7 +253,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROl: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
-  WITHINGS: 'withings',
+  HEALTH: 'health',
   UNKNOWN: 'unknown',
 };
 
@@ -313,7 +313,7 @@ const DEVICE_FEATURE_TYPES = {
   BUTTON: {
     CLICK: 'click',
   },
-  WITHINGS: {
+  HEALTH: {
     BATTERY: 'battery',
     WEIGHT: 'weight',
     HEIGHT: 'height',
@@ -350,6 +350,11 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
+  KILOGRAM: 'kg',
+  CENTIMETER: 'cm',
+  MERCURE_MILIMETER: 'mmHg',
+  BEATS_PER_MINUTE: 'bpm',
+  METER_PER_SECOND: 'm/s',
 };
 
 const ACTIONS_STATUS = {

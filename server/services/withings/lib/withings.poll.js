@@ -37,55 +37,55 @@ async function poll(device) {
             let withingsType;
             let featureBattery;
             switch (feat.type) {
-              case DEVICE_FEATURE_TYPES.WITHINGS.WEIGHT:
+              case DEVICE_FEATURE_TYPES.HEALTH.WEIGHT:
                 withingsType = 1;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.HEIGHT:
+              case DEVICE_FEATURE_TYPES.HEALTH.HEIGHT:
                 withingsType = 4;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.FAT_FREE_MASS:
+              case DEVICE_FEATURE_TYPES.HEALTH.FAT_FREE_MASS:
                 withingsType = 5;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.FAT_RATIO:
+              case DEVICE_FEATURE_TYPES.HEALTH.FAT_RATIO:
                 withingsType = 6;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.FAT_MASS_WEIGHT:
+              case DEVICE_FEATURE_TYPES.HEALTH.FAT_MASS_WEIGHT:
                 withingsType = 8;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.DIASTOLIC_BLOOD_PRESSURE:
+              case DEVICE_FEATURE_TYPES.HEALTH.DIASTOLIC_BLOOD_PRESSURE:
                 withingsType = 9;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.SYSTOLIC_BLOOD_PRESSURE:
+              case DEVICE_FEATURE_TYPES.HEALTH.SYSTOLIC_BLOOD_PRESSURE:
                 withingsType = 10;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.HEARTH_PULSE:
+              case DEVICE_FEATURE_TYPES.HEALTH.HEARTH_PULSE:
                 withingsType = 11;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.TEMPERATURE:
+              case DEVICE_FEATURE_TYPES.HEALTH.TEMPERATURE:
                 withingsType = 12;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.SPO2:
+              case DEVICE_FEATURE_TYPES.HEALTH.SPO2:
                 withingsType = 54;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.BODY_TEMPERATURE:
+              case DEVICE_FEATURE_TYPES.HEALTH.BODY_TEMPERATURE:
                 withingsType = 71;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.SKIN_TEMPERATURE:
+              case DEVICE_FEATURE_TYPES.HEALTH.SKIN_TEMPERATURE:
                 withingsType = 73;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.MUSCLE_MASS:
+              case DEVICE_FEATURE_TYPES.HEALTH.MUSCLE_MASS:
                 withingsType = 76;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.HYDRATION:
+              case DEVICE_FEATURE_TYPES.HEALTH.HYDRATION:
                 withingsType = 77;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.BONE_MASS:
+              case DEVICE_FEATURE_TYPES.HEALTH.BONE_MASS:
                 withingsType = 88;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.PULSE_WAVE_VELOCITY:
+              case DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY:
                 withingsType = 91;
                 break;
-              case DEVICE_FEATURE_TYPES.WITHINGS.BATTERY:
+              case DEVICE_FEATURE_TYPES.SENSOR.INTEGER:
                 withingsType = -1;
                 featureBattery = feat;
                 break;

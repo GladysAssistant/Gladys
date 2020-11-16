@@ -100,7 +100,7 @@ module.exports = {
           name: 'Test withings',
           selector: 'test-withings-image',
           external_id: 'withings:test',
-          category: 'withings',
+          category: 'health',
           type: 'weight',
           unit: null,
           read_only: false,

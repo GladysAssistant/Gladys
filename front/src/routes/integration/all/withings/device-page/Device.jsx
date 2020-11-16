@@ -16,7 +16,7 @@ class WithingsDeviceBox extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.WITHINGS.BATTERY
+      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.INTEGER
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;

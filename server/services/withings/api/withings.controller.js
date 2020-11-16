@@ -41,7 +41,7 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function deleteConfig(req, res) {
-    await withingsHandler.deleteVar('withings', req.query.userId);
+    await withingsHandler.deleteVar('withings', req.user.id);
     await withingsHandler.deleteDevices();
     res.json({
       success: true,
