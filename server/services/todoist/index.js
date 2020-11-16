@@ -11,6 +11,12 @@ module.exports = function TodoistService(gladys, serviceId) {
   const { default: axios } = require('axios');
   let todoistApiKey;
 
+  function ensureApiKey() {
+    if (!todoistApiKey) {
+      throw new ServiceNotConfiguredError('Todoist Service not configured');
+    }
+  }
+
   /**
    * @public
    * @description This function starts the service
@@ -20,9 +26,7 @@ module.exports = function TodoistService(gladys, serviceId) {
   async function start() {
     logger.info('Starting Todoist service');
     todoistApiKey = await gladys.variable.getValue(TODOIST_API_KEY, serviceId);
-    if (!todoistApiKey) {
-      throw new ServiceNotConfiguredError('Todoist Service not configured');
-    }
+    ensureApiKey();
   }
 
   /**
@@ -43,9 +47,8 @@ module.exports = function TodoistService(gladys, serviceId) {
    * gladys.services.todoist.getTasks();
    */
   async function getTasks(options) {
-    if (!todoistApiKey) {
-      throw new ServiceNotConfiguredError('Todoist API Key not found');
-    }
+    ensureApiKey();
+
     const url = `https://api.todoist.com/rest/v1/tasks`;
     try {
       const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` }, params: options });
@@ -63,9 +66,8 @@ module.exports = function TodoistService(gladys, serviceId) {
    * gladys.services.todoist.getProjects();
    */
   async function getProjects() {
-    if (!todoistApiKey) {
-      throw new ServiceNotConfiguredError('Todoist API Key not found');
-    }
+    ensureApiKey();
+
     const url = `https://api.todoist.com/rest/v1/projects`;
     try {
       const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
@@ -77,11 +79,31 @@ module.exports = function TodoistService(gladys, serviceId) {
     }
   }
 
+  /**
+   * @description Get Todoist tasks.
+   * @param {number} task_id
+   * @example
+   * gladys.services.todoist.completeTask(123);
+   */
+  async function completeTask(task_id) {
+    ensureApiKey();
+
+    const url = `https://api.todoist.com/rest/v1/tasks/${task_id}/close`;
+    try {
+      await axios.post(url, {}, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
+      logger.debug(`Completed task #${task_id}`);
+    } catch (e) {
+      logger.error(e);
+      throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+    }
+  }
+
   const service = {
     start,
     stop,
     getTasks,
     getProjects,
+    completeTask,
   };
 
   return Object.freeze({
