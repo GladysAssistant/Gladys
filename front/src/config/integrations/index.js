@@ -2,6 +2,7 @@ import devices from './devices.json';
 import communications from './communications.json';
 import calendars from './calendars.json';
 import weathers from './weathers.json';
+import tasks from './tasks.json';
 
 const integrations = [];
 const integrationsByType = {};
@@ -25,5 +26,6 @@ pushAllWithType(devices, 'device', 'toggle-right');
 pushAllWithType(communications, 'communication', 'message-square');
 pushAllWithType(calendars, 'calendar', 'calendar');
 pushAllWithType(weathers, 'weather', 'cloud');
+pushAllWithType(tasks, 'task', 'check-circle');
 
 export { integrations, integrationsByType, categories };
