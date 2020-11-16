@@ -175,7 +175,8 @@
       "temperature-in-room": "Température de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "todoist": "Todoist"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -213,6 +214,11 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "todoist": {
+        "editNameLabel": "Titre de la box",
+        "editProjectLabel": "Projet pour filtrer les tâches (facultatif)",
+        "unknownError": "Impossible de récupérer la liste des tâches."
       }
     }
   },
@@ -231,7 +237,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "task": "Tâche"
       }
     },
     "caldav": {
@@ -628,6 +635,16 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
+    },
+    "todoist": {
+      "title": "Todoist",
+      "description": "Lister vos tâches Todoist",
+      "introduction": "Cette intégration vous aide à intégrer l'API Todoist pour faire remonter vos tâches dans Gladys.",
+      "instructions": "Vous devez d'abord créer une clé d'API sur <a href=\"https://todoist.com/prefs/integrations\">https://todoist.com/prefs/integrations</a>.",
+      "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
+      "apiKeyPlaceholder": "Entrer la clé API Todoist",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box Todoist."
     }
   },
   "editScene": {

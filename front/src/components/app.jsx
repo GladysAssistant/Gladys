@@ -68,6 +68,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import TodoistPage from '../routes/integration/all/todoist';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -156,6 +157,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" category="health" />
         <IntegrationPage path="/dashboard/integration/weather" category="weather" />
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        <IntegrationPage path="/dashboard/integration/task" category="task" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
@@ -183,6 +185,7 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <TodoistPage path="/dashboard/integration/task/todoist" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
