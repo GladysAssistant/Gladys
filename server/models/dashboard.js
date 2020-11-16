@@ -13,6 +13,7 @@ const boxesSchema = Joi.array().items(
       camera: Joi.string(),
       name: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
+      todoist_project_id: Joi.number(),
     }),
   ),
 );
