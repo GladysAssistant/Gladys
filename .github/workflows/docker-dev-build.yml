@@ -12,7 +12,7 @@ jobs:
       - name: Setup nodejs
         uses: actions/setup-node@v1
         with:
-            node-version: 14.x
+            node-version: 12.x
       - run: cd front && npm install && npm run build
       - name: Upload build artifact
         uses: actions/upload-artifact@v1
