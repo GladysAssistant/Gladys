@@ -24,7 +24,7 @@ jobs:
           path: front/build
   docker:
     needs: build-front
-    name: Build and Push Gladys dev images
+    name: Build Gladys amd64 images
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
