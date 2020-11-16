@@ -4,17 +4,20 @@ import { connect } from 'unistore/preact';
 import actions from '../../../actions/dashboard/edit-boxes/editTodoist';
 import BaseEditBox from '../baseEditBox';
 
-const ProjectOption = ({ project, todoist_project_id, depth = 0 }) => {
-  const prefix = depth === 0 ? '' : new Array(depth).join('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;') + '&map; ';
+const ProjectOption = ({ project, todoistProjectIid, depth = 0 }) => {
   return (
     <Fragment>
-      <option selected={project.id === todoist_project_id} value={project.id} dangerouslySetInnerHTML={{ __html: prefix + project.name}}>
+      <option selected={project.id === todoistProjectIid} value={project.id}>
+        {depth > 0 && <span>{new Array(depth + 1).join('|--- ')} </span>}
+        {project.name}
       </option>
-      {project.children && project.children.map(child => (<ProjectOption project={child} todoist_project_id={todoist_project_id} depth={depth + 1}/>))}
+      {project.children &&
+        project.children.map(child => (
+          <ProjectOption project={child} todoist_project_id={todoistProjectIid} depth={depth + 1} />
+        ))}
     </Fragment>
-  )
-}
-
+  );
+};
 
 const EditTodoistBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.todoist">
@@ -34,7 +37,7 @@ const EditTodoistBox = ({ children, ...props }) => (
         </option>
         {props.projects &&
           props.projects.map(project => (
-            <ProjectOption project={project} todoist_project_id={props.box.todoist_project_id} />
+            <ProjectOption project={project} todoistProjectIid={props.box.todoist_project_id} />
           ))}
       </select>
     </div>
@@ -45,7 +48,7 @@ const EditTodoistBox = ({ children, ...props }) => (
 class EditTodoistBoxComponent extends Component {
   updateProject = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      todoist_project_id: e.target.value ? parseInt(e.target.value, 10) : undefined,
+      todoist_project_id: e.target.value ? parseInt(e.target.value, 10) : undefined
     });
   };
   updateName = e => {
@@ -58,7 +61,14 @@ class EditTodoistBoxComponent extends Component {
   }
 
   render(props, {}) {
-    return <EditTodoistBox {...props} name={this.props.box.name} updateName={this.updateName} updateProject={this.updateProject} />;
+    return (
+      <EditTodoistBox
+        {...props}
+        name={this.props.box.name}
+        updateName={this.updateName}
+        updateProject={this.updateProject}
+      />
+    );
   }
 }
 
