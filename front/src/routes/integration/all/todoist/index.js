@@ -12,8 +12,7 @@ class TodoistIntegration extends Component {
 
   render(props, {}) {
     const loading =
-      props.todoistSaveApiKeyStatus === RequestStatus.Getting ||
-      props.todoistGetApiKeyStatus === RequestStatus.Getting;
+      props.todoistSaveApiKeyStatus === RequestStatus.Getting || props.todoistGetApiKeyStatus === RequestStatus.Getting;
     return <TodoistPage {...props} loading={loading} />;
   }
 }

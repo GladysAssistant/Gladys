@@ -27,8 +27,8 @@ module.exports = function TodoistController(todoistService) {
    * @apiGroup Todoist
    */
   async function getTasksByProjectId(req, res) {
-    const project_id = parseInt(req.params.project_id, 10);
-    const tasks = await todoistService.getTasks({ project_id });
+    const projectId = parseInt(req.params.project_id, 10);
+    const tasks = await todoistService.getTasks({ project_id: projectId });
     res.json(tasks);
   }
 
@@ -38,8 +38,8 @@ module.exports = function TodoistController(todoistService) {
    * @apiGroup Todoist
    */
   async function completeTask(req, res) {
-    const task_id = parseInt(req.params.task_id, 10);
-    await todoistService.completeTask(task_id);
+    const taskId = parseInt(req.params.task_id, 10);
+    await todoistService.completeTask(taskId);
     res.status(204);
     res.send();
   }

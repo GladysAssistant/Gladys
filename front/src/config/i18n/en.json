@@ -175,7 +175,8 @@
       "temperature-in-room": "Temperature in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "todoist": "Todoist"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -213,6 +214,12 @@
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box"
+      },
+      "todoist": {
+        "editNameLabel": "Box title",
+        "editProjectLabel": "Project to filter tasks (optional)",
+        "unknownError": "Unable to fetch tasks list.",
+        "emptyTasks": "No tasks"
       }
     }
   },
@@ -629,6 +636,16 @@
           "successLabel": "Done"
         }
       }
+    },
+    "todoist": {
+      "title": "Todoist",
+      "description": "List your Todoist tasks",
+      "introduction": "This integration helps you to connect to Todoist API and get your tasks in Gladys.",
+      "instructions": "You first have to get your API key on <a href=\"https://todoist.com/prefs/integrations\">https://todoist.com/prefs/integrations</a>.",
+      "apiKeyLabel": "Enter your API key here:",
+      "apiKeyPlaceholder": "Enter your API key",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to dashboard and add Todoist box."
     }
   },
   "editScene": {
