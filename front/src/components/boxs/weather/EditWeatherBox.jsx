@@ -30,19 +30,19 @@ const EditWeatherBox = ({ children, ...props }) => (
         </label>
       </div>
       <div>
-        {Object.keys(GetWeatherModes).map((key) => {
+        {Object.keys(GetWeatherModes).map(key => {
           const mode = GetWeatherModes[key];
           const label = 'dashboard.boxes.weather.displayModes.' + mode;
           return (
-              <label>
-                <input
-                    type="checkbox"
-                    name={mode}
-                    checked={props.box.modes !== undefined && props.box.modes[mode]}
-                    onChange={props.updateBoxModes}
-                />
-                &nbsp; <Text id={label} />
-              </label>
+            <label>
+              <input
+                type="checkbox"
+                name={mode}
+                checked={props.box.modes !== undefined && props.box.modes[mode]}
+                onChange={props.updateBoxModes}
+              />
+              &nbsp; <Text id={label} />
+            </label>
           );
         })}
       </div>
@@ -64,7 +64,6 @@ class EditWeatherBoxComponent extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       modes
     });
-
   };
 
   componentDidMount() {

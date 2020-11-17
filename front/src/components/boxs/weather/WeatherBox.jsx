@@ -99,12 +99,11 @@ const WeatherBox = ({ children, ...props }) => (
     {props.weather && (
       <div style={padding} class="card-block px-30 py-10">
         <div
-            style={{
-              fontSize: '14px',
-              color: '#76838f'
-            }}
+          style={{
+            fontSize: '14px',
+            color: '#76838f'
+          }}
         >
-
           {props.datetimeBeautiful + ' - ' + props.houseName}
         </div>
         <div class="row">
@@ -135,73 +134,69 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-                className={'fe ' + props.weather}
-                style={{
-                  fontSize: '60px'
-                }}
+              className={'fe ' + props.weather}
+              style={{
+                fontSize: '60px'
+              }}
             />
           </div>
         </div>
         {props.display_mode[GetWeatherModes.AdvancedWeather] && (
-            <div className="col-9" style={{padding: '0'}}>
-              <span>
-                <i
-                  class="fe fe-droplet"
-                  style={{
-                    fpaddingRight: '5px'
-                  }}
-                />
-                {props.humidity}
-                <span
-                  style={{
-                    fontSize: '12px',
-                    color: 'grey'
-                  }}
-                >
+          <div className="col-9" style={{ padding: '0' }}>
+            <span>
+              <i
+                class="fe fe-droplet"
+                style={{
+                  fpaddingRight: '5px'
+                }}
+              />
+              {props.humidity}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
                 %
-                </span>
               </span>
-              <span style={{ float: 'right' }}>
-                  <i
-                      class="fe fe-wind"
-                      style={{
-                        paddingRight: '5px'
-                      }}
-                  />
-                  {props.wind}
-                <span
-                    style={{
-                      fontSize: '12px',
-                      color: 'grey'
-                    }}
-                >
+            </span>
+            <span style={{ float: 'right' }}>
+              <i
+                class="fe fe-wind"
+                style={{
+                  paddingRight: '5px'
+                }}
+              />
+              {props.wind}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
                 {props.units === 'si' ? 'km/h' : 'm/h'}
               </span>
             </span>
-            </div>
+          </div>
         )}
         {props.display_mode[GetWeatherModes.HourlyForecast] && (
-            <div>
-              <div
-                  class="row"
-                  style={{
-                    marginTop: '0.5em'
-                  }}
-              >
-                {props.hours_display}
-              </div>
+          <div>
+            <div
+              class="row"
+              style={{
+                marginTop: '0.5em'
+              }}
+            >
+              {props.hours_display}
             </div>
+          </div>
         )}
         {props.display_mode[GetWeatherModes.DailyForecast] && (
-            <div>
-              <div
-                  class="row"
-              >
-                <div className="container">
-                {props.days_display}
-                </div>
-              </div>
+          <div>
+            <div class="row">
+              <div className="container">{props.days_display}</div>
             </div>
+          </div>
         )}
       </div>
     )}
@@ -246,37 +241,35 @@ class WeatherBoxComponent extends Component {
         let i = 0;
         hoursDisplay = hours.map(hour => {
           return (
-              <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
-                <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-                  {hour.datetime_beautiful}h
-                </p>
-                <p style={{ margin: 'auto', textAlign: 'center' }}>
-                  <i className={'fe ' + hour.weather_icon} style={{ fontSize: '20px' }} />
-                </p>
-                <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.temperature}&deg;</p>
-              </div>
+            <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
+                {hour.datetime_beautiful}h
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center' }}>
+                <i className={'fe ' + hour.weather_icon} style={{ fontSize: '20px' }} />
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.temperature}&deg;</p>
+            </div>
           );
         });
       }
     }
 
-    if(displayMode[GetWeatherModes.DailyForecast]){
+    if (displayMode[GetWeatherModes.DailyForecast]) {
       const days = get(weatherObject, 'days');
       if (typeof days !== 'undefined') {
         let i = 0;
         daysDisplay = days.map(day => {
           return (
-              <div className="row" style={{marginTop: '0.5em'}}>
-                <div className="col-5">
-                  {day.datetime_beautiful}
-                </div>
-                <div className="col-3">
-                  <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
-                </div>
-                <div className="col-4" style={{textAlign: 'right' }}>
-                  {day.temperature_min}&deg;/{day.temperature_max}&deg;
-                </div>
+            <div className="row" style={{ marginTop: '0.5em' }}>
+              <div className="col-5">{day.datetime_beautiful}</div>
+              <div className="col-3">
+                <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
               </div>
+              <div className="col-4" style={{ textAlign: 'right' }}>
+                {day.temperature_min}&deg;/{day.temperature_max}&deg;
+              </div>
+            </div>
           );
         });
       }
