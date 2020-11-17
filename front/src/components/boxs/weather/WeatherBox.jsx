@@ -150,14 +150,14 @@ const WeatherBox = ({ children, ...props }) => (
                   fpaddingRight: '5px'
                 }}
               />
-              {props.humidity}
+              { props.humidity }
               <span
                 style={{
                   fontSize: '12px',
                   color: 'grey'
                 }}
               >
-                %
+                <Text id="global.percent" />
               </span>
             </span>
             <span style={{ float: 'right' }}>
@@ -243,12 +243,14 @@ class WeatherBoxComponent extends Component {
           return (
             <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-                {hour.datetime_beautiful}h
+                {hour.datetime_beautiful + 'h'}
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
                 <i className={'fe ' + hour.weather_icon} style={{ fontSize: '20px' }} />
               </p>
-              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>{hour.temperature}&deg;</p>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
+                <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
+              </p>
             </div>
           );
         });
@@ -267,7 +269,7 @@ class WeatherBoxComponent extends Component {
                 <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
-                {day.temperature_min}&deg;/{day.temperature_max}&deg;
+                <Text id="dashboard.boxes.weather.minMaxDegreeValue" fields={{ min: day.temperature_min, max: day.temperature_max }} />
               </div>
             </div>
           );

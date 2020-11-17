@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
     "save": "Enregistrer"
@@ -193,7 +194,8 @@
           "advancedWeather": "Humidité et vitesse du vent",
           "hourlyForecast": "Prévisions pour les 8 prochaines heures",
           "dailyForecast": "Prévisions pour les 7 prochains jours"
-        }
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
