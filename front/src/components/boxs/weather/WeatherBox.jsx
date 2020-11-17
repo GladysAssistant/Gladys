@@ -150,7 +150,7 @@ const WeatherBox = ({ children, ...props }) => (
                   fpaddingRight: '5px'
                 }}
               />
-              { props.humidity }
+              {props.humidity}
               <span
                 style={{
                   fontSize: '12px',
@@ -269,7 +269,10 @@ class WeatherBoxComponent extends Component {
                 <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
-                <Text id="dashboard.boxes.weather.minMaxDegreeValue" fields={{ min: day.temperature_min, max: day.temperature_max }} />
+                <Text
+                  id="dashboard.boxes.weather.minMaxDegreeValue"
+                  fields={{ min: day.temperature_min, max: day.temperature_max }}
+                />
               </div>
             </div>
           );
