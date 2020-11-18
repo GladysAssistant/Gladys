@@ -57,6 +57,7 @@ async function getLights() {
         case 'LWV001': // Hue White Filament Bulb ST64 E27
         case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
         case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp
+        case 'Classic A60 W clear - LIGHTIFY': // OSRAM Classic A60 W clear - LIGHTIFY
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LTW012': // Hue White Ambiance E12

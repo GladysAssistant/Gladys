@@ -1834,6 +1834,43 @@
       "_id": 36,
       "id": 36,
       "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "none",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2020-01-08T15:03:17"
+      },
+      "type": "Dimmable light",
+      "name": "plafond salon",
+      "modelid": "Classic A60 W clear - LIGHTIFY",
+      "manufacturername": "OSRAM",
+      "productname": "Dimmable light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "pendantround",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "7c:b0:3e:aa:0a:03:98:e6-03",
+        "swversion": "V1.04.12"
+      },
+      "_id": 37,
+      "id": 37
     }
   ]
 }
