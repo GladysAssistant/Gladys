@@ -1,0 +1,10 @@
+{
+    "name": "gladys-meross",
+    "main": "index.js",
+    "os": ["darwin", "linux", "win32"],
+    "cpu": ["x64", "arm", "arm64"],
+    "scripts": {},
+    "dependencies": {
+      "axios": "^0.18.0"
+    }
+  }
