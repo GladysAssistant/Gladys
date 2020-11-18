@@ -1775,6 +1775,65 @@
       },
       "_id": 35,
       "id": 35
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "hue": 8418,
+        "sat": 140,
+        "effect": "none",
+        "xy": [0.4573, 0.41],
+        "ct": 366,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-06-13T17:34:02"
+      },
+      "type": "Extended color light",
+      "name": "Bandeau bureau",
+      "modelid": "LCL001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue lightstrip plus",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 40,
+            "maxlumen": 1600,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "huelightstrip",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:09:11:ab:51-0b",
+        "swversion": "1.66.6_h2048EED",
+        "swconfigid": "A439E458",
+        "productid": "Philips-LCL001-1-LedStripsv4"
+      },
+      "_id": 36,
+      "id": 36,
+      "mappedColorGamut": "C"
     }
   ]
 }
