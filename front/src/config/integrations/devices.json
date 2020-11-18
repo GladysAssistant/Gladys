@@ -28,5 +28,9 @@
   {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg"
+  },
+  {
+    "key": "meross",
+    "img": "/assets/integrations/cover/meross.jpg"
   }
 ]

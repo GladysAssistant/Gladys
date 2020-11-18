@@ -413,6 +413,23 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
+    "meross": {
+      "title": "Meross",
+      "description": "Control your Meross devices.",
+      "search": "Search devices",
+      "device": {
+        "title": "Meross devices in Gladys",
+        "noDeviceFound": "No Meross device found.",
+      },
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "roomLabel": "Room",
+      "urlLabel": "Device URI",
+      "urlPlaceholder": "Ex: http://192.169.1.11",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "saveError": "There was an error saving the device."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connect to MQTT server.",

@@ -521,6 +521,23 @@
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
+    "meross": {
+      "title": "Meross",
+      "description": "Contrôler vos appareils Meross.",
+      "search": "Chercher un appareil",
+      "device": {
+        "title": "Appareils Meross dans Gladys",
+        "noDeviceFound": "Aucun appareil Meross trouvé.",
+      },
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "roomLabel": "Pièce",
+      "urlLabel": "URL de l'appareil",
+      "urlPlaceholder": "Ex: http://192.169.1.11",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "saveError": "Une erreur est survenue lors de la création de l'appareil."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT.",
