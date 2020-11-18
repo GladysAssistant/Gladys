@@ -15,6 +15,10 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
 async function command(message, classification, context) {
   try {
     const devices = await this.getLightsInRoom(context.room);
+    if (devices.length === 0) {
+      this.messageManager.replyByIntent(message, 'light.not-found', context);
+      return;
+    }
     switch (classification.intent) {
       case 'light.turn-on':
         // foreach devices in room

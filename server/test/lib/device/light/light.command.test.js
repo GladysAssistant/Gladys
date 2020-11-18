@@ -65,4 +65,15 @@ describe('Light.command', () => {
     assert.calledWith(messageManager.replyByIntent, message, 'light.turn-off.success', context);
     assert.called(testService.device.setValue);
   });
+  it('should fail to send a command because no device in this room', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, messageManager, stateManager, service);
+    // Mock getLightsInRoom to answer no devices
+    deviceManager.lightManager.getLightsInRoom = () =>
+      new Promise((resolve) => {
+        resolve([]);
+      });
+    await deviceManager.lightManager.command(message, { intent: 'light.turn-off' }, context);
+    assert.calledWith(messageManager.replyByIntent, message, 'light.not-found', context);
+  });
 });
