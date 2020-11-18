@@ -1989,6 +1989,57 @@
       "_id": 38,
       "id": 38,
       "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 200,
+        "hue": 10000,
+        "sat": 100,
+        "effect": "none",
+        "xy": [0.472, 0.2135],
+        "ct": 388,
+        "alert": "none",
+        "colormode": "hs",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2019-01-30T17:56:29"
+      },
+      "type": "Extended color light",
+      "name": "Color 1",
+      "modelid": "RB 285 C",
+      "manufacturername": "innr",
+      "productname": "Extended color light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {
+            "colorgamuttype": "other",
+            "colorgamut": [[0.7, 0.3], [0.11, 0.82], [0.12, 0.08]],
+            "ct": {
+              "min": 153,
+              "max": 555
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "mixed",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:15:8d:00:02:ff:ef:7f-01",
+        "swversion": "2.0"
+      },
+      "_id": 39,
+      "id": 39,
+      "mappedColorGamut": "other"
     }
   ]
 }

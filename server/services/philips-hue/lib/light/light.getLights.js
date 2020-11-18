@@ -44,6 +44,7 @@ async function getLights() {
         case 'LCT003': // Hue White and Color Ambiance Spot GU10
         case 'LCL001': // Hue Lightstrip Plus
         case 'LCS001': // Hue Lily Outdoor Spot Light RGBCCT
+        case 'RB 285 C': // Innr RGBW Bulb Colour E27
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation
