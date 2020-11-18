@@ -1871,6 +1871,65 @@
       },
       "_id": 37,
       "id": 37
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "hue": 41435,
+        "sat": 77,
+        "effect": "none",
+        "xy": [0.3129, 0.3291],
+        "ct": 153,
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-11-14T14:03:44"
+      },
+      "type": "Extended color light",
+      "name": "Chambre",
+      "modelid": "440400982841",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue Play",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 100,
+            "maxlumen": 560,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "hueplay",
+          "function": "decorative",
+          "direction": "upwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:5d:3a:85-0b",
+        "swversion": "1.56.7_r29434",
+        "swconfigid": "630AD3B2",
+        "productid": "3241-3127-7871_HC04_PSG03"
+      },
+      "_id": 38,
+      "id": 38,
+      "mappedColorGamut": "C"
     }
   ]
 }

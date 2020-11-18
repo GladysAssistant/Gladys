@@ -34,6 +34,7 @@ async function getLights() {
         case 'LCT015': // hue white & color 4th generation
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
+        case '440400982841': // Hue White and Color Ambiance Play Light Bar
         case 'LCT010': // Hue A19 White & Color w/ Richer Colors
         case 'LCA001': // Hue color lamp
         case 'GL-C-008': // Non-hue LED Strip
