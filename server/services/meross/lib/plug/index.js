@@ -7,8 +7,9 @@ const setValue = require('./plug.setValue');
  * @description Add ability to control a plug
  * @param {Object} gladys - Gladys instance.
  * @param {Object} client - Third-part client object.
+ * @param {Object} getKey - Callback to get Meross key.
  * @example
- * const merossPlugHandler = new MerossPlugHandler(gladys, client);
+ * const merossPlugHandler = new MerossPlugHandler(gladys, client, function(){return 'key';});
  */
 const MerossPlugHandler = function MerossPlugHandler(gladys, client, getKey) {
   this.client = client;

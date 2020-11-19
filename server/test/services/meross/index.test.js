@@ -11,11 +11,10 @@ const MerossService = proxyquire('../../../services/meross/index', {
 const gladys = {
   variable: {
     getValue: () => fake.resolves(1),
-  }
+  },
 };
 
 describe('MerossService', () => {
-
   const service = MerossService();
   it('should have start function', () => {
     expect(service)
@@ -65,7 +64,7 @@ describe('MerossService.device', () => {
     external_id: 'example:1',
     type: 'binary',
   };
-  
+
   it('should turnOn the device', async () => {
     await service.device.turnOn(device, deviceFeature);
   });

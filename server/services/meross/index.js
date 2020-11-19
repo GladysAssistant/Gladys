@@ -7,7 +7,7 @@ const MEROSS_KEY = 'MEROSS_KEY';
 
 module.exports = function MerossService(gladys, serviceId) {
   const axios = require('axios');
-  var merossKey;
+  let merossKey;
 
   // @ts-ignore: TS doesn't know about the axios.create function
   const client = axios.create({
@@ -40,7 +40,7 @@ module.exports = function MerossService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    device: new MerossPlugHandler(gladys, client, function(){
+    device: new MerossPlugHandler(gladys, client, function getKey() {
       return merossKey;
     }),
   });
