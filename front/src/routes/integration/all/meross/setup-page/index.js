@@ -13,8 +13,7 @@ class OpenWeatherIntegration extends Component {
 
   render(props, {}) {
     const loading =
-      props.merossSaveKeyStatus === RequestStatus.Getting ||
-      props.merossGetKeyStatus === RequestStatus.Getting;
+      props.merossSaveKeyStatus === RequestStatus.Getting || props.merossGetKeyStatus === RequestStatus.Getting;
     return (
       <MerossPage>
         <SetupPage {...props} loading={loading} />

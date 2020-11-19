@@ -7,7 +7,7 @@ import style from './style.css';
 import MerossDeviceBox from './MerossDeviceBox';
 
 const MerossPage = ({ children, ...props }) => (
-<div class="page">
+  <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">

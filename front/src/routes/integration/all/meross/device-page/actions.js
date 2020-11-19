@@ -2,10 +2,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
-} from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
@@ -40,7 +37,7 @@ function createActions(store) {
         });
       } catch (e) {
         store.setState({
-          getMerossStatus: RequestStatus.Error,
+          getMerossStatus: RequestStatus.Error
           //getMerossStatus: e.message
         });
       }
