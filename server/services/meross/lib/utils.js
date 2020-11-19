@@ -1,11 +1,13 @@
-var md5 = require('md5');
+const md5 = require('md5');
 
 /**
  * Generate Meross payload for toggle request.
  *
- * @param key - MerossKey.
- * @param onoff - On or off (1 or 0).
+ * @description Generate Meross payload for toggle request.
+ * @param {string} key - MerossKey.
+ * @param {number} onoff - On or off (1 or 0).
  * @returns {Object} JSON payload.
+ * @example merossTogglePayload('mykey', 0)
  * */
 function merossTogglePayload(key, onoff) {
   const messageId = `messsage${Date.now()}`;
@@ -14,28 +16,30 @@ function merossTogglePayload(key, onoff) {
   return {
     header: {
       from: '/app/gladys/subscribe',
-      messageId: messageId,
+      messageId,
       method: 'SET',
       namespace: 'Appliance.Control.ToggleX',
       payloadVersion: 1,
-      sign: sign,
-      timestamp: timestamp,
+      sign,
+      timestamp,
       triggerSrc: 'AndroidLocal',
     },
     payload: {
       togglex: {
         channel: 0,
-        onoff: onoff,
+        onoff,
       },
     },
   };
 }
 
 /**
- * Generate Meross payload for statze request.
- *
- * @param key - MerossKey.
+ * Generate Meross payload for state request.
+ * 
+ * @description Generate Meross payload for state request.
+ * @param {string} key - MerossKey.
  * @returns {Object} JSON payload.
+ * @example merossStatePayload('mykey')
  * */
 function merossStatePayload(key) {
   const messageId = `messsage${Date.now()}`;
@@ -44,12 +48,12 @@ function merossStatePayload(key) {
   return {
     header: {
       from: '/app/gladys/subscribe',
-      messageId: messageId,
+      messageId,
       method: 'GET',
       namespace: 'Appliance.System.All',
       payloadVersion: 1,
-      sign: sign,
-      timestamp: timestamp,
+      sign,
+      timestamp,
       triggerSrc: 'AndroidLocal',
     },
     payload: {},

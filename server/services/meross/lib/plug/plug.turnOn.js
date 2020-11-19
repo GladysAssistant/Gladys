@@ -1,5 +1,5 @@
 const { getDeviceParam } = require('../../../../utils/device');
-const { merossTogglePayload } = require('../../utils');
+const { merossTogglePayload } = require('../utils');
 /**
  * @private
  * @description Turn on the plug.
@@ -10,7 +10,7 @@ const { merossTogglePayload } = require('../../utils');
  * turnOn(deviceFeature);
  */
 async function turnOn(device, deviceFeature) {
-  const url = getDeviceParam(device, 'CAMERA_URL');
+  const url = getDeviceParam(device, 'DEVICE_URL');
   return this.client.post(`${url}/config`, merossTogglePayload(this.getKey(), 1));
 }
 

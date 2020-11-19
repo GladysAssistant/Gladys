@@ -23,7 +23,7 @@ function createActions(store) {
 
         // find camera url
         merossDevices.forEach(device => {
-          const deviceUrlParam = device.params.find(param => param.name === 'CAMERA_URL');
+          const deviceUrlParam = device.params.find(param => param.name === 'DEVICE_URL');
           if (deviceUrlParam) {
             device.deviceUrl = deviceUrlParam;
           }
@@ -85,7 +85,7 @@ function createActions(store) {
             external_id: uniqueId,
             service_id: store.getState().currentIntegration.id,
             deviceUrl: {
-              name: 'CAMERA_URL',
+              name: 'DEVICE_URL',
               value: null
             },
             features: [
@@ -104,7 +104,7 @@ function createActions(store) {
             ],
             params: [
               {
-                name: 'CAMERA_URL',
+                name: 'DEVICE_URL',
                 value: null
               }
             ]
@@ -131,7 +131,7 @@ function createActions(store) {
     },
     updateDeviceUrl(state, index, value) {
       const trimmedValue = value && value.trim ? value.trim() : value;
-      let deviceUrlParamIndex = state.merossDevices[index].params.findIndex(param => param.name === 'CAMERA_URL');
+      let deviceUrlParamIndex = state.merossDevices[index].params.findIndex(param => param.name === 'DEVICE_URL');
       const merossDevices = update(state.merossDevices, {
         [index]: {
           deviceUrl: {
