@@ -1,8 +1,13 @@
 const logger = require('../../utils/logger');
 const MerossPlugHandler = require('./lib/plug');
 
-module.exports = function MerossService(gladys) {
+const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
+
+const MEROSS_KEY = 'MEROSS_KEY';
+
+module.exports = function MerossService(gladys, serviceId) {
   const axios = require('axios');
+  var merossKey;
 
   // @ts-ignore: TS doesn't know about the axios.create function
   const client = axios.create({
@@ -16,6 +21,10 @@ module.exports = function MerossService(gladys) {
    */
   async function start() {
     logger.log('starting meross service');
+    merossKey = await gladys.variable.getValue(MEROSS_KEY, serviceId);
+    if (!merossKey) {
+      throw new ServiceNotConfiguredError('Meross not configured');
+    }
   }
 
   /**
@@ -31,6 +40,8 @@ module.exports = function MerossService(gladys) {
   return Object.freeze({
     start,
     stop,
-    device: new MerossPlugHandler(gladys, client),
+    device: new MerossPlugHandler(gladys, client, function(){
+      return merossKey;
+    }),
   });
 };

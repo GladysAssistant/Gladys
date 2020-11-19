@@ -10,9 +10,10 @@ const setValue = require('./plug.setValue');
  * @example
  * const merossPlugHandler = new MerossPlugHandler(gladys, client);
  */
-const MerossPlugHandler = function MerossPlugHandler(gladys, client) {
+const MerossPlugHandler = function MerossPlugHandler(gladys, client, getKey) {
   this.client = client;
   this.gladys = gladys;
+  this.getKey = getKey;
 };
 
 MerossPlugHandler.prototype.turnOn = turnOn;

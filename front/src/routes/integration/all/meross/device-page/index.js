@@ -1,8 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
-import MerossPage from './MerossPage';
-import { RequestStatus } from '../../../../utils/consts';
+import MerossDevicePage from './MerossDevicePage';
+import MerossPage from '../MerossPage';
 
 @connect('user,merossDevices,housesWithRooms,getMerossStatus', actions)
 class MerossIntegration extends Component {
@@ -13,7 +13,11 @@ class MerossIntegration extends Component {
   }
 
   render(props, {}) {
-    return <MerossPage {...props} />;
+    return (
+      <MerossPage>
+        <MerossDevicePage {...props} />
+      </MerossPage>
+    );
   }
 }
 

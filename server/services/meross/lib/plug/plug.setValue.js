@@ -10,7 +10,6 @@ const turnOff = require('./plug.turnOff');
  * setValue(device, deviceFeature, 0);
  */
 function setValue(device, deviceFeature, value) {
-  console.log(device);
   return value ? this.turnOn(device, deviceFeature) : this.turnOff(device, deviceFeature);
 }
 

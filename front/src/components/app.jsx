@@ -57,7 +57,6 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 import TelegramPage from '../routes/integration/all/telegram';
 import CaldavPage from '../routes/integration/all/caldav';
 import OpenWeatherPage from '../routes/integration/all/openweather';
-import MerossPage from '../routes/integration/all/meross';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -69,6 +68,10 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+
+// Meross
+import MerossSetupPage from '../routes/integration/all/meross/setup-page';
+import MerossDevicePage from '../routes/integration/all/meross/device-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -161,7 +164,6 @@ const AppRouter = connect(
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
-        <MerossPage path="/dashboard/integration/device/meross" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
@@ -185,6 +187,10 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+
+        <Redirect path="/dashboard/integration/device/meross" to="/dashboard/integration/device/meross/device" />
+        <MerossSetupPage path="/dashboard/integration/device/meross/setup" />
+        <MerossDevicePage path="/dashboard/integration/device/meross/device" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

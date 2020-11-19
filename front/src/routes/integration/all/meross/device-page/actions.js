@@ -1,13 +1,12 @@
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
 import {
-  DEVICE_POLL_FREQUENCIES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES
-} from '../../../../../../server/utils/constants';
-import createActionsIntegration from '../../../../actions/integration';
+} from '../../../../../../../server/utils/constants';
+import createActionsIntegration from '../../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);

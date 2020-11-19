@@ -527,7 +527,7 @@
       "search": "Chercher un appareil",
       "device": {
         "title": "Appareils Meross dans Gladys",
-        "noDeviceFound": "Aucun appareil Meross trouvé.",
+        "noDeviceFound": "Aucun appareil Meross trouvé."
       },
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
@@ -536,7 +536,14 @@
       "urlPlaceholder": "Ex: http://192.169.1.11",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
-      "saveError": "Une erreur est survenue lors de la création de l'appareil."
+      "deviceTab": "Appareils",
+      "setupTab": "Configuration",
+      "saveError": "Une erreur est survenue lors de la création de l'appareil.",
+      "introduction": "Cette intégration vous permet de contrôle des prises Meross.",
+      "instructions": "Vous devez d'abord récupérer votre clé en utilsant le script suivant : <a href=\"https://github.com/bapirex/meross-api/blob/master/login.py\">https://github.com/bapirex/meross-api/blob/master/login.py</a>",
+      "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
+      "apiKeyPlaceholder": "Entrer la clé API ",
+      "instructionsToUse": "Pour utiliser cette intégration, vous pouvez ajouter des appareils puis les ajouter sur le tableau de bord"
     },
     "mqtt": {
       "title": "MQTT",

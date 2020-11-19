@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import get from 'get-value';
 import cx from 'classnames';
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 
 class MerossDeviceBox extends Component {
   saveDevice = async () => {

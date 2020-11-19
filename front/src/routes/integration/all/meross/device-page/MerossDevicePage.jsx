@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
-import { RequestStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import MerossDeviceBox from './MerossDeviceBox';
 
