@@ -1,11 +1,13 @@
 /**
  * Generate MD5.
- *
- * @see http://www.webtoolkit.info/
- * @param string - String to md5.
- * @returns MD5 result.
- * */
+ * 
+ * @description see http://www.webtoolkit.info
+ * @param {string} string - String to md5.
+ * @returns {string} MD5 result.
+ * @example md5("hello")
+ */
 function md5(string) {
+    /* eslint-disable */
   function RotateLeft(lValue, iShiftBits) {
     return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
   }

@@ -1,8 +1,8 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const MockedClient = require('./mocks.test');
 const { setDeviceParam } = require('../../../utils/setDeviceParam');
-const { fake } = require('sinon');
 
 const MerossService = proxyquire('../../../services/meross/index', {
   axios: MockedClient,
