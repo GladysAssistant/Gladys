@@ -35,7 +35,7 @@ function merossTogglePayload(key, onoff) {
 
 /**
  * Generate Meross payload for state request.
- * 
+ *
  * @description Generate Meross payload for state request.
  * @param {string} key - MerossKey.
  * @returns {Object} JSON payload.
