@@ -2,12 +2,20 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const MockedClient = require('./mocks.test');
 const { setDeviceParam } = require('../../../utils/setDeviceParam');
+const { fake } = require('sinon');
 
 const MerossService = proxyquire('../../../services/meross/index', {
   axios: MockedClient,
 });
 
+const gladys = {
+  variable: {
+    getValue: () => fake.resolves(1),
+  }
+};
+
 describe('MerossService', () => {
+
   const service = MerossService();
   it('should have start function', () => {
     expect(service)
@@ -37,7 +45,7 @@ describe('MerossService', () => {
 });
 
 describe('MerossService lifecycle', () => {
-  const service = MerossService();
+  const service = MerossService(gladys);
   it('should start the service', async () => {
     await service.start();
   });
