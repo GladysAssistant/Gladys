@@ -175,7 +175,8 @@
       "temperature-in-room": "Température de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "chart-devices-in-room": "Appareils de la pièce graphique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -195,6 +196,11 @@
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
+      },
+      "devicesInRoomChart": {
+        "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editChartStyle": "Sélectionnez le type de graphique."
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",

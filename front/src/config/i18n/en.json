@@ -175,7 +175,8 @@
       "temperature-in-room": "Temperature in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "chart-devices-in-room": "Devices in room chart"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -195,6 +196,11 @@
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
+      },
+      "devicesInRoomChart": {
+        "editRoomLabel": "Select the room you want to display here.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display.",
+        "editChartStyle": "Select the type of chart."
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
