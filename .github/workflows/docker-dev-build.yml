@@ -28,7 +28,7 @@ jobs:
       DOCKER_CLI_EXPERIMENTAL: enabled # for 'docker buildx'
       DOCKERHUB_USER:  ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: gladys
+      DOCKERHUB_REPO: gladysassistant/gladys
       DOCKER_PLATFORMS: >
         linux/amd64
         linux/arm/v7
@@ -45,7 +45,7 @@ jobs:
       run: |
           set -vx
           echo "TAG=dev" >> $GITHUB_ENV
-          echo "DOCKER_BASE=${DOCKERHUB_USER}/${DOCKERHUB_REPO}" >> $GITHUB_ENV
+          echo "DOCKER_BASE=${DOCKERHUB_REPO}" >> $GITHUB_ENV
     - name: Install Docker buildx
       run: |
         set -vx
