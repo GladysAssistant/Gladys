@@ -88,11 +88,6 @@ class MerossDeviceBox extends Component {
                     <Text id="integration.meross.saveError" />
                   </div>
                 )}
-                {testConnectionError && (
-                  <div class="alert alert-danger">
-                    <Text id="integration.meross.testConnectionError" />
-                  </div>
-                )}
                 <div class="form-group">
                   <label>
                     <Text id="integration.meross.nameLabel" />
