@@ -13,7 +13,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
  * light.command(message, classification, context);
  */
 async function command(message, classification, context) {
-  let nbLightsAffected = 0;
+  let nbAffectedLights = 0;
   try {
     const devices = await this.getLightsInRoom(context.room);
     switch (classification.intent) {
@@ -29,10 +29,10 @@ async function command(message, classification, context) {
           // and if the binary feature exists, call it
           if (deviceFeature) {
             await this.turnOn(device, deviceFeature);
-            nbLightsAffected += 1;
+            nbAffectedLights += 1;
           }
         });
-        if (nbLightsAffected > 0) {
+        if (nbAffectedLights > 0) {
           this.messageManager.replyByIntent(message, 'light.turn-on.success', context);
         }
         break;
@@ -48,22 +48,22 @@ async function command(message, classification, context) {
           // and if the binary feature exists, call it
           if (deviceFeature) {
             await this.turnOff(device, deviceFeature);
-            nbLightsAffected += 1;
+            nbAffectedLights += 1;
           }
         });
-        if (nbLightsAffected > 0) {
+        if (nbAffectedLights > 0) {
           this.messageManager.replyByIntent(message, 'light.turn-off.success', context);
         }
         break;
       default:
         throw new Error('Not found');
     }
+    if (nbAffectedLights === 0) {
+      this.messageManager.replyByIntent(message, 'light.not-found', context);
+    }
   } catch (e) {
     logger.debug(e);
     this.messageManager.replyByIntent(message, 'light.turn-on.fail', context);
-  }
-  if (nbLightsAffected === 0) {
-    this.messageManager.replyByIntent(message, 'light.not-found', context);
   }
 }
 

@@ -17,12 +17,6 @@ const testServiceBroken = {
   },
 };
 
-const testServiceNoLight = {
-  getDeviceFeature: () => {
-    return null;
-  },
-};
-
 const service = {
   getService: () => testService,
 };
@@ -73,7 +67,18 @@ describe('Light.command', () => {
   });
   it('should fail to send a command because no device with binary feature in this room', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, testServiceNoLight);
+    const deviceManager = new Device(event, messageManager, stateManager, service);
+    // Mock getDeviceFeature to answer no binay feature
+    deviceManager.lightManager.getLightsInRoom = () =>
+      new Promise((resolve) => {
+        resolve([
+          {
+            device: {
+              getDeviceFeature: () => null,
+            },
+          },
+        ]);
+      });
     await deviceManager.lightManager.command(message, { intent: 'light.turn-off' }, context);
     assert.calledWith(messageManager.replyByIntent, message, 'light.not-found', context);
   });
