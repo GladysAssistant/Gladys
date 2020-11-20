@@ -87,7 +87,10 @@ const SignupLayout = ({ children, ...props }) => (
               </div>
             </div>
             <div class="text-center">
-              <MarkupText id="gatewayLinkUser.manageBilling" />
+              <MarkupText id="gatewayLinkUser.manageBilling" />{' '}
+              <a href="#" onClick={props.openStripeBilling}>
+                <Text id="gatewayLinkUser.here" />
+              </a>
             </div>
           </div>
         </div>
