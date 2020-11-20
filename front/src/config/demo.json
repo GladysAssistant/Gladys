@@ -184,7 +184,32 @@
       "latitude": 12,
       "longitude": 12,
       "language": "en"
-    }
+    },
+    "hours": [
+      {
+        "temperature": 27.9,
+        "humidity": 0.99,
+        "pressure": 1005.09,
+        "datetime": "2019-05-09T04:27:57.000Z",
+        "units": "metric",
+        "wind_speed": 1.96,
+        "wind_direction": 1.96,
+        "weather": "rain"
+      }
+    ],
+    "days": [
+      {
+        "temperature_min": 20.9,
+        "temperature_max": 27.9,
+        "humidity": 0.99,
+        "pressure": 1005.09,
+        "datetime": "2019-05-09T04:27:57.000Z",
+        "units": "metric",
+        "wind_speed": 1.96,
+        "wind_direction": 1.96,
+        "weather": "rain"
+      }
+    ]
   },
   "get /api/v1/room/living-room?expand=temperature": {
     "id": "1c634ff4-0476-4733-a084-b4a43d649c84",

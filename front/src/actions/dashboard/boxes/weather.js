@@ -45,6 +45,7 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
+        weather.weather_icon = translateWeatherToFeIcon(weather.weather);
 
         weather.hours.map(hour => {
           hour.weather_icon = translateWeatherToFeIcon(hour.weather);

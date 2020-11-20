@@ -134,9 +134,9 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-              className={'fe ' + props.weather}
+              className={'fe ' + props.weather_icon}
               style={{
-                fontSize: '60px'
+                fontSize: '50px'
               }}
             />
           </div>
@@ -224,6 +224,7 @@ class WeatherBoxComponent extends Component {
     const houseName = get(weatherObject, 'house.name');
 
     const weather = get(weatherObject, 'weather');
+    const weather_icon = get(weatherObject, 'weather_icon');
 
     let humidity, wind, hoursDisplay, daysDisplay;
     if (displayMode[GetWeatherModes.AdvancedWeather]) {
@@ -284,6 +285,7 @@ class WeatherBoxComponent extends Component {
       <WeatherBox
         {...props}
         weather={weather}
+        weather_icon={weather_icon}
         temperature={temperature}
         units={units}
         boxStatus={boxStatus}
