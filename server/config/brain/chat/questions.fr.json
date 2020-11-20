@@ -1,13 +1,13 @@
 [
   {
     "label": "chat.greeting",
-    "questions": ["Hey!","Salut","Bonjour"],
-    "answers": ["Hey!","Salut","Bonjour, je suis Gladys."]
+    "questions": ["Hey !","Salut","Bonjour"],
+    "answers": ["Hey !","Salut","Bonjour, je suis Gladys."]
   },
   {
     "label": "chat.greeting-gladys",
-    "questions": ["Hey Gladys!", "Salut Gladys","Bonjour Gladys"],
-    "answers": ["Hey, je suis votre assistante domotique!","Bonjour, je suis votre assistante domotique","Salut, je suis votre assistante domotique!"]
+    "questions": ["Hey Gladys !", "Salut Gladys","Bonjour Gladys"],
+    "answers": ["Hey, je suis votre assistante domotique !","Bonjour, je suis votre assistante domotique","Salut, je suis votre assistante domotique!"]
   },
   {
     "label": "chat.i-love-you",
@@ -16,7 +16,7 @@
   },
   {
     "label": "chat.joke",
-    "questions": ["Gladys raconnte moi une blague.", "Gladys est ce que tu connais une blague?","raconte moi une blague."],
-    "answers": ["J'en connais plein, mais je ne suis pas sûre que tu les comprennent!","On ne dit pas enrichi, mais Henry va satisfaire un besoin naturel.","Tu connais la blague du diable? Dommage elle est d’enfer."]
+    "questions": ["Gladys raconte moi une blague.", "Gladys est ce que tu connais une blague ?","Raconte moi une blague."],
+    "answers": ["Tu connais la blague du diable? Dommage elle est d’enfer."]
   }
 ]
