@@ -1176,7 +1176,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
+    "manageBilling": "To manage your billing, click ",
+    "here": "here"
   },
   "editDeviceForm": {
     "noName": "No name",
@@ -1310,17 +1311,6 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "cardTypeLabel": "Type",
-    "cardLastDigitsLabel": "Last 4 digits",
-    "cardExpirationLabel": "Expiration date",
-    "updateInformationTitle": "Update Card Information",
-    "updateInformationDescription": "If your card has expired, or you want to change credit card, you can update here your card information.",
-    "cancelSubscriptionTitle": "Cancel subscription",
-    "cancelSubscriptionError": "Warning: There was an error while trying to cancel your account. Please retry again later.",
-    "cancelSubscriptionSuccess": "Your subscription was successfully canceled!",
-    "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
-    "cancelSubscriptionButton": "Cancel subscription",
-    "accountCancelled": "Your account was canceled on {{date}}",
-    "subscriptionButton": "Subscribe again"
+    "stripeButton": "Edit subscription in Stripe"
   }
 }
