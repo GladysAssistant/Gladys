@@ -34,12 +34,17 @@ async function getLights() {
         case 'LCT015': // hue white & color 4th generation
         case 'LST002': // hue lightstrip indoor 2nd generation
         case 'LCT024': // Hue play 1
+        case '440400982841': // Hue White and Color Ambiance Play Light Bar
         case 'LCT010': // Hue A19 White & Color w/ Richer Colors
         case 'LCA001': // Hue color lamp
         case 'GL-C-008': // Non-hue LED Strip
         case 'CLA60 TW OSRAM': // CLA60 TW OSRAM
         case 'LLC020': // Hue go
         case 'LCT012': // Hue White and Color Ambiance Candle E12
+        case 'LCT003': // Hue White and Color Ambiance Spot GU10
+        case 'LCL001': // Hue Lightstrip Plus
+        case 'LCS001': // Hue Lily Outdoor Spot Light RGBCCT
+        case 'RB 285 C': // Innr RGBW Bulb Colour E27
           lightsToReturn.push(getPhilipsHueColorTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LLC001': // LivingColor lamp 2nd generation
@@ -55,6 +60,7 @@ async function getLights() {
         case 'LWV001': // Hue White Filament Bulb ST64 E27
         case 'TRADFRI bulb E14 W op/ch 400lm': // IKEA white spot
         case 'TRADFRI bulb E27 W opal 1000lm': // IKEA white lamp
+        case 'Classic A60 W clear - LIGHTIFY': // OSRAM Classic A60 W clear - LIGHTIFY
           lightsToReturn.push(getPhilipsHueWhiteLight(philipsHueLight, serialNumber, this.serviceId));
           break;
         case 'LTW012': // Hue White Ambiance E12
@@ -65,6 +71,7 @@ async function getLights() {
         case 'LTA001': // Hue White E27 with Bluetooth
           lightsToReturn.push(getPhilipsHueWhiteTemperatureLight(philipsHueLight, serialNumber, this.serviceId));
           break;
+        case 'LOM001': // Hue Smart Plug On/Off
         case 'LOM002': // Hue Smart Plug On/Off
         case 'SP 120': // Innr Smart Plug On/Off
         case 'Plug 01': // OSRAM Plug

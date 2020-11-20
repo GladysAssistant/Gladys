@@ -1201,7 +1201,8 @@
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",
-    "manageBilling": "Pour gérer votre facturation, cliquez "
+    "manageBilling": "Pour gérer votre facturation, cliquez ",
+    "here": "ici"
   },
   "editDeviceForm": {
     "noName": "Pas de nom",
@@ -1343,17 +1344,6 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
-    "cardTypeLabel": "Type",
-    "cardLastDigitsLabel": "4 derniers chiffres",
-    "cardExpirationLabel": "Date d'expiration",
-    "updateInformationTitle": "Mettre à jour les informations de la carte",
-    "updateInformationDescription": "Si votre carte a expirée, ou si vous souhaitez changer de carte de crédit, vous pouvez mettre à jour ici les informations de votre carte.",
-    "cancelSubscriptionTitle": "Annuler l'abonnement",
-    "cancelSubscriptionError": "Avertissement : une erreur s'est produite lors de la tentative d'annulation de votre compte. Veuillez réessayer ultérieurement.",
-    "cancelSubscriptionSuccess": "Votre abonnement a été annulé avec succès !",
-    "cancelSubscriptionDescription": "Si vous souhaitez annuler votre abonnement, cliquez ici :",
-    "cancelSubscriptionButton": "Annuler l'abonnement",
-    "accountCancelled": "Votre abonnement a été annulé le {{date}}",
-    "subscriptionButton": "S'abonner à nouveau"
+    "stripeButton": "Gérer la facturation dans Stripe"
   }
 }
