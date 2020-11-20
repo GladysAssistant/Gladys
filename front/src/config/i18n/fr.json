@@ -1176,7 +1176,8 @@
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",
-    "manageBilling": "Pour gérer votre facturation, cliquez "
+    "manageBilling": "Pour gérer votre facturation, cliquez ",
+    "here": "ici"
   },
   "editDeviceForm": {
     "noName": "Pas de nom",

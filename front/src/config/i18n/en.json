@@ -1176,7 +1176,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
+    "manageBilling": "To manage your billing, click ",
+    "here": "here"
   },
   "editDeviceForm": {
     "noName": "No name",
