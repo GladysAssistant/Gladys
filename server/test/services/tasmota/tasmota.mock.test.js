@@ -9,6 +9,6 @@ const TasmotaHandler = function TasmotaHandler(gladys, serviceId) {
 
 TasmotaHandler.prototype.connect = fake.returns(null);
 TasmotaHandler.prototype.disconnect = fake.returns(null);
-TasmotaHandler.prototype.handleMqttMessage = fake.returns(null);
+TasmotaHandler.prototype.handleMessage = fake.returns(null);
 
 module.exports = TasmotaHandler;

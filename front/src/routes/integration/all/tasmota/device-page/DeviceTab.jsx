@@ -4,7 +4,6 @@ import cx from 'classnames';
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
-import CheckMqttPanel from '../../mqtt/commons/CheckMqttPanel';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
 
 const DeviceTab = ({ children, ...props }) => (
@@ -38,8 +37,6 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      <CheckMqttPanel />
-
       <div
         class={cx('dimmer', {
           active: props.getTasmotaStatus === RequestStatus.Getting

@@ -414,27 +414,52 @@
       "title": "Tasmota",
       "description": "Contrôler vos appareils Tasmota.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte MQTT",
-      "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
+      "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte HTTP",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
         "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "protocolLabel": "Protocole",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
-        "title": "Découverte des appareils Tasmota sur MQTT",
-        "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
-        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "noDeviceFound": "Aucun appareil Tasmota découvert.",
+        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "documentation": "Documentation Tasmota",
-        "scan": "Scanner"
+        "mqtt": {
+          "title": "Découverte des appareils Tasmota sur MQTT",
+          "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
+          "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Tasmota en HTTP",
+          "singleModeButton": "Recherche par IP",
+          "rangeModeButton": "Recherche par plage d'IP",
+          "singleAddressLabel": "Adresse IP ou nom sur le réseau :",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "De :",
+          "lastAddressLabel": "A :",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Rechercher",
+          "usernameLabel": "Nom d'utilisateur",
+          "passwordLabel": "Mot de passe",
+          "needAuthenticationAlert": "L'apparail est protégé par nom d'utilisateur et mot de passe.",
+          "authenticateButton": "Se connecter et analyser",
+          "authError": "Nom d'utilisateur ou mot de passe incorrects."
+        }
       },
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "roomLabel": "Pièce",
-      "topicLabel": "Topic (%topic% Tasmota MQTT)",
+      "protocolLabels": {
+        "mqtt": "Topic MQTT",
+        "http": "Adresse HTTP"
+      },
       "saveButton": "Sauvegarder",
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
@@ -1184,7 +1209,8 @@
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",
-    "manageBilling": "Pour gérer votre facturation, cliquez "
+    "manageBilling": "Pour gérer votre facturation, cliquez ",
+    "here": "ici"
   },
   "editDeviceForm": {
     "noName": "Pas de nom",
@@ -1206,7 +1232,15 @@
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
-    "notFound": "Appareil recherché introuvable."
+    "notFound": "Appareil recherché introuvable.",
+    "pollFrequency": {
+      "label": "Fréquence de rafraîchissement",
+      "everyMinutes": "Toutes les minutes (recommandé)",
+      "every30Seconds": "Toutes les 30 secondes",
+      "every10Seconds": "Toutes les 10 secondes",
+      "every2Seconds": "Toutes les 2 secondes",
+      "every1Seconds": "Chaque seconde"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -1318,17 +1352,6 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
-    "cardTypeLabel": "Type",
-    "cardLastDigitsLabel": "4 derniers chiffres",
-    "cardExpirationLabel": "Date d'expiration",
-    "updateInformationTitle": "Mettre à jour les informations de la carte",
-    "updateInformationDescription": "Si votre carte a expirée, ou si vous souhaitez changer de carte de crédit, vous pouvez mettre à jour ici les informations de votre carte.",
-    "cancelSubscriptionTitle": "Annuler l'abonnement",
-    "cancelSubscriptionError": "Avertissement : une erreur s'est produite lors de la tentative d'annulation de votre compte. Veuillez réessayer ultérieurement.",
-    "cancelSubscriptionSuccess": "Votre abonnement a été annulé avec succès !",
-    "cancelSubscriptionDescription": "Si vous souhaitez annuler votre abonnement, cliquez ici :",
-    "cancelSubscriptionButton": "Annuler l'abonnement",
-    "accountCancelled": "Votre abonnement a été annulé le {{date}}",
-    "subscriptionButton": "S'abonner à nouveau"
+    "stripeButton": "Gérer la facturation dans Stripe"
   }
 }
