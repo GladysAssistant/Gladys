@@ -23,6 +23,7 @@ class GatewaySession {
     this.websocketConnected = false;
     this.connected = false;
     this.ready = false;
+    this.gladysGatewayApiUrl = config.gladysGatewayApiUrl;
     this.gatewayClient = new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
       cryptoLib: window.crypto
