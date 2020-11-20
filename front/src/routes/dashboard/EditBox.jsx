@@ -4,7 +4,7 @@ import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditR
 import EditCameraBox from '../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
-import EditDevicesInRoomChart from '../../components/boxs/device-in-room/EditDeviceInRoomChart';
+import EditDevicesInRoomChart from '../../components/boxs/chart-featue/EditDeviceInRoomChart';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {

@@ -4,6 +4,10 @@ import { connect } from 'unistore/preact';
 import Chart from 'react-apexcharts';
 
 import actions from '../../../actions/dashboard/boxes/devicesInRoom';
+
+import lineConfig from './chart-style/lineConfig';
+import areaConfig from './chart-style/areaConfig';
+import barConfig from './chart-style/barConfig';
 /*
 import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
@@ -27,39 +31,33 @@ class DevicesInRoomsChartBox extends Component {
   }
 
   getDeviceFeatures = async () => {
-    /*
-    const options = {
-      chart: {
-        id: "basic-bar"
-      },
-      xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
-      }
-    };
-
-    const series = [
-      {
-        name: "series-1",
-        data: [30, 40, 45, 50, 49, 60, 70, 91]
-      }
-    ];
-
-    await this.setState({ series, options, loading: false });
-    */
     const newSeries = [
       {
         name: 'series-1',
         data: [30, 40, 91, 60, 49, 55, 70, 15]
       }
     ];
-    const newOptions = {
-      chart: {
-        id: 'basic-bar'
-      },
-      xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+    const newOptions = lineConfig.OPTIONS;
+    newOptions.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
+
+    const newSeriesArea = [
+      {
+        name: 'series-1',
+        data: [30, 40, 91, 60, 49, 55, 70, 15]
       }
-    };
+    ];
+    const newOptionsArea = areaConfig.OPTIONS;
+    newOptionsArea.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
+
+    const newSeriesBar = [
+      {
+        name: 'series-1',
+        data: [30, 40, 91, 60, 49, 55, 70, 15]
+      }
+    ];
+    const newOptionsBar = barConfig.OPTIONS;
+    newOptionsBar.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
+
     const newSeries2 = [
       {
         name: 'series-1',
@@ -137,6 +135,10 @@ class DevicesInRoomsChartBox extends Component {
       options: newOptions,
       series2: newSeries2,
       options2: newOptions2,
+      seriesArea: newSeriesArea,
+      optionsArea: newOptionsArea,
+      seriesBar: newSeriesBar,
+      optionsBar: newOptionsBar,
       optionsDonut: newOptionsDonut,
       seriesDonut: newSeriesDonut,
       label: newLabelDonut,
@@ -149,20 +151,14 @@ class DevicesInRoomsChartBox extends Component {
     super(props);
 
     this.state = {
-      options: {
-        chart: {
-          id: 'basic-bar'
-        },
-        xaxis: {}
-      },
-      options2: {
-        chart: {
-          id: 'basic-bar2'
-        },
-        xaxis: {}
-      },
+      options: {},
+      options2: {},
+      optionsArea: {},
+      optionsBar: {},
       series: [],
       series2: [],
+      seriesArea: [],
+      seriesBar: [],
       optionsDonut: {},
       seriesDonut: [],
       label: [],
@@ -183,11 +179,17 @@ class DevicesInRoomsChartBox extends Component {
             <Text id="integration.zwave.network.title" />
           </h3>
         </div>
-        <Chart options={this.state.options} series={this.state.series} type="bar" width="100%" heigth="400px" />
+        <Chart options={this.state.optionsBar} series={this.state.seriesBar} type="bar" width="100%" heigth="400px" />
         <Chart options={this.state.options2} series={this.state.series2} type="bar" width="100%" heigth="400px" />
         <Chart options={this.state.options} series={this.state.series} type="line" width="100%" heigth="400px" />
         <Chart options={this.state.options2} series={this.state.series2} type="line" width="100%" heigth="400px" />
-        <Chart options={this.state.options} series={this.state.series} type="area" width="100%" heigth="400px" />
+        <Chart
+          options={this.state.optionsArea}
+          series={this.state.seriesArea}
+          type="area"
+          width="100%"
+          heigth="400px"
+        />
         <Chart
           options={this.state.optionsDonut}
           series={this.state.seriesDonut}

@@ -3,7 +3,7 @@ import RoomTemperatureBox from '../../components/boxs/room-temperature/RoomTempe
 import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
-import DevicesInRoomsChartBox from '../../components/boxs/device-in-room/DevicesInRoomsChartBox';
+import DevicesInRoomsChartBox from '../../components/boxs/chart-featue/DevicesInRoomsChartBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
