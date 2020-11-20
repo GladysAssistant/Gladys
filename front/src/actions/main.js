@@ -56,12 +56,15 @@ function createActions(store) {
       } catch (e) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.data.error');
+        const gatewayErrorMessage = get(e, 'response.data.error_message');
         if (status === 401 || status === 403) {
           state.session.reset();
           route('/login');
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
+          route('/link-gateway-user');
+        } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND') {
           route('/link-gateway-user');
         } else {
           console.log(e);
