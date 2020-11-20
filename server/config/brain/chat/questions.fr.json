@@ -17,6 +17,6 @@
   {
     "label": "chat.joke",
     "questions": ["Gladys raconte moi une blague.", "Gladys est ce que tu connais une blague ?","Raconte moi une blague."],
-    "answers": ["Tu connais la blague du diable? Dommage elle est d’enfer."]
+    "answers": ["Tu connais la blague du diable? Dommage elle est d’enfer.","L’autre jour, j’ai raconté une blague à mes vêtements. Ils étaient pliés !","Qui s’occupe de la décoration à l’Elysée ? Le ministère de l’intérieur."]
   }
 ]
