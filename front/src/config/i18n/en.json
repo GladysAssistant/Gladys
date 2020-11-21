@@ -176,7 +176,8 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart-devices-in-room": "Devices in room chart"
+      "chart-one-feature": "Chart 1 feature",
+      "chart-multi-feature": "Chart multi feature"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -197,10 +198,17 @@
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
       },
-      "devicesInRoomChart": {
+      "devicesChart": {
+        "editChartNamePlaceHolder": "Chart title",
         "editRoomLabel": "Select the room you want to display here.",
         "editDeviceFeaturesLabel": "Select the devices you want to display.",
-        "editChartStyle": "Select the type of chart."
+        "editChartType": "Select the type of chart.",
+        "editChartPeriod": "Select the default period displayed.",
+        "editChartDeviceClass": "Choose subset of devices:",
+        "editChartClass": {
+          "no": "No estriction",
+          "room": "Linked to a room"
+        }
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -219,6 +227,23 @@
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box"
+      }
+    },
+    "chart": {
+      "type": {
+        "name": {
+          "line": "Curve",
+          "area": "Area",
+          "bar": "Column"
+        }
+      }
+    },
+    "period": {
+      "label": {
+        "last1day": "Last 24 hours",
+        "last1week": "Last 1 week",
+        "last1month": "Last 1 month",
+        "last1year": "Last 1 year"
       }
     }
   },

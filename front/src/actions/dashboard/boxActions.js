@@ -67,6 +67,20 @@ function createActions(store) {
         }
       });
       store.setState(newState);
+    },
+    removeBoxConfig(state, x, y, data) {
+      const newState = update(state, {
+        homeDashboard: {
+          boxes: {
+            [x]: {
+              [y]: {
+                $unset: data
+              }
+            }
+          }
+        }
+      });
+      store.setState(newState);
     }
   };
   return actions;

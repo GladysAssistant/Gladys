@@ -412,7 +412,8 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
-  DEVICES_IN_ROOM_CHART: 'chart-devices-in-room',
+  CHART_ONE_FEATURE: 'chart-one-feature',
+  CHART_MULTI_FEATURE: 'chart-multi-feature',
 };
 
 const ERROR_MESSAGES = {

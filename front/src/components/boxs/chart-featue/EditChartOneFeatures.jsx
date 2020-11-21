@@ -1,25 +1,25 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
-import ChartSelector from './ChartSelector';
+import ChartTypeSelector from './ChartTypeSelector';
+import ChartPeriodSelector from './ChartPeriodSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-import actions from '../../../actions/dashboard/edit-boxes/editDevicesInRoomChart';
+import actions from '../../../actions/dashboard/edit-boxes/editChartMultiFeatures';
 
 @connect('httpClient', actions)
-class EditDeviceInRoomChart extends Component {
-  updateBoxChart = chart => {
-    this.props.updateBoxChart(this.props.x, this.props.y, chart.selector);
+class EditChartMultiFeatures extends Component {
+  updateBoxChartType = chartType => {
+    this.props.updateBoxChartType(this.props.x, this.props.y, chartType.value);
   };
 
-  updateBoxRoom = room => {
-    this.props.updateBoxRoom(this.props.x, this.props.y, room.selector);
-    this.updateDeviceFeatures([]);
+  updateBoxChartPeriod = chartPeriod => {
+    this.props.updateBoxChartPeriod(this.props.x, this.props.y, chartPeriod.value);
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
@@ -32,14 +32,13 @@ class EditDeviceInRoomChart extends Component {
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
-      console.log(this.props.box.chartType);
 
-      // we get the rooms with the devices
-      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}?expand=devices`);
+      let devices = await this.props.httpClient.get(`/api/v1/device`);
+      
+
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
-
-      room.devices.forEach(device => {
+      devices.forEach(device => {
         const roomDeviceFeatures = [];
         device.features.forEach(feature => {
           const featureOption = {
@@ -81,34 +80,33 @@ class EditDeviceInRoomChart extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room) {
+    if (prevProps.box.room !== this.props.box.room || prevProps.box.chartLimitClass !== this.props.box.chartLimitClass) {
       this.getDeviceFeatures();
     }
   }
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart-devices-in-room">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart-multi-feature">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devicesInRoomChart.editChartStyle" />
+                <Text id="dashboard.boxes.devicesChart.editChartType" />
               </label>
-              {props.box.chartType}
-              <ChartSelector selectedChartType={props.box.chartType} updateChartSelection={this.updateBoxChart} />
+              <ChartTypeSelector selectedChartType={props.box.chartType} updateChartTypeSelection={this.updateBoxChartType} />
             </div>
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devicesInRoomChart.editRoomLabel" />
-              </label>
-              <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
+                <Text id="dashboard.boxes.devicesChart.editChartPeriod" />
+              </label> 
+              <ChartPeriodSelector selectedChartPeriod={props.box.chartPeriod} updateChartPeriodSelection={this.updateBoxChartPeriod} />
             </div>
-            {deviceOptions && props.box.room && (
+            {deviceOptions && (
               <div class="form-group">
                 <label>
-                  <Text id="dashboard.boxes.devicesInRoomChart.editDeviceFeaturesLabel" />
+                  <Text id="dashboard.boxes.devicesChart.editDeviceFeaturesLabel" />
                 </label>
                 <Select
                   defaultValue={[]}
@@ -126,4 +124,4 @@ class EditDeviceInRoomChart extends Component {
   }
 }
 
-export default EditDeviceInRoomChart;
+export default EditChartMultiFeatures;

@@ -4,7 +4,8 @@ import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditR
 import EditCameraBox from '../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
-import EditDevicesInRoomChart from '../../components/boxs/chart-featue/EditDeviceInRoomChart';
+import EditChartOneFeatures from '../../components/boxs/chart-featue/EditChartOneFeatures';
+import EditChartMultiFeatures from '../../components/boxs/chart-featue/EditChartMultiFeatures';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -18,8 +19,10 @@ const Box = ({ children, ...props }) => {
       return <EditRoomTemperatureBox {...props} />;
     case 'devices-in-room':
       return <EditDevicesInRoom {...props} />;
-    case 'chart-devices-in-room':
-      return <EditDevicesInRoomChart {...props} />;
+    case 'chart-one-feature':
+      return <EditChartOneFeatures {...props} />;
+    case 'chart-multi-feature':
+      return <EditChartMultiFeatures {...props} />;
   }
 };
 

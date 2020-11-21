@@ -14,7 +14,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 */
 
 @connect('session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom', actions)
-class DevicesInRoomsChartBox extends Component {
+class ChartMultiFeaturesBox extends Component {
   generateData(baseval, count, yrange) {
     let i = 0;
     const series = [];
@@ -210,4 +210,4 @@ class DevicesInRoomsChartBox extends Component {
   }
 }
 
-export default DevicesInRoomsChartBox;
+export default ChartMultiFeaturesBox;
