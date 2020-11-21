@@ -172,11 +172,6 @@ class UserPresenceComponent extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
   }
 
-  componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
-  }
-
   componentDidUpdate(previousProps) {
     const usersChanged = get(previousProps, 'box.users') !== get(this.props, 'box.users');
     if (usersChanged) {

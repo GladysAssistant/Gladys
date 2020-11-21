@@ -20,7 +20,7 @@ class Chat extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.MESSAGE.SENT, this.syncChatMessage);
   }
 
-  render({ }, { }) {
+  render({}, {}) {
     return <ChatPage />;
   }
 }
