@@ -365,7 +365,7 @@
     },
     "tpLink": {
       "title": "TP Link",
-      "description": "Control TP Link lights and plugs.",
+      "description": "Control TP Link Bulbs and Plugs.",
       "deviceTab": "Devices",
       "device": {
         "title": "Devices in Gladys",
@@ -379,8 +379,8 @@
         "scanButton": "Scan network",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "noDevices": "No TP Link plugs device added yet.",
-        "noDevicesFound": "No devices found. Make sure you have connected one TP Link Plug to your wifi.",
+        "noDevices": "No TP Link device added yet.",
+        "noDevicesFound": "No devices found. Make sure you have connected one TP Link Device (Bulb/Plug) to your wifi.",
         "deviceOnNetworkTitle": "Devices detected on network",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "createGithubIssue": "Suggest this device"

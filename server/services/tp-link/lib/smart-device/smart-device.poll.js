@@ -66,8 +66,8 @@ async function poll(device) {
   const deviceIp = internalDevice.params.find((p) => p.name === TP_LINK_IP_ADDRESS).value;
   const tpLinkDevice = await this.client.getDevice({ host: deviceIp });
   const deviceSysInfo = await tpLinkDevice.getSysInfo();
-
-  switch (deviceSysInfo.type) {
+  const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
+  switch (type) {
     case 'IOT.SMARTPLUGSWITCH':
     case 'IOT.RANGEEXTENDER.SMARTPLUG':
       pollAndCompareStateForPlug(this, device, deviceSysInfo, deviceId);

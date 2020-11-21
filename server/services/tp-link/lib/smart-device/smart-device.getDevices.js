@@ -1,8 +1,17 @@
-const Promise = require('bluebird');
-
 const { getTpLinkPlug } = require('../models/plug');
 const { getTpLinkBulb } = require('../models/bulb');
 const { getTpLinkDevice } = require('../models/device');
+
+/**
+ * @description Remove duplicates by external_id from array.
+ * @param {Array} devices - Array to transform.
+ * @returns {Array} Array of unique devices.
+ * @example
+ * unibById(devices);
+ */
+function unibById(devices) {
+  return devices.filter((v, i, a) => a.findIndex((t) => t.external_id === v.external_id) === i);
+}
 
 /**
  * @description Get all devices.
@@ -15,7 +24,8 @@ async function getDevices() {
 
   this.client.startDiscovery({ discoveryTimeout: 1900 }).on('device-online', (device) => {
     device.getSysInfo().then((deviceSysInfo) => {
-      switch (deviceSysInfo.type) {
+      const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
+      switch (type) {
         case 'IOT.SMARTPLUGSWITCH':
         case 'IOT.RANGEEXTENDER.SMARTPLUG':
           devicesToReturn.push(getTpLinkPlug(device, deviceSysInfo, this.serviceId));
@@ -30,7 +40,7 @@ async function getDevices() {
   });
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(devicesToReturn);
+      resolve(unibById(devicesToReturn));
     }, 2000);
   });
 }

@@ -2,7 +2,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 const { TP_LINK_EXTERNAL_ID_BASE, TP_LINK_IP_ADDRESS, TP_LINK_SERIAL_NUMBER } = require('../../utils/consts');
 
-const getTpLinkPlug = (device, deviceSysInfo, serviceId) => ({
+const getTpLinkDevice = (device, deviceSysInfo, serviceId) => ({
   name: deviceSysInfo.alias,
   service_id: serviceId,
   external_id: `${TP_LINK_EXTERNAL_ID_BASE}:${deviceSysInfo.deviceId}`,
@@ -26,5 +26,5 @@ const getTpLinkPlug = (device, deviceSysInfo, serviceId) => ({
 });
 
 module.exports = {
-  getTpLinkPlug,
+  getTpLinkDevice,
 };

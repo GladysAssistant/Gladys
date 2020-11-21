@@ -3,7 +3,7 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const { TP_LINK_ON, TP_LINK_OFF, TP_LINK_IP_ADDRESS } = require('../../utils/consts');
 
 /**
- * @description Change value of a TP Link Plug
+ * @description Change value of a TP Link Device
  * @param {Object} device - The device to control.
  * @param {Object} deviceFeature - The device feature to control.
  * @param {string|number} value - The new value.
@@ -12,7 +12,7 @@ const { TP_LINK_ON, TP_LINK_OFF, TP_LINK_IP_ADDRESS } = require('../../utils/con
  * setValue(device, value);
  */
 async function setValue(device, deviceFeature, value) {
-  logger.debug(`Changing state of plug ${device} with value = ${value}`);
+  logger.debug(`Changing state of device ${device} with value = ${value}`);
   const devices = await this.gladys.device.get({ service: 'tp-link' });
   const internalDevice = devices.find((d) => d.external_id === device.external_id);
   if (!internalDevice) {
