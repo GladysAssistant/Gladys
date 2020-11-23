@@ -874,7 +874,7 @@
   },
   "servicesSettings": {
     "title": "Services",
-    "selector": "Selector: {{key}}",
+    "selector": "Internal name: {{key}}",
     "integrationLinkTitle": "Go to integration page",
     "status": {
       "title": "Status",
@@ -900,15 +900,15 @@
       },
       "NOT_CONFIGURED": {
         "title": "Not configured",
-        "detail": "Service might not be well configured"
+        "detail": "Service is not configured"
       },
       "ERROR": {
         "title": "Error",
-        "detail": "Service failed to start, please check logs"
+        "detail": "Service failed to start."
       },
       "LOADING": {
         "title": "Error",
-        "detail": "Service failed to start, please check logs"
+        "detail": "Service failed to start."
       }
     },
     "action": "Action"

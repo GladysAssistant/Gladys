@@ -874,7 +874,7 @@
   },
   "servicesSettings": {
     "title": "Services",
-    "selector": "Sélecteur : {{key}}",
+    "selector": "Nom interne : {{key}}",
     "integrationLinkTitle": "Aller à la page de l'intégration",
     "status": {
       "title": "Status",
@@ -896,19 +896,19 @@
       },
       "STOPPED": {
         "title": "Arrêté",
-        "detail": "Service arrêté par un utilsateur"
+        "detail": "Service arrêté par un utilisateur"
       },
       "NOT_CONFIGURED": {
-        "title": "Mal configuré",
-        "detail": "Service probablement mal configuré"
+        "title": "Non configuré",
+        "detail": "Service non configuré"
       },
       "ERROR": {
-        "title": "Erreur",
-        "detail": "Service impossible a démarrer, consultez les logs"
+        "title": "En erreur",
+        "detail": "Service en erreur lors du démarrage."
       },
       "LOADING": {
-        "title": "Erreur",
-        "detail": "Service impossible a démarrer, consultez les logs"
+        "title": "En erreur",
+        "detail": "Service en erreur lors du démarrage."
       }
     },
     "action": "Action"
