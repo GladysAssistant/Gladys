@@ -1,32 +1,25 @@
+const WEATHER_OW_TO_GLADYS = {
+  Thunderstorm: 'thunderstorm',
+  Drizzle: 'drizzle',
+  Rain: 'rain',
+  Snow: 'snow',
+  Mist: 'fog',
+  Fog: 'fog',
+  Clear: 'clear',
+  Clouds: 'cloud',
+};
+
 /**
  * @description Transform OpenWeather weather information to gladys weather information.
- * @param {string} weather - OpenWeather weather information.
+ * @param {string} weatherInformation - OpenWeather weather information.
  * @returns {Object} Return gladys weather information.
  * @example
  * const weather = translateIconToWeather(weather);
  */
-
 const translateWeatherOWToGladys = (weatherInformation) => {
-  if (weatherInformation.main.search('Snow') !== -1) {
-    return 'snow';
-  }
-  if (weatherInformation.main.search('Rain') !== -1) {
-    return 'rain';
-  }
-  if (weatherInformation.main.search('Clear') !== -1) {
-    return 'clear';
-  }
-  if (weatherInformation.main.search('Clouds') !== -1) {
-    return 'cloud';
-  }
-  if (weatherInformation.main.search('Mist') !== -1) {
-    return 'fog';
-  }
-  if (weatherInformation.main.search('Thunderstorm') !== -1) {
-    return 'thunderstorm';
-  }
-  if (weatherInformation.main.search('Drizzle') !== -1) {
-    return 'drizzle';
+  // Docs: https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+  if (weatherInformation.main in WEATHER_OW_TO_GLADYS) {
+    return WEATHER_OW_TO_GLADYS[weatherInformation.main];
   }
   return 'unknown';
 };

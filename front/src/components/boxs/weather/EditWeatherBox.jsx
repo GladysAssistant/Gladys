@@ -34,15 +34,18 @@ const EditWeatherBox = ({ children, ...props }) => (
           const mode = GetWeatherModes[key];
           const label = 'dashboard.boxes.weather.displayModes.' + mode;
           return (
-            <label>
+            <div className="form-check">
               <input
                 type="checkbox"
+                className="form-check-input"
                 name={mode}
                 checked={props.box.modes !== undefined && props.box.modes[mode]}
                 onChange={props.updateBoxModes}
               />
-              &nbsp; <Text id={label} />
-            </label>
+              <label className="form-check-label">
+                <Text id={label} />
+              </label>
+            </div>
           );
         })}
       </div>

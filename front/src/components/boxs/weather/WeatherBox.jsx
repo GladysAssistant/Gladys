@@ -160,7 +160,7 @@ const WeatherBox = ({ children, ...props }) => (
                 <Text id="global.percent" />
               </span>
             </span>
-            <span style={{ float: 'right' }}>
+            <span className="float-right">
               <i
                 class="fe fe-wind"
                 style={{

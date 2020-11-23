@@ -6,33 +6,18 @@ import get from 'get-value';
 
 const BOX_KEY = 'Weather';
 
-const translateWeatherToFeIcon = weather => {
-  if (weather === 'snow') {
-    return 'fe-cloud-snow';
-  }
-  if (weather === 'rain') {
-    return 'fe-cloud-rain';
-  }
-  if (weather === 'clear') {
-    return 'fe-sun';
-  }
-  if (weather === 'cloud') {
-    return 'fe-cloud';
-  }
-  if (weather === 'fog') {
-    return 'fe-cloud';
-  }
-  if (weather === 'sleet') {
-    return 'fe-cloud-drizzle';
-  }
-  if (weather === 'wind') {
-    return 'fe-wind';
-  }
-  if (weather === 'night') {
-    return 'fe-moon';
-  }
-  return 'fe-question';
+const WEATHER_ICONS = {
+  snow: 'fe-cloud-snow',
+  rain: 'fe-cloud-rain',
+  clear: 'fe-sun',
+  cloud: 'fe-cloud',
+  fog: 'fe-cloud',
+  sleet: 'fe-cloud-drizzle',
+  wind: 'fe-wind',
+  night: 'fe-moon'
 };
+
+const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
