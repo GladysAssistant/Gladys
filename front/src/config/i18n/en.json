@@ -852,6 +852,7 @@
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
+    "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Users",
     "gatewayOpenApiTab": "Open API"
@@ -870,6 +871,47 @@
     "revoke": "Revoke",
     "unknowDevice": "Unknow device",
     "apiKey": "API Key"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Internal name: {{key}}",
+    "integrationLinkTitle": "Go to integration page",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Unknown",
+        "detail": "Service not found"
+      },
+      "DISABLED": {
+        "title": "Disabled",
+        "detail": "Service disabled"
+      },
+      "ENABLED": {
+        "title": "Enabled",
+        "detail": "Service enabled"
+      },
+      "RUNNING": {
+        "title": "Running",
+        "detail": "Service running"
+      },
+      "STOPPED": {
+        "title": "Stopped",
+        "detail": "Service stopped by user"
+      },
+      "NOT_CONFIGURED": {
+        "title": "Not configured",
+        "detail": "Service is not configured"
+      },
+      "ERROR": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      },
+      "LOADING": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
