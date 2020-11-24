@@ -17,7 +17,7 @@ module.exports = function TPLinkController(tpLinkSmartDeviceHandler) {
    * @apiGroup TPLink
    */
   async function turnOn(req, res) {
-    tpLinkSmartDeviceHandler.setValue(req.params.device_id, 1);
+    await tpLinkSmartDeviceHandler.setValue(req.params.device_id, 1);
     res.json({
       success: true,
     });
@@ -29,7 +29,7 @@ module.exports = function TPLinkController(tpLinkSmartDeviceHandler) {
    * @apiGroup TPLink
    */
   async function turnOff(req, res) {
-    tpLinkSmartDeviceHandler.setValue(req.params.device_id, 0);
+    await tpLinkSmartDeviceHandler.setValue(req.params.device_id, 0);
     res.json({
       success: true,
     });

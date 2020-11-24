@@ -1,6 +1,6 @@
 const logger = require('../../utils/logger');
 const TPLinkSmartDevicetHandler = require('./lib/smart-device');
-const TPLinkController = require('./api/tplink.controller');
+const TPLinkController = require('./api/tp-link.controller');
 
 module.exports = function TpLinkService(gladys, serviceId) {
   // require the tplink-smarthome-api module
@@ -15,7 +15,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
    * gladys.services['tplink'].start();
    */
   async function start() {
-    logger.log('starting TP Link service');
+    logger.log('starting TP-Link service');
   }
 
   /**
@@ -25,7 +25,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
    *  gladys.services['tplink'].stop();
    */
   async function stop() {
-    logger.log('stopping TP Link service');
+    logger.log('stopping TP-Link service');
   }
 
   return Object.freeze({

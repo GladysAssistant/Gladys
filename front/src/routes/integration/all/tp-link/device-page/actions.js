@@ -94,7 +94,7 @@ function createActions(store) {
       store.setState(newState);
     },
     async deleteDevice(state, device, index) {
-      await state.httpClient.delete('/api/v1/device/' + device.selector);
+      await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         tpLinkDevices: {
           $splice: [[index, 1]]

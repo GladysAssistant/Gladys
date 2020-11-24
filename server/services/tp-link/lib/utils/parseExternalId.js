@@ -6,8 +6,8 @@
  * parseExternalId('tp-link-plug:1');
  */
 function parseExternalId(externalId) {
-  const parsedExternalId = externalId.split('-');
-  const deviceId = parsedExternalId[2];
+  const parsedExternalId = externalId.split(':');
+  const deviceId = parsedExternalId[1];
   return deviceId;
 }
 

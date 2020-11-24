@@ -1,13 +1,13 @@
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { TP_LINK_EXTERNAL_ID_BASE, TP_LINK_IP_ADDRESS } = require('../../utils/consts');
+const { TP_LINK_EXTERNAL_ID_BASE, TP_LINK_IP_ADDRESS } = require('../utils/consts');
 
 const logger = require('../../../../utils/logger');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const { parseExternalId } = require('../../utils/parseExternalId');
+const { parseExternalId } = require('../utils/parseExternalId');
 const { getDeviceFeature } = require('../../../../utils/device');
 
 /**
- * @description Poll value of a TP Link Plug and emit event if necessary
+ * @description Poll value of a TP-Link Plug and emit event if necessary
  * @param {Object} self - This.
  * @param {Object} device - Device.
  * @param {Object} deviceSysInfo - Device Sys Info to get relay_state.
@@ -19,16 +19,16 @@ function pollAndCompareStateForPlug(self, device, deviceSysInfo, deviceId) {
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY);
   const newState = deviceSysInfo.relay_state;
   if (binaryFeature && binaryFeature.last_value !== newState) {
-    logger.debug(`Polling TP Link Plug ${deviceId}, new value = ${newState}`);
+    logger.debug(`Polling TP-Link Plug ${deviceId}, new value = ${newState}`);
     self.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: `${TP_LINK_EXTERNAL_ID_BASE}-${deviceId}-${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
+      device_feature_external_id: `${TP_LINK_EXTERNAL_ID_BASE}:${deviceId}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
       state: newState,
     });
   }
 }
 
 /**
- * @description Poll value of a TP Link Bulb and emit event if necessary
+ * @description Poll value of a TP-Link Bulb and emit event if necessary
  * @param {Object} self - This.
  * @param {Object} device - Device.
  * @param {Object} deviceSysInfo - Device Sys Info to get light_state.
@@ -40,16 +40,16 @@ function pollAndCompareStateForBulb(self, device, deviceSysInfo, deviceId) {
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
   const newState = deviceSysInfo.light_state.on_off;
   if (binaryFeature && binaryFeature.last_value !== newState) {
-    logger.debug(`Polling TP Link Bulb ${deviceId}, new value = ${newState}`);
+    logger.debug(`Polling TP-Link Bulb ${deviceId}, new value = ${newState}`);
     self.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: `${TP_LINK_EXTERNAL_ID_BASE}-${deviceId}-${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
+      device_feature_external_id: `${TP_LINK_EXTERNAL_ID_BASE}:${deviceId}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
       state: newState,
     });
   }
 }
 
 /**
- * @description Poll value of a TP Link Device
+ * @description Poll value of a TP-Link Device
  * @param {Object} device - The device to control.
  * @returns {Promise} Promise.
  * @example
@@ -76,7 +76,8 @@ async function poll(device) {
       pollAndCompareStateForBulb(this, device, deviceSysInfo, deviceId);
       break;
     default:
-      logger.error(`Polling TP Link Device ${deviceId} - not managed`);
+      logger.error(`Polling TP-Link Device ${deviceId} - not managed`);
+      throw new NotFoundError(`TP_LINK_DEVICE_NOT_MANAGED`);
   }
 }
 

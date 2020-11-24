@@ -1,9 +1,9 @@
 const logger = require('../../../../utils/logger');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const { TP_LINK_ON, TP_LINK_OFF, TP_LINK_IP_ADDRESS } = require('../../utils/consts');
+const { TP_LINK_ON, TP_LINK_OFF, TP_LINK_IP_ADDRESS } = require('../utils/consts');
 
 /**
- * @description Change value of a TP Link Device
+ * @description Change value of a TP-Link Device
  * @param {Object} device - The device to control.
  * @param {Object} deviceFeature - The device feature to control.
  * @param {string|number} value - The new value.
@@ -32,7 +32,8 @@ async function setValue(device, deviceFeature, value) {
       tpLinkDevice.setPowerState(state);
       break;
     default:
-      logger.error(`Trying to set Value for a not managed TP Link Device ${device.external_id}`);
+      logger.error(`Trying to set Value for a not managed TP-Link Device ${device.external_id}`);
+      throw new NotFoundError(`TP_LINK_FEATURE_NOT_MANAGED`);
   }
 }
 

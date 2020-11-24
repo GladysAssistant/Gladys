@@ -7,9 +7,9 @@ const { getTpLinkDevice } = require('../models/device');
  * @param {Array} devices - Array to transform.
  * @returns {Array} Array of unique devices.
  * @example
- * unibById(devices);
+ * uniqById(devices);
  */
-function unibById(devices) {
+function uniqById(devices) {
   return devices.filter((v, i, a) => a.findIndex((t) => t.external_id === v.external_id) === i);
 }
 
@@ -22,7 +22,7 @@ function unibById(devices) {
 async function getDevices() {
   const devicesToReturn = [];
 
-  this.client.startDiscovery({ discoveryTimeout: 1900 }).on('device-online', (device) => {
+  this.client.startDiscovery({ discoveryTimeout: 1900, discoveryInterval: 800 }).on('device-online', (device) => {
     device.getSysInfo().then((deviceSysInfo) => {
       const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
       switch (type) {
@@ -40,7 +40,7 @@ async function getDevices() {
   });
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(unibById(devicesToReturn));
+      resolve(uniqById(devicesToReturn));
     }, 2000);
   });
 }
