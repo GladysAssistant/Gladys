@@ -680,6 +680,20 @@
         "notConnected": "Aucun serveur Domoticz connecté.",
         "connectedWithSuccess": "Le serveur Domoticz version {{version}} est connecté.",
         "connectionFailed": "La connection avec le serveur Domoticz a échoué. Merci de vérifier les informations."
+      },
+      "device": {
+        "title": "Appareils Domoticz",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil Domoticz n'a encore été ajouté.",
+        "nameLabel": "Nom",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Pas de fonctionnalités",
+        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
+        "noValueReceived": "Aucune valeur reçue.",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer"
       }
     }
   },

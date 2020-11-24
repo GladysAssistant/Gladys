@@ -572,6 +572,20 @@
         "notConnected": "No domoticz server connected.",
         "connectedWithSuccess": "The Domoticz server version {{version}} is connected.",
         "connectionFailed": "Connection with the Domoticz server has failed. Please verify information below."
+      },
+      "device": {
+        "title": "Domoticz devices",
+        "search": "Look for a device",
+        "noDevices": "No Domoticz device added yet.",
+        "nameLabel": "Name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "mostRecentValueAt": "Last received value at {{mostRecentValueAt}}.",
+        "noValueReceived": "No received value.",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit"
       }
     },
     "caldav": {
