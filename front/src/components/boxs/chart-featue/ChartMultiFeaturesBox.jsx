@@ -2,209 +2,122 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Chart from 'react-apexcharts';
+// import ReactApexCharts from 'react-apexcharts';
 
-import actions from '../../../actions/dashboard/boxes/devicesInRoom';
+import { DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
+import get from 'get-value';
 
-import lineConfig from './chart-style/lineConfig';
-import areaConfig from './chart-style/areaConfig';
-import barConfig from './chart-style/barConfig';
-/*
-import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
-*/
+import actions from '../../../actions/dashboard/boxes/chart';
 
-@connect('session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom', actions)
+import chartConfig from '../../../actions/dashboard/boxes/chart-box-config/chartConfig';
+
+@connect('session,user,DashboardBoxDataChartBox,DashboardBoxStatusChartBox', actions)
 class ChartMultiFeaturesBox extends Component {
-  generateData(baseval, count, yrange) {
-    let i = 0;
-    const series = [];
-    while (i < count) {
-      const x = Math.floor(Math.random() * (750 - 1 + 1)) + 1;
-      const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-      const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15;
-
-      series.push([x, y, z]);
-      baseval += 86400000;
-      i++;
-    }
-    return series;
-  }
-
-  getDeviceFeatures = async () => {
-    const newSeries = [
-      {
-        name: 'series-1',
-        data: [30, 40, 91, 60, 49, 55, 70, 15]
-      }
-    ];
-    const newOptions = lineConfig.OPTIONS;
-    newOptions.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
-
-    const newSeriesArea = [
-      {
-        name: 'series-1',
-        data: [30, 40, 91, 60, 49, 55, 70, 15]
-      }
-    ];
-    const newOptionsArea = areaConfig.OPTIONS;
-    newOptionsArea.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
-
-    const newSeriesBar = [
-      {
-        name: 'series-1',
-        data: [30, 40, 91, 60, 49, 55, 70, 15]
-      }
-    ];
-    const newOptionsBar = barConfig.OPTIONS;
-    newOptionsBar.xaxis.categories = [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
-
-    const newSeries2 = [
-      {
-        name: 'series-1',
-        data: [30, 40, 91, 60, 49, 55, 70, 15]
-      },
-      {
-        name: 'series-2',
-        data: [10, 20, 88, 7, 77, 15, 70, 18]
-      }
-    ];
-    const newOptions2 = {
-      chart: {
-        id: 'basic-bar'
-      },
-      xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
-      }
-    };
-
-    const newOptionsDonut = {};
-    const newSeriesDonut = [44, 55, 41, 17, 15];
-    const newLabelDonut = ['A', 'B', 'C', 'D', 'E'];
-
-    const newOptionsBubble = {
-      dataLabels: {
-        enabled: false
-      },
-      fill: {
-        opacity: 0.8
-      },
-      title: {
-        text: 'Simple Bubble Chart'
-      },
-      xaxis: {
-        tickAmount: 12,
-        type: 'category'
-      },
-      yaxis: {
-        max: 70
-      }
-    };
-    const newSeriesBubble = [
-      {
-        name: 'Bubble1',
-        data: this.generateData(new Date('11 Feb 2017 GMT').getTime(), 20, {
-          min: 10,
-          max: 60
-        })
-      },
-      {
-        name: 'Bubble2',
-        data: this.generateData(new Date('11 Feb 2017 GMT').getTime(), 20, {
-          min: 10,
-          max: 60
-        })
-      },
-      {
-        name: 'Bubble3',
-        data: this.generateData(new Date('11 Feb 2017 GMT').getTime(), 20, {
-          min: 10,
-          max: 60
-        })
-      },
-      {
-        name: 'Bubble4',
-        data: this.generateData(new Date('11 Feb 2017 GMT').getTime(), 20, {
-          min: 10,
-          max: 60
-        })
-      }
-    ];
-
-    this.setState({
-      series: newSeries,
-      options: newOptions,
-      series2: newSeries2,
-      options2: newOptions2,
-      seriesArea: newSeriesArea,
-      optionsArea: newOptionsArea,
-      seriesBar: newSeriesBar,
-      optionsBar: newOptionsBar,
-      optionsDonut: newOptionsDonut,
-      seriesDonut: newSeriesDonut,
-      label: newLabelDonut,
-      optionsBubble: newOptionsBubble,
-      seriesBubble: newSeriesBubble
-    });
-  };
-
   constructor(props) {
     super(props);
 
+    console.log('constructor: ' + this.props.box + this.props.x, +this.props.y);
+    let apexType;
+    switch (this.props.box.chartType) {
+      case chartConfig.CHART_TYPE_SELECTOR.LINE.name:
+        apexType = chartConfig.CHART_TYPE_SELECTOR.LINE.apexName;
+        break;
+      case chartConfig.CHART_TYPE_SELECTOR.AREA.name:
+        apexType = chartConfig.CHART_TYPE_SELECTOR.AREA.apexName;
+        break;
+      case chartConfig.CHART_TYPE_SELECTOR.BAR.name:
+        apexType = chartConfig.CHART_TYPE_SELECTOR.BAR.apexName;
+        break;
+      default:
+        apexType = chartConfig.CHART_TYPE_SELECTOR.LINE.apexName;
+    }
+
+    this.props.buildChartOption(this.props.box, this.props.x, this.props.y);
+
+    const boxData = get(this.props, `${DASHBOARD_BOX_DATA_KEY}ChartBox.${this.props.x}_${this.props.y}`);
+
+    console.log('test0: ', boxData);
+    console.log('test1: ', this.props.box);
+
     this.state = {
+      chartData: {},
+      showDropDownChartBox: false,
+      apexType,
       options: {},
-      options2: {},
-      optionsArea: {},
-      optionsBar: {},
-      series: [],
-      series2: [],
-      seriesArea: [],
-      seriesBar: [],
-      optionsDonut: {},
-      seriesDonut: [],
-      label: [],
-      optionsBubble: {},
-      seriesBubble: []
+      series: []
+    };
+  }
+  // TODO mettre le loading
+
+  componentDidMount() {
+    console.log('componentDidMount: ' + this.props.box + this.props.x, +this.props.y);
+    // this.props.buildChartOption(this.props.box, this.props.x, this.props.y);
+
+    const boxData = get(this.props, `${DASHBOARD_BOX_DATA_KEY}ChartBox.${this.props.x}_${this.props.y}`);
+    console.log('test: ', this.props.box);
+    this.state = {
+      options: boxData.options,
+      series: boxData.series
     };
   }
 
-  componentDidMount() {
-    this.getDeviceFeatures();
-  }
+  render(props, { chartData, showDropDownChartBox }) {
+    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}ChartBox.${props.x}_${props.y}`);
+    console.log('boxData: ', boxData);
+    // TODO voir usage box status = dimmer loading ?
+    // const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}ChartBox.${props.x}_${props.y}`);
+    const options = get(boxData, 'options');
+    const series = get(boxData, 'series');
+    const roomName = get(boxData, 'roomName');
+    const deviceName = get(boxData, 'deviceName');
+    console.log('options: ', options);
+    console.log('options2: ', this.state.options);
+    console.log('series: ', series);
+    console.log('apexType: ' + this.state.apexType);
+    console.log('roomName: ' + roomName);
+    console.log('deviceName: ' + deviceName);
 
-  render(props) {
     return (
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">
-            <Text id="integration.zwave.network.title" />
-          </h3>
+          <h3 class="card-title">{props.box.chartName}</h3>
         </div>
-        <Chart options={this.state.optionsBar} series={this.state.seriesBar} type="bar" width="100%" heigth="400px" />
-        <Chart options={this.state.options2} series={this.state.series2} type="bar" width="100%" heigth="400px" />
-        <Chart options={this.state.options} series={this.state.series} type="line" width="100%" heigth="400px" />
-        <Chart options={this.state.options2} series={this.state.series2} type="line" width="100%" heigth="400px" />
-        <Chart
-          options={this.state.optionsArea}
-          series={this.state.seriesArea}
-          type="area"
-          width="100%"
-          heigth="400px"
-        />
-        <Chart
-          options={this.state.optionsDonut}
-          series={this.state.seriesDonut}
-          type="donut"
-          width="100%"
-          heigth="400px"
-        />
-        <Chart options={this.state.options} series={this.state.series} type="radar" width="100%" heigth="400px" />
-        <Chart
-          options={this.state.optionsBubble}
-          series={this.state.seriesBubble}
-          type="bubble"
-          width="100%"
-          heigth="400px"
-        />
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">
+              <Text id="dashboard.boxes.devicesChart.lastValue" />
+            </div>
+            <div class="ml-auto lh-1">
+              <div class={'dropdown ' + (showDropDownChartBox && ' show')}>
+                <a
+                  class={'dropdown-toggle text-muted show ' + (showDropDownChartBox && ' show')}
+                  data-toggle="dropdown"
+                  onClick={props.toggleDropDown}
+                >
+                  <Text id="dashboard.period.label.last1day" />
+                </a>
+                <div class={'dropdown-menu dropdown-menu-right ' + (this.state.showDropDownChartBox && ' show')}>
+                  <a class="dropdown-item active" href="#">
+                    <Text id="dashboard.period.label.last1day" />
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <Text id="dashboard.period.label.last1week" />
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <Text id="dashboard.period.label.last1month" />
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <Text id="dashboard.period.label.last1year" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-baseline">
+            <div class="h1 mb-3 mr-2">{chartData.lastValue + ' ' + chartData.unit}</div>
+          </div>
+          <Chart options={options} series={series} type={this.state.apexType} class="chart-sm" />
+        </div>
       </div>
     );
   }

@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from 'react-select';
 
-import { CHART_PERIOD } from './chart-box-config/chartConfig';
+import { CHART_PERIOD } from '../../../actions/dashboard/boxes/chart-box-config/chartConfig';
 
 @connect('httpClient')
 class ChartPeriodSelector extends Component {
@@ -12,15 +12,14 @@ class ChartPeriodSelector extends Component {
   };
 
   componentWillReceiveProps = newProps => {
-
     const chartOptions = [];
     let selectedChartPeriod;
     CHART_PERIOD.map(currentChartPeriod => {
-      const labelI18N = <Text id={currentChartPeriod.label} />; 
-      const tmpOption ={
+      const labelI18N = <Text id={currentChartPeriod.label} />;
+      const tmpOption = {
         label: labelI18N,
         value: currentChartPeriod.value
-      }
+      };
       chartOptions.push(tmpOption);
       if (newProps.selectedChartPeriod === currentChartPeriod.value) {
         selectedChartPeriod = tmpOption;

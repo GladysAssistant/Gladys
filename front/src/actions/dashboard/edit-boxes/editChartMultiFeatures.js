@@ -25,11 +25,11 @@ function createActions(store) {
       });
     },
     updateBoxRoom(state, x, y, room) {
-      if(room){
+      if (room) {
         boxActions.updateBoxConfig(state, x, y, {
           room
         });
-      }else{
+      } else {
         boxActions.removeBoxConfig(state, x, y, ['room']);
       }
     },

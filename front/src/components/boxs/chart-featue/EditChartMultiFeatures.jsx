@@ -28,14 +28,14 @@ class EditChartMultiFeatures extends Component {
 
   updateBoxChartLimitClass = async chartLimitClass => {
     const chartLimitClassValue = chartLimitClass.target.value;
-    const roomDiv = document.getElementById('room-div-'+this.props.x+'-'+this.props.y);
-    if( chartLimitClassValue === 'no-limit' ){
+    const roomDiv = document.getElementById('room-div-' + this.props.x + '-' + this.props.y);
+    if (chartLimitClassValue === 'no-limit') {
       this.props.updateBoxRoom(this.props.x, this.props.y, null);
       roomDiv.hidden = true;
-    } else if( chartLimitClassValue === 'room-limit' ){
-      roomDiv.hidden = false; 
+    } else if (chartLimitClassValue === 'room-limit') {
+      roomDiv.hidden = false;
       const houses = await this.props.httpClient.get(`/api/v1/house?expand=rooms`);
-      if(houses && houses.length>0 && houses[0].rooms && houses[0].rooms.length>0){
+      if (houses && houses.length > 0 && houses[0].rooms && houses[0].rooms.length > 0) {
         this.props.updateBoxRoom(this.props.x, this.props.y, houses[0].rooms[0].selector);
       }
     }
@@ -60,7 +60,7 @@ class EditChartMultiFeatures extends Component {
       this.setState({ loading: true });
 
       let devices;
-      if( this.props.box.chartLimitClass === 'room-limit' ){
+      if (this.props.box.chartLimitClass === 'room-limit') {
         // we get the rooms with the devices
         const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}?expand=devices`);
         devices = room.devices;
@@ -110,17 +110,20 @@ class EditChartMultiFeatures extends Component {
 
   componentDidMount() {
     this.getDeviceFeatures();
-    const roomDiv = document.getElementById('room-div-'+this.props.x+'-'+this.props.y);
-    if(!this.props.box.chartLimitClass || this.props.box.chartLimitClass === 'no-limit'){
+    const roomDiv = document.getElementById('room-div-' + this.props.x + '-' + this.props.y);
+    if (!this.props.box.chartLimitClass || this.props.box.chartLimitClass === 'no-limit') {
       this.props.box.chartLimitClass = 'no-limit';
       roomDiv.hidden = true;
-    }else if(this.props.chartLimitClass === 'room-limit'){
+    } else if (this.props.chartLimitClass === 'room-limit') {
       roomDiv.hidden = false;
-    } 
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room || prevProps.box.chartLimitClass !== this.props.box.chartLimitClass) {
+    if (
+      prevProps.box.room !== this.props.box.room ||
+      prevProps.box.chartLimitClass !== this.props.box.chartLimitClass
+    ) {
       this.getDeviceFeatures();
     }
   }
@@ -146,46 +149,52 @@ class EditChartMultiFeatures extends Component {
               <label>
                 <Text id="dashboard.boxes.devicesChart.editChartType" />
               </label>
-              <ChartTypeSelector selectedChartType={props.box.chartType} updateChartTypeSelection={this.updateBoxChartType} />
+              <ChartTypeSelector
+                selectedChartType={props.box.chartType}
+                updateChartTypeSelection={this.updateBoxChartType}
+              />
             </div>
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.devicesChart.editChartPeriod" />
-              </label> 
-              <ChartPeriodSelector selectedChartPeriod={props.box.chartPeriod} updateChartPeriodSelection={this.updateBoxChartPeriod} />
+              </label>
+              <ChartPeriodSelector
+                selectedChartPeriod={props.box.chartPeriod}
+                updateChartPeriodSelection={this.updateBoxChartPeriod}
+              />
             </div>
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.devicesChart.editChartDeviceClass" />
               </label>
               <label class="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    class="custom-control-input"
-                    name={'chart-limitclass-radio-'+props.x+'-'+props.y}
-                    onChange={this.updateBoxChartLimitClass}
-                    value="no-limit"
-                    checked={props.box.chartLimitClass === 'no-limit'}
-                  />
+                <input
+                  type="radio"
+                  class="custom-control-input"
+                  name={'chart-limitclass-radio-' + props.x + '-' + props.y}
+                  onChange={this.updateBoxChartLimitClass}
+                  value="no-limit"
+                  checked={props.box.chartLimitClass === 'no-limit'}
+                />
                 <div class="custom-control-label">
                   <Text id="dashboard.boxes.devicesChart.editChartClass.no" />
                 </div>
               </label>
               <label class="custom-control custom-radio">
                 <input
-                    type="radio"
-                    class="custom-control-input"
-                    name={'chart-limitclass-radio-'+props.x+'-'+props.y}
-                    onChange={this.updateBoxChartLimitClass}
-                    value="room-limit"
-                    checked={props.box.chartLimitClass === 'room-limit'}
-                  />
+                  type="radio"
+                  class="custom-control-input"
+                  name={'chart-limitclass-radio-' + props.x + '-' + props.y}
+                  onChange={this.updateBoxChartLimitClass}
+                  value="room-limit"
+                  checked={props.box.chartLimitClass === 'room-limit'}
+                />
                 <div class="custom-control-label">
                   <Text id="dashboard.boxes.devicesChart.editChartClass.room" />
                 </div>
               </label>
             </div>
-            <div class="form-group" id={'room-div-'+props.x+'-'+props.y} >
+            <div class="form-group" id={'room-div-' + props.x + '-' + props.y}>
               <label>
                 <Text id="dashboard.boxes.devicesChart.editRoomLabel" />
               </label>

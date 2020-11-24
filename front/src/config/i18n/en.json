@@ -205,8 +205,9 @@
         "editChartType": "Select the type of chart.",
         "editChartPeriod": "Select the default period displayed.",
         "editChartDeviceClass": "Choose subset of devices:",
+        "lastValue": "Last Value:",
         "editChartClass": {
-          "no": "No estriction",
+          "no": "No restriction",
           "room": "Linked to a room"
         }
       },

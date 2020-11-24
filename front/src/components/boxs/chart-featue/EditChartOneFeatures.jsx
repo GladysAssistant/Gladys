@@ -1,10 +1,9 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
 import BaseEditBox from '../baseEditBox';
-import RoomSelector from '../../house/RoomSelector';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartPeriodSelector from './ChartPeriodSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
@@ -23,8 +22,8 @@ class EditChartMultiFeatures extends Component {
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
-    selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
-    const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
+    selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || {};
+    const deviceFeatures = [selectedDeviceFeaturesOptions.value];
     this.props.updateBoxDeviceFeatures(this.props.x, this.props.y, deviceFeatures);
     this.setState({ selectedDeviceFeaturesOptions });
   };
@@ -34,7 +33,6 @@ class EditChartMultiFeatures extends Component {
       this.setState({ loading: true });
 
       let devices = await this.props.httpClient.get(`/api/v1/device`);
-      
 
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
@@ -80,7 +78,10 @@ class EditChartMultiFeatures extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room || prevProps.box.chartLimitClass !== this.props.box.chartLimitClass) {
+    if (
+      prevProps.box.room !== this.props.box.room ||
+      prevProps.box.chartLimitClass !== this.props.box.chartLimitClass
+    ) {
       this.getDeviceFeatures();
     }
   }
@@ -95,13 +96,19 @@ class EditChartMultiFeatures extends Component {
               <label>
                 <Text id="dashboard.boxes.devicesChart.editChartType" />
               </label>
-              <ChartTypeSelector selectedChartType={props.box.chartType} updateChartTypeSelection={this.updateBoxChartType} />
+              <ChartTypeSelector
+                selectedChartType={props.box.chartType}
+                updateChartTypeSelection={this.updateBoxChartType}
+              />
             </div>
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.devicesChart.editChartPeriod" />
-              </label> 
-              <ChartPeriodSelector selectedChartPeriod={props.box.chartPeriod} updateChartPeriodSelection={this.updateBoxChartPeriod} />
+              </label>
+              <ChartPeriodSelector
+                selectedChartPeriod={props.box.chartPeriod}
+                updateChartPeriodSelection={this.updateBoxChartPeriod}
+              />
             </div>
             {deviceOptions && (
               <div class="form-group">
@@ -109,9 +116,7 @@ class EditChartMultiFeatures extends Component {
                   <Text id="dashboard.boxes.devicesChart.editDeviceFeaturesLabel" />
                 </label>
                 <Select
-                  defaultValue={[]}
                   value={selectedDeviceFeaturesOptions}
-                  isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
                 />

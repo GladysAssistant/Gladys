@@ -205,6 +205,7 @@
         "editChartType": "Sélectionnez le type de graphique.",
         "editChartPeriod": "Sélectionnez la période par défaut affichée.",
         "editChartDeviceClass": "Choisisser un sous ensemble d'appareils:",
+        "lastValue": "Dernière valeur:",
         "editChartClass": {
           "no": "Sans restriction",
           "room": "Lié à une pièce"
