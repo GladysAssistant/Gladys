@@ -26,19 +26,30 @@ const TasmotaPage = ({ children, user }) => (
                   </Link>
 
                   <Link
-                    href="/dashboard/integration/device/tasmota/discover"
+                    href="/dashboard/integration/device/tasmota/mqtt"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-radio" />
                     </span>
-                    <Text id="integration.tasmota.discoverTab" />
+                    <Text id="integration.tasmota.mqttDiscoverTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/integration/device/tasmota/http"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-globe" />
+                    </span>
+                    <Text id="integration.tasmota.httpDiscoverTab" />
                   </Link>
 
                   <DeviceConfigurationLink
                     user={user}
-                    documentKey="sonoff"
+                    documentKey="tasmota"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">

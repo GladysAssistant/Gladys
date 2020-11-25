@@ -3,23 +3,30 @@ import { connect } from 'unistore/preact';
 import GatewayBilling from './GatewayBilling';
 import SettingsLayout from '../SettingsLayout';
 import actions from '../../../actions/gateway';
-import { RequestStatus } from '../../../utils/consts';
 
-@connect(
-  'stripeCard,savingBillingError,paymentInProgress,cancelMonthlySubscriptionSuccess,cancelMonthlySubscriptionError,reSubscribeMonthlyPlanError,stripeLoaded,billingRequestStatus',
-  actions
-)
+@connect('session', actions)
 class SettingsBilling extends Component {
+  getSetupState = async () => {
+    await this.setState({ loading: true });
+    const setupState = await this.props.session.gatewayClient.getSetupState();
+    this.setState({
+      setupState,
+      loading: false
+    });
+  };
+  openStripeBilling = async () => {
+    window.open(
+      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
+    );
+  };
   componentWillMount() {
-    this.props.refreshCard();
-    this.props.loadStripe();
+    this.getSetupState();
   }
 
-  render(props, {}) {
-    const loading = props.billingRequestStatus === RequestStatus.Getting;
+  render(props, { setupState, loading }) {
     return (
       <SettingsLayout>
-        <GatewayBilling {...props} loading={loading} />
+        <GatewayBilling openStripeBilling={this.openStripeBilling} loading={loading} />
       </SettingsLayout>
     );
   }

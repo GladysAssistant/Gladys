@@ -755,7 +755,7 @@
     {
       "name": "Switch",
       "external_id": "tasmota:sonoff-basic",
-      "selector": "sonoff-basic",
+      "selector": "tasmota-sonoff-basic",
       "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
       "model": "sonoff-basic",
       "features": [
@@ -764,9 +764,27 @@
           "type": "binary"
         }
       ]
+    },
+    {
+      "name": "Switch",
+      "external_id": "tasmota:192.168.1.1",
+      "selector": "tasmota-192-168-1-1",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443e",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ]
     }
   ],
-  "get /api/v1/device/sonoff-basic": {
+  "get /api/v1/device/tasmota-sonoff-basic": {
     "name": "Switch",
     "external_id": "tasmota:sonoff-basic",
     "selector": "sonoff-basic",
@@ -780,7 +798,21 @@
       }
     ]
   },
-  "get /api/v1/service/tasmota/discover": [
+  "get /api/v1/device/tasmota-192-168-1-1": {
+    "name": "Switch",
+    "external_id": "tasmota:sonoff-basic",
+    "selector": "sonoff-basic",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "model": "sonoff-basic",
+    "features": [
+      {
+        "category": "switch",
+        "type": "binary",
+        "name": "Switch"
+      }
+    ]
+  },
+  "get /api/v1/service/tasmota/discover/mqtt": [
     {
       "name": "Sonoff Basic Kitchen",
       "external_id": "tasmota:sonoff-basic",
@@ -814,6 +846,80 @@
         {
           "category": "switch",
           "type": "binary"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/tasmota/discover/http": [
+    {
+      "name": "Sonoff Basic Kitchen",
+      "external_id": "tasmota:192.168.1.1",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "model": "sonoff-basic",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ]
+    },
+    {
+      "name": "Sonoff Pow Kitchen",
+      "external_id": "tasmota:192.168.1.2",
+      "model": "sonoff-pow",
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ]
+    },
+    {
+      "name": "Sonoff Mini Outside",
+      "external_id": "tasmota:192.168.1.3",
+      "model": "sonoff-basic",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updatable": true,
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ]
+    },
+    {
+      "name": "192.168.1.3",
+      "external_id": "tasmota:192.168.1.3",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "needAuthentication": true,
+      "features": [
+        {
+          "category": "switch",
+          "type": "binary"
+        }
+      ],
+      "params": [
+        {
+          "name": "protocol",
+          "value": "http"
         }
       ]
     }
@@ -933,6 +1039,173 @@
       "state": "running",
       "id": "9e5f09775f897624deb1eb2ec8688c1b300d81bc3727fc71ae3290d3d8f71fa9",
       "created_at": 1561506899
+    }
+  ],
+  "get /api/v1/service": [
+    {
+      "id": "27c96cfe-98ce-437b-a83f-5b13e0605203",
+      "pod_id": null,
+      "name": "example",
+      "selector": "example",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "LOADING",
+      "created_at": "2020-04-11T18:41:40.051Z",
+      "updated_at": "2020-10-18T10:13:22.365Z"
+    },
+    {
+      "id": "40262062-2e71-412c-8da0-70bd03f03b90",
+      "pod_id": null,
+      "name": "philips-hue",
+      "selector": "philips-hue",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-11T18:41:40.052Z",
+      "updated_at": "2020-10-30T07:44:07.731Z"
+    },
+    {
+      "id": "4cd73c14-a929-4af0-a5e2-baed35802224",
+      "pod_id": null,
+      "name": "rtsp-camera",
+      "selector": "rtsp-camera",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-11T18:41:40.053Z",
+      "updated_at": "2020-10-30T07:44:07.694Z"
+    },
+    {
+      "id": "0c27de72-ced7-4f7f-8950-473b9e904e71",
+      "pod_id": null,
+      "name": "telegram",
+      "selector": "telegram",
+      "version": "0.1.0",
+      "has_message_feature": true,
+      "status": "NOT_CONFIGURED",
+      "created_at": "2020-04-11T18:41:40.053Z",
+      "updated_at": "2020-10-30T07:44:07.518Z"
+    },
+    {
+      "id": "09a3e250-940a-4f52-8595-e6268ffd7198",
+      "pod_id": null,
+      "name": "usb",
+      "selector": "usb",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-11T18:41:40.053Z",
+      "updated_at": "2020-10-30T07:44:07.660Z"
+    },
+    {
+      "id": "8070fb7c-908f-426a-bbbf-12dce1f27549",
+      "pod_id": null,
+      "name": "darksky",
+      "selector": "darksky",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "UNKNOWN",
+      "created_at": "2020-04-11T18:41:40.054Z",
+      "updated_at": "2020-04-11T18:41:40.054Z"
+    },
+    {
+      "id": "366fd9d7-bfbf-4c13-bd8c-4cc777799142",
+      "pod_id": null,
+      "name": "xiaomi",
+      "selector": "xiaomi",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-11T18:41:40.055Z",
+      "updated_at": "2020-10-30T07:44:07.474Z"
+    },
+    {
+      "id": "3772bbf5-b1d7-441f-9bd4-ef94920e31cd",
+      "pod_id": null,
+      "name": "zwave",
+      "selector": "zwave",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "NOT_CONFIGURED",
+      "created_at": "2020-04-11T18:41:40.056Z",
+      "updated_at": "2020-10-30T07:44:07.594Z"
+    },
+    {
+      "id": "7355bc7f-4109-40ba-819f-fb03f91969b0",
+      "pod_id": null,
+      "name": "tasmota",
+      "selector": "tasmota",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-11T18:41:40.056Z",
+      "updated_at": "2020-10-30T07:44:07.627Z"
+    },
+    {
+      "id": "2e0bc58b-11e2-4176-8ad3-9ebc8cdd2318",
+      "pod_id": null,
+      "name": "mqtt",
+      "selector": "mqtt",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "ERROR",
+      "created_at": "2020-04-11T18:41:40.057Z",
+      "updated_at": "2020-10-30T07:44:07.785Z"
+    },
+    {
+      "id": "d97ba3fa-872f-4ecc-879f-46c55a2930c6",
+      "pod_id": null,
+      "name": "google-actions",
+      "selector": "google-actions",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "UNKNOWN",
+      "created_at": "2020-04-11T18:41:40.111Z",
+      "updated_at": "2020-04-11T18:41:40.111Z"
+    },
+    {
+      "id": "6d3c7a63-e4b8-4650-bcd3-50cf42b2996f",
+      "pod_id": null,
+      "name": "caldav",
+      "selector": "caldav",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-04-16T19:38:21.885Z",
+      "updated_at": "2020-10-30T07:44:07.558Z"
+    },
+    {
+      "id": "39a278e9-66da-47cb-bdaa-264ba6418091",
+      "pod_id": null,
+      "name": "openweather",
+      "selector": "openweather",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "NOT_CONFIGURED",
+      "created_at": "2020-08-19T13:04:57.309Z",
+      "updated_at": "2020-10-30T07:44:07.814Z"
+    },
+    {
+      "id": "9682e167-e07f-4823-bd31-a60f957842e0",
+      "pod_id": null,
+      "name": "broadlink",
+      "selector": "broadlink",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "UNKNOWN",
+      "created_at": "2020-08-30T15:55:19.467Z",
+      "updated_at": "2020-08-30T15:55:19.467Z"
+    },
+    {
+      "id": "d6ea610f-1e33-4c08-89a3-1c8be2cc45f9",
+      "pod_id": null,
+      "name": "bluetooth",
+      "selector": "bluetooth",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "LOADING",
+      "created_at": "2020-09-02T12:35:32.763Z",
+      "updated_at": "2020-10-18T09:28:14.935Z"
     }
   ],
   "get /api/v1/session": [
@@ -1354,12 +1627,13 @@
     }
   },
   "get /api/v1/service/bluetooth/status": {
-    "bluetoothStatus": "ready"
+    "running": true
   },
   "get /api/v1/service/bluetooth/peripheral": [
     {
       "name": "BLE Device 1",
       "external_id": "bluetooth:0011223341",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
       "selector": "bluetooth-0011223341",
       "params": [
         {
@@ -1387,6 +1661,10 @@
     {
       "name": "Peanut temperature",
       "external_id": "bluetooth:0011223343",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996278",
+      "service": {
+        "name": "peanut"
+      },
       "selector": "bluetooth-0011223343",
       "params": [
         {
