@@ -261,9 +261,11 @@ describe('CalDAV formaters', () => {
   });
 
   it('should format events', () => {
+    const clock = sinon.useFakeTimers(new Date('2020-05-01T00:00:00Z').getTime());
     const formattedEvents = formatter.formatEvents(events, {
       id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
     });
+    clock.restore();
     expect(formattedEvents).to.eql(expectedEvents);
   });
 

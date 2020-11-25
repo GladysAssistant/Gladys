@@ -98,6 +98,17 @@ const DashboardSettings = ({ children, ...props }) => (
                   </Link>
 
                   <Link
+                    href="/dashboard/settings/service"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-grid" />
+                    </span>
+                    <Text id="settings.serviceTab" />
+                  </Link>
+
+                  <Link
                     href="/dashboard/settings/system"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"

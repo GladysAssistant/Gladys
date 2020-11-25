@@ -20,6 +20,17 @@ const SESSION_TOKEN_TYPES = {
   API_KEY: 'api_key',
 };
 
+const SERVICE_STATUS = {
+  UNKNOWN: 'UNKNOWN',
+  ENABLED: 'ENABLED',
+  DISABLED: 'DISABLED',
+  LOADING: 'LOADING',
+  RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
+  ERROR: 'ERROR',
+  NOT_CONFIGURED: 'NOT_CONFIGURED',
+};
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
@@ -192,10 +203,6 @@ const ACTIONS = {
   TIME: {
     DELAY: 'delay',
   },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
-  },
   SCENE: {
     START: 'scene.start',
   },
@@ -269,6 +276,7 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
+    POWERHOUR: 'power-hour',
     ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
@@ -313,6 +321,7 @@ const DEVICE_FEATURE_UNITS = {
   PERCENT: 'percent',
   PASCAL: 'pascal',
   LUX: 'lux',
+  WATT: 'watt',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
@@ -383,7 +392,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'xiaomi.new-device',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
+  },
+  BLUETOOTH: {
+    STATE: 'bluetooth.status',
+    DISCOVER: 'bluetooth.discover',
   },
 };
 
@@ -467,6 +481,9 @@ module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 
 module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
+
+module.exports.SERVICE_STATUS = SERVICE_STATUS;
+module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 

@@ -26,7 +26,7 @@ Gladys is a home assistant who helps you in your everyday life.
 
 Like a kind of **JARVIS**!
 
-Gladys is connected to all your devices in your home. She is connected to your calendars and tons of API to help you.
+Gladys is connected to all your devices in your home. She is connected to your calendars and tons of other APIs to help you.
 
 But let's pick an example:
 
@@ -35,7 +35,7 @@ But let's pick an example:
 - At 8.30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
 - At 6.30 PM, you are getting back home : Everything is ready when you arrive. You are going to sleep, so you simply put your phone on your nightstand where a NFC tag is sticked. It immediately sends a request to Gladys to tell here you are going to sleep. She starts the "Going to sleep" scenario, and turns off all lights.
 
-This is just a simple scenario, possibilities with Gladys are just endless. Don't hesitate to suggest yours 😉
+This is just a simple scenario, possibilities with Gladys are just endless. Don't hesitate to suggest yours. 😉
 
 ## Getting Started
 
@@ -70,6 +70,8 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/Redshark30"><img src="https://avatars1.githubusercontent.com/u/38568609?v=4" width="100px;" alt=""/><br /><sub><b>Redshark30</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Redshark30" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/guillaumeLamanda"><img src="https://avatars0.githubusercontent.com/u/10440081?v=4" width="100px;" alt=""/><br /><sub><b>Lamanda </b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=guillaumeLamanda" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/link39"><img src="https://avatars0.githubusercontent.com/u/2229692?v=4" width="100px;" alt=""/><br /><sub><b>Thibaut Courvoisier</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=link39" title="Code">💻</a></td>
+    <td align="center"><a href="http://lebarzic.fr"><img src="https://avatars2.githubusercontent.com/u/1555884?v=4" width="100px;" alt=""/><br /><sub><b>Frédéric Le Barzic</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=hotfix31" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/NickDub"><img src="https://avatars1.githubusercontent.com/u/32032645?v=4" width="100px;" alt=""/><br /><sub><b>NickDub</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=NickDub" title="Code">💻</a></td>
   </tr>
 </table>
 

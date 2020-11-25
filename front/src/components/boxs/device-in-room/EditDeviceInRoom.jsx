@@ -32,8 +32,8 @@ class EditDeviceInRoom extends Component {
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
 
-      const roomDeviceFeatures = [];
       room.devices.forEach(device => {
+        const roomDeviceFeatures = [];
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,

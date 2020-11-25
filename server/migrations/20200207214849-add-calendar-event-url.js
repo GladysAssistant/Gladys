@@ -7,7 +7,5 @@ module.exports = {
     ]);
   },
 
-  down: (queryInterface, Sequelize) => {
-    return Promise.all([queryInterface.removeColumn('t_calendar_event', 'url')]);
-  },
+  down: (queryInterface, Sequelize) => {},
 };

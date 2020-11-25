@@ -61,7 +61,12 @@ const Header = ({ ...props }) => {
                     <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
                   </a>
                   <div class="dropdown-divider" />
-                  <a class="dropdown-item" href="https://community.gladysassistant.com/">
+                  <a
+                    class="dropdown-item"
+                    href="https://community.gladysassistant.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
                   </a>
                   <a class="dropdown-item" href="" onClick={props.logout}>

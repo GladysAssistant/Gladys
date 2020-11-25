@@ -1,5 +1,5 @@
 {
-  "plugins": ["jsdoc", "require-jsdoc"],
+  "plugins": ["jsdoc", "require-jsdoc", "no-call"],
   "extends": ["airbnb-base", "plugin:jsdoc/recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": 2018
@@ -121,7 +121,8 @@
     "jsdoc/require-returns-description": 2,
     "jsdoc/require-returns-type": 2,
     "jsdoc/valid-types": 2,
-    "require-jsdoc": 2
+    "require-jsdoc": 2,
+    "no-call/no-call": [2, ["queryInterface.removeColumn", "queryInterface.changeColumn"]]
   },
   "overrides": [
     {

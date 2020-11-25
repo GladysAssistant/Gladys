@@ -103,46 +103,6 @@ describe('scene.executeActions', () => {
       {},
     );
   });
-  it('should execute start service', async () => {
-    const example = {
-      start: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('service', 'example', example);
-    await executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.SERVICE.START,
-            service: 'example',
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(example.start);
-  });
-  it('should execute stop service', async () => {
-    const example = {
-      stop: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('service', 'example', example);
-    await executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.SERVICE.STOP,
-            service: 'example',
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(example.stop);
-  });
   it('should execute sequential actions', async () => {
     const device = {
       setValue: fake.resolves(null),

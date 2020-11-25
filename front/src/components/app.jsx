@@ -20,7 +20,6 @@ import ResetPassword from '../routes/reset-password';
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
-import SubscribeGateway from '../routes/subscribe-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
@@ -47,6 +46,7 @@ import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
 import SettingsSystemPage from '../routes/settings/settings-system';
+import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
@@ -77,7 +77,14 @@ import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 // Tasmota
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
-import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
+import TasmotaMqttDiscoverPage from '../routes/integration/all/tasmota/discover-mqtt';
+import TasmotaHttpDiscoverPage from '../routes/integration/all/tasmota/discover-http';
+
+// Integrations Bluetooth
+import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
+import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
+import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
+import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
 
 // StockExchange integrations
 import StockExchangePage from '../routes/integration/all/stock-exchange';
@@ -117,7 +124,6 @@ const AppRouter = connect(
         )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
-        {config.gatewayMode ? <SubscribeGateway path="/subscribe-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
         ) : (
@@ -152,6 +158,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/music" category="music" />
         <IntegrationPage path="/dashboard/integration/health" category="health" />
         <IntegrationPage path="/dashboard/integration/weather" category="weather" />
+        <IntegrationPage path="/dashboard/integration/service" category="service" />
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
@@ -180,7 +187,13 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
-        <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
+        <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+
+        <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
+        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
+        <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
+        <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
@@ -194,6 +207,7 @@ const AppRouter = connect(
         <SettingsHousePage path="/dashboard/settings/house" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
+        <SettingsServicePage path="/dashboard/settings/service" />
         <SettingsBackup path="/dashboard/settings/backup" />
         <Error type="404" default />
       </Router>
