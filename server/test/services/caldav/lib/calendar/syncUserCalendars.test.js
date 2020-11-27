@@ -160,6 +160,13 @@ describe('CalDAV sync', () => {
         start: new Date('2018-06-08 00:00:00.000 +00:00'),
         location: null,
       },
+      {
+        type: 'VEVENT',
+        uid: '49193db9-f666-4947-8ce6-3357ce3b7166',
+        summary: 'Evenement 1 duplicate to test errors',
+        start: new Date('2018-06-08 00:00:00.000 +00:00'),
+        location: null,
+      },
     ]);
 
     sync.gladys.calendar.getEvents
@@ -172,22 +179,26 @@ describe('CalDAV sync', () => {
         },
       ]);
 
-    sync.gladys.calendar.createEvent.resolves({
-      dataValues: {
-        id: '22396073-3fe6-49a6-bcd7-566281862b02',
-        calendar_id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
-        name: 'Evenement 1',
-        selector: 'evenement-1-2018-06-08',
-        external_id: '49193db9-f666-4947-8ce6-3357ce3b7166',
-        location: null,
-        start: '2018-06-08 00:00:00.000 +00:00',
-        end: '2018-06-09 00:00:00.000 +00:00',
-        url: 'https://caldav.host.com/home/personal/event-1.ics',
-        full_day: '1',
-        created_at: '2020-02-11 21:04:56.090 +00:00',
-        updated_at: '2020-02-11 21:04:56.090 +00:00',
-      },
-    });
+    sync.gladys.calendar.createEvent
+      .onFirstCall()
+      .resolves({
+        dataValues: {
+          id: '22396073-3fe6-49a6-bcd7-566281862b02',
+          calendar_id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
+          name: 'Evenement 1',
+          selector: 'evenement-1-2018-06-08',
+          external_id: '49193db9-f666-4947-8ce6-3357ce3b7166',
+          location: null,
+          start: '2018-06-08 00:00:00.000 +00:00',
+          end: '2018-06-09 00:00:00.000 +00:00',
+          url: 'https://caldav.host.com/home/personal/event-1.ics',
+          full_day: '1',
+          created_at: '2020-02-11 21:04:56.090 +00:00',
+          updated_at: '2020-02-11 21:04:56.090 +00:00',
+        },
+      })
+      .onSecondCall()
+      .rejects('ALREADY_EXIST');
 
     await sync.syncUserCalendars(userId);
 
@@ -198,10 +209,10 @@ describe('CalDAV sync', () => {
     expect(sync.requestEventsData.callCount).to.equal(1);
 
     expect(sync.gladys.calendar.create.callCount).to.equal(1);
-    expect(sync.gladys.calendar.createEvent.callCount).to.equal(1);
+    expect(sync.gladys.calendar.createEvent.callCount).to.equal(2);
     expect(sync.gladys.calendar.get.callCount).to.equal(3);
     expect(sync.gladys.calendar.update.callCount).to.equal(1);
-    expect(sync.gladys.calendar.getEvents.callCount).to.equal(2);
+    expect(sync.gladys.calendar.getEvents.callCount).to.equal(3);
     expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(1);
   });
 
