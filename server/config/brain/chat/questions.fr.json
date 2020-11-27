@@ -57,7 +57,8 @@
       "On fait un pile ou face ?",
       "Gladys, on joue à pile ou face ?",
       "Gladys, on fait un pile ou face ?",
-      "On joue à pile ou face ?"
+      "On joue à pile ou face ?",
+      "Pile ou face"
     ],
     "answers": ["Pile !", "Face !"]
   },
