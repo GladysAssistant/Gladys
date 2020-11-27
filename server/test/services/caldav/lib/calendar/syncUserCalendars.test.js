@@ -26,6 +26,7 @@ describe('CalDAV sync', () => {
         calendar: {
           create: sinon.stub(),
           createEvent: sinon.stub(),
+          updateEvent: sinon.stub(),
           get: sinon.stub(),
           update: sinon.stub().resolves(),
           getEvents: sinon.stub(),
@@ -167,11 +168,26 @@ describe('CalDAV sync', () => {
         start: new Date('2018-06-08 00:00:00.000 +00:00'),
         location: null,
       },
+      {
+        type: 'VEVENT',
+        uid: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5',
+        summary: 'Evenement 3 to update',
+        start: new Date('2018-06-08 00:00:00.000 +00:00'),
+        location: null,
+      },
     ]);
 
     sync.gladys.calendar.getEvents
       .withArgs(userId, { externalId: '49193db9-f666-4947-8ce6-3357ce3b7166' })
       .resolves([])
+      .withArgs(userId, { externalId: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5' })
+      .resolves([
+        {
+          selector: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5',
+          external_id: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5',
+          name: 'Evenement 3 to update',
+        },
+      ])
       .withArgs(userId, { url: 'https://caldav.host.com/home/professional/event-3.ics' })
       .resolves([
         {
@@ -200,6 +216,21 @@ describe('CalDAV sync', () => {
       .onSecondCall()
       .rejects('ALREADY_EXIST');
 
+    sync.gladys.calendar.updateEvent.onFirstCall().resolves({
+      id: '078149ff-50f4-4f48-b2da-03dc06af0835',
+      calendar_id: '402dd55b-6e06-4a7c-8164-ba3e4641c71b',
+      selector: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5',
+      external_id: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5',
+      name: 'Evenement 3 to update',
+      location: null,
+      start: '2018-06-08 00:00:00.000 +00:00',
+      end: '2018-06-09 00:00:00.000 +00:00',
+      url: 'https://caldav.host.com/home/personal/event-1.ics',
+      full_day: '1',
+      created_at: '2020-02-11 21:04:56.090 +00:00',
+      updated_at: '2020-02-11 21:04:56.090 +00:00',
+    });
+
     await sync.syncUserCalendars(userId);
 
     expect(sync.gladys.variable.getValue.callCount).to.equal(4);
@@ -212,7 +243,7 @@ describe('CalDAV sync', () => {
     expect(sync.gladys.calendar.createEvent.callCount).to.equal(2);
     expect(sync.gladys.calendar.get.callCount).to.equal(3);
     expect(sync.gladys.calendar.update.callCount).to.equal(1);
-    expect(sync.gladys.calendar.getEvents.callCount).to.equal(3);
+    expect(sync.gladys.calendar.getEvents.callCount).to.equal(4);
     expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(1);
   });
 
