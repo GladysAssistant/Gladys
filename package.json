@@ -1,8 +1,12 @@
 {
   "name": "gladys",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "postinstall": "run-p install-server:dev install-front:dev",
     "start": "run-p start-server:dev start-front:dev",
