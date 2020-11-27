@@ -39,8 +39,10 @@ async function syncUserCalendars(userId) {
 
   // Format all fetched calendars
   const formatedCalendars = this.formatCalendars(davCalendars, userId);
-  const calendarsToUpdate = await Promise.all(
-    formatedCalendars.map(async (formatedCalendar) => {
+
+  const calendarsToUpdate = await Promise.map(
+    formatedCalendars,
+    async (formatedCalendar) => {
       const gladysCalendar = await this.gladys.calendar.get(userId, { externalId: formatedCalendar.external_id });
       // Create calendar if it does not already exist in database
       if (gladysCalendar.length === 0) {
@@ -55,7 +57,8 @@ async function syncUserCalendars(userId) {
         return gladysCalendar[0];
       }
       return null;
-    }),
+    },
+    { concurrency: 1 },
   );
 
   await Promise.map(
@@ -114,10 +117,11 @@ async function syncUserCalendars(userId) {
             // Create event if it does not already exist in database
             if (gladysEvents.length === 0) {
               await this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
+            } else {
+              // Else update existing event
+              await this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
             }
 
-            // Else update existing event
-            await this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
             insertedOrUpdatedEvent += 1;
           } catch (e) {
             logger.error(e);
