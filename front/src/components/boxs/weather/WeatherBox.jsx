@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
   RequestStatus,
+  GetWeatherModes,
   GetWeatherStatus,
   DASHBOARD_BOX_STATUS_KEY,
   DASHBOARD_BOX_DATA_KEY
@@ -97,19 +98,20 @@ const WeatherBox = ({ children, ...props }) => (
     )}
     {props.weather && (
       <div style={padding} class="card-block px-30 py-10">
+        <div
+          style={{
+            fontSize: '14px',
+            color: '#76838f'
+          }}
+        >
+          {props.datetimeBeautiful + ' - ' + props.houseName}
+        </div>
         <div class="row">
-          <div class="col-6">
+          <div class="col-9">
             <div
               style={{
-                fontSize: '14px',
-                color: '#76838f'
-              }}
-            >
-              {props.datetimeBeautiful}
-            </div>
-            <div
-              style={{
-                fontSize: '40px'
+                fontSize: '40px',
+                lineHeight: '1.2'
               }}
               class="font-size-40 blue-grey-700"
             >
@@ -124,69 +126,78 @@ const WeatherBox = ({ children, ...props }) => (
             </div>
           </div>
           <div
-            class="col-6 text-right"
+            class="col-3 text-right"
             style={{
-              padding: '10px'
+              paddingRight: '10px',
+              paddingLeft: '10px',
+              marginTop: '-0.75rem'
             }}
           >
-            {props.weather === 'rain' && (
-              <i
-                class="fe fe-cloud-rain"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'clear' && (
-              <i
-                class="fe fe-sun"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'cloud' && (
-              <i
-                class="fe fe-cloud"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'snow' && (
-              <i
-                class="fe fe-cloud-snow"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'fog' && (
-              <i
-                class="fe fe-cloud"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'drizzle' && (
-              <i
-                class="fe fe-cloud-drizzle"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
-            {props.weather === 'thunderstorm' && (
-              <i
-                class="fe fe-cloud-lightning"
-                style={{
-                  fontSize: '60px'
-                }}
-              />
-            )}
+            <i
+              className={'fe ' + props.weather_icon}
+              style={{
+                fontSize: '50px'
+              }}
+            />
           </div>
         </div>
+        {props.display_mode[GetWeatherModes.AdvancedWeather] && (
+          <div className="col-9" style={{ padding: '0' }}>
+            <span>
+              <i
+                class="fe fe-droplet"
+                style={{
+                  fpaddingRight: '5px'
+                }}
+              />
+              {props.humidity}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
+                <Text id="global.percent" />
+              </span>
+            </span>
+            <span className="float-right">
+              <i
+                class="fe fe-wind"
+                style={{
+                  paddingRight: '5px'
+                }}
+              />
+              {props.wind}
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'grey'
+                }}
+              >
+                {props.units === 'si' ? 'km/h' : 'm/h'}
+              </span>
+            </span>
+          </div>
+        )}
+        {props.display_mode[GetWeatherModes.HourlyForecast] && (
+          <div>
+            <div
+              class="row"
+              style={{
+                marginTop: '0.5em'
+              }}
+            >
+              {props.hours_display}
+            </div>
+          </div>
+        )}
+        {props.display_mode[GetWeatherModes.DailyForecast] && (
+          <div>
+            <div class="row">
+              <div className="container">{props.days_display}</div>
+            </div>
+          </div>
+        )}
       </div>
     )}
   </div>
@@ -205,20 +216,86 @@ class WeatherBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Weather.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Weather.${props.x}_${props.y}`);
     const weatherObject = get(boxData, 'weather');
-    const weather = get(weatherObject, 'weather');
+    const displayMode = this.props.box.modes || {};
+    const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
     const temperature = Math.round(get(weatherObject, 'temperature'));
     const units = get(weatherObject, 'units');
-    const datetimeBeautiful = get(weatherObject, 'datetime_beautiful');
+
     const houseName = get(weatherObject, 'house.name');
+
+    const weather = get(weatherObject, 'weather');
+    const weather_icon = get(weatherObject, 'weather_icon');
+
+    let humidity, wind, hoursDisplay, daysDisplay;
+    if (displayMode[GetWeatherModes.AdvancedWeather]) {
+      humidity = get(weatherObject, 'humidity');
+      wind = get(weatherObject, 'wind_speed');
+      if (units === 'si') {
+        wind = wind * 3.6;
+        wind = wind.toFixed(2);
+      }
+    }
+
+    if (displayMode[GetWeatherModes.HourlyForecast]) {
+      const hours = get(weatherObject, 'hours');
+      if (typeof hours !== 'undefined') {
+        let i = 0;
+        hoursDisplay = hours.map(hour => {
+          return (
+            <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
+                {hour.datetime_beautiful + 'h'}
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center' }}>
+                <i className={'fe ' + hour.weather_icon} style={{ fontSize: '20px' }} />
+              </p>
+              <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
+                <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
+              </p>
+            </div>
+          );
+        });
+      }
+    }
+
+    if (displayMode[GetWeatherModes.DailyForecast]) {
+      const days = get(weatherObject, 'days');
+      if (typeof days !== 'undefined') {
+        let i = 0;
+        daysDisplay = days.map(day => {
+          return (
+            <div className="row" style={{ marginTop: '0.5em' }}>
+              <div className="col-5">{day.datetime_beautiful}</div>
+              <div className="col-3">
+                <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
+              </div>
+              <div className="col-4" style={{ textAlign: 'right' }}>
+                <Text
+                  id="dashboard.boxes.weather.minMaxDegreeValue"
+                  fields={{ min: day.temperature_min, max: day.temperature_max }}
+                />
+              </div>
+            </div>
+          );
+        });
+      }
+    }
+
     return (
       <WeatherBox
         {...props}
         weather={weather}
+        weather_icon={weather_icon}
         temperature={temperature}
         units={units}
         boxStatus={boxStatus}
         datetimeBeautiful={datetimeBeautiful}
         houseName={houseName}
+        hours_display={hoursDisplay}
+        days_display={daysDisplay}
+        humidity={humidity}
+        wind={wind}
+        display_mode={displayMode}
       />
     );
   }
