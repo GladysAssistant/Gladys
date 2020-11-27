@@ -86,8 +86,8 @@ function formatRecurringEvents(event, gladysCalendar) {
 
     if (showRecurrence === true) {
       const newEvent = {
-        external_id: `${event.uid}${startDate.format('YYYY-MM-DD')}`,
-        selector: slugify(`${recurrenceTitle} ${startDate.format('YYYY-MM-DD')}`),
+        external_id: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
+        selector: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         name: recurrenceTitle,
         location: event.location,
         url: event.href,
@@ -132,7 +132,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
     if (typeof caldavEvent.rrule === 'undefined') {
       const newEvent = {
         external_id: caldavEvent.uid,
-        selector: slugify(`${caldavEvent.summary} ${this.moment(caldavEvent.start).format('YYYY-MM-DD')}`),
+        selector: caldavEvent.uid,
         name: caldavEvent.summary,
         location: caldavEvent.location,
         url: caldavEvent.href,
