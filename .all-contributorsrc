@@ -164,6 +164,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "thebradleysanders",
+      "name": "Brad Sanders",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/10698631?v=4",
+      "profile": "https://github.com/thebradleysanders",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
