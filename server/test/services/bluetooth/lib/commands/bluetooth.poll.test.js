@@ -38,7 +38,7 @@ describe('bluetooth.poll command', () => {
       uuid: 'uuid',
       connectable: true,
       connect: fake.yields(null),
-      disconnectAsync: fake.resolves(null),
+      disconnect: fake.resolves(null),
       discoverServices: fake.yields(null, [service]),
     };
 
@@ -74,6 +74,7 @@ describe('bluetooth.poll command', () => {
 
     assert.calledOnce(peripheral.connect);
     assert.calledOnce(peripheral.discoverServices);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledOnce(characteristic.read);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {

@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { SERVICE_STATUS } = require('../../utils/constants');
 const db = require('../../models');
 
 /**
@@ -18,7 +19,6 @@ async function load(gladys) {
         selector: service,
         version: gladys.version,
         has_message_feature: false,
-        enabled: true,
       };
       // check if service already exist
       let serviceInDb = await db.Service.findOne({
@@ -30,6 +30,7 @@ async function load(gladys) {
       // if not, we create it
       if (!serviceInDb) {
         serviceInDb = await db.Service.create(serviceToInsertOrUpdate);
+        serviceToInsertOrUpdate.status = SERVICE_STATUS.ENABLED;
       }
       // we try to start the service
       try {
@@ -37,12 +38,13 @@ async function load(gladys) {
         const newServiceObject = this.servicesFromFiles[service](gladys, serviceInDb.id);
         // saving service in stateManager
         this.stateManager.setState('service', service, newServiceObject);
+        this.stateManager.setState('serviceById', serviceInDb.id, newServiceObject);
         if (newServiceObject.message && newServiceObject.message.send) {
           serviceToInsertOrUpdate.has_message_feature = true;
         }
       } catch (e) {
         logger.debug(e);
-        serviceToInsertOrUpdate.enabled = false;
+        serviceToInsertOrUpdate.status = SERVICE_STATUS.DISABLED;
       }
       // we update if needed the service with success/failed enabled
       // and features

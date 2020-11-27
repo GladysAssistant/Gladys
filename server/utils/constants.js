@@ -20,6 +20,17 @@ const SESSION_TOKEN_TYPES = {
   API_KEY: 'api_key',
 };
 
+const SERVICE_STATUS = {
+  UNKNOWN: 'UNKNOWN',
+  ENABLED: 'ENABLED',
+  DISABLED: 'DISABLED',
+  LOADING: 'LOADING',
+  RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
+  ERROR: 'ERROR',
+  NOT_CONFIGURED: 'NOT_CONFIGURED',
+};
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
@@ -29,6 +40,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
@@ -191,10 +205,6 @@ const ACTIONS = {
   },
   TIME: {
     DELAY: 'delay',
-  },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
   },
   SCENE: {
     START: 'scene.start',
@@ -385,7 +395,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'xiaomi.new-device',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',
@@ -472,6 +483,9 @@ module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 
 module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
+
+module.exports.SERVICE_STATUS = SERVICE_STATUS;
+module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 

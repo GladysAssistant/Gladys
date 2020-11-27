@@ -2,6 +2,10 @@
   "name": "gladys-server",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
     "pretest": "npm run eslint",
@@ -49,6 +53,7 @@
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsdoc": "^4.1.0",
+    "eslint-plugin-no-call": "^1.2.5",
     "eslint-plugin-require-jsdoc": "^1.0.4",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",

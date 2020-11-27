@@ -104,7 +104,7 @@ describe('CalDAV formaters', () => {
     expectedEvents = [
       {
         external_id: 'e52c11e3-af8a-48c7-9f54-de7aba373c46',
-        selector: 'event-1-2019-02-25',
+        selector: 'e52c11e3-af8a-48c7-9f54-de7aba373c46',
         name: 'Event 1',
         location: 'Paris',
         start: '2019-02-25T10:00:00.000Z',
@@ -114,7 +114,7 @@ describe('CalDAV formaters', () => {
       },
       {
         external_id: '71c01038-2231-4dee-a230-6820fdb1136e',
-        selector: 'event-2-2019-04-01',
+        selector: '71c01038-2231-4dee-a230-6820fdb1136e',
         name: 'Event 2',
         location: 'Toulouse',
         start: '2019-04-01T00:00:00.000Z',
@@ -124,8 +124,8 @@ describe('CalDAV formaters', () => {
         url: 'https://caldav.host/home/event2.ics',
       },
       {
-        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27',
-        selector: 'anniversaire-pepper-2019-09-27',
+        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27-00-00',
+        selector: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27-00-00',
         name: 'Anniversaire Pepper',
         location: 'Paris',
         calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
@@ -135,8 +135,8 @@ describe('CalDAV formaters', () => {
         url: 'https://caldav.host.com/home/recur-event2',
       },
       {
-        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27',
-        selector: 'anniversaire-pepper-2020-09-27',
+        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27-00-00',
+        selector: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27-00-00',
         name: 'Anniversaire Pepper',
         location: 'Paris',
         calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
@@ -148,11 +148,11 @@ describe('CalDAV formaters', () => {
       {
         calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
         end: '2021-09-28T00:00:00.000Z',
-        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802021-09-27',
+        external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802021-09-27-00-00',
         full_day: true,
         location: 'Paris',
         name: 'Anniversaire Pepper',
-        selector: 'anniversaire-pepper-2021-09-27',
+        selector: '29f76a08-5439-4e04-bc1f-a67c32b47c802021-09-27-00-00',
         start: '2021-09-27T00:00:00.000Z',
         url: 'https://caldav.host.com/home/recur-event2',
       },
@@ -208,8 +208,8 @@ describe('CalDAV formaters', () => {
     expectedRecurrEvents = [
       [
         {
-          external_id: 'fdc2bf57-0adb-4300-8287-4a9b34dc37862019-06-01',
-          selector: 'cours-de-tennis-2019-06-01',
+          external_id: 'fdc2bf57-0adb-4300-8287-4a9b34dc37862019-06-01-09-00',
+          selector: 'fdc2bf57-0adb-4300-8287-4a9b34dc37862019-06-01-09-00',
           name: 'Cours de tennis',
           location: 'Stade Roland-Garros',
           calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
@@ -222,8 +222,8 @@ describe('CalDAV formaters', () => {
       ],
       [
         {
-          external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27',
-          selector: 'anniversaire-pepper-2019-09-27',
+          external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27-00-00',
+          selector: '29f76a08-5439-4e04-bc1f-a67c32b47c802019-09-27-00-00',
           name: 'Anniversaire Pepper',
           location: 'Paris',
           calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
@@ -233,8 +233,8 @@ describe('CalDAV formaters', () => {
           url: 'https://caldav.host.com/home/recur-event2',
         },
         {
-          external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27',
-          selector: 'anniversaire-pepper-2020-09-27',
+          external_id: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27-00-00',
+          selector: '29f76a08-5439-4e04-bc1f-a67c32b47c802020-09-27-00-00',
           name: 'Anniversaire Pepper',
           location: 'Paris',
           calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',

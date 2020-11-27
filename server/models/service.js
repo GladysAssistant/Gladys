@@ -1,3 +1,5 @@
+const { SERVICE_STATUS, SERVICE_STATUS_LIST } = require('../utils/constants');
+
 module.exports = (sequelize, DataTypes) => {
   const service = sequelize.define(
     't_service',
@@ -28,15 +30,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
-      enabled: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
       has_message_feature: {
         allowNull: false,
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      status: {
+        allowNull: false,
+        type: DataTypes.ENUM(SERVICE_STATUS_LIST),
+        defaultValue: SERVICE_STATUS.UNKNOWN,
       },
     },
     {},

@@ -78,4 +78,16 @@ describe('bluetooth.connectDevices command', () => {
     assert.calledOnce(characteristic.subscribe);
     assert.calledOnce(characteristic.on);
   });
+
+  it('subscribe to peripheral with error', async () => {
+    peripheral.discoverServices = fake.yields('error');
+
+    await bluetoothManager.connectDevices();
+
+    assert.calledOnce(peripheral.connect);
+    assert.calledOnce(peripheral.discoverServices);
+    assert.notCalled(service.discoverCharacteristics);
+    assert.notCalled(characteristic.subscribe);
+    assert.notCalled(characteristic.on);
+  });
 });
