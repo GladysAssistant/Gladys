@@ -1,5 +1,3 @@
-const { slugify } = require('../../../../utils/slugify');
-
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
