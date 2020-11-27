@@ -7,12 +7,11 @@ const Service = require('../../../lib/service');
 const StateManager = require('../../../lib/state');
 const db = require('../../../models');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 const services = {};
 const serviceName = 'fake-service';
 
-describe('service.start', () => {
+describe('service.startAll', () => {
   let serviceImpl;
   let stateManager;
   let service;
@@ -22,6 +21,7 @@ describe('service.start', () => {
       selector: serviceName,
       name: serviceName,
       version: '0.1.0',
+      status: SERVICE_STATUS.UNKNOWN,
     };
 
     stateManager = new StateManager();
@@ -43,74 +43,73 @@ describe('service.start', () => {
     sinon.reset();
   });
 
-  it('should start a service, and set status to RUNNING', async () => {
+  it('should start all services success (status === UNKNOWN)', async () => {
     serviceImpl.start = fake.resolves(null);
 
-    const result = await service.start(serviceName);
+    await service.startAll();
 
     const serviceInDb = await db.Service.findOne({
       where: {
         name: serviceName,
       },
     });
-
     expect(serviceInDb.status).eq(SERVICE_STATUS.RUNNING);
-    expect(result.status).eq(SERVICE_STATUS.RUNNING);
     assert.calledOnce(serviceImpl.start);
   });
 
-  it('should fail starting a service, and set status to ERROR', async () => {
+  it('should start all services error (status === UNKNOWN)', async () => {
     serviceImpl.start = fake.rejects(null);
 
-    const result = await service.start(serviceName);
+    await service.startAll();
 
     const serviceInDb = await db.Service.findOne({
       where: {
         name: serviceName,
       },
     });
-
     expect(serviceInDb.status).eq(SERVICE_STATUS.ERROR);
-    expect(result.status).eq(SERVICE_STATUS.ERROR);
     assert.calledOnce(serviceImpl.start);
   });
 
-  it('should fail starting a service (dut to config), and set status to NOT_CONFIGURED', async () => {
-    serviceImpl.start = fake.rejects(new ServiceNotConfiguredError('error'));
-
-    const result = await service.start(serviceName);
-
-    const serviceInDb = await db.Service.findOne({
-      where: {
-        name: serviceName,
-      },
-    });
-
-    expect(serviceInDb.status).eq(SERVICE_STATUS.NOT_CONFIGURED);
-    expect(result.status).eq(SERVICE_STATUS.NOT_CONFIGURED);
-    assert.calledOnce(serviceImpl.start);
-  });
-
-  it('should not start service, and not change status', async () => {
+  it('should not start service (as status === STOPPED)', async () => {
     serviceImpl.start = fake.resolves(null);
 
-    let serviceInDb = await db.Service.findOne({
+    const serviceUpdate = await db.Service.findOne({
       where: {
         name: serviceName,
       },
     });
-    serviceInDb.update({ status: SERVICE_STATUS.LOADING });
+    await serviceUpdate.update({ status: SERVICE_STATUS.STOPPED });
 
-    const result = await service.start(serviceName);
+    await service.startAll();
 
-    serviceInDb = await db.Service.findOne({
+    const serviceInDb = await db.Service.findOne({
       where: {
         name: serviceName,
       },
     });
+    expect(serviceInDb.status).eq(SERVICE_STATUS.STOPPED);
+    assert.notCalled(serviceImpl.start);
+  });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.RUNNING);
-    expect(result.status).eq(SERVICE_STATUS.RUNNING);
-    assert.calledOnce(serviceImpl.start);
+  it('should not start service (as status === LOADING)', async () => {
+    serviceImpl.start = fake.resolves(null);
+
+    const serviceUpdate = await db.Service.findOne({
+      where: {
+        name: serviceName,
+      },
+    });
+    await serviceUpdate.update({ status: SERVICE_STATUS.LOADING });
+
+    await service.startAll();
+
+    const serviceInDb = await db.Service.findOne({
+      where: {
+        name: serviceName,
+      },
+    });
+    expect(serviceInDb.status).eq(SERVICE_STATUS.LOADING);
+    assert.notCalled(serviceImpl.start);
   });
 });

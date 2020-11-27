@@ -26,7 +26,9 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+  NOT_CONFIGURED: 'NOT_CONFIGURED',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -203,10 +205,6 @@ const ACTIONS = {
   },
   TIME: {
     DELAY: 'delay',
-  },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
   },
   SCENE: {
     START: 'scene.start',
