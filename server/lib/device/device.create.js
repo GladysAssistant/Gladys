@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
+const { EVENTS } = require('../../utils/constants');
 
 const getByExternalId = async (externalId) => {
   return db.Device.findOne({
@@ -61,6 +62,8 @@ async function create(device) {
   delete device.features;
   delete device.params;
 
+  let actionEvent = EVENTS.DEVICE.CREATE;
+
   // we execute the whole insert in a transaction to avoir inconsistent state
   await db.sequelize.transaction(async (transaction) => {
     // external_id is a required parameter
@@ -76,6 +79,8 @@ async function create(device) {
     if (deviceInDb === null) {
       deviceInDb = await db.Device.create(device, { transaction });
     } else {
+      actionEvent = EVENTS.DEVICE.UPDATE;
+
       // or update it
       await deviceInDb.update(device, { transaction });
 
@@ -151,6 +156,9 @@ async function create(device) {
   if (newDevice.should_poll) {
     this.poll(newDevice);
   }
+
+  // notify device is succesfully created or updated
+  this.notify(newDevice, actionEvent);
 
   return newDevice;
 }
