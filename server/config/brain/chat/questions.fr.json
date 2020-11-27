@@ -1,12 +1,74 @@
 [
   {
     "label": "chat.greeting",
-    "questions": ["Hey!"],
-    "answers": ["Hey!"]
+    "questions": ["Hey !", "Salut", "Bonjour"],
+    "answers": ["Hey !", "Salut", "Bonjour, je suis Gladys."]
+  },
+  {
+    "label": "chat.greeting-gladys",
+    "questions": ["Hey Gladys !", "Salut Gladys", "Bonjour Gladys"],
+    "answers": [
+      "Hey, je suis votre assistante domotique !",
+      "Bonjour, je suis votre assistante domotique !",
+      "Salut, je suis votre assistante domotique !"
+    ]
   },
   {
     "label": "chat.i-love-you",
     "questions": ["Je t'aime"],
     "answers": ["Moi aussi !", "Je le savais..."]
+  },
+  {
+    "label": "chat.joke",
+    "questions": [
+      "Gladys raconte moi une blague.",
+      "Gladys est ce que tu connais une blague ?",
+      "Raconte moi une blague."
+    ],
+    "answers": [
+      "Tu connais la blague du diable? Dommage elle est d’enfer !",
+      "L’autre jour, j’ai raconté une blague à mes vêtements. Ils étaient pliés !",
+      "Qui s’occupe de la décoration à l’Elysée ? Le ministère de l’intérieur.",
+      "Qu’est-ce qu’on dit quand on appelle un monstre à 4 têtes ? Allo, allo, allo, allo !",
+      "Quel est le point commun entre un facteur et un lanceur de couteau ? Les deux doivent avoir beaucoup d’adresse.",
+      "C’est l’histoire d’un chauve. Qui a un cheveu sur la langue",
+      "Pourquoi les policiers n’ont pas d’acné ? Car ils ont la peau lisse !",
+      "T’as 2 poussins, t’en veux qu’un, tu fais quoi ? T’en pousses un !"
+    ]
+  },
+  {
+    "label": "chat.shifumi",
+    "questions": [
+      "On fait un shifumi ?",
+      "Gladys, on joue au shifumi ?",
+      "shifumi",
+      "shi fu mi",
+      "Gladys, on fait un shi fu mi ?",
+      "On joue au shifumi?",
+      "On fait un pierre, papier, ciseaux ?",
+      "Gladys, on joue à pierre, papier, ciseaux ?",
+      "On joue à pierre, papier, ciseaux ?"
+    ],
+    "answers": ["Pierre !", "Papier !", "Ciseaux !"]
+  },
+  {
+    "label": "chat.heads-or-tails",
+    "questions": [
+      "On fait un pile ou face ?",
+      "Gladys, on joue à pile ou face ?",
+      "Gladys, on fait un pile ou face ?",
+      "On joue à pile ou face ?"
+    ],
+    "answers": ["Pile !", "Face !"]
+  },
+  {
+    "label": "chat.numbers0to10",
+    "questions": [
+      "Donne moi un chiffre entre 0 et 10",
+      "Gladys, donne moi un chiffre entre 0 et 10",
+      "Gladys, est ce que tu peux me donner un chiffre entre 0 et 10 ?",
+      "Un chiffre entre 0 et 10 ?"
+    ],
+    "answers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   }
 ]
