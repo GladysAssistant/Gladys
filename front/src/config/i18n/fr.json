@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
     "save": "Enregistrer"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
         "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
-        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?"
+        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editModeLabel": "Mode d'affichage :",
+        "displayModes": {
+          "advancedWeather": "Humidité et vitesse du vent",
+          "hourlyForecast": "Prévisions pour les 8 prochaines heures",
+          "dailyForecast": "Prévisions pour les 7 prochains jours"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
