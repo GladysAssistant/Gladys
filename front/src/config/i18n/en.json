@@ -778,7 +778,8 @@
         "different": "different",
         "valuePlaceholder": "Value",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
