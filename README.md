@@ -73,6 +73,9 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="http://lebarzic.fr"><img src="https://avatars2.githubusercontent.com/u/1555884?v=4" width="100px;" alt=""/><br /><sub><b>Frédéric Le Barzic</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=hotfix31" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/NickDub"><img src="https://avatars1.githubusercontent.com/u/32032645?v=4" width="100px;" alt=""/><br /><sub><b>NickDub</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=NickDub" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="http://www.fotozik.fr"><img src="https://avatars3.githubusercontent.com/u/1773153?v=4" width="100px;" alt=""/><br /><sub><b>Cyril Beslay</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=cicoub13" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
