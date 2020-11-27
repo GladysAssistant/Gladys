@@ -1,7 +1,7 @@
 FROM node:lts-alpine as gladys
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev bluez
 
 WORKDIR /tmp
 
