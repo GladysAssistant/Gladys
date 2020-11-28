@@ -1,4 +1,6 @@
 const { expect } = require('chai');
+// const uuid = require('uuid');
+// const fs = require('fs');
 const { authenticatedRequest } = require('../request.test');
 
 describe('POST /api/v1/device', () => {
@@ -77,5 +79,56 @@ describe('GET /api/v1/service/:service_name/device', () => {
       .get('/api/v1/service/unknown-service/device')
       .expect('Content-Type', /json/)
       .expect(404);
+  });
+});
+
+describe.only('GET /api/v1/device_feature_sate', () => {
+  it('should get device_feature_sate', async () => {
+  /*
+    const myDate = new Date();
+    let myData = '';
+    for (let i = 0 ; i < 10000 ; i+=1){
+      myDate.setSeconds(myDate.getSeconds() + (i*10));
+      myData+=`
+      {
+        id: '${uuid.v4()}',
+        device_feature_id: 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900',
+        value: ${Math.floor(Math.random() * 50) + 1},
+        created_at: '${myDate.toISOString()}',
+        updated_at: '${myDate.toISOString()}',
+      },`;
+
+    } 
+    await fs.writeFile('testSM.txt', myData, function (err) {
+      if (err) {
+         return console.log(err); 
+        };
+      console.log('Hello World > helloworld.txt');
+      return null;
+    });
+    */
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature_sate/test-device/test-temperature-sensor')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        res.body.forEach((device) => {
+          expect(device).to.have.property('features');
+          device.features.forEach((feature) => {
+            expect(feature).to.have.property('device_feature_states');
+          });
+        });
+
+        expect(res.body).to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features).to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features[0].device_feature_states).to.be.instanceOf(Array)
+          .and.have.lengthOf(100);
+        
+      });
+
   });
 });

@@ -1,3 +1,4 @@
+const { LTTB } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
@@ -91,6 +92,45 @@ module.exports = function DeviceController(gladys) {
     res.json(action);
   }
 
+  /**
+   * @api {get} /api/v1/device/device_feature_sate/:device_selector/:device_feature_selector getDeviceFeatureStates
+   * @apiName getDeviceFeatureStates
+   * @apiGroup Device
+   */
+  async function getDeviceFeatureStates(req, res) {
+    const params = Object.assign({}, req.query, {
+      device_selector: req.params.device_selector,
+      device_feature_selector: req.params.device_feature_selector,
+    });
+    const devices = await gladys.device.getFeatureStates(params); 
+    if(devices && devices.length > 0){
+      // TODO: fix le nb max de value + le type d'algo (en par de la request)
+      const chartWidth = 100;
+      const featureArray = [];
+      devices.forEach(device => {
+        device.features.forEach(feature => {
+          if(feature.device_feature_states && feature.device_feature_states.length > 0){
+
+            const newFeatureStateArray = [];
+            feature.device_feature_states.forEach(function changeState(state, index) {
+              newFeatureStateArray.push({
+                x: state.created_at, 
+                y: state.value
+              });
+            });
+
+            const smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
+            feature.device_feature_states = smoothFeatureStates;
+            featureArray.push(feature);
+          }      
+        });
+        device.features = featureArray;
+      });
+    }
+
+    res.json(devices);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
@@ -99,5 +139,6 @@ module.exports = function DeviceController(gladys) {
     destroy: asyncMiddleware(destroy),
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
+    getDeviceFeatureStates: asyncMiddleware(getDeviceFeatureStates),
   });
 };
