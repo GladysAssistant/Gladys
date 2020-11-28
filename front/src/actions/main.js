@@ -46,7 +46,7 @@ function createActions(store) {
       try {
         await state.session.init();
         if (!state.session.isConnected()) {
-          route('/login');
+          route(`/login${window.location.search}`);
         }
         const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
         const [user] = await Promise.all(tasks);
@@ -59,7 +59,7 @@ function createActions(store) {
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         if (status === 401 || status === 403) {
           state.session.reset();
-          route('/login');
+          route(`/login${window.location.search}`);
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {

@@ -1346,6 +1346,17 @@
       "valid_until": "2019-07-26T00:29:00.783Z",
       "last_seen": null,
       "revoked": false,
+      "client_id": "google-actions",
+      "created_at": "2019-06-26T00:29:00.783Z",
+      "updated_at": "2019-06-26T00:29:00.783Z"
+    },
+    {
+      "id": "2367a8cf-47a8-4db7-83b0-f89c2c6c34ac",
+      "token_type": "refresh_token",
+      "scope": ["dashboard:write", "dashboard:read"],
+      "valid_until": "2019-07-26T00:29:00.783Z",
+      "last_seen": null,
+      "revoked": false,
       "created_at": "2019-06-26T00:29:00.783Z",
       "updated_at": "2019-06-26T00:29:00.783Z"
     }

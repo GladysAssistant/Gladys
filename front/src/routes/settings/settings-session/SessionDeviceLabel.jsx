@@ -5,10 +5,10 @@ const SessionDeviceLabel = ({ session }) => {
   let label;
   let icon;
 
-  if (!session.useragent) {
-    label = <Text id="sessionsSettings.unknowDevice" />;
-    icon = 'alert-triangle';
-  } else {
+  if (session.client_id) {
+    label = session.client_id;
+    icon = 'globe';
+  } else if (session.useragent) {
     const useragent = uaParser.parse(session.useragent);
     label = `${useragent.browser} - ${useragent.platform} - ${useragent.os}`;
 
@@ -21,6 +21,9 @@ const SessionDeviceLabel = ({ session }) => {
     } else {
       icon = 'help-circle';
     }
+  } else {
+    label = <Text id="sessionsSettings.unknowDevice" />;
+    icon = 'alert-triangle';
   }
 
   return (

@@ -48,6 +48,35 @@
     "invalidEmail": "E-mail invalide",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
+  "authorize": {
+    "authorizeTitle": "{{client}} voudrait :",
+    "unknownClientTitle": "{{client}} n'est pas connu par Gladys et vos données ne seront pas envoyées.",
+    "denyClientTitle": "{{client}} a refusé de communiquer avec Gladys.",
+    "allowButtonText": "Autoriser",
+    "denyButtonText": "Refuser",
+    "grants": {
+      "user": "Accéder à vos données publiques"
+    },
+    "error": {
+      "invalid_request": "Erreur de protocole, tel qu’un paramètre obligatoire manquant.",
+      "unauthorized_client": "Le client authentifié n’est pas autorisé à utiliser ce type d’octroi d’autorisation.",
+      "access_denied": "Le propriétaire de la ressource n’a pas accordé son consentement.",
+      "unsupported_response_type": "Le serveur d’autorisation ne prend pas en charge le type de réponse dans la demande.",
+      "invalid_scope": "L’étendue demandée par l’application n’est pas valide.",
+      "server_error": "Le serveur a rencontré une erreur inattendue.",
+      "temporarily_unavailable": "Le serveur est temporairement trop occupé pour traiter la demande.",
+      "invalid_client": "Échec d’authentification du client.",
+      "invalid_grant": "Le code d’autorisation ou le vérificateur du code PCKE n’est pas valide ou a expiré.",
+      "undefined": "Une erreur est sruvenue.",
+      "client_disabled": "L'application est désactivée."
+    },
+    "card": {
+      "clientIdLabel": "ID client",
+      "clientSecretLabel": "Secret d'application",
+      "loadError": "L'application \"{{client}}\" authentifiée par OAuth n'est pas configurée.",
+      "changeStatusError": "Une erreur est survenue lors de la modification du statut de l'application \"{{client}}\"."
+    }
+  },
   "signup": {
     "welcome": {
       "title": "Bienvenue dans Gladys 🙋",

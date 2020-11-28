@@ -15,6 +15,7 @@ const FIELDS = [
   'last_seen',
   'revoked',
   'useragent',
+  'client_id',
   'created_at',
   'updated_at',
 ];
