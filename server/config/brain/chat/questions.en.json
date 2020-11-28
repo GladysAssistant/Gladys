@@ -1,12 +1,71 @@
 [
   {
     "label": "chat.greeting",
-    "questions": ["Hey!"],
-    "answers": ["Hey!"]
+    "questions": ["Hey!", "Hi", "Hello"],
+    "answers": ["Hey!", "Hi", "Hello, I'm Gladys."]
+  },
+  {
+    "label": "chat.greeting-gladys",
+    "questions": ["Hey Gladys !", "Hi Gladys", "Hello Gladys"],
+    "answers": [
+      "Hey, I'm your home automation assistant !",
+      "Hello, I am your home automation assistant !",
+      "Hi, I am your home automation assistant !"
+    ]
   },
   {
     "label": "chat.i-love-you",
     "questions": ["I love you"],
-    "answers": ["Me too!", "Of course you love me..."]
+    "answers": ["Me too!", "I knew that ..."]
+  },
+  {
+    "label": "chat.joke",
+    "Questions": ["Gladys tell me a joke.", "Gladys do you know a joke ?", "Tell me a joke."],
+    "answers": [
+      "Do you know the devil's joke? Too bad it's hell !",
+      "The other day I told a joke about my clothes. They were folded !",
+      "Who's in charge of the decoration at the Elysee? The Home Office.",
+      "What do you say when calling a 4-headed monster? Hello, hello, hello, hello !",
+      "What do a postman and a knife thrower have in common? Both must have a lot of skill.",
+      "This is the story of a bald man. Who has a hair on his tongue",
+      "Why don't the police have acne? Because they have smooth skin !",
+      "You have 2 chicks, you want one, what are you doing? You are pushing one !"
+    ]
+  },
+  {
+    "label": "chat.shifumi",
+    "Questions": [
+      "Shall we make a shifumi ?",
+      "Gladys, are we playing shifumi ?",
+      "shifumi",
+      "shi fu mi",
+      "Gladys, are we doing a shi fu mi ?",
+      "Are we playing shifumi ?",
+      "Shall we make a stone, paper, scissors ?",
+      "Gladys, are we playing rock, paper, scissors?",
+      "Are we playing rock, paper, scissors?"
+    ],
+    "answers": ["Stone !", "Paper !", "Scissors !"]
+  },
+  {
+    "label": "chat.heads-or-tails",
+    "Questions": [
+      "Shall we do a coin toss ?",
+      "Gladys, are we playing a coin toss ?",
+      "Gladys, are we doing a coin toss ?",
+      "Are we playing a coin toss ?",
+      "Heads or tails"
+    ],
+    "answers": ["Heads !", "Tails !"]
+  },
+  {
+    "label": "chat.numbers0to10",
+    "Questions": [
+      "Give me a number between 0 and 10",
+      "Gladys, give me a number between 0 and 10",
+      "Gladys, can you give me a number between 0 and 10 ?",
+      "A number between 0 and 10 ?"
+    ],
+    "answers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   }
 ]

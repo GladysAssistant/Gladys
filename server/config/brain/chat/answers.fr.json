@@ -3,7 +3,7 @@
     "label": "question.no-intent-found",
     "answers": [
       "Je n'ai pas compris...",
-      "Désolé je n'ai pas compris.",
+      "Désolé, je n'ai pas compris.",
       "Je ne suis pas en mesure de répondre à cette question pour le moment."
     ]
   }

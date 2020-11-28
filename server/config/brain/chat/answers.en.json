@@ -1,6 +1,10 @@
 [
   {
     "label": "question.no-intent-found",
-    "answers": ["I didn't understand what you said..."]
+    "answers": [
+      "I didn't understand...",
+      "Sorry, I did not understand.",
+      "I am not in a position to answer this question at the moment."
+    ]
   }
 ]
