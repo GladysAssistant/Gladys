@@ -671,7 +671,7 @@
     },
     "oauth2": {
       "buttonConnect": "Connecter maintenant",
-      "apiKeyLabel": "Saisissez ensuite votre clé client_id et secret_id ici : ",
+      "apiKeyLabel": "Saisissez ensuite votre clé client_id et secret_id ici:",
       "errorEmptyConfig": "Client Id et Secret Id ne doivent pas être vide !",
       "errorServiceId": "Service Id de l'intégration courante n'a pas été trouvé !",
       "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
@@ -689,7 +689,7 @@
         "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box de santé.",
         "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que votre client_id et votre secret_id sont corrects ?",
         "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres:",
-        "clientId": "Client Id: ",
+        "clientId": "Client Id:",
         "afterIntegration": "Allez à la page des appareils pour voir tous les appareils créés automatiquement."
       },
       "device": {

@@ -42,8 +42,8 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOGRAM && 'kg'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CENTIMETER && 'kg'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MERCURE_MILIMETER && 'kg'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CENTIMETER && 'cm'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MERCURE_MILIMETER && 'mmHg'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.BEATS_PER_MINUTE && 'bpm'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.METER_PER_SECOND && 'm/s'}
           </span>

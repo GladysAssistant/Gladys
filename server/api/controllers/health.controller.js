@@ -1,6 +1,4 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-// const { Error400 } = require('../../utils/httpErrors');
-// const { ERROR_MESSAGES } = require('../../utils/constants');
 
 module.exports = function HealthController(gladys) {
   /**

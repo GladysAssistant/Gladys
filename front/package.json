@@ -53,7 +53,6 @@
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.22.1",
     "react-datepicker": "^2.13.0",
-    "react-router": "^5.2.0",
     "react-select": "^3.0.8",
     "set-value": "^3.0.0",
     "tabler-ui": "0.0.32",

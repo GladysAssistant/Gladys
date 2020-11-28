@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import cx from 'classnames';
 
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
@@ -70,7 +71,7 @@ class EditHealthBox extends Component {
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.health">
-        <div class={loading ? 'dimmer active' : 'dimmer'}>
+        <div class={cx('dimmer', { active: loading })}>
           <div class="loader" />
           <div class="dimmer-content">
             {deviceOptions && (
