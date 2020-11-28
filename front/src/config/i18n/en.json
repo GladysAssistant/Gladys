@@ -689,7 +689,7 @@
         "instructionsToUse": "To use this integration, go to the dashboard and create a health box.",
         "configurationError": "We were not able to configure your account. Are you sure your client_id and secret_id are valid?",
         "complete": "Your account is now linked to Gladys with those parameters:",
-        "clientId": "Client Id: ",
+        "clientId": "Client Id:",
         "afterIntegration": "Go to devices page to see all devices automatically created."
       },
       "device": {
@@ -1258,7 +1258,6 @@
       "bed-activity": "Bed Activity"
     },
     "health": {
-      "battery": "Battery",
       "weight": "Weight",
       "height": "Height",
       "fat-free-mass": "Fat Free Mass",

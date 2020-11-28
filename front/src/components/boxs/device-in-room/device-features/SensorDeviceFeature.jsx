@@ -25,7 +25,7 @@ const SensorDeviceType = ({ children, ...props }) => (
     <td>{props.deviceFeature.name}</td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
       <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
-        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value.toFixed(2)}
         {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value !== null && (
           <span>
