@@ -30,12 +30,12 @@ function createActions(store) {
         });
       }
     },
-    async getDiscoveredTasmotaDevices(state) {
+    async getDiscoveredTasmotaDevices(state, type) {
       store.setState({
         loading: true
       });
       try {
-        const discoveredDevices = await state.httpClient.get('/api/v1/service/tasmota/discover');
+        const discoveredDevices = await state.httpClient.get(`/api/v1/service/tasmota/discover/${type}`);
         store.setState({
           discoveredDevices,
           loading: false,
@@ -43,6 +43,7 @@ function createActions(store) {
         });
       } catch (e) {
         store.setState({
+          discoveredDevices: undefined,
           loading: false,
           errorLoading: true
         });
@@ -130,12 +131,12 @@ function createActions(store) {
       });
       await actions.getTasmotaDevices(store.getState());
     },
-    async forceScan(state) {
+    async searchDevices(state, type, options = undefined) {
       store.setState({
         loading: true
       });
       try {
-        await state.httpClient.post('/api/v1/service/tasmota/discover');
+        await state.httpClient.post(`/api/v1/service/tasmota/discover/${type}`, options);
         store.setState({
           discoveredDevices: [],
           errorLoading: false
@@ -150,6 +151,15 @@ function createActions(store) {
           errorLoading: true
         });
       }
+    },
+    async connectAndScan(state, deviceIndex, username, password) {
+      const device = state.discoveredDevices[deviceIndex];
+      const options = {
+        singleAddress: device.external_id.replace('tasmota:', ''),
+        username,
+        password
+      };
+      await state.httpClient.post('/api/v1/service/tasmota/discover/http', options);
     },
     addDiscoveredDevice(state, newDevice) {
       const existingDevices = state.discoveredDevices || [];

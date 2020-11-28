@@ -26,7 +26,9 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+  NOT_CONFIGURED: 'NOT_CONFIGURED',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -38,6 +40,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
@@ -200,10 +205,6 @@ const ACTIONS = {
   },
   TIME: {
     DELAY: 'delay',
-  },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
   },
   SCENE: {
     START: 'scene.start',
@@ -422,7 +423,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'xiaomi.new-device',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',

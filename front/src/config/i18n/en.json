@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
     "save": "Save"
@@ -188,7 +189,14 @@
         "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
         "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editModeLabel": "Select display mode:",
+        "displayModes": {
+          "advancedWeather": "Humidity and wind speed",
+          "hourlyForecast": "Forecast for the next 8 hours",
+          "dailyForecast": "Forecast for the next 7 days"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -305,27 +313,52 @@
       "title": "Tasmota",
       "description": "Control your Tasmota devices.",
       "deviceTab": "Devices",
-      "discoverTab": "MQTT discover",
-      "discoverDeviceDescr": "Automatically scan MQTT devices",
+      "mqttDiscoverTab": "MQTT discover",
+      "httpDiscoverTab": "HTTP discover",
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Tasmota discover devices over MQTT",
-        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Tasmota devices.",
         "noDeviceFound": "No Tasmota device discovered.",
+        "error": "Error discovering Tasmota devices.",
         "documentation": "Tasmota documentation",
-        "scan": "Scan"
+        "mqtt": {
+          "title": "Tasmota discover devices over MQTT",
+          "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+          "scan": "Scan"
+        },
+        "http": {
+          "title": "Tasmota discover devices over HTTP",
+          "singleModeButton": "Single address scan",
+          "rangeModeButton": "Scan over IP range",
+          "singleAddressLabel": "IP address or hostname:",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "From:",
+          "lastAddressLabel": "To:",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Discover",
+          "usernameLabel": "Username",
+          "passwordLabel": "Password",
+          "needAuthenticationAlert": "The device is protected with username and password.",
+          "authenticateButton": "Connect and scan",
+          "authError": "Invalid username or password."
+        }
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Tasmota MQTT Topic",
+      "protocolLabels": {
+        "mqtt": "MQTT Topic",
+        "http": "HTTP identifier"
+      },
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
@@ -794,7 +827,8 @@
         "different": "different",
         "valuePlaceholder": "Value",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -876,6 +910,7 @@
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
+    "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Users",
     "gatewayOpenApiTab": "Open API"
@@ -894,6 +929,47 @@
     "revoke": "Revoke",
     "unknowDevice": "Unknow device",
     "apiKey": "API Key"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Internal name: {{key}}",
+    "integrationLinkTitle": "Go to integration page",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Unknown",
+        "detail": "Service not found"
+      },
+      "DISABLED": {
+        "title": "Disabled",
+        "detail": "Service disabled"
+      },
+      "ENABLED": {
+        "title": "Enabled",
+        "detail": "Service enabled"
+      },
+      "RUNNING": {
+        "title": "Running",
+        "detail": "Service running"
+      },
+      "STOPPED": {
+        "title": "Stopped",
+        "detail": "Service stopped by user"
+      },
+      "NOT_CONFIGURED": {
+        "title": "Not configured",
+        "detail": "Service is not configured"
+      },
+      "ERROR": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      },
+      "LOADING": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -1244,7 +1320,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
+    "manageBilling": "To manage your billing, click ",
+    "here": "here"
   },
   "editDeviceForm": {
     "noName": "No name",
@@ -1266,7 +1343,15 @@
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-    "notFound": "Requested device not found."
+    "notFound": "Requested device not found.",
+    "pollFrequency": {
+      "label": "Refresh frequency",
+      "everyMinutes": "Every minutes",
+      "every30Seconds": "Every 30 seconds",
+      "every10Seconds": "Every 10 seconds",
+      "every2Seconds": "Every 2 seconds",
+      "every1Seconds": "Every second"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -1378,17 +1463,6 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "cardTypeLabel": "Type",
-    "cardLastDigitsLabel": "Last 4 digits",
-    "cardExpirationLabel": "Expiration date",
-    "updateInformationTitle": "Update Card Information",
-    "updateInformationDescription": "If your card has expired, or you want to change credit card, you can update here your card information.",
-    "cancelSubscriptionTitle": "Cancel subscription",
-    "cancelSubscriptionError": "Warning: There was an error while trying to cancel your account. Please retry again later.",
-    "cancelSubscriptionSuccess": "Your subscription was successfully canceled!",
-    "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
-    "cancelSubscriptionButton": "Cancel subscription",
-    "accountCancelled": "Your account was canceled on {{date}}",
-    "subscriptionButton": "Subscribe again"
+    "stripeButton": "Edit subscription in Stripe"
   }
 }

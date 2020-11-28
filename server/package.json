@@ -2,6 +2,10 @@
   "name": "gladys-server",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
     "pretest": "npm run eslint",
