@@ -1021,6 +1021,18 @@
       ]
     }
   ],
+  "get /api/v1/service/google-actions": {},
+  "get /api/v1/service/google-actions/variable/GOOGLEACTIONS_PUBLIC_KEY": {
+    "value": "BZQCoLIUo0qVgEA1glvC"
+  },
+  "get /api/v1/service/google-actions/variable/GOOGLEACTIONS_SECRET_KEY": {
+    "value": "728IVZ0tZGFTLVn2F06S"
+  },
+  "get /api/v1/oauth/client/google-actions": {
+    "id": "google-actions",
+    "secret": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",
+    "active": true
+  },
   "get /api/v1/service/rtsp-camera/device": [
     {
       "id": "c2204fdc-c22f-4fc9-b7d7-c862f3c514c7",

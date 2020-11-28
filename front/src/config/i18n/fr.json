@@ -268,7 +268,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "third-party": "Service tiers"
       }
     },
     "caldav": {
@@ -694,6 +695,27 @@
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "disconnected": "Déconnecté du broker MQTT."
+      }
+    },
+    "google-actions": {
+      "title": "Google Actions",
+      "description": "Synchronisez Gladys devices avec Google Home",
+      "setupTab": "COnfiguration",
+      "setup": {
+        "cloud": {
+          "title": "Informations Google Actions",
+          "documentationLink": "Documentation Google Actions",
+          "error": "Une erreur est survenue lors de l'enregistrement.",
+          "saved": "La configuration est correctement enregistrée.",
+          "projectKey": "Clé du projet",
+          "projectFile": "Fichier du projet",
+          "projectFileButton": "Charger un fichier de projet Google",
+          "invalidFile": "Le fichier séléctionné n'est pas valide.",
+          "saveLabel": "Enregistrer"
+        },
+        "service": {
+          "title": "Authentification Google Actions"
+        }
       }
     },
     "xiaomi": {

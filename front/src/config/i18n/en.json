@@ -268,7 +268,8 @@
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "navigation",
+        "third-party": "Third-Party"
       }
     },
     "telegram": {
@@ -573,6 +574,27 @@
         "connected": "Connected to the MQTT broker with success !",
         "connectionError": "Error while connecting, please check your configuration.",
         "disconnected": "Disconnected from MQTT broker."
+      }
+    },
+    "google-actions": {
+      "title": "Google Actions",
+      "description": "Synchronize Gladys devices with Google Home application",
+      "setupTab": "Setup",
+      "setup": {
+        "cloud": {
+          "title": "Google Actions App Information",
+          "documentationLink": "See Google Actions documentation",
+          "error": "An error occured while saving configuration.",
+          "saved": "Configuration successfully saved.",
+          "projectKey": "Project Key",
+          "projectFile": "Project File",
+          "projectFileButton": "Choose a Google project file",
+          "invalidFile": "Choosen file is invalid.",
+          "saveLabel": "Save configuration"
+        },
+        "service": {
+          "title": "Google Actions Credentials"
+        }
       }
     },
     "xiaomi": {

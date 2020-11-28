@@ -73,6 +73,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import GoogleActionsSetupPage from '../routes/integration/all/google-actions/setup-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -171,6 +172,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" category="health" />
         <IntegrationPage path="/dashboard/integration/weather" category="weather" />
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        <IntegrationPage path="/dashboard/integration/third-party" category="third-party" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
@@ -211,6 +213,8 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
+        <GoogleActionsSetupPage path="/dashboard/integration/third-party/google-actions" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
