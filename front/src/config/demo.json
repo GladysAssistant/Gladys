@@ -1510,54 +1510,58 @@
       "poll_frequency": "86400000",
       "created_at": "2020-11-24T15:27:02.361Z",
       "updated_at": "2020-11-24T15:27:02.361Z",
-      "features": [ {
-        "id": "bf89880f-9f8e-42d5-ba55-b7379c274303",
-        "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "name": "Battery",
-        "selector": "withings-battery-063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "external_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "category": "battery",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": "false",
-        "has_feedback": "false",
-        "unit": "percent",
-        "min": "0",
-        "max": "0",
-        "last_value": "20",
-        "last_value_string": "20",
-        "last_value_changed": "2020-11-24T15:27:03.061Z",
-        "created_at": "2020-11-24T15:27:02.367Z",
-        "updated_at": "2020-11-24T15:27:03.075Z"
-      },
-      {
-        "id": "624b3214-9a75-41fb-8163-3b89d61e322d",
-        "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "name": "Weight",
-        "selector": "withings-weight-063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "external_id": "withings-Weight:063d4792-1db4-4fe9-a248-4307a6e8d226:624b3214-9a75-41fb-8163-3b89d61e322d",
-        "category": "health",
-        "type": "weight",
-        "read_only": "true",
-        "keep_history": "true",
-        "has_feedback": "false",
-        "unit": "kg",
-        "min": "0",
-        "max": "100000",
-        "last_value": "72.075",
-        "last_value_string": "72.075",
-        "last_value_changed": "2020-11-24T10:38:06.000Z",
-        "created_at": "2020-11-24T15:27:02.368Z",
-        "updated_at": "2020-11-24T15:27:02.368Z"
-      } ],
-      "params": [ {
-        "id": "3b2014b4-7c25-4a0b-b162-c296641d2148",
-        "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
-        "name": "withingsDeviceId",
-        "value": "4627e12ed86fa7bf7e5977a75a3d0194058827ed",
-        "created_at": "2020-11-24T15:27:02.638Z",
-        "updated_at": "2020-11-24T15:27:02.638Z"
-      } ],
+      "features": [
+        {
+          "id": "bf89880f-9f8e-42d5-ba55-b7379c274303",
+          "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "name": "Battery",
+          "selector": "withings-battery-063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "external_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "category": "battery",
+          "type": "integer",
+          "read_only": true,
+          "keep_history": "false",
+          "has_feedback": "false",
+          "unit": "percent",
+          "min": "0",
+          "max": "0",
+          "last_value": "20",
+          "last_value_string": "20",
+          "last_value_changed": "2020-11-24T15:27:03.061Z",
+          "created_at": "2020-11-24T15:27:02.367Z",
+          "updated_at": "2020-11-24T15:27:03.075Z"
+        },
+        {
+          "id": "624b3214-9a75-41fb-8163-3b89d61e322d",
+          "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "name": "Weight",
+          "selector": "withings-weight-063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "external_id": "withings-Weight:063d4792-1db4-4fe9-a248-4307a6e8d226:624b3214-9a75-41fb-8163-3b89d61e322d",
+          "category": "health",
+          "type": "weight",
+          "read_only": "true",
+          "keep_history": "true",
+          "has_feedback": "false",
+          "unit": "kg",
+          "min": "0",
+          "max": "100000",
+          "last_value": "72.075",
+          "last_value_string": "72.075",
+          "last_value_changed": "2020-11-24T10:38:06.000Z",
+          "created_at": "2020-11-24T15:27:02.368Z",
+          "updated_at": "2020-11-24T15:27:02.368Z"
+        }
+      ],
+      "params": [
+        {
+          "id": "3b2014b4-7c25-4a0b-b162-c296641d2148",
+          "device_id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
+          "name": "withingsDeviceId",
+          "value": "4627e12ed86fa7bf7e5977a75a3d0194058827ed",
+          "created_at": "2020-11-24T15:27:02.638Z",
+          "updated_at": "2020-11-24T15:27:02.638Z"
+        }
+      ],
       "room": null,
       "service": {
         "id": "55fe48a2-0ae0-4343-89d1-a164374b41ca",
@@ -1571,7 +1575,7 @@
         "updated_at": "2020-11-24T16:17:46.304Z"
       }
     }
-  ], 
+  ],
   "get /api/v1/service/oauth2/getCurrentConfig": {
     "success": "true",
     "clientId": "109f3d383039a288c46103c0350631c6831c815a4dbb2bb3da81c01547466f0e"
@@ -1586,18 +1590,20 @@
       {
         "id": "063d4792-1db4-4fe9-a248-4307a6e8d226",
         "name": "Withings - Body",
-        "features": [{
-          "id": "624b3214-9a75-41fb-8163-3b89d61e322d",
-          "name": "Weight",
-          "unit": "kg",
-          "selector": "withings-weight-063d4792-1db4-4fe9-a248-4307a6e8d226",
-          "last_value": 72.075,
-          "last_value_string": "72.075",
-          "last_value_change": "2019-02-20T04:26:47.811Z",
-          "category": "health",
-          "type": "weight",
-          "read_only": "true"
-        }]
+        "features": [
+          {
+            "id": "624b3214-9a75-41fb-8163-3b89d61e322d",
+            "name": "Weight",
+            "unit": "kg",
+            "selector": "withings-weight-063d4792-1db4-4fe9-a248-4307a6e8d226",
+            "last_value": 72.075,
+            "last_value_string": "72.075",
+            "last_value_change": "2019-02-20T04:26:47.811Z",
+            "category": "health",
+            "type": "weight",
+            "read_only": "true"
+          }
+        ]
       }
     ]
   }
