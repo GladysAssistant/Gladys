@@ -1,5 +1,6 @@
 import { Text, MarkupText } from 'preact-i18n';
 import style from './spinner.css';
+import cx from 'classnames';
 
 const SignupGeneratingKeys = ({ children, ...props }) => (
   <div onSubmit={props.validateForm} className="card" style={{ height: '250px' }}>
@@ -13,11 +14,11 @@ const SignupGeneratingKeys = ({ children, ...props }) => (
           </p>
         )}
       </div>
-      {!props.signupCompleted && <div class={style.spWave + ' ' + style.sp} />}
+      {!props.signupCompleted && <div class={cx(style.spWave, style.sp)} />}
 
       {props.signupCompleted && (
-        <div class={style['circle-loader'] + ' ' + style['load-complete']}>
-          <div class={style.checkmark + ' ' + style.draw} />
+        <div class={cx(style['circle-loader'], style['load-complete'])}>
+          <div class={cx(style.checkmark, style.draw)} />
         </div>
       )}
       <div />
