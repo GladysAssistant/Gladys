@@ -32,12 +32,15 @@ class ChartMultiFeaturesBox extends Component {
     // TODO voir usage box status = dimmer loading ?
     // const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}ChartBox.${props.x}_${props.y}`);
     const options = get(boxData, 'options');
-    console.log("options: ",options);
     const series = get(boxData, 'series');
     const unit = get(boxData, 'unit');
     const apexType = get(boxData, 'apexType'); 
     const showDropDownChartBox = get(boxData, 'showDropDownChartBox'); 
     const chartPeriod = get(boxData, 'chartPeriod'); 
+    console.log("===================================");
+    console.log("options: ",options);
+    console.log("series: ",series);
+    console.log("chartPeriod: ",chartPeriod);
 
     return (
       <div class="card">

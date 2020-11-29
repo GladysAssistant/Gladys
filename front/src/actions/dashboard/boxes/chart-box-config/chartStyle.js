@@ -62,7 +62,7 @@ const OPTIONS_COMMON = {
   colors: ['#206bc4', '#a8aeb7'],
   legend: {
     show: true,
-    position: 'top',
+    position: 'bottom',
     height: 32,
     offsetY: 8,
     markers: {

@@ -89,6 +89,7 @@ function createActions(store) {
           const yData = [];
           device.features.forEach(feature => {
             feature.device_feature_states.forEach(featureState => {
+              console.log(featureState.x)
               xData.push(featureState.x);
               yData.push(featureState.y);
             });

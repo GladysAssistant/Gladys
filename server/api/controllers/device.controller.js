@@ -141,6 +141,7 @@ module.exports = function DeviceController(gladys) {
             if (feature.device_feature_states && feature.device_feature_states.length > 0) {
               const newFeatureStateArray = [];
               feature.device_feature_states.forEach(function changeState(state, index) {
+                console.log('x: ', state.created_at);
                 newFeatureStateArray.push({
                   x: state.created_at,
                   y: state.value,
@@ -175,6 +176,7 @@ module.exports = function DeviceController(gladys) {
       }
     }
 
+    console.log('devices: ', devices);
     res.json(devices);
   }
 
