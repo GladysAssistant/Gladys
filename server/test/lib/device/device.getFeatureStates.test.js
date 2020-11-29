@@ -15,19 +15,21 @@ describe.only('Device.getFeatureStates', () => {
       }),
     };
     const device = new Device(event, {}, stateManager, service);
-    const devices = await device.getFeatureStates({ 
-      device_selector: 'test-device', 
-      device_feature_selector: 'test-temperature-sensor'
+    const devices = await device.getFeatureStates({
+      device_selector: 'test-device',
+      device_feature_selector: 'test-temperature-sensor',
     });
 
-    expect(devices).to.be.instanceOf(Array)
-          .and.have.lengthOf(1);
-
-    expect(devices[0].features).to.be.instanceOf(Array)
+    expect(devices)
+      .to.be.instanceOf(Array)
       .and.have.lengthOf(1);
 
-    expect(devices[0].features[0].device_feature_states).to.be.instanceOf(Array)
-      .and.have.lengthOf(10000);
+    expect(devices[0].features)
+      .to.be.instanceOf(Array)
+      .and.have.lengthOf(1);
 
+    expect(devices[0].features[0].device_feature_states)
+      .to.be.instanceOf(Array)
+      .and.have.lengthOf(10000);
   });
 });

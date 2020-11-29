@@ -242,6 +242,7 @@
     "period": {
       "label": {
         "last1day": "Dernières 24 heures",
+        "last2day": "Dernières 48 heures",
         "last1week": "Dernière semaine",
         "last1month": "Dernier mois",
         "last1year": "Dernière année"

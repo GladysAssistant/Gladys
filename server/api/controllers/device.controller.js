@@ -1,4 +1,4 @@
-const { LTTB } = require('downsample');
+const { LTTB, ASAP, SMA, LTOB, LTD } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
@@ -93,39 +93,86 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/device/device_feature_sate/:device_selector/:device_feature_selector getDeviceFeatureStates
+   * @api {get} /api/v1/device/device_feature_sate/:device_feature_selector getDeviceFeatureStates
    * @apiName getDeviceFeatureStates
    * @apiGroup Device
    */
   async function getDeviceFeatureStates(req, res) {
     const params = Object.assign({}, req.query, {
-      device_selector: req.params.device_selector,
-      device_feature_selector: req.params.device_feature_selector,
+      device_feature_selector: req.params.device_feature_selector.split(','),
     });
-    const devices = await gladys.device.getFeatureStates(params); 
-    if(devices && devices.length > 0){
-      // TODO: fix le nb max de value + le type d'algo (en par de la request)
-      const chartWidth = 100;
-      const featureArray = [];
-      devices.forEach(device => {
-        device.features.forEach(feature => {
-          if(feature.device_feature_states && feature.device_feature_states.length > 0){
 
-            const newFeatureStateArray = [];
-            feature.device_feature_states.forEach(function changeState(state, index) {
-              newFeatureStateArray.push({
-                x: state.created_at, 
-                y: state.value
+    // fix period
+    const beginDate = new Date();
+    switch (params.chartPeriod) {
+      case 'last2day-selector':
+        beginDate.setDate(beginDate.getDate() - 2);
+        break;
+      case 'lastweek-selector':
+        beginDate.setDate(beginDate.getDate() - 7);
+        break;
+      case 'last1month-selector':
+        beginDate.setDate(beginDate.getDate() - 31);
+        break;
+      case 'lastyear-selector':
+        beginDate.setDate(beginDate.getDate() - 365);
+        break;
+      case 'last1day-selector':
+      default:
+        beginDate.setDate(beginDate.getDate() - 1);
+    }
+
+    params.begin_date = beginDate;
+    params.end_date = new Date();
+
+    console.log('params: ', params);
+    const devices = await gladys.device.getFeatureStates(params);
+
+    // Downsample result to reduce nb of value in response
+    if (params.downsample && params.downsample === 'true') {
+      if (devices && devices.length > 0) {
+        let chartWidth = 100;
+        if (params.maxValue) {
+          chartWidth = params.maxValue;
+        }
+        const featureArray = [];
+        devices.forEach((device) => {
+          device.features.forEach((feature) => {
+            if (feature.device_feature_states && feature.device_feature_states.length > 0) {
+              const newFeatureStateArray = [];
+              feature.device_feature_states.forEach(function changeState(state, index) {
+                newFeatureStateArray.push({
+                  x: state.created_at,
+                  y: state.value,
+                });
               });
-            });
 
-            const smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
-            feature.device_feature_states = smoothFeatureStates;
-            featureArray.push(feature);
-          }      
+              // Choice algo of downsampling use
+              let smoothFeatureStates;
+              switch (params.downsamplemethod) {
+                case 'LTOB':
+                  smoothFeatureStates = LTOB(newFeatureStateArray, chartWidth);
+                  break;
+                case 'LTD':
+                  smoothFeatureStates = LTD(newFeatureStateArray, chartWidth);
+                  break;
+                case 'SMA':
+                  smoothFeatureStates = SMA(newFeatureStateArray, chartWidth);
+                  break;
+                case 'ASAP':
+                  smoothFeatureStates = ASAP(newFeatureStateArray, chartWidth);
+                  break;
+                case 'LTTB':
+                default:
+                  smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
+              }
+              feature.device_feature_states = smoothFeatureStates;
+              featureArray.push(feature);
+            }
+          });
+          device.features = featureArray;
         });
-        device.features = featureArray;
-      });
+      }
     }
 
     res.json(devices);

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-// const uuid = require('uuid');
-// const fs = require('fs');
+const uuid = require('uuid');
+const fs = require('fs');
 const { authenticatedRequest } = require('../request.test');
 
 describe('POST /api/v1/device', () => {
@@ -83,33 +83,31 @@ describe('GET /api/v1/service/:service_name/device', () => {
 });
 
 describe.only('GET /api/v1/device_feature_sate', () => {
-  it('should get device_feature_sate', async () => {
-  /*
+  it('should get device_feature_sate (default)', async () => {
     const myDate = new Date();
+    myDate.setDate(myDate.getDate() - 600);
     let myData = '';
-    for (let i = 0 ; i < 10000 ; i+=1){
-      myDate.setSeconds(myDate.getSeconds() + (i*10));
-      myData+=`
+    for (let i = 0; i < 10000; i += 1) {
+      myDate.setSeconds(myDate.getSeconds() + i * 10);
+      myData += `
       {
         id: '${uuid.v4()}',
-        device_feature_id: 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900',
+        device_feature_id: 'f07c5b27-9301-4482-a059-9f91329d30e7',
         value: ${Math.floor(Math.random() * 50) + 1},
         created_at: '${myDate.toISOString()}',
         updated_at: '${myDate.toISOString()}',
       },`;
-
-    } 
-    await fs.writeFile('testSM.txt', myData, function (err) {
+    }
+    await fs.writeFile('testSM.txt', myData, function(err) {
       if (err) {
-         return console.log(err); 
-        };
+        return console.log(err);
+      }
       console.log('Hello World > helloworld.txt');
       return null;
     });
-    */
 
     await authenticatedRequest
-      .get('/api/v1/device_feature_sate/test-device/test-temperature-sensor')
+      .get('/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=10')
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
@@ -121,14 +119,127 @@ describe.only('GET /api/v1/device_feature_sate', () => {
           });
         });
 
-        expect(res.body).to.be.instanceOf(Array)
+        expect(res.body)
+          .to.be.instanceOf(Array)
           .and.have.lengthOf(1);
-        expect(res.body[0].features).to.be.instanceOf(Array)
+        expect(res.body[0].features)
+          .to.be.instanceOf(Array)
           .and.have.lengthOf(1);
-        expect(res.body[0].features[0].device_feature_states).to.be.instanceOf(Array)
-          .and.have.lengthOf(100);
-        
+        expect(res.body[0].features[0].device_feature_states)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(10);
       });
+  });
 
+  it('should get device_feature_sate (LTOB)', async () => {
+    await authenticatedRequest
+      .get(
+        '/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=100&downsamplemethod=LTOB',
+      )
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        res.body.forEach((device) => {
+          expect(device).to.have.property('features');
+          device.features.forEach((feature) => {
+            expect(feature).to.have.property('device_feature_states');
+          });
+        });
+
+        expect(res.body)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features[0].device_feature_states)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(100);
+      });
+  });
+
+  it('should get device_feature_sate (LTD)', async () => {
+    await authenticatedRequest
+      .get(
+        '/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=100&downsamplemethod=LTD',
+      )
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        res.body.forEach((device) => {
+          expect(device).to.have.property('features');
+          device.features.forEach((feature) => {
+            expect(feature).to.have.property('device_feature_states');
+          });
+        });
+
+        expect(res.body)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features[0].device_feature_states)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(100);
+      });
+  });
+
+  it('should get device_feature_sate (SMA)', async () => {
+    await authenticatedRequest
+      .get(
+        '/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=100&downsamplemethod=SMA',
+      )
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        res.body.forEach((device) => {
+          expect(device).to.have.property('features');
+          device.features.forEach((feature) => {
+            expect(feature).to.have.property('device_feature_states');
+          });
+        });
+
+        expect(res.body)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features[0].device_feature_states)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(100);
+      });
+  });
+
+  it('should get device_feature_sate (ASAP)', async () => {
+    await authenticatedRequest
+      .get(
+        '/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=100&downsamplemethod=ASAP',
+      )
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        res.body.forEach((device) => {
+          expect(device).to.have.property('features');
+          device.features.forEach((feature) => {
+            expect(feature).to.have.property('device_feature_states');
+          });
+        });
+
+        expect(res.body)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(1);
+        expect(res.body[0].features[0].device_feature_states)
+          .to.be.instanceOf(Array)
+          .and.have.lengthOf(100);
+      });
   });
 });

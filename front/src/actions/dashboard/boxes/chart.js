@@ -1,6 +1,7 @@
+import update from 'immutability-helper';
+import get from 'get-value';
 import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
-import update from 'immutability-helper';
 import chartConfig from './chart-box-config/chartConfig';
 import chartStyle from '../../../actions/dashboard/boxes/chart-box-config/chartStyle';
 
@@ -9,78 +10,48 @@ function createActions(store) {
   const boxActions = createBoxActions(store);
 
   const actions = {
-    toggleDropDown(state) {
-      state.showDropDownChartBox = !state.showDropDownChartBox;
-      console.log('toggleDropDown' + state.showDropDownChartBox);
-      store.setState({
-        showDropDownChartBox: !state.showDropDownChartBox
+    toggleDropDown(state, box, x, y) {
+
+      const data = boxActions.getBoxData(state, BOX_KEY, x, y);
+      const currentShowDropDownChartBox = get(data, 'showDropDownChartBox');
+      const showDropDownChartBox = !currentShowDropDownChartBox;
+            
+      boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+        showDropDownChartBox
       });
     },
-    buildChartOption(state, box, x, y) {
-      const chartData = {
-        roomName: 'Salon',
-        deviceName: 'Temperature',
-        lastValue: 30,
-        unit: '°C',
-        deviceFeatureState: [
-          {
-            date: '2020-10-01',
-            value: 29
-          },
-          {
-            date: '2020-09-01',
-            value: 20
-          },
-          {
-            date: '2020-08-01',
-            value: 21
-          },
-          {
-            date: '2020-07-01',
-            value: 14
-          },
-          {
-            date: '2020-06-01',
-            value: 33
-          },
-          {
-            date: '2020-05-01',
-            value: 17
-          },
-          {
-            date: '2020-04-01',
-            value: 12
-          },
-          {
-            date: '2020-03-01',
-            value: 20
-          },
-          {
-            date: '2020-02-01',
-            value: 14
-          },
-          {
-            date: '2020-01-01',
-            value: 22
-          }
-        ]
-      };
+    async getChartOption(state, box, x, y, chartPeriod) {
 
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
+
+        let newChartPeriod = box.chartPeriod;
+        if(chartPeriod){
+          newChartPeriod = chartPeriod;
+        }
+        
+        // const chartData = state.httpClient.get(`/api/v1/room/${box.room}?expand=devices`);
+        const chartData = await state.httpClient
+          .get(`/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=1000&chartPeriod=${newChartPeriod}`);        
+                
         let chartTypeStyle;
+        let apexType;
         switch (box.chartType) {
           case chartConfig.CHART_TYPE_SELECTOR.LINE.name:
             chartTypeStyle = chartStyle.OPTIONS_LINE;
+            apexType = chartConfig.CHART_TYPE_SELECTOR.LINE.apexName;
             break;
           case chartConfig.CHART_TYPE_SELECTOR.AREA.name:
             chartTypeStyle = chartStyle.OPTIONS_AREA;
+            apexType = chartConfig.CHART_TYPE_SELECTOR.AREA.apexName;
             break;
           case chartConfig.CHART_TYPE_SELECTOR.BAR.name:
             chartTypeStyle = chartStyle.OPTIONS_BAR;
+            apexType = chartConfig.CHART_TYPE_SELECTOR.BAR.apexName;
             break;
           default:
             chartTypeStyle = chartStyle.OPTIONS_LINE.NAME;
+            apexType = chartConfig.CHART_TYPE_SELECTOR.LINE.apexName;
         }
 
         // we merge the old with the new one
@@ -110,31 +81,51 @@ function createActions(store) {
           }
         }
 
+        const series = [];
         const xData = [];
-        const yData = [];
-        chartData.deviceFeatureState.forEach(element => {
-          xData.push(element.date);
-          yData.push(element.value);
-        });
-        options.xaxis.categories = xData; // [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998];
+        let minYAxis;
+        let maxYAxis;
+        chartData.forEach(device => {
+          const yData = [];
+          device.features.forEach(feature => {
+            feature.device_feature_states.forEach(featureState => {
+              xData.push(featureState.x);
+              yData.push(featureState.y);
+            });
+            series.push(
+              {
+                name: device.name + ' - ' + feature.name,
+                data: yData 
+              }
+            );
 
-        const minYAxis = Math.min.apply(null, yData);
-        const maxYAxis = Math.max.apply(null, yData);
+            const tmpMinYAxis = Math.min.apply(null, yData);
+            if(!minYAxis || minYAxis > tmpMinYAxis){
+              minYAxis = tmpMinYAxis;
+            }
+            const tmpMaxYAxis = Math.max.apply(null, yData);
+            if(!maxYAxis || maxYAxis < tmpMaxYAxis){
+              maxYAxis = tmpMaxYAxis;
+            }
+
+          });
+        });
+
+        options.xaxis.categories = xData;
         options.yaxis.min = minYAxis - 1;
         options.yaxis.max = maxYAxis + 1;
 
-        const series = [
-          {
-            name: chartData.deviceName,
-            data: yData // [30, 40, 91, 60, 49, 55, 70, 15]
-          }
-        ];
-
+        // TODO last_value, unit , room name et device name a revoir => depends du type de box
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           options,
           series,
+          apexType,
+          chartPeriod: newChartPeriod,
+          showDropDownChartBox: false,
           roomName: chartData.roomName,
-          deviceName: chartData.deviceName
+          deviceName: chartData.deviceName,
+          lastValue: chartData.lastValue,
+          unit: chartData.unit,
         });
 
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);

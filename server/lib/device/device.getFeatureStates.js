@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get list of device feature states 
+ * @description Get list of device feature states
  * @param {Object} [options] - Options of the query.
  * @example
  * const devices = await gladys.device.get({
@@ -26,30 +26,48 @@ async function getFeatureStates(options) {
       {
         model: db.DeviceFeature,
         as: 'features',
-        include: [{
-          model: db.DeviceFeatureState,
-          as: 'device_feature_states',
-          required: false
-        }]
-      }
+        include: [
+          {
+            model: db.DeviceFeatureState,
+            as: 'device_feature_states',
+            required: false,
+          },
+        ],
+      },
     ],
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
   // search by devide selector
-  if(options.device_selector){
+  if (options.device_selector) {
     queryParams.where = {
-      selector: options.device_selector,
+      selector: { [Op.in]: options.device_selector },
     };
   }
 
   // search by feature selector
-  if(options.device_feature_selector){
+  if (options.device_feature_selector) {
     queryParams.include[0].where = {
-      selector: options.device_feature_selector,
+      selector: { [Op.in]: options.device_feature_selector },
     };
   }
+
+  console.log('queryParams: ', queryParams.include[0].where);
+
+  if (options.begin_date || options.end_date) {
+    queryParams.include[0].include[0].where = { created_at: {} };
+    if (options.begin_date && !options.end_date) {
+      queryParams.include[0].include[0].where.created_at = { [Op.gte]: options.begin_date };
+    }
+    if (!options.begin_date && options.end_date) {
+      queryParams.include[0].include[0].where.created_at = { [Op.gte]: options.end_date };
+    }
+    if (options.begin_date && options.end_date) {
+      queryParams.include[0].include[0].where.created_at = { [Op.between]: [options.begin_date, options.end_date] };
+    }
+  }
+  console.log('queryParams2: ', queryParams.include[0].include[0].where);
 
   // search by device feature category
   if (optionsWithDefault.device_feature_category) {

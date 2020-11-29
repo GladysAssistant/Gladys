@@ -61,8 +61,19 @@ const OPTIONS_COMMON = {
   },
   colors: ['#206bc4', '#a8aeb7'],
   legend: {
-    show: false
-  }
+    show: true,
+    position: 'top',
+    height: 32,
+    offsetY: 8,
+    markers: {
+      width: 8,
+      height: 8,
+      radius: 100,
+    },
+    itemMargin: {
+      horizontal: 8,
+    },
+  },
 };
 
 const OPTIONS_LINE = {
