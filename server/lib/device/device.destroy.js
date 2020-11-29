@@ -1,5 +1,5 @@
 const { NotFoundError } = require('../../utils/coreErrors');
-const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../utils/constants');
 const db = require('../../models');
 
 /**
@@ -51,6 +51,10 @@ async function destroy(selector) {
       }
     }
   });
+
+  // notify device removal
+  this.notify(device, EVENTS.DEVICE.DELETE);
+
   return null;
 }
 

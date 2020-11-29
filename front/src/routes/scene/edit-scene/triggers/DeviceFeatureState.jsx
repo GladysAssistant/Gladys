@@ -34,6 +34,9 @@ class TurnOnLight extends Component {
   handleValueChangeBinary = newValue => () => {
     this.props.updateTriggerProperty(this.props.index, 'value', newValue);
   };
+  handleThresholdOnlyModeChange = e => {
+    this.props.updateTriggerProperty(this.props.index, 'threshold_only', e.target.checked);
+  };
   getBinaryOperator = () => (
     <div class="col-2">
       <div class="text-center" style={{ marginTop: '10px' }}>
@@ -141,6 +144,19 @@ class TurnOnLight extends Component {
               </div>
             </div>
           )}
+          <div class="col-12">
+            <label class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                checked={props.trigger.threshold_only}
+                onChange={this.handleThresholdOnlyModeChange}
+              />
+              <span class="form-check-label">
+                <Text id="editScene.triggersCard.newState.onlyExecuteAtThreshold" />
+              </span>
+            </label>
+          </div>
         </div>
       </div>
     );
