@@ -10,7 +10,7 @@ import ChartPeriodSelector from './ChartPeriodSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-import actions from '../../../actions/dashboard/edit-boxes/editChartMultiFeatures';
+import actions from '../../../actions/dashboard/edit-boxes/editChartFeatures';
 
 @connect('httpClient', actions)
 class EditChartMultiFeatures extends Component {

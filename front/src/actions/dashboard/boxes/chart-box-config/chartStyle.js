@@ -82,6 +82,7 @@ const OPTIONS_COMMON = {
       format: 'dd MMM yyyy',
       formatter: undefined,
     },
+    y: [],
     marker: {
       show: true,
     },

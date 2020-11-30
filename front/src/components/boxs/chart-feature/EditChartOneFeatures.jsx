@@ -9,7 +9,7 @@ import ChartPeriodSelector from './ChartPeriodSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-import actions from '../../../actions/dashboard/edit-boxes/editChartMultiFeatures';
+import actions from '../../../actions/dashboard/edit-boxes/editChartFeatures';
 
 @connect('httpClient', actions)
 class EditChartMultiFeatures extends Component {
@@ -32,6 +32,14 @@ class EditChartMultiFeatures extends Component {
     try {
       this.setState({ loading: true });
 
+      const excludeFeatyreType = [
+        DEVICE_FEATURE_TYPES.SENSOR.BINARY, 
+        DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+        DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
+        DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN,
+        DEVICE_FEATURE_TYPES.LIGHT.COLOR      
+      ];
+
       let devices = await this.props.httpClient.get(`/api/v1/device`);
 
       const deviceOptions = [];
@@ -39,16 +47,17 @@ class EditChartMultiFeatures extends Component {
       devices.forEach(device => {
         const roomDeviceFeatures = [];
         device.features.forEach(feature => {
-          const featureOption = {
-            value: feature.selector,
-            label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
-          };
-          // for now, we only supports binary on/off and sensors
-          if (feature.read_only || feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
-            roomDeviceFeatures.push(featureOption);
-          }
-          if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
-            selectedDeviceFeaturesOptions.push(featureOption);
+          if( !excludeFeatyreType.includes(feature.type)){ 
+            const featureOption = {
+              value: feature.selector,
+              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+            }; 
+            if (feature.read_only) { 
+              roomDeviceFeatures.push(featureOption);
+            }
+            if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
+              selectedDeviceFeaturesOptions.push(featureOption);
+            }
           }
         });
         if (roomDeviceFeatures.length > 0) {

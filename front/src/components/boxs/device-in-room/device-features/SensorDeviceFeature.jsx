@@ -3,6 +3,7 @@ import get from 'get-value';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import commons from '../../../../actions/dashboard/boxes/commons';
 
 dayjs.extend(relativeTime);
 
@@ -30,17 +31,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value !== null && (
           <span>
             {' '}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PERCENT && '%'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS && '°C'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT && '°F'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.WATT && 'W'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT && 'kW'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
+            {commons.formatUnitToDisplay(props.deviceFeature.unit)}
           </span>
         )}
       </td>

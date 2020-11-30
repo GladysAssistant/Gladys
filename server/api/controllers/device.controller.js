@@ -1,4 +1,5 @@
 const { LTTB, ASAP, SMA, LTOB, LTD } = require('downsample');
+const trend = require('trend');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
@@ -137,6 +138,7 @@ module.exports = function DeviceController(gladys) {
           chartWidth = params.maxValue;
         }
         const featureArray = [];
+        const featureValuesArray = [];
         devices.forEach((device) => {
           device.features.forEach((feature) => {
             if (feature.device_feature_states && feature.device_feature_states.length > 0) {
@@ -146,6 +148,7 @@ module.exports = function DeviceController(gladys) {
                   x: state.created_at,
                   y: state.value,
                 });
+                featureValuesArray.push(state.value);
               });
 
               // Choice algo of downsampling use
@@ -168,6 +171,15 @@ module.exports = function DeviceController(gladys) {
                   smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
               }
               feature.device_feature_states = smoothFeatureStates;
+              feature.trend = trend(featureValuesArray, {
+                  lastPoints: 3,
+                  avgPoints: 10,
+                  avgMinimum: 10,
+                  reversed: false
+                });
+              console.log(featureValuesArray);
+              console.log(feature.trend);
+
               featureArray.push(feature);
             }
           });

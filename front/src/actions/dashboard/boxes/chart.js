@@ -4,6 +4,7 @@ import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
 import chartConfig from './chart-box-config/chartConfig';
 import chartStyle from '../../../actions/dashboard/boxes/chart-box-config/chartStyle';
+import commons from './commons';
 
 const BOX_KEY = 'ChartBox';
 function createActions(store) {
@@ -83,10 +84,14 @@ function createActions(store) {
         const series = [];
         const xData = [];
         let minYAxis;
-        let maxYAxis;
+        let maxYAxis; 
+        let unit;
         chartData.forEach(device => {
           device.features.forEach(feature => {
             const yData = [];
+            // Format unit to display
+            unit = commons.formatUnitToDisplay(feature.unit);
+            
             feature.device_feature_states.forEach(featureState => {
               xData.push(featureState.x);
               yData.push(featureState.y);
@@ -97,7 +102,16 @@ function createActions(store) {
                 data: yData 
               }
             );
-
+            const formatter = y => {
+              if(typeof y !== "undefined") {
+                return  y.toFixed(2) + ' ' + unit;
+              }
+              return y;
+            };
+            options.tooltip.y.push({
+              formatter
+            });
+            
             const tmpMinYAxis = Math.min.apply(null, yData);
             if(!minYAxis || minYAxis > tmpMinYAxis){
               minYAxis = tmpMinYAxis;
@@ -114,6 +128,30 @@ function createActions(store) {
         options.yaxis.min = minYAxis - 1;
         options.yaxis.max = maxYAxis + 1;
 
+        // Specific to OneFeature Box
+        let deviceName = '';
+        let roomName = '';
+        let lastValue = '';
+        let trend = 1;
+        let trendColor = 'grey';
+        if(box.type === 'chart-one-feature' && chartData.length > 0){
+          options.grid.padding.bottom = 0;
+          deviceName = chartData[0].name;
+          roomName = chartData[0].room.name; 
+          if(chartData[0].features.length > 0){
+            lastValue = chartData[0].features[0].last_value;
+            trend = chartData[0].features[0].trend;
+            if(trend < 1){
+              trendColor = 'red';
+            }
+            if(trend > 1){
+              trendColor = 'green';
+            }
+          }
+        }else{
+          options.grid.padding.bottom = 40;
+        }
+
         // TODO last_value, unit , room name et device name a revoir => depends du type de box
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           options,
@@ -121,10 +159,12 @@ function createActions(store) {
           apexType,
           chartPeriod: newChartPeriod,
           showDropDownChartBox: false,
-          roomName: chartData.roomName,
-          deviceName: chartData.deviceName,
-          lastValue: chartData.lastValue,
-          unit: chartData.unit,
+          roomName,
+          deviceName,
+          lastValue,
+          unit,
+          trend,
+          trendColor
         });
 
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);

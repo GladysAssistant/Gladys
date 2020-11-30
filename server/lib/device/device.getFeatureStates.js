@@ -34,6 +34,10 @@ async function getFeatureStates(options) {
           },
         ],
       },
+      {
+        model: db.Room,
+        as: 'room',
+      }
     ],
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
