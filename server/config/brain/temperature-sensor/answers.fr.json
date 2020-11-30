@@ -1,7 +1,11 @@
 [
   {
     "label": "temperature-sensor.get-in-room.success",
-    "answers": ["Il fait {{ temperature }} {{ unit }} dans la pièce {{ roomName }}."]
+    "answers": ["Il fait {{ temperature }} {{ unit }} dans la pièce {{ roomName }}.",
+                "La température est de {{ temperature }} {{ unit }} dans la pièce {{ roomName }}.",
+                "La température est de {{ temperature }} {{ unit }}.",
+                "Il fait {{ temperature }} {{ unit }}."
+               ]
   },
   {
     "label": "temperature-sensor.get-in-room.fail.no-results",

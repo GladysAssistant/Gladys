@@ -1,6 +1,8 @@
 [
   {
     "label": "camera.get-image-room",
-    "questions": ["Montre moi la caméra du %room%", "Montre moi le %room%"]
+    "questions": ["Montre moi la caméra du %room%",
+                  "Montre moi le %room%"
+                ]
   }
 ]

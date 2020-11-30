@@ -1,7 +1,10 @@
 [
   {
     "label": "camera.get-image-room.success",
-    "answers": ["Voilà ce que je vois:"]
+    "answers": ["Voilà ce que je vois:",
+                "Voici la caméra:",
+                "Voici les images de la caméra:"
+              ]
   },
 
   {
