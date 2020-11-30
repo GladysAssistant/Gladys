@@ -37,7 +37,7 @@ async function getFeatureStates(options) {
       {
         model: db.Room,
         as: 'room',
-      }
+      },
     ],
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
@@ -57,8 +57,6 @@ async function getFeatureStates(options) {
     };
   }
 
-  console.log('queryParams: ', queryParams.include[0].where);
-
   if (options.begin_date || options.end_date) {
     queryParams.include[0].include[0].where = { created_at: {} };
     if (options.begin_date && !options.end_date) {
@@ -71,7 +69,6 @@ async function getFeatureStates(options) {
       queryParams.include[0].include[0].where.created_at = { [Op.between]: [options.begin_date, options.end_date] };
     }
   }
-  console.log('queryParams2: ', queryParams.include[0].include[0].where);
 
   // search by device feature category
   if (optionsWithDefault.device_feature_category) {

@@ -1,5 +1,5 @@
 const { DEVICE_FEATURE_UNITS } = require('../../../../../server/utils/constants');
- 
+
 const formatUnitToDisplay = unit => {
   let result;
   switch (unit) {
@@ -56,7 +56,7 @@ const formatUnitToDisplay = unit => {
   }
 
   return result;
-}
+};
 
 module.exports = {
   formatUnitToDisplay

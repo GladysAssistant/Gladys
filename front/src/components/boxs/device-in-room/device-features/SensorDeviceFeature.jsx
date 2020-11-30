@@ -7,7 +7,7 @@ import commons from '../../../../actions/dashboard/boxes/commons';
 
 dayjs.extend(relativeTime);
 
-import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR];
 
@@ -29,10 +29,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
         {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value !== null && (
-          <span>
-            {' '}
-            {commons.formatUnitToDisplay(props.deviceFeature.unit)}
-          </span>
+          <span> {commons.formatUnitToDisplay(props.deviceFeature.unit)}</span>
         )}
       </td>
     )}

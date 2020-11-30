@@ -12,28 +12,26 @@ function createActions(store) {
 
   const actions = {
     toggleDropDown(state, box, x, y) {
-
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
       const currentShowDropDownChartBox = get(data, 'showDropDownChartBox');
       const showDropDownChartBox = !currentShowDropDownChartBox;
-            
+
       boxActions.mergeBoxData(state, BOX_KEY, x, y, {
         showDropDownChartBox
       });
     },
     async getChartOption(state, box, x, y, chartPeriod) {
-
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-
         let newChartPeriod = box.chartPeriod;
-        if(chartPeriod){
+        if (chartPeriod) {
           newChartPeriod = chartPeriod;
         }
-        
-        const chartData = await state.httpClient
-          .get(`/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=1000&chartPeriod=${newChartPeriod}`);        
-                
+
+        const chartData = await state.httpClient.get(
+          `/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=1000&chartPeriod=${newChartPeriod}`
+        );
+
         let chartTypeStyle;
         let apexType;
         switch (box.chartType) {
@@ -84,43 +82,40 @@ function createActions(store) {
         const series = [];
         const xData = [];
         let minYAxis;
-        let maxYAxis; 
+        let maxYAxis;
         let unit;
         chartData.forEach(device => {
           device.features.forEach(feature => {
             const yData = [];
             // Format unit to display
             unit = commons.formatUnitToDisplay(feature.unit);
-            
+
             feature.device_feature_states.forEach(featureState => {
               xData.push(featureState.x);
               yData.push(featureState.y);
             });
-            series.push(
-              {
-                name: device.name + ' - ' + feature.name,
-                data: yData 
-              }
-            );
+            series.push({
+              name: `${device.name} - ${feature.name}`,
+              data: yData
+            });
             const formatter = y => {
-              if(typeof y !== "undefined") {
-                return  y.toFixed(2) + ' ' + unit;
+              if (typeof y !== 'undefined') {
+                return `${y.toFixed(1)} ${unit}`;
               }
               return y;
             };
             options.tooltip.y.push({
               formatter
             });
-            
+
             const tmpMinYAxis = Math.min.apply(null, yData);
-            if(!minYAxis || minYAxis > tmpMinYAxis){
+            if (!minYAxis || minYAxis > tmpMinYAxis) {
               minYAxis = tmpMinYAxis;
             }
             const tmpMaxYAxis = Math.max.apply(null, yData);
-            if(!maxYAxis || maxYAxis < tmpMaxYAxis){
+            if (!maxYAxis || maxYAxis < tmpMaxYAxis) {
               maxYAxis = tmpMaxYAxis;
             }
-
           });
         });
 
@@ -134,21 +129,21 @@ function createActions(store) {
         let lastValue = '';
         let trend = 1;
         let trendColor = 'grey';
-        if(box.type === 'chart-one-feature' && chartData.length > 0){
+        if (box.type === 'chart-one-feature' && chartData.length > 0) {
           options.grid.padding.bottom = 0;
           deviceName = chartData[0].name;
-          roomName = chartData[0].room.name; 
-          if(chartData[0].features.length > 0){
+          roomName = chartData[0].room.name;
+          if (chartData[0].features.length > 0) {
             lastValue = chartData[0].features[0].last_value;
             trend = chartData[0].features[0].trend;
-            if(trend < 1){
+            if (trend < 1) {
               trendColor = 'red';
             }
-            if(trend > 1){
+            if (trend > 1) {
               trendColor = 'green';
             }
           }
-        }else{
+        } else {
           options.grid.padding.bottom = 40;
         }
 

@@ -84,6 +84,7 @@ describe('GET /api/v1/service/:service_name/device', () => {
 
 describe.only('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default)', async () => {
+    /*
     const myDate = new Date();
     myDate.setDate(myDate.getDate() - 600);
     let myData = '';
@@ -105,6 +106,7 @@ describe.only('GET /api/v1/device_feature_sate', () => {
       console.log('Hello World > helloworld.txt');
       return null;
     });
+    */
 
     await authenticatedRequest
       .get('/api/v1/device_feature_sate/test-device/test-temperature-sensor?downsample=true&maxValue=10')

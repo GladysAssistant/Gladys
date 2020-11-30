@@ -110,7 +110,6 @@ module.exports = function DeviceController(gladys) {
         beginDate.setDate(beginDate.getDate() - 2);
         break;
       case 'last1week-selector':
-        console.log('switch 1 week');
         beginDate.setDate(beginDate.getDate() - 7);
         break;
       case 'last1month-selector':
@@ -127,7 +126,6 @@ module.exports = function DeviceController(gladys) {
     params.begin_date = beginDate;
     params.end_date = new Date();
 
-    console.log('params: ', params);
     const devices = await gladys.device.getFeatureStates(params);
 
     // Downsample result to reduce nb of value in response
@@ -172,13 +170,11 @@ module.exports = function DeviceController(gladys) {
               }
               feature.device_feature_states = smoothFeatureStates;
               feature.trend = trend(featureValuesArray, {
-                  lastPoints: 3,
-                  avgPoints: 10,
-                  avgMinimum: 10,
-                  reversed: false
-                });
-              console.log(featureValuesArray);
-              console.log(feature.trend);
+                lastPoints: 3,
+                avgPoints: 10,
+                avgMinimum: 10,
+                reversed: false,
+              });
 
               featureArray.push(feature);
             }
@@ -188,7 +184,6 @@ module.exports = function DeviceController(gladys) {
       }
     }
 
-    console.log('devices: ', devices);
     res.json(devices);
   }
 

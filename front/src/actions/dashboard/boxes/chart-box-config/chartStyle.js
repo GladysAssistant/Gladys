@@ -66,27 +66,27 @@ const OPTIONS_COMMON = {
     markers: {
       width: 8,
       height: 8,
-      radius: 100,
+      radius: 100
     },
     itemMargin: {
-      horizontal: 2,
+      horizontal: 2
     }
   },
   tooltip: {
     enabled: true,
     shared: true,
-    followCursor: true, 
+    followCursor: true,
     theme: 'dark',
     x: {
       show: true,
       format: 'dd MMM yyyy',
-      formatter: undefined,
+      formatter: undefined
     },
     y: [],
     marker: {
-      show: true,
-    },
-  },
+      show: true
+    }
+  }
 };
 
 const OPTIONS_LINE = {
@@ -123,7 +123,7 @@ const OPTIONS_BAR = {
   plotOptions: {
     bar: {
       columnWidth: '55%',
-      endingShape: 'rounded',
+      endingShape: 'rounded'
     }
   }
 };

@@ -33,11 +33,11 @@ class EditChartMultiFeatures extends Component {
       this.setState({ loading: true });
 
       const excludeFeatyreType = [
-        DEVICE_FEATURE_TYPES.SENSOR.BINARY, 
+        DEVICE_FEATURE_TYPES.SENSOR.BINARY,
         DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
         DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
         DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN,
-        DEVICE_FEATURE_TYPES.LIGHT.COLOR      
+        DEVICE_FEATURE_TYPES.LIGHT.COLOR
       ];
 
       let devices = await this.props.httpClient.get(`/api/v1/device`);
@@ -47,12 +47,12 @@ class EditChartMultiFeatures extends Component {
       devices.forEach(device => {
         const roomDeviceFeatures = [];
         device.features.forEach(feature => {
-          if( !excludeFeatyreType.includes(feature.type)){ 
+          if (!excludeFeatyreType.includes(feature.type)) {
             const featureOption = {
               value: feature.selector,
               label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
-            }; 
-            if (feature.read_only) { 
+            };
+            if (feature.read_only) {
               roomDeviceFeatures.push(featureOption);
             }
             if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
