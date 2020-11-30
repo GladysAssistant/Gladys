@@ -9,7 +9,10 @@ class SceneCard extends Component {
     try {
       await this.setState({ saving: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/start`);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
+
     // make sure the loader is displayed at least 200ms
     setTimeout(() => this.setState({ saving: false }), 200);
   };
