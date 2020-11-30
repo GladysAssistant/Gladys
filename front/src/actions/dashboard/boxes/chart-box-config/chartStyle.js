@@ -2,7 +2,6 @@ const OPTIONS_COMMON = {
   chart: {
     fontFamily: 'inherit',
     width: '100%',
-    height: 35,
     offsetX: 0,
     offsetY: 0,
     parentHeightOffset: 0,
@@ -51,27 +50,40 @@ const OPTIONS_COMMON = {
   },
   grid: {
     show: false,
-    strokeDashArray: 4,
     padding: {
       top: 0,
       right: 0,
-      bottom: 0,
+      bottom: 40, // default value for multi feature set to 0 for one feature
       left: 0
     }
   },
-  colors: ['#206bc4', '#a8aeb7'],
+  colors: ['#206bc4', '#a8aeb7', '#2098c4', '#20aec4'],
   legend: {
     show: true,
     position: 'bottom',
     height: 32,
-    offsetY: 8,
+    offsetY: 0,
     markers: {
       width: 8,
       height: 8,
       radius: 100,
     },
     itemMargin: {
-      horizontal: 8,
+      horizontal: 2,
+    }
+  },
+  tooltip: {
+    enabled: true,
+    shared: true,
+    followCursor: true, 
+    theme: 'dark',
+    x: {
+      show: true,
+      format: 'dd MMM yyyy',
+      formatter: undefined,
+    },
+    marker: {
+      show: true,
     },
   },
 };
@@ -82,8 +94,8 @@ const OPTIONS_LINE = {
     opacity: 1
   },
   stroke: {
-    width: [2, 1],
-    dashArray: [0, 3],
+    width: [2, 2, 2, 2, 2],
+    dashArray: [0, 0, 0, 0],
     lineCap: 'round',
     curve: 'smooth'
   }
@@ -109,7 +121,8 @@ const OPTIONS_BAR = {
   },
   plotOptions: {
     bar: {
-      columnWidth: '40%'
+      columnWidth: '55%',
+      endingShape: 'rounded',
     }
   }
 };

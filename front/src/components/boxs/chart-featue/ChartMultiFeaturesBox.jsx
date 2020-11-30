@@ -2,8 +2,9 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Chart from 'react-apexcharts';
+import cx from 'classnames';
 
-import { DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
+import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import get from 'get-value';
 
 import actions from '../../../actions/dashboard/boxes/chart';
@@ -18,22 +19,27 @@ class ChartMultiFeaturesBox extends Component {
   }
 
   changeChartPeriod = async e =>{
-    console.log(e.target.name);
+    this.setState({ loading: true });
     await this.props.getChartOption(this.props.box, this.props.x, this.props.y, e.target.name);
+    this.setState({ loading: false });
+  }
+
+  getChartOption= () =>{
+    this.setState({ loading: true });
+    this.props.getChartOption(this.props.box, this.props.x, this.props.y);
+    this.setState({ loading: false });
   }
 
   componentDidMount() { 
-    this.props.getChartOption(this.props.box, this.props.x, this.props.y);
-    console.log(this.props.box.chartPeriod);
+    this.getChartOption(this.props.box, this.props.x, this.props.y);
   }
 
-  render(props, {}) {
+  render(props, {loading}) {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}ChartBox.${props.x}_${props.y}`); 
     // TODO voir usage box status = dimmer loading ?
-    // const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}ChartBox.${props.x}_${props.y}`);
+    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}ChartBox.${props.x}_${props.y}`);
     const options = get(boxData, 'options');
     const series = get(boxData, 'series');
-    const unit = get(boxData, 'unit');
     const apexType = get(boxData, 'apexType'); 
     const showDropDownChartBox = get(boxData, 'showDropDownChartBox'); 
     const chartPeriod = get(boxData, 'chartPeriod'); 
@@ -43,11 +49,11 @@ class ChartMultiFeaturesBox extends Component {
     console.log("chartPeriod: ",chartPeriod);
 
     return (
-      <div class="card">
+      <div class="card" >
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="subheader">
-              {props.box.chartName}
+              {props.box.chartName}              
             </div>
             <div class="ml-auto lh-1">
               <div class={'dropdown ' + (showDropDownChartBox && 'show')}>
@@ -102,11 +108,19 @@ class ChartMultiFeaturesBox extends Component {
               </div>
             </div>
           </div>
-          { options && series && apexType
-            && <Chart options={options} series={series} type={apexType} class="chart-sm" />
-          }
-        </div>
+          
+          <div class={cx('dimmer', { active: loading })}>
+            <div class="loader" />
+              <div class="dimmer-content">
+                {boxStatus === RequestStatus.Success && (
+                  options && series && apexType
+                    && <Chart options={options} series={series} type={apexType} class="chart-sm" height="300px" />
+                )}
+              </div>
+            </div>
+          </div>
       </div>
+      
     );
   }
 }

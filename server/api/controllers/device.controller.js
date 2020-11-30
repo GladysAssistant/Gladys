@@ -108,13 +108,14 @@ module.exports = function DeviceController(gladys) {
       case 'last2day-selector':
         beginDate.setDate(beginDate.getDate() - 2);
         break;
-      case 'lastweek-selector':
+      case 'last1week-selector':
+        console.log('switch 1 week');
         beginDate.setDate(beginDate.getDate() - 7);
         break;
       case 'last1month-selector':
         beginDate.setDate(beginDate.getDate() - 31);
         break;
-      case 'lastyear-selector':
+      case 'last1year-selector':
         beginDate.setDate(beginDate.getDate() - 365);
         break;
       case 'last1day-selector':
@@ -141,7 +142,6 @@ module.exports = function DeviceController(gladys) {
             if (feature.device_feature_states && feature.device_feature_states.length > 0) {
               const newFeatureStateArray = [];
               feature.device_feature_states.forEach(function changeState(state, index) {
-                console.log('x: ', state.created_at);
                 newFeatureStateArray.push({
                   x: state.created_at,
                   y: state.value,

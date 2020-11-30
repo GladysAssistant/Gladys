@@ -30,7 +30,6 @@ function createActions(store) {
           newChartPeriod = chartPeriod;
         }
         
-        // const chartData = state.httpClient.get(`/api/v1/room/${box.room}?expand=devices`);
         const chartData = await state.httpClient
           .get(`/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=1000&chartPeriod=${newChartPeriod}`);        
                 
@@ -86,10 +85,9 @@ function createActions(store) {
         let minYAxis;
         let maxYAxis;
         chartData.forEach(device => {
-          const yData = [];
           device.features.forEach(feature => {
+            const yData = [];
             feature.device_feature_states.forEach(featureState => {
-              console.log(featureState.x)
               xData.push(featureState.x);
               yData.push(featureState.y);
             });
