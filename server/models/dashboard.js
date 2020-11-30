@@ -16,6 +16,7 @@ const boxesSchema = Joi.array().items(
       chartType: Joi.string(),
       chartPeriod: Joi.string(),
       chartLimitClass: Joi.string(),
+      modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
     }),
   ),

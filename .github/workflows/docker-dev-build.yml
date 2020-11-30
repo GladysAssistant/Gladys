@@ -1,0 +1,87 @@
+name: Build Gladys dev images
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build-front:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup nodejs
+        uses: actions/setup-node@v1
+        with:
+            node-version: 12.x
+      - run: cd front && npm install && npm run build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: static
+          path: front/build
+  docker:
+    needs: build-front
+    name: Build and Push Gladys dev images
+    runs-on: ubuntu-latest
+    env:
+      # Export environment variables for all stages.
+      DOCKER_CLI_EXPERIMENTAL: enabled # for 'docker buildx'
+      DOCKERHUB_USER:  ${{secrets.DOCKERHUB_USER}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+      DOCKERHUB_REPO: gladysassistant/gladys
+      DOCKER_PLATFORMS: >
+        linux/amd64
+        linux/arm/v7
+        linux/arm/v6
+        linux/arm64/v8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download build artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: static
+    - name: Set up image tag
+      run: |
+          set -vx
+          echo "TAG=dev" >> $GITHUB_ENV
+          echo "DOCKER_BASE=${DOCKERHUB_REPO}" >> $GITHUB_ENV
+    - name: Install Docker buildx
+      run: |
+        set -vx
+        # Install up-to-date version of docker, with buildx support.
+        docker_apt_repo='https://download.docker.com/linux/ubuntu'
+        curl -fsSL "${docker_apt_repo}/gpg" | sudo apt-key add -
+        os="$(lsb_release -cs)"
+        sudo add-apt-repository "deb [arch=amd64] $docker_apt_repo $os stable"
+        sudo apt-get update
+        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+        # Enable docker daemon experimental support (for 'pull --platform').
+        config='/etc/docker/daemon.json'
+        if [[ -e "$config" ]]; then
+          sudo sed -i -e 's/{/{ "experimental": true, /' "$config"
+        else
+          echo '{ "experimental": true }' | sudo tee "$config"
+        fi
+        sudo systemctl restart docker
+        # Install QEMU multi-architecture support for docker buildx.
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        # Instantiate docker buildx builder with multi-architecture support.
+        docker buildx create --name gladysbuilder
+        docker buildx use gladysbuilder
+        # Start up buildx and verify that all is OK.
+        docker buildx inspect --bootstrap
+    - name: Build multi arch images with buildx
+      run: |
+        set -vx
+        echo "$DOCKERHUB_PASSWORD" \
+        | docker login -u="$DOCKERHUB_USER" --password-stdin
+        function buildx() {
+          docker buildx build \
+            --platform ${DOCKER_PLATFORMS// /,} \
+            --push \
+            -f docker/Dockerfile.buildx \
+            "$@" \
+            .
+        }
+        buildx -t "$DOCKER_BASE:$TAG" --target gladys

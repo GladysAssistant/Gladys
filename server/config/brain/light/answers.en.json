@@ -14,5 +14,9 @@
   {
     "label": "light.turn-off.fail",
     "answers": ["I didn't manage to turn off the light."]
+  },
+  {
+    "label": "light.not-found",
+    "answers": ["I didn't find any light in this room."]
   }
 ]

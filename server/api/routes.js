@@ -324,6 +324,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: serviceController.getByName,
     },
+    'get /api/v1/service': {
+      authenticated: true,
+      controller: serviceController.getAll,
+    },
     // user
     'get /api/v1/user': {
       authenticated: true,

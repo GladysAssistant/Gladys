@@ -1,5 +1,9 @@
 {
   "name": "gladys-front",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "start": "per-env",
     "start:production": "npm run -s serve",
@@ -52,7 +56,6 @@
     "react-big-calendar": "^0.22.1",
     "react-datepicker": "^2.13.0",
     "react-select": "^3.0.8",
-    "react-stripe-elements": "^5.0.1",
     "set-value": "^3.0.0",
     "tabler-ui": "0.0.32",
     "unistore": "^3.2.1",
