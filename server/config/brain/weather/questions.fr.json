@@ -1,10 +1,11 @@
 [
   {
     "label": "weather.get",
-    "questions": ["Quel temps fait-il ?",
-                  "Donne moi la météo.",
-                  "Quel est la météo ?",
-                  "Domme moi le temps qu'il fait."
-                ]
+    "questions": [
+      "Quel temps fait-il ?",
+      "Donne moi la météo.",
+      "Quel est la météo ?",
+      "Domme moi le temps qu'il fait."
+    ]
   }
 ]
