@@ -5,6 +5,6 @@
   },
   {
     "label": "calendar.next-event.get-location.fail",
-    "answers": ["I didn't manage to get your next event."]
+    "answers": ["I was unable to get your next event."]
   }
 ]
