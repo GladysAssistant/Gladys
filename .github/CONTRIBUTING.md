@@ -14,13 +14,13 @@ We want to make contributing to this project as easy and transparent as possible
 
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
-## Setup your development environnement
+## Setup your development environment
 
-Please read [this article](https://gladysassistant.com/en/docs/api/setup-development-environnement) on how to setup your developpement environnement for Gladys.
+Please read [this article](https://gladysassistant.com/en/docs/api/setup-development-environment) on how to setup your development environment for Gladys.
 
 ## Before making a Pull Request
 
-Make sure you discussed with the team on [Gladys Community](https://community.gladysassistant.com/) to ensure your pull request goes in the same direction as current developements 🙂
+Make sure you discussed with the team on [Gladys Community](https://community.gladysassistant.com/) to ensure your pull request goes in the same direction as current developments 🙂
 
 Then, create a GitHub Issue to indicate that you're working on the topic.
 
