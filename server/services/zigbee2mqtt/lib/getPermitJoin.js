@@ -1,7 +1,6 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-
 /**
  * @description Prepares service and starts connection with broker.
+ * @returns {boolean} Status of Zigbee2mqtt Permit join.
  * @example
  * init();
  */

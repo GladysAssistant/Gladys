@@ -1,14 +1,10 @@
-const logger = require('../../../utils/logger');
-const { exec } = require('../../../utils/childProcess');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { CONFIGURATION } = require('./constants');
-const { PlatformNotCompatible } = require('../../../utils/coreErrors');
-
-const { DEFAULT } = require('./constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
-const containerDescriptor = require('../docker/zigbee2mqtt-container.json');
-
 const { promisify } = require('util');
+const { exec } = require('../../../utils/childProcess');
+const { CONFIGURATION } = require('./constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const containerDescriptor = require('../docker/zigbee2mqtt-container.json');
+const logger = require('../../../utils/logger');
+
 const sleep = promisify(setTimeout);
 
 /**

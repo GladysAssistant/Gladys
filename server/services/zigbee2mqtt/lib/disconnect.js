@@ -11,6 +11,7 @@ const logger = require('../../../utils/logger');
 async function disconnect() {
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  let container;
 
   await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
   this.z2mEnabled = false;

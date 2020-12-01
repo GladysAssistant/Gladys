@@ -1,14 +1,10 @@
-const logger = require('../../../utils/logger');
-const { exec } = require('../../../utils/childProcess');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { CONFIGURATION } = require('./constants');
-const { PlatformNotCompatible } = require('../../../utils/coreErrors');
-
-const { DEFAULT } = require('./constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
-const containerDescriptor = require('../docker/z2m-mqtt-container.json');
-
 const { promisify } = require('util');
+const { exec } = require('../../../utils/childProcess');
+const { CONFIGURATION } = require('./constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const containerDescriptor = require('../docker/z2m-mqtt-container.json');
+const logger = require('../../../utils/logger');
+
 const sleep = promisify(setTimeout);
 
 /**
@@ -65,12 +61,12 @@ async function installMqttContainer() {
       logger.info(`Creating user/pass...`);
       const z2mMqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
       const z2mMqttPass = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
-      const z2mCreatePw = await this.gladys.system.exec(containerMqtt.id, {
+      await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUser, z2mMqttPass],
       });
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
       const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-      const createPw = await this.gladys.system.exec(containerMqtt.id, {
+      await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
       });
       logger.info('MQTT broker container successfully started');

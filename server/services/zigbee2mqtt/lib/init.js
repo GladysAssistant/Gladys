@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
-const { DEFAULT, CONFIGURATION } = require('./constants');
+const { CONFIGURATION } = require('./constants');
 const { generate } = require('../../../utils/password');
-const { ServiceNotConfiguredError, PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker.

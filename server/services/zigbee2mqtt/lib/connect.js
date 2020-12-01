@@ -4,6 +4,7 @@ const { DEFAULT } = require('./constants');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
+ * @param {Object} MqttParam - MQTT broker URL, Client MQTT username, Client MQTT password.
  * @example
  * connect();
  */

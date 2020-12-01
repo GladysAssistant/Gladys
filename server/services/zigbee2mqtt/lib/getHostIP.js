@@ -1,4 +1,3 @@
-const logger = require('../../../utils/logger');
 const { exec } = require('../../../utils/childProcess');
 
 /**
