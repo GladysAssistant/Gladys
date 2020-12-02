@@ -53,7 +53,7 @@ async function installMqttContainer() {
 
     try {
       logger.info('Zigbee2MQTT MQTT broker is starting...');
-      await this.gladys.system.restartContainer(containerMqtt.id);
+      await this.gladys.system.startContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
 
@@ -69,6 +69,11 @@ async function installMqttContainer() {
       await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
       });
+      // Container restart to inintialize users configuration
+      logger.info('Zigbee2MQTT MQTT broker is starting...');
+      await this.gladys.system.restartContainer(containerMqtt.id);
+      // wait 5 seconds for the container to restart
+      await sleep(5 * 1000);
       logger.info('MQTT broker container successfully started');
       this.mqttRunning = true;
       this.mqttExist = true;
