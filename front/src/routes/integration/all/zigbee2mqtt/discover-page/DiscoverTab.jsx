@@ -3,7 +3,6 @@ import cx from 'classnames';
 
 import EmptyState from './EmptyState';
 import DiscoveredBox from './DiscoveredBox';
-import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CheckStatus from '../commons/CheckStatus';
 
@@ -13,14 +12,16 @@ const DiscoverTab = ({ children, ...props }) => (
       <h1 class="card-title">
         <tr>
           <td class="text-right">
-            <a href={props.zigbee2mqttFrontend} target="_blank">
+            <a href={props.zigbee2mqttFrontend} rel="noopener noreferrer" target="_blank">
               <Text id="integration.zigbee2mqtt.discover.title" />
             </a>
           </td>
           <td>
             {props.zigbee2mqttDevices && (
               <div>
-                &nbsp;( {props.zigbee2mqttDevices.length} <Text id="integration.zigbee2mqtt.discover.device" /> )
+                &nbsp;{`( ${props.zigbee2mqttDevices.length} `}
+                <Text id="integration.zigbee2mqtt.discover.device" />
+                {` )`}
               </div>
             )}
           </td>

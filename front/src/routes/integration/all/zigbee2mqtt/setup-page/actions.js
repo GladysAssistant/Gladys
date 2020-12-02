@@ -97,7 +97,7 @@ const createActions = store => {
         });
       }
     },
-  
+
     async startContainer(state) {
       let z2mEnabled = true;
       let error = false;

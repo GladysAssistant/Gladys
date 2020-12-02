@@ -53,7 +53,7 @@ const SettingsTab = ({ children, ...props }) => (
                   usbPort =>
                     usbPort.comVID && (
                       <option value={usbPort.comPath} selected={props.zigbee2mqttDriverPath === usbPort.comPath}>
-                        {usbPort.comPath} - {usbPort.comName}
+                        {`${usbPort.comPath} - ${usbPort.comName} - ${usbPort.comVID}`}
                       </option>
                     )
                 )}

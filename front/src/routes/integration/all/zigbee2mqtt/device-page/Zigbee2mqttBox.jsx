@@ -30,7 +30,7 @@ class Zigbee2mqttBox extends Component {
 
     this.props.updateDeviceField(this.props.deviceIndex, 'model', selectedModel);
     this.props.updateDeviceField(this.props.deviceIndex, 'params', params);
-    this.props.updateDeviceField(this.props.deviceIndex, 'features', models[selectedModel]);
+    //    this.props.updateDeviceField(this.props.deviceIndex, 'features', models[selectedModel]);
   };
 
   saveDevice = async () => {

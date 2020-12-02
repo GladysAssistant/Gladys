@@ -3,9 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SettingsTab from './SettingsTab';
-import integrationConfig from '../../../../../config/integrations';
 import { RequestStatus } from '../../../../../utils/consts';
-//import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
   'user,session,usbPorts,zigbee2mqttStatus,zigbee2mqttDriverPath,getZigbee2mqttUsbPortStatus,getCurrentZigbee2mqttDriverPathStatus,zigbee2mqttGetStatusStatus,zigbee2mqttSaveStatus,zigbee2mqttSavingInProgress',
