@@ -70,13 +70,21 @@ async function init() {
       CONFIGURATION.Z2M_MQTT_USERNAME_VALUE,
       this.serviceId,
     );
-    await this.gladys.variable.setValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, generate(), this.serviceId);
+    await this.gladys.variable.setValue(
+      CONFIGURATION.Z2M_MQTT_PASSWORD_KEY,
+      generate(20, { number: true, lowercase: true, uppercase: true }),
+      this.serviceId,
+    );
     await this.gladys.variable.setValue(
       CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
       CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE,
       this.serviceId,
     );
-    await this.gladys.variable.setValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, generate(), this.serviceId);
+    await this.gladys.variable.setValue(
+      CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY,
+      generate(20, { number: true, lowercase: true, uppercase: true }),
+      this.serviceId,
+    );
     await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
   }
 
