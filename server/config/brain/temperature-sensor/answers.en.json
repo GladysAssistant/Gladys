@@ -1,10 +1,12 @@
 [
   {
     "label": "temperature-sensor.get-in-room.success",
-    "answers": ["It's {{ temperature }} {{ unit }} in the {{ roomName }}.",
+    "answers": [
+      "It's {{ temperature }} {{ unit }} in the {{ roomName }}.",
       "The temperature is {{ temperature }} {{ unit }} in the {{ roomName }}.",
       "The temperature is {{ temperature }} {{ unit }}.",
-      "It's {{ temperature }} {{ unit }}."]
+      "It's {{ temperature }} {{ unit }}."
+    ]
   },
   {
     "label": "temperature-sensor.get-in-room.fail.no-results",

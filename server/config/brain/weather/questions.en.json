@@ -1,9 +1,6 @@
 [
   {
     "label": "weather.get",
-    "questions": [
-      "What's the weather like ?",
-     "Give me the weather",
-     "What is the weather ?"]
+    "questions": ["What's the weather like ?", "Give me the weather", "What is the weather ?"]
   }
 ]

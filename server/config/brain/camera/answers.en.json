@@ -1,7 +1,7 @@
 [
   {
     "label": "camera.get-image-room.success",
-    "answers": ["Here is what I see:","Here are the images of the camera:","Here is the camera:"]
+    "answers": ["Here is what I see:", "Here are the images of the camera:", "Here is the camera:"]
   },
 
   {
