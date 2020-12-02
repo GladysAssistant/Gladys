@@ -1,6 +1,11 @@
 [
   {
     "label": "temperature-sensor.get-in-room",
-    "questions": ["What's the temperature in the %room% ?", "Give me the temperature in the %room%"]
+    "questions": [
+      "What's the temperature in the %room% ?",
+      "Give me the temperature in the %room%",
+      "How much is it in the %room% ?",
+      "The temperature in the %room%"
+    ]
   }
 ]

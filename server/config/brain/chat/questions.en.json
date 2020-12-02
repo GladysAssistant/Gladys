@@ -20,7 +20,7 @@
   },
   {
     "label": "chat.joke",
-    "Questions": ["Gladys tell me a joke.", "Gladys do you know a joke ?", "Tell me a joke."],
+    "questions": ["Gladys tell me a joke.", "Gladys do you know a joke ?", "Tell me a joke."],
     "answers": [
       "Do you know the devil's joke? Too bad it's hell !",
       "The other day I told a joke about my clothes. They were folded !",
@@ -34,7 +34,7 @@
   },
   {
     "label": "chat.shifumi",
-    "Questions": [
+    "questions": [
       "Shall we make a shifumi ?",
       "Gladys, are we playing shifumi ?",
       "shifumi",
@@ -49,7 +49,7 @@
   },
   {
     "label": "chat.heads-or-tails",
-    "Questions": [
+    "questions": [
       "Shall we do a coin toss ?",
       "Gladys, are we playing a coin toss ?",
       "Gladys, are we doing a coin toss ?",
@@ -60,7 +60,7 @@
   },
   {
     "label": "chat.numbers0to10",
-    "Questions": [
+    "questions": [
       "Give me a number between 0 and 10",
       "Gladys, give me a number between 0 and 10",
       "Gladys, can you give me a number between 0 and 10 ?",

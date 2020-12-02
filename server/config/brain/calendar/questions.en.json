@@ -1,7 +1,7 @@
 [
   {
     "label": "calendar.next-event.get-location",
-    "questions": ["Where is my next event?", "Where should I go next?"],
+    "questions": ["Where is my next event ?", "Where should I go next ?","What is my next appointment ?","What is my next meeting ?"],
     "answers": ["Let me check your calendar..."]
   }
 ]
