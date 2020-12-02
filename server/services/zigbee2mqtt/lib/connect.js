@@ -17,7 +17,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       username: mqttUsername,
       password: mqttPassword,
       reconnectPeriod: 5000,
-      clientId: 'gladys',
+      clientId: 'gladys-assistant-main-instance',
     });
     this.mqttClient.on('connect', () => {
       logger.info('Connected to MQTT container', mqttUrl);
