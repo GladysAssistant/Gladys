@@ -18,7 +18,7 @@ describe('Discover bluetooth characteristics', () => {
   beforeEach(() => {
     throwError = false;
 
-    characteristic = { uuid: 'uuid' };
+    characteristic = { uuid: 'fff1' };
     characteristics = [characteristic];
     discovered = false;
 

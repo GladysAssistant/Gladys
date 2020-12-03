@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 
-const { discoverServices } = require('./peripheral/bluetooth.discoverServices');
-const { discoverCharacteristics } = require('./service/bluetooth.discoverCharacteristics');
+const { discoverServices } = require('../utils/peripheral/bluetooth.discoverServices');
+const { discoverCharacteristics } = require('../utils/service/bluetooth.discoverCharacteristics');
 
 /**
  * @description Connects to peripheral, discovers all needed, to applu action.
