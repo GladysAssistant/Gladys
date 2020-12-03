@@ -197,7 +197,7 @@ describe('house.userLeft', () => {
       emit: fake.returns(null),
     };
     const house = new House(userLeftEvent);
-    const promise = house.userSeen('house-not-found', 'john');
+    const promise = house.userLeft('house-not-found', 'john');
     return assertChai.isRejected(promise, 'House not found');
   });
   it('should return user not found', async () => {
@@ -205,7 +205,7 @@ describe('house.userLeft', () => {
       emit: fake.returns(null),
     };
     const house = new House(userLeftEvent);
-    const promise = house.userSeen('test-house', 'user-not-found');
+    const promise = house.userLeft('test-house', 'user-not-found');
     return assertChai.isRejected(promise, 'User not found');
   });
 });
