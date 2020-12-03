@@ -209,7 +209,7 @@
         "noTemperatureRecorded": "No temperature recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
