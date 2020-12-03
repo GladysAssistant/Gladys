@@ -80,9 +80,9 @@ jobs:
       - run:
           name: Run prettier
           command: cd server && npm run prettier-check
-      # - run:
-      #     name: Run eslint
-      #     command: cd server && npm run eslint
+      - run:
+          name: Run eslint
+          command: cd server && npm run eslint
       # - run:
       #     name: Tests with coverage
       #     command: cd server && npm run coverage
