@@ -123,6 +123,12 @@ const actionsFunc = {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
     }
   },
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
+    await self.house.userSeen(action.house, action.user);
+  },
+  [ACTIONS.USER.SET_OUT_OF_HOME]: async (self, action) => {
+    await self.house.userLeft(action.house, action.user);
+  },
 };
 
 module.exports = {
