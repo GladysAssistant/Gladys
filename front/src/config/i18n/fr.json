@@ -724,6 +724,12 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU"
+      },
+      "userPresence": {
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
+        "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
       }
     },
     "actions": {
@@ -751,6 +757,10 @@
       },
       "condition": {
         "only-continue-if": "Continuer seulement si"
+      },
+      "user": {
+        "set-seen-at-home": "Utilisateur vu à la maison",
+        "set-out-of-home": "Utilisateur parti de la maison"
       }
     },
     "variables": {
