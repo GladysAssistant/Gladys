@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 const SignupForm = ({ children, ...props }) => (
   <form onSubmit={props.validateForm} className="card">
@@ -44,7 +45,7 @@ const SignupForm = ({ children, ...props }) => (
             <Localizer>
               <input
                 type="text"
-                className={'form-control ' + (props.fieldsErrored.includes('name') ? 'is-invalid' : '')}
+                className={cx('form-control', { 'is-invalid': props.fieldsErrored.includes('name') })}
                 placeholder={<Text id="gatewaySignUp.usernamePlaceholder" />}
                 value={props.name}
                 onInput={props.updateName}
@@ -61,7 +62,7 @@ const SignupForm = ({ children, ...props }) => (
             <Localizer>
               <input
                 type="email"
-                className={'form-control ' + (props.fieldsErrored.includes('email') ? 'is-invalid' : '')}
+                className={cx('form-control', { 'is-invalid': props.fieldsErrored.includes('email') })}
                 placeholder={<Text id="gatewaySignUp.emailPlaceholder" />}
                 value={props.email}
                 disabled={props.token && 'disabled'}
@@ -79,7 +80,7 @@ const SignupForm = ({ children, ...props }) => (
             <Localizer>
               <input
                 type="password"
-                className={'form-control ' + (props.fieldsErrored.includes('password') ? 'is-invalid' : '')}
+                className={cx('form-control', { 'is-invalid': props.fieldsErrored.includes('password') })}
                 placeholder={<Text id="gatewaySignUp.passwordPlaceholder" />}
                 value={props.password}
                 onInput={props.updatePassword}

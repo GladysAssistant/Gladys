@@ -1,6 +1,7 @@
 import style from '../style.css';
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
 
 const margin70px = {
   marginTop: '70px'
@@ -9,8 +10,8 @@ const margin20px = {
   marginTop: '20px'
 };
 
-const WelcomeStep = ({ children, ...props }) => (
-  <div class={'row ' + style.equal}>
+const WelcomeStep = () => (
+  <div class={cx('row', style.equal)}>
     <div class="col-lg-6">
       <h2>
         <Text id="signup.welcome.title" />

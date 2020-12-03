@@ -1,11 +1,12 @@
 import { Text, MarkupText } from 'preact-i18n';
 import style from '../style.css';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
 
-const ConfigureHouseTab = ({ children, ...props }) => (
+const ConfigureHouseTab = () => (
   <div class="card">
     <div class="card-body">
-      <div class={'row ' + style.equal}>
+      <div class={cx('row', style.equal)}>
         <div class="col-md">
           <img src="/assets/images/pierre-gilles-bali.jpg" />
         </div>

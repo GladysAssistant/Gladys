@@ -50,6 +50,7 @@ const triggersSchema = Joi.array().items(
     day_of_the_month: Joi.number()
       .min(1)
       .max(31),
+    threshold_only: Joi.boolean(),
   }),
 );
 
