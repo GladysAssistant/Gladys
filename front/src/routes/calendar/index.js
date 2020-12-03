@@ -33,7 +33,7 @@ class Map extends Component {
     this.props.getEventsInRange(from, to);
   };
 
-  eventPropGetter = event => ({
+  eventPropGetter = event => event.color && ({
     style: {
       backgroundColor: event.color,
       color: isBright(event.color) ? 'black' : 'white'
