@@ -2,7 +2,6 @@ const dayjs = require('dayjs');
 const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError, NoValuesFoundError, NotFoundError } = require('../../utils/coreErrors');
 
-
 const DAYS_OF_WEEKS = {
   sunday: 0,
   monday: 1,
@@ -40,7 +39,6 @@ async function command(message, classification, context) {
   let weather;
   let weatherDay;
   try {
-
     const houses = await this.house.get();
     const house = houses[0];
     if (!house || !house.latitude || !house.longitude) {
@@ -52,16 +50,16 @@ async function command(message, classification, context) {
         context.temperature = weather.temperature;
         context.units = weather.units === 'metric' ? '°C' : '°F';
 
-        await this.messageManager.replyByIntent(
-            message, `weather.get.success.${weather.weather}`, context
-        );
+        await this.messageManager.replyByIntent(message, `weather.get.success.${weather.weather}`, context);
         break;
       case 'weather.tomorrow':
         context.temperature_min = weather.days[0].temperature_min;
         context.temperature_max = weather.days[0].temperature_max;
         context.units = weather.units === 'metric' ? '°C' : '°F';
         await this.messageManager.replyByIntent(
-            message, `weather.tomorrow.success.${weather.days[0].weather}`, context
+          message,
+          `weather.tomorrow.success.${weather.days[0].weather}`,
+          context,
         );
         break;
       case 'weather.after-tomorrow':
@@ -69,7 +67,9 @@ async function command(message, classification, context) {
         context.temperature_max = weather.days[1].temperature_max;
         context.units = weather.units === 'metric' ? '°C' : '°F';
         await this.messageManager.replyByIntent(
-            message, `weather.after-tomorrow.success.${weather.days[1].weather}`, context
+          message,
+          `weather.after-tomorrow.success.${weather.days[1].weather}`,
+          context,
         );
         break;
       case 'weather.day':
@@ -77,15 +77,13 @@ async function command(message, classification, context) {
           throw new NotFoundError('day not found');
         }
         weatherDay = getWeatherByDay(weather, context.day);
-        if(!weatherDay){
+        if (!weatherDay) {
           throw new NotFoundError('weather for this day not found');
         }
         context.temperature_min = weatherDay.temperature_min;
         context.temperature_max = weatherDay.temperature_max;
         context.units = weather.units === 'metric' ? '°C' : '°F';
-        await this.messageManager.replyByIntent(
-            message, `weather.day.success.${weatherDay.weather}`, context
-        );
+        await this.messageManager.replyByIntent(message, `weather.day.success.${weatherDay.weather}`, context);
         break;
 
       default:

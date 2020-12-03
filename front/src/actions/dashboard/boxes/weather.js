@@ -24,8 +24,8 @@ const DAYS_OF_WEEKS = {
   3: 'dashboard.boxes.weather.daysOfWeek.wednesday',
   4: 'dashboard.boxes.weather.daysOfWeek.thursday',
   5: 'dashboard.boxes.weather.daysOfWeek.friday',
-  6: 'dashboard.boxes.weather.daysOfWeek.saturday',
-}
+  6: 'dashboard.boxes.weather.daysOfWeek.saturday'
+};
 
 const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
 
