@@ -53,7 +53,7 @@ async function installMqttContainer() {
 
     try {
       logger.info('Zigbee2MQTT MQTT broker is starting...');
-      await this.gladys.system.startContainer(containerMqtt.id);
+      await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
 

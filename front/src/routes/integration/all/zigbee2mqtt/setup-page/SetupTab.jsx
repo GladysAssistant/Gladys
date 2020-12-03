@@ -99,20 +99,24 @@ class SetupTab extends Component {
                   <img src={logoGladys} alt={`Gladys`} title={`Gladys`} width="80" height="80" />
                 </td>
                 <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
-                  <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
+                  {props.mqttRunning && (
+                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
+                  )}
                   {props.mqttRunning && props.gladysConnected && (
                     <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
                   )}
                   {props.mqttRunning && !props.gladysConnected && (
                     <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
                   )}
-                  <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
+                  {props.mqttRunning && (
+                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
+                  )}
                 </td>
                 <td class="text-center">
                   {props.mqttExist && <img src={logoMqtt} alt={`MQTT`} title={`MQTT`} width="80" height="80" />}
                 </td>
                 <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
-                  {props.zigbee2mqttExist && (
+                  {props.zigbee2mqttRunning && (
                     <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
                   )}
                   {props.zigbee2mqttRunning && props.zigbee2mqttConnected && (
@@ -121,7 +125,7 @@ class SetupTab extends Component {
                   {props.zigbee2mqttRunning && !props.zigbee2mqttConnected && (
                     <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
                   )}
-                  {props.zigbee2mqttExist && (
+                  {props.zigbee2mqttRunning && (
                     <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
                   )}
                 </td>
