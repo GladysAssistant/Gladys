@@ -1,5 +1,32 @@
+const dayjs = require('dayjs');
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError, NoValuesFoundError } = require('../../utils/coreErrors');
+const { ServiceNotConfiguredError, NoValuesFoundError, NotFoundError } = require('../../utils/coreErrors');
+
+
+const DAYS_OF_WEEKS = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
+/**
+ * @description Get the weather by a day.
+ * @param {Object} weather - The weather object return by the external service.
+ * @param {string} day - The requested day.
+ * @returns {Object} The weather object for the requested day.
+ * @example
+ * getWeatherByDay(weather, day);
+ */
+function getWeatherByDay(weather, day) {
+  const filterWeatherDays = weather.days.filter((weatherDay) => {
+    return dayjs(weatherDay.datetime).day() === DAYS_OF_WEEKS[day];
+  });
+  return filterWeatherDays.length === 1 ? filterWeatherDays[0] : undefined;
+}
 
 /**
  * @description Get the weather in a text request.
@@ -11,19 +38,56 @@ const { ServiceNotConfiguredError, NoValuesFoundError } = require('../../utils/c
  */
 async function command(message, classification, context) {
   let weather;
+  let weatherDay;
   try {
+
     const houses = await this.house.get();
     const house = houses[0];
     if (!house || !house.latitude || !house.longitude) {
       throw new NoValuesFoundError();
     }
+    weather = await this.get(house);
     switch (classification.intent) {
       case 'weather.get':
-        weather = await this.get(house);
         context.temperature = weather.temperature;
         context.units = weather.units === 'metric' ? '°C' : '°F';
-        await this.messageManager.replyByIntent(message, `weather.get.success.${weather.weather}`, context);
+
+        await this.messageManager.replyByIntent(
+            message, `weather.get.success.${weather.weather}`, context
+        );
         break;
+      case 'weather.tomorrow':
+        context.temperature_min = weather.days[0].temperature_min;
+        context.temperature_max = weather.days[0].temperature_max;
+        context.units = weather.units === 'metric' ? '°C' : '°F';
+        await this.messageManager.replyByIntent(
+            message, `weather.tomorrow.success.${weather.days[0].weather}`, context
+        );
+        break;
+      case 'weather.after-tomorrow':
+        context.temperature_min = weather.days[1].temperature_min;
+        context.temperature_max = weather.days[1].temperature_max;
+        context.units = weather.units === 'metric' ? '°C' : '°F';
+        await this.messageManager.replyByIntent(
+            message, `weather.after-tomorrow.success.${weather.days[1].weather}`, context
+        );
+        break;
+      case 'weather.day':
+        if (!context.day) {
+          throw new NotFoundError('day not found');
+        }
+        weatherDay = getWeatherByDay(weather, context.day);
+        if(!weatherDay){
+          throw new NotFoundError('weather for this day not found');
+        }
+        context.temperature_min = weatherDay.temperature_min;
+        context.temperature_max = weatherDay.temperature_max;
+        context.units = weather.units === 'metric' ? '°C' : '°F';
+        await this.messageManager.replyByIntent(
+            message, `weather.day.success.${weatherDay.weather}`, context
+        );
+        break;
+
       default:
         throw new Error('Not found');
     }
