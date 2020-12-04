@@ -14,6 +14,10 @@ describe('parseJsonIfJson', () => {
     const text = parseJsonIfJson('toto');
     expect(text).to.equal('toto');
   });
+  it('should return null', () => {
+    const res = parseJsonIfJson(null);
+    expect(res).to.equal(null);
+  });
   it('should convert json array to array', () => {
     const object = parseJsonIfJson('[{"test": "test"}]');
     expect(object).to.deep.equal([{ test: 'test' }]);
