@@ -1,6 +1,6 @@
 /**
  * @description Return a JSON parsed or the original string.
- * @param {string} str - String to parse.
+ * @param {any} str - Variable to parse.
  * @returns {any} Return a JSON parsed or the original string.
  * @example const res = parseJsonIfJson('{}');
  */
