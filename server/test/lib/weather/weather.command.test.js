@@ -200,4 +200,34 @@ describe('weather.command', () => {
       units: '°C',
     });
   });
+  it("shouldn't get the weather without day", async () => {
+    const weather = new Weather(service, event, messageManager, houses);
+    const message = {
+      text: 'Meteo next?',
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.day',
+      },
+      {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail', {});
+  });
+  it("shouldn't get the weather without a good day", async () => {
+    const weather = new Weather(service, event, messageManager, houses);
+    const message = {
+      text: 'Meteo next december?',
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.day',
+      },
+      {
+        day: 'december',
+      },
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail', { day: 'december' });
+  });
 });
