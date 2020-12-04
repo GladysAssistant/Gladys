@@ -3,6 +3,7 @@ const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('..
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
+const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
 
 const actionsFunc = {
@@ -128,6 +129,15 @@ const actionsFunc = {
   },
   [ACTIONS.USER.SET_OUT_OF_HOME]: async (self, action) => {
     await self.house.userLeft(action.house, action.user);
+  },
+  [ACTIONS.HTTP.REQUEST]: async (self, action, scope, columnIndex, rowIndex) => {
+    const response = await self.http.request(
+      action.method,
+      action.url,
+      parseJsonIfJson(action.body),
+      parseJsonIfJson(action.headers),
+    );
+    scope[`${columnIndex}.${rowIndex}.data`] = response;
   },
 };
 
