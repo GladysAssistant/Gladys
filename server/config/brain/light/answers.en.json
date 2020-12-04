@@ -1,22 +1,22 @@
 [
   {
     "label": "light.turn-on.success",
-    "answers": ["I turned on the light with success!"]
+    "answers": ["I have turned on the light."]
   },
   {
     "label": "light.turn-on.fail",
-    "answers": ["I didn't manage to turn on the light."]
+    "answers": ["I was unable to turn on the light."]
   },
   {
     "label": "light.turn-off.success",
-    "answers": ["I turned off the light with success!"]
+    "answers": ["I have turned off the light."]
   },
   {
     "label": "light.turn-off.fail",
-    "answers": ["I didn't manage to turn off the light."]
+    "answers": ["I was unable to turn off the light."]
   },
   {
     "label": "light.not-found",
-    "answers": ["I didn't find any light in this room."]
+    "answers": ["I didn't find any lights in this room."]
   }
 ]
