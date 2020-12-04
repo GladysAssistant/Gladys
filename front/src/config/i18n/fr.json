@@ -730,6 +730,19 @@
         "houseLabel": "Maison",
         "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
+      },
+      "httpRequest": {
+        "description": "Cette action permet d'envoyer une requête HTTP.",
+        "methodLabel": "Méthode",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body"
       }
     },
     "actions": {
@@ -761,6 +774,9 @@
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
         "set-out-of-home": "Utilisateur parti de la maison"
+      },
+      "http": {
+        "request": "Faire une requête HTTP"
       }
     },
     "variables": {

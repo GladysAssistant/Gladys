@@ -18,6 +18,9 @@ const actionSchema = Joi.array().items(
       text: Joi.string(),
       value: Joi.number(),
       unit: Joi.string(),
+      url: Joi.string(),
+      body: Joi.string(),
+      method: Joi.string(),
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
