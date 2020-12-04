@@ -294,6 +294,30 @@
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "deviceTab": "Netatmo Devices",
+      "settingTab": "Settings",
+      "setting": {
+        "title": "Netatmo configuration",
+        "usernamePlaceholder": "Username",
+        "passwordPlaceholder": "Password",
+        "clientIdPlaceholder": "Client ID",
+        "clientSecretPlaceholder": "Client Secret",
+        "saveLabel": "Save",
+        "connectLabel": "Connect"
+      },
+      "device": {
+        "title": "Netatmo Devices",
+        "addTitle": "Add new devices",
+        "search": "Search",
+        "foundDevice": "Getting new devices",
+        "noDevicesFound": "No device found",
+        "addDeviceButton": "Add",
+        "noDevices": "No devices found",
+        "deviceNotHandled": "Device is not handled"
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Control your Tasmota devices.",

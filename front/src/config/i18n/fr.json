@@ -402,6 +402,30 @@
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "deviceTab": "Netatmo Devices",
+      "settingTab": "Settings",
+      "setting": {
+        "title": "Netatmo configuration",
+        "usernamePlaceholder": "Username",
+        "passwordPlaceholder": "Password",
+        "clientIdPlaceholder": "Client ID",
+        "clientSecretPlaceholder": "Client Secret",
+        "saveLabel": "Save",
+        "connectLabel": "Connect"
+      },
+      "device": {
+        "title": "Netatmo Devices",
+        "addTitle": "Add new devices",
+        "search": "Search",
+        "foundDevice": "Getting new devices",
+        "noDevicesFound": "No device found",
+        "addDeviceButton": "Add",
+        "noDevices": "No devices found",
+        "deviceNotHandled": "Device is not handled"
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Contrôler vos appareils Tasmota.",
