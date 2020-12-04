@@ -18,6 +18,15 @@ const actionSchema = Joi.array().items(
       text: Joi.string(),
       value: Joi.number(),
       unit: Joi.string(),
+      url: Joi.string().uri(),
+      body: Joi.string(),
+      method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
+      headers: Joi.array().items(
+        Joi.object().keys({
+          key: Joi.string(),
+          value: Joi.string(),
+        }),
+      ),
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
