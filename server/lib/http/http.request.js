@@ -12,12 +12,17 @@ const DEFAULT_TIMEOUT = 60 * 1000;
  * request('post', 'http://localhost:3000', '{}');
  */
 async function request(method, url, body, headers) {
-  const options = { method, url, timeout: DEFAULT_TIMEOUT };
+  const options = {
+    method,
+    url,
+    timeout: DEFAULT_TIMEOUT,
+    headers: { 'user-agent': `GladysAssistant/${this.system.gladysVersion}` },
+  };
   if (body) {
     options.data = body;
   }
   if (headers) {
-    options.headers = headers;
+    options.headers = Object.assign(options.headers, headers);
   }
   // @ts-ignore
   const { data } = await axios.request(options);

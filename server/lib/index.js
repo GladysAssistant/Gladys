@@ -51,7 +51,8 @@ function Gladys(params = {}) {
   const area = new Area();
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
-  const http = new Http();
+  const system = new System(db.sequelize, event, config);
+  const http = new Http(system);
   const house = new House(event);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
@@ -62,7 +63,6 @@ function Gladys(params = {}) {
   const device = new Device(event, message, stateManager, service, room, variable);
   const scene = new Scene(stateManager, event, device, message, variable, house, http);
   const scheduler = new Scheduler(event);
-  const system = new System(db.sequelize, event, config);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user);
 
