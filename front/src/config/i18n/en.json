@@ -730,6 +730,22 @@
         "houseLabel": "House",
         "userSeenDescription": "This action set the user as \"at home\".",
         "userLeftHomeDescription": "This action set the user as \"left home\"."
+      },
+      "httpRequest": {
+        "description": "This action let you make HTTP requests.",
+        "methodLabel": "Method",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Name",
+        "headersValuePlaceholder": "Value"
       }
     },
     "actions": {
@@ -761,6 +777,9 @@
       "user": {
         "set-seen-at-home": "User seen at home",
         "set-out-of-home": "User left home"
+      },
+      "http": {
+        "request": "Make a HTTP request"
       }
     },
     "variables": {
