@@ -228,6 +228,6 @@ describe('weather.command', () => {
         day: 'december',
       },
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail', { day: 'december' });
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail.no-weather', { day: 'december' });
   });
 });

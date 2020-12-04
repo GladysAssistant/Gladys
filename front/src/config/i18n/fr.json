@@ -195,16 +195,7 @@
           "hourlyForecast": "Prévisions pour les 8 prochaines heures",
           "dailyForecast": "Prévisions pour les 7 prochains jours"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°",
-        "daysOfWeek": {
-          "monday": "Lundi",
-          "tuesday": "Mardi",
-          "wednesday": "Mercredi",
-          "thursday": "Jeudi",
-          "friday": "Vendredi",
-          "saturday": "Samedi",
-          "sunday": "Dimanche"
-        }
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",

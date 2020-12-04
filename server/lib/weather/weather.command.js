@@ -1,6 +1,8 @@
 const dayjs = require('dayjs');
 const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError, NoValuesFoundError, NotFoundError } = require('../../utils/coreErrors');
+const { INTENTS } = require('../../utils/constants');
+const { NoWeatherFoundError } = require('./weather.error');
 
 const DAYS_OF_WEEKS = {
   sunday: 0,
@@ -45,14 +47,14 @@ async function command(message, classification, context) {
       throw new NoValuesFoundError();
     }
     weather = await this.get(house);
-    switch (classification.intent) {
-      case 'weather.get':
+    switch (`intent.${classification.intent}`) {
+      case INTENTS.WEATHER.GET:
         context.temperature = weather.temperature;
         context.units = weather.units === 'metric' ? '°C' : '°F';
 
         await this.messageManager.replyByIntent(message, `weather.get.success.${weather.weather}`, context);
         break;
-      case 'weather.tomorrow':
+      case INTENTS.WEATHER.TOMORROW:
         context.temperature_min = weather.days[0].temperature_min;
         context.temperature_max = weather.days[0].temperature_max;
         context.units = weather.units === 'metric' ? '°C' : '°F';
@@ -62,7 +64,7 @@ async function command(message, classification, context) {
           context,
         );
         break;
-      case 'weather.after-tomorrow':
+      case INTENTS.WEATHER.AFTER_TOMORROW:
         context.temperature_min = weather.days[1].temperature_min;
         context.temperature_max = weather.days[1].temperature_max;
         context.units = weather.units === 'metric' ? '°C' : '°F';
@@ -72,13 +74,13 @@ async function command(message, classification, context) {
           context,
         );
         break;
-      case 'weather.day':
+      case INTENTS.WEATHER.DAY:
         if (!context.day) {
           throw new NotFoundError('day not found');
         }
         weatherDay = getWeatherByDay(weather, context.day);
         if (!weatherDay) {
-          throw new NotFoundError('weather for this day not found');
+          throw new NoWeatherFoundError('weather for this day not found');
         }
         context.temperature_min = weatherDay.temperature_min;
         context.temperature_max = weatherDay.temperature_max;
@@ -95,6 +97,8 @@ async function command(message, classification, context) {
       this.messageManager.replyByIntent(message, 'weather.get.fail.not-configured', context);
     } else if (e instanceof NoValuesFoundError) {
       this.messageManager.replyByIntent(message, 'weather.get.fail.no-house', context);
+    } else if (e instanceof NoWeatherFoundError) {
+      await this.messageManager.replyByIntent(message, `weather.get.fail.no-weather`, context);
     } else {
       this.messageManager.replyByIntent(message, 'weather.get.fail', context);
     }

@@ -17,15 +17,6 @@ const WEATHER_ICONS = {
   night: 'fe-moon'
 };
 
-const DAYS_OF_WEEKS = {
-  0: 'dashboard.boxes.weather.daysOfWeek.sunday',
-  1: 'dashboard.boxes.weather.daysOfWeek.monday',
-  2: 'dashboard.boxes.weather.daysOfWeek.tuesday',
-  3: 'dashboard.boxes.weather.daysOfWeek.wednesday',
-  4: 'dashboard.boxes.weather.daysOfWeek.thursday',
-  5: 'dashboard.boxes.weather.daysOfWeek.friday',
-  6: 'dashboard.boxes.weather.daysOfWeek.saturday'
-};
 
 const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
 
@@ -47,8 +38,8 @@ function createActions(store) {
           hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
         });
         weather.days.map(day => {
-          day.weatherIcon = translateWeatherToFeIcon(day.weather);
-          day.datetime_beautiful = DAYS_OF_WEEKS[dayjs(day.datetime).day()];
+          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.datetime_beautiful = dayjs(day.datetime).format('dddd');
         });
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
