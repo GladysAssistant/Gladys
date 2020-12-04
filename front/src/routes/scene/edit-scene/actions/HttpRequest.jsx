@@ -22,10 +22,6 @@ class Header extends Component {
     e.preventDefault();
     this.props.deleteHeader(this.props.index);
   };
-  addNewHeader = e => {
-    e.preventDefault();
-    this.props.addNewHeader();
-  };
   render(props) {
     return (
       <div class="row g-2 mb-2">
@@ -52,16 +48,9 @@ class Header extends Component {
           </Localizer>
         </div>
         <div class="col-2">
-          {props.lastItem && (
-            <button class="btn btn-secondary" onClick={this.addNewHeader}>
-              <i class="fe fe-plus" />
-            </button>
-          )}
-          {!props.lastItem && (
-            <button class="btn btn-danger" onClick={this.deleteHeader}>
-              <i class="fe fe-trash" />
-            </button>
-          )}
+          <button class="btn btn-danger" onClick={this.deleteHeader}>
+            <i class="fe fe-trash" />
+          </button>
         </div>
       </div>
     );
@@ -82,15 +71,14 @@ class HttpRequestAction extends Component {
   handleChangeBody = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', e.target.value);
   };
-  addNewHeader = () => {
-    const newHeaderArray = update(this.props.action.headers, {
+  addNewHeader = e => {
+    e.preventDefault();
+    const newHeaderArray = update(this.props.action.headers || [], {
       $push: [
-        [
-          {
-            key: '',
-            value: ''
-          }
-        ]
+        {
+          key: null,
+          value: null
+        }
       ]
     });
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
@@ -114,16 +102,10 @@ class HttpRequestAction extends Component {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', 'post');
     }
     if (!this.props.action.headers) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', [
-        {
-          key: '',
-          value: ''
-        }
-      ]);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', []);
     }
   }
   render(props) {
-    console.log(this.props.action);
     const displayBody = METHOD_WITH_BODY.includes(props.action.method);
     return (
       <div>
@@ -185,12 +167,14 @@ class HttpRequestAction extends Component {
                 <Header
                   header={header}
                   index={index}
-                  addNewHeader={this.addNewHeader}
                   updateHeader={this.updateHeader}
                   deleteHeader={this.deleteHeader}
                   lastItem={index === props.action.headers.length - 1}
                 />
               ))}
+            <button class="btn btn-secondary" onClick={this.addNewHeader}>
+              <i class="fe fe-plus" />
+            </button>
           </div>
           {displayBody && (
             <div class="form-group">
