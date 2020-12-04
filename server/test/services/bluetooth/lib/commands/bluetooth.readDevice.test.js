@@ -6,13 +6,9 @@ const { assert, fake } = sinon;
 const BluetoothManager = require('../../../../../services/bluetooth/lib');
 const BluetoothMock = require('../../BluetoothMock.test');
 
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
+const { BadParameters } = require('../../../../../utils/coreErrors');
 
-const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-};
+const gladys = {};
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 describe('bluetooth.readDevice', () => {
@@ -21,7 +17,6 @@ describe('bluetooth.readDevice', () => {
   let characteristic;
   let service;
   let peripheral;
-  let device;
 
   let bluetooth;
   let bluetoothManager;
@@ -55,19 +50,7 @@ describe('bluetooth.readDevice', () => {
         localName: 'P1',
       },
       lastSeen: 'D1',
-      connectable: true,
-      connect: fake.yields(null),
-      disconnect: fake.resolves(null),
       discoverServices: fake.yields(null, [service]),
-    };
-
-    device = {
-      external_id: `bluetooth:${peripheral.uuid}`,
-      features: [
-        {
-          external_id: `bluetooth:${peripheral.uuid}:${service.uuid}:${characteristic.uuid}`,
-        },
-      ],
     };
 
     bluetooth = new BluetoothMock();
@@ -89,63 +72,53 @@ describe('bluetooth.readDevice', () => {
   });
 
   it('bluetooth.readDevice success', async () => {
-    const readValue = await bluetoothManager.readDevice(device);
+    const readValue = await bluetoothManager.readDevice(peripheral, service.uuid, characteristic.uuid);
 
-    const expectedResult = [13];
+    const expectedResult = 'd';
     expect(readValue).deep.eq(expectedResult);
 
-    assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
-    });
   });
 
   it('bluetooth.readDevice error on read', async () => {
     throwError = true;
 
-    await bluetoothManager.readDevice(device);
+    try {
+      await bluetoothManager.readDevice(peripheral, service.uuid, characteristic.uuid);
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error);
+    }
 
-    assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
-    });
   });
 
   it('bluetooth.readDevice not readable (no props)', async () => {
     characteristic.properties = undefined;
 
-    await bluetoothManager.readDevice(device);
-
-    assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnect);
+    try {
+      await bluetoothManager.readDevice(peripheral, service.uuid, characteristic.uuid);
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
-    });
   });
 
   it('bluetooth.readDevice not readable prop', async () => {
     characteristic.properties = ['write'];
 
-    await bluetoothManager.readDevice(device);
+    try {
+      await bluetoothManager.readDevice(peripheral, service.uuid, characteristic.uuid);
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
 
-    assert.calledOnce(peripheral.connect);
-    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(peripheral.discoverServices);
     assert.calledOnce(service.discoverCharacteristics);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
-    });
   });
 });
