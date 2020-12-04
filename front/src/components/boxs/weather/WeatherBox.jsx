@@ -267,9 +267,7 @@ class WeatherBoxComponent extends Component {
         daysDisplay = days.map(day => {
           return (
             <div className="row" style={{ marginTop: '0.5em' }}>
-              <div className="col-5">
-                {day.datetime_beautiful}
-              </div>
+              <div className="col-5">{day.datetime_beautiful}</div>
               <div className="col-3">
                 <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
               </div>

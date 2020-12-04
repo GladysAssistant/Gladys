@@ -17,7 +17,6 @@ const WEATHER_ICONS = {
   night: 'fe-moon'
 };
 
-
 const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
 
 function createActions(store) {
