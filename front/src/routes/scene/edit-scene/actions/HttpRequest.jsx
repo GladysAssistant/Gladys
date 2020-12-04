@@ -9,7 +9,7 @@ class HttpRequestAction extends Component {
   handleChangeMethod = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', e.target.value);
     if (!METHOD_WITH_BODY.includes(e.target.value)) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', null);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', undefined);
     }
   };
   handleChangeUrl = e => {
