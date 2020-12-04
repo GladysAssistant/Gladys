@@ -742,7 +742,11 @@
         "urlLabel": "URL",
         "urlPlaceholder": "URL",
         "bodyLabel": "Body",
-        "bodyPlaceholder": "Body"
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Nom",
+        "headersValuePlaceholder": "Valeur",
+        "plusButton": "+"
       }
     },
     "actions": {

@@ -1,8 +1,72 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import update from 'immutability-helper';
 
 const METHOD_WITH_BODY = ['post', 'patch', 'put'];
+
+class Header extends Component {
+  updateHeaderKey = e => {
+    this.props.updateHeader(this.props.index, {
+      key: e.target.value,
+      value: this.props.header.value
+    });
+  };
+  updateHeaderValue = e => {
+    this.props.updateHeader(this.props.index, {
+      key: this.props.header.key,
+      value: e.target.value
+    });
+  };
+  deleteHeader = e => {
+    e.preventDefault();
+    this.props.deleteHeader(this.props.index);
+  };
+  addNewHeader = e => {
+    e.preventDefault();
+    this.props.addNewHeader();
+  };
+  render(props) {
+    return (
+      <div class="row g-2 mb-2">
+        <div class="col-5">
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              value={props.header.key}
+              onChange={this.updateHeaderKey}
+              placeholder={<Text id="editScene.actionsCard.httpRequest.headersKeyPlaceholder" />}
+            />
+          </Localizer>
+        </div>
+        <div class="col-5">
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              value={props.header.value}
+              onChange={this.updateHeaderValue}
+              placeholder={<Text id="editScene.actionsCard.httpRequest.headersValuePlaceholder" />}
+            />
+          </Localizer>
+        </div>
+        <div class="col-2">
+          {props.lastItem && (
+            <button class="btn btn-secondary" onClick={this.addNewHeader}>
+              <i class="fe fe-plus" />
+            </button>
+          )}
+          {!props.lastItem && (
+            <button class="btn btn-danger" onClick={this.deleteHeader}>
+              <i class="fe fe-trash" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
 
 @connect('', {})
 class HttpRequestAction extends Component {
@@ -18,12 +82,48 @@ class HttpRequestAction extends Component {
   handleChangeBody = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', e.target.value);
   };
+  addNewHeader = () => {
+    const newHeaderArray = update(this.props.action.headers, {
+      $push: [
+        [
+          {
+            key: '',
+            value: ''
+          }
+        ]
+      ]
+    });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+  };
+  updateHeader = (index, newHeader) => {
+    const newHeaderArray = update(this.props.action.headers, {
+      [index]: {
+        $set: newHeader
+      }
+    });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+  };
+  deleteHeader = index => {
+    const newHeaderArray = update(this.props.action.headers, {
+      $splice: [[index, 1]]
+    });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+  };
   componentDidMount() {
     if (!this.props.action.method) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', 'post');
     }
+    if (!this.props.action.headers) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', [
+        {
+          key: '',
+          value: ''
+        }
+      ]);
+    }
   }
-  render(props, {}) {
+  render(props) {
+    console.log(this.props.action);
     const displayBody = METHOD_WITH_BODY.includes(props.action.method);
     return (
       <div>
@@ -72,6 +172,25 @@ class HttpRequestAction extends Component {
                 placeholder={<Text id="editScene.actionsCard.httpRequest.urlPlaceholder" />}
               />
             </Localizer>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="editScene.actionsCard.httpRequest.headersLabel" />
+              <span class="form-required">
+                <Text id="global.requiredField" />
+              </span>
+            </label>
+            {props.action.headers &&
+              props.action.headers.map((header, index) => (
+                <Header
+                  header={header}
+                  index={index}
+                  addNewHeader={this.addNewHeader}
+                  updateHeader={this.updateHeader}
+                  deleteHeader={this.deleteHeader}
+                  lastItem={index === props.action.headers.length - 1}
+                />
+              ))}
           </div>
           {displayBody && (
             <div class="form-group">

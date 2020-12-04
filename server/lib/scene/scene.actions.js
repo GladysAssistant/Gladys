@@ -137,6 +137,7 @@ const actionsFunc = {
       parseJsonIfJson(action.body),
       parseJsonIfJson(action.headers),
     );
+    console.log(response);
     scope[`${columnIndex}.${rowIndex}.data`] = response;
   },
 };
