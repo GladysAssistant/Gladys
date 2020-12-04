@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { parseJsonIfJson } = require('../../utils/json');
 
-describe.only('parseJsonIfJson', () => {
+describe('parseJsonIfJson', () => {
   it('should convert a json to object', () => {
     const object = parseJsonIfJson('{}');
     expect(object).to.deep.equal({});
