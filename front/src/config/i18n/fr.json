@@ -745,8 +745,7 @@
         "bodyPlaceholder": "Body",
         "headersLabel": "Headers",
         "headersKeyPlaceholder": "Nom",
-        "headersValuePlaceholder": "Valeur",
-        "plusButton": "+"
+        "headersValuePlaceholder": "Valeur"
       }
     },
     "actions": {
