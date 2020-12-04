@@ -131,13 +131,13 @@ const actionsFunc = {
     await self.house.userLeft(action.house, action.user);
   },
   [ACTIONS.HTTP.REQUEST]: async (self, action, scope, columnIndex, rowIndex) => {
-    const response = await self.http.request(
-      action.method,
-      action.url,
-      parseJsonIfJson(action.body),
-      parseJsonIfJson(action.headers),
-    );
-    console.log(response);
+    const headersObject = {};
+    action.headers.forEach((header) => {
+      if (header.key && header.value) {
+        headersObject[header.key] = header.value;
+      }
+    });
+    const response = await self.http.request(action.method, action.url, parseJsonIfJson(action.body), headersObject);
     scope[`${columnIndex}.${rowIndex}.data`] = response;
   },
 };

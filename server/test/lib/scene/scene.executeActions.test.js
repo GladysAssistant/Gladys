@@ -332,7 +332,12 @@ describe('scene.executeActions', () => {
             method: 'post',
             url: 'http://test.test',
             body: '{"toto":"toto"}',
-            headers: '{"authorization": "token"}',
+            headers: [
+              {
+                key: 'authorization',
+                value: 'token',
+              },
+            ],
           },
         ],
       ],

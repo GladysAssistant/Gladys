@@ -21,6 +21,12 @@ const actionSchema = Joi.array().items(
       url: Joi.string(),
       body: Joi.string(),
       method: Joi.string(),
+      headers: Joi.array().items(
+        Joi.object().keys({
+          key: Joi.string(),
+          value: Joi.string(),
+        }),
+      ),
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
