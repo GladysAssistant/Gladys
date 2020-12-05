@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { getTpLinkPlug } = require('../models/plug');
 const { getTpLinkBulb } = require('../models/bulb');
 const { getTpLinkDevice } = require('../models/device');
@@ -38,11 +39,7 @@ async function getDevices() {
       }
     });
   });
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(uniqById(devicesToReturn));
-    }, 2000);
-  });
+  return Promise.delay(2000).then(() => uniqById(devicesToReturn));
 }
 
 module.exports = {

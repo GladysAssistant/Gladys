@@ -10,6 +10,7 @@ const TpLinkService = proxyquire('../../../../services/tp-link/index', {
 });
 
 const StateManager = require('../../../../lib/state');
+const { TP_LINK_ON } = require('../../../../services/tp-link/lib/utils/consts');
 
 const event = {
   emit: fake.resolves(null),
@@ -36,23 +37,25 @@ describe('TpLinkService SetValue', () => {
   it('should turn on plug', async () => {
     // PREPARE
     // Mock Sysinfo fetch to answer plug type
-    TpLinkApiClient.Client.prototype.getDevice = fake.resolves({
+    const plugDevice = {
       getSysInfo: fake.resolves({
         type: 'IOT.SMARTPLUGSWITCH',
         relay_state: 0,
       }),
       setPowerState: fake.resolves(true),
-    });
+    };
+    TpLinkApiClient.Client.prototype.getDevice = fake.resolves(plugDevice);
 
     // EXECUTE
     await tpLinkService.device.setValue(devices[0], { category: DEVICE_FEATURE_CATEGORIES.SWITCH }, 1);
 
     // ASSERT
+    assert.calledWith(plugDevice.setPowerState, TP_LINK_ON);
   });
   it('should turn on bulb', async () => {
     // PREPARE
     // Mock Sysinfo fetch to answer bulb type
-    TpLinkApiClient.Client.prototype.getDevice = fake.resolves({
+    const bulbDevice = {
       getSysInfo: fake.resolves({
         mic_type: 'IOT.SMARTBULB',
         light_state: {
@@ -60,12 +63,14 @@ describe('TpLinkService SetValue', () => {
         },
       }),
       setPowerState: fake.resolves(true),
-    });
+    };
+    TpLinkApiClient.Client.prototype.getDevice = fake.resolves(bulbDevice);
 
     // EXECUTE
     await tpLinkService.device.setValue(devices[1], { category: DEVICE_FEATURE_CATEGORIES.LIGHT }, 1);
 
     // ASSERT
+    assert.calledWith(bulbDevice.setPowerState, TP_LINK_ON);
   });
   it('should return device not found', async () => {
     try {
