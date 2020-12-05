@@ -44,7 +44,7 @@ const actions = store => ({
       philipsHueDeleteDeviceStatus: RequestStatus.Getting
     });
     try {
-      await state.httpClient.delete('/api/v1/device/' + device.selector);
+      await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         philipsHueBridgesDevices: {
           $splice: [[index, 1]]

@@ -464,4 +464,13 @@ describe('bluetooth.scanDevice', () => {
 
     assert.callCount(service.discoverCharacteristics, Object.keys(INFORMATION_SERVICES[service.uuid]).length);
   });
+
+  it('bluetooth.scanDevice with error (on connect)', async () => {
+    peripheral.connect = fake.yields(new Error('error'));
+
+    await bluetoothManager.scanDevice(peripheral.uuid);
+
+    assert.calledOnce(peripheral.connect);
+    assert.notCalled(peripheral.discoverServices);
+  });
 });

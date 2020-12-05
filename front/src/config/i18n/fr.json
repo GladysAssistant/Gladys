@@ -210,7 +210,7 @@
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
@@ -773,6 +773,28 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU"
+      },
+      "userPresence": {
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
+        "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
+      },
+      "httpRequest": {
+        "description": "Cette action permet d'envoyer une requête HTTP.",
+        "methodLabel": "Méthode",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Nom",
+        "headersValuePlaceholder": "Valeur"
       }
     },
     "actions": {
@@ -800,6 +822,13 @@
       },
       "condition": {
         "only-continue-if": "Continuer seulement si"
+      },
+      "user": {
+        "set-seen-at-home": "Utilisateur vu à la maison",
+        "set-out-of-home": "Utilisateur parti de la maison"
+      },
+      "http": {
+        "request": "Faire une requête HTTP"
       }
     },
     "variables": {

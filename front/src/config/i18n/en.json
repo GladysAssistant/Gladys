@@ -210,7 +210,7 @@
         "noTemperatureRecorded": "No temperature recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
@@ -773,6 +773,28 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR"
+      },
+      "userPresence": {
+        "userLabel": "User",
+        "houseLabel": "House",
+        "userSeenDescription": "This action set the user as \"at home\".",
+        "userLeftHomeDescription": "This action set the user as \"left home\"."
+      },
+      "httpRequest": {
+        "description": "This action let you make HTTP requests.",
+        "methodLabel": "Method",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Name",
+        "headersValuePlaceholder": "Value"
       }
     },
     "actions": {
@@ -800,6 +822,13 @@
       },
       "condition": {
         "only-continue-if": "Only continue if"
+      },
+      "user": {
+        "set-seen-at-home": "User seen at home",
+        "set-out-of-home": "User left home"
+      },
+      "http": {
+        "request": "Make a HTTP request"
       }
     },
     "variables": {

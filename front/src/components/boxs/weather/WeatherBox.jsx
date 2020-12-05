@@ -2,6 +2,8 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
+
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
   RequestStatus,
@@ -104,7 +106,7 @@ const WeatherBox = ({ children, ...props }) => (
             color: '#76838f'
           }}
         >
-          {props.datetimeBeautiful + ' - ' + props.houseName}
+          {`${props.datetimeBeautiful} - ${props.houseName}`}
         </div>
         <div class="row">
           <div class="col-9">
@@ -134,7 +136,7 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-              className={'fe ' + props.weather_icon}
+              className={cx('fe', props.weather_icon)}
               style={{
                 fontSize: '50px'
               }}
@@ -244,10 +246,10 @@ class WeatherBoxComponent extends Component {
           return (
             <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>
-                {hour.datetime_beautiful + 'h'}
+                {`${hour.datetime_beautiful}h`}
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
-                <i className={'fe ' + hour.weather_icon} style={{ fontSize: '20px' }} />
+                <i className={cx('fe', hour.weather_icon)} style={{ fontSize: '20px' }} />
               </p>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
                 <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
@@ -267,7 +269,7 @@ class WeatherBoxComponent extends Component {
             <div className="row" style={{ marginTop: '0.5em' }}>
               <div className="col-5">{day.datetime_beautiful}</div>
               <div className="col-3">
-                <i className={'fe ' + day.weather_icon} style={{ fontSize: '20px' }} />
+                <i className={cx('fe', day.weather_icon)} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text

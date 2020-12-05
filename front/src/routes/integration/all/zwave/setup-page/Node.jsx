@@ -18,7 +18,7 @@ const createGithubUrl = node => {
     classes: Object.keys(rawZwaveNode.classes)
   };
   const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.manufacturer} ${rawZwaveNode.product}"`);
-  const body = encodeURIComponent('```\n' + JSON.stringify(deviceToSend, null, 2) + '\n```');
+  const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(deviceToSend, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
 

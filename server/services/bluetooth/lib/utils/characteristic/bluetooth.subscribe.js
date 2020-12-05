@@ -9,7 +9,7 @@ const { TIMERS } = require('../bluetooth.constants');
  * @description Try to subscribe to Noble characteristic.
  * @param {Object} characteristic - Noble characteristic.
  * @param {Object} onNotify - Value callback.
- * @returns {Promise<Object>} Read value.
+ * @returns {Promise<Object>} Subscrption status.
  * @example
  * await subscribe(characteristic, (value) => console.log(value));
  */
@@ -24,13 +24,13 @@ async function subscribe(characteristic, onNotify) {
   return new Promise((resolve, reject) => {
     characteristic.subscribe((error) => {
       if (error) {
-        reject(new Error(`Bluetooth: failed to subscribe characteristic ${characteristic.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: failed to subscribe characteristic ${characteristic.uuid} - ${error}`));
       }
 
       characteristic.on('notify', (value) => onNotify(value));
 
       logger.debug(`Bluetooth: subscribed to characteristic ${characteristic.uuid}`);
-      resolve();
+      return resolve();
     });
   }).timeout(TIMERS.READ);
 }

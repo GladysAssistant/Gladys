@@ -1,5 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
-import classnames from 'classnames';
+import cx from 'classnames';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 
@@ -42,7 +42,7 @@ const Header = ({ ...props }) => {
               </span>
             </a>
             <div class="d-flex order-lg-2 ml-auto">
-              <div class={'dropdown' + (props.showDropDown && ' show')}>
+              <div class={cx('dropdown', { show: props.showDropDown })}>
                 <a onClick={props.toggleDropDown} class="nav-link pr-0 leading-none" data-toggle="dropdown">
                   <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
                   <span class="ml-2 d-none d-lg-block">
@@ -53,7 +53,11 @@ const Header = ({ ...props }) => {
                     </small>
                   </span>
                 </a>
-                <div class={'dropdown-menu dropdown-menu-right dropdown-menu-arrow' + (props.showDropDown && ' show')}>
+                <div
+                  class={cx('dropdown-menu', 'dropdown-menu-right', 'dropdown-menu-arrow', {
+                    show: props.showDropDown
+                  })}
+                >
                   <a class="dropdown-item" href="/dashboard/profile">
                     <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
                   </a>
@@ -86,7 +90,10 @@ const Header = ({ ...props }) => {
           </div>
         </div>
       </div>
-      <div class={'header collapse d-lg-flex p-0 ' + (props.showCollapsedMenu && ' show')} id="headerMenuCollapse">
+      <div
+        class={cx('header', 'collapse', 'd-lg-flex', 'p-0', { show: props.showCollapsedMenu })}
+        id="headerMenuCollapse"
+      >
         <div class="container">
           <div class="row align-items-center">
             <div class="col-lg order-lg-first">
@@ -94,7 +101,7 @@ const Header = ({ ...props }) => {
                 <li class="nav-item">
                   <Link
                     href="/dashboard"
-                    class={classnames('nav-link', {
+                    class={cx('nav-link', {
                       active: props.currentUrl === '/dashboard'
                     })}
                   >
@@ -104,7 +111,7 @@ const Header = ({ ...props }) => {
                 <li class="nav-item">
                   <Link
                     href="/dashboard/chat"
-                    class={classnames('nav-link', {
+                    class={cx('nav-link', {
                       active: props.currentUrl === '/dashboard/chat'
                     })}
                   >
@@ -122,7 +129,7 @@ const Header = ({ ...props }) => {
                 <li class="nav-item">
                   <Link
                     href="/dashboard/calendar"
-                    class={classnames('nav-link', {
+                    class={cx('nav-link', {
                       active: props.currentUrl === '/dashboard/calendar'
                     })}
                   >
@@ -133,7 +140,7 @@ const Header = ({ ...props }) => {
                   <Link
                     activeClassName="active"
                     href="/dashboard/maps"
-                    class={classnames('nav-link', {
+                    class={cx('nav-link', {
                       active: props.currentUrl === '/dashboard/maps'
                     })}
                   >
