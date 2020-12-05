@@ -37,7 +37,7 @@ const SystemPage = ({ children, ...props }) => (
               <small class="text-muted">
                 <Text
                   id="global.percentValue"
-                  fields={{ value: props.systemDiskSpace && props.systemDiskSpace.capacity * 100 }}
+                  fields={{ value: props.systemDiskSpace && Math.ceil(props.systemDiskSpace.capacity * 100) }}
                 />
               </small>
             </div>
