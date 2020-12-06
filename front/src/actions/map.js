@@ -36,6 +36,28 @@ function createActions(store) {
         });
       }
     },
+    async createAreasWithLocation(state) {
+      store.setState({
+        createAreasWithLocation: RequestStatus.Getting
+      });
+      try {
+        const areasWithLocation = await state.httpClient.post('/api/v1/area', {
+          name: 'Work',
+          latitude: state.latitude,
+          longitude: state.longitude,
+          radius: state.radius,
+          color: '#00000'
+        });
+        store.setState({
+          areasWithLocation,
+          createAreasWithLocation: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          createAreasWithLocation: RequestStatus.Error
+        });
+      }
+    },
     async getAreasWithLocation(state) {
       store.setState({
         getAreasWithLocation: RequestStatus.Getting
