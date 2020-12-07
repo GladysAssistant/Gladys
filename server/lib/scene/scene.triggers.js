@@ -7,8 +7,14 @@ const triggersFunc = {
     if (event.device_feature !== trigger.device_feature) {
       return false;
     }
-    // we compare the value with the expected value
-    return compare(trigger.operator, event.last_value, trigger.value);
+    const newValueValidateRule = compare(trigger.operator, event.last_value, trigger.value);
+    // if the trigger is only a threshold_only, we only validate the trigger is the rule has been validated
+    // and was not validated with the previous value
+    if (trigger.threshold_only === true && !Number.isNaN(event.previous_value)) {
+      const previousValueValidateRule = compare(trigger.operator, event.previous_value, trigger.value);
+      return newValueValidateRule && !previousValueValidateRule;
+    }
+    return newValueValidateRule;
   },
   [EVENTS.TIME.CHANGED]: (event, trigger) => event.key === trigger.key,
 };

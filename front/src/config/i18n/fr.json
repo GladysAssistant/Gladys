@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
     "save": "Enregistrer"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
         "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
-        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?"
+        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editModeLabel": "Mode d'affichage :",
+        "displayModes": {
+          "advancedWeather": "Humidité et vitesse du vent",
+          "hourlyForecast": "Prévisions pour les 8 prochaines heures",
+          "dailyForecast": "Prévisions pour les 7 prochains jours"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -201,7 +209,7 @@
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
@@ -716,6 +724,28 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU"
+      },
+      "userPresence": {
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
+        "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
+      },
+      "httpRequest": {
+        "description": "Cette action permet d'envoyer une requête HTTP.",
+        "methodLabel": "Méthode",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Nom",
+        "headersValuePlaceholder": "Valeur"
       }
     },
     "actions": {
@@ -743,6 +773,13 @@
       },
       "condition": {
         "only-continue-if": "Continuer seulement si"
+      },
+      "user": {
+        "set-seen-at-home": "Utilisateur vu à la maison",
+        "set-out-of-home": "Utilisateur parti de la maison"
+      },
+      "http": {
+        "request": "Faire une requête HTTP"
       }
     },
     "variables": {
@@ -770,7 +807,8 @@
         "different": "différent",
         "valuePlaceholder": "Valeur",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",

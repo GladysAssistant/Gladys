@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
     "save": "Save"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
         "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editModeLabel": "Select display mode:",
+        "displayModes": {
+          "advancedWeather": "Humidity and wind speed",
+          "hourlyForecast": "Forecast for the next 8 hours",
+          "dailyForecast": "Forecast for the next 7 days"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -201,7 +209,7 @@
         "noTemperatureRecorded": "No temperature recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
@@ -716,6 +724,28 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR"
+      },
+      "userPresence": {
+        "userLabel": "User",
+        "houseLabel": "House",
+        "userSeenDescription": "This action set the user as \"at home\".",
+        "userLeftHomeDescription": "This action set the user as \"left home\"."
+      },
+      "httpRequest": {
+        "description": "This action let you make HTTP requests.",
+        "methodLabel": "Method",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Name",
+        "headersValuePlaceholder": "Value"
       }
     },
     "actions": {
@@ -743,6 +773,13 @@
       },
       "condition": {
         "only-continue-if": "Only continue if"
+      },
+      "user": {
+        "set-seen-at-home": "User seen at home",
+        "set-out-of-home": "User left home"
+      },
+      "http": {
+        "request": "Make a HTTP request"
       }
     },
     "variables": {
@@ -770,7 +807,8 @@
         "different": "different",
         "valuePlaceholder": "Value",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",

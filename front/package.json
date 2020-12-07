@@ -1,5 +1,9 @@
 {
   "name": "gladys-front",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "start": "per-env",
     "start:production": "npm run -s serve",

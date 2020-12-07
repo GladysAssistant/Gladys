@@ -2,13 +2,15 @@ const { expect } = require('chai');
 const EventEmitter = require('events');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const ServiceManager = require('../../../lib/service');
 
 const event = new EventEmitter();
 
 describe('Device', () => {
   it('should create device alone', async () => {
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     const newDevice = await device.create({
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       name: 'Philips Hue 1',
@@ -36,7 +38,8 @@ describe('Device', () => {
         },
       ],
     });
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -69,7 +72,8 @@ describe('Device', () => {
   });
   it('should update device which already exist, update a feature and a param', async () => {
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -151,7 +155,8 @@ describe('Device', () => {
         },
       ],
     });
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -194,7 +199,8 @@ describe('Device', () => {
         },
       ],
     });
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -215,7 +221,8 @@ describe('Device', () => {
   });
   it('should create device, one feature and one param', async () => {
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
     const newDevice = await device.create({
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       name: 'Philips Hue 1',

@@ -8,11 +8,13 @@ const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
 });
 
 const StateManager = require('../../../../lib/state');
+const ServiceManager = require('../../../../lib/service');
 const DeviceManager = require('../../../../lib/device');
 
 const event = new EventEmitter();
 const stateManager = new StateManager(event);
-const deviceManager = new DeviceManager(event, {}, stateManager, {});
+const serviceManager = new ServiceManager({}, stateManager);
+const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager);
 
 const gladys = {
   device: deviceManager,

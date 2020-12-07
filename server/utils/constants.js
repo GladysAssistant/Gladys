@@ -40,6 +40,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
@@ -211,6 +214,13 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+  },
+  USER: {
+    SET_SEEN_AT_HOME: 'user.set-seen-at-home',
+    SET_OUT_OF_HOME: 'user.set-out-of-home',
+  },
+  HTTP: {
+    REQUEST: 'http.request',
   },
 };
 

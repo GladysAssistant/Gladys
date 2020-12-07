@@ -117,6 +117,46 @@ describe('mqttHandler.getConfiguration', () => {
     assert.calledOnce(gladys.system.getNetworkMode);
   });
 
+  it('should getConfiguration: Docker existing container (not use embedded)', async () => {
+    const gladys = {
+      variable: {
+        getValue: sinon
+          .stub()
+          .onCall(3)
+          .resolves('0')
+          .resolves('value'),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        getContainers: fake.resolves([
+          {
+            image: 'eclipse-mosquitto:any-tag',
+          },
+        ]),
+        getNetworkMode: fake.resolves('host'),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    const expectedConfig = {
+      mqttUrl: 'value',
+      mqttUsername: 'value',
+      mqttPassword: 'value',
+      useEmbeddedBroker: false,
+      dockerBased: true,
+      brokerContainerAvailable: true,
+      networkModeValid: true,
+    };
+    expect(config).to.deep.eq(expectedConfig);
+
+    assert.callCount(gladys.variable.getValue, 4);
+    assert.calledOnce(gladys.system.isDocker);
+    assert.calledOnce(gladys.system.getContainers);
+    assert.calledOnce(gladys.system.getNetworkMode);
+  });
+
   it('no config on Docker', async () => {
     const gladys = {
       variable: {
