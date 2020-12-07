@@ -1,0 +1,173 @@
+[
+  {
+    "service_id": "abcd-0123-efgh",
+    "external_id": "domoticz:5",
+    "name": "Température et humidité",
+    "selector": "domoticz-temperature-et-humidite-5",
+    "model": "Open Weather:THB1 - BTHR918, BTHGN129",
+    "should_poll": true,
+    "poll_frequency": 60000,
+    "params": [],
+    "features": [
+      {
+        "name": "Température et humidité",
+        "selector": "domoticz-temp-temperature-et-humidite-5",
+        "external_id": "domoticz-temp-temperature-et-humidite-5",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "unit": "celsius",
+        "min": -250,
+        "max": 1000,
+        "last_value": "13.1",
+        "last_value_changed": "2020-11-16 21:34:57"
+      },
+      {
+        "name": "Température et humidité",
+        "selector": "domoticz-humidity-temperature-et-humidite-5",
+        "external_id": "domoticz-humidity-temperature-et-humidite-5",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "last_value": "87",
+        "last_value_changed": "2020-11-16 21:34:57"
+      },
+      {
+        "name": "Température et humidité",
+        "selector": "domoticz-baro-temperature-et-humidite-5",
+        "external_id": "domoticz-baro-temperature-et-humidite-5",
+        "category": "pressure-sensor",
+        "has_feedback": false,
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "pascal",
+        "min": 0,
+        "max": 100000,
+        "last_value": "1018",
+        "last_value_changed": "2020-11-16 21:34:57"
+      }
+    ]
+  },
+  {
+    "service_id": "abcd-0123-efgh",
+    "external_id": "domoticz:9",
+    "name": "Etage",
+    "selector": "domoticz-etage-9",
+    "model": "RFXCom:THGR810, THGN800",
+    "should_poll": true,
+    "poll_frequency": 60000,
+    "params": [],
+    "features": [
+      {
+        "name": "Etage",
+        "selector": "domoticz-temp-etage-9",
+        "external_id": "domoticz-temp-etage-9",
+        "category": "temperature-sensor",
+        "has_feedback": false,
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "celsius",
+        "min": -250,
+        "max": 1000,
+        "last_value": "21.0",
+        "last_value_changed": "2020-11-16 21:40:38"
+      },
+      {
+        "name": "Etage",
+        "selector": "domoticz-humidity-etage-9",
+        "external_id": "domoticz-humidity-etage-9",
+        "category": "humidity-sensor",
+        "has_feedback": false,
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "last_value": "66",
+        "last_value_changed": "2020-11-16 21:40:38"
+      },
+      {
+        "name": "Etage",
+        "selector": "domoticz-battery-etage-9",
+        "external_id": "domoticz-battery-etage-9",
+        "category": "battery",
+        "has_feedback": false,
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "last_value": 100,
+        "last_value_changed": "2020-11-16 21:40:38"
+      }
+    ]
+  },
+  {
+    "service_id": "abcd-0123-efgh",
+    "external_id": "domoticz:11",
+    "name": "Sous-sol",
+    "selector": "domoticz-sous-sol-11",
+    "model": "RFXCom:THGR810, THGN800",
+    "should_poll": true,
+    "poll_frequency": 60000,
+    "params": [],
+    "features": [
+      {
+        "name": "Sous-sol",
+        "selector": "domoticz-temp-sous-sol-11",
+        "external_id": "domoticz-temp-sous-sol-11",
+        "category": "temperature-sensor",
+        "has_feedback": false,
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "celsius",
+        "min": -250,
+        "max": 1000,
+        "last_value": "21.7",
+        "last_value_changed": "2020-11-16 21:40:13"
+      },
+      {
+        "name": "Sous-sol",
+        "selector": "domoticz-humidity-sous-sol-11",
+        "external_id": "domoticz-humidity-sous-sol-11",
+        "category": "humidity-sensor",
+        "has_feedback": false,
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "last_value": "66",
+        "last_value_changed": "2020-11-16 21:40:13"
+      },
+      {
+        "name": "Sous-sol",
+        "selector": "domoticz-battery-sous-sol-11",
+        "external_id": "domoticz-battery-sous-sol-11",
+        "category": "battery",
+        "has_feedback": false,
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "last_value": 100,
+        "last_value_changed": "2020-11-16 21:40:13"
+      }
+    ]
+  }
+]

@@ -28,5 +28,9 @@
   {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg"
+  },
+  {
+    "key": "domoticz",
+    "img": "/assets/integrations/cover/domoticz.jpg"
   }
 ]

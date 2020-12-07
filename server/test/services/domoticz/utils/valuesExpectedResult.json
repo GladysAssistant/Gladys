@@ -1,0 +1,44 @@
+[
+  [
+    {
+      "device_feature_external_id": "domoticz-temp-temperature-et-humidite-5",
+      "state": "13.1"
+    },
+    {
+      "device_feature_external_id": "domoticz-humidity-temperature-et-humidite-5",
+      "state": "87"
+    },
+    {
+      "device_feature_external_id": "domoticz-baro-temperature-et-humidite-5",
+      "state": "1018"
+    }
+  ],
+  [
+    {
+      "device_feature_external_id": "domoticz-temp-etage-9",
+      "state": "21.0"
+    },
+    {
+      "device_feature_external_id": "domoticz-humidity-etage-9",
+      "state": "66"
+    },
+    {
+      "device_feature_external_id": "domoticz-battery-etage-9",
+      "state": 100
+    }
+  ],
+  [
+    {
+      "device_feature_external_id": "domoticz-temp-sous-sol-11",
+      "state": "21.7"
+    },
+    {
+      "device_feature_external_id": "domoticz-humidity-sous-sol-11",
+      "state": "66"
+    },
+    {
+      "device_feature_external_id": "domoticz-battery-sous-sol-11",
+      "state": 100
+    }
+  ]
+]

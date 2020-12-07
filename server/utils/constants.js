@@ -409,6 +409,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATE: 'bluetooth.status',
     DISCOVER: 'bluetooth.discover',
   },
+  DOMOTICZ: {
+    SERVER_READY: 'domoticz.server-ready',
+    SERVER_FAILED: 'domoticz.server-failed',
+  },
 };
 
 const DASHBOARD_TYPE = {
