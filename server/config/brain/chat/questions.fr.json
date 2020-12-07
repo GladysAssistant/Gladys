@@ -61,15 +61,5 @@
       "Pile ou face"
     ],
     "answers": ["Pile !", "Face !"]
-  },
-  {
-    "label": "chat.numbers0to10",
-    "questions": [
-      "Donne moi un chiffre entre 0 et 10",
-      "Gladys, donne moi un chiffre entre 0 et 10",
-      "Gladys, est ce que tu peux me donner un chiffre entre 0 et 10 ?",
-      "Un chiffre entre 0 et 10 ?"
-    ],
-    "answers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   }
 ]

@@ -59,15 +59,5 @@
       "Heads or tails"
     ],
     "answers": ["Heads !", "Tails !"]
-  },
-  {
-    "label": "chat.numbers0to10",
-    "questions": [
-      "Give me a number between 0 and 10",
-      "Gladys, give me a number between 0 and 10",
-      "Gladys, can you give me a number between 0 and 10 ?",
-      "A number between 0 and 10 ?"
-    ],
-    "answers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   }
 ]
