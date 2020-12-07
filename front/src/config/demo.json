@@ -1055,7 +1055,7 @@
     "size": 499313172480,
     "used": 464613756928,
     "available": 28587036672,
-    "capacity": 0.95,
+    "capacity": 0.953000005,
     "mountpoint": "/"
   },
   "get /api/v1/system/container": [

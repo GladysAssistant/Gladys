@@ -22,9 +22,12 @@ async function getConfiguration() {
   if (dockerBased) {
     networkModeValid = await this.checkDockerNetwork();
 
-    useEmbeddedBroker = await this.gladys.variable.getValue(CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY, this.serviceId);
-    // Force boolean value
-    useEmbeddedBroker = networkModeValid && (!!useEmbeddedBroker || !mqttUrl);
+    const useEmbeddedBrokerVariable = await this.gladys.variable.getValue(
+      CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
+      this.serviceId,
+    );
+    // Boolean stored as integer, we need to check it
+    useEmbeddedBroker = networkModeValid && useEmbeddedBrokerVariable !== '0';
 
     const dockerImages = await this.gladys.system.getContainers({
       all: true,

@@ -32,7 +32,7 @@ const EditWeatherBox = ({ children, ...props }) => (
       <div>
         {Object.keys(GetWeatherModes).map(key => {
           const mode = GetWeatherModes[key];
-          const label = 'dashboard.boxes.weather.displayModes.' + mode;
+          const label = `dashboard.boxes.weather.displayModes.${mode}`;
           return (
             <div className="form-check">
               <input
