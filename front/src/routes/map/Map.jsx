@@ -57,30 +57,54 @@ class MapComponent extends Component {
           featureGroup: drawnItems
       }
     };
+    // Truncate value based on number of decimals
+    var _round = function(num, len) {
+        return Math.round(num*(Math.pow(10, len)))/(Math.pow(10, len));
+    };
+    // Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
+    var strLatLng = function(latlng) {
+        return "("+_round(latlng.lat, 6)+", "+_round(latlng.lng, 6)+")";
+    };
     var drawControl = new L.Control.Draw(options);
     map.addControl(drawControl);
-    // Functions to handle the new lines, polygons, or markers added to the map
+
+    // Generate popup content based on layer type
+    var getPopupContent = function(layer) {
+        // Marker - add lat/long
+        const latlng = layer.getLatLng();
+        const latitude = latlng.lat;
+        const longitude = latlng.lng;
+        const radius = _round(layer.getRadius(), 2);
+        return `<fieldset>
+        <legend>Area details</legend>
+          <input name="title" />
+          <div><label class="form-label">Coordonates :</label> ( ${latitude},${longitude} )</div>
+          <div><label class="form-label">Radius : </label>${radius}m </div>
+          <div class="form-footer">
+            <button
+              onClick="/api/v1/area"
+              class="btn btn-primary btn-block"
+            >
+              Valider
+            </button>
+          </div>
+        </fieldset>`;
+    };
 
     map.on(L.Draw.Event.CREATED, function (e) {
 
        var type = e.layerType,
            layer = e.layer;
 
-
+       var content = getPopupContent(layer);
+        if (content !== null) {
+            layer.bindPopup(content);
+        }
        if (type === 'marker') {
            // Do marker specific actions
            console.log('Marker');
 
        }
-
-       var idIW = leaflet.popup();
-       //var content = '<span><b>Shape Name</b></span><br/><input id="shapeName" type="text"/><br/><br/><span><b>Shape Description<b/></span><br/><textarea id="shapeDesc" cols="25" rows="5"></textarea><br/><br/><input type="button" id="okBtn" value="Save" onclick="saveIdIW()"/>';
-       var content = '<span><b>Shape Name</b></span>';
-       idIW.setContent(content);
-       idIW.setLatLng(layer.getLatLng()); //calculated based on the e.layertype
-       idIW.openOn(map);
-
-
        // Do whatever else you need to. (save to db; add to map etc)
        console.log('CREATED');
        console.log(layer.getLatLng());
