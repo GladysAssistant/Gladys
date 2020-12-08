@@ -82,6 +82,7 @@ import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page
 // Netatmo integration
 import NetatmoDevicePage from '../routes/integration/all/netatmo/device-page';
 import NetatmoSettingPage from '../routes/integration/all/netatmo/setting';
+import EditNetatmoPage from '../routes/integration/all/netatmo/device-page/edit-page';
 
 // Integrations Bluetooth
 import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
@@ -189,7 +190,8 @@ const AppRouter = connect(
         <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
         <NetatmoDevicePage path="/dashboard/integration/device/netatmo" />
         <NetatmoSettingPage path="/dashboard/integration/device/netatmo/setting" />
-        
+        <EditNetatmoPage path="/dashboard/integration/device/netatmo/edit/:deviceSelector" />
+
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />

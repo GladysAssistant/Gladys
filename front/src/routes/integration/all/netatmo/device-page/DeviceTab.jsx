@@ -13,11 +13,6 @@ const DeviceTab = ({ children, ...props }) => (
         <Text id="integration.netatmo.device.title" />
       </h3>
       <div class="page-options d-flex">
-        <a href="/dashboard/integration/device/netatmo/add">
-          <button class="btn btn-outline-success ml-2">
-            <Text id="integration.netatmo.device.addDeviceButton" /> <i class="fe fe-plus" />
-          </button>
-        </a>
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto ml-2">
           <option value="asc">
             <Text id="global.orderDirAsc" />

@@ -309,7 +309,9 @@
         "saveButton": "Save",
         "deleteButton": "Delete",
         "editButton": "Edit details",
-        "noFeatures": "No features"
+        "noFeatures": "No features",
+        "noDevices": "No devices found",
+        "deviceNotHandled": "Device is not handled"
       },
       "setting": {
         "title": "Netatmo configuration",
@@ -319,16 +321,6 @@
         "clientSecretPlaceholder": "Client Secret",
         "saveLabel": "Save",
         "connectLabel": "Connect"
-      },
-      "device": {
-        "title": "Netatmo Devices",
-        "addTitle": "Add new devices",
-        "search": "Search",
-        "foundDevice": "Getting new devices",
-        "noDevicesFound": "No device found",
-        "addDeviceButton": "Add",
-        "noDevices": "No devices found",
-        "deviceNotHandled": "Device is not handled"
       }
     },
     "tasmota": {

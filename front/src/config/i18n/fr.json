@@ -408,17 +408,18 @@
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
       "device": {
-        "title": "Appareils Xiaomi dans Gladys",
-        "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
+        "title": "Equipements Netatmo dans Gladys",
+        "noDevices": "Aucun appareil Netatmo n'a encore été ajouté.",
         "searchPlaceholder": "Chercher un appareil",
-        "sidLabel": "SID Xiaomi",
-        "ipLabel": "Adresse IP",
+        "sidLabel": "SID Netatmo",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "editButton": "Editer les détails",
-        "noFeatures": "Aucune fonctionnalité"
+        "noFeatures": "Aucune fonctionnalité",
+        "addDeviceButton": "Ajouter",
+        "deviceNotHandled": "Equipements non pris en charge"
       },
       "setting": {
         "title": "Netatmo configuration",
@@ -428,16 +429,6 @@
         "clientSecretPlaceholder": "Client Secret",
         "saveLabel": "Save",
         "connectLabel": "Connect"
-      },
-      "device": {
-        "title": "Netatmo Devices",
-        "addTitle": "Add new devices",
-        "search": "Search",
-        "foundDevice": "Getting new devices",
-        "noDevicesFound": "No device found",
-        "addDeviceButton": "Add",
-        "noDevices": "No devices found",
-        "deviceNotHandled": "Device is not handled"
       }
     },
     "tasmota": {
