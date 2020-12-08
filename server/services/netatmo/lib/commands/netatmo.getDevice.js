@@ -17,6 +17,8 @@ async function getDevice() {
     for (let element of device.modules) {
       if (element.module_name == "Thermostat") {
         this.newValueThermostat(element)
+      } else {
+        console.log(element)
       }
     }
   }
