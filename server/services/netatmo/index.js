@@ -27,6 +27,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
+    device: netatmoManager,
     controllers: NetatmoController(netatmoManager),
   });
 };

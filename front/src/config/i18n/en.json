@@ -311,7 +311,8 @@
         "editButton": "Edit details",
         "noFeatures": "No features",
         "noDevices": "No devices found",
-        "deviceNotHandled": "Device is not handled"
+        "deviceNotHandled": "Device is not handled",
+        "foundDevice": "Device Found"
       },
       "setting": {
         "title": "Netatmo configuration",

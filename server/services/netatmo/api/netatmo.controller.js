@@ -20,7 +20,6 @@ module.exports = function NetatmoController(netatmoManager) {
      */
     async function getSensors(req, res) {
       const sensors = await netatmoManager.getSensors();
-      console.log(sensors)
       res.json(sensors);
     }
 

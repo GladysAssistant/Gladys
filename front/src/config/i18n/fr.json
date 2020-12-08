@@ -419,7 +419,8 @@
         "editButton": "Editer les détails",
         "noFeatures": "Aucune fonctionnalité",
         "addDeviceButton": "Ajouter",
-        "deviceNotHandled": "Equipements non pris en charge"
+        "deviceNotHandled": "Equipements non pris en charge",
+        "foundDevice": "Equipements trouvés"
       },
       "setting": {
         "title": "Netatmo configuration",

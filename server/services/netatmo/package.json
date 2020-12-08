@@ -12,6 +12,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "netatmo": "^2.3.0"
+    "netatmo": "^2.3.0",
+    "bottleneck": "^2.19.5"
   }
 }

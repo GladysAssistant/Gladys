@@ -8,6 +8,7 @@ const {
 
 const { CUBE_STATUS } = require('../utils/deviceStatus');
 const { getBatteryPercent } = require('../utils/getBatteryPercent');
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 const MIN_VOLT = 2800;
 const MAX_VOLT = 3300;
@@ -25,6 +26,7 @@ const MAX_VOLT = 3300;
 function newValueThermostat(data) {
   const sid = data._id;
   logger.debug(`Netatmo : New value thermostat, sid = ${sid}`);
+  this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
     name: `Netatmo Thermostat`,
@@ -32,6 +34,7 @@ function newValueThermostat(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-thermostat',
     should_poll: true,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
         name: 'Temperature',
