@@ -1079,6 +1079,10 @@
       "shortCategoryName": "Capteur température",
       "decimal": "Température"
     },
+    "setpoint": {
+      "shortCategoryName": "Setpoint",
+      "decimal": "Setpoint"
+    },
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",

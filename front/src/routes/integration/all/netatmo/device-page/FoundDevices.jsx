@@ -28,7 +28,7 @@ const FoundDevices = ({ children, ...props }) => (
             {props.netatmoNewDevices && props.netatmoNewDevices.length === 0 && (
               <div class="col-md-12">
                 <div class="alert alert-info">
-                  <Text id="integration.netatmo.device.noDevicesFound" />
+                  <Text id="integration.netatmo.device.noDevices" />
                 </div>
               </div>
             )}
@@ -54,9 +54,6 @@ const FoundDevices = ({ children, ...props }) => (
                   </div>
                 </div>
               ))}
-            {props.netatmoDevices && props.netatmoDevices.length === 0 && (
-              <Text id="integration.netatmo.device.noDevices" />
-            )}
           </div>
         </div>
       </div>

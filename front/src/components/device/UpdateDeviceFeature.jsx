@@ -84,6 +84,32 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT && (
+              <div class="form-group">
+                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                  <Text id="editDeviceForm.unitLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`unit_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.unit}
+                    onChange={this.updateUnit}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
+                      <Text id="deviceFeatureUnit.celsius" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
+                      <Text id="deviceFeatureUnit.fahrenheit" />
+                    </option>
+                  </select>
+                </Localizer>
+              </div>
+            )}
             {props.allowModifyFeatures && (
               <div class="form-group">
                 <label class="form-label" for={`min_${props.featureIndex}`}>
