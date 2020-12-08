@@ -15,7 +15,7 @@ async function getDevices() {
   let sensors = await promise;
   for (let sensor of sensors) {
     for (let element of sensor.modules) {
-      if (element.module_name == "Thermostat") {
+      if (element.type == "NATherm1") {
         this.newValueThermostat(element)
       } else {
         console.log(element)
