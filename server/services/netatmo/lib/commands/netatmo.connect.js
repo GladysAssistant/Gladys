@@ -27,11 +27,7 @@ async function connect() {
     this.api.on("error", function (error) {
       console.error('NETATMO threw an error: ' + error);
     });
-
-    this.api.getThermostatsData(function(err, measure) {
-      console.log(measure.length);
-      console.log(measure[0]);
-    });
+    this.getDevice()
 }
 
 module.exports = {

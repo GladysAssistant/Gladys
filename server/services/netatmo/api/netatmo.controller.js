@@ -13,10 +13,24 @@ module.exports = function NetatmoController(netatmoManager) {
         });
     }
 
+    /**
+     * @api {get} /api/v1/service/netatmo/sensor Get Netatmo sensors
+     * @apiName getSensors
+     * @apiGroup Netatmo
+     */
+    async function getDevices(req, res) {
+      const sensors = await netatmoManager.getDevices();
+      res.json(devices);
+    }
+
     return {
         'post /api/v1/service/netatmo/connect': {
             authenticated: true,
             controller: asyncMiddleware(connect),
+        },
+        'get /api/v1/service/xiaomi/device': {
+          authenticated: true,
+          controller: asyncMiddleware(getDevices),
         },
     };
 };
