@@ -26,6 +26,10 @@ async function poll(device) {
     device_feature_external_id: `netatmo:${sid}:temperature`,
     state: this.devices[sid].measured.temperature
   });
+  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+    device_feature_external_id: `netatmo:${sid}:setpoint`,
+    state: this.devices[sid].measured.setpoint_temp
+  });
 }
 
 module.exports = {

@@ -253,6 +253,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROl: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  SETPOINT: 'setpoint',
   UNKNOWN: 'unknown',
 };
 

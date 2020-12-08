@@ -62,29 +62,21 @@ function newValueThermostat(data) {
         min: 0,
         max: 100,
       },
+      {
+        name: 'Setpoint',
+        selector: `netatmo:${sid}:setpoint`,
+        external_id: `netatmo:${sid}:setpoint`,
+        category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: -20,
+        max: 60,
+      },
     ],
-  };// // emit new battery value event
-  // if (data.voltage) {
-  //   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-  //     device_feature_external_id: `netatmo:${sid}:battery`,
-  //     state: getBatteryPercent(data.voltage, MIN_VOLT, MAX_VOLT),
-  //   });
-  // }
-  // if (data.status) {
-  //   const cubeStatus = data.status.toUpperCase();
-  //   if (CUBE_STATUS[cubeStatus]) {
-  //     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-  //       device_feature_external_id: `netatmo:${sid}:cube:mode`,
-  //       state: CUBE_STATUS[cubeStatus],
-  //     });
-  //   }
-  // }
-  // if (data.rotate) {
-  //   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-  //     device_feature_external_id: `netatmo:${sid}:cube:rotation`,
-  //     state: data.rotate,
-  //   });
-  // }
+  };
   this.addSensor(sid, newSensor);
 }
 
