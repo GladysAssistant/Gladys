@@ -9,6 +9,7 @@ const { addSensor } = require('./commands/netatmo.addSensor.js');
 
 // event
 const { newValueThermostat } = require('./event/newValueThermostat.js');
+const { newValueStation } = require('./event/newValueStation.js');
 const { poll } = require('./event/netatmo.poll.js');
 
 // we rate-limit the number of request per seconds to poll lights
@@ -42,6 +43,7 @@ NetatmoManager.prototype.getDevices = getDevices;
 NetatmoManager.prototype.addSensor = addSensor;
 
 NetatmoManager.prototype.newValueThermostat = newValueThermostat;
+NetatmoManager.prototype.newValueStation = newValueStation;
 NetatmoManager.prototype.poll = pollLimiter.wrap(poll);
 
 module.exports = NetatmoManager;

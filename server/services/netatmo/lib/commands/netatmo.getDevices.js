@@ -50,7 +50,9 @@ async function getDevices() {
     })
   })
   stations = await promise;
-  console.log(stations)
+  for (let station of stations) {
+    this.newValueStation(station)
+  }
 }
 
 module.exports = {
