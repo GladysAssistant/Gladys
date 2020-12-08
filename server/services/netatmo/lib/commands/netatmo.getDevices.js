@@ -7,6 +7,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
  * netatmo.getDevices();
  */
 async function getDevices() {
+  // on recupere le thermostat
   let promise = new Promise((resolve, reject) => {
     this.api.getThermostatsData(function(err, sensors) {
       resolve(sensors)
@@ -21,7 +22,25 @@ async function getDevices() {
         console.log(element)
       }
     }
+  };
+  // on recupere l id de la maison
+  let promise2 = new Promise((resolve, reject) => {
+    this.api.getHomeData(function(err, data) {
+      resolve(data.homes[0].id)
+    })
+  })
+  let idHome = await promise2;
+  // on recuepre les tete thermostatique
+  var options = {
+    home_id: idHome
   }
+  promise = new Promise((resolve, reject) => {
+    this.api.getHomeStatus(options, function(err, data) {
+      resolve(data.home)
+    })
+  })
+  sensors = await promise;
+  console.log(sensors)
 }
 
 module.exports = {
