@@ -298,6 +298,19 @@
       "title": "Netatmo",
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
+      "device": {
+        "title": "Netatmo devices in Gladys",
+        "noDevices": "No Netatmo devices added yet.",
+        "searchPlaceholder": "Search Netatmo devices",
+        "sidLabel": "Netatmo SID",
+        "ipLabel": "IP Address",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit details",
+        "noFeatures": "No features"
+      },
       "setting": {
         "title": "Netatmo configuration",
         "usernamePlaceholder": "Username",

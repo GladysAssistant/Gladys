@@ -3,6 +3,8 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import { Link } from 'preact-router/match';
+import Device from './Device';
+import style from './style.css';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -39,7 +41,36 @@ const DeviceTab = ({ children, ...props }) => (
         </div>
       </div>
     </div>
-    <div class="card-body"></div>
+    <div class="card-body">
+      <div
+        class={cx('dimmer', {
+          active: props.getNetatmoDevicesStatus === RequestStatus.Getting
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          {props.getNetatmoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          <div class="row">
+            {props.netatmoDevices &&
+              props.netatmoDevices.map((netatmoDevice, index) => (
+                <Device
+                  device={netatmoDevice}
+                  deviceIndex={index}
+                  houses={props.houses}
+                  updateDeviceProperty={props.updateDeviceProperty}
+                  saveDevice={props.saveDevice}
+                  deleteDevice={props.deleteDevice}
+                />
+              ))}
+            {props.netatmoDevices && props.netatmoDevices.length === 0 && (
+              <p class="text-center">
+                <Text id="integration.netatmo.device.noDevices" />
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 );
 

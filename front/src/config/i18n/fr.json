@@ -407,6 +407,19 @@
       "description": "Control your netatmo device",
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
+      "device": {
+        "title": "Appareils Xiaomi dans Gladys",
+        "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
+        "searchPlaceholder": "Chercher un appareil",
+        "sidLabel": "SID Xiaomi",
+        "ipLabel": "Adresse IP",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer les détails",
+        "noFeatures": "Aucune fonctionnalité"
+      },
       "setting": {
         "title": "Netatmo configuration",
         "usernamePlaceholder": "Username",
