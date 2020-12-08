@@ -41,6 +41,16 @@ async function getDevices() {
   })
   sensors = await promise;
   console.log(sensors)
+
+
+  // Recuperer la station
+  promise = new Promise((resolve, reject) => {
+    this.api.getStationsData(function(err, data) {
+      resolve(data)
+    })
+  })
+  stations = await promise;
+  console.log(stations)
 }
 
 module.exports = {
