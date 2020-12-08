@@ -1,5 +1,6 @@
 var netatmo = require('netatmo');
 const { connect } = require('./commands/netatmo.connect.js');
+const { getDevice } = require('./commands/netatmo.get.device.js');
 
 /**
  * @param {Object} gladys - The gladys object.
@@ -19,5 +20,6 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
 };
 
 NetatmoManager.prototype.connect = connect;
+NetatmoManager.prototype.getDevice = getDevice;
 
 module.exports = NetatmoManager;
