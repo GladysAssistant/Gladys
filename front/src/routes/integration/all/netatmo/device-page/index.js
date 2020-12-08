@@ -5,12 +5,12 @@ import NetatmoPage from '../NetatmoPage';
 import DeviceTab from './DeviceTab';
 import FoundDevices from './FoundDevices';
 
-@connect('session,user,houses,netatmoDevices,netatmoNewDevices,getNetatmoNewDevicesStatus,getNetatmoDevicesStatus', actions)
+@connect('session,user,houses,netatmoSensors,netatmoDevices,getNetatmoNewDevicesStatus,getNetatmoDevicesStatus', actions)
 class NetatmoDevicePage extends Component {
   componentWillMount() {
-    this.props.getNetatmoDevices();
+    this.props.getNetatmoSensors();
     this.props.getHouses();
-    this.props.getNetatmoNewDevices();
+    this.props.getNetatmoDevices();
     this.props.getIntegrationByName('netatmo');
   }
 

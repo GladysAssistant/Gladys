@@ -27,7 +27,7 @@ async function connect() {
     this.api.on("error", function (error) {
       console.error('NETATMO threw an error: ' + error);
     });
-    this.getDevice()
+    this.getDevices()
 }
 
 module.exports = {

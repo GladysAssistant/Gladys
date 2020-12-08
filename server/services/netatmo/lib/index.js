@@ -2,8 +2,9 @@ var netatmo = require('netatmo');
 
 // commands
 const { connect } = require('./commands/netatmo.connect.js');
-const { getDevice } = require('./commands/netatmo.getDevice.js');
-const { addDevice } = require('./commands/netatmo.addDevice.js');
+const { getSensors } = require('./commands/netatmo.getSensors.js');
+const { getDevices } = require('./commands/netatmo.getDevices.js');
+const { addSensor } = require('./commands/netatmo.addSensor.js');
 
 // event
 const { newValueThermostat } = require('./event/newValueThermostat.js');
@@ -20,15 +21,16 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
     this.serviceId = serviceId;
     this.netatmo = netatmo;
     this.api = undefined;
-    this.devices = {};
+    this.sensors = {};
     this.connected = false;
     this.topicBinds = {};
     this.configured = false;
 };
 
 NetatmoManager.prototype.connect = connect;
-NetatmoManager.prototype.getDevice = getDevice;
-NetatmoManager.prototype.addDevice = addDevice;
+NetatmoManager.prototype.getSensors = getSensors;
+NetatmoManager.prototype.getDevices = getDevices;
+NetatmoManager.prototype.addSensor = addSensor;
 
 NetatmoManager.prototype.newValueThermostat = newValueThermostat;
 

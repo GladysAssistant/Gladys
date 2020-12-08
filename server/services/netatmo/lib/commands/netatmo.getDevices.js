@@ -4,17 +4,17 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 /**
  * @description Get Device.
  * @example
- * netatmo.getDevice();
+ * netatmo.getDevices();
  */
-async function getDevice() {
+async function getDevices() {
   let promise = new Promise((resolve, reject) => {
-    this.api.getThermostatsData(function(err, devices) {
-      resolve(devices)
+    this.api.getThermostatsData(function(err, sensors) {
+      resolve(sensors)
     });
   });
-  let devices = await promise;
-  for (let device of devices) {
-    for (let element of device.modules) {
+  let sensors = await promise;
+  for (let sensor of sensors) {
+    for (let element of sensor.modules) {
       if (element.module_name == "Thermostat") {
         this.newValueThermostat(element)
       } else {
@@ -25,5 +25,5 @@ async function getDevice() {
 }
 
 module.exports = {
-    getDevice,
+    getDevices,
 };

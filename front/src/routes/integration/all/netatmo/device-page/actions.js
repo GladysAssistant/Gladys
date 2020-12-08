@@ -9,26 +9,30 @@ function createActions(store) {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getNetatmoDevices(state) {
+    async getNetatmoSensors(state) {
       store.setState({
         getNetatmoDevicesStatus: RequestStatus.Getting
       });
       try {
-        const netatmoDevices = await state.httpClient.get('/api/v1/service/netatmo/thermostat');
-        const netatmoDevicesMap = new Map();
-        netatmoDevices.forEach(device => netatmoDevicesMap.set(device.external_id, device));
+        const netatmoSensors = await state.httpClient.get('/api/v1/service/netatmo/sensor');
+        console.log(netatmoSensors)
+        const netatmoSensorsFiltered = netatmoSensors.filter(sensor => {
+          if (!state.netatmoSensorsMap) {
+            return true;
+          }
+          return !state.netatmoSensorsMap.has(sensor.external_id);
+        })
         store.setState({
-          netatmoDevicesMap,
-          netatmoDevices,
-          getNetatmoDevicesStatus: RequestStatus.Success
+          netatmoSensors: netatmoSensorsFiltered,
+          getNetatmoSensorsStatus: RequestStatus.Success
         })
       } catch (e) {
         store.setState({
-          getNetatmoDevicesStatus: RequestStatus.Error
+          getNetatmoSensorsStatus: RequestStatus.Error
         });
       }
     },
-    async getNetatmoNewDevices(state) {
+    async getNetatmoDevices(state) {
       store.setState({
         getNetatmoNewDevicesStatus: RequestStatus.Getting
       });

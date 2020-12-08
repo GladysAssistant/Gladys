@@ -25,7 +25,7 @@ const MAX_VOLT = 3300;
 function newValueThermostat(data) {
   const sid = data._id;
   logger.debug(`Netatmo : New value thermostat, sid = ${sid}`);
-  const newDevice = {
+  const newSensor = {
     service_id: this.serviceId,
     name: `Netatmo Thermostat`,
     selector: `netatmo:${sid}`,
@@ -82,7 +82,7 @@ function newValueThermostat(data) {
   //     state: data.rotate,
   //   });
   // }
-  this.addDevice(sid, newDevice);
+  this.addSensor(sid, newSensor);
 }
 
 module.exports = {
