@@ -4,8 +4,9 @@
     "questions": [
       "What's the temperature in the %room% ?",
       "Give me the temperature in the %room%",
-      "How much is it in the %room% ?",
-      "The temperature in the %room%"
+      "How cold is the %room% ?",
+      "The temperature in the %room%",
+      "How hot is the %room% ?"
     ]
   }
 ]
