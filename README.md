@@ -43,7 +43,10 @@ To get started, you can go to [our website](https://gladysassistant.com).
 
 ## Pull requests are welcome
 
-If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
+If you want to help us develop on Gladys Assistant, you need to first setup your development environment locally.
+
+- [MacOS/Linux instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-mac-linux/)
+- [Windows instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-windows/)
 
 Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
 
@@ -82,6 +85,7 @@ Thanks goes to these wonderful people 👏
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
