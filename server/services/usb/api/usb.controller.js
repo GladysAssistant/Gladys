@@ -14,6 +14,11 @@ module.exports = function UsbController({ list }) {
         return {
           comPath: port.path,
           comName: port.path,
+          manufacturer: port.manufacturer,
+          serialNumber: port.serialNumber,
+          locationId: port.locationId,
+          vendorId: port.vendorId,
+          productId: port.productId,
         };
       }),
     );

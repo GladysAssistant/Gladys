@@ -255,6 +255,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
+  RADIO_SENSOR: 'radio-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
@@ -353,6 +354,15 @@ const DEVICE_POLL_FREQUENCIES = {
   EVERY_SECONDS: 1 * 1000,
 };
 
+const DEVICE_FUNCTION = {
+  RECV_433: 'recv_433',
+  EMIT_433: 'emit_433',
+  EMIT_433_CHACON: 'emit_433_chacon',
+  EMIT_IR: 'emit_ir',
+  DHT_TEMPERATURE: 'dht_temperature',
+  DHT_HUMIDITY: 'dht_humidity',
+};
+
 const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
@@ -431,6 +441,101 @@ const ERROR_MESSAGES = {
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
 };
 
+const ARDUINO_MODEL = [
+  {
+    NAME: 'uno',
+    LABEL: 'Arduino Uno',
+  },
+  {
+    NAME: 'mega',
+    LABEL: 'Arduino Mega',
+  },
+  {
+    NAME: 'adk',
+    LABEL: 'Arduino ADK',
+  },
+  {
+    NAME: 'leonardo',
+    LABEL: 'Arduino Leonardo',
+  },
+  {
+    NAME: 'micro',
+    LABEL: 'Arduino Micro',
+  },
+  {
+    NAME: 'nano',
+    LABEL: 'Arduino Nano',
+  },
+  {
+    NAME: 'nano (new bootloader)',
+    LABEL: 'Arduino Nano (with new bootloader)',
+  },
+  {
+    NAME: 'lilypad-usb',
+    LABEL: 'Arduino Lilypad USB',
+  },
+  {
+    NAME: 'duemilanove168',
+    LABEL: 'Arduino Duemilanove',
+  },
+  {
+    NAME: 'yun',
+    LABEL: 'Arduino Yun',
+  },
+  {
+    NAME: 'esplora',
+    LABEL: 'Arduino Esplora',
+  },
+  {
+    NAME: 'blend-micro',
+    LABEL: 'RedBearLab Blend Micro',
+  },
+  {
+    NAME: 'tinyduino',
+    LABEL: 'Tiny Circuits Tinyduino',
+  },
+  {
+    NAME: 'sf-pro-micro',
+    LABEL: 'SparkFun Pro Micro',
+  },
+  {
+    NAME: 'qduino',
+    LABEL: 'Qtechknow Qduino',
+  },
+  {
+    NAME: 'pinoccio',
+    LABEL: 'Pinoccio Scout',
+  },
+  {
+    NAME: 'imuduino',
+    LABEL: 'Femtoduino IMUduino',
+  },
+  {
+    NAME: 'feather',
+    LABEL: 'Adafruit Feather 32u4 Basic Proto',
+  },
+  {
+    NAME: 'arduboy',
+    LABEL: 'Arduboy',
+  },
+  {
+    NAME: 'circuit-playground-classic',
+    LABEL: 'Adafruit Circuit Playground',
+  },
+  {
+    NAME: 'bqZum',
+    LABEL: 'BQ ZUM',
+  },
+  {
+    NAME: 'zumcore2',
+    LABEL: 'BQ ZUM Core 2',
+  },
+  {
+    NAME: 'zumjunior',
+    LABEL: 'BQ ZUM Junior',
+  },
+];
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -458,6 +563,7 @@ const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_FUNCTION_LIST = createList(DEVICE_FUNCTION);
 
 module.exports.STATE = STATE;
 module.exports.EVENTS = EVENTS;
@@ -501,4 +607,9 @@ module.exports.DASHBOARD_TYPE_LIST = DASHBOARD_TYPE_LIST;
 module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
+module.exports.DEVICE_FUNCTION = DEVICE_FUNCTION;
+module.exports.DEVICE_FUNCTION_LIST = DEVICE_FUNCTION_LIST;
+
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.ARDUINO_MODEL = ARDUINO_MODEL;

@@ -1,0 +1,120 @@
+{
+  "id": "67804a09-804d-45df-be98-0e4a51056ea8",
+  "service_id": "1dbaeb48-d6d2-4930-b7ca-f17d637a364b",
+  "room_id": "8eb3add6-9f31-4dcf-89d7-20edcef55462",
+  "name": "Temperature",
+  "selector": "temperature",
+  "model": null,
+  "external_id": "f0546382-5132-49e4-aaad-5e49fe78af0b",
+  "should_poll": false,
+  "poll_frequency": null,
+  "createdAt": "2020-05-25T17:28:53.170Z",
+  "updatedAt": "2020-05-25T17:28:53.170Z",
+  "features": [
+    {
+      "id": "196129b3-5aae-44bc-8ab8-3e3fe31be144",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "Temperature",
+      "selector": "temperature",
+      "external_id": "f0546382-5132-49e4-aaad-5e49fe78af0b",
+      "category": "temperature-sensor",
+      "type": "decimal",
+      "read_only": true,
+      "keep_history": false,
+      "has_feedback": false,
+      "unit": "celsius",
+      "min": 0,
+      "max": 100,
+      "last_value": 26,
+      "last_value_string": null,
+      "last_value_changed": "2020-05-27T04:56:18.108Z",
+      "createdAt": "2020-05-25T17:28:53.180Z",
+      "updatedAt": "2020-05-27T04:56:18.118Z"
+    }
+  ],
+  "params": [
+    {
+      "id": "4604c9f7-4b23-468b-bee0-2f925ab51f47",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "DATA_PIN",
+      "value": "8",
+      "createdAt": "2020-05-25T17:28:53.191Z",
+      "updatedAt": "2020-05-25T17:28:53.191Z"
+    },
+    {
+      "id": "70088af5-e527-4b7d-9dd1-92868f2a6fe1",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "FUNCTION",
+      "value": "dht_temperature",
+      "createdAt": "2020-05-25T17:28:53.193Z",
+      "updatedAt": "2020-05-25T17:28:53.193Z"
+    },
+    {
+      "id": "22c9a314-9076-47bd-b099-2fc10449c787",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "ARDUINO_LINKED",
+      "value": "arduino-mega",
+      "createdAt": "2020-05-25T17:28:53.194Z",
+      "updatedAt": "2020-05-25T17:28:53.194Z"
+    },
+    {
+      "id": "d5b8c0f9-7d55-4ce2-b28d-e797752fba12",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "CODE",
+      "value": "0",
+      "createdAt": "2020-05-25T17:28:53.195Z",
+      "updatedAt": "2020-05-25T17:28:53.195Z"
+    },
+    {
+      "id": "a0350656-c79a-4677-90b9-df201254c499",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "CODE_ON",
+      "value": "0",
+      "createdAt": "2020-05-25T17:28:53.196Z",
+      "updatedAt": "2020-05-25T17:28:53.196Z"
+    },
+    {
+      "id": "92fdfcf1-4352-43bd-9f22-9a7115b4f771",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "CODE_OFF",
+      "value": "0",
+      "createdAt": "2020-05-25T17:28:53.197Z",
+      "updatedAt": "2020-05-25T17:28:53.197Z"
+    },
+    {
+      "id": "387908b1-d956-44c6-8bad-3174361cd748",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "BIT_LENGTH",
+      "value": "32",
+      "createdAt": "2020-05-25T17:28:53.198Z",
+      "updatedAt": "2020-05-25T17:28:53.198Z"
+    },
+    {
+      "id": "a2470072-0c62-43be-ad3d-0748e8ee2dac",
+      "device_id": "67804a09-804d-45df-be98-0e4a51056ea8",
+      "name": "PULSE_LENGTH",
+      "value": "1",
+      "createdAt": "2020-05-25T17:28:53.199Z",
+      "updatedAt": "2020-05-25T17:28:53.199Z"
+    }
+  ],
+  "room": {
+    "id": "8eb3add6-9f31-4dcf-89d7-20edcef55462",
+    "house_id": "bb6c2b29-3f55-4644-a0d4-5395ca7e7fe8",
+    "name": "Salon",
+    "selector": "salon",
+    "createdAt": "2020-05-25T17:16:16.594Z",
+    "updatedAt": "2020-05-25T17:16:16.594Z"
+  },
+  "service": {
+    "id": "1dbaeb48-d6d2-4930-b7ca-f17d637a364b",
+    "pod_id": null,
+    "name": "arduino",
+    "selector": "arduino",
+    "version": "0.1.0",
+    "enabled": true,
+    "has_message_feature": false,
+    "createdAt": "2020-05-25T17:07:00.776Z",
+    "updatedAt": "2020-05-25T17:07:00.776Z"
+  }
+}

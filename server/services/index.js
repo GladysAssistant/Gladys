@@ -1,4 +1,5 @@
 module.exports.example = require('./example');
+module.exports.arduino = require('./arduino');
 module.exports.caldav = require('./caldav');
 module.exports.openweather = require('./openweather');
 module.exports.mqtt = require('./mqtt');
