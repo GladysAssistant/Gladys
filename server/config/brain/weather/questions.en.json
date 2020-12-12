@@ -2,5 +2,21 @@
   {
     "label": "weather.get",
     "questions": ["What's the weather like?"]
+  },
+  {
+    "label": "weather.tomorrow",
+    "questions": ["Give me the weather for tomorrow", "What will the weather be like tomorrow ?", "weather tomorrow ?"]
+  },
+  {
+    "label": "weather.after.tomorrow",
+    "questions": [
+      "Give me the weather for afer tomorrow",
+      "What will the weather be like afer tomorrow ?",
+      "weather afer tomorrow ?"
+    ]
+  },
+  {
+    "label": "weather.day",
+    "questions": ["Give me the weather for %day%", "What will the weather be like %day% ?", "weather %day% ?"]
   }
 ]

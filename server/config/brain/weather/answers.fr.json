@@ -4,32 +4,128 @@
     "answers": ["Il neige dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
+    "label": "weather.tomorrow.success.snow",
+    "answers": ["Demain il va neiger dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.snow",
+    "answers": ["Après demain il va neiger dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.snow",
+    "answers": ["%day% il va neiger dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
     "label": "weather.get.success.rain",
     "answers": ["Il pleut dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.tomorrow.success.rain",
+    "answers": ["Demain il va pleuvoir dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.rain",
+    "answers": ["Après demain il va pleuvoir dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.rain",
+    "answers": ["%day% il va pleuvoir dehors et la température sera de {{ temperature }} {{ units }}."]
   },
   {
     "label": "weather.get.success.clear",
     "answers": ["Le ciel est dégagé dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
+    "label": "weather.tomorrow.success.clear",
+    "answers": ["Demain le ciel sera dégagé dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.clear",
+    "answers": ["Après demain le ciel sera dégagé dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.clear",
+    "answers": ["%day% le ciel sera degagé dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
     "label": "weather.get.success.cloud",
     "answers": ["Il fait nuageux dehors et la température est de  {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.tomorrow.success.cloud",
+    "answers": ["Demain il y aura des nuages dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.cloud",
+    "answers": ["Après demain il y aura des nuages dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.cloud",
+    "answers": ["%day% il y aura des nuages dehors et la température sera de {{ temperature }} {{ units }}."]
   },
   {
     "label": "weather.get.success.fog",
     "answers": ["Il y a du brouillard dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
+    "label": "weather.tomorrow.success.fog",
+    "answers": ["Demain il y aura du brouillard dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.fog",
+    "answers": ["Après demain il y aura du brouillard dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.fog",
+    "answers": ["%day% il y aura du brouillard dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
     "label": "weather.get.success.sleet",
-    "answers": ["Il fait {{ temperature }} {{ units }} dehors avec une pluie glaciale..."]
+    "answers": ["Il fait {{ temperature }} {{ units }} dehors avec une pluie glaciale."]
+  },
+  {
+    "label": "weather.tomorrow.success.sleet",
+    "answers": ["Demain il fera {{ temperature }} {{ units }} dehors avec une pluie glaciale."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.sleet",
+    "answers": ["Après demain il fera {{ temperature }} {{ units }} dehors avec une pluie glaciale."]
+  },
+  {
+    "label": "weather.day.success.sleet",
+    "answers": ["%day% il fera {{ temperature }} {{ units }} dehors avec une pluie glaciale."]
   },
   {
     "label": "weather.get.success.wind",
     "answers": ["Le temps est venteux aujourd'hui, et il fait {{ temperature }} {{ units }}."]
   },
   {
+    "label": "weather.tomorrow.success.wind",
+    "answers": ["Demain le temps sera venteux dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.wind",
+    "answers": ["Après demain le temps sera venteux dehors et la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.wind",
+    "answers": ["%day% le temps sera venteux dehors et la tempérture sera de {{ temperature }} {{ units }}."]
+  },
+  {
     "label": "weather.get.success.unknown",
     "answers": ["La température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.tomorrow.success.unknown",
+    "answers": ["Demain la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.after-tomorrow.success.unknown",
+    "answers": ["Après demain la température sera de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.day.success.unknown",
+    "answers": ["%day% la tempérture sera de {{ temperature }} {{ units }}."]
   },
   {
     "label": "weather.get.fail",
@@ -44,5 +140,9 @@
     "answers": [
       "Vous devez d'abord configurer votre maison et la positionner sur la carte pour utiliser cette fonctionnalité."
     ]
+  },
+  {
+    "label": "weather.get.fail.no-weather",
+    "answers": ["Les prévision météorologiques pour ce jour sont introuvables."]
   }
 ]
