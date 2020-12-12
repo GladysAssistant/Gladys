@@ -69,6 +69,10 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 
+// Meross
+import MerossSetupPage from '../routes/integration/all/meross/setup-page';
+import MerossDevicePage from '../routes/integration/all/meross/device-page';
+
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -184,6 +188,10 @@ const AppRouter = connect(
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+
+        <Redirect path="/dashboard/integration/device/meross" to="/dashboard/integration/device/meross/device" />
+        <MerossSetupPage path="/dashboard/integration/device/meross/setup" />
+        <MerossDevicePage path="/dashboard/integration/device/meross/device" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
