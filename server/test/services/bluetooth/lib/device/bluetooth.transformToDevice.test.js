@@ -9,6 +9,7 @@ describe('bluetooth.transformToDevice', () => {
       address: 'address',
       advertisement: {
         localName: 'LocalName',
+        manufacturerData: Buffer.from([0x01, 0x0d]),
       },
       connectable: true,
     };
@@ -18,7 +19,12 @@ describe('bluetooth.transformToDevice', () => {
       external_id: 'bluetooth:uuid',
       selector: 'bluetooth-uuid',
       features: [],
-      params: [],
+      params: [
+        {
+          name: 'manufacturer_data',
+          value: '010d',
+        },
+      ],
     };
     expect(result).deep.eq(expectedResult);
   });

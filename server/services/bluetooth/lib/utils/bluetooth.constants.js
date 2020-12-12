@@ -10,6 +10,7 @@ const PARAMS = {
   CONNECTABLE: 'connectable',
   LOADED: 'loaded',
   MANUFACTURER: 'manufacturer',
+  MANUFACTURER_DATA: 'manufacturer_data',
 };
 
 module.exports = { TIMERS, PARAMS };

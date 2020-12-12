@@ -12,11 +12,12 @@ const { encodeParamValue } = require('./bluetooth.information');
  * transformToDevice({});
  */
 function transformToDevice(peripheral) {
-  const { uuid, address, advertisement, connectable } = peripheral;
+  const { uuid, address, advertisement = {}, connectable } = peripheral;
+  const { localName, manufacturerData } = advertisement;
   const externalId = `bluetooth:${uuid}`;
 
   const device = {
-    name: (advertisement && encodeParamValue(advertisement.localName)) || address || uuid,
+    name: encodeParamValue(localName) || address || uuid,
     external_id: externalId,
     selector: externalId,
     features: [],
@@ -25,6 +26,10 @@ function transformToDevice(peripheral) {
 
   if (!connectable) {
     setDeviceParam(device, PARAMS.LOADED, true);
+  }
+
+  if (manufacturerData) {
+    setDeviceParam(device, PARAMS.MANUFACTURER_DATA, manufacturerData.toString('hex'));
   }
 
   addSelector(device);
