@@ -6,26 +6,26 @@ import DeviceForm from './DeviceForm';
 
 class TpLinkDeviceBox extends Component {
   saveDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, saveError: null, deleteError: null });
     try {
       await this.props.saveDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      this.setState({ saveError: RequestStatus.Error });
     }
     this.setState({ loading: false });
   };
 
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, saveError: null, deleteError: null });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      this.setState({ deleteError: RequestStatus.Error });
     }
     this.setState({ loading: false });
   };
 
-  render(props, { loading }) {
+  render(props, { loading, saveError, deleteError }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -48,6 +48,17 @@ class TpLinkDeviceBox extends Component {
                     <Text id="integration.tpLink.device.deleteButton" />
                   </button>
                 </div>
+
+                {saveError && (
+                  <div class="alert alert-danger">
+                    <Text id="integration.tpLink.device.saveError" />
+                  </div>
+                )}
+                {deleteError && (
+                  <div class="alert alert-danger">
+                    <Text id="integration.tpLink.device.deleteError" />
+                  </div>
+                )}
               </div>
             </div>
           </div>

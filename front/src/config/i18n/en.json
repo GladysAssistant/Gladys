@@ -383,7 +383,9 @@
         "noDevicesFound": "No devices found. Make sure you have connected one TP-Link Device (Bulb/Plug) to your WiFi.",
         "deviceOnNetworkTitle": "Devices detected on network",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
-        "createGithubIssue": "Suggest this device"
+        "createGithubIssue": "Suggest this device",
+        "saveError": "Error while saving, please try again.",
+        "deleteError": "Error when deleting, please try again."
       }
     },
     "zwave": {

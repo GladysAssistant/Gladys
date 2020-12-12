@@ -491,7 +491,9 @@
         "deviceOnNetworkTitle": "Appareils détectés sur le réseau",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
         "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un appareil TP-Link (lumière/prise) à votre réseau et qu'il soit allumé.",
-        "createGithubIssue": "Proposer ce périphérique"
+        "createGithubIssue": "Proposer ce périphérique",
+        "saveError": "Erreur lors de la sauvegarde, veuillez réessayer.",
+        "deleteError": "Erreur lors de la suppression, veuillez réessayer."
       }
     },
     "zwave": {
