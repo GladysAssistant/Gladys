@@ -13,12 +13,19 @@ class EweLinkSetupPage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('ewelink');
     this.props.loadProps();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED, () =>
-      this.props.displayConnectedMessage()
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
+      this.props.displayConnectedMessage
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, payload =>
-      this.props.displayEweLinkError(payload)
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
+      this.props.displayConnectedMessage
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
   }
 
   render(props, {}) {

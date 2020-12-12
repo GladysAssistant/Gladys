@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const { getDeviceFeature, getDeviceParam } = require('../../../../utils/device');
@@ -26,13 +25,19 @@ async function poll(device) {
     throw new NotFoundError('eWeLink: Error, device is not currently online');
   }
 
-  const [binaryFeature, powFeature, tempFeature, humFeature, firmwareParam] = await Promise.all([
-    getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY),
-    getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.POWER),
-    getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL),
-    getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL),
-    getDeviceParam(device, DEVICE_FIRMWARE),
-  ]);
+  const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BINARY);
+  const powFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.POWER);
+  const tempFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+    DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+  );
+  const humFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+    DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+  );
+  const firmwareParam = getDeviceParam(device, DEVICE_FIRMWARE);
 
   if (binaryFeature) {
     const response = await connection.getDevicePowerState(deviceId, channel);
