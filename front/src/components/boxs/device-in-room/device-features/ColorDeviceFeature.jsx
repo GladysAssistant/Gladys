@@ -32,7 +32,7 @@ class ColorDeviceType extends Component {
 
   setColorPickerState = (open, fromEvent) => {
     if (!open) {
-      document.removeEventListener('click', this.blur);
+      document.removeEventListener('click', this.blur, true);
     }
 
     this.setState({ open, fromEvent }, () => {
@@ -65,7 +65,6 @@ class ColorDeviceType extends Component {
   componentDidMount() {
     const deviceLastValue = this.props.deviceFeature.last_value;
     const color = deviceLastValue === null ? undefined : `#${intToHex(deviceLastValue)}`;
-    console.log(deviceLastValue, color);
 
     this.colorPicker = new iro.ColorPicker(this.colorPickerRef.current, {
       width: 150,
@@ -78,6 +77,10 @@ class ColorDeviceType extends Component {
       ]
     });
     this.colorPicker.on('input:end', color => this.updateValue(color));
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.blur, true);
   }
 
   render({ device, deviceFeature }, { open }) {
