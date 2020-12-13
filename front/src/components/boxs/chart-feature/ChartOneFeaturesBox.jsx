@@ -22,14 +22,14 @@ class ChartOneFeaturesBox extends Component {
     this.setState({ loading: false });
   };
 
-  getChartTitle = async() => {
+  getChartTitle = async () => {
     this.setState({ loading: true });
-    await this.props.getChartTitle(this.props.box, this.props.x, this.props.y); 
+    await this.props.getChartTitle(this.props.box, this.props.x, this.props.y);
     this.setState({ loading: false });
   };
 
-  getChartOption = async() => {
-    this.props.getChartOption(this.props.box, this.props.x, this.props.y); 
+  getChartOption = async () => {
+    this.props.getChartOption(this.props.box, this.props.x, this.props.y);
   };
 
   componentDidMount() {
@@ -57,60 +57,58 @@ class ChartOneFeaturesBox extends Component {
         <div class={cx('dimmer', { active: loading })}>
           <div class="dimmer-content">
             <div class="card-body" style="padding:0.5em;">
-              <div class="d-flex align-items-baseline"> 
-                  <div class="h5">
-                   {`${roomName} - ${deviceName}`}
-                 </div>
-                 <div class="ml-auto lh-1">
-                   <ChartPeriodDropDown
-                     box={props.box}
-                     x={props.x}
-                      y={props.y}
-                      chartPeriod={chartPeriod}
-                      showDropDownChartBox={showDropDownChartBox}
-                      toggleDropDown={this.toggleDropDown}
-                      changeChartPeriod={this.changeChartPeriod}
-                    />
-                  </div>
-              </div>
-              <div class="d-flex align-items-baseline" > 
-                  <Text id="dashboard.boxes.devicesChart.lastValue" />
-                  <div class="h6 " style="padding-left: 0.5em;" >
-                    {lastValue && `${lastValue} ${unit}`}
-                    {!lastValue && `?`}
-                    <span class="d-inline-flex align-items-baseline lh-1" >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="icon ml-1"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 22 22"
-                        stroke-width="2"
-                        stroke={trendColor}
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        {trend === 1 && <line x1="5" y1="12" x2="19" y2="12" />}
-                        {trend > 1 && <polyline points="3 17 9 11 13 15 21 7" />}
-                        {trend > 1 && <polyline points="14 7 21 7 21 14" />}
-                        {trend < 1 && <polyline points="3 7 9 13 13 9 21 17" />}
-                        {trend < 1 && <polyline points="21 10 21 17 14 17" />}
-                      </svg>
-                    </span> 
-                  </div>  
+              <div class="d-flex align-items-baseline">
+                <div class="h5">{`${roomName} - ${deviceName}`}</div>
+                <div class="ml-auto lh-1">
+                  <ChartPeriodDropDown
+                    box={props.box}
+                    x={props.x}
+                    y={props.y}
+                    chartPeriod={chartPeriod}
+                    showDropDownChartBox={showDropDownChartBox}
+                    toggleDropDown={this.toggleDropDown}
+                    changeChartPeriod={this.changeChartPeriod}
+                  />
                 </div>
-              </div> 
-        </div>
-        <div class={cx('dimmer', { active: boxStatus === RequestStatus.Getting })}>
-          <div class="loader" />
-          <div class="dimmer-content" style="height:50px">
-            {boxStatus === RequestStatus.Success && options && series && apexType && (
-              <Chart options={options} series={series} type={apexType} class="chart-sm" height="50" />
-            )}
+              </div>
+              <div class="d-flex align-items-baseline">
+                <Text id="dashboard.boxes.devicesChart.lastValue" />
+                <div class="h6 " style="padding-left: 0.5em;">
+                  {lastValue && `${lastValue} ${unit}`}
+                  {!lastValue && `?`}
+                  <span class="d-inline-flex align-items-baseline lh-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon ml-1"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 22 22"
+                      stroke-width="2"
+                      stroke={trendColor}
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      {trend === 1 && <line x1="5" y1="12" x2="19" y2="12" />}
+                      {trend > 1 && <polyline points="3 17 9 11 13 15 21 7" />}
+                      {trend > 1 && <polyline points="14 7 21 7 21 14" />}
+                      {trend < 1 && <polyline points="3 7 9 13 13 9 21 17" />}
+                      {trend < 1 && <polyline points="21 10 21 17 14 17" />}
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+          <div class={cx('dimmer', { active: boxStatus === RequestStatus.Getting })}>
+            <div class="loader" />
+            <div class="dimmer-content" style="height:50px">
+              {boxStatus === RequestStatus.Success && options && series && apexType && (
+                <Chart options={options} series={series} type={apexType} class="chart-sm" height="50" />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );

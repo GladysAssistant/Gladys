@@ -43,13 +43,13 @@ async function getFeatureStates(options) {
   };
 
   // fix attributes
-  if(optionsWithDefault.attributes_device && optionsWithDefault.attributes_device.length > 0){
+  if (optionsWithDefault.attributes_device && optionsWithDefault.attributes_device.length > 0) {
     queryParams.attributes = optionsWithDefault.attributes_device;
   }
-  if(optionsWithDefault.attributes_device_feature && optionsWithDefault.attributes_device_feature.length > 0){
+  if (optionsWithDefault.attributes_device_feature && optionsWithDefault.attributes_device_feature.length > 0) {
     queryParams.include[0].attributes = optionsWithDefault.attributes_device_feature;
   }
-  if(optionsWithDefault.attributes_device_room && optionsWithDefault.attributes_device_room.length > 0){
+  if (optionsWithDefault.attributes_device_room && optionsWithDefault.attributes_device_room.length > 0) {
     queryParams.include[1].attributes = optionsWithDefault.attributes_device_room;
   }
 
@@ -77,10 +77,7 @@ async function getFeatureStates(options) {
     }
     if (optionsWithDefault.begin_date && optionsWithDefault.end_date) {
       queryParams.include[0].include[0].where.created_at = {
-        [Op.between]: [
-          optionsWithDefault.begin_date, 
-          optionsWithDefault.end_date
-        ] 
+        [Op.between]: [optionsWithDefault.begin_date, optionsWithDefault.end_date],
       };
     }
   }

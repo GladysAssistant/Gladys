@@ -23,18 +23,14 @@ function createActions(store) {
     async getChartTitle(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-
-        const chartData = await state.httpClient.get(
-          `/api/v1/device/device_feature/${box.device_features}`
-        );
+        const chartData = await state.httpClient.get(`/api/v1/device/device_feature/${box.device_features}`);
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           chartPeriod: box.chartPeriod,
           roomName: chartData[0].room.name,
           deviceName: chartData[0].name,
-          showDropDownChartBox: false,
+          showDropDownChartBox: false
         });
- 
       } catch (e) {
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }

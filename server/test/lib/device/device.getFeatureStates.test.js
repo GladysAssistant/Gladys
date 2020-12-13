@@ -6,7 +6,7 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
-describe.only('Device.getFeatureStates', () => {
+describe('Device.getFeatureStates', () => {
   it('should getFeatureStates ', async () => {
     const stateManager = new StateManager(event);
     const service = {
@@ -19,7 +19,7 @@ describe.only('Device.getFeatureStates', () => {
     const params = {
       device_feature_selector: ['test-temperature-sensor-2'],
       begin_date: '2020-07-16 22:14:26.590 +00:00',
-      end_date: '2020-07-18 22:14:26.590 +00:00'
+      end_date: '2020-07-18 22:14:26.590 +00:00',
     };
     // Choose attributes
     params.attributes_device = [];
@@ -36,7 +36,7 @@ describe.only('Device.getFeatureStates', () => {
     params.attributes_device_room.push('selector');
 
     const devices = await device.getFeatureStates(params);
-    
+
     expect(devices)
       .to.be.instanceOf(Array)
       .and.have.lengthOf(1);

@@ -21,14 +21,14 @@ class ChartMultiFeaturesBox extends Component {
     this.setState({ loading: false });
   };
 
-  getChartTitle = async() => {
+  getChartTitle = async () => {
     this.setState({ loading: true });
-    await this.props.getChartTitle(this.props.box, this.props.x, this.props.y); 
+    await this.props.getChartTitle(this.props.box, this.props.x, this.props.y);
     this.setState({ loading: false });
   };
 
-  getChartOption = async() => {
-    this.props.getChartOption(this.props.box, this.props.x, this.props.y); 
+  getChartOption = async () => {
+    this.props.getChartOption(this.props.box, this.props.x, this.props.y);
   };
 
   componentDidMount() {
@@ -68,13 +68,13 @@ class ChartMultiFeaturesBox extends Component {
           </div>
         </div>
         <div class={cx('dimmer', { active: boxStatus === RequestStatus.Getting })}>
-            <div class="loader" />
-            <div class="dimmer-content" style="height:250px">
-              {boxStatus === RequestStatus.Success && options && series && apexType && (
-                <Chart options={options} series={series} type={apexType} class="chart-sm" height="250px" />
-              )}
-            </div>
+          <div class="loader" />
+          <div class="dimmer-content" style="height:250px">
+            {boxStatus === RequestStatus.Success && options && series && apexType && (
+              <Chart options={options} series={series} type={apexType} class="chart-sm" height="250px" />
+            )}
           </div>
+        </div>
       </div>
     );
   }

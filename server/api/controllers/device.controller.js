@@ -99,10 +99,9 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeature(req, res) {
-    
     const params = Object.assign({}, req.query, {
       device_feature_selector: req.params.device_feature_selector.split(','),
-    }); 
+    });
 
     // Choose attributes
     params.attributes_device = [];
@@ -124,7 +123,7 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device_param.push('name');
 
     const devices = await gladys.device.get(params);
-    
+
     res.json(devices);
   }
   /**
@@ -133,7 +132,6 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeatureStates(req, res) {
-
     // const debut=new Date();
     const params = Object.assign({}, req.query, {
       device_feature_selector: req.params.device_feature_selector.split(','),
@@ -201,7 +199,7 @@ module.exports = function DeviceController(gladys) {
 
               // Choice algo of downsampling use
               let smoothFeatureStates = newFeatureStateArray;
-              if(newFeatureStateArray.length > chartWidth){
+              if (newFeatureStateArray.length > chartWidth) {
                 smoothFeatureStates = LTD(newFeatureStateArray, chartWidth);
               }
               feature.device_feature_states = smoothFeatureStates;
@@ -219,7 +217,7 @@ module.exports = function DeviceController(gladys) {
         });
       }
     }
-    
+
     // console.log('fin; '+ debut + ' - ' +new Date());
     res.json(devices);
   }

@@ -1,7 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert('t_device_feature_state', [
-      
       {
         id: '87a7818a-1a5a-4638-9b44-37004c0f1ea6',
         device_feature_id: 'f07c5b27-9301-4482-a059-9f91329d30e7',

@@ -80,7 +80,7 @@ describe('GET /api/v1/service/:service_name/device', () => {
   });
 });
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default)', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=10')
@@ -94,7 +94,7 @@ describe.only('GET /api/v1/device_feature_sate', () => {
             expect(feature).to.have.property('device_feature_states');
           });
         });
-        
+
         expect(res.body)
           .to.be.instanceOf(Array)
           .and.have.lengthOf(1);
@@ -108,10 +108,12 @@ describe.only('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1month)', async () => {
     await authenticatedRequest
-      .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=1000&chartPeriod=last1month-selector')
+      .get(
+        '/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=1000&chartPeriod=last1month-selector',
+      )
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
@@ -136,10 +138,12 @@ describe.only('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1week)', async () => {
     await authenticatedRequest
-      .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=100&chartPeriod=last1week-selector')
+      .get(
+        '/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=100&chartPeriod=last1week-selector',
+      )
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
@@ -164,10 +168,12 @@ describe.only('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last2day)', async () => {
     await authenticatedRequest
-      .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=10&chartPeriod=last2day-selector')
+      .get(
+        '/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=10&chartPeriod=last2day-selector',
+      )
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
@@ -192,10 +198,12 @@ describe.only('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1year-selector)', async () => {
     await authenticatedRequest
-      .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=100&chartPeriod=last1year-selector')
+      .get(
+        '/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=100&chartPeriod=last1year-selector',
+      )
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
