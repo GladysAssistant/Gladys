@@ -13,9 +13,8 @@ const DEFAULT_OPTIONS = {
  * @description Get list of device feature states
  * @param {Object} [options] - Options of the query.
  * @example
- * const devices = await gladys.device.get({
- *  take: 20,
- *  skip: 0
+ * const devices = await gladys.device.getFeatureStates({
+ *  device_feature_selector: 'test-selector'
  * });
  */
 async function getFeatureStates(options) {
@@ -43,30 +42,46 @@ async function getFeatureStates(options) {
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
+  // fix attributes
+  if(optionsWithDefault.attributes_device && optionsWithDefault.attributes_device.length > 0){
+    queryParams.attributes = optionsWithDefault.attributes_device;
+  }
+  if(optionsWithDefault.attributes_device_feature && optionsWithDefault.attributes_device_feature.length > 0){
+    queryParams.include[0].attributes = optionsWithDefault.attributes_device_feature;
+  }
+  if(optionsWithDefault.attributes_device_room && optionsWithDefault.attributes_device_room.length > 0){
+    queryParams.include[1].attributes = optionsWithDefault.attributes_device_room;
+  }
+
   // search by devide selector
-  if (options.device_selector) {
+  if (optionsWithDefault.device_selector) {
     queryParams.where = {
-      selector: { [Op.in]: options.device_selector },
+      selector: { [Op.in]: optionsWithDefault.device_selector },
     };
   }
 
   // search by feature selector
-  if (options.device_feature_selector) {
+  if (optionsWithDefault.device_feature_selector) {
     queryParams.include[0].where = {
-      selector: { [Op.in]: options.device_feature_selector },
+      selector: { [Op.in]: optionsWithDefault.device_feature_selector },
     };
   }
 
-  if (options.begin_date || options.end_date) {
+  if (optionsWithDefault.begin_date || optionsWithDefault.end_date) {
     queryParams.include[0].include[0].where = { created_at: {} };
-    if (options.begin_date && !options.end_date) {
-      queryParams.include[0].include[0].where.created_at = { [Op.gte]: options.begin_date };
+    if (optionsWithDefault.begin_date && !optionsWithDefault.end_date) {
+      queryParams.include[0].include[0].where.created_at = { [Op.gte]: optionsWithDefault.begin_date };
     }
-    if (!options.begin_date && options.end_date) {
-      queryParams.include[0].include[0].where.created_at = { [Op.gte]: options.end_date };
+    if (!optionsWithDefault.begin_date && optionsWithDefault.end_date) {
+      queryParams.include[0].include[0].where.created_at = { [Op.gte]: optionsWithDefault.end_date };
     }
-    if (options.begin_date && options.end_date) {
-      queryParams.include[0].include[0].where.created_at = { [Op.between]: [options.begin_date, options.end_date] };
+    if (optionsWithDefault.begin_date && optionsWithDefault.end_date) {
+      queryParams.include[0].include[0].where.created_at = {
+        [Op.between]: [
+          optionsWithDefault.begin_date, 
+          optionsWithDefault.end_date
+        ] 
+      };
     }
   }
 

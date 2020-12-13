@@ -44,10 +44,33 @@ async function get(options) {
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
+  // fix attributes
+  if(optionsWithDefault.attributes_device && optionsWithDefault.attributes_device.length > 0){
+    queryParams.attributes = optionsWithDefault.attributes_device;
+  }
+  if(optionsWithDefault.attributes_device_feature && optionsWithDefault.attributes_device_feature.length > 0){
+    queryParams.include[0].attributes = optionsWithDefault.attributes_device_feature;
+  }
+  if(optionsWithDefault.attributes_device_param && optionsWithDefault.attributes_device_param.length > 0){
+    queryParams.include[1].attributes = optionsWithDefault.attributes_device_param;
+  }
+  if(optionsWithDefault.attributes_device_room && optionsWithDefault.attributes_device_room.length > 0){
+    queryParams.include[2].attributes = optionsWithDefault.attributes_device_room;
+  }
+  if(optionsWithDefault.attributes_device_service && optionsWithDefault.attributes_device_service.length > 0){
+    queryParams.include[3].attributes = optionsWithDefault.attributes_device_service;
+  }
   // search by device feature category
   if (optionsWithDefault.device_feature_category) {
     queryParams.include[0].where = {
       category: optionsWithDefault.device_feature_category,
+    };
+  }
+
+  // search by feature selector
+  if (optionsWithDefault.device_feature_selector) {
+    queryParams.include[0].where = {
+      selector: { [Op.in]: optionsWithDefault.device_feature_selector },
     };
   }
 

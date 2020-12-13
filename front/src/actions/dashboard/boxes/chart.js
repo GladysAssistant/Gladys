@@ -20,16 +20,39 @@ function createActions(store) {
         showDropDownChartBox
       });
     },
+    async getChartTitle(state, box, x, y) {
+      boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
+      try {
+
+        const chartData = await state.httpClient.get(
+          `/api/v1/device/device_feature/${box.device_features}`
+        );
+
+        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+          chartPeriod: box.chartPeriod,
+          roomName: chartData[0].room.name,
+          deviceName: chartData[0].name,
+          showDropDownChartBox: false,
+        });
+ 
+      } catch (e) {
+        boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
+      }
+    },
     async getChartOption(state, box, x, y, chartPeriod) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         let newChartPeriod = box.chartPeriod;
         if (chartPeriod) {
           newChartPeriod = chartPeriod;
+          boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+            chartPeriod: newChartPeriod,
+            showDropDownChartBox: false
+          });
         }
 
         const chartData = await state.httpClient.get(
-          `/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=1000&chartPeriod=${newChartPeriod}`
+          `/api/v1/device_feature_sate/${box.device_features}?downsample=true&maxValue=100&chartPeriod=${newChartPeriod}`
         );
 
         let chartTypeStyle;
@@ -147,7 +170,6 @@ function createActions(store) {
           options.grid.padding.bottom = 40;
         }
 
-        // TODO last_value, unit , room name et device name a revoir => depends du type de box
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           options,
           series,
@@ -159,7 +181,8 @@ function createActions(store) {
           lastValue,
           unit,
           trend,
-          trendColor
+          trendColor,
+          loadingChartOption: false
         });
 
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);

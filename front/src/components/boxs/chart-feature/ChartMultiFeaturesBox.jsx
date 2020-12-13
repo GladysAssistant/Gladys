@@ -17,17 +17,22 @@ class ChartMultiFeaturesBox extends Component {
 
   changeChartPeriod = async e => {
     this.setState({ loading: true });
-    await this.props.getChartOption(this.props.box, this.props.x, this.props.y, e.target.name);
+    this.props.getChartOption(this.props.box, this.props.x, this.props.y, e.target.name);
     this.setState({ loading: false });
   };
 
-  getChartOption = () => {
+  getChartTitle = async() => {
     this.setState({ loading: true });
-    this.props.getChartOption(this.props.box, this.props.x, this.props.y);
+    await this.props.getChartTitle(this.props.box, this.props.x, this.props.y); 
     this.setState({ loading: false });
+  };
+
+  getChartOption = async() => {
+    this.props.getChartOption(this.props.box, this.props.x, this.props.y); 
   };
 
   componentDidMount() {
+    this.getChartTitle(this.props.box, this.props.x, this.props.y);
     this.getChartOption(this.props.box, this.props.x, this.props.y);
   }
 
@@ -42,33 +47,34 @@ class ChartMultiFeaturesBox extends Component {
 
     return (
       <div class="card">
-        <div class="card-body">
-          <div class="d-flex align-items-baseline">
-            <div class="subheader">
-              <div class="h5 mb-3 mr-2">{props.box.chartName}</div>
-            </div>
-            <div class="ml-auto lh-1">
-              <ChartPeriodDropDown
-                box={props.box}
-                x={props.x}
-                y={props.y}
-                chartPeriod={chartPeriod}
-                showDropDownChartBox={showDropDownChartBox}
-                toggleDropDown={this.toggleDropDown}
-                changeChartPeriod={this.changeChartPeriod}
-              />
+        <div class={cx('dimmer', { active: loading })}>
+          <div class="dimmer-content">
+            <div class="card-body" style="padding:0.5em;">
+              <div class="d-flex align-items-baseline">
+                <div class="h5 mb-3 mr-2">{props.box.chartName}</div>
+                <div class="ml-auto lh-1">
+                  <ChartPeriodDropDown
+                    box={props.box}
+                    x={props.x}
+                    y={props.y}
+                    chartPeriod={chartPeriod}
+                    showDropDownChartBox={showDropDownChartBox}
+                    toggleDropDown={this.toggleDropDown}
+                    changeChartPeriod={this.changeChartPeriod}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class={cx('dimmer', { active: loading })}>
+        </div>
+        <div class={cx('dimmer', { active: boxStatus === RequestStatus.Getting })}>
             <div class="loader" />
-            <div class="dimmer-content">
+            <div class="dimmer-content" style="height:250px">
               {boxStatus === RequestStatus.Success && options && series && apexType && (
                 <Chart options={options} series={series} type={apexType} class="chart-sm" height="250px" />
               )}
             </div>
           </div>
-        </div>
       </div>
     );
   }

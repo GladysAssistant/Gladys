@@ -37,7 +37,10 @@ class EditChartMultiFeatures extends Component {
         DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
         DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
         DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN,
-        DEVICE_FEATURE_TYPES.LIGHT.COLOR
+        DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+        DEVICE_FEATURE_TYPES.CUBE.MODE,
+        DEVICE_FEATURE_TYPES.CUBE.ROTATION,
+        DEVICE_FEATURE_TYPES.BUTTON.CLICK
       ];
 
       let devices = await this.props.httpClient.get(`/api/v1/device`);

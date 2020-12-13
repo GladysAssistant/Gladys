@@ -79,7 +79,7 @@ const OPTIONS_COMMON = {
     theme: 'dark',
     x: {
       show: true,
-      format: 'dd MMM yyyy',
+      format: 'dd MMM yyyy HH:mm:ss',
       formatter: undefined
     },
     y: [],

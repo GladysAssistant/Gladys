@@ -18,9 +18,19 @@ module.exports = (sequelize, DataTypes) => {
       value: {
         allowNull: false,
         type: DataTypes.DOUBLE,
-      },
+      }
     },
-    {},
+    {
+      indexes: [
+        {
+          name: 'created_at_index',
+          using: 'BTREE',
+          fields: [
+            'created_at'
+          ]
+        }
+      ]
+    },
   );
 
   deviceFeatureState.associate = (models) => {
