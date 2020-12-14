@@ -1,29 +1,21 @@
 const logger = require('../../../../utils/logger');
 const {
-  EVENTS,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-const { CUBE_STATUS } = require('../utils/deviceStatus');
-const { getBatteryPercent } = require('../utils/getBatteryPercent');
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
-
-const MIN_VOLT = 2800;
-const MAX_VOLT = 3300;
 
 /**
  * @description New value thermostat received.
- * @param {Object} message - Message received.
  * @param {Object} data - Data received.
  * @example
  * newValueThermostat(122324, {
- *    voltage: 3000,
- *    status: 1
  * });
  */
 function newValueThermostat(data) {
+  /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
   logger.debug(`Netatmo : New value thermostat, sid = ${sid}`);
   this.devices[sid] = data;

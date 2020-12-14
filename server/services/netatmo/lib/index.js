@@ -1,4 +1,4 @@
-var netatmo = require('netatmo');
+const netatmo = require('netatmo');
 const Bottleneck = require('bottleneck/es5');
 
 // commands
@@ -8,8 +8,9 @@ const { getDevices } = require('./commands/netatmo.getDevices.js');
 const { addSensor } = require('./commands/netatmo.addSensor.js');
 
 // event
-const { newValueThermostat } = require('./event/newValueThermostat.js');
-const { newValueStation } = require('./event/newValueStation.js');
+const { newValueThermostat } = require('./event/netatmo.newValueThermostat.js');
+const { newValueStation } = require('./event/netatmo.newValueStation.js');
+const {newValueCamera } = require('./event/netatmo.newValueCamera.js');
 const { poll } = require('./event/netatmo.poll.js');
 
 // we rate-limit the number of request per seconds to poll lights
@@ -21,20 +22,21 @@ const pollLimiter = new Bottleneck({
 /**
  * @param {Object} gladys - The gladys object.
  * @param {string} serviceId - Identification of the service.
- * @description Create all device if not exist by listening
+ * @description Create all device if not exist
  * @example
  * NetatmoManager(gladys, serviceId)
  */
 const NetatmoManager = function NetatmoManager(gladys, serviceId) {
     this.gladys = gladys;
     this.serviceId = serviceId;
-    this.netatmo = netatmo;
+    this.Netatmo = netatmo;
     this.api = undefined;
     this.sensors = {};
     this.devices = {};
     this.connected = false;
     this.topicBinds = {};
     this.configured = false;
+    this.accessToken = undefined;
 };
 
 NetatmoManager.prototype.connect = connect;
@@ -44,6 +46,7 @@ NetatmoManager.prototype.addSensor = addSensor;
 
 NetatmoManager.prototype.newValueThermostat = newValueThermostat;
 NetatmoManager.prototype.newValueStation = newValueStation;
+NetatmoManager.prototype.newValueCamera = newValueCamera;
 NetatmoManager.prototype.poll = pollLimiter.wrap(poll);
 
 module.exports = NetatmoManager;

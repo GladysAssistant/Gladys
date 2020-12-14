@@ -1,8 +1,6 @@
-const { CONFIGURATION } = require('../constants');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-
 /**
- * @description Get Device.
+ * @description Get Sensors.
+ * @returns {Array} Return array of sensor.
  * @example
  * netatmo.getSensor();
  */

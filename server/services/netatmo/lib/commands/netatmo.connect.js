@@ -1,33 +1,39 @@
+const logger = require('../../../../utils/logger');
 const { CONFIGURATION } = require('../constants');
+var util = require('util');
+const request = require('request');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-
+const BASE_URL = 'https://api.netatmo.net';
 /**
  * @description Connect.
  * @example
  * netatmo.connect();
  */
 async function connect() {
-    const netatmo_Client_Id = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_ID, this.serviceId);
-    const netatmo_Client_Secret = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_SECRET, this.serviceId);
-    const netatmo_Username = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_USERNAME, this.serviceId);
-    const netatmo_Password = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_PASSWORD, this.serviceId);
-    const variablesFound = netatmo_Client_Id;
-    if (!variablesFound) {
-        this.configured = false;
-        throw new ServiceNotConfiguredError('NETATMO is not configured.');
-    }
-    this.configured = true;
-    const auth = {
-        "client_id": netatmo_Client_Id,
-        "client_secret": netatmo_Client_Secret,
-        "username": netatmo_Username,
-        "password": netatmo_Password,
-    }
-    this.api = new this.netatmo(auth);
-    this.api.on("error", function (error) {
-      console.error('NETATMO threw an error: ' + error);
-    });
-    this.getDevices()
+  const axios = require('axios');
+
+  const netatmoClientId = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_ID, this.serviceId);
+  const netatmoCientSecret = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_SECRET, this.serviceId);
+  const netatmoUsername = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_USERNAME, this.serviceId);
+  const netatmoPassword = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_PASSWORD, this.serviceId);
+  const variablesFound = netatmoClientId;
+  if (!variablesFound) {
+      this.configured = false;
+      throw new ServiceNotConfiguredError('NETATMO is not configured.');
+  }
+  this.configured = true;
+  const auth = {
+      'client_id': netatmoClientId,
+      'client_secret': netatmoCientSecret,
+      'username': netatmoUsername,
+      'password': netatmoPassword,
+      'scope': 'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
+  };
+  this.api = new this.Netatmo(auth);
+  this.api.on('error', function ErrorOnApi(error) {
+    logger.error(`NETATMO threw an error: ${error}`);
+  });
+  this.getDevices();
 }
 
 module.exports = {

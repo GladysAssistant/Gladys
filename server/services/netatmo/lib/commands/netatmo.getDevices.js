@@ -1,58 +1,54 @@
-const { CONFIGURATION } = require('../constants');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-
+const logger = require('../../../../utils/logger');
 /**
  * @description Get Device.
+ * @returns {Array} Return array of devices.
  * @example
  * netatmo.getDevices();
  */
 async function getDevices() {
+
+  let options = {};
+  console.log(this.accessToken);
   // on recupere le thermostat
-  let promise = new Promise((resolve, reject) => {
-    this.api.getThermostatsData(function(err, sensors) {
-      resolve(sensors)
+  const promiseThermostat = new Promise((resolve, reject) => {
+    this.api.getThermostatsData((err, sensors) => {
+      resolve(sensors);
     });
   });
-  let sensors = await promise;
-  for (let sensor of sensors) {
-    for (let element of sensor.modules) {
-      if (element.type == "NATherm1") {
-        this.newValueThermostat(element)
+  let sensors = await promiseThermostat;
+  sensors.forEach((sensor) => {
+    sensor.modules.forEach((module) => {
+      if (module.type === 'NATherm1') {
+        this.newValueThermostat(module);
       } else {
-        console.log(element)
+        logger.info(module);
       }
-    }
-  };
+    });
+  });
   // on recupere l id de la maison
-  let promise2 = new Promise((resolve, reject) => {
-    this.api.getHomeData(function(err, data) {
-      resolve(data.homes[0].id)
-    })
-  })
-  let idHome = await promise2;
-  // on recuepre les tete thermostatique
-  var options = {
-    home_id: idHome
-  }
-  promise = new Promise((resolve, reject) => {
-    this.api.getHomeStatus(options, function(err, data) {
-      resolve(data.home)
-    })
-  })
-  sensors = await promise;
-  console.log(sensors)
-
+  const promiseGetHomeData = new Promise((resolve, reject) => {
+    this.api.getHomeData((err, data) => {
+      resolve(data.homes[0]);
+    });
+  });
+  const homes = await promiseGetHomeData;
+  // on recupere les cameras
+  if (homes.cameras) {
+    homes.cameras.forEach((camera) => {
+      this.newValueCamera(camera);
+    });
+  };
 
   // Recuperer la station
-  promise = new Promise((resolve, reject) => {
-    this.api.getStationsData(function(err, data) {
-      resolve(data)
-    })
-  })
-  stations = await promise;
-  for (let station of stations) {
-    this.newValueStation(station)
-  }
+  const promiseGetStationsData = new Promise((resolve, reject) => {
+    this.api.getStationsData((err, data) => {
+      resolve(data);
+    });
+  });
+  const stations = await promiseGetStationsData;
+  stations.forEach((station) => {
+    this.newValueStation(station);
+  });
 }
 
 module.exports = {

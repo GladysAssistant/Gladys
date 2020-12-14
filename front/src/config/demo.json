@@ -1082,6 +1082,62 @@
       ]
     }
   ],
+  "get /api/v1/service/netatmo/device": [
+    {
+      "id": "b2174c6b-8d27-49a2-adea-ad7c9023ebe3",
+      "name": "Netatmo Thermostat",
+      "external_id": "netatmo:1234",
+      "selector": "netatmo:1234",
+      "room_id": "f99ab22a-e6a8-4756-b1fe-4d19dc8c8620",
+      "service_id": "ab043fbc-6ba7-4f6f-8447-ffc1bb2d0df9",
+      "features": [
+        {
+          "name": "Temperature",
+          "selector": "netatmo:12344:temperature",
+          "external_id": "netatmo:12344:temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "unit": "celsius",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": -20,
+          "max": 60
+        },
+        {
+          "name": "Setpoint",
+          "selector": "netatmo:12344:setpoint",
+          "external_id": "netatmo:12344:setpoint",
+          "category": "setpoint",
+          "type": "decimal",
+          "unit": "celsius",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": -20,
+          "max": 60
+        },
+        {
+          "name": "Battery",
+          "selector": "netatmo:12344:battery",
+          "external_id": "netatmo:12344:battery",
+          "category": "battery",
+          "type": "integer",
+          "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/netatmo": {
+    "id": "ab043fbc-6ba7-4f6f-8447-ffc1bb2d0df9",
+    "name": "Netatmo",
+    "selector": "netatmo"
+  },
   "get /api/v1/device": [
     {
       "id": "06e735a3-ac62-4a05-85b6-855f2c556d7b",
