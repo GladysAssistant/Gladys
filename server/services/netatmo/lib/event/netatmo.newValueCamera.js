@@ -14,7 +14,6 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
  * });
  */
 function newValueCamera(data) {
-  console.log(data)
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data.id;
   logger.debug(`Netatmo : New camera, sid = ${sid}`);

@@ -2,7 +2,6 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import { Link } from 'preact-router/match';
 import Device from './Device';
 import style from './style.css';
 
@@ -29,7 +28,7 @@ const DeviceTab = ({ children, ...props }) => (
             <input
               type="text"
               class="form-control w-10"
-              placeholder={<Text id="integration.netatmo.device.search" />}
+              placeholder={<Text id="integration.netatmo.device.searchPlaceholder" />}
               onInput={props.debouncedSearch}
             />
           </Localizer>

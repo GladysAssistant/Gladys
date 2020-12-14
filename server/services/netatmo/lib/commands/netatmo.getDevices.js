@@ -6,16 +6,13 @@ const logger = require('../../../../utils/logger');
  * netatmo.getDevices();
  */
 async function getDevices() {
-
-  let options = {};
-  console.log(this.accessToken);
   // on recupere le thermostat
   const promiseThermostat = new Promise((resolve, reject) => {
     this.api.getThermostatsData((err, sensors) => {
       resolve(sensors);
     });
   });
-  let sensors = await promiseThermostat;
+  const sensors = await promiseThermostat;
   sensors.forEach((sensor) => {
     sensor.modules.forEach((module) => {
       if (module.type === 'NATherm1') {

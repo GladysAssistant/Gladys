@@ -42,8 +42,10 @@ async function poll(device) {
       state: this.devices[sid].dashboard_data.Pressure
     });
     /* eslint-disable no-restricted-syntax */
-    for (let module of this.devices[sid].modules) {
-      let sidModule = module._id;
+    let sidModule;
+    for (const module of this.devices[sid].modules) {
+      /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+      sidModule = module._id;
       if (module.data_type[0] === 'Rain') {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sidModule}:rain`,

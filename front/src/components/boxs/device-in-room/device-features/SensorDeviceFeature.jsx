@@ -7,7 +7,7 @@ const { getCardinalDirection } = require('../../../../utils/cardinalPoints');
 
 dayjs.extend(relativeTime);
 
-import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR];
 

@@ -36,7 +36,6 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
     this.connected = false;
     this.topicBinds = {};
     this.configured = false;
-    this.accessToken = undefined;
 };
 
 NetatmoManager.prototype.connect = connect;

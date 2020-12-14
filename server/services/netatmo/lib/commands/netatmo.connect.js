@@ -1,17 +1,12 @@
 const logger = require('../../../../utils/logger');
 const { CONFIGURATION } = require('../constants');
-var util = require('util');
-const request = require('request');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-const BASE_URL = 'https://api.netatmo.net';
 /**
  * @description Connect.
  * @example
  * netatmo.connect();
  */
 async function connect() {
-  const axios = require('axios');
-
   const netatmoClientId = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_ID, this.serviceId);
   const netatmoCientSecret = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_SECRET, this.serviceId);
   const netatmoUsername = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_USERNAME, this.serviceId);

@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS, DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 

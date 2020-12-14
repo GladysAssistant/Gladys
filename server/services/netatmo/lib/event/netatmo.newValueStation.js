@@ -1,6 +1,5 @@
 const logger = require('../../../../utils/logger');
 const {
-  EVENTS,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
@@ -10,15 +9,13 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value thermostat received.
- * @param {Object} message - Message received.
  * @param {Object} data - Data received.
  * @example
- * newValueThermostat(122324, {
- *    voltage: 3000,
- *    status: 1
+ * newValueStation(122324, {
  * });
  */
 function newValueStation(data) {
+  /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
   logger.debug(`Netatmo : New value stations, sid = ${sid}`);
   this.devices[sid] = data;
@@ -86,9 +83,11 @@ function newValueStation(data) {
     ],
   };
   this.addSensor(sid, newSensor);
+  let sidModule;
   // eslint-disable-next-line no-restricted-syntax
-  for (let module of this.devices[sid].modules) {
-    const sidModule = module._id;
+  for (const module of this.devices[sid].modules) {
+    /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+    sidModule = module._id;
     logger.debug(`Netatmo : New value stations, sid = ${sidModule}`);
     this.devices[sidModule] = module;
     let newSensor2;
@@ -298,72 +297,70 @@ function newValueStation(data) {
           ],
         };
       }
-    } else {
-      if(module.data_type.length === 4)  {
-        newSensor2 = {
-          service_id: this.serviceId,
-          name: module.module_name,
-          selector: `netatmo:${sidModule}`,
-          external_id: `netatmo:${sidModule}`,
-          model: 'netatmo-station-outdoor',
-          should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
-          features: [
-            {
-              name: 'Temperature',
-              selector: `netatmo:${sidModule}:temperature`,
-              external_id: `netatmo:${sidModule}:temperature`,
-              category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-              type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-              unit: DEVICE_FEATURE_UNITS.CELSIUS,
-              read_only: true,
-              keep_history: true,
-              has_feedback: true,
-              min: -20,
-              max: 60,
-            },
-            {
-              name: 'Humidity',
-              selector: `netatmo:${sidModule}:humidity`,
-              external_id: `netatmo:${sidModule}:humidity`,
-              category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
-              type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-              unit: DEVICE_FEATURE_UNITS.PERCENT,
-              read_only: true,
-              keep_history: true,
-              has_feedback: true,
-              min: 0,
-              max: 100,
-            },
-            {
-              name: 'CO2',
-              selector: `netatmo:${sidModule}:co2`,
-              external_id: `netatmo:${sidModule}:co2`,
-              category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
-              type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-              unit: DEVICE_FEATURE_UNITS.PERCENT,
-              read_only: true,
-              keep_history: true,
-              has_feedback: true,
-              min: 0,
-              max: 1000,
-            },
-            {
-              name: 'Pressure',
-              selector: `netatmo:${sidModule}:pressure`,
-              external_id: `netatmo:${sidModule}:pressure`,
-              category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
-              type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-              unit: DEVICE_FEATURE_UNITS.PASCAL,
-              read_only: true,
-              keep_history: true,
-              has_feedback: true,
-              min: 3000,
-              max: 11000,
-            }
-          ],
-        };
-      }
+    } else if (module.data_type.length === 4) {
+      newSensor2 = {
+        service_id: this.serviceId,
+        name: module.module_name,
+        selector: `netatmo:${sidModule}`,
+        external_id: `netatmo:${sidModule}`,
+        model: 'netatmo-station-outdoor',
+        should_poll: true,
+        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        features: [
+          {
+            name: 'Temperature',
+            selector: `netatmo:${sidModule}:temperature`,
+            external_id: `netatmo:${sidModule}:temperature`,
+            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            read_only: true,
+            keep_history: true,
+            has_feedback: true,
+            min: -20,
+            max: 60,
+          },
+          {
+            name: 'Humidity',
+            selector: `netatmo:${sidModule}:humidity`,
+            external_id: `netatmo:${sidModule}:humidity`,
+            category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            read_only: true,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 100,
+          },
+          {
+            name: 'CO2',
+            selector: `netatmo:${sidModule}:co2`,
+            external_id: `netatmo:${sidModule}:co2`,
+            category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            read_only: true,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 1000,
+          },
+          {
+            name: 'Pressure',
+            selector: `netatmo:${sidModule}:pressure`,
+            external_id: `netatmo:${sidModule}:pressure`,
+            category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
+            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+            unit: DEVICE_FEATURE_UNITS.PASCAL,
+            read_only: true,
+            keep_history: true,
+            has_feedback: true,
+            min: 3000,
+            max: 11000,
+          }
+        ],
+      };
     }
     this.addSensor(sidModule, newSensor2);
   }

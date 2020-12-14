@@ -308,9 +308,9 @@
         "featuresLabel": "Features",
         "saveButton": "Save",
         "deleteButton": "Delete",
+        "addDeviceButton": "Add",
         "editButton": "Edit details",
         "noFeatures": "No features",
-        "noDevices": "No devices found",
         "deviceNotHandled": "Device is not handled",
         "foundDevice": "Device Found"
       },

@@ -1,6 +1,4 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
-import cx from 'classnames';
-import { RequestStatus } from '../../../../../utils/consts';
+import { Text } from 'preact-i18n';
 
 const SetupTab = ({ children, ...props }) => {
   return (
@@ -12,7 +10,7 @@ const SetupTab = ({ children, ...props }) => {
       </div>
       <div class="card-body">
         <div class="form-group">
-          <label class="form-label">Username</label>
+          <label class="form-label"><Text id="integration.netatmo.setting.usernamePlaceholder" /></label>
           <input
             type="text"
             class="form-control"
@@ -23,7 +21,7 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <label class="form-label"><Text id="integration.netatmo.setting.passwordPlaceholder" /></label>
           <input
             type="password"
             class="form-control"
@@ -34,7 +32,7 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Client ID</label>
+          <label class="form-label"><Text id="integration.netatmo.setting.clientIdPlaceholder" /></label>
           <input
             type="text"
             class="form-control"
@@ -45,7 +43,7 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Client Secret</label>
+          <label class="form-label"><Text id="integration.netatmo.setting.clientSecretPlaceholder" /></label>
           <input
             type="password"
             class="form-control"

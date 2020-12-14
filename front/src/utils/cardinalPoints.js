@@ -3,7 +3,7 @@
  */
 function getCardinalDirection(angle) {
   if (typeof angle === 'string') {
-      angle = parseInt(angle);
+      angle = parseInt(angle, 10);
   }
   if (angle <= 0 || angle > 360 || typeof angle === 'undefined') {
       return '☈';
@@ -17,7 +17,7 @@ function getCardinalDirection(angle) {
       return directions[i]; //arrows[directions[i]];
     }
   }
-  return arrows['north'];
+  return arrows.north;
 }
 module.exports = {
   getCardinalDirection,
