@@ -244,6 +244,9 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
+  WINDSPEED_SENSOR: 'windspeed-sensor',
+  RAINFALL_SENSOR: 'rainfall-sensor',
+  ANGLE_SENSOR: 'angle-sensor',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
@@ -274,6 +277,7 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
     BINARY: 'binary',
     PUSH: 'push',
+    STRING: 'string',
     UNKNOWN: 'unknown',
   },
   SWITCH: {
@@ -330,6 +334,10 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
+  DEGREE: 'degree',
+  KILOMETER_HOUR: 'kilometer-hour',
+  MILLIMETER: 'millimeter',
+  MILLIMETER_HOUR: 'millimeter-hour'
 };
 
 const ACTIONS_STATUS = {

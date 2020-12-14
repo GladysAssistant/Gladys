@@ -1050,13 +1050,17 @@
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "%",
-    "ppm": "ppm"
+    "ppm": "ppm",
+    "degree": "Degré (°)",
+    "null": "Pas d'unité"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
     "percent": "%",
-    "ppm": "ppm"
+    "ppm": "ppm",
+    "degree": "°",
+    "null": ""
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1117,6 +1121,19 @@
     "co2-sensor": {
       "shortCategoryName": "Capteur de Co2",
       "decimal": "Niveau de CO2"
+    },
+    "windspeed-sensor": {
+      "shortCategoryName": "Capteur de Vitesse",
+      "decimal": "Vitesse vent"
+    },
+    "rainfall-sensor": {
+      "shortCategoryName": "Capteur de pluie",
+      "decimal": "Pluviomètre"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Capteur d'angle",
+      "decimal": "Angle",
+      "string": "Point Cardinal"
     },
     "switch": {
       "shortCategoryName": "Prise",
@@ -1356,5 +1373,19 @@
     "cancelSubscriptionButton": "Annuler l'abonnement",
     "accountCancelled": "Votre abonnement a été annulé le {{date}}",
     "subscriptionButton": "S'abonner à nouveau"
+  },
+  "cardinalPoints": {
+    "north": "↑ N (Nord)",
+    "northNorthEast": "↗ NNE (Nord Nord Est)",
+    "northEast": "↗ NE (Nord Est)",
+    "east": "→ E (Est)",
+    "southEast": "↘ SE (Sud Est)",
+    "southSouthEast": "↘ SSE (Sud Sud Est)",
+    "south": "↓ S (Sud)",
+    "southSouthWest": "↙ SSO (Sud Sud Ouest)",
+    "southWest": "↙ SO (Sud Ouest)",
+    "west": "← O (Ouest)",
+    "northWest": "↖ NO (Nord Ouest)",
+    "northNorthWest": "↖ NNO (Nord Nord Ouest)"
   }
 }

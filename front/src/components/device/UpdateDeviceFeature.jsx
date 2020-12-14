@@ -110,6 +110,72 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR && (
+              <div class="form-group">
+                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                  <Text id="editDeviceForm.unitLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`unit_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.unit}
+                    onChange={this.updateUnit}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.PERCENT}>
+                      <Text id="deviceFeatureUnit.percent" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.PPM}>
+                      <Text id="deviceFeatureUnit.ppm" />
+                    </option>
+                  </select>
+                </Localizer>
+              </div>
+            )}
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && (
+              <div class="form-group">
+                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                  <Text id="editDeviceForm.unitLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`type_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.type}
+                    onChange={this.updateType}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value={DEVICE_FEATURE_TYPES.SENSOR.STRING}>
+                      <Text id="deviceFeatureCategory.angle-sensor.string" />
+                    </option>
+                    <option value={DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}>
+                      <Text id="deviceFeatureCategory.angle-sensor.decimal" />
+                    </option>
+                  </select>
+                  <select
+                    id={`unit_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.unit}
+                    onChange={this.updateUnit}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value={DEVICE_FEATURE_UNITS.DEGREE}>
+                      <Text id="deviceFeatureUnit.degree" />
+                    </option>
+                  </select>
+                </Localizer>
+              </div>
+            )}
             {props.allowModifyFeatures && (
               <div class="form-group">
                 <label class="form-label" for={`min_${props.featureIndex}`}>

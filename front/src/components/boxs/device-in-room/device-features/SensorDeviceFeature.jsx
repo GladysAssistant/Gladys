@@ -3,6 +3,7 @@ import get from 'get-value';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+const { getCardinalDirection } = require('../../../../utils/cardinalPoints');
 
 dayjs.extend(relativeTime);
 
@@ -41,6 +42,10 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOMETER_HOUR && 'km/h'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER && 'mm'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER_HOUR && 'mm/h'}
           </span>
         )}
       </td>
@@ -58,6 +63,24 @@ const SensorDeviceType = ({ children, ...props }) => (
           dayjs(props.deviceFeature.last_value_changed)
             .locale(props.user.language)
             .fromNow()}
+      </td>
+    )}
+    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL && (
+      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+        {props.deviceFeature.last_value !== null && (
+          <span>
+            {' '}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}
+          </span>
+        )}
+      </td>
+    )}
+    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
+      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+        {props.deviceFeature.last_value !== null && <Text id={`cardinalPoints.${getCardinalDirection(props.deviceFeature.last_value)}`} />}
+        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       </td>
     )}
   </tr>
