@@ -4,17 +4,16 @@ const lights = require('./lights.json');
 const STATE_ON = { _values: { on: true } };
 const STATE_OFF = { _values: { off: true } };
 
-class LightState {
-  on() {
-    this.test = 1; // useless, this is just for eslint
-    return STATE_ON;
-  }
+const fakes = {
+  on: fake.returns(STATE_ON),
+  off: fake.returns(STATE_ON),
+  rgb: fake.returns(null),
+};
 
-  off() {
-    this.test = 1; // useless, this is just for eslint
-    return STATE_OFF;
-  }
-}
+class LightState {}
+LightState.prototype.on = fakes.on;
+LightState.prototype.off = fakes.off;
+LightState.prototype.rgb = fakes.rgb;
 
 const hueApi = {
   users: {
@@ -85,6 +84,9 @@ const MockedPhilipsHueClient = {
   },
 };
 
-module.exports = MockedPhilipsHueClient;
-module.exports.STATE_ON = STATE_ON;
-module.exports.STATE_OFF = STATE_OFF;
+module.exports = {
+  MockedPhilipsHueClient,
+  STATE_ON,
+  STATE_OFF,
+  fakes,
+};
