@@ -12,8 +12,7 @@ async function poll(device) {
   const sid = info[1];
   this.getDevices();
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
-    console.log(this.devices[sid].url)
-    axios.get(this.devices[sid].url, {responseType: 'arraybuffer'}).then(response => {
+    axios.get(this.devices[sid].vpn_url, {responseType: 'arraybuffer'}).then(response => {
       function _imageEncode (arrayBuffer) {
         let u8 = new Uint8Array(arrayBuffer)
         let b64encoded = btoa([].reduce.call(new Uint8Array(arrayBuffer),function(p,c){return p+String.fromCharCode(c)},''))
