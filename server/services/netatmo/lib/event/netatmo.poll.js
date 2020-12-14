@@ -11,7 +11,6 @@ async function poll(device) {
   const info = device.external_id.split('netatmo:');
   const sid = info[1];
   this.getDevices();
-  console.log(this.devices[sid].type)
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
     axios.get(this.devices[sid].vpn_url+'/live/snapshot_720.jpg', {responseType: 'arraybuffer'}).then(response => {
       function _imageEncode (arrayBuffer) {

@@ -35,12 +35,6 @@ async function getDevices() {
       this.newValueCamera(camera);
     });
   }
-  this.newValueCamera({
-    'name': 'fjeifzoejf',
-    'type': 'NOC',
-    'id': '123456783424',
-    'url': 'https://www.cleverfiles.com/howto/wp-content/uploads/2018/03/minion.jpg'
-  })
   // Recuperer la station
   const promiseGetStationsData = new Promise((resolve, reject) => {
     this.api.getStationsData((err, data) => {
