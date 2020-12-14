@@ -28,5 +28,9 @@
   {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg"
+  },
+  {
+    "key": "eWeLink",
+    "img": "/assets/integrations/cover/ewelink.jpg"
   }
 ]
