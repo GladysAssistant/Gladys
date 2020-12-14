@@ -10,7 +10,7 @@ const { addSensor } = require('./commands/netatmo.addSensor.js');
 // event
 const { newValueThermostat } = require('./event/netatmo.newValueThermostat.js');
 const { newValueStation } = require('./event/netatmo.newValueStation.js');
-const {newValueCamera } = require('./event/netatmo.newValueCamera.js');
+const { newValueCamera } = require('./event/netatmo.newValueCamera.js');
 const { poll } = require('./event/netatmo.poll.js');
 
 // we rate-limit the number of request per seconds to poll lights
@@ -27,15 +27,15 @@ const pollLimiter = new Bottleneck({
  * NetatmoManager(gladys, serviceId)
  */
 const NetatmoManager = function NetatmoManager(gladys, serviceId) {
-    this.gladys = gladys;
-    this.serviceId = serviceId;
-    this.Netatmo = netatmo;
-    this.api = undefined;
-    this.sensors = {};
-    this.devices = {};
-    this.connected = false;
-    this.topicBinds = {};
-    this.configured = false;
+  this.gladys = gladys;
+  this.serviceId = serviceId;
+  this.Netatmo = netatmo;
+  this.api = undefined;
+  this.sensors = {};
+  this.devices = {};
+  this.connected = false;
+  this.topicBinds = {};
+  this.configured = false;
 };
 
 NetatmoManager.prototype.connect = connect;

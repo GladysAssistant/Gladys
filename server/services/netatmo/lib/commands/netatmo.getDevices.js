@@ -34,8 +34,7 @@ async function getDevices() {
     homes.cameras.forEach((camera) => {
       this.newValueCamera(camera);
     });
-  };
-
+  }
   // Recuperer la station
   const promiseGetStationsData = new Promise((resolve, reject) => {
     this.api.getStationsData((err, data) => {
@@ -49,5 +48,5 @@ async function getDevices() {
 }
 
 module.exports = {
-    getDevices,
+  getDevices,
 };

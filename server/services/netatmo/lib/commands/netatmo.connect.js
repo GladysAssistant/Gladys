@@ -13,16 +13,17 @@ async function connect() {
   const netatmoPassword = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_PASSWORD, this.serviceId);
   const variablesFound = netatmoClientId;
   if (!variablesFound) {
-      this.configured = false;
-      throw new ServiceNotConfiguredError('NETATMO is not configured.');
+    this.configured = false;
+    throw new ServiceNotConfiguredError('NETATMO is not configured.');
   }
   this.configured = true;
   const auth = {
-      'client_id': netatmoClientId,
-      'client_secret': netatmoCientSecret,
-      'username': netatmoUsername,
-      'password': netatmoPassword,
-      'scope': 'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
+    client_id: netatmoClientId,
+    client_secret: netatmoCientSecret,
+    username: netatmoUsername,
+    password: netatmoPassword,
+    scope:
+      'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
   };
   this.api = new this.Netatmo(auth);
   this.api.on('error', function ErrorOnApi(error) {
@@ -32,5 +33,5 @@ async function connect() {
 }
 
 module.exports = {
-    connect,
+  connect,
 };

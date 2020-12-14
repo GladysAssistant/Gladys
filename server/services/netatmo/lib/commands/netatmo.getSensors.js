@@ -9,5 +9,5 @@ async function getSensors() {
 }
 
 module.exports = {
-    getSensors,
+  getSensors,
 };

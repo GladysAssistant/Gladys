@@ -17,7 +17,6 @@ const res = {
   status: fake.returns(null),
 };
 
-
 describe('POST /api/v1/service/netatmo/connect', () => {
   it('should connect', async () => {
     const netatmoController = NetatmoController(netatmoManager);

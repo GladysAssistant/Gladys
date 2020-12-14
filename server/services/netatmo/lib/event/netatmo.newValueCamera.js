@@ -1,8 +1,5 @@
 const logger = require('../../../../utils/logger');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-} = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
@@ -19,7 +16,6 @@ function newValueCamera(data) {
   logger.debug(`Netatmo : New camera, sid = ${sid}`);
   this.devices[sid] = data;
   const newCamera = {
-    id: `netatmo:${sid}`,
     name: data.name,
     should_poll: true,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
@@ -27,7 +23,7 @@ function newValueCamera(data) {
     service_id: this.serviceId,
     cameraUrl: {
       name: 'CAMERA_URL',
-      value: data.vpn_url
+      value: `${data.vpn_url}/live/snapshot_720.jpg`,
     },
     features: [
       {
@@ -40,15 +36,15 @@ function newValueCamera(data) {
         keep_history: false,
         has_feedback: false,
         min: 0,
-        max: 0
-      }
+        max: 0,
+      },
     ],
     params: [
       {
         name: 'CAMERA_URL',
-        value: data.vpn_url
-      }
-    ]
+        value: `${data.vpn_url}/live/snapshot_720.jpg`,
+      },
+    ],
   };
   this.addSensor(sid, newCamera);
 }

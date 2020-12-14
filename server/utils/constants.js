@@ -337,7 +337,7 @@ const DEVICE_FEATURE_UNITS = {
   DEGREE: 'degree',
   KILOMETER_HOUR: 'kilometer-hour',
   MILLIMETER: 'millimeter',
-  MILLIMETER_HOUR: 'millimeter-hour'
+  MILLIMETER_HOUR: 'millimeter-hour',
 };
 
 const ACTIONS_STATUS = {
