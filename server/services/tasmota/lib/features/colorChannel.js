@@ -1,4 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { intToRgb, rgbToInt } = require('../../../../utils/colors');
 
 module.exports = {
   // Tasmota matcher
@@ -14,7 +15,7 @@ module.exports = {
         read_only: false,
         has_feedback: true,
         min: 0,
-        max: 16777215,
+        max: 6579300,
       };
     }
 
@@ -22,15 +23,10 @@ module.exports = {
   },
   // Gladys vs Tasmota transformers
   readValue: (value) => {
-    return value.slice(0, 3).reduce((acc, cur, i) => {
-      return acc + ((cur * 255) / 100) * 256 ** (2 - i);
-    }, 0);
+    return rgbToInt(value.slice(0, 3));
   },
   writeValue: (value) => {
-    const blue = value % 256;
-    const green = ((value - blue) / 256) % 256;
-    const red = ((value - green * 256 - blue) / 65536) % 256;
-
+    const [red, green, blue] = intToRgb(value);
     return `${red},${green},${blue}`;
   },
 };

@@ -26,7 +26,7 @@ describe('Tasmota - MQTT - handle new state Color Channel', () => {
 
     const expectedEvent = {
       device_feature_external_id: `tasmota:tasmota-device-topic:Channel`,
-      state: 16777215,
+      state: 6579300,
     };
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
