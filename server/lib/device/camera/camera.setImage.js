@@ -13,9 +13,9 @@ const MAX_SIZE_IMAGE = 75 * 1024;
  * camera.setImage('test-camera', 'sfdsf');
  */
 async function setImage(selector, image) {
-  if (image.length > MAX_SIZE_IMAGE) {
-    throw new BadParameters('Image is too big');
-  }
+  // if (image.length > MAX_SIZE_IMAGE) {
+  //   throw new BadParameters('Image is too big');
+  // }
   const device = this.stateManager.get('device', selector);
   if (device === null) {
     throw new NotFoundError('Camera not found');
