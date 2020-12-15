@@ -1,4 +1,5 @@
 const { EVENTS } = require('../../../../utils/constants');
+const { NETATMO_VALUES } = require('../constants');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -11,17 +12,59 @@ async function poll(device) {
   const info = device.external_id.split('netatmo:');
   const sid = info[1];
   this.getDevices();
+
+  // on traite les donnees des cameras
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
-    axios.get(this.devices[sid].vpn_url+'/live/snapshot_720.jpg', {responseType: 'arraybuffer'}).then(response => {
-      function _imageEncode (arrayBuffer) {
-        let u8 = new Uint8Array(arrayBuffer)
-        let b64encoded = btoa([].reduce.call(new Uint8Array(arrayBuffer),function(p,c){return p+String.fromCharCode(c)},''))
-        let mimetype="image/jpeg"
-        return "data:"+mimetype+";base64,"+b64encoded
-      }
-      this.gladys.device.camera.setImage(device.selector, _imageEncode(response.data));
-    })
+    axios.get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'}).then(response => {
+      const b64encoded = btoa([].reduce.call(new Uint8Array(response.data), function(p, c){return p+String.fromCharCode(c)}, ''));
+      const mimetype="image/jpeg";
+      const base64image = "data:"+mimetype+";base64,"+b64encoded;
+      this.gladys.device.camera.setImage(device.selector, base64image);
+    });
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `netatmo:${sid}:power`,
+      state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].alim_status.toUpperCase()]
+    });
+    if (this.devices[sid].type === 'NACamera') {
+      this.devices[sid].modules.forEach((module) => {
+        const sidModule = module.id;
+        // on traite les données des sirènes intérieures
+        if (this.devices[sidModule].type === 'NIS') {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sidModule}:battery`,
+            state: this.devices[sidModule].battery_percent,
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sidModule}:siren`,
+            state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sidModule].status.toUpperCase()]
+          });
+        }
+        // on traite les données des détecteurs d'ouverture de porte/fenêtre intérieures
+        if (this.devices[sidModule].type === 'NACamDoorTag') {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sidModule}:battery`,
+            state: this.devices[sidModule].battery_percent,
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sidModule}:doorTag`,
+            state: NETATMO_VALUES.SECURITY.DOOR_TAG[this.devices[sidModule].status.toUpperCase()]
+          });
+        }
+      });
+    }
+    if (this.devices[sid].type === 'NOC') {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${sid}:light`,
+        state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].light_mode_status.toUpperCase()]
+      });
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${sid}:siren`,
+        state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sid].siren_status.toUpperCase()]
+      });
+    }
   }
+
+
   if (this.devices[sid].type === 'NATherm1') {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `netatmo:${sid}:battery`,
