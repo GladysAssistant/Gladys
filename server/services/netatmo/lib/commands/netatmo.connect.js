@@ -14,22 +14,23 @@ async function connect() {
   const variablesFound = netatmoClientId;
   if (!variablesFound) {
     this.configured = false;
-    throw new ServiceNotConfiguredError('NETATMO is not configured.');
+    logger.debug('NETATMO is not configured.');
+  } else {
+    this.configured = true;
+    const auth = {
+      client_id: netatmoClientId,
+      client_secret: netatmoCientSecret,
+      username: netatmoUsername,
+      password: netatmoPassword,
+      scope:
+        'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
+    };
+    this.api = new this.Netatmo(auth);
+    this.api.on('error', function ErrorOnApi(error) {
+      logger.error(`NETATMO threw an error: ${error}`);
+    });
+    this.getDevices();
   }
-  this.configured = true;
-  const auth = {
-    client_id: netatmoClientId,
-    client_secret: netatmoCientSecret,
-    username: netatmoUsername,
-    password: netatmoPassword,
-    scope:
-      'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
-  };
-  this.api = new this.Netatmo(auth);
-  this.api.on('error', function ErrorOnApi(error) {
-    logger.error(`NETATMO threw an error: ${error}`);
-  });
-  this.getDevices();
 }
 
 module.exports = {
