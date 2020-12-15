@@ -23,7 +23,9 @@ function uniqById(devices) {
 async function getDevices() {
   const devicesToReturn = [];
 
-  this.client.startDiscovery({ discoveryTimeout: 1900, discoveryInterval: 800 }).on('device-online', (device) => {
+  const discovery = this.client.startDiscovery({ discoveryTimeout: 1900, discoveryInterval: 800 });
+
+  discovery.on('device-online', (device) => {
     device.getSysInfo().then((deviceSysInfo) => {
       const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
       switch (type) {
@@ -39,7 +41,10 @@ async function getDevices() {
       }
     });
   });
-  return Promise.delay(2000).then(() => uniqById(devicesToReturn));
+  return Promise.delay(2000).then(() => {
+    discovery.removeAllListeners('device-online');
+    return uniqById(devicesToReturn);
+  });
 }
 
 module.exports = {

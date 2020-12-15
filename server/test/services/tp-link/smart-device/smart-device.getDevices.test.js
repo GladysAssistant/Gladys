@@ -62,7 +62,11 @@ describe('TpLinkService GetDevices', () => {
       }),
     });
     // ASSERT
-    // Only 3 devices must be returned because two have same id
-    return promise.then((detectedDevices) => assert.match(detectedDevices.length, 3));
+    return promise.then((detectedDevices) => {
+      // Check event listeners have been removed
+      assert.match(eventTpLink.listenerCount(), 0);
+      // Only 3 devices must be returned because two have same id
+      assert.match(detectedDevices.length, 3);
+    });
   }).timeout(3000);
 });
