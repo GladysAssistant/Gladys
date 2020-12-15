@@ -7,7 +7,11 @@ const { getCardinalDirection } = require('../../../../utils/cardinalPoints');
 
 dayjs.extend(relativeTime);
 
-import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_UNITS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR];
 
@@ -65,24 +69,25 @@ const SensorDeviceType = ({ children, ...props }) => (
             .fromNow()}
       </td>
     )}
-    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
-        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value !== null && (
-          <span>
-            {' '}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}
-          </span>
-        )}
-      </td>
-    )}
-    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
-        {props.deviceFeature.last_value !== null && <Text id={`cardinalPoints.${getCardinalDirection(props.deviceFeature.last_value)}`} />}
-        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-      </td>
-    )}
+    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
+      props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL && (
+        <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+          {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+          {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+          {props.deviceFeature.last_value !== null && (
+            <span> {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}</span>
+          )}
+        </td>
+      )}
+    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
+      props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
+        <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+          {props.deviceFeature.last_value !== null && (
+            <Text id={`cardinalPoints.${getCardinalDirection(props.deviceFeature.last_value)}`} />
+          )}
+          {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+        </td>
+      )}
   </tr>
 );
 

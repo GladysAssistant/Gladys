@@ -10,7 +10,9 @@ const SetupTab = ({ children, ...props }) => {
       </div>
       <div class="card-body">
         <div class="form-group">
-          <label class="form-label"><Text id="integration.netatmo.setting.usernamePlaceholder" /></label>
+          <label class="form-label">
+            <Text id="integration.netatmo.setting.usernamePlaceholder" />
+          </label>
           <input
             type="text"
             class="form-control"
@@ -21,7 +23,9 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label"><Text id="integration.netatmo.setting.passwordPlaceholder" /></label>
+          <label class="form-label">
+            <Text id="integration.netatmo.setting.passwordPlaceholder" />
+          </label>
           <input
             type="password"
             class="form-control"
@@ -32,7 +36,9 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label"><Text id="integration.netatmo.setting.clientIdPlaceholder" /></label>
+          <label class="form-label">
+            <Text id="integration.netatmo.setting.clientIdPlaceholder" />
+          </label>
           <input
             type="text"
             class="form-control"
@@ -43,7 +49,9 @@ const SetupTab = ({ children, ...props }) => {
           />
         </div>
         <div class="form-group">
-          <label class="form-label"><Text id="integration.netatmo.setting.clientSecretPlaceholder" /></label>
+          <label class="form-label">
+            <Text id="integration.netatmo.setting.clientSecretPlaceholder" />
+          </label>
           <input
             type="password"
             class="form-control"
@@ -53,7 +61,6 @@ const SetupTab = ({ children, ...props }) => {
             placeholder={<Text id="integration.netatmo.setting.clientSecretPlaceholder" />}
           />
         </div>
-
       </div>
       <div class="card-footer text-right">
         <div class="d-flex">

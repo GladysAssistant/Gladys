@@ -25,7 +25,7 @@ const createActions = store => {
           netatmoClientId: (netatmoClientId || {}).value,
           netatmoClientSecret,
           connected: false
-        })
+        });
       }
     },
     updateConfigration(state, e) {
@@ -53,7 +53,7 @@ const createActions = store => {
           await state.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_PASSWORD', {
             value: state.netatmoPassword
           });
-        };
+        }
         await state.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_CLIENT_ID', {
           value: state.netatmoClientId
         });
@@ -61,7 +61,7 @@ const createActions = store => {
           await state.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_CLIENT_SECRET', {
             value: state.netatmoClientSecret
           });
-        };
+        }
         await state.httpClient.post(`/api/v1/service/netatmo/connect`);
 
         store.setState({

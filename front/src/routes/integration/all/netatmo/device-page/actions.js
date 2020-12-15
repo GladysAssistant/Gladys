@@ -20,11 +20,11 @@ function createActions(store) {
             return true;
           }
           return !state.netatmoDevicesMap.has(sensor.external_id);
-        })
+        });
         store.setState({
           netatmoSensors: netatmoSensorsFiltered,
           getNetatmoSensorsStatus: RequestStatus.Success
-        })
+        });
       } catch (e) {
         store.setState({
           getNetatmoSensorsStatus: RequestStatus.Error

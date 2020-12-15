@@ -8,7 +8,8 @@
   "cpu": [
     "x64",
     "arm",
-    "arm64"
+    "arm64",
+    "win32"
   ],
   "scripts": {},
   "dependencies": {

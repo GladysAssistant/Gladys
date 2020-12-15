@@ -4,7 +4,10 @@ import actions from './actions';
 import NetatmoPage from '../NetatmoPage';
 import SettingTab from './SettingTab';
 
-@connect('user,session, netatmoUsername, netatmoPassword, netatmoClientId, netatmoClientSecret, connectNetatmoStatus, netatmoConnected', actions)
+@connect(
+  'user,session, netatmoUsername, netatmoPassword, netatmoClientId, netatmoClientSecret, connectNetatmoStatus, netatmoConnected',
+  actions
+)
 class NetatmoNodePage extends Component {
   componentWillMount() {
     this.props.loadProps();

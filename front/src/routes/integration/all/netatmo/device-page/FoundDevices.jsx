@@ -17,8 +17,7 @@ const FoundDevices = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active:
-            props.getNetatmoNewDevicesStatus === RequestStatus.Getting
+          active: props.getNetatmoNewDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
