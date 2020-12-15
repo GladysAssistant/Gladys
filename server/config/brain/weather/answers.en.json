@@ -42,5 +42,9 @@
   {
     "label": "weather.get.fail.no-house",
     "answers": ["You need to first configure your house and its location in parameters."]
+  },
+  {
+    "label": "weather.get.fail.no-weather",
+    "answers": ["The weather forecast for that day couldn't be found."]
   }
 ]
