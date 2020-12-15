@@ -17,10 +17,6 @@
   },
   {
     "label": "weather.day",
-    "questions": [
-      "Give me the weather for %day%",
-      "What will the weather be like %day% ?",
-      "weather %day% ?"
-    ]
+    "questions": ["Give me the weather for %day%", "What will the weather be like %day% ?", "weather %day% ?"]
   }
 ]
