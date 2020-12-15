@@ -8,7 +8,7 @@
     "questions": ["Give me the weather for tomorrow", "What will the weather be like tomorrow ?", "weather tomorrow ?"]
   },
   {
-    "label": "weather.after.tomorrow",
+    "label": "weather-after.tomorrow",
     "questions": [
       "Give me the weather for afer tomorrow",
       "What will the weather be like afer tomorrow ?",
