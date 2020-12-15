@@ -9,7 +9,7 @@
   "cpu": [
     "x64",
     "arm",
-    "arm64",
+    "arm64"
   ],
   "scripts": {},
   "dependencies": {
