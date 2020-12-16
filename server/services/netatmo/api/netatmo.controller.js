@@ -7,9 +7,9 @@ module.exports = function NetatmoController(netatmoManager) {
    * @apiGroup Netatmo
    */
   async function connect(req, res) {
-    await netatmoManager.connect();
+    const result = await netatmoManager.connect();
     res.json({
-      success: true,
+      success: result,
     });
   }
 

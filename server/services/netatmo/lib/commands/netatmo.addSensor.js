@@ -12,7 +12,7 @@ function addSensor(sid, sensor) {
   this.sensors[sid] = sensor;
   if (doesntExistYet) {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE,
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.NEW_DEVICE,
       payload: sensor,
     });
   }

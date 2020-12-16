@@ -309,7 +309,7 @@
         "saveButton": "Save",
         "deleteButton": "Delete",
         "addDeviceButton": "Add",
-        "editButton": "Edit details",
+        "editButton": "Modify",
         "noFeatures": "No features",
         "deviceNotHandled": "Device is not handled",
         "foundDevice": "Device Found"
@@ -321,7 +321,9 @@
         "clientIdPlaceholder": "Client ID",
         "clientSecretPlaceholder": "Client Secret",
         "saveLabel": "Save",
-        "connectLabel": "Connect"
+        "connectLabel": "Connect",
+        "configure": "Connect to Netatmo",
+        "error": "Connection with Netatmo failed"
       }
     },
     "tasmota": {

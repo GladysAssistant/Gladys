@@ -13,8 +13,10 @@
   ],
   "scripts": {},
   "dependencies": {
-    "netatmo": "^2.3.0",
+    "axios": "^0.18.0",
     "bottleneck": "^2.19.5",
-    "axios": "^0.18.0"
+    "netatmo": "^2.3.0",
+    "resize-base64": "^1.0.12",
+    "sharp": "^0.26.3"
   }
 }

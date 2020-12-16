@@ -19,12 +19,28 @@ async function poll(device) {
 
   // on traite les données des cameras
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
+<<<<<<< HEAD
     axios.get(`${'begel'}`, {responseType: 'arraybuffer'}).then(response => {
       const b64encoded = btoa([].reduce.call(new Uint8Array(response.data), function(p, c){return p+String.fromCharCode(c)}, ''));
       const mimetype="image/jpeg";
       const base64image = "data:"+mimetype+";base64,"+b64encoded;
       this.gladys.device.camera.setImage(device.selector, base64image);
     }); //live/snapshot_720.jpg`
+=======
+    axios.get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'}).then(response => {
+      const sharp = require('sharp');
+      sharp(response.data)
+        .rotate()
+        .resize(200)
+        .toBuffer()
+        .then( data => {
+          const b64encoded = btoa([].reduce.call(new Uint8Array(data), function(p, c){return p+String.fromCharCode(c)}, ''));
+          const mimetype="image/jpeg";
+          const base64image = "data:"+mimetype+";base64,"+b64encoded;
+          this.gladys.device.camera.setImage(device.selector, base64image);
+        })
+    });
+>>>>>>> 18ff3746bafe75ab1ffadcb102e0a0eedb66d3d8
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `netatmo:${sid}:power`,
       state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].alim_status.toUpperCase()]

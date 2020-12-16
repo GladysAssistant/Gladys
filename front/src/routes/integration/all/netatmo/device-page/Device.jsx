@@ -53,7 +53,7 @@ class NetatmoDeviceBox extends Component {
 
   render(props, { batteryLevel, loading, error }) {
     return (
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">{props.device.name}</h3>

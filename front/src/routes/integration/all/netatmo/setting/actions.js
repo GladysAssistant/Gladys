@@ -62,8 +62,7 @@ const createActions = store => {
             value: state.netatmoClientSecret
           });
         }
-        await state.httpClient.post(`/api/v1/service/netatmo/connect`);
-
+        const result = await state.httpClient.post(`/api/v1/service/netatmo/connect`);
         store.setState({
           connectNetatmoStatus: RequestStatus.Success
         });
@@ -74,7 +73,31 @@ const createActions = store => {
           clientSecretChanges: false
         });
       }
-    }
+    },
+    displayConnectedMessage(state) {
+      // display 3 seconds a message "NETATMO connected"
+      store.setState({
+        netatmoConnectedMessage: true,
+        netatmoConnectedError: false,
+        netatmoConnectionError: undefined
+      });
+      setTimeout(
+        () =>
+          store.setState({
+            netatmoConnectedMessage: false,
+            connectMqttStatus: undefined
+          }),
+        3000
+      );
+    },
+    displayNetatmoError(state) {
+      console.log('HERE')
+      store.setState({
+        netatmoConnectedMessage: false,
+        netatmoConnectedError: true,
+        connectNetatmoStatus: undefined
+      });
+    },
   };
   return Object.assign({}, actions, integrationActions);
 };
