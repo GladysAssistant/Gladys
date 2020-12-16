@@ -247,6 +247,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   WINDSPEED_SENSOR: 'windspeed-sensor',
   RAINFALL_SENSOR: 'rainfall-sensor',
   ANGLE_SENSOR: 'angle-sensor',
+  NOISE_SENSOR: 'noise-sensor',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
@@ -257,6 +258,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CUBE: 'cube',
   BUTTON: 'button',
   SETPOINT: 'setpoint',
+  INDEX: 'index',
   UNKNOWN: 'unknown',
 };
 
@@ -317,6 +319,10 @@ const DEVICE_FEATURE_TYPES = {
   BUTTON: {
     CLICK: 'click',
   },
+  INDEX: {
+    INTEGER: 'integer',
+    DIMMER: 'dimmer',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -338,6 +344,8 @@ const DEVICE_FEATURE_UNITS = {
   KILOMETER_HOUR: 'kilometer-hour',
   MILLIMETER: 'millimeter',
   MILLIMETER_HOUR: 'millimeter-hour',
+  MILLIBAR: 'millibar',
+  DECIBEL: 'decibel',
 };
 
 const ACTIONS_STATUS = {

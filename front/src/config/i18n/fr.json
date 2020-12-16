@@ -1135,6 +1135,15 @@
       "decimal": "Angle",
       "string": "Point Cardinal"
     },
+    "noise-sensor": {
+      "shortCategoryName": "Capteur de bruit",
+      "integer": "Niveau sonore"
+    },
+    "index": {
+      "shortCategoryName": "Index",
+      "integer": "Index",
+      "dimmer": "Jauge d'index"
+    },
     "switch": {
       "shortCategoryName": "Prise",
       "voltage": "Tension moyenne",

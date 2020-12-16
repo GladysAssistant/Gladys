@@ -140,6 +140,32 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.INDEX && (
+              <div class="form-group">
+                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                  <Text id="editDeviceForm.unitLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`type_${props.featureIndex}`}
+                    type="text"
+                    value={props.feature.type}
+                    onChange={this.updateType}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value={DEVICE_FEATURE_TYPES.INDEX.INTEGER}>
+                      <Text id="deviceFeatureCategory.index.integer" />
+                    </option>
+                    <option value={DEVICE_FEATURE_TYPES.INDEX.DIMMER}>
+                      <Text id="deviceFeatureCategory.index.dimmer" />
+                    </option>
+                  </select>
+                </Localizer>
+              </div>
+            )}
             {props.feature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${props.featureIndex}`}>

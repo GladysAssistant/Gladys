@@ -50,6 +50,8 @@ const SensorDeviceType = ({ children, ...props }) => (
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOMETER_HOUR && 'km/h'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER && 'mm'}
             {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER_HOUR && 'mm/h'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIBAR && 'mbar'}
+            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DECIBEL && 'dB'}
           </span>
         )}
       </td>
@@ -58,6 +60,7 @@ const SensorDeviceType = ({ children, ...props }) => (
       <td class="text-right">
         {props.deviceFeature.last_value === 1 && <i class="fe fe-shield" />}
         {props.deviceFeature.last_value === 0 && <i class="fe fe-shield-off" />}
+        {props.deviceFeature.last_value === -1 && <i class="fe fe-alert-triangle" />}
       </td>
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (

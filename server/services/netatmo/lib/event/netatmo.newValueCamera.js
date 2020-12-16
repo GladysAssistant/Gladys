@@ -15,7 +15,6 @@ function newValueCamera(data) {
   let newCamera;
   logger.debug(`Netatmo : New camera, sid = ${sid}`);
   this.devices[sid] = data;
-
   // on crée le device caméra
   if(data.type === 'NACamera'){
     newCamera = {
@@ -28,7 +27,7 @@ function newValueCamera(data) {
       model: `netatmo-${data.type}`,
       cameraUrl: {
         name: 'CAMERA_URL',
-        value: `${data.vpn_url}/live/snapshot_720.jpg`,
+        value: `${data.vpn_url}/live/snapshot_720_pour_faire_merder`, //.jpg`,
       },
       features: [
         {
@@ -73,7 +72,7 @@ function newValueCamera(data) {
         // si module sirène présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
-          name: module.name,
+          name: `Siren - ${module.name}`,
           selector: `netatmo:${sidModule}`,
           external_id: `netatmo:${sidModule}`,
           model: `netatmo-sirene-${module.type}`,

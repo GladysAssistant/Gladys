@@ -10,6 +10,8 @@ const { addSensor } = require('./commands/netatmo.addSensor.js');
 // event
 const { newValueThermostat } = require('./event/netatmo.newValueThermostat.js');
 const { newValueStation } = require('./event/netatmo.newValueStation.js');
+const { newValueHomeCoach } = require('./event/netatmo.newValueHomeCoach.js');
+const { newValueSmokeDetector } = require('./event/netatmo.newValueSmokeDetector.js');
 const { newValueCamera } = require('./event/netatmo.newValueCamera.js');
 const { poll } = require('./event/netatmo.poll.js');
 
@@ -45,6 +47,8 @@ NetatmoManager.prototype.addSensor = addSensor;
 
 NetatmoManager.prototype.newValueThermostat = newValueThermostat;
 NetatmoManager.prototype.newValueStation = newValueStation;
+NetatmoManager.prototype.newValueHomeCoach = newValueHomeCoach;
+NetatmoManager.prototype.newValueSmokeDetector = newValueSmokeDetector;
 NetatmoManager.prototype.newValueCamera = newValueCamera;
 NetatmoManager.prototype.poll = pollLimiter.wrap(poll);
 

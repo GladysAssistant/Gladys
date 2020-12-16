@@ -1135,6 +1135,15 @@
       "decimal": "Angle",
       "string": "Cardinal point"
     },
+    "noise-sensor": {
+      "shortCategoryName": "Noise sensor",
+      "integer": "Sound level"
+    },
+    "index": {
+      "shortCategoryName": "Index",
+      "integer": "Index",
+      "dimmer": "Index gauge"
+    },
     "switch": {
       "shortCategoryName": "Switch",
       "voltage": "Switch Voltage",
