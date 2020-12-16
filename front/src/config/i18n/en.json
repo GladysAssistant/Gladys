@@ -309,7 +309,7 @@
         "saveButton": "Save",
         "deleteButton": "Delete",
         "addDeviceButton": "Add",
-        "editButton": "Edit details",
+        "editButton": "Modify",
         "noFeatures": "No features",
         "deviceNotHandled": "Device is not handled",
         "foundDevice": "Device Found"

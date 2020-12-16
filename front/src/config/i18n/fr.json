@@ -416,7 +416,7 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer les détails",
+        "editButton": "Modifier",
         "noFeatures": "Aucune fonctionnalité",
         "addDeviceButton": "Ajouter",
         "deviceNotHandled": "Equipements non pris en charge",
