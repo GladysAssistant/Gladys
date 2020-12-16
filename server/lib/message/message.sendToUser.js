@@ -10,7 +10,7 @@ const db = require('../../models');
  * @example
  * reply(originalMessage, 'thanks!');
  */
-async function sendToUser(userSelector, text, file = null) {
+async function sendToUser(userSelector, serviceSelector, text, file = null) {
   const user = this.state.get('user', userSelector);
   if (user === null) {
     throw new NotFoundError(`User ${userSelector} not found`);
@@ -29,13 +29,23 @@ async function sendToUser(userSelector, text, file = null) {
     userId: user.id,
     payload: messageCreated,
   });
-  // We send the message to the telegram service
-  const service = this.service.getService('telegram');
-  // if the service exist and the user had telegram configured
-  if (service && user.telegram_user_id) {
-    // we forward the message to Telegram
-    await service.message.send(user.telegram_user_id, messageCreated);
+  
+  
+  const service = this.service.getService(serviceSelector);
+  if(service) {
+	  if(serviceSelector == "telegram"){
+		  // We send the message to the telegram service
+		  if (user.telegram_user_id) {
+			await service.message.send(user.telegram_user_id, messageCreated);
+		  }
+	  } else if(serviceSelector == "pushover"){
+		  // We send the message to the pushover service
+		  if (user && text) {
+			await service.message.send(user, text);
+		  } 
+	  }
   }
+  
   return messageCreated;
 }
 

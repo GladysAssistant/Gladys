@@ -252,6 +252,16 @@
       "apiKey": "Telegram Bot API Key",
       "saveButton": "Save"
     },
+    "pushover": {
+      "title": "Pushover",
+      "description": "Let Gladys text with Pushover",
+      "introduction": "To connect Gladys to Pushover, you first need to create an account and setup and an API key.",
+      "note": "This link is unique to your account, do not send it to other users.",
+      "configurationError": "We were not able to configure your account. Are you sure these tokens are valid?",
+      "apiKey": "API Key",
+      "userKey": "User Key",
+      "saveButton": "Save"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights.",
@@ -752,6 +762,7 @@
       },
       "messageSend": {
         "userLabel": "User",
+		"serviceLabel": "Service",
         "textLabel": "Message",
         "textPlaceholder": "Message text"
       },
