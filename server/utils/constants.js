@@ -404,6 +404,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   NETATMO: {
     NEW_DEVICE: 'netatmo.new-device',
+    CONNECTED: 'netatmo.connected',
+    ERROR: 'netatmo.error',
   },
   TASMOTA: {
     NEW_DEVICE: 'tasmota.new-device',

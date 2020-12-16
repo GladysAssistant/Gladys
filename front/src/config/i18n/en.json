@@ -321,7 +321,9 @@
         "clientIdPlaceholder": "Client ID",
         "clientSecretPlaceholder": "Client Secret",
         "saveLabel": "Save",
-        "connectLabel": "Connect"
+        "connectLabel": "Connect",
+        "configure": "Connect to Netatmo",
+        "error": "Connection with Netatmo failed"
       }
     },
     "tasmota": {

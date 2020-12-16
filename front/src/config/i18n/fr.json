@@ -404,9 +404,9 @@
     },
     "netatmo": {
       "title": "Netatmo",
-      "description": "Control your netatmo device",
-      "deviceTab": "Netatmo Devices",
-      "settingTab": "Settings",
+      "description": "Contrôler les équipements Netatmo",
+      "deviceTab": "Netatmo équipements",
+      "settingTab": "Paramètre",
       "device": {
         "title": "Equipements Netatmo dans Gladys",
         "noDevices": "Aucun appareil Netatmo n'a encore été ajouté.",
@@ -424,12 +424,14 @@
       },
       "setting": {
         "title": "Netatmo configuration",
-        "usernamePlaceholder": "Username",
-        "passwordPlaceholder": "Password",
-        "clientIdPlaceholder": "Client ID",
-        "clientSecretPlaceholder": "Client Secret",
-        "saveLabel": "Save",
-        "connectLabel": "Connect"
+        "usernamePlaceholder": "Utilisateur",
+        "passwordPlaceholder": "Mot de passe",
+        "clientIdPlaceholder": "Identifiant client",
+        "clientSecretPlaceholder": "Secret client",
+        "saveLabel": "Sauvegarder",
+        "connectLabel": "Connecter",
+        "configure": "Connexion à Netatmo",
+        "error": "La connexion à Netatmo a échoué"
       }
     },
     "tasmota": {

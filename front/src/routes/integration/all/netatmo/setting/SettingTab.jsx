@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupTab = ({ children, ...props }) => {
   return (
@@ -9,6 +10,16 @@ const SetupTab = ({ children, ...props }) => {
         </h3>
       </div>
       <div class="card-body">
+      {props.netatmoConnectedMessage === true && (
+        <p class="text-center alert alert-success">
+          <Text id="integration.netatmo.setting.configure" />
+        </p>
+      )}
+      {props.netatmoConnectedError === true && (
+        <p class="text-center alert alert-danger">
+          <Text id="integration.netatmo.setting.error" />
+        </p>
+      )}
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.netatmo.setting.usernamePlaceholder" />

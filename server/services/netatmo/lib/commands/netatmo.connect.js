@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { CONFIGURATION } = require('../constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 /**
  * @description Connect.
@@ -26,10 +27,17 @@ async function connect() {
         'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach',
     };
     this.api = new this.Netatmo(auth);
-    this.api.on('error', function ErrorOnApi(error) {
-      logger.error(`NETATMO threw an error: ${error}`);
+    this.api.on('error', () => {
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
+      });
+      logger.debug(`NETATMO threw an error login`);
     });
+
     this.getDevices();
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
+    });
   }
 }
 
