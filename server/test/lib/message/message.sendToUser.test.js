@@ -16,7 +16,7 @@ describe('message.sendToUser', () => {
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
-    const message = await messageHandler.sendToUser('test-user', 'coucou');
+    const message = await messageHandler.sendToUser('test-user', 'test-service', 'coucou');
     expect(message).to.have.property('id');
     expect(message).to.have.property('text', 'coucou');
   });
@@ -39,7 +39,7 @@ describe('message.sendToUser', () => {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       telegram_user_id: 'one-id',
     });
-    const message = await messageHandler.sendToUser('test-user', 'coucou');
+    const message = await messageHandler.sendToUser('test-user', 'telegram', 'coucou');
     expect(message).to.have.property('id');
     expect(message).to.have.property('text', 'coucou');
     assert.calledOnce(send);
