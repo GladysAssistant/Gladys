@@ -432,6 +432,16 @@
         "connectLabel": "Connecter",
         "configure": "Connexion à Netatmo",
         "error": "La connexion à Netatmo a échoué"
+      },
+      "healthHomeCoach":{
+        "airQualityHealthIndex":{
+          "healthy": "Excellent",
+          "fine": "Agréable",
+          "fair": "Acceptable",
+          "poor": "Mauvais",
+          "unhealthy": "Médiocre",
+          "null": "NC"
+        }
       }
     },
     "tasmota": {

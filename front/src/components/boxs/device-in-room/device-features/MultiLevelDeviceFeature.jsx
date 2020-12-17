@@ -31,33 +31,18 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
 
       <td class="text-right" style="padding-top: 0px; padding-bottom: 0px">
         <div class="col">
-          {props.deviceFeature.read_only === false && (
-            <input
-              style={{
-                minHeight: '30px'
-              }}
-              type="range"
-              value={props.deviceFeature.lastValue}
-              onChange={updateValue}
-              class="form-control custom-range"
-              step="1"
-              min={props.deviceFeature.min}
-              max={props.deviceFeature.max}
-            />
-          )}
-          {props.deviceFeature.read_only === true && (
-            <input
-              style={{
-                minHeight: '30px'
-              }}
-              type="range"
-              value={props.deviceFeature.lastValue}
-              class="form-control custom-range"
-              step="1"
-              min={props.deviceFeature.min}
-              max={props.deviceFeature.max}
-            />
-          )}
+          <input
+            style={{
+              minHeight: '30px'
+            }}
+            type="range"
+            value={props.deviceFeature.lastValue}
+            onChange={updateValue}
+            class="form-control custom-range"
+            step="1"
+            min={props.deviceFeature.min}
+            max={props.deviceFeature.max}
+          />
         </div>
       </td>
     </tr>
