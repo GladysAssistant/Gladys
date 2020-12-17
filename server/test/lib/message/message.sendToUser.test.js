@@ -58,12 +58,28 @@ describe('message.sendToUser', () => {
         };
       },
     };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
-    stateManager.setState('user', 'test-user', {
-      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      telegram_user_id: 'one-id',
-    });
-    const promise = messageHandler.sendToUser('user-not-found', 'coucou');
-    return assertChai.isRejected(promise);
+	
+    const service = 'telegram';
+    if(service) {
+        if(serviceSelector === 'telegram'){
+            // We send the message to the telegram service
+			stateManager.setState('user', 'test-user', {
+                id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+                telegram_user_id: 'one-id',
+            });
+            if (user.telegram_user_id) {
+                const messageHandler = new MessageHandler(event, {}, service, stateManager);
+                const promise = messageHandler.sendToUser('user-not-found', 'service-not-found', 'coucou');
+                return assertChai.isRejected(promise);
+            }
+        } else if(serviceSelector === 'pushover'){
+            // We send the message to the pushover service
+            if ('user-not-found' && 'coucou') {
+				const messageHandler = new MessageHandler(event, {}, service, stateManager);
+				const promise = messageHandler.sendToUser('user-not-found', 'service-not-found', 'coucou');
+                return assertChai.isRejected(promise);
+            } 
+        }
+    }
   });
 });
