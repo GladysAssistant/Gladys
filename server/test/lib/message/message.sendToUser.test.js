@@ -59,8 +59,8 @@ describe('message.sendToUser', () => {
       },
     };
 
-    const service = 'telegram';
-    if (service) {
+    const serviceName = 'telegram';
+    if (serviceName) {
       if (serviceSelector === 'telegram') {
         // We send the message to the telegram service
         stateManager.setState('user', 'test-user', {
