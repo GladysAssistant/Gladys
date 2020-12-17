@@ -11,10 +11,10 @@ async function poll(device) {
   const axios = require('axios');
   const info = device.external_id.split('netatmo:');
   const sid = info[1];
-  this.getDevices();
 
   // on traite les donnees des cameras
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
+    this.getDevices('camera');
     axios.get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'}).then(response => {
       const sharp = require('sharp');
       sharp(response.data)
@@ -33,6 +33,7 @@ async function poll(device) {
       state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].alim_status.toUpperCase()]
     });
     if (this.devices[sid].type === 'NACamera') {
+      this.getDevices('camera');
       this.devices[sid].modules.forEach((module) => {
         const sidModule = module.id;
         // on traite les données des sirènes intérieures
@@ -60,6 +61,7 @@ async function poll(device) {
       });
     }
     if (this.devices[sid].type === 'NOC') {
+      this.getDevices('camera');
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `netatmo:${sid}:light`,
         state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].light_mode_status.toUpperCase()]
@@ -73,6 +75,7 @@ async function poll(device) {
 
 
   if (this.devices[sid].type === 'NATherm1') {
+    this.getDevices('thermostat');
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `netatmo:${sid}:battery`,
       state: this.devices[sid].battery_percent,
@@ -87,6 +90,7 @@ async function poll(device) {
     });
   }
   if (this.devices[sid].type === 'NAMain') {
+    this.getDevices('station');
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `netatmo:${sid}:temperature`,
       state: this.devices[sid].dashboard_data.Temperature,
