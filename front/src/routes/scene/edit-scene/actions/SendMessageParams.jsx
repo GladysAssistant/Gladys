@@ -8,28 +8,28 @@ class SendMessageParams extends Component {
   getOptions = async () => {
     try {
       const users = await this.props.httpClient.get('/api/v1/user');
-	  const services = await this.props.httpClient.get('/api/v1/service');
+      const services = await this.props.httpClient.get('/api/v1/service');
       const userOptions = [];
-	  const serviceOptions = [];
-	  
+      const serviceOptions = [];
+
       users.forEach(user => {
         userOptions.push({
           label: user.firstname,
           value: user.selector
         });
       });
-	  
-	  const supportedServices = ['pushover','telegram']
-	  services.forEach(service => {
-		if(service.status == "RUNNING" && supportedServices.indexOf(service.name) > -1){
-			serviceOptions.push({
-			  label: service.name.charAt(0).toUpperCase() + service.name.slice(1),
-			  value: service.selector
-			});
-		}
+
+      const supportedServices = ['pushover', 'telegram'];
+      services.forEach(service => {
+        if (service.status == 'RUNNING' && supportedServices.indexOf(service.name) > -1) {
+          serviceOptions.push({
+            label: service.name.charAt(0).toUpperCase() + service.name.slice(1),
+            value: service.selector
+          });
+        }
       });
-	  
-      await this.setState({ userOptions, serviceOptions});
+
+      await this.setState({ userOptions, serviceOptions });
       this.refreshSelectedOptions(this.props);
       return userOptions;
     } catch (e) {
@@ -46,8 +46,8 @@ class SendMessageParams extends Component {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
     }
   };
-  handleChangeService = selectedServiceOption => {  
-  	if (selectedServiceOption && selectedServiceOption.value) {
+  handleChangeService = selectedServiceOption => {
+    if (selectedServiceOption && selectedServiceOption.value) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'service', selectedServiceOption.value);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'service', null);
@@ -55,14 +55,14 @@ class SendMessageParams extends Component {
   };
   refreshSelectedOptions = nextProps => {
     let selectedUserOption = '';
-	let selectedServiceOption = '';
+    let selectedServiceOption = '';
     if (nextProps.action.user && this.state.userOptions) {
       const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
       if (userOption) {
         selectedUserOption = userOption;
       }
     }
-	if (nextProps.action.service && this.state.serviceOptions) {
+    if (nextProps.action.service && this.state.serviceOptions) {
       const serviceOption = this.state.serviceOptions.find(option => option.value === nextProps.action.service);
       if (serviceOption) {
         selectedServiceOption = serviceOption;
@@ -75,7 +75,7 @@ class SendMessageParams extends Component {
     this.props = props;
     this.state = {
       selectedUserOption: '',
-	  selectedServiceOption: ''
+      selectedServiceOption: ''
     };
   }
   componentDidMount() {
@@ -99,7 +99,7 @@ class SendMessageParams extends Component {
           </label>
           <Select options={userOptions} value={selectedUserOption} onChange={this.handleChangeUser} />
         </div>
-		<div class="form-group">
+        <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.messageSend.serviceLabel" />
             <span class="form-required">

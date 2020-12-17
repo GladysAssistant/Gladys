@@ -165,7 +165,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
-		<PushoverPage path="/dashboard/integration/communication/pushover" />
+        <PushoverPage path="/dashboard/integration/communication/pushover" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect

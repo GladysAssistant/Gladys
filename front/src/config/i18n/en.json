@@ -762,7 +762,7 @@
       },
       "messageSend": {
         "userLabel": "User",
-		"serviceLabel": "Service",
+        "serviceLabel": "Service",
         "textLabel": "Message",
         "textPlaceholder": "Message text"
       },

@@ -24,7 +24,8 @@ const PushoverPage = ({ children, ...props }) => (
                       <p>
                         <MarkupText id="integration.pushover.introduction" />
                       </p>
-                      {(props.pushoverSaveApiKeyStatus === RequestStatus.Error || props.pushoverSaveUserKeyStatus === RequestStatus.Error) && (
+                      {(props.pushoverSaveApiKeyStatus === RequestStatus.Error ||
+                        props.pushoverSaveUserKeyStatus === RequestStatus.Error) && (
                         <div class="alert alert-danger">
                           <Text id="integration.pushover.configurationError" />
                         </div>
@@ -46,7 +47,7 @@ const PushoverPage = ({ children, ...props }) => (
                             </Localizer>
                           </div>
                         </div>
-						
+
                         <div class="form-group">
                           <div class="form-label">
                             <Text id="integration.pushover.userKey" />
@@ -62,15 +63,14 @@ const PushoverPage = ({ children, ...props }) => (
                               />
                             </Localizer>
                           </div>
-						  <br/>
-						  <span class="input-group-append">
-                             <button type="submit" class="btn btn-primary">
-                               <Text id="integration.pushover.saveButton" />
-                             </button>
-                           </span>
+                          <br />
+                          <span class="input-group-append">
+                            <button type="submit" class="btn btn-primary">
+                              <Text id="integration.pushover.saveButton" />
+                            </button>
+                          </span>
                         </div>
                       </form>
-
                     </div>
                   </div>
                 </div>

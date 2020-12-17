@@ -1,5 +1,3 @@
-const logger = require('../../../utils/logger');
-
 /**
  * @description Setup Pushover API
  * @param {string} token - Pushover API token.
@@ -8,8 +6,8 @@ const logger = require('../../../utils/logger');
  * setup('test', 'test');
  */
 async function setup(token, user) {
-	this.token = token;
-	this.user = user;
+  this.token = token;
+  this.user = user;
 }
 
 module.exports = {
