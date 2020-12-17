@@ -21,7 +21,7 @@ class SendMessageParams extends Component {
 
       const supportedServices = ['pushover', 'telegram'];
       services.forEach(service => {
-        if (service.status == 'RUNNING' && supportedServices.indexOf(service.name) > -1) {
+        if (service.status === 'RUNNING' && supportedServices.indexOf(service.name) > -1) {
           serviceOptions.push({
             label: service.name.charAt(0).toUpperCase() + service.name.slice(1),
             value: service.selector
