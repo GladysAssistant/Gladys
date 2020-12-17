@@ -27,7 +27,7 @@ function newValueCamera(data) {
       model: `netatmo-${data.type}`,
       cameraUrl: {
         name: 'CAMERA_URL',
-        value: `${data.vpn_url}/live/snapshot_720_pour_faire_merder`, //.jpg`,
+        value: `${data.vpn_url}/live/snapshot_720.jpg`,
       },
       features: [
         {
@@ -65,22 +65,23 @@ function newValueCamera(data) {
     this.devices[sid].modules.forEach((module) => {
       // si module de la camera "NACamera" présent
       const sidModule = module.id;
-      logger.debug(`Netatmo : New value stations, sid = ${sidModule}`);
+      const moduleName = module.name;
+      logger.debug(`Netatmo : New Module Camera, sid = ${sidModule}`);
       this.devices[sidModule] = module;
       let newModuleCam;
       if(module.type === 'NIS'){
         // si module sirène présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
-          name: `Siren - ${module.name}`,
+          name: `Siren - ${moduleName}`,
           selector: `netatmo:${sidModule}`,
           external_id: `netatmo:${sidModule}`,
           model: `netatmo-sirene-${module.type}`,
-          should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+          should_poll: false,
+          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
-              name: `Battery - ${module.name}`,
+              name: `Battery - ${moduleName}`,
               selector: `netatmo:${sidModule}:battery`,
               external_id: `netatmo:${sidModule}:battery`,
               category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -93,7 +94,7 @@ function newValueCamera(data) {
               max: 100,
             },
             {
-              name: `Détection intrusion - ${module.name}`,
+              name: `Détection intrusion - ${moduleName}`,
               selector: `netatmo:${sidModule}:siren`,
               external_id: `netatmo:${sidModule}:siren`,
               category: DEVICE_FEATURE_CATEGORIES.SIREN,
@@ -111,15 +112,15 @@ function newValueCamera(data) {
         // si module Détecteur d'ouverture porte et fenêtre présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
-          name: module.name,
+          name: moduleName,
           selector: `netatmo:${sidModule}`,
           external_id: `netatmo:${sidModule}`,
           model: `netatmo-${module.type}`,
-          should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+          should_poll: false,
+          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
-              name: `Battery - ${module.name}`,
+              name: `Battery - ${moduleName}`,
               selector: `netatmo:${sidModule}:battery`,
               external_id: `netatmo:${sidModule}:battery`,
               category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -132,7 +133,7 @@ function newValueCamera(data) {
               max: 100,
             },
             {
-              name: `Détection intrusion - ${module.name}`,
+              name: `Détection intrusion - ${moduleName}`,
               selector: `netatmo:${sidModule}:doorTag`,
               external_id: `netatmo:${sidModule}:doorTag`,
               category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,

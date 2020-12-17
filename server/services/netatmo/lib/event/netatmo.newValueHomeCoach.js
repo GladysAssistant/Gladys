@@ -5,7 +5,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../../../utils/constants');
 
 /**
  * @description New value homecoachs received.
@@ -17,7 +17,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 function newValueHomeCoach(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
-  logger.debug(`Netatmo : New value homecoachs, sid = ${sid}`);
+  logger.debug(`Netatmo : New homecoach, sid = ${sid}`);
   this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
@@ -26,10 +26,10 @@ function newValueHomeCoach(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-home-coachs',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
     features: [
       {
-        name: 'Temperature',
+        name: `Temperature - ${data.station_name}`,
         selector: `netatmo:${sid}:temperature`,
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -42,7 +42,7 @@ function newValueHomeCoach(data) {
         max: 60,
       },
       {
-        name: 'Humidity',
+        name: `Humidity - ${data.station_name}`,
         selector: `netatmo:${sid}:humidity`,
         external_id: `netatmo:${sid}:humidity`,
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -55,7 +55,7 @@ function newValueHomeCoach(data) {
         max: 100,
       },
       {
-        name: 'CO2',
+        name: `CO2 - ${data.station_name}`,
         selector: `netatmo:${sid}:co2`,
         external_id: `netatmo:${sid}:co2`,
         category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
@@ -68,7 +68,7 @@ function newValueHomeCoach(data) {
         max: 1000,
       },
       {
-        name: 'Pressure',
+        name: `Pressure - ${data.station_name}`,
         selector: `netatmo:${sid}:pressure`,
         external_id: `netatmo:${sid}:pressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
@@ -81,7 +81,7 @@ function newValueHomeCoach(data) {
         max: 5000,
       },
       {
-        name: 'Pressure absolue',
+        name: `Pressure absolue - ${data.station_name}`,
         selector: `netatmo:${sid}:absolutePressure`,
         external_id: `netatmo:${sid}:absolutePressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
@@ -94,7 +94,7 @@ function newValueHomeCoach(data) {
         max: 5000,
       },
       {
-        name: 'Noise',
+        name: `Noise - ${data.station_name}`,
         selector: `netatmo:${sid}:noise`,
         external_id: `netatmo:${sid}:noise`,
         category: DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR,
@@ -107,7 +107,7 @@ function newValueHomeCoach(data) {
         max: 150,
       },
       {
-        name: 'Health index',
+        name: `Health index - ${data.station_name}`,
         selector: `netatmo:${sid}:health_idx`,
         external_id: `netatmo:${sid}:health_idx`,
         category: DEVICE_FEATURE_CATEGORIES.INDEX,
@@ -119,7 +119,7 @@ function newValueHomeCoach(data) {
         max: 4,
       },
       {
-        name: 'Reachable (WiFi or Power)',
+        name: `Reachable (WiFi or Power) - ${data.station_name}`,
         selector: `netatmo:${sid}:reachable`,
         external_id: `netatmo:${sid}:reachable`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,

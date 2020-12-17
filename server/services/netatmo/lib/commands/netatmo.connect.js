@@ -34,7 +34,7 @@ async function connect() {
       logger.debug(`NETATMO threw an error login`);
     });
 
-    this.getDevices();
+    this.getDevices('all');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
     });

@@ -1,46 +1,51 @@
 const logger = require('../../../../utils/logger');
+
 /**
  * @description Get Device.
  * @returns {Array} Return array of devices.
  * @example
  * netatmo.getDevices();
  */
-async function getDevices() {
-  // on récupère les thermostats
-  const promiseThermostat = new Promise((resolve, reject) => {
-    this.api.getThermostatsData((err, sensors) => {
-      resolve(sensors);
+async function getDevices(type) {  
+  if (type === 'thermostat' || type === 'all') {
+    // on récupère les thermostats
+    const promiseThermostat = new Promise((resolve, reject) => {
+      this.api.getThermostatsData((err, sensors) => {
+        resolve(sensors);
+      });
     });
-  });
-  const sensors = await promiseThermostat;
-  sensors.forEach((sensor) => {
-    sensor.modules.forEach((module) => {
-      if (module.type === 'NATherm1') {
-        // note: "boiler_status": true  = Demande de chauffe = Allumage chaudière 
-        this.newValueThermostat(module);
-      } else {
-        logger.info(module);
-      }
+    const sensors = await promiseThermostat;
+    sensors.forEach((sensor) => {
+      sensor.modules.forEach((module) => {
+        if (module.type === 'NATherm1') {
+          // note: "boiler_status": true  = Demande de chauffe = Allumage chaudière 
+          this.newValueThermostat(module);
+        } else {
+          logger.info(module);
+        }
+      });
     });
-  });
+  }
   
-  // on récupère les maisons du Netatmo Security
-  const promiseGetHomeData = new Promise((resolve, reject) => {
-    this.api.getHomeData((err, data) => {
-      resolve(data.homes);
+  if (type === 'camera' || type === 'smokedetector' || type === 'all') {
+    // on récupère les maisons du Netatmo Security
+    const promiseGetHomeData = new Promise((resolve, reject) => {
+      this.api.getHomeData((err, data) => {
+        resolve(data.homes);
+      });
     });
-  });
-  const homes = await promiseGetHomeData;
-  homes.forEach((home) => {
-    // puis on récupère les caméras
-    home.cameras.forEach((camera) => {
-      this.newValueCamera(camera);
+    const homes = await promiseGetHomeData;
+    homes.forEach((home) => {
+      // puis on récupère les caméras
+      home.cameras.forEach((camera) => {
+        this.newValueCamera(camera);
+      });
+      // puis on récupère les détecteurs de fumée
+      home.smokedetectors.forEach((smokedetector) => {
+        this.newValueSmokeDetector(smokedetector);
+      });
     });
-    // puis on récupère les détecteurs de fumée
-    home.smokedetectors.forEach((smokedetector) => {
-      this.newValueSmokeDetector(smokedetector);
-    });
-  });
+  }
 
 
 
@@ -84,27 +89,31 @@ async function getDevices() {
 */
 
 
-  // on récupère les stations
-  const promiseGetStationsData = new Promise((resolve, reject) => {
-    this.api.getStationsData((err, data) => {
-      resolve(data);
+  if (type === 'station' || type === 'all') {
+    // on récupère les stations
+    const promiseGetStationsData = new Promise((resolve, reject) => {
+      this.api.getStationsData((err, data) => {
+        resolve(data);
+      });
     });
-  });
-  const stations = await promiseGetStationsData;
-  stations.forEach((station) => {
-    this.newValueStation(station);
-  });
-
-  // on récupère les homeCoachs
-  const promiseGetHomecoachsData = new Promise((resolve, reject) => {
-    this.api.getHealthyHomeCoachData((err, data) => {
-      resolve(data);
+    const stations = await promiseGetStationsData;
+    stations.forEach((station) => {
+      this.newValueStation(station);
     });
-  });
-  const homecoachs = await promiseGetHomecoachsData;
-  homecoachs.forEach((homecoach) => {
-    this.newValueHomeCoach(homecoach);
-  });
+  }
+  
+  if (type === 'homecoach' || type === 'all') {
+    // on récupère les homeCoachs
+    const promiseGetHomecoachsData = new Promise((resolve, reject) => {
+      this.api.getHealthyHomeCoachData((err, data) => {
+        resolve(data);
+      });
+    });
+    const homecoachs = await promiseGetHomecoachsData;
+    homecoachs.forEach((homecoach) => {
+      this.newValueHomeCoach(homecoach);
+    });
+  }
 }
 
 module.exports = {

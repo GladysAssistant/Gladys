@@ -5,7 +5,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../../../utils/constants');
 
 /**
  * @description New value stations received.
@@ -17,7 +17,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 function newValueStation(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
-  logger.debug(`Netatmo : New value stations, sid = ${sid}`);
+  logger.debug(`Netatmo : New station, sid = ${sid}`);
   this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
@@ -26,10 +26,10 @@ function newValueStation(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-station',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
     features: [
       {
-        name: 'Temperature',
+        name: `Temperature - ${data.station_name}`,
         selector: `netatmo:${sid}:temperature`,
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -42,7 +42,7 @@ function newValueStation(data) {
         max: 60,
       },
       {
-        name: 'Humidity',
+        name: `Humidity - ${data.station_name}`,
         selector: `netatmo:${sid}:humidity`,
         external_id: `netatmo:${sid}:humidity`,
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -55,7 +55,7 @@ function newValueStation(data) {
         max: 100,
       },
       {
-        name: 'CO2',
+        name: `CO2 - ${data.station_name}`,
         selector: `netatmo:${sid}:co2`,
         external_id: `netatmo:${sid}:co2`,
         category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
@@ -68,7 +68,7 @@ function newValueStation(data) {
         max: 1000,
       },
       {
-        name: 'Pressure',
+        name: `Pressure - ${data.station_name}`,
         selector: `netatmo:${sid}:pressure`,
         external_id: `netatmo:${sid}:pressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
@@ -81,7 +81,7 @@ function newValueStation(data) {
         max: 5000,
       },
       {
-        name: 'Pressure absolue',
+        name: `Pressure absolue - ${data.station_name}`,
         selector: `netatmo:${sid}:absolutePressure`,
         external_id: `netatmo:${sid}:absolutePressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
@@ -94,7 +94,7 @@ function newValueStation(data) {
         max: 5000,
       },
       {
-        name: 'Noise',
+        name: `Noise - ${data.station_name}`,
         selector: `netatmo:${sid}:noise`,
         external_id: `netatmo:${sid}:noise`,
         category: DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR,
@@ -107,7 +107,7 @@ function newValueStation(data) {
         max: 150,
       },
       {
-        name: 'Temperature mini',
+        name: `Temperature mini - ${data.station_name}`,
         selector: `netatmo:${sid}:min_temp`,
         external_id: `netatmo:${sid}:min_temp`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -120,7 +120,7 @@ function newValueStation(data) {
         max: 60,
       },
       {
-        name: 'Temperature maxi',
+        name: `Temperature maxi - ${data.station_name}`,
         selector: `netatmo:${sid}:max_temp`,
         external_id: `netatmo:${sid}:max_temp`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -133,7 +133,7 @@ function newValueStation(data) {
         max: 60,
       },
       {
-        name: 'Reachable (WiFi or Power)',
+        name: `Reachable (WiFi or Power) - ${data.station_name}`,
         selector: `netatmo:${sid}:reachable`,
         external_id: `netatmo:${sid}:reachable`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -147,26 +147,25 @@ function newValueStation(data) {
     ],
   };
   this.addSensor(sid, newSensor);
-  let sidModule;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const module of this.devices[sid].modules) {
-    /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-    sidModule = module._id;
-    logger.debug(`Netatmo : New value stations, sid = ${sidModule}`);
+
+  this.devices[sid].modules.forEach((module) => {
+    const sidModule = module._id;
+    const moduleName = module.module_name;
+    logger.debug(`Netatmo : New Module station, sid = ${sidModule}`);
     this.devices[sidModule] = module;
     let newSensor2;
     if (module.data_type[0] === 'Wind') {
       newSensor2 = {
         service_id: this.serviceId,
-        name: module.module_name,
+        name: moduleName,
         selector: `netatmo:${sidModule}`,
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-wind',
         should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
         features: [
           {
-            name: 'Wind strength',
+            name: `Wind strength - ${moduleName}`,
             selector: `netatmo:${sidModule}:WindStrength`,
             external_id: `netatmo:${sidModule}:WindStrength`,
             category: DEVICE_FEATURE_CATEGORIES.WINDSPEED_SENSOR,
@@ -179,7 +178,7 @@ function newValueStation(data) {
             max: 160,
           },
           {
-            name: 'Wind angle',
+            name: `Wind angle - ${moduleName}`,
             selector: `netatmo:${sidModule}:WindAngle`,
             external_id: `netatmo:${sidModule}:WindAngle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
@@ -191,7 +190,7 @@ function newValueStation(data) {
             max: 360,
           },
           {
-            name: 'Gust strength',
+            name: `Gust strength - ${moduleName}`,
             selector: `netatmo:${sidModule}:GustStrength`,
             external_id: `netatmo:${sidModule}:GustStrength`,
             category: DEVICE_FEATURE_CATEGORIES.WINDSPEED_SENSOR,
@@ -204,7 +203,7 @@ function newValueStation(data) {
             max: 160,
           },
           {
-            name: 'Gust angle',
+            name: `Gust angle - ${moduleName}`,
             selector: `netatmo:${sidModule}:GustAngle`,
             external_id: `netatmo:${sidModule}:GustAngle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
@@ -216,7 +215,7 @@ function newValueStation(data) {
             max: 360,
           },
           {
-            name: 'Max wind strength day',
+            name: `Max wind strength day - ${moduleName}`,
             selector: `netatmo:${sidModule}:max_wind_str`,
             external_id: `netatmo:${sidModule}:max_wind_str`,
             category: DEVICE_FEATURE_CATEGORIES.WINDSPEED_SENSOR,
@@ -229,7 +228,7 @@ function newValueStation(data) {
             max: 160,
           },
           {
-            name: 'Max wind angle day',
+            name: `Max wind angle day - ${moduleName}`,
             selector: `netatmo:${sidModule}:max_wind_angle`,
             external_id: `netatmo:${sidModule}:max_wind_angle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
@@ -241,7 +240,7 @@ function newValueStation(data) {
             max: 360,
           },
           {
-            name: `Battery - ${module.module_name}`,
+            name: `Battery - ${moduleName}`,
             selector: `netatmo:${sidModule}:battery`,
             external_id: `netatmo:${sidModule}:battery`,
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -254,7 +253,7 @@ function newValueStation(data) {
             max: 100,
           },
           {
-            name: `Reachable (WiFi or Power) - ${module.module_name}`,
+            name: `Reachable (WiFi or Power) - ${moduleName}`,
             selector: `netatmo:${sidModule}:reachable`,
             external_id: `netatmo:${sidModule}:reachable`,
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -271,15 +270,15 @@ function newValueStation(data) {
     if (module.data_type[0] === 'Rain') {
       newSensor2 = {
         service_id: this.serviceId,
-        name: module.module_name,
+        name: moduleName,
         selector: `netatmo:${sidModule}`,
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-rain',
-        should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        should_poll: false,
+        // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
         features: [
           {
-            name: 'Rain',
+            name: `Rain - ${moduleName}`,
             selector: `netatmo:${sidModule}:rain`,
             external_id: `netatmo:${sidModule}:rain`,
             category: DEVICE_FEATURE_CATEGORIES.RAINFALL_SENSOR,
@@ -292,7 +291,7 @@ function newValueStation(data) {
             max: 150,
           },
           {
-            name: 'Sum Rain last 1 hour',
+            name: `Sum Rain last 1 hour - ${moduleName}`,
             selector: `netatmo:${sidModule}:sum_rain_1`,
             external_id: `netatmo:${sidModule}:sum_rain_1`,
             category: DEVICE_FEATURE_CATEGORIES.RAINFALL_SENSOR,
@@ -305,7 +304,7 @@ function newValueStation(data) {
             max: 150,
           },
           {
-            name: 'Sum Rain last 24 hours',
+            name: `Sum Rain last 24 hours - ${moduleName}`,
             selector: `netatmo:${sidModule}:sum_rain_24`,
             external_id: `netatmo:${sidModule}:sum_rain_24`,
             category: DEVICE_FEATURE_CATEGORIES.RAINFALL_SENSOR,
@@ -318,7 +317,7 @@ function newValueStation(data) {
             max: 150,
           },
           {
-            name: `Battery - ${module.module_name}`,
+            name: `Battery - ${moduleName}`,
             selector: `netatmo:${sidModule}:battery`,
             external_id: `netatmo:${sidModule}:battery`,
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -331,7 +330,7 @@ function newValueStation(data) {
             max: 100,
           },
           {
-            name: `Reachable (WiFi or Power) - ${module.module_name}`,
+            name: `Reachable (WiFi or Power) - ${moduleName}`,
             selector: `netatmo:${sidModule}:reachable`,
             external_id: `netatmo:${sidModule}:reachable`,
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -349,15 +348,15 @@ function newValueStation(data) {
       if (module.data_type.length === 2) {
         newSensor2 = {
           service_id: this.serviceId,
-          name: module.module_name,
+          name: moduleName,
           selector: `netatmo:${sidModule}`,
           external_id: `netatmo:${sidModule}`,
           model: 'netatmo-station-outdoor',
-          should_poll: true,
-          poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+          should_poll: false,
+          // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
           features: [
             {
-              name: 'Temperature',
+              name: `Temperature - ${moduleName}`,
               selector: `netatmo:${sidModule}:temperature`,
               external_id: `netatmo:${sidModule}:temperature`,
               category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -370,7 +369,7 @@ function newValueStation(data) {
               max: 60,
             },
             {
-              name: 'Humidity',
+              name: `Humidity - ${moduleName}`,
               selector: `netatmo:${sidModule}:humidity`,
               external_id: `netatmo:${sidModule}:humidity`,
               category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -383,7 +382,7 @@ function newValueStation(data) {
               max: 100,
             },
             {
-              name: 'Temperature mini',
+              name: `Temperature mini- ${moduleName}`,
               selector: `netatmo:${sidModule}:min_temp`,
               external_id: `netatmo:${sidModule}:min_temp`,
               category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -396,7 +395,7 @@ function newValueStation(data) {
               max: 60,
             },
             {
-              name: 'Temperature maxi',
+              name: `Temperature maxi - ${moduleName}`,
               selector: `netatmo:${sidModule}:max_temp`,
               external_id: `netatmo:${sidModule}:max_temp`,
               category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -409,7 +408,7 @@ function newValueStation(data) {
               max: 60,
             },
             {
-              name: `Battery - ${module.module_name}`,
+              name: `Battery - ${moduleName}`,
               selector: `netatmo:${sidModule}:battery`,
               external_id: `netatmo:${sidModule}:battery`,
               category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -422,7 +421,7 @@ function newValueStation(data) {
               max: 100,
             },
             {
-              name: `Reachable (WiFi or Power) - ${module.module_name}`,
+              name: `Reachable (WiFi or Power) - ${moduleName}`,
               selector: `netatmo:${sidModule}:reachable`,
               external_id: `netatmo:${sidModule}:reachable`,
               category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -444,11 +443,11 @@ function newValueStation(data) {
         selector: `netatmo:${sidModule}`,
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-indoor',
-        should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        should_poll: false,
+        // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
         features: [
           {
-            name: 'Temperature',
+            name: `Temperature - ${moduleName}`,
             selector: `netatmo:${sidModule}:temperature`,
             external_id: `netatmo:${sidModule}:temperature`,
             category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -461,7 +460,7 @@ function newValueStation(data) {
             max: 60,
           },
           {
-            name: 'Humidity',
+            name: `Humidity - ${moduleName}`,
             selector: `netatmo:${sidModule}:humidity`,
             external_id: `netatmo:${sidModule}:humidity`,
             category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -474,7 +473,7 @@ function newValueStation(data) {
             max: 100,
           },
           {
-            name: 'CO2',
+            name: `CO2 - ${moduleName}`,
             selector: `netatmo:${sidModule}:co2`,
             external_id: `netatmo:${sidModule}:co2`,
             category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
@@ -487,7 +486,7 @@ function newValueStation(data) {
             max: 1000,
           },
           {
-            name: 'Temperature mini',
+            name: `Temperature mini - ${moduleName}`,
             selector: `netatmo:${sidModule}:min_temp`,
             external_id: `netatmo:${sidModule}:min_temp`,
             category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -500,7 +499,7 @@ function newValueStation(data) {
             max: 60,
           },
           {
-            name: 'Temperature maxi',
+            name: `Temperature maxi - ${moduleName}`,
             selector: `netatmo:${sidModule}:max_temp`,
             external_id: `netatmo:${sidModule}:max_temp`,
             category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -513,7 +512,7 @@ function newValueStation(data) {
             max: 60,
           },
           {
-            name: `Battery - ${module.module_name}`,
+            name: `Battery - ${moduleName}`,
             selector: `netatmo:${sidModule}:battery`,
             external_id: `netatmo:${sidModule}:battery`,
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -526,7 +525,7 @@ function newValueStation(data) {
             max: 100,
           },
           {
-            name: `Reachable (WiFi or Power) - ${module.module_name}`,
+            name: `Reachable (WiFi or Power) - ${moduleName}`,
             selector: `netatmo:${sidModule}:reachable`,
             external_id: `netatmo:${sidModule}:reachable`,
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -541,7 +540,7 @@ function newValueStation(data) {
       };
     }
     this.addSensor(sidModule, newSensor2);
-  }
+  });
 }
 
 module.exports = {

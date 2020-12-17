@@ -2,7 +2,6 @@ const logger = require('../../../../utils/logger');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
@@ -17,7 +16,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 function newValueSmokeDetector(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data.id;
-  logger.debug(`Netatmo : New value Smoke Detector, sid = ${sid}`);
+  logger.debug(`Netatmo : New Smoke Detector, sid = ${sid}`);
   this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
