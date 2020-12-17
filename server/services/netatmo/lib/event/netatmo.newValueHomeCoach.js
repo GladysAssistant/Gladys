@@ -5,7 +5,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-const { DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value homecoachs received.
@@ -26,7 +26,7 @@ function newValueHomeCoach(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-home-coachs',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
         name: `Temperature - ${data.station_name}`,

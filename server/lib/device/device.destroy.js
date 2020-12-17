@@ -1,5 +1,5 @@
 const { NotFoundError } = require('../../utils/coreErrors');
-const { DEVICE_POLL_FREQUENCIES, DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
 const db = require('../../models');
 
 /**
@@ -48,20 +48,6 @@ async function destroy(selector) {
       // if yes, we remove it
       if (index !== -1) {
         this.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES[frequency]].splice(index, 1);
-      }
-    }
-  });
-  // foreach frequency specific
-  Object.keys(DEVICE_POLL_FREQUENCIES_SPECIF).forEach((frequency) => {
-    // if the frequency exist
-    if (this.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES_SPECIF[frequency]]) {
-      // we see if the device is member of the group without being member
-      const index = this.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES_SPECIF[frequency]].findIndex(
-        (d) => d.selector === device.selector,
-      );
-      // if yes, we remove it
-      if (index !== -1) {
-        this.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES_SPECIF[frequency]].splice(index, 1);
       }
     }
   });

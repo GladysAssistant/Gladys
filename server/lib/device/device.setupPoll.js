@@ -1,4 +1,4 @@
-const { DEVICE_POLL_FREQUENCIES, DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
 
 /**
  * @description Setup poll setInterval
@@ -6,23 +6,6 @@ const { DEVICE_POLL_FREQUENCIES, DEVICE_POLL_FREQUENCIES_SPECIF } = require('../
  * setupPoll();
  */
 function setupPoll() {
-  // poll devices who need to be polled every minutes
-  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_HOURS), DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_HOURS);
-  // poll devices who need to be polled every minutes
-  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_30_MINUTES), 
-    DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_30_MINUTES
-  );
-  // poll devices who need to be polled every minutes
-  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_10_MINUTES), 
-    DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_10_MINUTES
-  );
-  // poll devices who need to be polled every minutes
-  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES), 
-    DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES);
-  // poll devices who need to be polled every minutes
-  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_2_MINUTES), 
-    DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_2_MINUTES
-  );
   // poll devices who need to be polled every minutes
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES), DEVICE_POLL_FREQUENCIES.EVERY_MINUTES);
   // poll devices who need to be polled every 30 seconds

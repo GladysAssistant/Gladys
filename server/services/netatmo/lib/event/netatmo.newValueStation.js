@@ -5,7 +5,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-const { DEVICE_POLL_FREQUENCIES_SPECIF } = require('../../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value stations received.
@@ -26,7 +26,7 @@ function newValueStation(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-station',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
         name: `Temperature - ${data.station_name}`,
@@ -162,7 +162,7 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-wind',
         should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Wind strength - ${moduleName}`,
@@ -275,7 +275,7 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-rain',
         should_poll: false,
-        // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Rain - ${moduleName}`,
@@ -353,7 +353,7 @@ function newValueStation(data) {
           external_id: `netatmo:${sidModule}`,
           model: 'netatmo-station-outdoor',
           should_poll: false,
-          // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
               name: `Temperature - ${moduleName}`,
@@ -444,7 +444,7 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-indoor',
         should_poll: false,
-        // poll_frequency: DEVICE_POLL_FREQUENCIES_SPECIF.EVERY_5_MINUTES,
+        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Temperature - ${moduleName}`,
