@@ -1,7 +1,7 @@
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 
-class Netatmo extends EventEmitter {};
+class Netatmo extends EventEmitter {}
 
 Netatmo.prototype.auth = fake.resolves(null);
 

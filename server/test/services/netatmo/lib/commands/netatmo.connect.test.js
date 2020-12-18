@@ -4,10 +4,8 @@ const proxyquire = require('proxyquire').noCallThru();
 const Netatmo = require('../netatmo.mock');
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {
-  netatmo: Netatmo
+  netatmo: Netatmo,
 });
-
-
 
 const gladys = {
   event: {
