@@ -1206,7 +1206,9 @@
     "kilowatt-hour": "Kilowatt per hour (kW/h)",
     "ampere": "Ampere (A)",
     "volt": "Volt (V)",
-    "ppm": "Parts per million (ppm)"
+    "ppm": "Parts per million (ppm)",
+    "cm": "Centimeter (cm)",
+    "mm": "Millimeter (mm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1219,7 +1221,9 @@
     "kilowatt-hour": "kW/h",
     "ampere": "A",
     "volt": "V",
-    "ppm": "ppm"
+    "ppm": "ppm",
+    "cm": "cm",
+    "mm": "mm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1259,6 +1263,10 @@
     "sismic-sensor": {
       "shortCategoryName": "Sismic sensor",
       "decimal": "Sismic (decimal)"
+    },
+    "distance-sensor": {
+      "shortCategoryName": "Distance",
+      "decimal": "Distance"
     },
     "camera": {
       "shortCategoryName": "Camera",
