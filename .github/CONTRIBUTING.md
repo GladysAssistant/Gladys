@@ -14,9 +14,10 @@ We want to make contributing to this project as easy and transparent as possible
 
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
-## Setup your development environnement
+## Setup your development environment
 
-Please read [this article](https://gladysassistant.com/en/docs/api/setup-development-environnement) on how to setup your developpement environnement for Gladys.
+- [MacOS/Linux instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-mac-linux/)
+- [Windows instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-windows/)
 
 ## Before making a Pull Request
 

@@ -26,7 +26,9 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+  NOT_CONFIGURED: 'NOT_CONFIGURED',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -38,6 +40,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
@@ -201,10 +206,6 @@ const ACTIONS = {
   TIME: {
     DELAY: 'delay',
   },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
-  },
   SCENE: {
     START: 'scene.start',
   },
@@ -213,6 +214,13 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+  },
+  USER: {
+    SET_SEEN_AT_HOME: 'user.set-seen-at-home',
+    SET_OUT_OF_HOME: 'user.set-out-of-home',
+  },
+  HTTP: {
+    REQUEST: 'http.request',
   },
 };
 
@@ -424,11 +432,17 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'netatmo.error',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',
     DISCOVER: 'bluetooth.discover',
+  },
+  EWELINK: {
+    CONNECTED: 'ewelink.connected',
+    NEW_DEVICE: 'ewelink.new-device',
+    ERROR: 'ewelink.error',
   },
 };
 

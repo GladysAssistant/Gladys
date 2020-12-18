@@ -1,3 +1,6 @@
+const { addSelector } = require('../../../../utils/addSelector');
+const logger = require('../../../../utils/logger');
+
 // Modules
 const modules = require('./modules');
 
@@ -57,10 +60,41 @@ const recursiveSearch = (message, callback, key = undefined) => {
   });
 };
 
+const addFeature = (device, featureTemplate, fullKey, command, value) => {
+  const featureExternalId = generateExternalId(featureTemplate, command, fullKey);
+  const externalId = `${device.external_id}:${featureExternalId}`;
+  const existingFeature = device.features.find((f) => f.external_id === externalId);
+
+  if (existingFeature) {
+    logger.debug(`Tasmota: duplicated feature handled for ${externalId}`);
+  } else {
+    const generatedFeature = featureTemplate.generateFeature(device, command, value);
+
+    if (generatedFeature) {
+      const convertedValue = generateValue(featureTemplate, value);
+
+      const feature = {
+        ...generatedFeature,
+        external_id: externalId,
+        selector: externalId,
+        last_value: convertedValue,
+      };
+
+      addSelector(feature);
+
+      device.features.push(feature);
+      return feature;
+    }
+  }
+
+  return null;
+};
+
 module.exports = {
   MODULES: modules,
   FEATURE_TEMPLATES,
   recursiveSearch,
+  addFeature,
   generateExternalId,
   generateValue,
 };

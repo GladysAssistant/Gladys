@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { MarkupText, Text } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -31,7 +31,7 @@ const SetupTab = ({ children, ...props }) => {
               <div class="dimmer-content">
                 {props.philipsHueDeleteDeviceStatus === RequestStatus.Error && (
                   <p class="alert alert-danger">
-                    <Text id="integration.philipsHue.setup.unknownError" />
+                    <MarkupText id="integration.philipsHue.setup.unknownError" />
                   </p>
                 )}
                 {props.philipsHueGetDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
@@ -104,7 +104,7 @@ const SetupTab = ({ children, ...props }) => {
               )}
               {props.philipsHueCreateDeviceStatus === RequestStatus.Error && (
                 <p class="alert alert-danger">
-                  <Text id="integration.philipsHue.setup.unknownError" />
+                  <MarkupText id="integration.philipsHue.setup.unknownError" />
                 </p>
               )}
               {props.philipsHueBridges &&

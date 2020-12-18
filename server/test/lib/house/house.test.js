@@ -155,6 +155,61 @@ describe('house.userSeen', () => {
   });
 });
 
+describe('house.userLeft', () => {
+  it('should mark user as left the house', async () => {
+    const userLeftEvent = {
+      emit: fake.returns(null),
+    };
+    const house = new House(userLeftEvent);
+    await house.userSeen('test-house', 'john');
+    const user = await house.userLeft('test-house', 'john');
+    expect(user).to.deep.equal({
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      current_house_id: null,
+      last_house_changed: user.last_house_changed,
+      updated_at: user.updated_at,
+    });
+    assert.calledWith(userLeftEvent.emit, EVENTS.USER_PRESENCE.LEFT_HOME, user);
+  });
+  it('should not change anything', async () => {
+    const userLeftEvent = {
+      emit: fake.returns(null),
+    };
+    const house = new House(userLeftEvent);
+    const user = await house.userLeft('test-house', 'john');
+    expect(user).to.deep.equal({
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      current_house_id: null,
+      last_house_changed: null,
+    });
+    assert.notCalled(userLeftEvent.emit);
+  });
+  it('should return house not found', async () => {
+    const userLeftEvent = {
+      emit: fake.returns(null),
+    };
+    const house = new House(userLeftEvent);
+    const promise = house.userLeft('house-not-found', 'john');
+    return assertChai.isRejected(promise, 'House not found');
+  });
+  it('should return user not found', async () => {
+    const userLeftEvent = {
+      emit: fake.returns(null),
+    };
+    const house = new House(userLeftEvent);
+    const promise = house.userLeft('test-house', 'user-not-found');
+    return assertChai.isRejected(promise, 'User not found');
+  });
+});
+
 describe('house.getBySelector', () => {
   const house = new House(event);
   it('should return a house', async () => {

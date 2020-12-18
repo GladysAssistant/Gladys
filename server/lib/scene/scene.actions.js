@@ -3,6 +3,7 @@ const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('..
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
+const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
 
 const actionsFunc = {
@@ -99,8 +100,6 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
-  [ACTIONS.SERVICE.START]: async (self, action, scope) => self.stateManager.get('service', action.service).start(),
-  [ACTIONS.SERVICE.STOP]: async (self, action, scope) => self.stateManager.get('service', action.service).stop(),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     await self.message.sendToUser(action.user, action.text);
@@ -124,6 +123,22 @@ const actionsFunc = {
     if (oneConditionVerified === false) {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
     }
+  },
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
+    await self.house.userSeen(action.house, action.user);
+  },
+  [ACTIONS.USER.SET_OUT_OF_HOME]: async (self, action) => {
+    await self.house.userLeft(action.house, action.user);
+  },
+  [ACTIONS.HTTP.REQUEST]: async (self, action, scope, columnIndex, rowIndex) => {
+    const headersObject = {};
+    action.headers.forEach((header) => {
+      if (header.key && header.value) {
+        headersObject[header.key] = header.value;
+      }
+    });
+    const response = await self.http.request(action.method, action.url, parseJsonIfJson(action.body), headersObject);
+    scope[`${columnIndex}.${rowIndex}.data`] = response;
   },
 };
 

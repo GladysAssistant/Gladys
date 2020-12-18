@@ -1775,6 +1775,271 @@
       },
       "_id": 35,
       "id": 35
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "hue": 8418,
+        "sat": 140,
+        "effect": "none",
+        "xy": [0.4573, 0.41],
+        "ct": 366,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-06-13T17:34:02"
+      },
+      "type": "Extended color light",
+      "name": "Bandeau bureau",
+      "modelid": "LCL001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue lightstrip plus",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 40,
+            "maxlumen": 1600,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "huelightstrip",
+          "function": "mixed",
+          "direction": "omnidirectional",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:09:11:ab:51-0b",
+        "swversion": "1.66.6_h2048EED",
+        "swconfigid": "A439E458",
+        "productid": "Philips-LCL001-1-LedStripsv4"
+      },
+      "_id": 36,
+      "id": 36,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": true,
+        "bri": 254,
+        "alert": "none",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2020-01-08T15:03:17"
+      },
+      "type": "Dimmable light",
+      "name": "plafond salon",
+      "modelid": "Classic A60 W clear - LIGHTIFY",
+      "manufacturername": "OSRAM",
+      "productname": "Dimmable light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {},
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "pendantround",
+          "function": "functional",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "7c:b0:3e:aa:0a:03:98:e6-03",
+        "swversion": "V1.04.12"
+      },
+      "_id": 37,
+      "id": 37
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 254,
+        "hue": 41435,
+        "sat": 77,
+        "effect": "none",
+        "xy": [0.3129, 0.3291],
+        "ct": 153,
+        "alert": "select",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-11-14T14:03:44"
+      },
+      "type": "Extended color light",
+      "name": "Chambre",
+      "modelid": "440400982841",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue Play",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 100,
+            "maxlumen": 560,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "hueplay",
+          "function": "decorative",
+          "direction": "upwards",
+          "startup": {
+            "mode": "safety",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:08:5d:3a:85-0b",
+        "swversion": "1.56.7_r29434",
+        "swconfigid": "630AD3B2",
+        "productid": "3241-3127-7871_HC04_PSG03"
+      },
+      "_id": 38,
+      "id": 38,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 1,
+        "hue": 56813,
+        "sat": 243,
+        "effect": "none",
+        "xy": [0.4343, 0.1932],
+        "ct": 328,
+        "alert": "none",
+        "colormode": "xy",
+        "mode": "homeautomation",
+        "reachable": true
+      },
+      "swupdate": {
+        "state": "noupdates",
+        "lastinstall": "2020-03-03T06:06:08"
+      },
+      "type": "Extended color light",
+      "name": "Spot extérieur 1",
+      "modelid": "LCS001",
+      "manufacturername": "Signify Netherlands B.V.",
+      "productname": "Hue outdoor spot",
+      "_rawData": {
+        "capabilities": {
+          "certified": true,
+          "control": {
+            "mindimlevel": 100,
+            "maxlumen": 650,
+            "colorgamuttype": "C",
+            "colorgamut": [[0.6915, 0.3083], [0.17, 0.7], [0.1532, 0.0475]],
+            "ct": {
+              "min": 153,
+              "max": 500
+            }
+          },
+          "streaming": {
+            "renderer": true,
+            "proxy": true
+          }
+        },
+        "config": {
+          "archetype": "groundspot",
+          "function": "decorative",
+          "direction": "upwards",
+          "startup": {
+            "mode": "powerfail",
+            "configured": true
+          }
+        },
+        "uniqueid": "00:17:88:01:06:90:3e:6e-0b",
+        "swversion": "1.50.2_r30933",
+        "swconfigid": "949259E6",
+        "productid": "ENA-LCS001-1-LilySpikev1"
+      },
+      "_id": 38,
+      "id": 38,
+      "mappedColorGamut": "C"
+    },
+    {
+      "state": {
+        "on": false,
+        "bri": 200,
+        "hue": 10000,
+        "sat": 100,
+        "effect": "none",
+        "xy": [0.472, 0.2135],
+        "ct": 388,
+        "alert": "none",
+        "colormode": "hs",
+        "mode": "homeautomation",
+        "reachable": false
+      },
+      "swupdate": {
+        "state": "notupdatable",
+        "lastinstall": "2019-01-30T17:56:29"
+      },
+      "type": "Extended color light",
+      "name": "Color 1",
+      "modelid": "RB 285 C",
+      "manufacturername": "innr",
+      "productname": "Extended color light",
+      "_rawData": {
+        "capabilities": {
+          "certified": false,
+          "control": {
+            "colorgamuttype": "other",
+            "colorgamut": [[0.7, 0.3], [0.11, 0.82], [0.12, 0.08]],
+            "ct": {
+              "min": 153,
+              "max": 555
+            }
+          },
+          "streaming": {
+            "renderer": false,
+            "proxy": false
+          }
+        },
+        "config": {
+          "archetype": "classicbulb",
+          "function": "mixed",
+          "direction": "omnidirectional"
+        },
+        "uniqueid": "00:15:8d:00:02:ff:ef:7f-01",
+        "swversion": "2.0"
+      },
+      "_id": 39,
+      "id": 39,
+      "mappedColorGamut": "other"
     }
   ]
 }

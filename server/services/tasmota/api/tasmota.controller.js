@@ -1,33 +1,35 @@
-module.exports = function MqttController(mqttManager) {
+const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+
+module.exports = function TasmotaController(tasmotaManager) {
   /**
-   * @api {get} /api/v1/service/tasmota/discover Get discovered Tasmota devices
+   * @api {get} /api/v1/service/tasmota/discover/:protocol Get discovered Tasmota devices over selected protocol
    * @apiName discover
    * @apiGroup Tasmota
    */
   function discover(req, res) {
-    res.json(mqttManager.getDiscoveredDevices());
+    res.json(tasmotaManager.getDiscoveredDevices(req.params.protocol));
   }
 
   /**
-   * @api {post} /api/v1/service/tasmota/discover Force to discover Tasmota devices
+   * @api {post} /api/v1/service/tasmota/discover/:protocol Discover Tasmota devices over selected protocol.
    * @apiName scan
    * @apiGroup Tasmota
    */
   function scan(req, res) {
-    mqttManager.forceScan();
+    tasmotaManager.scan(req.params.protocol, req.body);
     res.json({
       success: true,
     });
   }
 
   return {
-    'get /api/v1/service/tasmota/discover': {
+    'get /api/v1/service/tasmota/discover/:protocol': {
       authenticated: true,
-      controller: discover,
+      controller: asyncMiddleware(discover),
     },
-    'post /api/v1/service/tasmota/discover': {
+    'post /api/v1/service/tasmota/discover/:protocol': {
       authenticated: true,
-      controller: scan,
+      controller: asyncMiddleware(scan),
     },
   };
 };
