@@ -21,7 +21,7 @@ function newValueThermostat(data) {
   this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
-    name: `Netatmo Thermostat`,
+    name: data.name,
     selector: `netatmo:${sid}`,
     external_id: `netatmo:${sid}`,
     model: 'netatmo-thermostat',
@@ -29,7 +29,7 @@ function newValueThermostat(data) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
-        name: 'Temperature',
+        name: `Temperature - ${data.name}`,
         selector: `netatmo:${sid}:temperature`,
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -42,7 +42,7 @@ function newValueThermostat(data) {
         max: 60,
       },
       {
-        name: 'Battery',
+        name: `Battery - ${data.name}`,
         selector: `netatmo:${sid}:battery`,
         external_id: `netatmo:${sid}:battery`,
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -55,7 +55,7 @@ function newValueThermostat(data) {
         max: 100,
       },
       {
-        name: 'Setpoint',
+        name: `Setpoint - ${data.name}`,
         selector: `netatmo:${sid}:setpoint`,
         external_id: `netatmo:${sid}:setpoint`,
         category: DEVICE_FEATURE_CATEGORIES.SETPOINT,

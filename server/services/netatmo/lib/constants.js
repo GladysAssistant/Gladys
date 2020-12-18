@@ -12,6 +12,13 @@ const DEFAULT = {
 };
 
 const NETATMO_VALUES ={
+  BATTERY: {
+    VERY_LOW: 5,
+    LOW: 25,
+    ADETERMINER1: 50,
+    ADETERMINER3: 75,
+    FULL: 100,
+  },
   SECURITY: {
     STATUS: {
       OFF: 0,
@@ -30,6 +37,14 @@ const NETATMO_VALUES ={
       UNDEFINED: -1,
       CLOSED: 0,
       OPEN: 1,
+    },
+  },
+  ENERGY: {
+    SETPOINT_MODE: {
+      SCHEDULE: 0,
+      MANUAL: 1,
+      HG: 2, // Hors Gel
+      AWAY: 3, // Absent
     },
   },
 };

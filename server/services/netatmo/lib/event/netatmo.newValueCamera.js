@@ -150,7 +150,7 @@ function newValueCamera(data) {
       this.addSensor(sidModule, newModuleCam);
     });
   }
-  if(data.type === 'NOC'){
+  if(data.type === 'NOC'){      
     newCamera = {
       name: data.name,
       should_poll: true,
@@ -161,7 +161,7 @@ function newValueCamera(data) {
       model: `netatmo-${data.type}`,
       cameraUrl: {
         name: 'CAMERA_URL',
-        value: `${data.vpn_url}/live/snapshot_720.jpg`,
+        value: `${data.homeStatus.vpn_url}/live/snapshot_720.jpg`,
       },
       features: [
         {
@@ -216,7 +216,7 @@ function newValueCamera(data) {
       params: [
         {
           name: 'CAMERA_URL',
-          value: `${data.vpn_url}/live/snapshot_720.jpg`
+          value: `${data.homeStatus.vpn_url}/live/snapshot_720.jpg`,
         }
       ]
     };

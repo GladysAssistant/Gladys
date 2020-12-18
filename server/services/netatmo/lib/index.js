@@ -13,6 +13,7 @@ const { newValueStation } = require('./event/netatmo.newValueStation.js');
 const { newValueHomeCoach } = require('./event/netatmo.newValueHomeCoach.js');
 const { newValueSmokeDetector } = require('./event/netatmo.newValueSmokeDetector.js');
 const { newValueCamera } = require('./event/netatmo.newValueCamera.js');
+const { newValueValve } = require('./event/netatmo.newValueValve.js');
 const { poll } = require('./event/netatmo.poll.js');
 
 // we rate-limit the number of request per seconds to poll lights
@@ -50,6 +51,7 @@ NetatmoManager.prototype.newValueStation = newValueStation;
 NetatmoManager.prototype.newValueHomeCoach = newValueHomeCoach;
 NetatmoManager.prototype.newValueSmokeDetector = newValueSmokeDetector;
 NetatmoManager.prototype.newValueCamera = newValueCamera;
+NetatmoManager.prototype.newValueValve = newValueValve;
 NetatmoManager.prototype.poll = pollLimiter.wrap(poll);
 
 module.exports = NetatmoManager;
