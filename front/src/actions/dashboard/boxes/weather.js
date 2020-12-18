@@ -6,6 +6,19 @@ import get from 'get-value';
 
 const BOX_KEY = 'Weather';
 
+const WEATHER_ICONS = {
+  snow: 'fe-cloud-snow',
+  rain: 'fe-cloud-rain',
+  clear: 'fe-sun',
+  cloud: 'fe-cloud',
+  fog: 'fe-cloud',
+  sleet: 'fe-cloud-drizzle',
+  wind: 'fe-wind',
+  night: 'fe-moon'
+};
+
+const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
+
 function createActions(store) {
   const boxActions = createBoxActions(store);
 
@@ -17,6 +30,17 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
+        weather.weather_icon = translateWeatherToFeIcon(weather.weather);
+
+        weather.hours.map(hour => {
+          hour.weather_icon = translateWeatherToFeIcon(hour.weather);
+          hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
+        });
+        weather.days.map(day => {
+          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.datetime_beautiful = dayjs(day.datetime).format('D MMM');
+        });
+
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           weather
         });

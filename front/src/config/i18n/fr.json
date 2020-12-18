@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
     "save": "Enregistrer"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
         "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
-        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?"
+        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editModeLabel": "Mode d'affichage :",
+        "displayModes": {
+          "advancedWeather": "Humidité et vitesse du vent",
+          "hourlyForecast": "Prévisions pour les 8 prochaines heures",
+          "dailyForecast": "Prévisions pour les 7 prochains jours"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -201,7 +209,7 @@
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
@@ -448,27 +456,52 @@
       "title": "Tasmota",
       "description": "Contrôler vos appareils Tasmota.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte MQTT",
-      "discoverDeviceDescr": "Scanner automatiquement les appareils MQTT",
+      "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte HTTP",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
         "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "protocolLabel": "Protocole",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
-        "title": "Découverte des appareils Tasmota sur MQTT",
-        "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
-        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "noDeviceFound": "Aucun appareil Tasmota découvert.",
+        "error": "Erreur lors de la découverte des appareils Tasmota.",
         "documentation": "Documentation Tasmota",
-        "scan": "Scanner"
+        "mqtt": {
+          "title": "Découverte des appareils Tasmota sur MQTT",
+          "description": "Les appareils Tasmota configurés sont automatiquement découverts sur le réseau MQTT.",
+          "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Tasmota en HTTP",
+          "singleModeButton": "Recherche par IP",
+          "rangeModeButton": "Recherche par plage d'IP",
+          "singleAddressLabel": "Adresse IP ou nom sur le réseau :",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "De :",
+          "lastAddressLabel": "A :",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Rechercher",
+          "usernameLabel": "Nom d'utilisateur",
+          "passwordLabel": "Mot de passe",
+          "needAuthenticationAlert": "L'apparail est protégé par nom d'utilisateur et mot de passe.",
+          "authenticateButton": "Se connecter et analyser",
+          "authError": "Nom d'utilisateur ou mot de passe incorrects."
+        }
       },
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "roomLabel": "Pièce",
-      "topicLabel": "Topic (%topic% Tasmota MQTT)",
+      "protocolLabels": {
+        "mqtt": "Topic MQTT",
+        "http": "Adresse HTTP"
+      },
       "saveButton": "Sauvegarder",
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
@@ -670,6 +703,60 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
+    },
+    "eWeLink": {
+      "title": "eWeLink",
+      "description": "Contrôlez vos appareils eWeLink.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte eWeLink",
+      "setupTab": "Configuration",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils eWeLink",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
+        "setupPageLink": "page de configuration eWeLink."
+      },
+      "device": {
+        "title": "Appareils eWeLink dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil eWeLink trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud eWeLink",
+        "description": "Les appareils eWeLink sont automatiquement découverts. Vos appareils eWeLink doivent être ajoutés à votre compte cloud eWeLink avant.",
+        "error": "Erreur de découverte des appareils eWeLink. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil eWeLink n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration eWeLink",
+        "eweLinkDescription": "Vous pouvez connecter Gladys à votre compte cloud eWeLink pour commander les appareils associés.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur eWeLink",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur eWeLink",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
+        "connected": "Connexion réussie au compte cloud eWeLink !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
     }
   },
   "editScene": {
@@ -733,6 +820,28 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU"
+      },
+      "userPresence": {
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
+        "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
+      },
+      "httpRequest": {
+        "description": "Cette action permet d'envoyer une requête HTTP.",
+        "methodLabel": "Méthode",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Nom",
+        "headersValuePlaceholder": "Valeur"
       }
     },
     "actions": {
@@ -760,6 +869,13 @@
       },
       "condition": {
         "only-continue-if": "Continuer seulement si"
+      },
+      "user": {
+        "set-seen-at-home": "Utilisateur vu à la maison",
+        "set-out-of-home": "Utilisateur parti de la maison"
+      },
+      "http": {
+        "request": "Faire une requête HTTP"
       }
     },
     "variables": {
@@ -787,7 +903,8 @@
         "different": "différent",
         "valuePlaceholder": "Valeur",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -869,6 +986,7 @@
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
+    "serviceTab": "Services",
     "billingTab": "Facturation",
     "gatewayUsersTab": "Utilisateurs",
     "gatewayOpenApiTab": "Open API"
@@ -887,6 +1005,47 @@
     "revoke": "Révoquer",
     "unknowDevice": "Appareil inconnu",
     "apiKey": "Clé API"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Nom interne : {{key}}",
+    "integrationLinkTitle": "Aller à la page de l'intégration",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Inconnu",
+        "detail": "Service non trouvé"
+      },
+      "DISABLED": {
+        "title": "Désactivé",
+        "detail": "Service désactivé"
+      },
+      "ENABLED": {
+        "title": "Activé",
+        "detail": "Service activé"
+      },
+      "RUNNING": {
+        "title": "Démarré",
+        "detail": "Service en cours d'exécution"
+      },
+      "STOPPED": {
+        "title": "Arrêté",
+        "detail": "Service arrêté par un utilisateur"
+      },
+      "NOT_CONFIGURED": {
+        "title": "Non configuré",
+        "detail": "Service non configuré"
+      },
+      "ERROR": {
+        "title": "En erreur",
+        "detail": "Service en erreur lors du démarrage."
+      },
+      "LOADING": {
+        "title": "En erreur",
+        "detail": "Service en erreur lors du démarrage."
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -1248,7 +1407,8 @@
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",
-    "manageBilling": "Pour gérer votre facturation, cliquez "
+    "manageBilling": "Pour gérer votre facturation, cliquez ",
+    "here": "ici"
   },
   "editDeviceForm": {
     "noName": "Pas de nom",
@@ -1270,7 +1430,15 @@
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
-    "notFound": "Appareil recherché introuvable."
+    "notFound": "Appareil recherché introuvable.",
+    "pollFrequency": {
+      "label": "Fréquence de rafraîchissement",
+      "everyMinutes": "Toutes les minutes (recommandé)",
+      "every30Seconds": "Toutes les 30 secondes",
+      "every10Seconds": "Toutes les 10 secondes",
+      "every2Seconds": "Toutes les 2 secondes",
+      "every1Seconds": "Chaque seconde"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -1382,6 +1550,7 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
+    "stripeButton": "Gérer la facturation dans Stripe",
     "cardTypeLabel": "Type",
     "cardLastDigitsLabel": "4 derniers chiffres",
     "cardExpirationLabel": "Date d'expiration",

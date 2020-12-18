@@ -60,6 +60,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
+      color: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
     },
     {},
   );

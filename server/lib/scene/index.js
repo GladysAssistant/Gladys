@@ -16,12 +16,14 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
-const SceneManager = function SceneManager(stateManager, event, device, message, variable) {
+const SceneManager = function SceneManager(stateManager, event, device, message, variable, house, http) {
   this.stateManager = stateManager;
   this.event = event;
   this.device = device;
   this.message = message;
   this.variable = variable;
+  this.house = house;
+  this.http = http;
   this.scenes = {};
   this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore

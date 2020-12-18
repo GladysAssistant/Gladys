@@ -1,0 +1,72 @@
+name: Build Gladys amd64 images on PR
+
+on:
+  pull_request:
+    branches: [ master ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  build-front:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup nodejs
+        uses: actions/setup-node@v1
+        with:
+            node-version: 12.x
+      - run: cd front && npm install && npm run build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: static
+          path: front/build
+  docker:
+    needs: build-front
+    name: Build Gladys amd64 images
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download build artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: static
+    - name: Get PR number
+      run: |
+          set -vx
+          echo "PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')" >> $GITHUB_ENV
+    - name: Set up image tag
+      run: |
+          set -vx
+          echo "TAG=PR${PR_NUMBER}" >> $GITHUB_ENV
+    - name: Installing Docker
+      run: |
+        set -vx
+        # Install up-to-date version of docker, with buildx support.
+        docker_apt_repo='https://download.docker.com/linux/ubuntu'
+        curl -fsSL "${docker_apt_repo}/gpg" | sudo apt-key add -
+        os="$(lsb_release -cs)"
+        sudo add-apt-repository "deb [arch=amd64] $docker_apt_repo $os stable"
+        sudo apt-get update
+        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+        # Enable docker daemon experimental support (for 'pull --platform').
+        config='/etc/docker/daemon.json'
+        if [[ -e "$config" ]]; then
+          sudo sed -i -e 's/{/{ "experimental": true, /' "$config"
+        else
+          echo '{ "experimental": true }' | sudo tee "$config"
+        fi
+        sudo systemctl restart docker
+    - name: Build amd64 images for PR
+      run: |
+        set -vx
+        touch qemu-amd64-static
+        docker build -f ./docker/Dockerfile \
+          --build-arg TARGET=amd64 \
+          --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+          --build-arg VERSION=$PR_NUMBER \
+          .

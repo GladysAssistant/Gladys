@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 const ResetPassworFrom = ({ children, ...props }) => (
   <form onSubmit={props.resetPassword} className="card">
@@ -28,7 +29,7 @@ const ResetPassworFrom = ({ children, ...props }) => (
         <Localizer>
           <input
             type="password"
-            className={'form-control ' + (props.passwordError ? 'is-invalid' : '')}
+            className={cx('form-control', { 'is-invalid': props.passwordError })}
             placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
             value={props.password}
             onInput={props.updatePassword}
@@ -45,7 +46,7 @@ const ResetPassworFrom = ({ children, ...props }) => (
         <Localizer>
           <input
             type="password"
-            className={'form-control ' + (props.passwordError ? 'is-invalid' : '')}
+            className={cx('form-control', { 'is-invalid': props.passwordError })}
             placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
             value={props.passwordRepeat}
             onInput={props.updatePasswordRepeat}
