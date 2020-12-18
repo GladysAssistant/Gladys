@@ -1,10 +1,8 @@
 const { assert, fake } = require('sinon');
-const EventEmitter = require('events');
 
-const event = new EventEmitter();
 const NetatmoManager = require('../../../../../services/netatmo/lib');
 
-sensor = {
+const sensor = {
   id: 'netatmo:1234',
   name: 'test',
   should_poll: true,
@@ -19,7 +17,7 @@ sensor = {
     {
       name: 'test',
       selector: null,
-      external_id: 'netatmo:${sid}:camera',
+      external_id: 'netatmo:1234:camera',
       category: 'camera',
       type: 'image',
       read_only: false,
@@ -55,5 +53,5 @@ describe('netatmoManager AddSensor', () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     await netatmoManager.addSensor('1234', {});
     assert.called(gladys.event.emit);
-  })
+  });
 });

@@ -11,7 +11,7 @@ const DEFAULT = {
   ],
 };
 
-const NETATMO_VALUES ={
+const NETATMO_VALUES = {
   BATTERY: {
     VERY_LOW: 5,
     LOW: 25,

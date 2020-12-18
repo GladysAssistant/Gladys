@@ -1,5 +1,9 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
 
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
@@ -16,7 +20,7 @@ function newValueCamera(data) {
   logger.debug(`Netatmo : New camera, sid = ${sid}`);
   this.devices[sid] = data;
   // on crée le device caméra
-  if(data.type === 'NACamera'){
+  if (data.type === 'NACamera') {
     newCamera = {
       name: data.name,
       should_poll: true,
@@ -69,7 +73,7 @@ function newValueCamera(data) {
       logger.debug(`Netatmo : New Module Camera, sid = ${sidModule}`);
       this.devices[sidModule] = module;
       let newModuleCam;
-      if(module.type === 'NIS'){
+      if (module.type === 'NIS') {
         // si module sirène présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
@@ -108,7 +112,7 @@ function newValueCamera(data) {
           ],
         };
       }
-      if(module.type === 'NACamDoorTag'){
+      if (module.type === 'NACamDoorTag') {
         // si module Détecteur d'ouverture porte et fenêtre présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
@@ -150,7 +154,7 @@ function newValueCamera(data) {
       this.addSensor(sidModule, newModuleCam);
     });
   }
-  if(data.type === 'NOC'){      
+  if (data.type === 'NOC') {
     newCamera = {
       name: data.name,
       should_poll: true,
@@ -174,7 +178,7 @@ function newValueCamera(data) {
           keep_history: false,
           has_feedback: false,
           min: 0,
-          max: 0
+          max: 0,
         },
         {
           name: 'Light',
@@ -217,8 +221,8 @@ function newValueCamera(data) {
         {
           name: 'CAMERA_URL',
           value: `${data.homeStatus.vpn_url}/live/snapshot_720.jpg`,
-        }
-      ]
+        },
+      ],
     };
   }
   this.addSensor(sid, newCamera);

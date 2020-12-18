@@ -19,7 +19,7 @@ function newValueSmokeDetector(data) {
   const sid = data.id;
   logger.debug(`Netatmo : New Smoke Detector, sid = ${sid}`);
   this.devices[sid] = data;
-  
+
   const newSensor = {
     service_id: this.serviceId,
     name: data.name,

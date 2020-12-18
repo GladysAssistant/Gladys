@@ -1,7 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { CONFIGURATION } = require('../constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 /**
  * @description Connect.
  * @example

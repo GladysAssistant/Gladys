@@ -1,5 +1,9 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
 
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
@@ -16,7 +20,7 @@ function newValueValve(data) {
   logger.debug(`Netatmo : New valve, sid = ${sid}`);
   this.devices[sid] = data;
   // on crée le device de la vanne
-  if(data.type === 'NRV'){
+  if (data.type === 'NRV') {
     newValve = {
       name: data.name,
       should_poll: true,

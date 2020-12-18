@@ -325,8 +325,8 @@
         "configure": "Connect to Netatmo",
         "error": "Connection with Netatmo failed"
       },
-      "healthHomeCoach":{
-        "airQualityHealthIndex":{
+      "healthHomeCoach": {
+        "airQualityHealthIndex": {
           "healthy": "Healthy",
           "fine": "Fine",
           "fair": "Fair",

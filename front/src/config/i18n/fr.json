@@ -433,8 +433,8 @@
         "configure": "Connexion à Netatmo",
         "error": "La connexion à Netatmo a échoué"
       },
-      "healthHomeCoach":{
-        "airQualityHealthIndex":{
+      "healthHomeCoach": {
+        "airQualityHealthIndex": {
           "healthy": "Sain",
           "fine": "Agréable",
           "fair": "Acceptable",
