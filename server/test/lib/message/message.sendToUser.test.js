@@ -63,7 +63,7 @@ describe('message.sendToUser', () => {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       telegram_user_id: 'one-id',
     });
-    const promise = messageHandler.sendToUser('user-not-found', 'service-not-found'. 'coucou');
+    const promise = messageHandler.sendToUser('user-not-found', 'service-not-found', 'coucou');
     return assertChai.isRejected(promise);
   });
 });
