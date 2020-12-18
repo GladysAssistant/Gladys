@@ -102,7 +102,7 @@ const actionsFunc = {
     }),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    await self.message.sendToUser(action.user, action.text);
+    await self.message.sendToUser(action.user, action.service, action.text);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);

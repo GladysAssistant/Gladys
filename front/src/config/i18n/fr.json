@@ -360,6 +360,16 @@
       "apiKey": "Clé API du Bot Telegram",
       "saveButton": "Sauvegarder"
     },
+    "pushover": {
+      "title": "Pushover",
+      "description": "Recevez des notifications avec Pushover",
+      "introduction": "Pour connecter Gladys à Pushover, vous devez créer un compte et configurer une clé API.",
+      "note": "Ce lien est unique et spécifique à votre compte, ne le communiquez à personne.",
+      "configurationError": "Impossible de configurer le compte. Êtes vous certain que le jeton est valide?",
+      "apiKey": "Clé API",
+      "userKey": "Clé Utilisateur",
+      "saveButton": "Enregistrer"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Contrôler les lumières Philips Hue.",
@@ -752,6 +762,7 @@
       },
       "messageSend": {
         "userLabel": "Utilisateur",
+        "serviceLabel": "Un service",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message"
       },
