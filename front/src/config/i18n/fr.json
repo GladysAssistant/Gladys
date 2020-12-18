@@ -421,6 +421,7 @@
         "searchPlaceholder": "Chercher un appareil",
         "sidLabel": "SID Netatmo",
         "roomLabel": "Pièce",
+        "ipLabel": "Adresse IP",
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",

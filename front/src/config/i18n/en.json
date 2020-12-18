@@ -304,6 +304,7 @@
     },
     "netatmo": {
       "title": "Netatmo",
+      "description": "Control Netatmo Devices",
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
       "device": {
