@@ -4,7 +4,6 @@ const { ServiceNotConfiguredError, NoValuesFoundError } = require('../../utils/c
 const { INTENTS } = require('../../utils/constants');
 const { NoWeatherFoundError } = require('./weather.error');
 
-
 /**
  * @description Capitalize First Letter.
  * @param {string} string - The word.
@@ -15,7 +14,6 @@ const { NoWeatherFoundError } = require('./weather.error');
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
-
 
 /**
  * @description Get the weather in a text request.
@@ -35,47 +33,50 @@ async function command(message, classification, context) {
     }
     const weather = await this.get(house);
 
-    if(`intent.${classification.intent}` === INTENTS.WEATHER.GET){
+    if (`intent.${classification.intent}` === INTENTS.WEATHER.GET) {
       const dateEntity = classification.entities.find((entity) => entity.entity === 'date');
       // console.log(dateEntity);
 
-      if(dateEntity === undefined){
+      if (dateEntity === undefined) {
         // current day
         context.temperature = weather.temperature;
         context.units = weather.units === 'metric' ? '°C' : '°F';
 
         await this.messageManager.replyByIntent(message, `weather.get.success.now.${weather.weather}`, context);
-      }else{
+      } else {
         let diff;
-        if(dateEntity.resolution.type === 'interval'){
+        if (dateEntity.resolution.type === 'interval') {
           diff = dayjs(dateEntity.resolution.strFutureValue).diff(dayjs().startOf('day'), 'day');
-        }else{
+        } else {
           diff = dayjs(dateEntity.resolution.date).diff(dayjs().startOf('day'), 'day');
         }
         const weatherDay = weather.days[diff];
 
-        if(weatherDay !== undefined){
+        if (weatherDay !== undefined) {
           context.temperature_min = weatherDay.temperature_min;
           context.temperature_max = weatherDay.temperature_max;
           context.units = weather.units === 'metric' ? '°C' : '°F';
 
-          if(diff <= 2 ){
+          if (diff <= 2) {
             const days1 = ['today', 'tomorrow', 'after-tomorrow'];
             const day = days1[diff];
 
-            await this.messageManager.replyByIntent(message, `weather.get.success.${day}.${weatherDay.weather}`, context);
-          }else{
+            await this.messageManager.replyByIntent(
+              message,
+              `weather.get.success.${day}.${weatherDay.weather}`,
+              context,
+            );
+          } else {
             context.day = capitalizeFirstLetter(dateEntity.sourceText);
             await this.messageManager.replyByIntent(message, `weather.get.success.day.${weatherDay.weather}`, context);
           }
-        }else{
+        } else {
           throw new NoWeatherFoundError('weather for this day not found');
         }
       }
-    }else{
+    } else {
       throw new Error('Not found');
     }
-
   } catch (e) {
     logger.debug(e);
     if (e instanceof ServiceNotConfiguredError) {
