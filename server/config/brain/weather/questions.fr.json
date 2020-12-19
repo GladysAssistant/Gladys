@@ -1,28 +1,6 @@
 [
   {
     "label": "weather.get",
-    "questions": ["Quel temps fait-il ?", "Donne moi la météo"]
-  },
-  {
-    "label": "weather.tomorrow",
-    "questions": [
-      "Quel temps fait-il demain ?",
-      "Donne moi la météo pour demain",
-      "Quel temps fera t'il demain ?",
-      "Météo demain ?"
-    ]
-  },
-  {
-    "label": "weather.after-tomorrow",
-    "questions": [
-      "Quel temps fait-il après demain ?",
-      "Donne moi la météo pour après demain",
-      "Quel temps fera t'il après demain ?",
-      "Météo après demain ?"
-    ]
-  },
-  {
-    "label": "weather.day",
     "questions": [
       "Quel temps fait-il %day% ?",
       "Donne moi la météo pour %day%",

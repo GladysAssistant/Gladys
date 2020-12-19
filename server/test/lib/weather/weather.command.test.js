@@ -1,5 +1,6 @@
 const { fake, assert } = require('sinon');
 const EvenEmitter = require('events');
+const dayjs = require('dayjs');
 const Weather = require('../../../lib/weather');
 
 const event = new EvenEmitter();
@@ -125,7 +126,7 @@ describe('weather.command', () => {
     };
   });
 
-  it('should get the weather', async () => {
+  it('should get the current weather', async () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo ?',
@@ -134,11 +135,39 @@ describe('weather.command', () => {
       message,
       {
         intent: 'weather.get',
+        entities: []
       },
       {},
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.cloud', {
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.now.cloud', {
       temperature: 54.87,
+      units: '°C',
+    });
+  });
+  it('should get the weather for today', async () => {
+    const weather = new Weather(service, event, messageManager, houses);
+    const message = {
+      text: 'Meteo Today?',
+    };
+    await weather.command(
+        message,
+        {
+          intent: 'weather.get',
+          entities: [
+            {
+              entity: 'date',
+              resolution: {
+                type: 'date',
+                date: dayjs().toDate()
+              }
+            }
+          ]
+        },
+        {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.today.rain', {
+      temperature_max: 11,
+      temperature_min: 6,
       units: '°C',
     });
   });
@@ -150,13 +179,22 @@ describe('weather.command', () => {
     await weather.command(
       message,
       {
-        intent: 'weather.tomorrow',
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: dayjs().add(1, 'day').toDate()
+            }
+          }
+        ]
       },
       {},
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.tomorrow.success.rain', {
-      temperature_max: 11,
-      temperature_min: 6,
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.tomorrow.clear', {
+      temperature_max: 9,
+      temperature_min: 4,
       units: '°C',
     });
   });
@@ -168,13 +206,22 @@ describe('weather.command', () => {
     await weather.command(
       message,
       {
-        intent: 'weather.after-tomorrow',
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: dayjs().add(2, 'days').toDate()
+            }
+          }
+        ]
       },
       {},
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.after-tomorrow.success.clear', {
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.after-tomorrow.cloud', {
       temperature_max: 9,
-      temperature_min: 4,
+      temperature_min: 5,
       units: '°C',
     });
   });
@@ -187,15 +234,23 @@ describe('weather.command', () => {
     await weather.command(
       message,
       {
-        intent: 'weather.day',
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            sourceText: 'sunday',
+            resolution: {
+              type: 'interval',
+              strFutureValue: dayjs().add(4, 'days').toDate()
+            }
+          }
+        ]
       },
-      {
-        day: 'sunday',
-      },
+      {},
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.day.success.cloud', {
-      day: 'sunday',
-      temperature_max: 9,
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.day.rain', {
+      day: 'Sunday',
+      temperature_max: 6,
       temperature_min: 5,
       units: '°C',
     });
@@ -208,26 +263,39 @@ describe('weather.command', () => {
     await weather.command(
       message,
       {
-        intent: 'weather.day',
+        intent: 'weather.get',
+        entities: [],
       },
       {},
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail', {});
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.now.cloud', {
+      temperature: 54.87,
+      units: '°C',
+    });
   });
-  it("shouldn't get the weather without a good day", async () => {
+  it("shouldn't get the weather with a too far day", async () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
-      text: 'Meteo next december?',
+      text: 'Meteo next far day?',
     };
     await weather.command(
       message,
       {
-        intent: 'weather.day',
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            sourceText: 'sunday',
+            resolution: {
+              type: 'interval',
+              strFutureValue: dayjs().add(30, 'days').toDate()
+            }
+          }
+        ]
       },
       {
-        day: 'december',
       },
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail.no-weather', { day: 'december' });
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail.no-weather', {});
   });
 });
