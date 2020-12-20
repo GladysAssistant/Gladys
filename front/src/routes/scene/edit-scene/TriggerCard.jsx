@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import DeviceFeatureState from './triggers/DeviceFeatureState';
 import ScheduledTrigger from './triggers/ScheduledTrigger';
 import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
+import SunriseSunsetTrigger from './triggers/SunriseSunsetTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 
@@ -15,6 +16,8 @@ const TriggerCard = ({ children, ...props }) => (
     <div class="card-header">
       {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="fe fe-activity" />}
       {props.trigger.type === EVENTS.TIME.CHANGED && <i class="fe fe-watch" />}
+      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="fe fe-sunset" />}
+      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="fe fe-sunrise" />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
@@ -53,6 +56,23 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
+          houses={props.houses}
+        />
+      )}
+      {props.trigger.type === EVENTS.TIME.SUNRISE && (
+        <SunriseSunsetTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+          houses={props.houses}
+        />
+      )}
+      {props.trigger.type === EVENTS.TIME.SUNSET && (
+        <SunriseSunsetTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+          houses={props.houses}
         />
       )}
     </div>

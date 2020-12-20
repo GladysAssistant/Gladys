@@ -896,7 +896,9 @@
         "new-state": "Device state change"
       },
       "time": {
-        "changed": "Scheduled trigger"
+        "changed": "Scheduled trigger",
+        "sunrise": "Every sunrise",
+        "sunset": "Every sunset"
       }
     },
     "triggersCard": {
@@ -941,7 +943,8 @@
           "friday": "Friday",
           "saturday": "Saturday",
           "sunday": "Sunday"
-        }
+        },
+        "house": "House"
       }
     }
   },

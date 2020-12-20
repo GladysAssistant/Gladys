@@ -10,6 +10,7 @@ const { get } = require('./scene.get');
 const { getBySelector } = require('./scene.getBySelector');
 const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
+const { dailyUpdate } = require('./scene.dailyUpdate');
 
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
@@ -43,6 +44,7 @@ SceneManager.prototype.checkTrigger = checkTrigger;
 SceneManager.prototype.destroy = destroy;
 SceneManager.prototype.get = get;
 SceneManager.prototype.init = init;
+SceneManager.prototype.dailyUpdate = dailyUpdate;
 SceneManager.prototype.getBySelector = getBySelector;
 SceneManager.prototype.execute = execute;
 SceneManager.prototype.executeSingleAction = executeSingleAction;

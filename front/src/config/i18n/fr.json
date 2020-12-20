@@ -896,7 +896,9 @@
         "new-state": "Changement d'état de l'appareil"
       },
       "time": {
-        "changed": "Déclenchement programmé"
+        "changed": "Déclenchement programmé",
+        "sunrise": "A chaque levé de soleil",
+        "sunset": "A chaque couché de soleil"
       }
     },
     "triggersCard": {
@@ -941,7 +943,8 @@
           "friday": "Vendredi",
           "saturday": "Samedi",
           "sunday": "Dimanche"
-        }
+        },
+        "house": "Maison"
       }
     }
   },

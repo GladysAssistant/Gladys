@@ -70,6 +70,7 @@ const EditScenePage = ({ children, ...props }) => (
                 deleteTrigger={props.deleteTrigger}
                 updateTriggerProperty={props.updateTriggerProperty}
                 saving={props.saving}
+                houses={props.houses}
               />
             </div>
             <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
