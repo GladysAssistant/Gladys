@@ -1,7 +1,16 @@
+const db = require('../models');
+
 module.exports = {
-  up: async (queryInterface) => {
-    await queryInterface.sequelize.query(
-      "UPDATE t_service SET status='RUNNING' WHERE status='NOT_CONFIGURED' OR status='STOPPED'",
+  up: async () => {
+    await db.Service.update(
+      {
+        status: 'RUNNING',
+      },
+      {
+        where: {
+          status: ['NOT_CONFIGURED', 'STOPPED'],
+        },
+      },
     );
   },
   down: async () => {},
