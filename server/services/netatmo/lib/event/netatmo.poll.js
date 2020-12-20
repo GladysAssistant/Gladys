@@ -48,7 +48,7 @@ async function poll(device) {
       try{
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:battery`,
-          state: NETATMO_VALUES.BATTERY[this.devices[sid].homeStatus.battery_state.toUpperCase()]
+          state: NETATMO_VALUES.BATTERY[this.devices[sid].homeStatus.battery_state.toUpperCase()],
         });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:temperature`,
@@ -79,32 +79,36 @@ async function poll(device) {
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
     this.getDevices('camera');
     try {
-        // @ts-ignore
-        axios.get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'})
-        .then(response => {
-          const sharp = require('sharp');
-          sharp(response.data)
-            .rotate()
-            .resize(400)
-            .toBuffer()
-            .then( data => {
-              // eslint-disable-next-line no-undef
-              const b64encoded = btoa([].reduce.call(new Uint8Array(data), 
-                // eslint-disable-next-line func-names
+        axios
+          .get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'})
+          .then(response => {
+            const sharp = require('sharp');
+            sharp(response.data)
+              .rotate()
+              .resize(400)
+              .toBuffer()
+              .then( data => {
+                const btoa = require('btoa');
+                const b64encoded = btoa(
+                  [].reduce.call(
+                    new Uint8Array(data), 
                 function(p, c){ 
                   return p+String.fromCharCode(c); 
-                }, ''));
+                }, 
+                '',
+              ),
+              );
               const mimetype='image/jpeg';
               const base64image = `data:${mimetype};base64,${b64encoded}`;
               this.gladys.device.camera.setImage(device.selector, base64image);
             });
           })
-        .catch(error => {
-          logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${error}`);
-        });
+          .catch((error) => {
+            logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${error}`);
+          });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:power`,
-          state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].alim_status.toUpperCase()]
+          state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].alim_status.toUpperCase()],
         });
         if (this.devices[sid].type === 'NACamera') {
           this.devices[sid].modules.forEach((module) => {
@@ -118,11 +122,11 @@ async function poll(device) {
                 });
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:siren`,
-                  state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sidModule].status.toUpperCase()]
+                  state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sidModule].status.toUpperCase()],
                 });
               }
-            } catch (e) { 
-              logger.error(`Netatmo : File netatmo.poll.js - DoorTag - error : ${e}`); 
+            } catch (e) {
+              logger.error(`Netatmo : File netatmo.poll.js - DoorTag - error : ${e}`);
             }
             try {
             // on traite les données des détecteurs d'ouverture de porte/fenêtre intérieures
@@ -133,33 +137,33 @@ async function poll(device) {
                 });
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:doorTag`,
-                  state: NETATMO_VALUES.SECURITY.DOOR_TAG[this.devices[sidModule].status.toUpperCase()]
+                  state: NETATMO_VALUES.SECURITY.DOOR_TAG[this.devices[sidModule].status.toUpperCase()],
                 });
               }
-            } catch (e) { 
-              logger.error(`Netatmo : File netatmo.poll.js - DoorTag - error : ${e}`); 
+            } catch (e) {
+              logger.error(`Netatmo : File netatmo.poll.js - DoorTag - error : ${e}`);
             }
           });
         }
         if (this.devices[sid].type === 'NOC') {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${sid}:light`,
-            state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].light_mode_status.toUpperCase()]
+            state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[sid].light_mode_status.toUpperCase()],
           });
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${sid}:siren`,
-            state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sid].siren_status.toUpperCase()]
+            state: NETATMO_VALUES.SECURITY.SIREN[this.devices[sid].siren_status.toUpperCase()],
           });
         }
-      } catch (e) { 
-        logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${e}`); 
+      } catch (e) {
+        logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${e}`);
       }
     }
  
   // on traite les données des home coach
     if (this.devices[sid].type === 'NHC') {
       this.getDevices('homecoach');
-      try{
+      try {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:temperature`,
           state: this.devices[sid].dashboard_data.Temperature,
@@ -192,12 +196,12 @@ async function poll(device) {
           device_feature_external_id: `netatmo:${sid}:reachable`,
           state: this.devices[sid].reachable,
         });
-      } catch (e) { 
-        logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach - error : ${e}`); 
+      } catch (e) {
+        logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach - error : ${e}`);
       }
     }
-    
-  // on traite les données des stations météo
+
+    // on traite les données des stations météo
     if (this.devices[sid].type === 'NAMain') {
       this.getDevices('station');      
       try{
@@ -265,8 +269,8 @@ async function poll(device) {
                 state: this.devices[sidModule].reachable,
               });
             }
-          } catch (e) { 
-            logger.error(`Netatmo : File netatmo.poll.js - Rain - error : ${e}`); 
+          } catch (e) {
+            logger.error(`Netatmo : File netatmo.poll.js - Rain - error : ${e}`);
           }
           try {
             // on traite les données des anémomètres
@@ -304,8 +308,8 @@ async function poll(device) {
                 state: this.devices[sidModule].reachable,
               });
             }
-          } catch (e) { 
-            logger.error(`Netatmo : File netatmo.poll.js - Wind - error : ${e}`); 
+          } catch (e) {
+            logger.error(`Netatmo : File netatmo.poll.js - Wind - error : ${e}`);
           }
           if (module.data_type[0] !== 'Rain' && module.data_type[0] !== 'Wind') {
             try {
@@ -366,17 +370,17 @@ async function poll(device) {
                   state: this.devices[sidModule].reachable,
                 });
               }
-            } catch (e) { 
-              logger.error(`Netatmo : File netatmo.poll.js - Module - error : ${e}`); 
+            } catch (e) {
+              logger.error(`Netatmo : File netatmo.poll.js - Module - error : ${e}`);
             }
           }
         });
-      } catch (e) { 
-        logger.error(`Netatmo : File netatmo.poll.js - Weather - error : ${e}`); 
+      } catch (e) {
+        logger.error(`Netatmo : File netatmo.poll.js - Weather - error : ${e}`);
       }
     }
-  } catch (e) { 
-    logger.error(`Netatmo : File netatmo.poll.js - error : ${e}`); 
+  } catch (e) {
+    logger.error(`Netatmo : File netatmo.poll.js - error : ${e}`);
   }
 }
 

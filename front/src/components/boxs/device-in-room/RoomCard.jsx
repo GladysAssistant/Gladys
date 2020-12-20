@@ -1,3 +1,5 @@
+import cx from 'classnames';
+
 import DeviceRow from './DeviceRow';
 
 const RoomCard = ({ children, ...props }) => {
@@ -6,10 +8,7 @@ const RoomCard = ({ children, ...props }) => {
   }
 
   return (
-    <div
-      class={'card ' + (props.room.collapsed ? ' card-collapsed' : '')}
-      style="display: inline-block; min-width: 300px"
-    >
+    <div class={cx('card', { 'card-collapsed': props.room.collapsed })} style="display: inline-block; min-width: 300px">
       <div class="card-header">
         <h3 class="card-title">{props.room.name}</h3>
         <div class="card-options">

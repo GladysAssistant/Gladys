@@ -38,6 +38,7 @@ async function load(gladys) {
         const newServiceObject = this.servicesFromFiles[service](gladys, serviceInDb.id);
         // saving service in stateManager
         this.stateManager.setState('service', service, newServiceObject);
+        this.stateManager.setState('serviceById', serviceInDb.id, newServiceObject);
         if (newServiceObject.message && newServiceObject.message.send) {
           serviceToInsertOrUpdate.has_message_feature = true;
         }

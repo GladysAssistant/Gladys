@@ -32,5 +32,9 @@
   {
     "key": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg"
+  },
+  {
+    "key": "eWeLink",
+    "img": "/assets/integrations/cover/ewelink.jpg"
   }
 ]

@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
     "save": "Save"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
         "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editModeLabel": "Select display mode:",
+        "displayModes": {
+          "advancedWeather": "Humidity and wind speed",
+          "hourlyForecast": "Forecast for the next 8 hours",
+          "dailyForecast": "Forecast for the next 7 days"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -201,7 +209,7 @@
         "noTemperatureRecorded": "No temperature recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
@@ -233,6 +241,68 @@
         "weather": "Weather",
         "navigation": "navigation"
       }
+    },
+    "caldav": {
+      "title": "CalDAV",
+      "description": "Sync your CalDAV calendars.",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "hostLabel": "CalDAV host",
+      "hostInfo": "Choose your calendar host to be helped during configuration.",
+      "services": {
+        "apple": {
+          "name": "iCloud Calendar",
+          "url": "iCloud URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Apple ID",
+          "usernameInfo": "Enter your Apple ID.",
+          "password": "Password",
+          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "google": {
+          "name": "Google Calendar (deprecated)",
+          "url": "Google Calendar URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Email",
+          "usernameInfo": "Enter your Google email adress.",
+          "password": "Password",
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "synology": {
+          "name": "Synology Calendar",
+          "url": "Synology CalDAV URL",
+          "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
+          "username": "Synology username",
+          "usernameInfo": "Enter your username.",
+          "password": "Password",
+          "passwordInfo": "Enter your password."
+        },
+        "other": {
+          "name": "Other",
+          "url": "CalDAV URL",
+          "username": "CalDAV Username",
+          "password": "CalDAV Password"
+        }
+      },
+      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
+      "configurationSuccess": "Auto-configuration done.",
+      "configurationDefaultError": "An error occured during auto-configuration.",
+      "configurationError": "Check settings and CalDAV server status.",
+      "configurationBadCredentialsError": "Check your username/password.",
+      "configurationBadUrlError": "Check your CalDAV server URL.",
+      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
+      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
+      "cleanUpSuccess": "Clean up completed.",
+      "cleanUpError": "An error occured while trying clean up.",
+      "synchronizationSuccess": "Synchronization completed.",
+      "synchronizationDefaultError": "An error occured while trying synchronization.",
+      "synchronizationError": "Check CalDAV server state.",
+      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
+      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
+      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
+      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "buttonSave": "Save",
+      "buttonCleanUp": "Clean Up",
+      "buttonSync": "Sync now"
     },
     "telegram": {
       "title": "Telegram",
@@ -296,6 +366,7 @@
     },
     "netatmo": {
       "title": "Netatmo",
+      "description": "Control Netatmo Devices",
       "deviceTab": "Netatmo Devices",
       "settingTab": "Settings",
       "device": {
@@ -370,27 +441,52 @@
       "title": "Tasmota",
       "description": "Control your Tasmota devices.",
       "deviceTab": "Devices",
-      "discoverTab": "MQTT discover",
-      "discoverDeviceDescr": "Automatically scan MQTT devices",
+      "mqttDiscoverTab": "MQTT discover",
+      "httpDiscoverTab": "HTTP discover",
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Tasmota discover devices over MQTT",
-        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Tasmota devices.",
         "noDeviceFound": "No Tasmota device discovered.",
+        "error": "Error discovering Tasmota devices.",
         "documentation": "Tasmota documentation",
-        "scan": "Scan"
+        "mqtt": {
+          "title": "Tasmota discover devices over MQTT",
+          "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+          "scan": "Scan"
+        },
+        "http": {
+          "title": "Tasmota discover devices over HTTP",
+          "singleModeButton": "Single address scan",
+          "rangeModeButton": "Scan over IP range",
+          "singleAddressLabel": "IP address or hostname:",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "From:",
+          "lastAddressLabel": "To:",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Discover",
+          "usernameLabel": "Username",
+          "passwordLabel": "Password",
+          "needAuthenticationAlert": "The device is protected with username and password.",
+          "authenticateButton": "Connect and scan",
+          "authError": "Invalid username or password."
+        }
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Tasmota MQTT Topic",
+      "protocolLabels": {
+        "mqtt": "MQTT Topic",
+        "http": "HTTP identifier"
+      },
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
@@ -593,68 +689,6 @@
         "magnet": "Magnet Sensor"
       }
     },
-    "caldav": {
-      "title": "CalDAV",
-      "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "hostLabel": "CalDAV host",
-      "hostInfo": "Choose your calendar host to be helped during configuration.",
-      "services": {
-        "apple": {
-          "name": "iCloud Calendar",
-          "url": "iCloud URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
-          "username": "Apple ID",
-          "usernameInfo": "Enter your Apple ID.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
-        },
-        "google": {
-          "name": "Google Calendar (deprecated)",
-          "url": "Google Calendar URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
-          "username": "Email",
-          "usernameInfo": "Enter your Google email adress.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
-        },
-        "synology": {
-          "name": "Synology Calendar",
-          "url": "Synology CalDAV URL",
-          "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
-          "username": "Synology username",
-          "usernameInfo": "Enter your username.",
-          "password": "Password",
-          "passwordInfo": "Enter your password."
-        },
-        "other": {
-          "name": "Other",
-          "url": "CalDAV URL",
-          "username": "CalDAV Username",
-          "password": "CalDAV Password"
-        }
-      },
-      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
-      "configurationSuccess": "Auto-configuration done.",
-      "configurationDefaultError": "An error occured during auto-configuration.",
-      "configurationError": "Check settings and CalDAV server status.",
-      "configurationBadCredentialsError": "Check your username/password.",
-      "configurationBadUrlError": "Check your CalDAV server URL.",
-      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
-      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
-      "cleanUpSuccess": "Clean up completed.",
-      "cleanUpError": "An error occured while trying clean up.",
-      "synchronizationSuccess": "Synchronization completed.",
-      "synchronizationDefaultError": "An error occured while trying synchronization.",
-      "synchronizationError": "Check CalDAV server state.",
-      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
-      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
-      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
-      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
-      "buttonSave": "Save",
-      "buttonCleanUp": "Clean Up",
-      "buttonSync": "Sync now"
-    },
     "bluetooth": {
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices.",
@@ -699,6 +733,60 @@
           "cancelLabel": "Cancel",
           "successLabel": "Done"
         }
+      }
+    },
+    "eWeLink": {
+      "title": "eWeLink",
+      "description": "Control your eWeLink devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "eWeLink discover",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan eWeLink devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
+      "status": {
+        "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
+        "setupPageLink": "eWeLink configuration page."
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "search": "Search devices",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No eWeLink device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your eWeLink cloud account",
+        "description": "eWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "error": "Error discovering eWeLink devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No eWeLink device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "eWeLink configuration",
+        "eweLinkDescription": "You can connect Gladys to your eWeLink cloud account to command the associated devices.",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter eWeLink username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter eWeLink password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
+        "connected": "Connected to the eWeLink cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
       }
     }
   },
@@ -763,6 +851,28 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR"
+      },
+      "userPresence": {
+        "userLabel": "User",
+        "houseLabel": "House",
+        "userSeenDescription": "This action set the user as \"at home\".",
+        "userLeftHomeDescription": "This action set the user as \"left home\"."
+      },
+      "httpRequest": {
+        "description": "This action let you make HTTP requests.",
+        "methodLabel": "Method",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Name",
+        "headersValuePlaceholder": "Value"
       }
     },
     "actions": {
@@ -790,6 +900,13 @@
       },
       "condition": {
         "only-continue-if": "Only continue if"
+      },
+      "user": {
+        "set-seen-at-home": "User seen at home",
+        "set-out-of-home": "User left home"
+      },
+      "http": {
+        "request": "Make a HTTP request"
       }
     },
     "variables": {
@@ -817,7 +934,8 @@
         "different": "different",
         "valuePlaceholder": "Value",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -899,6 +1017,7 @@
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
+    "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Users",
     "gatewayOpenApiTab": "Open API"
@@ -917,6 +1036,47 @@
     "revoke": "Revoke",
     "unknowDevice": "Unknow device",
     "apiKey": "API Key"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Internal name: {{key}}",
+    "integrationLinkTitle": "Go to integration page",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Unknown",
+        "detail": "Service not found"
+      },
+      "DISABLED": {
+        "title": "Disabled",
+        "detail": "Service disabled"
+      },
+      "ENABLED": {
+        "title": "Enabled",
+        "detail": "Service enabled"
+      },
+      "RUNNING": {
+        "title": "Running",
+        "detail": "Service running"
+      },
+      "STOPPED": {
+        "title": "Stopped",
+        "detail": "Service stopped by user"
+      },
+      "NOT_CONFIGURED": {
+        "title": "Not configured",
+        "detail": "Service is not configured"
+      },
+      "ERROR": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      },
+      "LOADING": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -1278,7 +1438,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
+    "manageBilling": "To manage your billing, click ",
+    "here": "here"
   },
   "editDeviceForm": {
     "noName": "No name",
@@ -1300,7 +1461,15 @@
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-    "notFound": "Requested device not found."
+    "notFound": "Requested device not found.",
+    "pollFrequency": {
+      "label": "Refresh frequency",
+      "everyMinutes": "Every minutes",
+      "every30Seconds": "Every 30 seconds",
+      "every10Seconds": "Every 10 seconds",
+      "every2Seconds": "Every 2 seconds",
+      "every1Seconds": "Every second"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -1423,7 +1592,8 @@
     "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
     "cancelSubscriptionButton": "Cancel subscription",
     "accountCancelled": "Your account was canceled on {{date}}",
-    "subscriptionButton": "Subscribe again"
+    "subscriptionButton": "Subscribe again",
+    "stripeButton": "Edit subscription in Stripe"
   },
   "cardinalPoints": {
     "north": "↑ N (North)",

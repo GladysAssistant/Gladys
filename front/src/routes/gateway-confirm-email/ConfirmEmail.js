@@ -41,7 +41,7 @@ const ConfirmEmail = ({ children, ...props }) => (
                     </div>
 
                     <div class="form-footer">
-                      <a href={'/login?email=' + props.email} class="btn btn-primary btn-block">
+                      <a href={`/login?email=${props.email}`} class="btn btn-primary btn-block">
                         <Text id="forgotPassword.signIn" />
                       </a>
                     </div>

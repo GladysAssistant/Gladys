@@ -1,0 +1,19 @@
+{
+  "online": true,
+  "name": "Switch 3",
+  "deviceid": "10004533ae",
+  "apikey": "validApikey",
+  "extra": {
+    "extra": {
+      "uiid": 7,
+      "model": "PSA-BHA-GL"
+    }
+  },
+  "params": {
+    "fwVersion": "3.3.0"
+  },
+  "ip": "192.168.0.3",
+  "brandName": "Sonoff",
+  "productModel": "2CH",
+  "uiid": 7
+}

@@ -1,5 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { 
+  DEVICE_FEATURE_CATEGORIES, 
+  DEVICE_FEATURE_TYPES, 
+  DEVICE_FEATURE_UNITS, 
+  DEVICE_POLL_FREQUENCIES 
+} = require('../../../../utils/constants');
 
 /**
  * @description New value camera received.
@@ -139,7 +144,7 @@ function newValueCamera(data) {
       logger.debug(`Netatmo : New Module Camera, sid = ${sidModule}`);
       this.devices[sidModule] = module;
       let newModuleCam;
-      if(module.type === 'NIS'){
+      if (module.type === 'NIS') {
         // si module sirène présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,
@@ -178,7 +183,7 @@ function newValueCamera(data) {
           ],
         };
       }
-      if(module.type === 'NACamDoorTag'){
+      if (module.type === 'NACamDoorTag') {
         // si module Détecteur d'ouverture porte et fenêtre présent on crée le device
         newModuleCam = {
           service_id: this.serviceId,

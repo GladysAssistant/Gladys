@@ -2,10 +2,10 @@ const { assert } = require('chai');
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
-const PhilipsHueClient = require('../mocks.test');
+const { MockedPhilipsHueClient } = require('../mocks.test');
 
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
-  'node-hue-api': PhilipsHueClient,
+  'node-hue-api': MockedPhilipsHueClient,
 });
 
 const StateManager = require('../../../../lib/state');

@@ -60,8 +60,47 @@ class TasmotaDeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
-    const validModel = device.features.length > 0;
+  updateUsername = e => {
+    e.preventDefault();
+
+    this.setState({ username: e.target.value });
+  };
+
+  updatePassword = e => {
+    e.preventDefault();
+
+    this.setState({ password: e.target.value });
+  };
+
+  connectAndScan = async () => {
+    this.setState({
+      loading: true,
+      authErrorMessage: null
+    });
+    try {
+      const { device, httpClient } = this.props;
+      const { username, password } = this.state;
+      const options = {
+        singleAddress: device.external_id.replace('tasmota:', ''),
+        username,
+        password
+      };
+      await httpClient.post('/api/v1/service/tasmota/discover/http', options);
+    } catch (e) {
+      console.log(e);
+      this.setState({
+        authErrorMessage: 'integration.tasmota.discover.http.authError'
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
+
+  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
+    const validModel = device.features.length > 0 || device.needAuthentication;
+    // default value is 'mqtt'
+    const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
 
     return (
       <div class="col-md-6">
@@ -74,7 +113,59 @@ class TasmotaDeviceBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <div class="card-body">
+              {device.needAuthentication && (
+                <div class="card-body position-absolute w-100 h-100">
+                  <div class="alert alert-info">
+                    <Text id="integration.tasmota.discover.http.needAuthenticationAlert" />
+                  </div>
+
+                  {authErrorMessage && (
+                    <div class="alert alert-danger">
+                      <Text id={authErrorMessage} />
+                    </div>
+                  )}
+
+                  <div class="form-group">
+                    <label class="form-label" for={`username_${deviceIndex}`}>
+                      <Text id="integration.tasmota.discover.http.usernameLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id={`username_${deviceIndex}`}
+                        type="text"
+                        class="form-control"
+                        onInput={this.updateUsername}
+                        placeholder={<Text id="integration.tasmota.discover.http.usernameLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for={`password_${deviceIndex}`}>
+                      <Text id="integration.tasmota.discover.http.passwordLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id={`password_${deviceIndex}`}
+                        type="password"
+                        class="form-control"
+                        onInput={this.updatePassword}
+                        placeholder={<Text id="integration.tasmota.discover.http.passwordLabel" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="text-center">
+                    <button class="btn btn-primary mx-auto" onClick={this.connectAndScan}>
+                      <Text id="integration.tasmota.discover.http.authenticateButton" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div
+                class={cx('card-body', {
+                  invisible: device.needAuthentication
+                })}
+              >
                 {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />
@@ -125,18 +216,54 @@ class TasmotaDeviceBox extends Component {
 
                 <div class="form-group">
                   <label class="form-label" for={`topic_${deviceIndex}`}>
-                    <Text id="integration.tasmota.topicLabel" />
+                    <Text id={`integration.tasmota.protocolLabels.${deviceProtocol}`} />
                   </label>
-                  <Localizer>
-                    <input
-                      id={`topic_${deviceIndex}`}
-                      type="text"
-                      value={device.external_id.substring(8)}
-                      class="form-control"
-                      disabled="true"
-                    />
-                  </Localizer>
+                  <input
+                    id={`topic_${deviceIndex}`}
+                    type="text"
+                    value={device.external_id.substring(8)}
+                    class="form-control"
+                    disabled="true"
+                  />
                 </div>
+
+                {props.editButton && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.tasmota.device.protocolLabel" />
+                    </label>
+                    <div class="form-check form-check-inline">
+                      <label class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          name={`device-protocol-${deviceIndex}`}
+                          value="mqtt"
+                          checked={deviceProtocol === 'mqtt'}
+                          disabled
+                        />
+                        <div class="custom-control-label">
+                          <Text id="integration.tasmota.device.protocolMQTT" />
+                        </div>
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <label class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          name={`device-protocol-${deviceIndex}`}
+                          value="http"
+                          checked={deviceProtocol === 'http'}
+                          disabled
+                        />
+                        <div class="custom-control-label">
+                          <Text id="integration.tasmota.device.protocolHTTP" />
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 {device.features && device.features.length > 0 && (
                   <div class="form-group">

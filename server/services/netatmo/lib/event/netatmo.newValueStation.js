@@ -432,7 +432,7 @@ function newValueStation(data) {
         };
       }
     }
-    if (module.data_type.length === 3) {      
+    if (module.data_type.length === 3) {
       newSensor2 = {
         service_id: this.serviceId,
         name: module.module_name,

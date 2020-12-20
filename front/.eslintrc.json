@@ -6,7 +6,9 @@
     "preact-i18n/no-missing-template-field": "error",
     "preact-i18n/no-text-as-attribute": "error",
     "preact-i18n/no-text-as-children": "error",
-    "preact-i18n/no-unknown-key": "error"
+    "preact-i18n/no-unknown-key": "error",
+    "no-useless-concat": "error",
+    "prefer-template": "error"
   },
   "plugins": ["json", "preact-i18n"],
   "parserOptions": {

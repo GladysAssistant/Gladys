@@ -190,20 +190,6 @@ class UpdateDeviceFeature extends Component {
                       <Text id="deviceFeatureCategory.angle-sensor.decimal" />
                     </option>
                   </select>
-                  {/* <select
-                    id={`unit_${props.featureIndex}`}
-                    type="text"
-                    value={props.feature.unit}
-                    onChange={this.updateUnit}
-                    class="form-control"
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.DEGREE}>
-                      <Text id="deviceFeatureUnit.degree" />
-                    </option>
-                  </select> */}
                 </Localizer>
               </div>
             )}

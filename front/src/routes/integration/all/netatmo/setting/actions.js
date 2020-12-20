@@ -62,7 +62,7 @@ const createActions = store => {
             value: state.netatmoClientSecret
           });
         }
-        const result = await state.httpClient.post(`/api/v1/service/netatmo/connect`);
+        await state.httpClient.post(`/api/v1/service/netatmo/connect`);
         store.setState({
           connectNetatmoStatus: RequestStatus.Success
         });
@@ -91,13 +91,12 @@ const createActions = store => {
       );
     },
     displayNetatmoError(state) {
-      console.log('HERE')
       store.setState({
         netatmoConnectedMessage: false,
         netatmoConnectedError: true,
         connectNetatmoStatus: undefined
       });
-    },
+    }
   };
   return Object.assign({}, actions, integrationActions);
 };
