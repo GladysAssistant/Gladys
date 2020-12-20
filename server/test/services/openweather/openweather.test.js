@@ -172,7 +172,7 @@ describe('OpenWeatherService', () => {
   ];
 
   const days = [
-  {
+    {
       datetime: new Date('2020-11-16T11:00:00.000Z'),
       humidity: 54,
       pressure: 1021,
@@ -182,8 +182,8 @@ describe('OpenWeatherService', () => {
       weather: 'rain',
       wind_direction: 319,
       wind_speed: 7.08,
-  },
-  {
+    },
+    {
       datetime: new Date('2020-11-17T11:00:00.000Z'),
       humidity: 48,
       pressure: 1026,
