@@ -54,12 +54,12 @@ jobs:
           command: |
             sudo apt-get install -y libudev-dev sqlite3 openssl
       - run:
-          name: Install Openzwave 1.6 # Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
+          name: Install Openzwave 1.6 Rev 133 # Commit dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd - Novemeber, 12th 2020
           command: |
             cd /tmp
             git clone https://github.com/OpenZWave/open-zwave.git 
             cd open-zwave
-            git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5
+            git checkout dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd
             sudo make
             sudo make install
             sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openzwave.conf"
@@ -91,7 +91,7 @@ jobs:
           command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
   test-front:
     working_directory: ~/gladys-test/front # directory where steps will run
-    docker: # run the steps with Docker
+    docker: # run the steps with DockerInstall OZW 1.6 Rev 133- Commit dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd - November, 12th 2020
       - image: circleci/node:12
     steps: # a collection of executable commands
       - checkout:
