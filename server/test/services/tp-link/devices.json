@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Machine à café",
+    "service_id": "ae8f1100-730b-4757-a845-09685cc0e5d3",
+    "external_id": "tp-link:1234",
+    "selector": "tp-link:1234",
+    "model": "HS100(FR)",
+    "should_poll": true,
+    "poll_frequency": 60000,
+    "features": [
+      {
+        "name": "Machine à café On/Off",
+        "read_only": false,
+        "has_feedback": false,
+        "external_id": "tp-link:1234:binary",
+        "selector": "tp-link:1234:binary",
+        "category": "switch",
+        "type": "binary",
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "TP_LINK_IP_ADDRESS",
+        "value": "192.168.1.95"
+      },
+      {
+        "name": "TP_LINK_SERIAL_NUMBER",
+        "value": "1234"
+      }
+    ]
+  },
+  {
+    "id": "3b2e53e1-df01-45e5-ba98-720b1341f791",
+    "service_id": "ae8f1100-730b-4757-a845-09685cc0e5d3",
+    "room_id": "2398c689-8b47-43cc-ad32-e98d9be098b5",
+    "name": "Mock lb130",
+    "selector": "tp-link:1235",
+    "model": "LB130(US)",
+    "external_id": "tp-link:1235",
+    "should_poll": true,
+    "poll_frequency": 60000,
+    "created_at": "2020-11-21T13:55:56.556Z",
+    "updated_at": "2020-11-21T13:56:00.824Z",
+    "features": [
+      {
+        "id": "34111749-eaa7-4540-8a24-88997a8cf27b",
+        "device_id": "3b2e53e1-df01-45e5-ba98-720b1341f791",
+        "name": "Mock lb130 On/Off",
+        "selector": "tp-link:1235:binary",
+        "external_id": "tp-link:1235:binary",
+        "category": "light",
+        "type": "binary",
+        "read_only": false,
+        "keep_history": true,
+        "has_feedback": false,
+        "unit": null,
+        "min": 0,
+        "max": 1,
+        "last_value": 0,
+        "last_value_string": null,
+        "last_value_changed": "2020-11-21T13:56:52.059Z",
+        "created_at": "2020-11-21T13:55:56.563Z",
+        "updated_at": "2020-11-21T13:56:52.061Z"
+      }
+    ],
+    "params": [
+      {
+        "id": "c736a75f-fa1f-4421-8435-6cf371a18df8",
+        "device_id": "3b2e53e1-df01-45e5-ba98-720b1341f791",
+        "name": "TP_LINK_IP_ADDRESS",
+        "value": "192.168.1.100"
+      },
+      {
+        "id": "d467f0d9-fee9-4689-8264-629982ed6f3d",
+        "device_id": "3b2e53e1-df01-45e5-ba98-720b1341f791",
+        "name": "TP_LINK_SERIAL_NUMBER",
+        "value": "1235"
+      }
+    ],
+    "service": {
+      "id": "ae8f1100-730b-4757-a845-09685cc0e5d3",
+      "pod_id": null,
+      "name": "tp-link",
+      "selector": "tp-link",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-11-20T18:08:00.226Z",
+      "updated_at": "2020-11-24T07:35:17.020Z"
+    }
+  }
+]

@@ -471,6 +471,31 @@
         "conflictError": "Le topic actuel est déjà utilisé."
       }
     },
+    "tpLink": {
+      "title": "TP-Link",
+      "description": "Contrôler les lumières et prises TP-Link.",
+      "deviceTab": "Appareils",
+      "device": {
+        "title": "Appareils dans Gladys",
+        "nameLabel": "Nom",
+        "noNameLabel": "Pas de nom",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "search": "Recherche d'appareils",
+        "connectButton": "Connecter/Reconnecter",
+        "scanButton": "Recherche sur le réseau",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "noDevices": "Aucun appareil TP-Link ajouté.",
+        "deviceOnNetworkTitle": "Appareils détectés sur le réseau",
+        "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
+        "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un appareil TP-Link (lumière/prise) à votre réseau et qu'il soit allumé.",
+        "createGithubIssue": "Proposer ce périphérique",
+        "saveError": "Erreur lors de la sauvegarde, veuillez réessayer.",
+        "deleteError": "Erreur lors de la suppression, veuillez réessayer."
+      }
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
@@ -660,6 +685,60 @@
         "cube": "Contrôleur",
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
+      }
+    },
+    "eWeLink": {
+      "title": "eWeLink",
+      "description": "Contrôlez vos appareils eWeLink.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte eWeLink",
+      "setupTab": "Configuration",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils eWeLink",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
+        "setupPageLink": "page de configuration eWeLink."
+      },
+      "device": {
+        "title": "Appareils eWeLink dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil eWeLink trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud eWeLink",
+        "description": "Les appareils eWeLink sont automatiquement découverts. Vos appareils eWeLink doivent être ajoutés à votre compte cloud eWeLink avant.",
+        "error": "Erreur de découverte des appareils eWeLink. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil eWeLink n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration eWeLink",
+        "eweLinkDescription": "Vous pouvez connecter Gladys à votre compte cloud eWeLink pour commander les appareils associés.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur eWeLink",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur eWeLink",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
+        "connected": "Connexion réussie au compte cloud eWeLink !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     }
   },
