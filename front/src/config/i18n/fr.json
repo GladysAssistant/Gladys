@@ -990,10 +990,6 @@
         "title": "Arrêté",
         "detail": "Service arrêté par un utilisateur"
       },
-      "NOT_CONFIGURED": {
-        "title": "Non configuré",
-        "detail": "Service non configuré"
-      },
       "ERROR": {
         "title": "En erreur",
         "detail": "Service en erreur lors du démarrage."

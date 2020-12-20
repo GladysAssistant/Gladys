@@ -990,10 +990,6 @@
         "title": "Stopped",
         "detail": "Service stopped by user"
       },
-      "NOT_CONFIGURED": {
-        "title": "Not configured",
-        "detail": "Service is not configured"
-      },
       "ERROR": {
         "title": "Error",
         "detail": "Service failed to start."
