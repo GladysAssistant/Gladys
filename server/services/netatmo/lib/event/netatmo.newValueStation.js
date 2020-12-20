@@ -155,7 +155,6 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-wind',
         should_poll: false,
-        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Wind strength - ${moduleName}`,
@@ -271,7 +270,6 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-rain',
         should_poll: false,
-        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Rain - ${moduleName}`,
@@ -349,7 +347,6 @@ function newValueStation(data) {
           external_id: `netatmo:${sidModule}`,
           model: 'netatmo-station-outdoor',
           should_poll: false,
-          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
               name: `Temperature - ${moduleName}`,
@@ -440,7 +437,6 @@ function newValueStation(data) {
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-indoor',
         should_poll: false,
-        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Temperature - ${moduleName}`,

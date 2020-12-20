@@ -19,7 +19,7 @@ function newValueCamera(data) {
   logger.debug(`Netatmo : New camera, sid = ${sid}`);
   this.devices[sid] = data;
 
-  // on crée le device caméra
+  // we create the camera device
   if(data.type === 'NOC'){      
     newCamera = {
       name: data.name,
@@ -138,14 +138,14 @@ function newValueCamera(data) {
       ],
     };
     this.devices[sid].modules.forEach((module) => {
-      // si module de la camera "NACamera" présent
+      // if the "NACamera" camera module is present
       const sidModule = module.id;
       const moduleName = module.name;
       logger.debug(`Netatmo : New Module Camera, sid = ${sidModule}`);
       this.devices[sidModule] = module;
       let newModuleCam;
       if (module.type === 'NIS') {
-        // si module sirène présent on crée le device
+        // if siren module present, the device is created
         newModuleCam = {
           service_id: this.serviceId,
           name: `Siren - ${moduleName}`,
@@ -153,7 +153,6 @@ function newValueCamera(data) {
           external_id: `netatmo:${sidModule}`,
           model: `netatmo-sirene-${module.type}`,
           should_poll: false,
-          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
               name: `Battery - ${moduleName}`,
@@ -184,7 +183,7 @@ function newValueCamera(data) {
         };
       }
       if (module.type === 'NACamDoorTag') {
-        // si module Détecteur d'ouverture porte et fenêtre présent on crée le device
+        // if the Door and window opening detector module is present, the device is created
         newModuleCam = {
           service_id: this.serviceId,
           name: moduleName,
@@ -192,7 +191,6 @@ function newValueCamera(data) {
           external_id: `netatmo:${sidModule}`,
           model: `netatmo-${module.type}`,
           should_poll: false,
-          // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
           features: [
             {
               name: `Battery - ${moduleName}`,

@@ -13,7 +13,7 @@ async function poll(device) {
   const info = device.external_id.split('netatmo:');
   const sid = info[1];
   try{
-      // on traite les données des thermostats
+      // we process the data from the thermostats
       if (this.devices[sid].type === 'NATherm1') {
         this.getDevices('thermostat');
         try{
@@ -42,7 +42,7 @@ async function poll(device) {
         }
       }
 
-    // on traite les données des vannes
+    // we process the data from the valves
     if (this.devices[sid].type === 'NRV'){
       this.getDevices('valve');
       try{
@@ -75,7 +75,7 @@ async function poll(device) {
       }
     }
 
-  // on traite les données des cameras
+  // we process the data from the cameras
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
     this.getDevices('camera');
     try {
@@ -114,7 +114,7 @@ async function poll(device) {
           this.devices[sid].modules.forEach((module) => {
             const sidModule = module.id;
             try {
-              // on traite les données des sirènes intérieures
+              // we process the data of the indoor sirens
               if (this.devices[sidModule].type === 'NIS') {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:battery`,
@@ -129,7 +129,7 @@ async function poll(device) {
               logger.error(`Netatmo : File netatmo.poll.js - DoorTag - error : ${e}`);
             }
             try {
-            // on traite les données des détecteurs d'ouverture de porte/fenêtre intérieures
+            // we process the data from interior door / window opening detectors
               if (this.devices[sidModule].type === 'NACamDoorTag') {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:battery`,
@@ -160,7 +160,7 @@ async function poll(device) {
       }
     }
  
-  // on traite les données des home coach
+  // we process home coach data
     if (this.devices[sid].type === 'NHC') {
       this.getDevices('homecoach');
       try {
@@ -201,7 +201,7 @@ async function poll(device) {
       }
     }
 
-    // on traite les données des stations météo
+    // we process data from weather stations
     if (this.devices[sid].type === 'NAMain') {
       this.getDevices('station');      
       try{
@@ -241,12 +241,12 @@ async function poll(device) {
           device_feature_external_id: `netatmo:${sid}:reachable`,
           state: this.devices[sid].reachable,
         });     
-        // on traite les données des modules de la station météo
+        // we process the data of the weather station modules
         this.devices[sid].modules.forEach((module) => {
           /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
           const sidModule = module._id;
           try {
-            // on traite les données des pluviomètres
+            // we process the data from the rain gauges
             if (module.data_type[0] === 'Rain') {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${sidModule}:rain`,
@@ -273,7 +273,7 @@ async function poll(device) {
             logger.error(`Netatmo : File netatmo.poll.js - Rain - error : ${e}`);
           }
           try {
-            // on traite les données des anémomètres
+            // we process the data from the anemometers
             if (module.data_type[0] === 'Wind') {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${sidModule}:WindStrength`,
@@ -313,7 +313,7 @@ async function poll(device) {
           }
           if (module.data_type[0] !== 'Rain' && module.data_type[0] !== 'Wind') {
             try {
-              // on traite les données des hygromètres extérieurs
+              // we process the data from outdoor hygrometers
               if (module.data_type.length === 2) {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:temperature`,
@@ -339,7 +339,7 @@ async function poll(device) {
                   device_feature_external_id: `netatmo:${sidModule}:reachable`,
                   state: this.devices[sidModule].reachable,
                 });
-                // on traite les données des hygromètres intérieurs
+                // we process the data from indoor hygrometers
               } else if (module.data_type.length === 3) {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:temperature`,

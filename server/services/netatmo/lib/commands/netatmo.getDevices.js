@@ -9,7 +9,7 @@ const logger = require('../../../../utils/logger');
  */
 async function getDevices(type) {
   if (type === 'thermostat' || type === 'all') {
-    // on récupère les thermostats
+    // we get the thermostats
     const promiseThermostat = new Promise((resolve, reject) => {
       this.api.getThermostatsData((err, sensors) => {
         resolve(sensors);
@@ -19,7 +19,7 @@ async function getDevices(type) {
     sensors.forEach((sensor) => {
       sensor.modules.forEach((module) => {
         if (module.type === 'NATherm1') {
-          // note: "boiler_status": true  = Demande de chauffe = Allumage chaudière
+          // note: "boiler_status": true = Heating request = Boiler ignition
           this.newValueThermostat(module);
         } else {
           logger.info(module);
@@ -29,7 +29,7 @@ async function getDevices(type) {
   }
   
   if (type === 'camera' || type === 'all') {
-    // on récupère les maisons du Netatmo Security
+    // we get the houses of Netatmo Security
     const promiseGetHomeData = new Promise((resolve, reject) => {
       this.api.getHomeData((err, data) => {
         resolve(data.homes);
@@ -37,7 +37,7 @@ async function getDevices(type) {
     });
     const homes = await promiseGetHomeData;
     homes.forEach((home) => {
-      // puis on récupère les caméras
+      // then we get the cameras
       home.cameras.forEach((camera) => {
           this.newValueCamera(camera);
       });
@@ -45,7 +45,7 @@ async function getDevices(type) {
   }
 
   if (type === 'valve' || type === 'room' || type === 'smokedetector' || type === 'all') {
-    // on récupère les maisons du Netatmo Energy
+    // we get the houses of Netatmo Energy
     const promiseHomeData = new Promise((resolve, reject) => {
       this.api.homesData((err, data) => {
         resolve(data.homes);
@@ -67,18 +67,18 @@ async function getDevices(type) {
       /* const smokedetectors=[]; */
       const valves=[];
       home.modules.forEach((module) => {
-        // on récupère la 1ère partie des détecteurs de fumée - pas de données intéressantes pour le moment - en attente maj API Netatmo car données disponible sur https://dev.netatmo.com/apidocumentation/energy
+        // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         /* if (module.type === 'NSD') {
           smokedetectors[smokedetectors.length+1] = [module];
         } */
-        // puis on récupère la 1ère partie des vannes
+        // then we get the 1st part of the valves
         if (module.type === 'NRV') {
           valves[valves.length+1] = [module];
         }
       });
       homeStatus.modules.forEach((module) => {
 
-        // puis on récupère la 2ème partie des détecteurs de fumée - pas de données intéressantes pour le moment - en attente maj API Netatmo car données disponible sur https://dev.netatmo.com/apidocumentation/energy
+        // then we get the 2nd part of the smoke detectors - no interesting data for the moment - pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
         /* if (module.type === 'NSD') {
           smokedetectors.forEach((smokedetector) => {
             if (smokedetector[0].id === module.id) {
@@ -88,7 +88,7 @@ async function getDevices(type) {
           });
         } */
 
-        // puis on récupère la 2ème partie des vannes
+        // then we get the 2nd part of the valves
         if (module.type === 'NRV') {
           valves.forEach((valve) => {
             if (valve[0].id === module.id) {
@@ -98,7 +98,7 @@ async function getDevices(type) {
         }
       });
       homeStatus.rooms.forEach((room) => {
-        // puis on récupère la 3ème partie des vannes
+        // then we get the 3rd part of the valves
         valves.forEach((valve) => {
           if (valve[0].room_id === room.id) {
             valve[0]['room'] = room;
@@ -110,7 +110,7 @@ async function getDevices(type) {
   }
 
   if (type === 'station' || type === 'all') {
-    // on récupère les stations
+    // we get the weather stations
     const promiseGetStationsData = new Promise((resolve, reject) => {
       this.api.getStationsData((err, data) => {
         resolve(data);
@@ -123,7 +123,7 @@ async function getDevices(type) {
   }
 
   if (type === 'homecoach' || type === 'all') {
-    // on récupère les homeCoachs
+    // we get the les homeCoachs
     const promiseGetHomecoachsData = new Promise((resolve, reject) => {
       this.api.getHealthyHomeCoachData((err, data) => {
         resolve(data);
