@@ -124,7 +124,8 @@
       [
         {
           "type": "devices-in-room",
-          "room": "kitchen"
+          "room": "kitchen",
+          "device_features": ["main-presence-sensor"]
         }
       ]
     ],
@@ -376,6 +377,18 @@
             "read_only": true,
             "last_value": 340,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "Presence",
+            "selector": "main-presence-sensor",
+            "category": "presence-sensor",
+            "type": "push",
+            "unit": null,
+            "min": 0,
+            "max": 1,
+            "read_only": true,
+            "last_value": 0,
+            "last_value_changed": "2020-12-20 13:49:07.556 +01:00"
           },
           {
             "name": "Kitchen door",

@@ -1238,6 +1238,10 @@
       "push": "Motion (push)",
       "binary": "Motion (binary)"
     },
+    "presence-sensor": {
+      "shortCategoryName": "Presence sensor",
+      "push": "Presence"
+    },
     "light-sensor": {
       "shortCategoryName": "Luminosity sensor",
       "integer": "Luminosity (integer)",

@@ -8,7 +8,12 @@ dayjs.extend(relativeTime);
 
 import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
-const SPECIAL_SENSORS = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR];
+const SPECIAL_SENSORS = [
+  DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR
+];
+const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
@@ -51,7 +56,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value === 0 && <i class="fe fe-shield-off" />}
       </td>
     )}
-    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
+    {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (
       <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value_changed })}>
         {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value_changed &&
