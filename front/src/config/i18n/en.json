@@ -1275,7 +1275,8 @@
       "temperature": "Light Temperature",
       "power": "Light Power consumption",
       "effect-mode": "Effect mode",
-      "effect-speed": "Effect speed"
+      "effect-speed": "Effect speed",
+      "string": "Light mode On/Off/Auto"
     },
     "battery": {
       "shortCategoryName": "Battery",
@@ -1287,7 +1288,8 @@
     },
     "setpoint": {
       "shortCategoryName": "Setpoint",
-      "decimal": "Temperature"
+      "decimal": "Setpoint temperature",
+      "string": "Setpoint mode"
     },
     "motion-sensor": {
       "shortCategoryName": "Motion sensor",
@@ -1464,7 +1466,11 @@
     "notFound": "Requested device not found.",
     "pollFrequency": {
       "label": "Refresh frequency",
-      "everyMinutes": "Every minutes",
+      "everyHours": "Every hours",
+      "every30Minutes": "Every 30 minutes",
+      "every10Minutes": "Every 10 minutes",
+      "every5Minutes": "Every 5 minutes (recommended for some device)",
+      "everyMinutes": "Every minutes (recommended)",
       "every30Seconds": "Every 30 seconds",
       "every10Seconds": "Every 10 seconds",
       "every2Seconds": "Every 2 seconds",

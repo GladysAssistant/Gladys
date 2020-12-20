@@ -1275,7 +1275,8 @@
       "temperature": "Température éclairage",
       "power": "Puissance consommée éclairage",
       "effect-mode": "Effet",
-      "effect-speed": "Vitesse de l'effet"
+      "effect-speed": "Vitesse de l'effet",
+      "string": "Mode d'éclairage On/Off/Auto"
     },
     "battery": {
       "shortCategoryName": "Batterie",
@@ -1286,8 +1287,9 @@
       "decimal": "Température"
     },
     "setpoint": {
-      "shortCategoryName": "Setpoint",
-      "decimal": "Setpoint"
+      "shortCategoryName": "Consigne",
+      "decimal": "Température de consigne",
+      "string": "Mode de consigne"
     },
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
@@ -1464,6 +1466,10 @@
     "notFound": "Appareil recherché introuvable.",
     "pollFrequency": {
       "label": "Fréquence de rafraîchissement",
+      "everyHours": "Toutes les heures",
+      "every30Minutes": "Toutes les 30 minutes",
+      "every10Minutes": "Toutes les 10 minutes",
+      "every5Minutes": "Toutes les 5 minutes (recommandé pour certains équipements)",
       "everyMinutes": "Toutes les minutes (recommandé)",
       "every30Seconds": "Toutes les 30 secondes",
       "every10Seconds": "Toutes les 10 secondes",

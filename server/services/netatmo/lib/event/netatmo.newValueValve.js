@@ -73,12 +73,10 @@ function newValueValve(data) {
           selector: `netatmo:${sid}:therm_setpoint_mode`,
           external_id: `netatmo:${sid}:therm_setpoint_mode`,
           category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
-          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          type: DEVICE_FEATURE_TYPES.SENSOR.STRING,
           read_only: true,
           keep_history: true,
           has_feedback: true,
-          min: -20,
-          max: 60,
         },
         {
           name: `Heating power request - ${data.name}`,
