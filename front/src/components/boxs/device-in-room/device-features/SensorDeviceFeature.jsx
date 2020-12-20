@@ -25,7 +25,7 @@ const SPECIAL_SENSORS_TYPE = [DEVICE_FEATURE_CATEGORIES.SWITCH.BINARY];
 const SPECIAL_SENSORS_CATEGORY_TYPE = [
   DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, 
   DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER, 
-  DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SENSOR.INTEGER
+  DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SENSOR.STRING
 ];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
@@ -151,7 +151,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         </td>
       )}
       {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT &&
-        props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.INTEGER && (
+        props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
         <td class="text-right">
           {props.deviceFeature.last_value !== null && <Text id={`integration.netatmo.DeviceFeatureValues.energy.setpointmode.${props.deviceFeature.last_value}`} />}
           {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}     

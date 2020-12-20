@@ -77,6 +77,8 @@ function newValueValve(data) {
           read_only: true,
           keep_history: true,
           has_feedback: true,
+          min: 0,
+          max: 0
         },
         {
           name: `Heating power request - ${data.name}`,

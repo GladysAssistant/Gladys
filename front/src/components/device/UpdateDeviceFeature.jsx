@@ -63,7 +63,7 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && props.feature.type !== DEVICE_FEATURE_TYPES.SENSOR.STRING && (
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${props.featureIndex}`}>
                   <Text id="editDeviceForm.unitLabel" />
@@ -89,7 +89,7 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT && (
+            {props.feature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT && props.feature.type !== DEVICE_FEATURE_TYPES.SENSOR.STRING && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${props.featureIndex}`}>
                   <Text id="editDeviceForm.unitLabel" />
