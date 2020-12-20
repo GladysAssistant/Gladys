@@ -14,6 +14,7 @@ class UpdateDeviceFeature extends Component {
   updateMin = e => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
+  updateType = e => this.props.updateFeatureProperty(this.props.featureIndex, 'type', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
   render(props, {}) {
@@ -189,7 +190,7 @@ class UpdateDeviceFeature extends Component {
                       <Text id="deviceFeatureCategory.angle-sensor.decimal" />
                     </option>
                   </select>
-                  <select
+                  {/* <select
                     id={`unit_${props.featureIndex}`}
                     type="text"
                     value={props.feature.unit}
@@ -202,7 +203,7 @@ class UpdateDeviceFeature extends Component {
                     <option value={DEVICE_FEATURE_UNITS.DEGREE}>
                       <Text id="deviceFeatureUnit.degree" />
                     </option>
-                  </select>
+                  </select> */}
                 </Localizer>
               </div>
             )}

@@ -16,7 +16,7 @@ const NETATMO_VALUES ={
     VERY_LOW: 5,
     LOW: 25,
     ADETERMINER1: 50,
-    ADETERMINER3: 75,
+    HIGH: 75,
     FULL: 100,
   },
   SECURITY: {
@@ -45,6 +45,11 @@ const NETATMO_VALUES ={
       MANUAL: 1,
       HG: 2, // Hors Gel
       AWAY: 3, // Absent
+      PROGRAM: 4,
+    },
+    HEATING_REQ: {
+      0: 0,
+      100: 1,
     },
   },
 };

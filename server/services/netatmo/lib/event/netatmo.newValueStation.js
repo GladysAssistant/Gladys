@@ -1,11 +1,5 @@
 const logger = require('../../../../utils/logger');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../../utils/constants');
-
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value stations received.
@@ -26,7 +20,7 @@ function newValueStation(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-station',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES,
     features: [
       {
         name: `Temperature - ${data.station_name}`,
@@ -146,7 +140,6 @@ function newValueStation(data) {
       },
     ],
   };
-  this.addSensor(sid, newSensor);
 
   this.devices[sid].modules.forEach((module) => {
     const sidModule = module._id;
@@ -161,8 +154,8 @@ function newValueStation(data) {
         selector: `netatmo:${sidModule}`,
         external_id: `netatmo:${sidModule}`,
         model: 'netatmo-station-wind',
-        should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        should_poll: false,
+        // poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         features: [
           {
             name: `Wind strength - ${moduleName}`,
@@ -183,6 +176,7 @@ function newValueStation(data) {
             external_id: `netatmo:${sidModule}:WindAngle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
             type: DEVICE_FEATURE_TYPES.SENSOR.STRING,
+            unit: DEVICE_FEATURE_UNITS.DEGREE,
             read_only: true,
             keep_history: true,
             has_feedback: true,
@@ -208,6 +202,7 @@ function newValueStation(data) {
             external_id: `netatmo:${sidModule}:GustAngle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
             type: DEVICE_FEATURE_TYPES.SENSOR.STRING,
+            unit: DEVICE_FEATURE_UNITS.DEGREE,
             read_only: true,
             keep_history: true,
             has_feedback: true,
@@ -233,6 +228,7 @@ function newValueStation(data) {
             external_id: `netatmo:${sidModule}:max_wind_angle`,
             category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
             type: DEVICE_FEATURE_TYPES.SENSOR.STRING,
+            unit: DEVICE_FEATURE_UNITS.DEGREE,
             read_only: true,
             keep_history: true,
             has_feedback: true,
@@ -541,6 +537,7 @@ function newValueStation(data) {
     }
     this.addSensor(sidModule, newSensor2);
   });
+  this.addSensor(sid, newSensor);
 }
 
 module.exports = {

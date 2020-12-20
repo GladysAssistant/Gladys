@@ -1,7 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
-
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value valve received.
@@ -20,7 +18,7 @@ function newValueValve(data) {
     newValve = {
       name: data.name,
       should_poll: true,
-      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_2_MINUTES,
       external_id: `netatmo:${sid}`,
       selector: `netatmo:${sid}`,
       service_id: this.serviceId,

@@ -28,7 +28,7 @@ const createActions = store => {
         });
       }
     },
-    updateConfigration(state, e) {
+    updateConfiguration(state, e) {
       const data = {};
       data[e.target.name] = e.target.value;
       if (e.target.name === 'netatmoPassword') {

@@ -325,6 +325,36 @@
         "configure": "Connect to Netatmo",
         "error": "Connection with Netatmo failed"
       },
+      "DeviceFeatureValues":{
+        "security": {
+          "status": {
+            "0": "Off",
+            "1": "On"
+          },
+          "light": {
+            "0": "Off",
+            "1": "On",
+            "2": "Auto"
+          },
+          "siren": {
+            "0": "volume-x",
+            "1": "volume-2"
+          }
+        },
+        "ENERGY": {
+          "SETPOINT_MODE": {
+            "0": "Schedule",
+            "1": "Manual",
+            "2": "Frost free",
+            "3": "Away",
+            "4": "Program"
+          },
+          "HEATING_REQ": {
+            "0": "0",
+            "1": "100"
+          }
+        }
+      },
       "healthHomeCoach":{
         "airQualityHealthIndex":{
           "healthy": "Healthy",

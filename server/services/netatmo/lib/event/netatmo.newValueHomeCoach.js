@@ -1,11 +1,5 @@
 const logger = require('../../../../utils/logger');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../../utils/constants');
-
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value homecoachs received.
@@ -26,7 +20,7 @@ function newValueHomeCoach(data) {
     external_id: `netatmo:${sid}`,
     model: 'netatmo-home-coachs',
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES,
     features: [
       {
         name: `Temperature - ${data.station_name}`,

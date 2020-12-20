@@ -1,11 +1,5 @@
 const logger = require('../../../../utils/logger');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../../utils/constants');
-
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value thermostat received.
@@ -21,7 +15,7 @@ function newValueThermostat(data) {
   this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
-    name: data.name,
+    name: data.module_name,
     selector: `netatmo:${sid}`,
     external_id: `netatmo:${sid}`,
     model: 'netatmo-thermostat',
@@ -29,7 +23,7 @@ function newValueThermostat(data) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     features: [
       {
-        name: `Temperature - ${data.name}`,
+        name: `Temperature - ${data.module_name}`,
         selector: `netatmo:${sid}:temperature`,
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -42,7 +36,7 @@ function newValueThermostat(data) {
         max: 60,
       },
       {
-        name: `Battery - ${data.name}`,
+        name: `Battery - ${data.module_name}`,
         selector: `netatmo:${sid}:battery`,
         external_id: `netatmo:${sid}:battery`,
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -55,9 +49,9 @@ function newValueThermostat(data) {
         max: 100,
       },
       {
-        name: `Setpoint - ${data.name}`,
-        selector: `netatmo:${sid}:setpoint`,
-        external_id: `netatmo:${sid}:setpoint`,
+        name: `Setpoint temperature - ${data.module_name}`,
+        selector: `netatmo:${sid}:therm_setpoint_temperature`,
+        external_id: `netatmo:${sid}:therm_setpoint_temperature`,
         category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -67,7 +61,37 @@ function newValueThermostat(data) {
         min: -20,
         max: 60,
       },
+      {
+        name: `Setpoint mode - ${data.module_name}`,
+        selector: `netatmo:${sid}:therm_setpoint_mode`,
+        external_id: `netatmo:${sid}:therm_setpoint_mode`,
+        category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: -20,
+        max: 60,
+      },
+      {
+        name: `Heating power request - ${data.module_name}`,
+        selector: `netatmo:${sid}:heating_power_request`,
+        external_id: `netatmo:${sid}:heating_power_request`,
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: 0,
+        max: 1,
+      },
     ],
+    params: [
+      {
+        name: `Programs Thermostat ${data.module_name}`,
+        value: JSON.stringify(this.devices[sid].therm_program_list),
+      }
+    ]
   };
   this.addSensor(sid, newSensor);
 }

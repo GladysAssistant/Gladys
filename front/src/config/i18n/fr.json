@@ -433,6 +433,36 @@
         "configure": "Connexion à Netatmo",
         "error": "La connexion à Netatmo a échoué"
       },
+      "DeviceFeatureValues":{
+        "security": {
+          "status": {
+            "0": "Off",
+            "1": "On"
+          },
+          "light": {
+            "0": "Off",
+            "1": "On",
+            "2": "Auto"
+          },
+          "siren": {
+            "0": "volume-x",
+            "1": "volume-2"
+          }
+        },
+        "energy": {
+          "setpointmode": {
+            "0": "Programme",
+            "1": "Manuel Boost",
+            "2": "Hors-gel",
+            "3": "Absent",
+            "4": "Programme"
+          },
+          "HEATING_REQ": {
+            "0": "0",
+            "1": "100"
+          }
+        }
+      },
       "healthHomeCoach":{
         "airQualityHealthIndex":{
           "healthy": "Sain",

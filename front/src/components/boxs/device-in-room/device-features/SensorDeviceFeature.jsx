@@ -1,3 +1,4 @@
+/* eslint-disable preact-i18n/no-unknown-key */
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
@@ -15,7 +16,7 @@ import {
 
 const SPECIAL_SENSORS_CATEGORY = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR, DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_CATEGORIES.INDEX];
 const SPECIAL_SENSORS_TYPE = [DEVICE_FEATURE_CATEGORIES.SWITCH.BINARY];
-const SPECIAL_SENSORS_CATEGORY_TYPE = [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER];
+const SPECIAL_SENSORS_CATEGORY_TYPE = [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER, DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SENSOR.INTEGER];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
@@ -92,14 +93,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value === -1 || props.deviceFeature.last_value === null && (<span class="badge badge-dark"><Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.null" /></span>)}       
       </td> 
     )}
-    {/*props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.INDEX &&
-      props.deviceFeature.type === DEVICE_FEATURE_TYPES.INDEX.INTEGER && (
-      <td class="text-right">
-              {props.deviceFeature.last_value === 1 && <i class="fe fe-power" />}
-              {props.deviceFeature.last_value === 0 && <i class="fe fe-zap-off" />}
-      </td>
-      )*/}
-    {/*{props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
+    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
       props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL && (
         <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
           {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
@@ -108,7 +102,7 @@ const SensorDeviceType = ({ children, ...props }) => (
             <span> {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}</span>
           )}
         </td>
-      )}*/}
+      )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
       props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
         <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
@@ -117,6 +111,15 @@ const SensorDeviceType = ({ children, ...props }) => (
           )}
           {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         </td>
+      )}
+      {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT &&
+        props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.INTEGER && (
+        <td class="text-right">
+        {console.log(`integration.netatmo.DeviceFeatureValues.energy.setpointmode.${props.deviceFeature.last_value},0`)}
+        {console.log(`${<Text id={`integration.netatmo.DeviceFeatureValues.energy.setpointmode.${props.deviceFeature.last_value},0`} />}`)}
+          {props.deviceFeature.last_value !== null && <Text id={`integration.netatmo.DeviceFeatureValues.energy.setpointmode.${props.deviceFeature.last_value}`} />}
+          {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}     
+        </td> 
       )}
   </tr>
 );

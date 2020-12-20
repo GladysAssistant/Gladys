@@ -27,7 +27,7 @@ async function getDevices(type) {
     });
   }
   
-  if (type === 'camera' || type === 'smokedetector' || type === 'all') {
+  if (type === 'camera' || type === 'all') {
     // on récupère les maisons du Netatmo Security
     const promiseGetHomeData = new Promise((resolve, reject) => {
       this.api.getHomeData((err, data) => {
@@ -38,14 +38,8 @@ async function getDevices(type) {
     homes.forEach((home) => {
       // puis on récupère les caméras
       home.cameras.forEach((camera) => {
-        if (camera.type === 'NACamera') {
           this.newValueCamera(camera);
-        }
       });
-      // puis on récupère les détecteurs de fumée (possible de le récupérer par là.)
-      /* home.smokedetectors.forEach((smokedetector) => {
-        this.newValueSmokeDetector(smokedetector);
-      }); */
     });
   }
 
@@ -69,49 +63,41 @@ async function getDevices(type) {
     });
     const homeStatus = await promiseHomeStatus;
     
-    const camerasNOC=[];
-    const smokedetectors=[];
+    /* const smokedetectors=[]; */
     const valves=[];
     home.modules.forEach((module) => {
-      if (module.type === 'NOC') {
-        camerasNOC[camerasNOC.length+1] = [module];
-      }
-      if (module.type === 'NSD') {
+      // on récupère la 1ère partie des détecteurs de fumée - pas de données intéressantes pour le moment - en attente maj API Netatmo car données disponible sur https://dev.netatmo.com/apidocumentation/energy
+      /* if (module.type === 'NSD') {
         smokedetectors[smokedetectors.length+1] = [module];
-      }
+      } */
+      // puis on récupère la 1ère partie des vannes
       if (module.type === 'NRV') {
         valves[valves.length+1] = [module];
       }
     });
     homeStatus.modules.forEach((module) => {
-      // puis on récupère les détecteurs de fumée
-      if (module.type === 'NSD') {
+
+      // puis on récupère la 2ème partie des détecteurs de fumée - pas de données intéressantes pour le moment - en attente maj API Netatmo car données disponible sur https://dev.netatmo.com/apidocumentation/energy
+      /* if (module.type === 'NSD') {
         smokedetectors.forEach((smokedetector) => {
           if (smokedetector[0].id === module.id) {
-            smokedetector[0]['homeStatus'] = [module];
+            smokedetector[0]['homeStatus'] = module;
             this.newValueSmokeDetector(smokedetector[0]);
           }
         });
-      }
-      // puis on récupère les caméras NOC
-      if (module.type === 'NOC') {
-        camerasNOC.forEach((cameraNOC) => {
-          if (cameraNOC[0].id === module.id) {
-            cameraNOC[0]['homeStatus'] = [module];
-            this.newValueCamera(cameraNOC[0]);
-          }
-        });
-      }
+      } */
+
+      // puis on récupère la 2ème partie des vannes
       if (module.type === 'NRV') {
         valves.forEach((valve) => {
           if (valve[0].id === module.id) {
-            valve[0]['homeStatus'] = [module];
+            valve[0]['homeStatus'] = module;
           }
         });
       }
     });
     homeStatus.rooms.forEach((room) => {
-      // puis on récupère les vannes
+      // puis on récupère la 3ème partie des vannes
       valves.forEach((valve) => {
         if (valve[0].room_id === room.id) {
           valve[0]['room'] = room;

@@ -12,13 +12,39 @@ async function poll(device) {
   const axios = require('axios');
   const info = device.external_id.split('netatmo:');
   const sid = info[1];
-  
   try{
-    // on traite les données des cameras
+      // on traite les données des thermostats
+      if (this.devices[sid].type === 'NATherm1') {
+        this.getDevices('thermostat');
+        try{
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sid}:battery`,
+            state: this.devices[sid].battery_percent,
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sid}:temperature`,
+            state: this.devices[sid].measured.temperature,
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sid}:therm_setpoint_temperature`,
+            state: this.devices[sid].measured.setpoint_temp,
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sid}:therm_setpoint_mode`,
+            state: NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[sid].setpoint.setpoint_mode.toUpperCase()]
+          });
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `netatmo:${sid}:heating_power_request`,
+            state: NETATMO_VALUES.ENERGY.HEATING_REQ[this.devices[sid].therm_relay_cmd]
+          });
+        } catch (e) { 
+          logger.error(`Netatmo : File netatmo.poll.js - Thermostat - error : ${e}`); 
+        }
+      }
+
+    // on traite les données des vannes
     if (this.devices[sid].type === 'NRV'){
       this.getDevices('valve');
-      console.log("Valve");
-      console.log(this.devices[sid]);
       try{
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:battery`,
@@ -33,7 +59,7 @@ async function poll(device) {
           state: this.devices[sid].room.therm_setpoint_temperature,
         });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `netatmo:${sid}:setpoint`,
+          device_feature_external_id: `netatmo:${sid}:therm_setpoint_mode`,
           state: NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[sid].room.therm_setpoint_mode.toUpperCase()]
         });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -42,12 +68,8 @@ async function poll(device) {
         });
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:reachable`,
-          state: this.devices[sid].room.reachable,
+          state: this.devices[sid].homeStatus.reachable,
         });
-        
-        /* const RoomID = device.external_id.split('-')[device.external_id.split('-').length];
-        console.log("'RoomID'");
-        console.log(RoomID); */
       } catch (e) { 
         logger.error(`Netatmo : File netatmo.poll.js - Valve - error : ${e}`); 
       }
@@ -57,6 +79,7 @@ async function poll(device) {
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
     this.getDevices('camera');
     try {
+        // @ts-ignore
         axios.get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'})
         .then(response => {
           const sharp = require('sharp');
@@ -65,7 +88,12 @@ async function poll(device) {
             .resize(400)
             .toBuffer()
             .then( data => {
-              const b64encoded = btoa([].reduce.call(new Uint8Array(data), function(p, c){ return p+String.fromCharCode(c); }, ''));
+              // eslint-disable-next-line no-undef
+              const b64encoded = btoa([].reduce.call(new Uint8Array(data), 
+                // eslint-disable-next-line func-names
+                function(p, c){ 
+                  return p+String.fromCharCode(c); 
+                }, ''));
               const mimetype='image/jpeg';
               const base64image = `data:${mimetype};base64,${b64encoded}`;
               this.gladys.device.camera.setImage(device.selector, base64image);
@@ -83,7 +111,7 @@ async function poll(device) {
             const sidModule = module.id;
             try {
               // on traite les données des sirènes intérieures
-              if (this.devices[sidModule].type === 'NIS' && device.external_id === `netatmo:${module.id}`) {
+              if (this.devices[sidModule].type === 'NIS') {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:battery`,
                   state: this.devices[sidModule].battery_percent,
@@ -98,7 +126,7 @@ async function poll(device) {
             }
             try {
             // on traite les données des détecteurs d'ouverture de porte/fenêtre intérieures
-              if (this.devices[sidModule].type === 'NACamDoorTag' && device.external_id === `netatmo:${module.id}`) {
+              if (this.devices[sidModule].type === 'NACamDoorTag') {
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                   device_feature_external_id: `netatmo:${sidModule}:battery`,
                   state: this.devices[sidModule].battery_percent,
@@ -127,28 +155,7 @@ async function poll(device) {
         logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${e}`); 
       }
     }
-
-  // on traite les données des thermostats
-    if (this.devices[sid].type === 'NATherm1') {
-      this.getDevices('thermostat');
-      try{
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `netatmo:${sid}:battery`,
-          state: this.devices[sid].battery_percent,
-        });
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `netatmo:${sid}:temperature`,
-          state: this.devices[sid].measured.temperature,
-        });
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `netatmo:${sid}:setpoint`,
-          state: this.devices[sid].measured.setpoint_temp,
-        });
-      } catch (e) { 
-        logger.error(`Netatmo : File netatmo.poll.js - Thermostat - error : ${e}`); 
-      }
-    }
-  
+ 
   // on traite les données des home coach
     if (this.devices[sid].type === 'NHC') {
       this.getDevices('homecoach');
@@ -192,7 +199,7 @@ async function poll(device) {
     
   // on traite les données des stations météo
     if (this.devices[sid].type === 'NAMain') {
-      this.getDevices('station');
+      this.getDevices('station');      
       try{
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:temperature`,
@@ -229,7 +236,8 @@ async function poll(device) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:reachable`,
           state: this.devices[sid].reachable,
-        });
+        });     
+        // on traite les données des modules de la station météo
         this.devices[sid].modules.forEach((module) => {
           /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
           const sidModule = module._id;

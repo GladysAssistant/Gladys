@@ -29,7 +29,7 @@ const SetupTab = ({ children, ...props }) => {
             class="form-control"
             name="netatmoUsername"
             value={props.netatmoUsername}
-            onInput={props.updateConfigration}
+            onInput={props.updateConfiguration}
             placeholder={<Text id="integration.netatmo.setting.usernamePlaceholder" />}
           />
         </div>
@@ -42,7 +42,7 @@ const SetupTab = ({ children, ...props }) => {
             class="form-control"
             name="netatmoPassword"
             value={props.netatmoPassword}
-            onInput={props.updateConfigration}
+            onInput={props.updateConfiguration}
             placeholder={<Text id="integration.netatmo.setting.passwordPlaceholder" />}
           />
         </div>
@@ -55,7 +55,7 @@ const SetupTab = ({ children, ...props }) => {
             class="form-control"
             name="netatmoClientId"
             value={props.netatmoClientId}
-            onInput={props.updateConfigration}
+            onInput={props.updateConfiguration}
             placeholder={<Text id="integration.netatmo.setting.clientIdPlaceholder" />}
           />
         </div>
@@ -68,7 +68,7 @@ const SetupTab = ({ children, ...props }) => {
             class="form-control"
             name="netatmoClientSecret"
             value={props.netatmoClientSecret}
-            onInput={props.updateConfigration}
+            onInput={props.updateConfiguration}
             placeholder={<Text id="integration.netatmo.setting.clientSecretPlaceholder" />}
           />
         </div>

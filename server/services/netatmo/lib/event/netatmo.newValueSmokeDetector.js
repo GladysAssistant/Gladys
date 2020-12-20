@@ -1,11 +1,7 @@
-const logger = require('../../../../utils/logger');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../../utils/constants');
+// Non utilisé pour le moment car pas de données intéressantes - en attente maj API Netatmo, données déjà disponibles sur https://dev.netatmo.com/apidocumentation/energy
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 
 /**
  * @description New value smoke detector received.
@@ -15,7 +11,6 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
  * });
  */
 function newValueSmokeDetector(data) {
-  /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data.id;
   logger.debug(`Netatmo : New Smoke Detector, sid = ${sid}`);
   this.devices[sid] = data;
