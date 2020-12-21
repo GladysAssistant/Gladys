@@ -508,7 +508,6 @@
         "externalIdLabel": "Feature external ID",
         "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
-        "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
@@ -1199,13 +1198,27 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
-    "percent": "%",
-    "ppm": "ppm"
+    "percent": "Percent (%)",
+    "pascal": "Pascal (Pa)",
+    "lux": "Lux",
+    "watt": "Watt (W)",
+    "kilowatt": "Kilowatt (kW)",
+    "kilowatt-hour": "Kilowatt per hour (kW/h)",
+    "ampere": "Ampere (A)",
+    "volt": "Volt (V)",
+    "ppm": "Parts per million (ppm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
     "percent": "%",
+    "pascal": "Pa",
+    "lux": "lx",
+    "watt": "W",
+    "kilowatt": "KW",
+    "kilowatt-hour": "kW/h",
+    "ampere": "A",
+    "volt": "V",
     "ppm": "ppm"
   },
   "deviceFeatureCategory": {
