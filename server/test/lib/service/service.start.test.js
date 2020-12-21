@@ -75,7 +75,7 @@ describe('service.start', () => {
     assert.calledOnce(serviceImpl.start);
   });
 
-  it('should fail starting a service (dut to config), and set status to NOT_CONFIGURED', async () => {
+  it('should fail starting a service (dut to config), and set status to RUNNING', async () => {
     serviceImpl.start = fake.rejects(new ServiceNotConfiguredError('error'));
 
     const result = await service.start(serviceName);
@@ -86,8 +86,8 @@ describe('service.start', () => {
       },
     });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.NOT_CONFIGURED);
-    expect(result.status).eq(SERVICE_STATUS.NOT_CONFIGURED);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.RUNNING);
+    expect(result.status).eq(SERVICE_STATUS.RUNNING);
     assert.calledOnce(serviceImpl.start);
   });
 
