@@ -1,5 +1,8 @@
 import Select from 'react-select';
+import Tags from '@yaireo/tagify/dist/react.tagify';
+import '@yaireo/tagify/dist/tagify.css';
 import { Component } from 'preact';
+import get from 'get-value';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
@@ -60,6 +63,23 @@ class SendMessageParams extends Component {
     this.refreshSelectedOptions(nextProps);
   }
   render(props, { selectedOption, userOptions }) {
+    const variableWhileList = [];
+
+    props.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
+      actionGroup.forEach((action, index) => {
+        if (this.props.variables[groupIndex][index]) {
+          this.props.variables[groupIndex][index].forEach(option => {
+            variableWhileList.push({
+              id: `${groupIndex + 1}. ${option.label}`,
+              text: `${groupIndex + 1}. ${option.label}`,
+              title: `${groupIndex + 1}. ${option.label}`,
+              value: `${groupIndex}.${index}.${option.name}`
+            });
+          });
+        }
+      });
+    });
+    console.log(variableWhileList);
     return (
       <div>
         <div class="form-group">
@@ -86,6 +106,35 @@ class SendMessageParams extends Component {
               placeholder={<Text id="editScene.actionsCard.messageSend.textPlaceholder" />}
             />
           </Localizer>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="editScene.actionsCard.messageSend.textLabel" />{' '}
+            <span class="form-required">
+              <Text id="global.requiredField" />
+            </span>
+          </label>
+          {variableWhileList && variableWhileList.length > 0 && (
+            <Tags
+              InputMode="textarea"
+              onChange={console.log}
+              onInput={e => console.log(e.detail)}
+              settings={{
+                mode: 'mix',
+                pattern: /{{/,
+                duplicates: true,
+                enforceWhitelist: true,
+                tagTextProp: 'text',
+                dropdown: {
+                  enabled: 1,
+                  position: 'text',
+                  mapValueTo: 'title'
+                },
+                whitelist: variableWhileList,
+                mixTagsInterpolator: ['{{', '}}']
+              }}
+            />
+          )}
         </div>
       </div>
     );

@@ -118,6 +118,8 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
