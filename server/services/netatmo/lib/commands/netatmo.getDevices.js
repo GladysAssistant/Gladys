@@ -9,39 +9,12 @@ const logger = require('../../../../utils/logger');
  */
 async function getDevices(type) {
   if (type === 'thermostat' || type === 'all') {
-    // we get the thermostats
-    const promiseThermostat = new Promise((resolve, reject) => {
-      this.api.getThermostatsData((err, sensors) => {
-        resolve(sensors);
-      });
-    });
-    const sensors = await promiseThermostat;
-    sensors.forEach((sensor) => {
-      sensor.modules.forEach((module) => {
-        if (module.type === 'NATherm1') {
-          // note: "boiler_status": true = Heating request = Boiler ignition
-          this.newValueThermostat(module);
-        } else {
-          logger.info(module);
-        }
-      });
-    });
+    this.getThermostatsData();
   }
-  
+
   if (type === 'camera' || type === 'all') {
     // we get the houses of Netatmo Security
-    const promiseGetHomeData = new Promise((resolve, reject) => {
-      this.api.getHomeData((err, data) => {
-        resolve(data.homes);
-      });
-    });
-    const homes = await promiseGetHomeData;
-    homes.forEach((home) => {
-      // then we get the cameras
-      home.cameras.forEach((camera) => {
-          this.newValueCamera(camera);
-      });
-    });
+    this.getHomeData();
   }
 
   if (type === 'valve' || type === 'room' || type === 'smokedetector' || type === 'all') {
@@ -63,7 +36,7 @@ async function getDevices(type) {
         });
       });
       const homeStatus = await promiseHomeStatus;
-      
+
       /* let smokedetectors=[]; */
       let valves=[];
       home.modules.forEach((module) => {
@@ -72,20 +45,20 @@ async function getDevices(type) {
           smokedetectors = module;
           const indexSmokedetectorsHomeStatus = homeStatus.modules.findIndex((element) => element.id === smokedetectors.id);
           const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) => element.id === smokedetectors.room_id);
-          
+
           // then we get the 2nd part of the smoke detectors - no interesting data for the moment - pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
           smokedetectors['homeStatus'] = homeStatus.modules[indexValveHomeStatus];
           // then we get the 3rd part of the smoke detectors : rooms
           smokedetectors['room'] = homeStatus.rooms[indexRoomHomeStatus];
           this.newValueSmokeDetector( smokedetectors);
         } */
-        
+
         if (module.type === 'NRV') {
           // then we get the 1st part of the valves
-          valves = module; 
+          valves = module;
           const indexValveHomeStatus = homeStatus.modules.findIndex((element) => element.id === valves.id);
           const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) => element.id === valves.room_id);
-          
+
           // then we get the 2nd part of the valves
           valves['homeStatus'] = homeStatus.modules[indexValveHomeStatus];
           // then we get the 3rd part of the valves : rooms
@@ -98,28 +71,12 @@ async function getDevices(type) {
 
   if (type === 'station' || type === 'all') {
     // we get the weather stations
-    const promiseGetStationsData = new Promise((resolve, reject) => {
-      this.api.getStationsData((err, data) => {
-        resolve(data);
-      });
-    });
-    const stations = await promiseGetStationsData;
-    stations.forEach((station) => {
-      this.newValueStation(station);
-    });
+    this.getStationsData()
   }
 
   if (type === 'homecoach' || type === 'all') {
     // we get the les homeCoachs
-    const promiseGetHomecoachsData = new Promise((resolve, reject) => {
-      this.api.getHealthyHomeCoachData((err, data) => {
-        resolve(data);
-      });
-    });
-    const homecoachs = await promiseGetHomecoachsData;
-    homecoachs.forEach((homecoach) => {
-      this.newValueHomeCoach(homecoach);
-    });
+    this.getHealthyHomeCoachData()
   }
 }
 
