@@ -18,9 +18,9 @@ async function getStationsData() {
       this.newValueStation(station);
     });
   })
-  .catch(() => {
-    logger.info('Erreur getStationsData')
-  })
+  .catch((err) => {
+    logger.info(`Error on getStationsData - ${err}`);
+  });
 }
 
 module.exports = {

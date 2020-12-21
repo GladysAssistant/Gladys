@@ -72,6 +72,9 @@ class UpdateDeviceForm extends Component {
               <option value={DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES}>
                 <Text id="editDeviceForm.pollFrequency.every5Minutes" />
               </option>
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_2_MINUTES}>
+                <Text id="editDeviceForm.pollFrequency.every2Minutes" />
+              </option>
               <option value={DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}>
                 <Text id="editDeviceForm.pollFrequency.everyMinutes" />
               </option>

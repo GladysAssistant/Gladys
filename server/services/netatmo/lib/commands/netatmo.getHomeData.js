@@ -7,7 +7,7 @@ const logger = require('../../../../utils/logger');
  * getHomeData();
  */
 async function getHomeData() {
-  // we get the thermostats
+  // we get the cameras
   new Promise((resolve, reject) => {
     this.api.getHomeData((err, data) => {
       resolve(data.homes);
@@ -15,15 +15,14 @@ async function getHomeData() {
   })
   .then((homes) => {
     homes.forEach((home) => {
-      // then we get the cameras
       home.cameras.forEach((camera) => {
         this.newValueCamera(camera);
       });
     });
   })
-  .catch(() => {
-    logger.info('Aucune camera')
-  })
+  .catch((err) => {
+    logger.info(`Error on getHomeData (camera) - ${err}`);
+  });
 }
 
 module.exports = {

@@ -7,20 +7,20 @@ const logger = require('../../../../utils/logger');
  * getHealthyHomeCoachData();
  */
 async function getHealthyHomeCoachData() {
-  // we get the thermostats
+  // we get the les homeCoachs
   new Promise((resolve, reject) => {
     this.api.getHealthyHomeCoachData((err, data) => {
       resolve(data);
     });
   })
   .then((homeCoaches) => {
-    homecoachs.forEach((homecoach) => {
+    homeCoaches.forEach((homecoach) => {
       this.newValueHomeCoach(homecoach);
     });
   })
-  .catch(() => {
-    logger.info('Erreur getHealthyHomeCoachData')
-  })
+  .catch((err) => {
+    logger.info(`Error on getHealthyHomeCoachData - ${err}`);
+  });
 }
 
 module.exports = {

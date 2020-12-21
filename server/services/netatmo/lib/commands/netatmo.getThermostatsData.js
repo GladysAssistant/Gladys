@@ -25,9 +25,9 @@ async function getThermostatsData() {
       });
     });
   })
-  .catch(() => {
-    logger.warning('Erreur getThermostatData')
-  })
+  .catch((err) => {
+    logger.info(`Error on getThermostatData - ${err}`);
+  });
 }
 
 module.exports = {

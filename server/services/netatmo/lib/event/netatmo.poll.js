@@ -15,7 +15,7 @@ async function poll(device) {
   try{
       // we process the data from the thermostats
       if (this.devices[sid].type === 'NATherm1') {
-        this.getDevices('thermostat');
+        this.getThermostatsData();
         try{
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${sid}:battery`,
@@ -44,7 +44,7 @@ async function poll(device) {
 
     // we process the data from the valves
     if (this.devices[sid].type === 'NRV'){
-      this.getDevices('valve');
+      this.getHomeStatusData();
       try{
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:battery`,
@@ -77,7 +77,7 @@ async function poll(device) {
 
   // we process the data from the cameras
   if (this.devices[sid].type === 'NACamera' || this.devices[sid].type === 'NOC') {
-    this.getDevices('camera');
+    this.getHomeData();
     try {
         axios
           .get(`${this.devices[sid].vpn_url}/live/snapshot_720.jpg`, {responseType: 'arraybuffer'})
@@ -162,7 +162,7 @@ async function poll(device) {
  
   // we process home coach data
     if (this.devices[sid].type === 'NHC') {
-      this.getDevices('homecoach');
+      this.getHealthyHomeCoachData();
       try {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:temperature`,
@@ -203,7 +203,7 @@ async function poll(device) {
 
     // we process data from weather stations
     if (this.devices[sid].type === 'NAMain') {
-      this.getDevices('station');      
+      this.getStationsData();   
       try{
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${sid}:temperature`,

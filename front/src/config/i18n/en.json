@@ -1470,11 +1470,12 @@
       "every30Minutes": "Every 30 minutes",
       "every10Minutes": "Every 10 minutes",
       "every5Minutes": "Every 5 minutes (recommended for some device)",
+      "every2Minutes": "Every 2 minutes",
       "everyMinutes": "Every minutes (recommended)",
       "every30Seconds": "Every 30 seconds",
       "every10Seconds": "Every 10 seconds",
-      "every2Seconds": "Every 2 seconds",
-      "every1Seconds": "Every second"
+      "every2Seconds": "Every 2 seconds (not recommended)",
+      "every1Seconds": "Every second (not recommended)"
     }
   },
   "gatewaySignup": {

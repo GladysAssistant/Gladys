@@ -36,7 +36,7 @@ async function connect() {
     // socket listening on error event
     await this.errorHandler()
 
-    this.getDevices('all');
+    this.getDevices();
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
     });

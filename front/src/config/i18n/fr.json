@@ -1470,11 +1470,12 @@
       "every30Minutes": "Toutes les 30 minutes",
       "every10Minutes": "Toutes les 10 minutes",
       "every5Minutes": "Toutes les 5 minutes (recommandé pour certains équipements)",
+      "every2Minutes": "Toutes les 2 minutes",
       "everyMinutes": "Toutes les minutes (recommandé)",
       "every30Seconds": "Toutes les 30 secondes",
       "every10Seconds": "Toutes les 10 secondes",
-      "every2Seconds": "Toutes les 2 secondes",
-      "every1Seconds": "Chaque seconde"
+      "every2Seconds": "Toutes les 2 secondes (déconseillé)",
+      "every1Seconds": "Chaque seconde (déconseillé)"
     }
   },
   "gatewaySignup": {
