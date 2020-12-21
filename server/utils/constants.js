@@ -257,7 +257,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
-  ACCESS_CONTROl: 'access-control',
+  ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
   UNKNOWN: 'unknown',
