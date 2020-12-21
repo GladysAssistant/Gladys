@@ -28,7 +28,6 @@ const SERVICE_STATUS = {
   RUNNING: 'RUNNING',
   STOPPED: 'STOPPED',
   ERROR: 'ERROR',
-  NOT_CONFIGURED: 'NOT_CONFIGURED',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -255,6 +254,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',

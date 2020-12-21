@@ -124,7 +124,8 @@
       [
         {
           "type": "devices-in-room",
-          "room": "kitchen"
+          "room": "kitchen",
+          "device_features": ["main-presence-sensor"]
         }
       ]
     ],
@@ -376,6 +377,18 @@
             "read_only": true,
             "last_value": 340,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "Presence",
+            "selector": "main-presence-sensor",
+            "category": "presence-sensor",
+            "type": "push",
+            "unit": null,
+            "min": 0,
+            "max": 1,
+            "read_only": true,
+            "last_value": 0,
+            "last_value_changed": "2020-12-20 13:49:07.556 +01:00"
           },
           {
             "name": "Kitchen door",
@@ -1124,7 +1137,7 @@
       "selector": "telegram",
       "version": "0.1.0",
       "has_message_feature": true,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.053Z",
       "updated_at": "2020-10-30T07:44:07.518Z"
     },
@@ -1168,7 +1181,7 @@
       "selector": "zwave",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.056Z",
       "updated_at": "2020-10-30T07:44:07.594Z"
     },
@@ -1223,7 +1236,7 @@
       "selector": "openweather",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-08-19T13:04:57.309Z",
       "updated_at": "2020-10-30T07:44:07.814Z"
     },
