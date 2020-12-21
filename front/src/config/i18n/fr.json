@@ -442,7 +442,7 @@
         "configure": "Connexion à Netatmo",
         "error": "La connexion à Netatmo a échoué"
       },
-      "DeviceFeatureValues":{
+      "DeviceFeatureValues": {
         "security": {
           "status": {
             "0": "Off",
@@ -472,8 +472,8 @@
           }
         }
       },
-      "healthHomeCoach":{
-        "airQualityHealthIndex":{
+      "healthHomeCoach": {
+        "airQualityHealthIndex": {
           "healthy": "Sain",
           "fine": "Agréable",
           "fair": "Acceptable",
