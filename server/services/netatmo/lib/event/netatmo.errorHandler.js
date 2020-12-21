@@ -11,7 +11,7 @@ async function errorHandler() {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
     });
-    console.log(error)
+    logger.debug(error);
     logger.debug(`NETATMO threw an error login`);
   });
 }

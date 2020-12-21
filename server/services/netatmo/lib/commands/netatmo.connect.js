@@ -34,7 +34,7 @@ async function connect() {
     this.api = new this.Netatmo(auth);
 
     // socket listening on error event
-    await this.errorHandler()
+    await this.errorHandler();
 
     this.getDevices();
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

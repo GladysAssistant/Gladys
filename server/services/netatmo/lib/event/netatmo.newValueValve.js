@@ -1,9 +1,9 @@
 const logger = require('../../../../utils/logger');
-const { 
-  DEVICE_FEATURE_CATEGORIES, 
-  DEVICE_FEATURE_TYPES, 
-  DEVICE_FEATURE_UNITS, 
-  DEVICE_POLL_FREQUENCIES 
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 
 /**
@@ -78,7 +78,7 @@ function newValueValve(data) {
           keep_history: true,
           has_feedback: true,
           min: 0,
-          max: 0
+          max: 0,
         },
         {
           name: `Heating power request - ${data.name}`,

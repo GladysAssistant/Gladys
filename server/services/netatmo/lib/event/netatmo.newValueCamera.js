@@ -1,9 +1,9 @@
 const logger = require('../../../../utils/logger');
-const { 
-  DEVICE_FEATURE_CATEGORIES, 
-  DEVICE_FEATURE_TYPES, 
-  DEVICE_FEATURE_UNITS, 
-  DEVICE_POLL_FREQUENCIES 
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 
 /**
@@ -20,7 +20,7 @@ function newValueCamera(data) {
   this.devices[sid] = data;
 
   // we create the camera device
-  if(data.type === 'NOC'){      
+  if (data.type === 'NOC') {
     newCamera = {
       name: data.name,
       should_poll: true,
@@ -44,7 +44,7 @@ function newValueCamera(data) {
           keep_history: false,
           has_feedback: false,
           min: 0,
-          max: 0
+          max: 0,
         },
         {
           name: `Light - ${data.name}`,
@@ -91,7 +91,7 @@ function newValueCamera(data) {
       ],
     };
   }
-  if(data.type === 'NACamera'){
+  if (data.type === 'NACamera') {
     newCamera = {
       name: data.name,
       should_poll: true,

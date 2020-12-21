@@ -1,7 +1,12 @@
 // Non utilisé pour le moment car pas de données intéressantes - en attente maj API Netatmo, données déjà disponibles sur https://dev.netatmo.com/apidocumentation/energy
 
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
+} = require('../../../../utils/constants');
 
 /**
  * @description New value smoke detector received.

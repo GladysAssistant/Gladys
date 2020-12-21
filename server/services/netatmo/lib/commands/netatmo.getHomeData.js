@@ -1,8 +1,7 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Handler Error from event
- * @returns devices
+ * @description Get Home Data
  * @example
  * getHomeData();
  */
@@ -13,16 +12,16 @@ async function getHomeData() {
       resolve(data.homes);
     });
   })
-  .then((homes) => {
-    homes.forEach((home) => {
-      home.cameras.forEach((camera) => {
-        this.newValueCamera(camera);
+    .then((homes) => {
+      homes.forEach((home) => {
+        home.cameras.forEach((camera) => {
+          this.newValueCamera(camera);
+        });
       });
+    })
+    .catch((err) => {
+      logger.info(`Error on getHomeData (camera) - ${err}`);
     });
-  })
-  .catch((err) => {
-    logger.info(`Error on getHomeData (camera) - ${err}`);
-  });
 }
 
 module.exports = {

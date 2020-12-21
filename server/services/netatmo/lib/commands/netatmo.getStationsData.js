@@ -1,8 +1,7 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Handler Error from event
- * @returns devices
+ * @description Get station data
  * @example
  * getStationsData();
  */
@@ -13,14 +12,14 @@ async function getStationsData() {
       resolve(data);
     });
   })
-  .then((stations) => {
-    stations.forEach((station) => {
-      this.newValueStation(station);
+    .then((stations) => {
+      stations.forEach((station) => {
+        this.newValueStation(station);
+      });
+    })
+    .catch((err) => {
+      logger.info(`Error on getStationsData - ${err}`);
     });
-  })
-  .catch((err) => {
-    logger.info(`Error on getStationsData - ${err}`);
-  });
 }
 
 module.exports = {

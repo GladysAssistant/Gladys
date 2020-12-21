@@ -1,13 +1,10 @@
-const logger = require('../../../../utils/logger');
-
 /**
  * @description Get Device.
- * @param {string} type - Netatmo Type of devices needed.
  * @returns {Array} Return array of devices.
  * @example
  * netatmo.getDevices(type);
  */
-async function getDevices(type) {
+async function getDevices() {
   // we get the thermostats
   this.getThermostatsData();
 
@@ -19,10 +16,9 @@ async function getDevices(type) {
 
   // we get the weather stations
   this.getStationsData();
-  
+
   // we get the homeCoachs
   this.getHealthyHomeCoachData();
-
 }
 
 module.exports = {

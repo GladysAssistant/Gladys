@@ -281,7 +281,7 @@ const DEVICE_FEATURE_TYPES = {
     POWER: 'power',
     EFFECT_MODE: 'effect-mode',
     EFFECT_SPEED: 'effect-speed',
-    STRING: 'string'
+    STRING: 'string',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -364,7 +364,7 @@ const ACTIONS_STATUS = {
 };
 
 const DEVICE_POLL_FREQUENCIES = {
-  EVERY_HOURS : 60 * 60 * 1000,
+  EVERY_HOURS: 60 * 60 * 1000,
   EVERY_30_MINUTES: 30 * 60 * 1000,
   EVERY_10_MINUTES: 10 * 60 * 1000,
   EVERY_5_MINUTES: 5 * 60 * 1000,

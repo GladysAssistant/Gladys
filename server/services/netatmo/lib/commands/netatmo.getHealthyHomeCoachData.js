@@ -1,8 +1,7 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Handler Error from event
- * @returns devices
+ * @description Get Healthy HomeCoachs.
  * @example
  * getHealthyHomeCoachData();
  */
@@ -13,14 +12,14 @@ async function getHealthyHomeCoachData() {
       resolve(data);
     });
   })
-  .then((homeCoaches) => {
-    homeCoaches.forEach((homecoach) => {
-      this.newValueHomeCoach(homecoach);
+    .then((homeCoaches) => {
+      homeCoaches.forEach((homecoach) => {
+        this.newValueHomeCoach(homecoach);
+      });
+    })
+    .catch((err) => {
+      logger.info(`Error on getHealthyHomeCoachData - ${err}`);
     });
-  })
-  .catch((err) => {
-    logger.info(`Error on getHealthyHomeCoachData - ${err}`);
-  });
 }
 
 module.exports = {

@@ -1,12 +1,11 @@
-const { assert, fake } = require('sinon');
-const EventEmitter = require('events');
+const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const Api = require('../netatmo.api.mock');
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {
   this: {
-    api: Api
+    api: Api,
   },
 });
 

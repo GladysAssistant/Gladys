@@ -1,5 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
+} = require('../../../../utils/constants');
 
 /**
  * @description New value stations received.

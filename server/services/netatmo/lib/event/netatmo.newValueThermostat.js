@@ -1,5 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
+} = require('../../../../utils/constants');
 
 /**
  * @description New value thermostat received.
@@ -71,7 +76,7 @@ function newValueThermostat(data) {
         keep_history: true,
         has_feedback: true,
         min: 0,
-        max: 0
+        max: 0,
       },
       {
         name: `Heating power request - ${data.module_name}`,
@@ -90,8 +95,8 @@ function newValueThermostat(data) {
       {
         name: `Programs Thermostat ${data.module_name}`,
         value: JSON.stringify(this.devices[sid].therm_program_list),
-      }
-    ]
+      },
+    ],
   };
   this.addSensor(sid, newSensor);
 }
