@@ -23,7 +23,7 @@ function newValueValve(data) {
     newValve = {
       name: data.name,
       should_poll: true,
-      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_2_MINUTES,
+      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
       external_id: `netatmo:${sid}`,
       selector: `netatmo:${sid}`,
       service_id: this.serviceId,

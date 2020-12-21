@@ -64,47 +64,34 @@ async function getDevices(type) {
       });
       const homeStatus = await promiseHomeStatus;
       
-      /* const smokedetectors=[]; */
-      const valves=[];
+      /* let smokedetectors=[]; */
+      let valves=[];
       home.modules.forEach((module) => {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         /* if (module.type === 'NSD') {
-          smokedetectors[smokedetectors.length+1] = [module];
+          smokedetectors = module;
+          const indexSmokedetectorsHomeStatus = homeStatus.modules.findIndex((element) => element.id === smokedetectors.id);
+          const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) => element.id === smokedetectors.room_id);
+          
+          // then we get the 2nd part of the smoke detectors - no interesting data for the moment - pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
+          smokedetectors['homeStatus'] = homeStatus.modules[indexValveHomeStatus];
+          // then we get the 3rd part of the smoke detectors : rooms
+          smokedetectors['room'] = homeStatus.rooms[indexRoomHomeStatus];
+          this.newValueSmokeDetector( smokedetectors);
         } */
-        // then we get the 1st part of the valves
+        
         if (module.type === 'NRV') {
-          valves[valves.length+1] = [module];
+          // then we get the 1st part of the valves
+          valves = module; 
+          const indexValveHomeStatus = homeStatus.modules.findIndex((element) => element.id === valves.id);
+          const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) => element.id === valves.room_id);
+          
+          // then we get the 2nd part of the valves
+          valves['homeStatus'] = homeStatus.modules[indexValveHomeStatus];
+          // then we get the 3rd part of the valves : rooms
+          valves['room'] = homeStatus.rooms[indexRoomHomeStatus];
+          this.newValueValve( valves);
         }
-      });
-      homeStatus.modules.forEach((module) => {
-
-        // then we get the 2nd part of the smoke detectors - no interesting data for the moment - pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
-        /* if (module.type === 'NSD') {
-          smokedetectors.forEach((smokedetector) => {
-            if (smokedetector[0].id === module.id) {
-              smokedetector[0]['homeStatus'] = module;
-              this.newValueSmokeDetector(smokedetector[0]);
-            }
-          });
-        } */
-
-        // then we get the 2nd part of the valves
-        if (module.type === 'NRV') {
-          valves.forEach((valve) => {
-            if (valve[0].id === module.id) {
-              valve[0]['homeStatus'] = module;
-            }
-          });
-        }
-      });
-      homeStatus.rooms.forEach((room) => {
-        // then we get the 3rd part of the valves
-        valves.forEach((valve) => {
-          if (valve[0].room_id === room.id) {
-            valve[0]['room'] = room;
-            this.newValueValve(valve[0]);
-          }
-        });
       });
     });
   }
