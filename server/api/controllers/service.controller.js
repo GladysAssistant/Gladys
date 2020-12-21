@@ -44,7 +44,7 @@ module.exports = function ServiceController(gladys) {
    * }
    */
   async function stop(req, res) {
-    const service = await gladys.service.stop(req.params.service_name);
+    const service = await gladys.service.stop(req.params.service_name, null, true);
     if (!service) {
       res.status(404);
     }
