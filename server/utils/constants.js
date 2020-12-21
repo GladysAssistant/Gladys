@@ -254,6 +254,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',

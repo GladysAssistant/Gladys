@@ -1234,6 +1234,10 @@
       "push": "Détecteur de mouvement",
       "binary": "Détection mouvement Oui/Non"
     },
+    "presence-sensor": {
+      "shortCategoryName": "Détecteur de présence",
+      "push": "Présence"
+    },
     "light-sensor": {
       "shortCategoryName": "Capteur de luminosité",
       "integer": "Luminosité entière",
