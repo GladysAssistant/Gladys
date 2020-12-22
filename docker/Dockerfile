@@ -17,7 +17,7 @@ WORKDIR /tmp
 
 # Install OZW in a dedicated RUN to benefit from Docker cache on local dev'
 RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
-    # Install OZW 1.6 Rev 133- Commit dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd - November, 12th 2020
+    # Install OZW 1.6 Rev 133 - Commit dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd - November, 12th 2020
     && git clone https://github.com/OpenZWave/open-zwave.git \
     && cd open-zwave \
     && git checkout dfebb1c92af5bbbb4361f62e8c7b7e805bb07cbd \
