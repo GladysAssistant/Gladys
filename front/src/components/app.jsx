@@ -93,6 +93,9 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// Showcase
+import Showcase from '../routes/showcase';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -217,6 +220,9 @@ const AppRouter = connect(
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsServicePage path="/dashboard/settings/service" />
         <SettingsBackup path="/dashboard/settings/backup" />
+
+        {config.demoMode && <Showcase path="/showcase" />}
+
         <Error type="404" default />
       </Router>
     </Layout>

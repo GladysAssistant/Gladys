@@ -1517,5 +1517,11 @@
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
     "stripeButton": "Gérer la facturation dans Stripe"
+  },
+  "showcase": {
+    "title": "Showcase",
+    "sensorDevices": "Capteurs",
+    "actuatorDevices": "Actionneurs",
+    "unitSeparator": " / "
   }
 }

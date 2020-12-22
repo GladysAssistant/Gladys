@@ -1517,5 +1517,11 @@
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
     "stripeButton": "Edit subscription in Stripe"
+  },
+  "showcase": {
+    "title": "Showcase",
+    "sensorDevices": "Sensors",
+    "actuatorDevices": "Actuator",
+    "unitSeparator": " / "
   }
 }
