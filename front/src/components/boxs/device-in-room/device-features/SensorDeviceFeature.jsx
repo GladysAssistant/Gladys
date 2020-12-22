@@ -6,7 +6,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-import { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
@@ -35,17 +35,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value !== null && (
           <span>
             {' '}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PERCENT && '%'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS && '°C'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT && '°F'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.WATT && 'W'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT && 'kW'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
-            {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
+            <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
           </span>
         )}
       </td>
