@@ -1,16 +1,21 @@
+import {render as htmlrendering} from 'preact-render-to-string';
 import { Component } from 'preact';
+import { Text, Localizer } from 'preact-i18n';
+import { connect } from 'unistore/preact';
+import update from 'immutability-helper';
+import { route } from 'preact-router';
+import Area from './Area';
+import actions from '../../actions/map';
+
 import leaflet from 'leaflet';
-//import 'leaflet-toolbar';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-//import 'leaflet-draw-toolbar/dist/leaflet.draw-toolbar.js';
 import 'leaflet/dist/leaflet.css';
-//import 'leaflet-toolbar/dist/leaflet.toolbar.css';
-//import 'leaflet-draw-toolbar/dist/leaflet.draw-toolbar.css';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
+@connect('session,httpClient', actions)
 class MapComponent extends Component {
   initMap = () => {
     if (this.leafletMap) {
@@ -31,12 +36,13 @@ class MapComponent extends Component {
     this.displayAreas();
     this.displayUsers();
     this.displayToolbar();
+
     //this.displayPositionOptions();
 
   };
-
   displayToolbar = () => {
     var map = this.leafletMap;
+    this.props.updateAreaLocation("12", "45","55555", '1');
     var drawnItems = new L.FeatureGroup().addTo(this.leafletMap);
     map.addLayer(drawnItems);
     // Initialise the draw control and pass it the FeatureGroup of editable layers
@@ -57,14 +63,6 @@ class MapComponent extends Component {
           featureGroup: drawnItems
       }
     };
-    // Truncate value based on number of decimals
-    var _round = function(num, len) {
-        return Math.round(num*(Math.pow(10, len)))/(Math.pow(10, len));
-    };
-    // Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
-    var strLatLng = function(latlng) {
-        return "("+_round(latlng.lat, 6)+", "+_round(latlng.lng, 6)+")";
-    };
     var drawControl = new L.Control.Draw(options);
     map.addControl(drawControl);
 
@@ -75,44 +73,71 @@ class MapComponent extends Component {
         const latitude = latlng.lat;
         const longitude = latlng.lng;
         const radius = _round(layer.getRadius(), 2);
-        return `<fieldset>
-        <legend>Area details</legend>
-          <input name="title" />
-          <div><label class="form-label">Coordonates :</label> ( ${latitude},${longitude} )</div>
-          <div><label class="form-label">Radius : </label>${radius}m </div>
-          <div class="form-footer">
-            <button
-              onClick="/api/v1/area"
-              class="btn btn-primary btn-block"
-            >
-              Valider
-            </button>
-          </div>
-        </fieldset>`;
+        return `
+        <div class="form-group" style="width:250px;">
+          <fieldset>
+          <legend>Area details</legend>
+              <div>
+                <label class="form-label">Label :</label>
+                <input class="form-control" placeholder="Title" name="title" />
+              <div>
+                <label class="form-label">Coordonates :</label>
+              </div>
+              <div>
+              <input class="form-control" name="latitude" editable="false" value="${latitude}"/>
+              <input class="form-control" name="longitude" editable="false" value="${longitude}"/>
+              </div>
+              <div>
+                <label class="form-label">Radius(m) : </label>
+                <input class="form-control" name="radius" value="${radius}"/>
+              </div>
+              <div class="form-footer">
+                <button class="btn btn-primary mx-auto" onClick="">
+                  Create
+                </button>
+            </div>
+          </fieldset>
+        </div>`;
     };
 
-    map.on(L.Draw.Event.CREATED, function (e) {
 
-       var type = e.layerType,
-           layer = e.layer;
+    // Truncate value based on number of decimals
+    var _round = function(num, len) {
+        return Math.round(num*(Math.pow(10, len)))/(Math.pow(10, len));
+    };
+    // Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
+    var strLatLng = function(latlng) {
+        return "("+_round(latlng.lat, 6)+", "+_round(latlng.lng, 6)+")";
+    };
+    let latitude = 0;
+    let longitude = 0;
+    let radius = 0;
+    const updateAreaLocation = this.props.updateAreaLocation
 
-       var content = getPopupContent(layer);
-        if (content !== null) {
-            layer.bindPopup(content);
-        }
-       if (type === 'marker') {
-           // Do marker specific actions
-           console.log('Marker');
+    map.on(L.Draw.Event.CREATED, e => {
+      var type = e.layerType,
+          layer = e.layer;
+      const latlng = layer.getLatLng();
+      latitude = latlng.lat;
+      longitude = latlng.lng;
+      updateAreaLocation(latitude, longitude, layer.getRadius(), '1');
 
-       }
-       // Do whatever else you need to. (save to db; add to map etc)
-       console.log('CREATED');
-       console.log(layer.getLatLng());
-       const latlng = layer.getLatLng();
+      layer.bindPopup(getPopupContent(layer));
+      drawnItems.addLayer(layer);
+      map.addLayer(layer);
 
-       drawnItems.addLayer(layer);
-       map.addLayer(layer);
     });
+
+    map.on(L.Draw.Event.EDITED, e => {
+      var layers = e.layers;
+      layers.eachLayer(function (layer) {
+        const latlng = layer.getLatLng();
+        latitude = latlng.lat;
+        longitude = latlng.lng;
+        updateAreaLocation(latitude, longitude, layer.getRadius(), '1');
+      });
+    });
+
     map.on(L.Draw.Event.DELETED, function (e) {
        var type = e.layerType,
            layer = e.layer;
@@ -124,7 +149,6 @@ class MapComponent extends Component {
        console.log('DELETED');
     });
   };
-
 
   displayPositionOptions = () => {
     const CenterToHouseAction = L.Toolbar2.Action.extend({

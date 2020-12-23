@@ -1,4 +1,5 @@
 import { RequestStatus } from '../utils/consts';
+import update, { extend } from 'immutability-helper';
 
 function createActions(store) {
   const actions = {
@@ -20,6 +21,7 @@ function createActions(store) {
         });
       }
     },
+
     async getHousesWithLocation(state) {
       store.setState({
         getHousesWithLocation: RequestStatus.Getting
@@ -36,28 +38,7 @@ function createActions(store) {
         });
       }
     },
-    async createAreasWithLocation(state) {
-      store.setState({
-        createAreasWithLocation: RequestStatus.Getting
-      });
-      try {
-        const areasWithLocation = await state.httpClient.post('/api/v1/area', {
-          name: 'Work',
-          latitude: state.latitude,
-          longitude: state.longitude,
-          radius: state.radius,
-          color: '#00000'
-        });
-        store.setState({
-          areasWithLocation,
-          createAreasWithLocation: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          createAreasWithLocation: RequestStatus.Error
-        });
-      }
-    },
+
     async getAreasWithLocation(state) {
       store.setState({
         getAreasWithLocation: RequestStatus.Getting
@@ -71,6 +52,74 @@ function createActions(store) {
       } catch (e) {
         store.setState({
           getAreasWithLocation: RequestStatus.Error
+        });
+      }
+    },
+
+    updateAreaLocation(state, latitude, longitude, radius, areaIndex) {
+      console.log('Update location');
+      const newState = update(state, {
+            latitude: {
+              $set: latitude
+            },
+            longitude: {
+              $set: longitude
+            },
+            radius: {
+              $set: radius
+            }
+          }
+    );
+      store.setState(newState);
+    },
+
+    onTitleChange(state, event) {
+      store.setState({
+        title: event.target.value
+      });
+    },
+    onLatitudeChange(state, event) {
+      store.setState({
+        latitude: event.target.value
+      });
+    },
+    onLongitudeChange(state, event) {
+      store.setState({
+        longitude: event.target.value
+      });
+    },
+    onRadiusChange(state, event) {
+      store.setState({
+        radius: event.target.value
+      });
+    },
+    async createAreasWithLocation(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        createAreasWithLocation: RequestStatus.Getting,
+        title: '',
+        latitude: '',
+        longitude: '',
+        radius: ''
+      });
+
+      try {
+        const areasWithLocation = await state.httpClient.post('/api/v1/area', {
+          name: state.title,
+          latitude: state.latitude,
+          longitude: state.longitude,
+          radius: state.radius,
+          color: '#00000'
+        });
+        store.setState({
+          areasWithLocation,
+          createAreasWithLocation: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          createAreasWithLocation: RequestStatus.Error
         });
       }
     }
