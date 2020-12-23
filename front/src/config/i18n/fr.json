@@ -466,7 +466,7 @@
             "3": "Absent",
             "4": "Programme"
           },
-          "HEATING_REQ": {
+          "heating_req": {
             "0": "0",
             "1": "100"
           }

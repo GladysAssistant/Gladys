@@ -6,7 +6,7 @@
  */
 async function getDevices() {
   // we get the thermostats
-  this.getThermostatsData();
+  // this.getThermostatsData();
 
   // We get the data from the house of Netatmo Energy
   this.getHomeStatusData();

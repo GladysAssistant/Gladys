@@ -412,15 +412,15 @@
             "1": "volume-2"
           }
         },
-        "ENERGY": {
-          "SETPOINT_MODE": {
+        "energy": {
+          "setpointmode": {
             "0": "Schedule",
             "1": "Manual",
             "2": "Frost free",
             "3": "Away",
             "4": "Program"
           },
-          "HEATING_REQ": {
+          "heating_req": {
             "0": "0",
             "1": "100"
           }

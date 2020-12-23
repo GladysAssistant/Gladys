@@ -38,6 +38,5 @@ describe('should say netatmo is not configured', () => {
     };
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     await netatmoManager.connect();
-    // assert.called(netatmoManager.getDevices());
   });
 });
