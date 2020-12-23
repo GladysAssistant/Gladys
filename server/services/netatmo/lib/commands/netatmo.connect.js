@@ -17,6 +17,9 @@ async function connect() {
   // if no variable message
   if (!variablesFound) {
     this.configured = false;
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
+    });
     logger.debug('NETATMO is not configured.');
   } else {
     // else is configured send websocket ok

@@ -77,9 +77,6 @@ const SetupTab = ({ children, ...props }) => {
           <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
             <Text id="integration.netatmo.setting.saveLabel" />
           </button>
-          <button type="submit" class="btn btn-primary ml-auto" onClick={props.connectConfiguration}>
-            <Text id="integration.netatmo.setting.connectLabel" />
-          </button>
         </div>
       </div>
     </div>
