@@ -1,4 +1,5 @@
 const { fake } = require('sinon');
+// const { expect } = require('chai');
 
 const NetatmoManager = require('../../../../../services/netatmo/lib');
 
@@ -46,5 +47,6 @@ describe('netatmoManager GetSensor', () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.sensors['1234'] = sensor;
     await netatmoManager.getSensors();
+    // expect(sensors).to.deep.equal(netatmoManager.sensors);
   });
 });
