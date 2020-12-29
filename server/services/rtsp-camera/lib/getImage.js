@@ -30,16 +30,18 @@ async function getImage(device) {
     );
 
     if (cameraUrlParam.value === 'pi-camera') {
+      // init the camera tool
       const stillCamera = new this.picam.StillCamera();
-      // take image in high quality
+
       stillCamera
-        .takeImage()
+        .takeImage() // take image in high quality
         .then((image) => {
-          fse.writeFileSync(filePath, image);
-          // convert binary data to base64 encoded string
+          fse.writeFileSync(filePath, image); // save the image in a file
+          // convert the image to base64 encoded string
           const cameraImageBase = Buffer.from(image).toString('base64');
           const cameraImage = `image/png;base64,${cameraImageBase}`;
           resolve(cameraImage);
+          // remove the tmp file
           fse.remove(filePath);
         })
         .catch((err) => {
