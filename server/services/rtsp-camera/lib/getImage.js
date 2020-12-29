@@ -32,20 +32,23 @@ async function getImage(device) {
     if (cameraUrlParam.value === 'pi-camera') {
       const stillCamera = new this.picam.StillCamera();
       // take image in high quality
-      stillCamera.takeImage().then(image => {
-        fse.writeFileSync(filePath, image);
-        // convert binary data to base64 encoded string
-        const cameraImageBase = Buffer.from(image).toString('base64');
-        const cameraImage = `image/png;base64,${cameraImageBase}`;
-        resolve(cameraImage);
-        fse.remove(filePath);
-      }).catch(err => {
-        logger.debug(`Cannot process video: ${err.message}`);
-        reject(err.message);
-        fse.remove(filePath);
-      });
+      stillCamera
+        .takeImage()
+        .then((image) => {
+          fse.writeFileSync(filePath, image);
+          // convert binary data to base64 encoded string
+          const cameraImageBase = Buffer.from(image).toString('base64');
+          const cameraImage = `image/png;base64,${cameraImageBase}`;
+          resolve(cameraImage);
+          fse.remove(filePath);
+        })
+        .catch((err) => {
+          logger.debug(`Cannot process video: ${err.message}`);
+          reject(err.message);
+          fse.remove(filePath);
+        });
     } else {
-      // we create a writestream 
+      // we create a writestream
       const writeStream = fse.createWriteStream(filePath);
       // and send a camera thumbnail to this stream
       this.ffmpeg(cameraUrlParam.value)
@@ -72,7 +75,6 @@ async function getImage(device) {
         })
         .run();
     }
-
 
     return null;
   });
