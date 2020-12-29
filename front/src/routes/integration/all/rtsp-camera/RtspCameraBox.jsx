@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import get from 'get-value';
 import cx from 'classnames';
@@ -166,6 +166,9 @@ class RtspCameraBox extends Component {
                       placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
                     />
                   </Localizer>
+                  <div class="alert alert-info">
+                    <MarkupText id="integration.rtspCamera.fluxDescription" />
+                  </div>
                 </div>
                 <div class="form-group">
                   <button onClick={this.testConnection} class="btn btn-info mr-2">

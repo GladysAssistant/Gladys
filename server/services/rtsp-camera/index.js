@@ -3,9 +3,10 @@ const logger = require('../../utils/logger');
 const RtspCameraHandler = require('./lib');
 const RtspCameraController = require('./api/rtspCamera.controller');
 
-module.exports = function RtspCameraService(gladys, serviceId) {
+module.exports = function RtspCameraService(gladys, serviceId) { 
   const ffmpeg = require('fluent-ffmpeg');
-  const device = new RtspCameraHandler(gladys, ffmpeg, serviceId);
+  const picam = require('pi-camera-connect');
+  const device = new RtspCameraHandler(gladys, ffmpeg, picam, serviceId);
   /**
    * @public
    * @description This function starts service
