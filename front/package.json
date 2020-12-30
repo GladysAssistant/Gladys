@@ -1,5 +1,9 @@
 {
   "name": "gladys-front",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "start": "per-env",
     "start:production": "npm run -s serve",
@@ -30,6 +34,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.2.4",
+    "@jaames/iro": "^5.2.3",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "cropperjs": "^1.5.1",

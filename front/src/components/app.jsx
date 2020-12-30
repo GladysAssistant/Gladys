@@ -59,6 +59,7 @@ import CaldavPage from '../routes/integration/all/caldav';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
+import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
@@ -88,6 +89,12 @@ import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/se
 
 // StockExchange integrations
 import StockExchangePage from '../routes/integration/all/stock-exchange';
+
+// EweLink
+import EweLinkPage from '../routes/integration/all/ewelink/device-page';
+import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
+import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
+import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -171,6 +178,8 @@ const AppRouter = connect(
         />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
+        <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
+        <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
@@ -189,6 +198,10 @@ const AppRouter = connect(
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+        <EweLinkPage path="/dashboard/integration/device/ewelink" />
+        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
+        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
+        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

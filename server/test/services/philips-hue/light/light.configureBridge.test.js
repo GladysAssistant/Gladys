@@ -1,18 +1,20 @@
 const { assert, expect } = require('chai');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
-const PhilipsHueClient = require('../mocks.test');
+const { MockedPhilipsHueClient } = require('../mocks.test');
 
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
-  'node-hue-api': PhilipsHueClient,
+  'node-hue-api': MockedPhilipsHueClient,
 });
 
 const StateManager = require('../../../../lib/state');
+const ServiceManager = require('../../../../lib/service');
 const DeviceManager = require('../../../../lib/device');
 
 const event = new EventEmitter();
 const stateManager = new StateManager(event);
-const deviceManager = new DeviceManager(event, {}, stateManager, {});
+const serviceManager = new ServiceManager({}, stateManager);
+const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager);
 
 const gladys = {
   device: deviceManager,

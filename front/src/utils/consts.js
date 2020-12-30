@@ -96,6 +96,12 @@ export const GetStockExchangeStatus = {
   Success: 'Success'
 };
 
+export const GetWeatherModes = {
+  AdvancedWeather: 'advancedWeather',
+  HourlyForecast: 'hourlyForecast',
+  DailyForecast: 'dailyForecast'
+};
+
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
 
@@ -109,6 +115,9 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'eye',
     [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: 'eye'
+  },
+  [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: 'users'
   },
   [DEVICE_FEATURE_CATEGORIES.SISMIC_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'activity'
@@ -161,7 +170,7 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.SIREN]: {
     [DEVICE_FEATURE_TYPES.SIREN.BINARY]: 'bell'
   },
-  [DEVICE_FEATURE_CATEGORIES.ACCESS_CONTROl]: {
+  [DEVICE_FEATURE_CATEGORIES.ACCESS_CONTROL]: {
     [DEVICE_FEATURE_TYPES.ACCESS_CONTROL.MODE]: 'lock'
   },
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {

@@ -4,7 +4,7 @@ import ScenePage from './ScenePage';
 import actions from '../../actions/scene';
 import { RequestStatus } from '../../utils/consts';
 
-@connect('scenes,currentUrl,scenesGetStatus', actions)
+@connect('httpClient,scenes,currentUrl,scenesGetStatus', actions)
 class Scene extends Component {
   componentWillMount() {
     this.props.getScenes();

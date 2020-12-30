@@ -1,0 +1,16 @@
+{
+  "online": false,
+  "name": "Switch 2",
+  "type": "10",
+  "deviceid": "10004532ae",
+  "apikey": "validApikey",
+  "extra": {
+    "extra": {
+      "uiid": 1,
+      "model": "PSF-BD1-GL"
+    }
+  },
+  "brandName": "SONOFF",
+  "productModel": "MINI",
+  "uiid": 1
+}

@@ -2,6 +2,10 @@
   "name": "gladys-server",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
     "pretest": "npm run eslint",
@@ -69,6 +73,7 @@
     "@gladysassistant/gladys-gateway-js": "^3.2.6",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
+    "axios": "^0.21.0",
     "bcrypt": "^3.0.3",
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",

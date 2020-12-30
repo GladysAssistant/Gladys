@@ -86,4 +86,30 @@ describe('bluetooth.poll command', () => {
       state: 13,
     });
   });
+
+  it('error on getCharacteristic', async () => {
+    service.discoverCharacteristics = fake.yields(new Error('error'));
+
+    const device = {
+      external_id: 'bluetooth:uuid',
+      features: [
+        {
+          external_id: 'bluetooth:uuid:1809:2a6e',
+        },
+      ],
+    };
+
+    await bluetoothManager.poll(device);
+
+    assert.calledOnce(peripheral.connect);
+    assert.calledOnce(peripheral.discoverServices);
+    assert.calledOnce(peripheral.disconnect);
+    assert.calledOnce(service.discoverCharacteristics);
+    assert.notCalled(characteristic.read);
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
+      payload: { peripheralLookup: false, ready: false, scanning: false },
+    });
+  });
 });

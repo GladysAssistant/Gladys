@@ -39,8 +39,10 @@ async function syncUserCalendars(userId) {
 
   // Format all fetched calendars
   const formatedCalendars = this.formatCalendars(davCalendars, userId);
-  const calendarsToUpdate = await Promise.all(
-    formatedCalendars.map(async (formatedCalendar) => {
+
+  const calendarsToUpdate = await Promise.map(
+    formatedCalendars,
+    async (formatedCalendar) => {
       const gladysCalendar = await this.gladys.calendar.get(userId, { externalId: formatedCalendar.external_id });
       // Create calendar if it does not already exist in database
       if (gladysCalendar.length === 0) {
@@ -55,7 +57,8 @@ async function syncUserCalendars(userId) {
         return gladysCalendar[0];
       }
       return null;
-    }),
+    },
+    { concurrency: 1 },
   );
 
   await Promise.map(
@@ -69,8 +72,10 @@ async function syncUserCalendars(userId) {
         logger.error(e);
         throw new NotFoundError('CALDAV_FAILED_REQUEST_CHANGES');
       }
-      await Promise.all(
-        eventsToUpdate.map(async (eventToUpdate) => {
+
+      await Promise.map(
+        eventsToUpdate,
+        async (eventToUpdate) => {
           // Delete existing event if pops is empty
           if (JSON.stringify(eventToUpdate.props) === JSON.stringify({})) {
             const eventToDelete = await this.gladys.calendar.getEvents(userId, { url: eventToUpdate.href });
@@ -80,7 +85,8 @@ async function syncUserCalendars(userId) {
             return null;
           }
           return eventToUpdate;
-        }),
+        },
+        { concurrency: 1 },
       );
 
       if (
@@ -101,19 +107,29 @@ async function syncUserCalendars(userId) {
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);
 
-      const savedEvents = await Promise.all(
-        formatedEvents.map(async (formatedEvent) => {
-          const gladysEvents = await this.gladys.calendar.getEvents(userId, { externalId: formatedEvent.external_id });
-          // Create event if it does not already exist in database
-          if (gladysEvents.length === 0) {
-            return this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
-          }
+      let insertedOrUpdatedEvent = 0;
 
-          // Else update existing event
-          return this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
-        }),
+      await Promise.map(
+        formatedEvents,
+        async (formatedEvent) => {
+          const gladysEvents = await this.gladys.calendar.getEvents(userId, { externalId: formatedEvent.external_id });
+          try {
+            // Create event if it does not already exist in database
+            if (gladysEvents.length === 0) {
+              await this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
+            } else {
+              // Else update existing event
+              await this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
+            }
+
+            insertedOrUpdatedEvent += 1;
+          } catch (e) {
+            logger.error(e);
+          }
+        },
+        { concurrency: 1 },
       );
-      logger.info(`CalDAV : ${savedEvents.length} events updated for calendar ${calendarToUpdate.name}.`);
+      logger.info(`CalDAV : ${insertedOrUpdatedEvent} events updated for calendar ${calendarToUpdate.name}.`);
     },
     { concurrency: 1 },
   );

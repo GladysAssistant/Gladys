@@ -112,13 +112,20 @@
         {
           "type": "devices-in-room",
           "room": "living-room",
-          "device_features": ["main-lamp-binary", "tv-lamp-binary", "mqtt-living-room-switch", "mqtt-living-room-temp"]
+          "device_features": [
+            "main-lamp-binary",
+            "tv-lamp-binary",
+            "tv-lamp-color",
+            "mqtt-living-room-switch",
+            "mqtt-living-room-temp"
+          ]
         }
       ],
       [
         {
           "type": "devices-in-room",
-          "room": "kitchen"
+          "room": "kitchen",
+          "device_features": ["main-presence-sensor"]
         }
       ]
     ],
@@ -184,7 +191,32 @@
       "latitude": 12,
       "longitude": 12,
       "language": "en"
-    }
+    },
+    "hours": [
+      {
+        "temperature": 27.9,
+        "humidity": 0.99,
+        "pressure": 1005.09,
+        "datetime": "2019-05-09T04:27:57.000Z",
+        "units": "metric",
+        "wind_speed": 1.96,
+        "wind_direction": 1.96,
+        "weather": "rain"
+      }
+    ],
+    "days": [
+      {
+        "temperature_min": 20.9,
+        "temperature_max": 27.9,
+        "humidity": 0.99,
+        "pressure": 1005.09,
+        "datetime": "2019-05-09T04:27:57.000Z",
+        "units": "metric",
+        "wind_speed": 1.96,
+        "wind_direction": 1.96,
+        "weather": "rain"
+      }
+    ]
   },
   "get /api/v1/room/living-room?expand=temperature": {
     "id": "1c634ff4-0476-4733-a084-b4a43d649c84",
@@ -215,6 +247,17 @@
             "max": 1,
             "read_only": false,
             "last_value": 1,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "TV Lamp color",
+            "selector": "tv-lamp-color",
+            "category": "light",
+            "type": "color",
+            "min": 0,
+            "max": 16777215,
+            "read_only": false,
+            "last_value": 65000,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
           }
         ]
@@ -334,6 +377,18 @@
             "read_only": true,
             "last_value": 340,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "Presence",
+            "selector": "main-presence-sensor",
+            "category": "presence-sensor",
+            "type": "push",
+            "unit": null,
+            "min": 0,
+            "max": 1,
+            "read_only": true,
+            "last_value": 0,
+            "last_value_changed": "2020-12-20 13:49:07.556 +01:00"
           },
           {
             "name": "Kitchen door",
@@ -1030,7 +1085,7 @@
     "size": 499313172480,
     "used": 464613756928,
     "available": 28587036672,
-    "capacity": 0.95,
+    "capacity": 0.953000005,
     "mountpoint": "/"
   },
   "get /api/v1/system/container": [
@@ -1082,7 +1137,7 @@
       "selector": "telegram",
       "version": "0.1.0",
       "has_message_feature": true,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.053Z",
       "updated_at": "2020-10-30T07:44:07.518Z"
     },
@@ -1126,7 +1181,7 @@
       "selector": "zwave",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.056Z",
       "updated_at": "2020-10-30T07:44:07.594Z"
     },
@@ -1181,7 +1236,7 @@
       "selector": "openweather",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-08-19T13:04:57.309Z",
       "updated_at": "2020-10-30T07:44:07.814Z"
     },
@@ -1206,6 +1261,17 @@
       "status": "LOADING",
       "created_at": "2020-09-02T12:35:32.763Z",
       "updated_at": "2020-10-18T09:28:14.935Z"
+    },
+    {
+      "id": "c9fe2705-35dc-417b-b6fc-c4bbb9c69886",
+      "pod_id": null,
+      "name": "tp-link",
+      "selector": "tp-link",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-11-11T18:41:40.052Z",
+      "updated_at": "2020-11-28T07:44:07.731Z"
     }
   ],
   "get /api/v1/session": [
@@ -1765,5 +1831,170 @@
         "max": 250
       }
     ]
-  }
+  },
+  "get /api/v1/service/ewelink": {
+    "id": "45c792a5-051b-4e6f-b746-2dd4c77d9d31",
+    "name": "ewelink",
+    "selector": "ewelink"
+  },
+  "get api/v1/service/ewelink/device": [
+    {
+      "id": "28e8ad03-70a8-431f-93cb-df916019c509",
+      "room_id": "568981d0-1a4d-40ea-af97-dd4037d2b344",
+      "name": "Switch 1",
+      "selector": "ewelink-1000768322-0",
+      "model": "MINI",
+      "external_id": "ewelink:1000768322:0",
+      "should_poll": true,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "id": "6f8172ed-37e5-4785-94ad-ec33706a31f3",
+          "device_id": "28e8ad03-70a8-431f-93cb-df916019c509",
+          "name": "Switch 1 On/Off",
+          "selector": "ewelink-1000768322-0-binary",
+          "external_id": "ewelink:1000768322:0:binary",
+          "category": "switch",
+          "type": "binary",
+          "read_only": false,
+          "has_feedback": false,
+          "min": 0,
+          "max": 1
+        }
+      ],
+      "params": [
+        {
+          "id": "5e1ef948-305b-44c5-bb78-78952b1f5cb2",
+          "device_id": "28e8ad03-70a8-431f-93cb-df916019c509",
+          "name": "IP_ADDRESS",
+          "value": "0.0.0.1"
+        },
+        {
+          "id": "f3a6f3fa-a7b0-4968-b9fd-2e492ced2274",
+          "device_id": "28e8ad03-70a8-431f-93cb-df916019c509",
+          "name": "FIRMWARE",
+          "value": "3.3.0"
+        }
+      ],
+      "room": {
+        "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "name": "Living Room",
+        "selector": "living-room"
+      },
+      "service": {
+        "id": "45c792a5-051b-4e6f-b746-2dd4c77d9d31",
+        "name": "ewelink",
+        "selector": "ewelink"
+      }
+    }
+  ],
+  "get api/v1/service/ewelink/discover": [
+    {
+      "service_id": "45c792a5-051b-4e6f-b746-2dd4c77d9d31",
+      "name": "Switch 2",
+      "model": "Basic",
+      "external_id": "ewelink:10004636bf:0",
+      "selector": "ewelink:10004636bf:0",
+      "should_poll": true,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "name": "Switch 2 On/Off",
+          "external_id": "ewelink:10004636bf:0:binary",
+          "selector": "ewelink:10004636bf:0:binary",
+          "category": "switch",
+          "type": "binary",
+          "read_only": false,
+          "has_feedback": false,
+          "min": 0,
+          "max": 1
+        }
+      ],
+      "params": [
+        {
+          "name": "IP_ADDRESS",
+          "value": "0.0.0.2"
+        },
+        {
+          "name": "FIRMWARE",
+          "value": "3.2.1"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/tp-link": {
+    "id": "c9fe2705-35dc-417b-b6fc-c4bbb9c69886",
+    "pod_id": null,
+    "name": "tp-link",
+    "selector": "tp-link",
+    "version": "0.1.0",
+    "has_message_feature": false,
+    "status": "RUNNING",
+    "created_at": "2020-11-11T18:41:40.052Z",
+    "updated_at": "2020-11-28T07:44:07.731Z"
+  },
+  "get /api/v1/service/tp-link/device": [
+    {
+      "id": "1",
+      "name": "Plug Coffee Machine",
+      "model": "HS100",
+      "external_id": "tp-link-1",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "switch",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Light Swimming Pool",
+      "model": "LB100",
+      "external_id": "tp-link-2",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/tp-link/scan": [
+    {
+      "id": "3",
+      "name": "Plug TV Dock",
+      "model": "HS100",
+      "external_id": "tp-link-3",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "switch",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Light Bedroom",
+      "model": "LB100",
+      "external_id": "tp-link-4",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    }
+  ]
 }
