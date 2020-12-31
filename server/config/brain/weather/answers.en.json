@@ -76,9 +76,7 @@
   },
   {
     "label": "weather.get.success.today.unknown",
-    "answers": [
-      "Today, the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
-    ]
+    "answers": ["Today, the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."]
   },
 
   {
