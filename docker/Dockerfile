@@ -27,9 +27,6 @@ RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
     && cd /tmp \
     && rm -rf /tmp/open-zwave
 
-# Install Bluez dependencies
-RUN apk add --no-cache bluez
-
 # Install Gladys
 COPY . /src
 COPY ./static /src/server/static
