@@ -31,9 +31,7 @@ RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
 RUN apk add --no-cache bluez
 
 # Install Gladys
-RUN mkdir /src
-WORKDIR /src
-ADD . /src
+COPY . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers \
