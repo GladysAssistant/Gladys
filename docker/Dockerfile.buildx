@@ -17,7 +17,6 @@ RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
     && cd /tmp \
     && rm -rf /tmp/open-zwave
 
-WORKDIR /src
 COPY . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
