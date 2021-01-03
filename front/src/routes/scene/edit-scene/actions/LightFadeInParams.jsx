@@ -7,13 +7,19 @@ import Select from 'react-select';
 class LightFadeInParams extends Component {
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'durationValue', newValue);
+    this.setState({ parameters: { ...this.state.parameters, durationValue: newValue}}, () => {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
+    })
   };
   handleChangeUnit = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'durationUnit', e.target.value);
+    this.setState({ parameters: { ...this.state.parameters, durationUnit: e.target.value}}, () => {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
+    })
   };
-  handleChangeTargetIntensity = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'targetIntensity', e.target.value);
+  handleChangeTargetBrightness = e => {
+    this.setState({ parameters: { ...this.state.parameters, targetBrightness: e.target.value}}, () => {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
+    })
   }
   getOptions = async () => {
     try {
@@ -56,7 +62,8 @@ class LightFadeInParams extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOptions: []
+      selectedOptions: [],
+      parameters: props.parameters
     };
   }
   async componentDidMount() {
@@ -68,6 +75,7 @@ class LightFadeInParams extends Component {
   }
 
   render(props, { selectedOptions, deviceOptions }) {
+    const { parameters } = props.action;
     return (
       <div class="form-group">
         <label class="form-label">
@@ -81,15 +89,15 @@ class LightFadeInParams extends Component {
           options={deviceOptions}
         />
         <label className="form-label">
-          <Text id="editScene.actionsCard.fadeInLights.targetIntensity" />
+          <Text id="editScene.actionsCard.fadeInLights.targetBrightness" />
         </label>
         <input
           style={{
             minHeight: '30px'
           }}
           type="range"
-          value={props.action.targetIntensity}
-          onChange={this.handleChangeTargetIntensity}
+          value={parameters ? parameters.targetBrightness : undefined}
+          onChange={this.handleChangeTargetBrightness}
           className="form-control custom-range"
           step="1"
           min="0"
@@ -101,14 +109,14 @@ class LightFadeInParams extends Component {
               <input
                 type="text"
                 className="form-control"
-                value={props.action.durationValue}
+                value={parameters ? parameters.durationValue : undefined}
                 onChange={this.handleChangeDuration}
                 placeholder={<Text id="editScene.actionsCard.fadeInLights.inputPlaceholder" />}
               />
             </Localizer>
           </div>
           <div className="col-md-6">
-            <select className="custom-select" value={props.action.durationUnit} onChange={this.handleChangeUnit}>
+            <select className="custom-select" value={parameters ? parameters.durationUnit : 'seconds'} onChange={this.handleChangeUnit}>
               <option value="seconds">
                 <Text id="editScene.actionsCard.fadeInLights.seconds" />
               </option>

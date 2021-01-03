@@ -37,6 +37,17 @@ const getPhilipsHueWhiteLight = (philipsHueLight, bridgeSerialNumber, serviceId)
       min: 0,
       max: 100,
     },
+    {
+      name: `${philipsHueLight.name} Fade In/Off`,
+      read_only: false,
+      has_feedback: false,
+      external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.FADE_IN}`,
+      selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.FADE_IN}`,
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.FADE_IN,
+      min: 0,
+      max: 0
+    },
   ],
 });
 

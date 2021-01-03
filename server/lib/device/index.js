@@ -23,6 +23,7 @@ const { saveState } = require('./device.saveState');
 const { saveStringState } = require('./device.saveStringState');
 const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
+const { scenario } = require('./device.scenario');
 const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
@@ -75,5 +76,6 @@ DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
 DeviceManager.prototype.notify = notify;
+DeviceManager.prototype.scenario = scenario;
 
 module.exports = DeviceManager;

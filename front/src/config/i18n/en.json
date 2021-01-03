@@ -888,7 +888,7 @@
       "fadeInLights": {
         "duration": "Duration",
         "label": "Select the lights you want to fade in",
-        "targetIntensity": "Target Intensity",
+        "targetBrightness": "Target Intensity",
         "inputPlaceholder": "Duration",
         "seconds": "seconds",
         "minutes": "minutes",

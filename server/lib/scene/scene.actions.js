@@ -83,20 +83,20 @@ const actionsFunc = {
           DEVICE_FEATURE_TYPES.LIGHT.FADE_IN,
         );
         let durationMilliseconds;
-        switch (action.duration) {
+        switch (action.parameters.durationUnit) {
           case 'seconds':
-            durationMilliseconds = action.value * 1000;
+            durationMilliseconds = action.parameters.durationValue * 1000;
             break;
           case 'minutes':
-            durationMilliseconds = action.value * 1000 * 60;
+            durationMilliseconds = action.parameters.durationValue * 1000 * 60;
             break;
           case 'hours':
-            durationMilliseconds = action.value * 1000 * 60 * 60;
+            durationMilliseconds = action.parameters.durationValue * 1000 * 60 * 60;
             break;
           default:
             throw new Error(`Unit ${action.unit} not recognized`);
         }
-        await self.device.scenario(device, deviceFeature, { ...action, duration: durationMilliseconds });
+        await self.device.scenario(device, deviceFeature, { ...action.parameters, duration: durationMilliseconds });
       } catch (e) {
         logger.warn(e);
       }

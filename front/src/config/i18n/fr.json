@@ -888,7 +888,7 @@
       "fadeInLights": {
         "duration": "Durée",
         "label": "Sélectionnez les lumières que vous souhaitez allumer progressivement",
-        "targetIntensity": "Intensité cible",
+        "targetBrightness": "Intensité cible",
         "inputPlaceholder": "Durée",
         "seconds": "secondes",
         "minutes": "minutes",
