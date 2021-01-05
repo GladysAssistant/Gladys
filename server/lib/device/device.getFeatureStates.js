@@ -25,13 +25,6 @@ async function getFeatureStates(options) {
       {
         model: db.DeviceFeature,
         as: 'features',
-        include: [
-          {
-            model: db.DeviceFeatureState,
-            as: 'device_feature_states',
-            required: false,
-          },
-        ],
       },
       {
         model: db.Room,
@@ -53,50 +46,17 @@ async function getFeatureStates(options) {
     queryParams.include[1].attributes = optionsWithDefault.attributes_device_room;
   }
 
-  // search by devide selector
-  if (optionsWithDefault.device_selector) {
-    queryParams.where = {
-      selector: { [Op.in]: optionsWithDefault.device_selector },
-    };
-  }
-
   // search by feature selector
   if (optionsWithDefault.device_feature_selector) {
-    queryParams.include[0].where = {
-      selector: { [Op.in]: optionsWithDefault.device_feature_selector },
-    };
-  }
-
-  if (optionsWithDefault.begin_date || optionsWithDefault.end_date) {
-    queryParams.include[0].include[0].where = { created_at: {} };
-    if (optionsWithDefault.begin_date && !optionsWithDefault.end_date) {
-      queryParams.include[0].include[0].where.created_at = { [Op.gte]: optionsWithDefault.begin_date };
-    }
-    if (!optionsWithDefault.begin_date && optionsWithDefault.end_date) {
-      queryParams.include[0].include[0].where.created_at = { [Op.gte]: optionsWithDefault.end_date };
-    }
-    if (optionsWithDefault.begin_date && optionsWithDefault.end_date) {
-      queryParams.include[0].include[0].where.created_at = {
-        [Op.between]: [optionsWithDefault.begin_date, optionsWithDefault.end_date],
+    if(optionsWithDefault.device_feature_selector.indexOf(',') > 0){
+      queryParams.include[0].where = {
+        selector: { [Op.in]: optionsWithDefault.device_feature_selector },
+      };
+    } else {
+      queryParams.include[0].where = {
+        selector: { [Op.eq]: optionsWithDefault.device_feature_selector },
       };
     }
-  }
-
-  // search by device feature category
-  if (optionsWithDefault.device_feature_category) {
-    queryParams.include[0].where = {
-      category: optionsWithDefault.device_feature_category,
-    };
-  }
-
-  // search by device feature type
-  if (optionsWithDefault.device_feature_type) {
-    const condition = {
-      type: optionsWithDefault.device_feature_type,
-    };
-    queryParams.include[0].where = queryParams.include[0].where
-      ? Sequelize.and(queryParams.include[0].where, condition)
-      : condition;
   }
 
   // take is not a default
@@ -104,40 +64,79 @@ async function getFeatureStates(options) {
     queryParams.limit = optionsWithDefault.take;
   }
 
-  if (optionsWithDefault.search) {
-    queryParams.where = {
-      [Op.or]: [
-        Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_device.name')), {
-          [Op.like]: `%${optionsWithDefault.search}%`,
-        }),
-        Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_device.external_id')), {
-          [Op.like]: `%${optionsWithDefault.search}%`,
-        }),
-      ],
-    };
-  }
-
-  if (optionsWithDefault.service) {
-    const service = await this.serviceManager.getLocalServiceByName(optionsWithDefault.service);
-    if (!service) {
-      throw new NotFoundError('SERVICE_NOT_FOUND');
-    }
-    const condition = {
-      service_id: service.id,
-    };
-    queryParams.where = queryParams.where ? Sequelize.and(queryParams.where, condition) : condition;
-  }
-
-  if (optionsWithDefault.model) {
-    const condition = {
-      model: optionsWithDefault.model,
-    };
-    queryParams.where = queryParams.where ? Sequelize.and(queryParams.where, condition) : condition;
-  }
-
   const devices = await db.Device.findAll(queryParams);
 
   const devicesPlain = devices.map((device) => device.get({ plain: true }));
+
+  // search feature state
+  const queryStateParams = {
+    offset: optionsWithDefault.skip,
+    order: [['created_at', optionsWithDefault.order_dir]],
+  };
+
+  if (optionsWithDefault.begin_date || optionsWithDefault.end_date) {
+    queryStateParams.where = { device_feature_id: {},  created_at: {} };
+    if (optionsWithDefault.begin_date && !optionsWithDefault.end_date) {
+      queryStateParams.where.created_at = { [Op.gte]: optionsWithDefault.begin_date };
+    }
+    if (!optionsWithDefault.begin_date && optionsWithDefault.end_date) {
+      queryStateParams.where.created_at = { [Op.gte]: optionsWithDefault.end_date };
+    }
+    if (optionsWithDefault.begin_date && optionsWithDefault.end_date) {
+      queryStateParams.where.created_at = {
+        [Op.between]: [optionsWithDefault.begin_date, optionsWithDefault.end_date],
+      };
+    }
+  } else {
+    queryStateParams.where = { device_feature_id: {} };
+  }
+
+  // Build list of features id
+  let featuresId = '';
+  devicesPlain.forEach(device => {
+    device.features.forEach(feature => {
+      if(featuresId.length > 0){
+        featuresId += ', ';
+      }
+      featuresId += feature.id;
+      feature.device_feature_states = [];
+    });
+  });
+  // Put where condition on feature id
+  if(featuresId.indexOf(',') > 0){
+    queryStateParams.where.device_feature_id ={
+      [Op.in]: featuresId
+    };
+  }else{
+    queryStateParams.where.device_feature_id ={
+      [Op.eq]: featuresId
+    };
+  }
+
+  queryStateParams.attributes = ['device_feature_id', 'value', 'created_at']; 
+
+  const deviceFeaturesStates = await db.DeviceFeatureState.findAll(queryStateParams);
+
+  const deviceFeaturesStatesPlain = 
+    deviceFeaturesStates.map((deviceFeaturesState) => deviceFeaturesState.get({ plain: true }));
+  
+  const mapOfState = new Map();
+  deviceFeaturesStatesPlain.forEach(state => {
+    let tmpArray = mapOfState.get(state.device_feature_id);
+    if(!tmpArray){
+      tmpArray = [];
+    }
+    tmpArray.push(state);
+    mapOfState.set(state.device_feature_id, tmpArray);
+  });
+
+  devicesPlain.forEach(device => {
+    device.features.forEach(feature => {
+      if(mapOfState.get(feature.id)){
+        feature.device_feature_states = mapOfState.get(feature.id);
+      }
+    });
+  });
 
   return devicesPlain;
 }

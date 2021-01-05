@@ -1,5 +1,4 @@
-const { LTD } = require('downsample');
-const trend = require('trend');
+const { LTTB } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
@@ -132,7 +131,7 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeatureStates(req, res) {
-    // const debut=new Date();
+    const debut=new Date();
     const params = Object.assign({}, req.query, {
       device_feature_selector: req.params.device_feature_selector.split(','),
     });
@@ -165,6 +164,7 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device.push('name');
     params.attributes_device.push('selector');
     params.attributes_device_feature = [];
+    params.attributes_device_feature.push('id');
     params.attributes_device_feature.push('name');
     params.attributes_device_feature.push('selector');
     params.attributes_device_feature.push('unit');
@@ -173,9 +173,12 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device_room = [];
     params.attributes_device_room.push('name');
     params.attributes_device_room.push('selector');
-
+console.log('============================================================');
     const devices = await gladys.device.getFeatureStates(params);
 
+    const finSQL=new Date();
+    console.log('============================================================');
+    console.log(`sql; ${debut} - ${finSQL}  =  ${(finSQL.getTime() - debut.getTime())}`);
     // Downsample result to reduce nb of value in response
     if (params.downsample && params.downsample === 'true') {
       if (devices && devices.length > 0) {
@@ -188,6 +191,7 @@ module.exports = function DeviceController(gladys) {
         devices.forEach((device) => {
           device.features.forEach((feature) => {
             if (feature.device_feature_states && feature.device_feature_states.length > 0) {
+              console.log(`size: ${feature.device_feature_states.length}`);
               const newFeatureStateArray = [];
               feature.device_feature_states.forEach(function changeState(state, index) {
                 newFeatureStateArray.push({
@@ -197,19 +201,13 @@ module.exports = function DeviceController(gladys) {
                 featureValuesArray.push(state.value);
               });
 
-              // Choice algo of downsampling use
               let smoothFeatureStates = newFeatureStateArray;
               if (newFeatureStateArray.length > chartWidth) {
-                smoothFeatureStates = LTD(newFeatureStateArray, chartWidth);
+                smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
               }
               feature.device_feature_states = smoothFeatureStates;
-              feature.trend = trend(featureValuesArray, {
-                lastPoints: 3,
-                avgPoints: 10,
-                avgMinimum: 10,
-                reversed: false,
-              });
-
+              feature.trend = newFeatureStateArray[newFeatureStateArray.length-1] - newFeatureStateArray[0];
+              
               featureArray.push(feature);
             }
           });
@@ -218,7 +216,10 @@ module.exports = function DeviceController(gladys) {
       }
     }
 
-    // console.log('fin; '+ debut + ' - ' +new Date());
+    const findownsampling=new Date(); 
+    console.log(`down; ${finSQL} - ${findownsampling}  =  ${(findownsampling.getTime() - finSQL.getTime())}`);
+ 
+    console.log(`fin; ${debut} - ${new Date()}  =  ${(new Date().getTime() - debut.getTime())}`);
     res.json(devices);
   }
 
