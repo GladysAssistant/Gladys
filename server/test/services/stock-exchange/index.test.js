@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const StockExchangeService = require('../../../services/stock-exchange/index');
 
-describe.only('StockExchangeService', () => {
+describe('StockExchangeService', () => {
   it('should have controllers', () => {
     const stockExchangeService = StockExchangeService();
     expect(stockExchangeService)
