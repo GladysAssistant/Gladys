@@ -7,7 +7,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
       props.y,
       props.device,
       props.deviceFeature,
-      props.roomIndex,
+      props.deviceIndex,
       props.deviceFeatureIndex,
       e.target.value,
       props.deviceFeature.lastValue
