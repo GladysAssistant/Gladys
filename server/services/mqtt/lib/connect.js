@@ -35,7 +35,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   });
 
   this.mqttClient.on('connect', () => {
-    logger.info(`Connected to MQTT server ${mqttUrl} with clientId ${this.mqttClient.options.clientId}`);
+    logger.info(`Connected to MQTT server ${mqttUrl}`);
 
     Object.keys(this.topicBinds).forEach((topic) => {
       this.subscribe(topic, this.topicBinds[topic]);
