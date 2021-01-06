@@ -1,0 +1,174 @@
+{
+  "body": {
+    "devices": [
+      {
+        "_id": "17:cc:50:67:aa:09",
+        "date_setup": 1605564990,
+        "last_setup": 1605564990,
+        "type": "NAMain",
+        "last_status_store": 1608765382,
+        "module_name": "Hygrométrie Salon",
+        "firmware": 178,
+        "wifi_status": 50,
+        "reachable": true,
+        "co2_calibrating": false,
+        "data_type": [
+          "Temperature",
+          "CO2",
+          "Humidity",
+          "Noise",
+          "Pressure"
+        ],
+        "place": {
+          "altitude": 123,
+          "city": "Paris",
+          "country": "FR",
+          "timezone": "Europe/Paris",
+          "location": [
+            0.2348836678374973,
+            48.853492494796304
+          ]
+        },
+        "station_name": "Maison Stark (Hygrométrie Salon)",
+        "home_id": "3iuhef7oihih89kojoihoui3",
+        "home_name": "Maison Stark",
+        "dashboard_data": {
+          "time_utc": 1608764772,
+          "Temperature": 21,
+          "CO2": 548,
+          "Humidity": 61,
+          "Noise": 32,
+          "Pressure": 1005.1,
+          "AbsolutePressure": 990.6,
+          "min_temp": 20.9,
+          "max_temp": 21,
+          "date_max_temp": 1608764772,
+          "date_min_temp": 1608764470,
+          "temp_trend": "stable",
+          "pressure_trend": "stable"
+        },
+        "modules": [
+          {
+            "_id": "17:cc:50:67:aa:0a",
+            "type": "NAModule1",
+            "module_name": "Hygrométrie Extérieur",
+            "last_setup": 1605564992,
+            "data_type": [
+              "Temperature",
+              "Humidity"
+            ],
+            "battery_percent": 98,
+            "reachable": true,
+            "firmware": 50,
+            "last_message": 1608765376,
+            "last_seen": 1608765337,
+            "rf_status": 75,
+            "battery_vp": 5964,
+            "dashboard_data": {
+              "time_utc": 1608764722,
+              "Temperature": 7.1,
+              "Humidity": 100,
+              "min_temp": 7.1,
+              "max_temp": 7.1,
+              "date_max_temp": 1608764465,
+              "date_min_temp": 1608764465,
+              "temp_trend": "stable"
+            }
+          },
+          {
+            "_id": "17:cc:50:67:aa:0b",
+            "type": "NAModule3",
+            "module_name": "Pluviomètre maison Stark",
+            "last_setup": 1605604312,
+            "data_type": [
+              "Rain"
+            ],
+            "battery_percent": 100,
+            "reachable": true,
+            "firmware": 12,
+            "last_message": 1608765376,
+            "last_seen": 1608765376,
+            "rf_status": 66,
+            "battery_vp": 6058,
+            "dashboard_data": {
+              "time_utc": 1608764760,
+              "Rain": 0.101,
+              "sum_rain_1": 0.505,
+              "sum_rain_24": 0.1
+            }
+          },
+          {
+            "_id": "17:cc:50:67:aa:0c",
+            "type": "NAModule2",
+            "module_name": "Anémomètre maison Stark",
+            "last_setup": 1605604559,
+            "data_type": [
+              "Wind"
+            ],
+            "battery_percent": 97,
+            "reachable": true,
+            "firmware": 25,
+            "last_message": 1608765376,
+            "last_seen": 1608765376,
+            "rf_status": 87,
+            "battery_vp": 5947,
+            "dashboard_data": {
+              "time_utc": 1608764760,
+              "WindStrength": 1,
+              "WindAngle": 90,
+              "GustStrength": 4,
+              "GustAngle": 102,
+              "max_wind_str": 6,
+              "max_wind_angle": 113,
+              "date_max_wind_str": 1608764466
+            }
+          },
+          {
+            "_id": "17:cc:50:67:aa:0d",
+            "type": "NAModule4",
+            "module_name": "Hygromètre cuisine",
+            "last_setup": 1608046641,
+            "data_type": [
+              "Temperature",
+              "CO2",
+              "Humidity"
+            ],
+            "battery_percent": 100,
+            "reachable": true,
+            "firmware": 50,
+            "last_message": 1608765376,
+            "last_seen": 1608765331,
+            "rf_status": 76,
+            "battery_vp": 6146,
+            "dashboard_data": {
+              "time_utc": 1608764767,
+              "Temperature": 19.7,
+              "CO2": 790,
+              "Humidity": 65,
+              "min_temp": 19.7,
+              "max_temp": 19.7,
+              "date_max_temp": 1608764459,
+              "date_min_temp": 1608764459,
+              "temp_trend": "stable"
+            }
+          }
+        ]
+      }
+    ],
+    "user": {
+      "mail": "tony.stark@gmail.com",
+      "administrative": {
+        "lang": "fr",
+        "reg_locale": "fr-FR",
+        "country": "FR_FR",
+        "unit": 0,
+        "windunit": 0,
+        "pressureunit": 0,
+        "feel_like_algo": 0
+      }
+    }
+  },
+  "status": "ok",
+  "time_exec": 0.13647985458374023,
+  "time_server": 1608765806
+}

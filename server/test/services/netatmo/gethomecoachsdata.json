@@ -1,0 +1,62 @@
+{
+  "body": {
+    "devices": [
+      {
+        "_id": "17:cc:50:67:aa:08",
+        "station_name": "Air Chambre parental ",
+        "date_setup": 1605532232,
+        "last_setup": 1605532232,
+        "type": "NHC",
+        "last_status_store": 1608764305,
+        "module_name": "Indoor",
+        "firmware": 48,
+        "wifi_status": 47,
+        "reachable": true,
+        "co2_calibrating": false,
+        "data_type": [
+          "Temperature",
+          "CO2",
+          "Humidity",
+          "Noise",
+          "Pressure",
+          "health_idx"
+        ],
+        "place": {
+          "altitude": 123,
+          "city": "Paris",
+          "country": "FR",
+          "timezone": "Europe/Paris",
+          "location": [
+            0.2348836678374973,
+            48.853492494796304
+          ]
+        },
+        "dashboard_data": {
+          "time_utc": 1608764304,
+          "Temperature": 20.8,
+          "CO2": 856,
+          "Humidity": 59,
+          "Noise": 36,
+          "Pressure": 1004,
+          "AbsolutePressure": 989.5,
+          "health_idx": 0
+        }
+      }
+    ],
+    "user": {
+      "mail": "tony.stark@gmail.com",
+      "administrative": {
+        "lang": "fr",
+        "reg_locale": "fr-FR",
+        "country": "FR_FR",
+        "unit": 0,
+        "windunit": 0,
+        "pressureunit": 0,
+        "feel_like_algo": 0
+      }
+    }
+  },
+  "status": "ok",
+  "time_exec": 0.03840899467468262,
+  "time_server": 1608764900
+}

@@ -16,12 +16,16 @@ async function getHomeStatusData() {
     .then((data) => {
       data.forEach((home) => {
         const options = {
-          device: '',
+          device_types: 'NRV',
           home_id: home.id,
         };
         new Promise((resolve, reject) => {
           this.api.homeStatus(options, (err, homeStatus) => {
             resolve(homeStatus.home);
+            console.log("Test homeStatus");
+            console.log(homeStatus.home);
+            console.log("Test err");
+            console.log(err);
           });
         }).then((homeStatus) => {
           let valves = [];
