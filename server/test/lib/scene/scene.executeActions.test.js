@@ -103,46 +103,6 @@ describe('scene.executeActions', () => {
       {},
     );
   });
-  it('should execute start service', async () => {
-    const example = {
-      start: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('service', 'example', example);
-    await executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.SERVICE.START,
-            service: 'example',
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(example.start);
-  });
-  it('should execute stop service', async () => {
-    const example = {
-      stop: fake.resolves(null),
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('service', 'example', example);
-    await executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.SERVICE.STOP,
-            service: 'example',
-          },
-        ],
-      ],
-      {},
-    );
-    assert.calledOnce(example.stop);
-  });
   it('should execute sequential actions', async () => {
     const device = {
       setValue: fake.resolves(null),
@@ -314,6 +274,76 @@ describe('scene.executeActions', () => {
       scope,
     );
     expect(scope).to.deep.equal({ '0.0.last_value': 15 });
+  });
+  it('should execute action user.setSeenAtHome', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      userSeen: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.SET_SEEN_AT_HOME,
+            user: 'john',
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(house.userSeen, 'my-house', 'john');
+  });
+  it('should execute action user.setLeftHome', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.SET_OUT_OF_HOME,
+            user: 'john',
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(house.userLeft, 'my-house', 'john');
+  });
+  it('should execute action http.request', async () => {
+    const stateManager = new StateManager(event);
+    const http = {
+      request: fake.resolves({ success: true }),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, http },
+      [
+        [
+          {
+            type: ACTIONS.HTTP.REQUEST,
+            method: 'post',
+            url: 'http://test.test',
+            body: '{"toto":"toto"}',
+            headers: [
+              {
+                key: 'authorization',
+                value: 'token',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(http.request, 'post', 'http://test.test', { toto: 'toto' }, { authorization: 'token' });
   });
   it('should abort scene, condition is not verified', async () => {
     const stateManager = new StateManager(event);

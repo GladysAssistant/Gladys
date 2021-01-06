@@ -18,7 +18,7 @@ describe('Discover bluetooth services', () => {
   beforeEach(() => {
     throwError = false;
 
-    service = { uuid: 'service1' };
+    service = { uuid: 'fff0' };
     services = [service];
 
     discovered = false;
@@ -70,29 +70,5 @@ describe('Discover bluetooth services', () => {
       expect(e).is.instanceOf(NotFoundError);
       expect(discovered).is.eq(true);
     }
-  });
-
-  it('Discover service all already discovered', async () => {
-    const tmpServices = [{ uuid: 'fff2' }];
-    peripheral.services = tmpServices;
-
-    const discoveredServices = await discoverServices(peripheral, ['fff2']);
-
-    const expectedResult = { fff2: tmpServices[0] };
-
-    expect(discoveredServices).deep.eq(expectedResult);
-    expect(discovered).is.eq(false);
-  });
-
-  it('Discover service half already discovered', async () => {
-    const tmpServices = [{ uuid: 'fff2' }];
-    peripheral.services = tmpServices;
-
-    const discoveredServices = await discoverServices(peripheral, ['fff0', 'fff2']);
-
-    const expectedResult = { fff2: tmpServices[0], [service.uuid]: service };
-
-    expect(discoveredServices).deep.eq(expectedResult);
-    expect(discovered).is.eq(true);
   });
 });

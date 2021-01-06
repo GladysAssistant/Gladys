@@ -10,6 +10,7 @@
     "requiredField": "*",
     "listItem": "{{index}}.",
     "percentValue": "{{value}}%",
+    "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
     "save": "Save"
@@ -187,7 +188,14 @@
         "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
         "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
         "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editModeLabel": "Select display mode:",
+        "displayModes": {
+          "advancedWeather": "Humidity and wind speed",
+          "hourlyForecast": "Forecast for the next 8 hours",
+          "dailyForecast": "Forecast for the next 7 days"
+        },
+        "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -201,7 +209,7 @@
         "noTemperatureRecorded": "No temperature recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
@@ -376,27 +384,52 @@
       "title": "Tasmota",
       "description": "Control your Tasmota devices.",
       "deviceTab": "Devices",
-      "discoverTab": "MQTT discover",
-      "discoverDeviceDescr": "Automatically scan MQTT devices",
+      "mqttDiscoverTab": "MQTT discover",
+      "httpDiscoverTab": "HTTP discover",
       "device": {
         "title": "Tasmota devices in Gladys",
         "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Tasmota discover devices over MQTT",
-        "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
-        "error": "Error discovering Tasmota devices.",
         "noDeviceFound": "No Tasmota device discovered.",
+        "error": "Error discovering Tasmota devices.",
         "documentation": "Tasmota documentation",
-        "scan": "Scan"
+        "mqtt": {
+          "title": "Tasmota discover devices over MQTT",
+          "description": "Configured Tasmota devices are automatically discovered over MQTT network.",
+          "scan": "Scan"
+        },
+        "http": {
+          "title": "Tasmota discover devices over HTTP",
+          "singleModeButton": "Single address scan",
+          "rangeModeButton": "Scan over IP range",
+          "singleAddressLabel": "IP address or hostname:",
+          "singleAddressPlaceholer": "192.168.1.1, host",
+          "firstAddressLabel": "From:",
+          "lastAddressLabel": "To:",
+          "firstAddressPlaceholer": "192.168.1.1",
+          "lastAddressPlaceholer": "192.168.1.100",
+          "discoverButton": "Discover",
+          "usernameLabel": "Username",
+          "passwordLabel": "Password",
+          "needAuthenticationAlert": "The device is protected with username and password.",
+          "authenticateButton": "Connect and scan",
+          "authError": "Invalid username or password."
+        }
       },
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
-      "topicLabel": "Tasmota MQTT Topic",
+      "protocolLabels": {
+        "mqtt": "MQTT Topic",
+        "http": "HTTP identifier"
+      },
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
@@ -406,6 +439,31 @@
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current topic is already in use."
+      }
+    },
+    "tpLink": {
+      "title": "TP-Link",
+      "description": "Control TP-Link Bulbs and Plugs.",
+      "deviceTab": "Devices",
+      "device": {
+        "title": "Devices in Gladys",
+        "nameLabel": "Name",
+        "noNameLabel": "No name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "search": "Search devices",
+        "connectButton": "Connect/Reconnect",
+        "scanButton": "Scan network",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "noDevices": "No TP-Link device added yet.",
+        "noDevicesFound": "No devices found. Make sure you have connected one TP-Link Device (Bulb/Plug) to your WiFi.",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "createGithubIssue": "Suggest this device",
+        "saveError": "Error while saving, please try again.",
+        "deleteError": "Error when deleting, please try again."
       }
     },
     "zwave": {
@@ -528,7 +586,6 @@
         "externalIdLabel": "Feature external ID",
         "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
-        "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
@@ -666,6 +723,7 @@
       "description": "Control your Bluetooth devices.",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
         "search": "Search devices",
@@ -675,8 +733,8 @@
         "namePlaceholder": "Enter device name",
         "roomLabel": "Room",
         "externalIdLabel": "External ID",
-        "manufacturerLabel": "Fabricant",
-        "modelLabel": "Modèle",
+        "manufacturerLabel": "Manufacturer",
+        "modelLabel": "Model",
         "featuresLabel": "Features",
         "noFeatureDiscovered": "No features discovered.",
         "featureNamePlaceholder": "Enter feature name",
@@ -686,7 +744,6 @@
       },
       "setup": {
         "title": "Bluetooth Setup",
-        "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
         "scanButton": "Scan",
         "reloadButton": "Reload",
         "noDeviceFound": "No bluetooth device discovered.",
@@ -694,6 +751,8 @@
         "updateDeviceInGladys": "Update in Gladys",
         "deviceCreatedSuccess": "The device was successfully added",
         "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "notManagedByBluteoothButton": "Managed by \"{{service}}\" service",
+        "notManagedByBluteooth": "You cannot manage this device here as it is already manager by \"{{service}}\" service.",
         "saveSuccess": "Bluetooth device successfully created.",
         "saveError": "There was an error creating the device.",
         "peripheral": {
@@ -703,6 +762,60 @@
           "cancelLabel": "Cancel",
           "successLabel": "Done"
         }
+      }
+    },
+    "eWeLink": {
+      "title": "eWeLink",
+      "description": "Control your eWeLink devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "eWeLink discover",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan eWeLink devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
+      "status": {
+        "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
+        "setupPageLink": "eWeLink configuration page."
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "search": "Search devices",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No eWeLink device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your eWeLink cloud account",
+        "description": "eWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "error": "Error discovering eWeLink devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No eWeLink device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "eWeLink configuration",
+        "eweLinkDescription": "You can connect Gladys to your eWeLink cloud account to command the associated devices.",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter eWeLink username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter eWeLink password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
+        "connected": "Connected to the eWeLink cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
       }
     }
   },
@@ -767,6 +880,28 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR"
+      },
+      "userPresence": {
+        "userLabel": "User",
+        "houseLabel": "House",
+        "userSeenDescription": "This action set the user as \"at home\".",
+        "userLeftHomeDescription": "This action set the user as \"left home\"."
+      },
+      "httpRequest": {
+        "description": "This action let you make HTTP requests.",
+        "methodLabel": "Method",
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
+        "urlLabel": "URL",
+        "urlPlaceholder": "URL",
+        "bodyLabel": "Body",
+        "bodyPlaceholder": "Body",
+        "headersLabel": "Headers",
+        "headersKeyPlaceholder": "Name",
+        "headersValuePlaceholder": "Value"
       }
     },
     "actions": {
@@ -794,6 +929,13 @@
       },
       "condition": {
         "only-continue-if": "Only continue if"
+      },
+      "user": {
+        "set-seen-at-home": "User seen at home",
+        "set-out-of-home": "User left home"
+      },
+      "http": {
+        "request": "Make a HTTP request"
       }
     },
     "variables": {
@@ -821,7 +963,8 @@
         "different": "different",
         "valuePlaceholder": "Value",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -903,6 +1046,7 @@
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
+    "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Users",
     "gatewayOpenApiTab": "Open API"
@@ -921,6 +1065,43 @@
     "revoke": "Revoke",
     "unknowDevice": "Unknow device",
     "apiKey": "API Key"
+  },
+  "servicesSettings": {
+    "title": "Services",
+    "selector": "Internal name: {{key}}",
+    "integrationLinkTitle": "Go to integration page",
+    "status": {
+      "title": "Status",
+      "UNKNOWN": {
+        "title": "Unknown",
+        "detail": "Service not found"
+      },
+      "DISABLED": {
+        "title": "Disabled",
+        "detail": "Service disabled"
+      },
+      "ENABLED": {
+        "title": "Enabled",
+        "detail": "Service enabled"
+      },
+      "RUNNING": {
+        "title": "Running",
+        "detail": "Service running"
+      },
+      "STOPPED": {
+        "title": "Stopped",
+        "detail": "Service stopped by user"
+      },
+      "ERROR": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      },
+      "LOADING": {
+        "title": "Error",
+        "detail": "Service failed to start."
+      }
+    },
+    "action": "Action"
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -1095,14 +1276,32 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
-    "percent": "%",
-    "ppm": "ppm"
+    "percent": "Percent (%)",
+    "pascal": "Pascal (Pa)",
+    "lux": "Lux",
+    "watt": "Watt (W)",
+    "kilowatt": "Kilowatt (kW)",
+    "kilowatt-hour": "Kilowatt per hour (kW/h)",
+    "ampere": "Ampere (A)",
+    "volt": "Volt (V)",
+    "ppm": "Parts per million (ppm)",
+    "cm": "Centimeter (cm)",
+    "mm": "Millimeter (mm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
     "percent": "%",
-    "ppm": "ppm"
+    "pascal": "Pa",
+    "lux": "lx",
+    "watt": "W",
+    "kilowatt": "KW",
+    "kilowatt-hour": "kW/h",
+    "ampere": "A",
+    "volt": "V",
+    "ppm": "ppm",
+    "cm": "cm",
+    "mm": "mm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1130,6 +1329,10 @@
       "push": "Motion (push)",
       "binary": "Motion (binary)"
     },
+    "presence-sensor": {
+      "shortCategoryName": "Presence sensor",
+      "push": "Presence"
+    },
     "light-sensor": {
       "shortCategoryName": "Luminosity sensor",
       "integer": "Luminosity (integer)",
@@ -1138,6 +1341,10 @@
     "sismic-sensor": {
       "shortCategoryName": "Sismic sensor",
       "decimal": "Sismic (decimal)"
+    },
+    "distance-sensor": {
+      "shortCategoryName": "Distance",
+      "decimal": "Distance"
     },
     "camera": {
       "shortCategoryName": "Camera",
@@ -1252,7 +1459,8 @@
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click <a href=\"/dashboard/settings/billing\"here</a>."
+    "manageBilling": "To manage your billing, click ",
+    "here": "here"
   },
   "editDeviceForm": {
     "noName": "No name",
@@ -1274,7 +1482,15 @@
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
-    "notFound": "Requested device not found."
+    "notFound": "Requested device not found.",
+    "pollFrequency": {
+      "label": "Refresh frequency",
+      "everyMinutes": "Every minutes",
+      "every30Seconds": "Every 30 seconds",
+      "every10Seconds": "Every 10 seconds",
+      "every2Seconds": "Every 2 seconds",
+      "every1Seconds": "Every second"
+    }
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
@@ -1386,17 +1602,6 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "cardTypeLabel": "Type",
-    "cardLastDigitsLabel": "Last 4 digits",
-    "cardExpirationLabel": "Expiration date",
-    "updateInformationTitle": "Update Card Information",
-    "updateInformationDescription": "If your card has expired, or you want to change credit card, you can update here your card information.",
-    "cancelSubscriptionTitle": "Cancel subscription",
-    "cancelSubscriptionError": "Warning: There was an error while trying to cancel your account. Please retry again later.",
-    "cancelSubscriptionSuccess": "Your subscription was successfully canceled!",
-    "cancelSubscriptionDescription": "If you want to cancel your account, click here:",
-    "cancelSubscriptionButton": "Cancel subscription",
-    "accountCancelled": "Your account was canceled on {{date}}",
-    "subscriptionButton": "Subscribe again"
+    "stripeButton": "Edit subscription in Stripe"
   }
 }

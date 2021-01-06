@@ -11,3 +11,5 @@ module.exports.zwave = require('./zwave');
 module.exports.tasmota = require('./tasmota');
 module.exports.rflink = require('./rflink');
 module.exports.bluetooth = require('./bluetooth');
+module.exports.ewelink = require('./ewelink');
+module.exports['tp-link'] = require('./tp-link');

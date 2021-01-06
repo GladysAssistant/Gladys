@@ -58,7 +58,6 @@ describe('bluetooth.discover event', () => {
       selector: 'bluetooth-uuid',
       features: [],
       params: [{ name: 'loaded', value: true }],
-      service_id: serviceId,
     };
 
     assert.calledWith(eventWS, { payload: expectedWSPeripheral, type: 'bluetooth.discover' });
@@ -85,7 +84,6 @@ describe('bluetooth.discover event', () => {
       selector: 'bluetooth-uuid2',
       features: [],
       params: [],
-      service_id: serviceId,
     };
 
     assert.calledWith(eventWS, { payload: expectedWSPeripheral, type: 'bluetooth.discover' });
@@ -109,9 +107,40 @@ describe('bluetooth.discover event', () => {
       selector: 'bluetooth-uuid',
       features: [],
       params: [],
-      service_id: serviceId,
     };
 
     assert.calledWith(eventWS, { payload: expectedWSPeripheral, type: 'bluetooth.discover' });
+  });
+
+  it('should not add discovered (already discovered)', () => {
+    const newPeripheral = {
+      uuid: 'UUID',
+      address: 'ADDRESS',
+      rssi: 'RSSI',
+      advertisement: {},
+      state: 'connected',
+      connectable: true,
+    };
+
+    bluetoothManager.discoveredDevices.UUID = {};
+    bluetoothManager.discover(newPeripheral);
+
+    assert.notCalled(eventWS);
+  });
+
+  it('should not add discovered (peripheral lookup)', () => {
+    const newPeripheral = {
+      uuid: 'UUID',
+      address: 'ADDRESS',
+      rssi: 'RSSI',
+      advertisement: {},
+      state: 'connected',
+      connectable: true,
+    };
+
+    bluetoothManager.peripheralLookup = true;
+    bluetoothManager.discover(newPeripheral);
+
+    assert.notCalled(eventWS);
   });
 });

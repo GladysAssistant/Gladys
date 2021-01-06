@@ -5,8 +5,21 @@ import actions from '../../actions/gatewayLinkUser';
 import { route } from 'preact-router';
 import { RequestStatus } from '../../utils/consts';
 
-@connect('users,usersGetStatus', actions)
+@connect('users,usersGetStatus,session', actions)
 class LinkGatewayUser extends Component {
+  getSetupState = async () => {
+    await this.setState({ loading: true });
+    const setupState = await this.props.session.gatewayClient.getSetupState();
+    this.setState({
+      setupState,
+      loading: false
+    });
+  };
+  openStripeBilling = async () => {
+    window.open(
+      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
+    );
+  };
   selectUser = e => {
     this.setState({
       selectedUser: e.target.value
@@ -24,6 +37,7 @@ class LinkGatewayUser extends Component {
   };
   componentWillMount() {
     this.props.getUsers();
+    this.getSetupState();
   }
   render(props, { savingUserLoading, error }) {
     const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
@@ -34,6 +48,7 @@ class LinkGatewayUser extends Component {
         selectUser={this.selectUser}
         saveUser={this.saveUser}
         loading={loading}
+        openStripeBilling={this.openStripeBilling}
       />
     );
   }

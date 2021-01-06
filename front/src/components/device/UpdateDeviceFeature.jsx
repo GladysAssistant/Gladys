@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
@@ -12,29 +12,24 @@ class UpdateDeviceFeature extends Component {
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
-  render(props, {}) {
+  render({ feature, featureIndex, ...props }) {
     return (
       <div class="col-md-4">
         <div class="card">
           <div class="card-header">
-            <i
-              class={`mr-2 fe fe-${get(
-                DeviceFeatureCategoriesIcon,
-                `${props.feature.category}.${props.feature.type}`
-              )}`}
-            />
-            <Text id={`deviceFeatureCategory.${props.feature.category}.${props.feature.type}`} />
+            <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
           </div>
           <div class="card-body">
-            <div class="form-group form-label" for={`featureName_${props.featureIndex}`}>
+            <div class="form-group form-label" for={`featureName_${featureIndex}`}>
               <label>
                 <Text id="editDeviceForm.nameLabel" />
               </label>
               <Localizer>
                 <input
-                  id={`featureName_${props.featureIndex}`}
+                  id={`featureName_${featureIndex}`}
                   type="text"
-                  value={props.feature.name}
+                  value={feature.name}
                   onInput={this.updateName}
                   class="form-control"
                   placeholder={<Text id="editDeviceForm.namePlaceholder" />}
@@ -43,14 +38,14 @@ class UpdateDeviceFeature extends Component {
             </div>
             {props.allowModifyFeatures && (
               <div class="form-group">
-                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <label class="form-label" for={`externalid_${featureIndex}`}>
                   <Text id="editDeviceForm.externalIdLabel" />
                 </label>
                 <Localizer>
                   <input
-                    id={`externalid_${props.featureIndex}`}
+                    id={`externalid_${featureIndex}`}
                     type="text"
-                    value={props.feature.external_id}
+                    value={feature.external_id}
                     onInput={this.updateExternalId}
                     class="form-control"
                     placeholder={<Text id="editDeviceForm.externalIdPlaceholder" />}
@@ -58,42 +53,41 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && (
+            {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
               <div class="form-group">
-                <label class="form-label" for={`externalid_${props.featureIndex}`}>
+                <label class="form-label" for={`externalid_${featureIndex}`}>
                   <Text id="editDeviceForm.unitLabel" />
                 </label>
                 <Localizer>
                   <select
-                    id={`unit_${props.featureIndex}`}
+                    id={`unit_${featureIndex}`}
                     type="text"
-                    value={props.feature.unit}
+                    value={feature.unit}
                     onChange={this.updateUnit}
                     class="form-control"
                   >
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
-                      <Text id="deviceFeatureUnit.celsius" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
-                      <Text id="deviceFeatureUnit.fahrenheit" />
-                    </option>
+                    {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category].map(unit => (
+                      <option value={unit}>
+                        <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
+                      </option>
+                    ))}
                   </select>
                 </Localizer>
               </div>
             )}
             {props.allowModifyFeatures && (
               <div class="form-group">
-                <label class="form-label" for={`min_${props.featureIndex}`}>
+                <label class="form-label" for={`min_${featureIndex}`}>
                   <Text id="editDeviceForm.minLabel" />
                 </label>
                 <Localizer>
                   <input
-                    id={`min_${props.featureIndex}`}
+                    id={`min_${featureIndex}`}
                     type="number"
-                    value={props.feature.min}
+                    value={feature.min}
                     onInput={this.updateMin}
                     class="form-control"
                     placeholder={<Text id="editDeviceForm.minPlaceholder" />}
@@ -103,14 +97,14 @@ class UpdateDeviceFeature extends Component {
             )}
             {props.allowModifyFeatures && (
               <div class="form-group">
-                <label class="form-label" for={`max_${props.featureIndex}`}>
+                <label class="form-label" for={`max_${featureIndex}`}>
                   <Text id="editDeviceForm.maxLabel" />
                 </label>
                 <Localizer>
                   <input
-                    id={`max_${props.featureIndex}`}
+                    id={`max_${featureIndex}`}
                     type="number"
-                    value={props.feature.max}
+                    value={feature.max}
                     onInput={this.updateMax}
                     class="form-control"
                     placeholder={<Text id="editDeviceForm.maxPlaceholder" />}

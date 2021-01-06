@@ -1,3 +1,4 @@
+const WebSocket = require('ws');
 const { parseWebsocketMessage, formatWebsocketMessage } = require('../../utils/websocketUtils');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -21,7 +22,9 @@ function sendMessageUser({ type, payload, userId }) {
     return;
   }
   this.connections[userId].forEach((userConnection) => {
-    userConnection.client.send(formatWebsocketMessage(type, payload));
+    if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
+      userConnection.client.send(formatWebsocketMessage(type, payload));
+    }
   });
 }
 
@@ -35,7 +38,9 @@ function sendMessageAllUsers({ type, payload }) {
   const usersIds = Object.keys(this.connections);
   usersIds.forEach((userId) => {
     this.connections[userId].forEach((userConnection) => {
-      userConnection.client.send(formatWebsocketMessage(type, payload));
+      if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
+        userConnection.client.send(formatWebsocketMessage(type, payload));
+      }
     });
   });
 }

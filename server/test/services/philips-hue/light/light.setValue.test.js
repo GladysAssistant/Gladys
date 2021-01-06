@@ -1,11 +1,13 @@
-const { assert } = require('chai');
-const { fake } = require('sinon');
+const { expect } = require('chai');
+const sinon = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
-const PhilipsHueClient = require('../mocks.test');
+const { MockedPhilipsHueClient, fakes } = require('../mocks.test');
+
+const { fake, assert } = sinon;
 
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
-  'node-hue-api': PhilipsHueClient,
+  'node-hue-api': MockedPhilipsHueClient,
 });
 
 const StateManager = require('../../../../lib/state');
@@ -66,7 +68,11 @@ const gladys = {
 };
 
 describe('PhilipsHueService', () => {
-  it('should set value', async () => {
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('should set binary value (on)', async () => {
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await philipsHueService.device.init();
     await philipsHueService.device.setValue(
@@ -85,13 +91,17 @@ describe('PhilipsHueService', () => {
       },
       1,
     );
+
+    assert.calledOnce(fakes.on);
+    assert.notCalled(fakes.off);
+    assert.notCalled(fakes.rgb);
   });
-  it('should return hue api not found', async () => {
+  it('should set binary value (off)', async () => {
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await philipsHueService.device.init();
-    const promise = philipsHueService.device.setValue(
+    await philipsHueService.device.setValue(
       {
-        external_id: 'light:not-found:1',
+        external_id: 'light:1234:1',
         features: [
           {
             category: 'light',
@@ -103,8 +113,61 @@ describe('PhilipsHueService', () => {
         category: 'light',
         type: 'binary',
       },
-      1,
+      0,
     );
-    return assert.isRejected(promise, 'HUE_API_NOT_FOUND');
+
+    assert.calledOnce(fakes.off);
+    assert.notCalled(fakes.on);
+    assert.notCalled(fakes.rgb);
+  });
+  it('should set color value', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+    await philipsHueService.device.setValue(
+      {
+        external_id: 'light:1234:1',
+        features: [
+          {
+            category: 'light',
+            type: 'color',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'color',
+      },
+      255,
+    );
+
+    assert.calledOnce(fakes.rgb);
+    assert.notCalled(fakes.off);
+    assert.notCalled(fakes.on);
+  });
+  it('should return hue api not found', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+
+    try {
+      await philipsHueService.device.setValue(
+        {
+          external_id: 'light:not-found:1',
+          features: [
+            {
+              category: 'light',
+              type: 'binary',
+            },
+          ],
+        },
+        {
+          category: 'light',
+          type: 'binary',
+        },
+        1,
+      );
+      expect.fail();
+    } catch (e) {
+      expect(e.message).eq('HUE_API_NOT_FOUND');
+    }
   });
 });

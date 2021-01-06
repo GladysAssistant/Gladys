@@ -1,26 +1,15 @@
-import { RequestStatus } from '../../../../../utils/consts';
-import createActionsHouse from '../../../../../actions/house';
 import update from 'immutability-helper';
+import { RequestStatus } from '../../../../../utils/consts';
+
+import createActionsHouse from '../../../../../actions/house';
+import createActionsIntegration from '../../../../../actions/integration';
+import createActionsBluetooth from '../commons/actions';
 
 const createActions = store => {
   const houseActions = createActionsHouse(store);
+  const integrationActions = createActionsIntegration(store);
+  const bluetoothActions = createActionsBluetooth(store);
   const actions = {
-    async getStatus(state) {
-      store.setState({
-        bluetoothGetDriverStatus: RequestStatus.Getting
-      });
-      try {
-        const bluetoothStatus = await state.httpClient.get('/api/v1/service/bluetooth/status');
-        store.setState({
-          bluetoothStatus,
-          bluetoothGetDriverStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          bluetoothGetDriverStatus: RequestStatus.Error
-        });
-      }
-    },
     async getPeripherals(state) {
       store.setState({
         bluetoothGetPeripheralsStatus: RequestStatus.Getting
@@ -37,55 +26,17 @@ const createActions = store => {
         });
       }
     },
-    async scan(state, selector) {
-      const useSelector = typeof selector === 'string';
-
-      if (!useSelector) {
-        store.setState({
-          bluetoothScanStatus: RequestStatus.Getting
-        });
-      }
-
-      let action;
-      if (state.bluetoothStatus.scanning) {
-        action = 'off';
-      } else {
-        action = 'on';
-      }
-
-      try {
-        const uri = `/api/v1/service/bluetooth/scan${useSelector ? `/${selector}` : ''}`;
-        const bluetoothStatus = await state.httpClient.post(uri, {
-          scan: action
-        });
-        store.setState({
-          bluetoothStatus,
-          bluetoothScanStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        if (!useSelector) {
-          store.setState({
-            bluetoothScanStatus: RequestStatus.Error
-          });
-        }
-      }
-    },
-    async updateStatus(state, bluetoothStatus) {
-      store.setState({
-        bluetoothStatus
-      });
-    },
     async addPeripheral(state, peripheral) {
       const peripheralKey = peripheral.selector;
-      const currentIndex = (state.bluetoothPeripherals || []).findIndex(p => p.selector === peripheralKey);
+      let bluetoothPeripherals = state.bluetoothPeripherals || [];
+      const currentIndex = bluetoothPeripherals.findIndex(p => p.selector === peripheralKey);
 
-      let bluetoothPeripherals;
       if (currentIndex >= 0) {
-        bluetoothPeripherals = update(state.bluetoothPeripherals, {
+        bluetoothPeripherals = update(bluetoothPeripherals, {
           [currentIndex]: { $set: peripheral }
         });
       } else {
-        bluetoothPeripherals = update(state.bluetoothPeripherals, {
+        bluetoothPeripherals = update(bluetoothPeripherals, {
           $push: [peripheral]
         });
       }
@@ -117,15 +68,9 @@ const createActions = store => {
           bluetoothSaveStatus: RequestStatus.Error
         });
       }
-    },
-    async getIntegrationByName(state, name) {
-      const currentIntegration = await state.httpClient.get(`/api/v1/service/${name}`);
-      store.setState({
-        currentIntegration
-      });
     }
   };
-  return Object.assign({}, actions, houseActions);
+  return Object.assign({}, actions, houseActions, integrationActions, bluetoothActions);
 };
 
 export default createActions;

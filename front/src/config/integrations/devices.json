@@ -30,7 +30,16 @@
     "img": "/assets/integrations/cover/rflink.png"
   },
   {
+    "key": "tpLink",
+    "link": "tp-link",
+    "img": "/assets/integrations/cover/tp-link.jpg"
+  },
+  {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg"
+  },
+  {
+    "key": "eWeLink",
+    "img": "/assets/integrations/cover/ewelink.jpg"
   }
 ]

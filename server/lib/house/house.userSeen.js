@@ -31,24 +31,24 @@ async function userSeen(houseSelector, userSelector) {
     throw new NotFoundError('User not found');
   }
 
-  const userPlain = user.get({ plain: true });
+  let userFinal = user;
 
   // user was not in this house before
   if (user.current_house_id !== house.id) {
-    await user.update({ current_house_id: house.id, last_house_changed: new Date() });
+    userFinal = await user.update({ current_house_id: house.id, last_house_changed: new Date() });
     // so we emit back at home event
-    this.event.emit(EVENTS.USER_PRESENCE.BACK_HOME, userPlain);
+    this.event.emit(EVENTS.USER_PRESENCE.BACK_HOME, userFinal.get({ plain: true }));
     // and we emit websocket event so that the change is sent to UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME,
-      payload: userPlain,
+      payload: userFinal.get({ plain: true }),
     });
   } else {
     // otherwise, we just emit user seen event
-    this.event.emit(EVENTS.USER_PRESENCE.SEEN_AT_HOME, userPlain);
+    this.event.emit(EVENTS.USER_PRESENCE.SEEN_AT_HOME, userFinal.get({ plain: true }));
   }
 
-  return userPlain;
+  return userFinal.get({ plain: true });
 }
 
 module.exports = {

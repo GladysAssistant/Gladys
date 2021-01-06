@@ -20,7 +20,6 @@ import ResetPassword from '../routes/reset-password';
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
-import SubscribeGateway from '../routes/subscribe-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
@@ -47,6 +46,7 @@ import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
 import SettingsSystemPage from '../routes/settings/settings-system';
+import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
@@ -59,6 +59,7 @@ import CaldavPage from '../routes/integration/all/caldav';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
+import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
@@ -80,13 +81,20 @@ import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 // Tasmota
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
-import TasmotaDiscoverPage from '../routes/integration/all/tasmota/discover-page';
+import TasmotaMqttDiscoverPage from '../routes/integration/all/tasmota/discover-mqtt';
+import TasmotaHttpDiscoverPage from '../routes/integration/all/tasmota/discover-http';
 
 // Integrations Bluetooth
 import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
 import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
 import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
 import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
+
+// EweLink
+import EweLinkPage from '../routes/integration/all/ewelink/device-page';
+import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
+import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
+import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -123,7 +131,6 @@ const AppRouter = connect(
         )}
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
-        {config.gatewayMode ? <SubscribeGateway path="/subscribe-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
           <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />
         ) : (
@@ -170,6 +177,8 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
+        <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
+        <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
@@ -186,11 +195,16 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
-        <TasmotaDiscoverPage path="/dashboard/integration/device/tasmota/discover" />
+        <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
+        <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
         <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
         <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
+        <EweLinkPage path="/dashboard/integration/device/ewelink" />
+        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
+        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
+        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
@@ -207,6 +221,7 @@ const AppRouter = connect(
         <SettingsHousePage path="/dashboard/settings/house" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
+        <SettingsServicePage path="/dashboard/settings/service" />
         <SettingsBackup path="/dashboard/settings/backup" />
         <Error type="404" default />
       </Router>

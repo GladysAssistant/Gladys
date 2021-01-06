@@ -25,7 +25,8 @@ const SERVICE_STATUS = {
   ENABLED: 'ENABLED',
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
-  READY: 'READY',
+  RUNNING: 'RUNNING',
+  STOPPED: 'STOPPED',
   ERROR: 'ERROR',
 };
 
@@ -38,6 +39,9 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   DEVICE: {
     NEW: 'device.new',
+    CREATE: 'device.create',
+    UPDATE: 'device.update',
+    DELETE: 'device.delete',
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
@@ -201,10 +205,6 @@ const ACTIONS = {
   TIME: {
     DELAY: 'delay',
   },
-  SERVICE: {
-    START: 'service.start',
-    STOP: 'service.stop',
-  },
   SCENE: {
     START: 'scene.start',
   },
@@ -213,6 +213,13 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+  },
+  USER: {
+    SET_SEEN_AT_HOME: 'user.set-seen-at-home',
+    SET_OUT_OF_HOME: 'user.set-out-of-home',
+  },
+  HTTP: {
+    REQUEST: 'http.request',
   },
 };
 
@@ -247,10 +254,12 @@ const DEVICE_FEATURE_CATEGORIES = {
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
+  DISTANCE_SENSOR: 'distance-sensor',
   CAMERA: 'camera',
   SWITCH: 'switch',
   SIREN: 'siren',
-  ACCESS_CONTROl: 'access-control',
+  ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
   UNKNOWN: 'unknown',
@@ -351,6 +360,18 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
+  MM: 'mm',
+  CM: 'cm',
+};
+
+const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
+  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [DEVICE_FEATURE_UNITS.MM, DEVICE_FEATURE_UNITS.CM],
+  [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL],
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
 };
 
 const ACTIONS_STATUS = {
@@ -422,11 +443,17 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'xiaomi.new-device',
   },
   TASMOTA: {
-    NEW_DEVICE: 'tasmota.new-device',
+    NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',
     DISCOVER: 'bluetooth.discover',
+  },
+  EWELINK: {
+    CONNECTED: 'ewelink.connected',
+    NEW_DEVICE: 'ewelink.new-device',
+    ERROR: 'ewelink.error',
   },
 };
 
@@ -511,6 +538,8 @@ module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 
 module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
+
+module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGORY;
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);

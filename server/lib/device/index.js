@@ -24,6 +24,7 @@ const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
 const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
+const { notify } = require('./device.notify');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -71,5 +72,6 @@ DeviceManager.prototype.saveStringState = saveStringState;
 DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
+DeviceManager.prototype.notify = notify;
 
 module.exports = DeviceManager;

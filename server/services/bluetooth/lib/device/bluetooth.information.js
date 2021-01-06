@@ -84,7 +84,7 @@ const INFORMATION_SERVICES = {
           unit: DEVICE_FEATURE_UNITS.PERCENT,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: 0,
           max: 100,
         };
@@ -104,7 +104,7 @@ const INFORMATION_SERVICES = {
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -100,
           max: 250,
         };
@@ -122,7 +122,7 @@ const INFORMATION_SERVICES = {
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -100,
           max: 250,
         };
@@ -140,7 +140,7 @@ const INFORMATION_SERVICES = {
           unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
           read_only: true,
           keep_history: true,
-          has_feedback: true,
+          has_feedback: false,
           min: -200,
           max: 500,
         };
@@ -175,7 +175,12 @@ const decodeValue = (serviceUuid, characteristicUuid, feature, value) => {
   return (INFORMATION_SERVICES[serviceUuid][characteristicUuid].decode || defaultDecodeValue)(feature, value);
 };
 
-const defaultEncodeValue = (value) => value;
+const defaultEncodeValue = (value) => {
+  if (Number.isNaN(value)) {
+    return value;
+  }
+  return value.toString(16);
+};
 
 const encodeValue = (serviceUuid, characteristicUuid, value) => {
   const serviceInfo = INFORMATION_SERVICES[serviceUuid];

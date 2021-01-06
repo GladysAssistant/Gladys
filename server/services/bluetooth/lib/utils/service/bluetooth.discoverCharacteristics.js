@@ -11,52 +11,37 @@ const { TIMERS } = require('./../bluetooth.constants');
  * @param {string[]} characteristicUuids - Requested characteristic uuids.
  * @returns {Promise<Object>} The map of characteristics by UUID.
  * @example
- * await discover(peripheral, {}, []);
+ * await discover({}, []);
  */
-async function discoverCharacteristics(service, characteristicUuids = []) {
+async function discoverCharacteristics(service, characteristicUuids) {
   const characteristicMap = {};
-  const filtering = characteristicUuids.length && service.characteristics;
-
-  let notMapped = characteristicUuids;
-  if (filtering) {
-    logger.debug(`Bluetooth: filtering characteristics for service ${service.uuid}`);
-
-    notMapped = characteristicUuids.filter((uuid) => {
-      const found = service.characteristics.filter((characteristic) => {
-        const filtered = characteristic.uuid === uuid;
-        if (filtered) {
-          characteristicMap[characteristic.uuid] = characteristic;
-        }
-        return filtered;
-      });
-
-      return found.length === 0;
-    });
-  }
-
-  if (filtering && notMapped.length === 0) {
-    logger.debug(`Bluetooth: all characteristics already found for service ${service.uuid}`);
-    return characteristicMap;
-  }
-
   logger.trace(`Bluetooth: discovering characteristics for service ${service.uuid}`);
 
   return new Promise((resolve, reject) => {
-    service.discoverCharacteristics(notMapped, (error, characteristics) => {
+    service.discoverCharacteristics(characteristicUuids, (error, characteristics) => {
       if (error) {
-        reject(new Error(`Bluetooth: error discovering characteristics for service ${service.uuid} - ${error}`));
+        return reject(new Error(`Bluetooth: error discovering characteristics for service ${service.uuid} - ${error}`));
       }
 
       if (characteristics.length === 0) {
-        reject(new NotFoundError(`Bluetooth: no characteristics found for service ${service.uuid}`));
+        return reject(new NotFoundError(`Bluetooth: no characteristics found for service ${service.uuid}`));
       }
 
       characteristics.forEach((characteristic) => {
         characteristicMap[characteristic.uuid] = characteristic;
       });
 
+      if (characteristicUuids) {
+        const characteristicKeys = Object.keys(characteristicMap);
+        if (!characteristicUuids.every((s) => characteristicKeys.includes(s))) {
+          return reject(
+            new NotFoundError(`Bluetooth: requested ${characteristicUuids} services not found for ${service.uuid}`),
+          );
+        }
+      }
+
       logger.debug(`Bluetooth: all characteristics already found for service ${service.uuid}`);
-      resolve(characteristicMap);
+      return resolve(characteristicMap);
     });
   }).timeout(TIMERS.DISCOVER);
 }

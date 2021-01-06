@@ -4,7 +4,6 @@ const { assert, fake } = sinon;
 const BluetoothController = require('../../../../services/bluetooth/api/bluetooth.controller');
 
 const status = 'ready';
-let peripheral;
 const peripherals = [
   {
     uuid: 'UUID1',
@@ -17,7 +16,6 @@ const peripherals = [
 const bluetoothManager = function bluetoothManager() {};
 
 bluetoothManager.getStatus = fake.returns(status);
-bluetoothManager.getDiscoveredDevice = fake.returns(peripheral);
 bluetoothManager.getDiscoveredDevices = fake.returns(peripherals);
 bluetoothManager.scan = fake.returns(null);
 bluetoothManager.scanDevice = fake.resolves(null);
@@ -54,8 +52,22 @@ describe('GET /api/v1/service/bluetooth/peripheral', () => {
     assert.calledWith(res.json, peripherals);
   });
 
+  it('should fail with peripheral', async () => {
+    const bluetoothController = BluetoothController(bluetoothManager);
+    const device = {};
+    bluetoothManager.getDiscoveredDevice = fake.returns(device);
+
+    const req = { params: { uuid: 'uuid1' } };
+    await bluetoothController['get /api/v1/service/bluetooth/peripheral/bluetooth-:uuid'].controller(req, res);
+    assert.calledOnce(bluetoothManager.getDiscoveredDevice);
+    assert.calledWith(res.json, device);
+    assert.notCalled(res.status);
+  });
+
   it('should fail without peripheral', async () => {
     const bluetoothController = BluetoothController(bluetoothManager);
+    bluetoothManager.getDiscoveredDevice = fake.returns(undefined);
+
     const req = { params: { uuid: 'uuid1' } };
     await bluetoothController['get /api/v1/service/bluetooth/peripheral/bluetooth-:uuid'].controller(req, res);
     assert.calledOnce(bluetoothManager.getDiscoveredDevice);

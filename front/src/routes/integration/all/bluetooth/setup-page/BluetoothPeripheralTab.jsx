@@ -5,16 +5,16 @@ import style from '../style.css';
 import BluetoothPeripheral from './BluetoothPeripheral';
 import { RequestStatus } from '../../../../../utils/consts';
 import EmptyState from '../EmptyState';
+import CheckBluetoothPanel from '../commons/CheckBluetoothPanel';
 
 const BluetoothPeripheralTab = ({
   scan,
   createDevice,
-  bluetoothGetDriverStatus,
   bluetoothStatus = {},
   bluetoothGetPeripheralsStatus,
-  bluetoothPeripherals = []
+  bluetoothPeripherals = [],
+  currentIntegration = {}
 }) => {
-  const bluetoothNotReady = bluetoothGetDriverStatus === RequestStatus.Error || !bluetoothStatus.ready;
   const scanning = bluetoothStatus.scanning || bluetoothGetPeripheralsStatus === RequestStatus.Getting;
 
   return (
@@ -30,18 +30,14 @@ const BluetoothPeripheralTab = ({
               'btn-outline-primary': !bluetoothStatus.scanning
             })}
             onClick={scan}
-            disabled={bluetoothNotReady || bluetoothStatus.peripheralLookup}
+            disabled={!bluetoothStatus.ready || bluetoothStatus.peripheralLookup}
           >
             <Text id="integration.bluetooth.setup.scanButton" /> <i class="fe fe-radio" />
           </button>
         </div>
       </div>
       <div class="card-body">
-        {bluetoothNotReady && (
-          <div class="alert alert-warning">
-            <Text id="integration.bluetooth.setup.bluetoothNotReadyError" />
-          </div>
-        )}
+        <CheckBluetoothPanel />
         <div
           class={cx('dimmer', {
             active: scanning && !bluetoothStatus.peripheralLookup,
@@ -51,10 +47,10 @@ const BluetoothPeripheralTab = ({
           <div class="loader" />
           <div class="dimmer-content">
             <div class="row">
-              {!bluetoothNotReady && bluetoothPeripherals.length === 0 && (
+              {bluetoothStatus.ready && bluetoothPeripherals.length === 0 && (
                 <EmptyState id="integration.bluetooth.setup.noDeviceFound" />
               )}
-              {!bluetoothNotReady &&
+              {bluetoothStatus.ready &&
                 bluetoothPeripherals.map((peripheral, index) => (
                   <BluetoothPeripheral
                     peripheral={peripheral}
@@ -62,6 +58,7 @@ const BluetoothPeripheralTab = ({
                     createDevice={createDevice}
                     scan={scan}
                     bluetoothStatus={bluetoothStatus}
+                    currentIntegration={currentIntegration}
                   />
                 ))}
             </div>

@@ -11,6 +11,9 @@ const { EVENTS } = require('../../../../../utils/constants');
 
 const gladys = {
   event,
+  stateManager: {
+    get: fake.returns(null),
+  },
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
@@ -34,6 +37,7 @@ describe('bluetooth.getDiscoveredDevices command', () => {
     const result = bluetoothManager.getDiscoveredDevices();
     expect(result).deep.eq([]);
     assert.notCalled(eventWS);
+    assert.notCalled(gladys.stateManager.get);
   });
 
   it('should get retrieved peripherals', () => {
@@ -93,5 +97,6 @@ describe('bluetooth.getDiscoveredDevices command', () => {
       bluetoothManager.discoveredDevices.P3,
     ]);
     assert.notCalled(eventWS);
+    assert.callCount(gladys.stateManager.get, 3);
   });
 });

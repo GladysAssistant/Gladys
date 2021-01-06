@@ -1,4 +1,5 @@
 import { Text, Localizer, MarkupText } from 'preact-i18n';
+import cx from 'classnames';
 
 import OpenApiKey from './OpenApiKey';
 
@@ -44,7 +45,7 @@ const OpenApi = ({ children, ...props }) => (
                 <Localizer>
                   <input
                     type="text"
-                    class={'form-control ' + (props.missingNewOpenApiName ? 'is-invalid' : '')}
+                    class={cx('form-control', { 'is-invalid': props.missingNewOpenApiName })}
                     value={props.newApiKeyName}
                     onChange={props.updateNewApiKeyName}
                     placeholder={<Text id="gatewayOpenApi.keyName" />}

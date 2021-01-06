@@ -13,14 +13,9 @@ function discover(noblePeripheral) {
   logger.trace(`Bluetooth: discover ${noblePeripheral.uuid}`);
 
   // Store device if not already there
-  if (!this.peripheralLookup || !this.discoveredDevices[noblePeripheral.uuid]) {
-    const device = transformToDevice(noblePeripheral);
-    const existingDevice = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-    device.service_id = this.serviceId;
-    if (existingDevice) {
-      device.id = existingDevice.id;
-    }
-
+  if (!this.peripheralLookup && !this.discoveredDevices[noblePeripheral.uuid]) {
+    let device = transformToDevice(noblePeripheral);
+    device = this.completeDevice(device);
     this.discoveredDevices[noblePeripheral.uuid] = device;
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

@@ -14,21 +14,21 @@ class BluetoothPeripheralFeatures extends Component {
     this.props.scan(this.props.peripheral.selector);
   };
 
-  render({ children, peripheral, bluetoothStatus }) {
+  render({ children, peripheral, bluetoothStatus, bluetoothDevice }) {
     const params = peripheral.params || [];
     const loadedParam = params.find(p => p.name === PARAMS.LOADED);
     const loadedValue = (loadedParam || { value: false }).value;
 
     return (
       <div class="form-group">
-        <label>
+        <label class="form-label">
           <Text id="integration.bluetooth.device.featuresLabel" />
         </label>
         <div class="row mb-3">
           <button
             type="button"
             class="btn btn-sm btn-outline-primary mx-auto"
-            disabled={bluetoothStatus.scanning || bluetoothStatus.peripheralLookup}
+            disabled={bluetoothStatus.scanning || bluetoothStatus.peripheralLookup || !bluetoothDevice}
             onClick={this.scan}
           >
             <Text id="integration.bluetooth.setup.reloadButton" />

@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import get from 'get-value';
 import update from 'immutability-helper';
 
 import actions from '../actions';
@@ -60,7 +61,8 @@ class ConfigurePeripheralForm extends Component {
   createDevice = e => {
     e.preventDefault();
 
-    this.props.createDevice(this.state.device);
+    const { device } = this.state;
+    this.props.createDevice({ ...device, service_id: this.props.currentIntegration.id });
   };
 
   constructor(props) {
@@ -80,15 +82,17 @@ class ConfigurePeripheralForm extends Component {
     this.props.getIntegrationByName('bluetooth');
   }
 
-  render({ houses, bluetoothStatus, reloadDevice }, { device, bluetoothSaveStatus }) {
-    const disableForm = bluetoothSaveStatus === RequestStatus.Getting;
+  render({ houses, bluetoothStatus, reloadDevice, bluetoothSaveStatus, currentIntegration = {} }, { device }) {
+    const disableForm = bluetoothSaveStatus === RequestStatus.Getting || !bluetoothDevice;
     const deviceFeatures = device.features || [];
+    const deviceService = get(device, 'service_id');
+    const bluetoothDevice = !deviceService || deviceService === currentIntegration.id;
 
     return (
       <form>
-        {bluetoothSaveStatus === RequestStatus.Error && (
-          <div class="alert alert-danger">
-            <Text id="integration.bluetooth.setup.saveError" />
+        {!bluetoothDevice && (
+          <div class="alert alert-warning">
+            <Text id="integration.bluetooth.setup.notManagedByBluteooth" fields={{ service: device.service.name }} />
           </div>
         )}
 
@@ -144,14 +148,21 @@ class ConfigurePeripheralForm extends Component {
             </div>
           </div>
 
-          <BluetoothPeripheralFeatures peripheral={device} bluetoothStatus={bluetoothStatus} scan={reloadDevice}>
-            {deviceFeatures.map((feature, index) => (
-              <UpdateDeviceFeature
-                feature={feature}
-                featureIndex={index}
-                updateFeatureProperty={this.updateFeatureProperty}
-              />
-            ))}
+          <BluetoothPeripheralFeatures
+            peripheral={device}
+            bluetoothStatus={bluetoothStatus}
+            scan={reloadDevice}
+            bluetoothDevice={bluetoothDevice}
+          >
+            <div class="row">
+              {deviceFeatures.map((feature, index) => (
+                <UpdateDeviceFeature
+                  feature={feature}
+                  featureIndex={index}
+                  updateFeatureProperty={this.updateFeatureProperty}
+                />
+              ))}
+            </div>
           </BluetoothPeripheralFeatures>
 
           <div class="row mt-5">
@@ -167,7 +178,7 @@ class ConfigurePeripheralForm extends Component {
             </div>
             <div class="col text-right">
               <Link href="/dashboard/integration/device/bluetooth/setup">
-                <button type="button" class="btn btn-danger" disabled={disableForm}>
+                <button type="button" class="btn btn-danger">
                   <Text id="integration.bluetooth.setup.peripheral.cancelLabel" />
                 </button>
               </Link>

@@ -15,6 +15,11 @@ process.on('unhandledRejection', (error, promise) => {
   logger.error(error);
 });
 
+process.on('uncaughtException', (error, promise) => {
+  logger.error('uncaughtException catched:', promise);
+  logger.error(error);
+});
+
 (async () => {
   // create Gladys object
   const gladys = Gladys({

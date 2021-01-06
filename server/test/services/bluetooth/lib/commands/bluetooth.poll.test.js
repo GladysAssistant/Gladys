@@ -38,7 +38,7 @@ describe('bluetooth.poll command', () => {
       uuid: 'uuid',
       connectable: true,
       connect: fake.yields(null),
-      disconnectAsync: fake.resolves(null),
+      disconnect: fake.resolves(null),
       discoverServices: fake.yields(null, [service]),
     };
 
@@ -74,6 +74,7 @@ describe('bluetooth.poll command', () => {
 
     assert.calledOnce(peripheral.connect);
     assert.calledOnce(peripheral.discoverServices);
+    assert.calledOnce(peripheral.disconnect);
     assert.calledOnce(service.discoverCharacteristics);
     assert.calledOnce(characteristic.read);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -83,6 +84,32 @@ describe('bluetooth.poll command', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'bluetooth:uuid:1809:2a6e',
       state: 13,
+    });
+  });
+
+  it('error on getCharacteristic', async () => {
+    service.discoverCharacteristics = fake.yields(new Error('error'));
+
+    const device = {
+      external_id: 'bluetooth:uuid',
+      features: [
+        {
+          external_id: 'bluetooth:uuid:1809:2a6e',
+        },
+      ],
+    };
+
+    await bluetoothManager.poll(device);
+
+    assert.calledOnce(peripheral.connect);
+    assert.calledOnce(peripheral.discoverServices);
+    assert.calledOnce(peripheral.disconnect);
+    assert.calledOnce(service.discoverCharacteristics);
+    assert.notCalled(characteristic.read);
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
+      payload: { peripheralLookup: false, ready: false, scanning: false },
     });
   });
 });

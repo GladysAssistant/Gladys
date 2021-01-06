@@ -15,6 +15,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 async function saveState(deviceFeature, newValue) {
   logger.debug(`device.saveState of deviceFeature ${deviceFeature.selector}`);
   const now = new Date();
+  const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
+  const previousDeviceFeatureValue = previousDeviceFeature ? previousDeviceFeature.last_value : null;
   // save local state in RAM
   this.stateManager.setState('deviceFeature', deviceFeature.selector, {
     last_value: newValue,
@@ -64,6 +66,7 @@ async function saveState(deviceFeature, newValue) {
   this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.DEVICE.NEW_STATE,
     device_feature: deviceFeature.selector,
+    previous_value: previousDeviceFeatureValue,
     last_value: newValue,
     last_value_changed: now,
   });

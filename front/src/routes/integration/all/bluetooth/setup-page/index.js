@@ -5,18 +5,16 @@ import BluetoothPage from '../BluetoothPage';
 import BluetoothPeripheralTab from './BluetoothPeripheralTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('user,session,bluetoothPeripheralUuids,bluetoothPeripherals,bluetoothStatus,bluetoothGetDriverStatus', actions)
+@connect('user,session,bluetoothPeripheralUuids,bluetoothPeripherals,bluetoothStatus,currentIntegration', actions)
 class BluetoothSetupPage extends Component {
   componentWillMount() {
     this.props.getPeripherals();
-    this.props.getStatus();
+    this.props.getIntegrationByName('bluetooth');
 
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.props.addPeripheral);
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.props.addPeripheral);
   }
 
