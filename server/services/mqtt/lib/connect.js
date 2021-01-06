@@ -31,11 +31,11 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
     username: mqttUsername,
     password: mqttPassword,
     reconnectPeriod: 5000,
-    clientId: 'gladys-assistant-main-instance',
+    clientId: `gladys-main-instance-${Math.floor(Math.random() * 1000000)}`,
   });
 
   this.mqttClient.on('connect', () => {
-    logger.info(`Connected to MQTT server ${mqttUrl}`);
+    logger.info(`Connected to MQTT server ${mqttUrl} with clientId ${this.mqttClient.options.clientId}`);
 
     Object.keys(this.topicBinds).forEach((topic) => {
       this.subscribe(topic, this.topicBinds[topic]);
