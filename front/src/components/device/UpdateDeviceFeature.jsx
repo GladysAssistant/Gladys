@@ -3,9 +3,9 @@ import { Text, Localizer } from 'preact-i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_TYPES
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY
 } from '../../../../server/utils/constants';
-import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 

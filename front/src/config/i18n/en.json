@@ -1272,7 +1272,7 @@
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
     "degree": "Degree (°)",
-    "null": "no unit"
+    "null": "no unit",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "lux": "Lux",
@@ -1290,7 +1290,7 @@
     "fahrenheit": "°F",
     "percent": "%",
     "degree": "°",
-    "null": ""
+    "null": "",
     "pascal": "Pa",
     "lux": "lx",
     "watt": "W",
