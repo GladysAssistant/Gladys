@@ -18,6 +18,10 @@ describe('should say netatmo is not configured', () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.getDevices = fake.resolves(null);
     netatmoManager.pollManual = fake.resolves(null);
+    nock(`${netatmoManager.baseUrl}`)
+      .persist()
+      .post('/oauth2/token')
+      .reply(400, { data: 'Problem' });
     await netatmoManager.connect();
   });
 
@@ -29,6 +33,7 @@ describe('should say netatmo is not configured', () => {
     netatmoManager.getDevices = fake.resolves(null);
     netatmoManager.pollManual = fake.resolves(null);
     nock(`${netatmoManager.baseUrl}`)
+      .persist()
       .post('/oauth2/token')
       .reply(200, { data: { access_token: 'XERTRXZEZREAR35346T4' } });
     await netatmoManager.connect();
@@ -42,6 +47,7 @@ describe('should say netatmo is not configured', () => {
     netatmoManager.getDevices = fake.resolves(null);
     netatmoManager.pollManual = fake.resolves(null);
     nock(`${netatmoManager.baseUrl}`)
+      .persist()
       .post('/oauth2/token')
       .reply(400, { data: 'Problem' });
     await netatmoManager.connect();
