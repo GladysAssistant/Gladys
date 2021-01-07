@@ -13,8 +13,7 @@
 <p align="center">
   <a href="#the-project">The Project</a> •
   <a href="#getting-started">Getting Started</a> •
-   <a href="#links">Links</a> •
-  <a href="#contributors-">Contributors</a> •
+  <a href="#contributors">Contributors</a> •
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
@@ -41,6 +40,8 @@ These are just simple scenarios, possibilities with Gladys are endless. Don't he
 
 To get started, you can go to [our website](https://gladysassistant.com).
 
+You can also try Gladys Assistant on our demo website [here](https://demo.gladysassistant.com).
+
 ## Pull requests are welcome
 
 If you want to help us develop on Gladys Assistant, you need to first setup your development environment locally.
@@ -50,7 +51,7 @@ If you want to help us develop on Gladys Assistant, you need to first setup your
 
 Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
 
-## Contributors ✨
+## Contributors
 
 Thanks goes to these wonderful people 👏
 

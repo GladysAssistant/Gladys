@@ -26,6 +26,12 @@ const SPECIAL_SENSORS_CATEGORY_TYPE = [
   DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER,
   DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SENSOR.STRING
 ];
+const SPECIAL_SENSORS = [
+  DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR
+];
+const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
@@ -70,6 +76,18 @@ const SensorDeviceType = ({ children, ...props }) => (
           )}
         </td>
       )}
+    {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
+      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+        {props.deviceFeature.last_value !== null && (
+          <span>
+            {' '}
+            <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
+          </span>
+        )}
+      </td>
+    )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
       <td class="text-right">
         {props.deviceFeature.last_value === 1 && <i class="fe fe-shield" />}
@@ -77,7 +95,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         {props.deviceFeature.last_value === -1 && <i class="fe fe-alert-triangle" />}
       </td>
     )}
-    {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR && (
+    {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (
       <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value_changed })}>
         {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value_changed &&

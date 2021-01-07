@@ -124,7 +124,8 @@
       [
         {
           "type": "devices-in-room",
-          "room": "kitchen"
+          "room": "kitchen",
+          "device_features": ["main-presence-sensor"]
         }
       ]
     ],
@@ -376,6 +377,18 @@
             "read_only": true,
             "last_value": 340,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "Presence",
+            "selector": "main-presence-sensor",
+            "category": "presence-sensor",
+            "type": "push",
+            "unit": null,
+            "min": 0,
+            "max": 1,
+            "read_only": true,
+            "last_value": 0,
+            "last_value_changed": "2020-12-20 13:49:07.556 +01:00"
           },
           {
             "name": "Kitchen door",
@@ -1124,7 +1137,7 @@
       "selector": "telegram",
       "version": "0.1.0",
       "has_message_feature": true,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.053Z",
       "updated_at": "2020-10-30T07:44:07.518Z"
     },
@@ -1168,7 +1181,7 @@
       "selector": "zwave",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-04-11T18:41:40.056Z",
       "updated_at": "2020-10-30T07:44:07.594Z"
     },
@@ -1223,7 +1236,7 @@
       "selector": "openweather",
       "version": "0.1.0",
       "has_message_feature": false,
-      "status": "NOT_CONFIGURED",
+      "status": "RUNNING",
       "created_at": "2020-08-19T13:04:57.309Z",
       "updated_at": "2020-10-30T07:44:07.814Z"
     },
@@ -1248,6 +1261,17 @@
       "status": "LOADING",
       "created_at": "2020-09-02T12:35:32.763Z",
       "updated_at": "2020-10-18T09:28:14.935Z"
+    },
+    {
+      "id": "c9fe2705-35dc-417b-b6fc-c4bbb9c69886",
+      "pod_id": null,
+      "name": "tp-link",
+      "selector": "tp-link",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2020-11-11T18:41:40.052Z",
+      "updated_at": "2020-11-28T07:44:07.731Z"
     }
   ],
   "get /api/v1/session": [
@@ -1950,6 +1974,81 @@
         {
           "name": "FIRMWARE",
           "value": "3.2.1"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/tp-link": {
+    "id": "c9fe2705-35dc-417b-b6fc-c4bbb9c69886",
+    "pod_id": null,
+    "name": "tp-link",
+    "selector": "tp-link",
+    "version": "0.1.0",
+    "has_message_feature": false,
+    "status": "RUNNING",
+    "created_at": "2020-11-11T18:41:40.052Z",
+    "updated_at": "2020-11-28T07:44:07.731Z"
+  },
+  "get /api/v1/service/tp-link/device": [
+    {
+      "id": "1",
+      "name": "Plug Coffee Machine",
+      "model": "HS100",
+      "external_id": "tp-link-1",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "switch",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Light Swimming Pool",
+      "model": "LB100",
+      "external_id": "tp-link-2",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/tp-link/scan": [
+    {
+      "id": "3",
+      "name": "Plug TV Dock",
+      "model": "HS100",
+      "external_id": "tp-link-3",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "switch",
+          "type": "binary",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Light Bedroom",
+      "model": "LB100",
+      "external_id": "tp-link-4",
+      "features": [
+        {
+          "name": "On/Off",
+          "category": "light",
+          "type": "binary",
+          "min": 0,
+          "max": 1
         }
       ]
     }

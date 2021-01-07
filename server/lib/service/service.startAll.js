@@ -29,9 +29,6 @@ async function startAll() {
       case SERVICE_STATUS.STOPPED:
         logger.info(`Service ${serviceKey} was manually stopped, so it is ignored at startup`);
         return false;
-      case SERVICE_STATUS.LOADING:
-        logger.warn(`Service ${serviceKey} was not correctly loaded at last startup, it will be avoid for now.`);
-        return false;
       default:
         return true;
     }

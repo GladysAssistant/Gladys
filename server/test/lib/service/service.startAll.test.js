@@ -109,7 +109,7 @@ describe('service.startAll', () => {
         name: serviceName,
       },
     });
-    expect(serviceInDb.status).eq(SERVICE_STATUS.LOADING);
-    assert.notCalled(serviceImpl.start);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.RUNNING);
+    assert.calledOnce(serviceImpl.start);
   });
 });
