@@ -19,4 +19,12 @@ describe('netatmoManager getHomeData', () => {
       .reply(200, jsonHomeData);
     await netatmoManager.getHomeData();
   });
+
+  it('should failed getHomeData', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    nock(`${netatmoManager.baseUrl}`)
+      .post('/api/gethomedata')
+      .reply(400, { data: { body: 'Problem' } });
+    await netatmoManager.getHomeData();
+  });
 });

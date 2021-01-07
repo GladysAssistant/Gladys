@@ -23,4 +23,12 @@ describe('netatmoManager getHealthyHomeCoachData', () => {
       .reply(200, jsonHomeCoachData);
     await netatmoManager.getHealthyHomeCoachData();
   });
+
+  it('should failed getHealthyHomeCoachData', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    nock(`${netatmoManager.baseUrl}`)
+      .get(`/api/gethomecoachsdata?access_token=${netatmoManager.token}`)
+      .reply(400, { data: { body: 'Problem' } });
+    await netatmoManager.getHealthyHomeCoachData();
+  });
 });

@@ -15,7 +15,7 @@ async function getHomeData() {
       });
     });
   } catch (err) {
-    logger.info(`Error on getHomeData (camera) - ${err.data.body}`);
+    logger.info(`Error on getHomeData (camera) - ${err}`);
   }
 }
 

@@ -16,8 +16,8 @@ async function getHomeStatusData() {
         home_id: home.id,
         access_token: this.token,
       };
-      const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homesdata`, options);
-      home.modules.forEach((module) => {
+      const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
+      responseHomeStatus.data.body.home.modules.forEach((module) => {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         // if (module.type === 'NSD') {
         //   smokedetectors = module;
@@ -39,23 +39,23 @@ async function getHomeStatusData() {
         if (module.type === 'NRV') {
           // then we get the 1st part of the valves
           const valves = module;
-          const indexValveHomeStatus = responseHomeStatus.data.body.modules.findIndex(
+          const indexValveHomeStatus = responseHomeStatus.data.body.home.modules.findIndex(
             (element) => element.id === valves.id,
           );
-          const indexRoomHomeStatus = responseHomeStatus.data.body.rooms.findIndex(
+          const indexRoomHomeStatus = responseHomeStatus.data.body.home.rooms.findIndex(
             (element) => element.id === valves.room_id,
           );
 
           // then we get the 2nd part of the valves
-          valves.homeStatus = responseHomeStatus.data.body.modules[indexValveHomeStatus];
+          valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
           // then we get the 3rd part of the valves : rooms
-          valves.room = responseHomeStatus.data.body.rooms[indexRoomHomeStatus];
+          valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
           this.newValueValve(valves);
         }
       });
     });
   } catch (err) {
-    logger.info(`Error on getHomeStatusData - ${err.data.body}`);
+    logger.info(`Error on getHomeStatusData - ${err}`);
   }
 }
 
