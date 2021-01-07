@@ -12,22 +12,13 @@
         "wifi_status": 50,
         "reachable": true,
         "co2_calibrating": false,
-        "data_type": [
-          "Temperature",
-          "CO2",
-          "Humidity",
-          "Noise",
-          "Pressure"
-        ],
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
         "place": {
           "altitude": 123,
           "city": "Paris",
           "country": "FR",
           "timezone": "Europe/Paris",
-          "location": [
-            0.2348836678374973,
-            48.853492494796304
-          ]
+          "location": [0.2348836678374973, 48.853492494796304]
         },
         "station_name": "Maison Stark (Hygrométrie Salon)",
         "home_id": "3iuhef7oihih89kojoihoui3",
@@ -53,10 +44,7 @@
             "type": "NAModule1",
             "module_name": "Hygrométrie Extérieur",
             "last_setup": 1605564992,
-            "data_type": [
-              "Temperature",
-              "Humidity"
-            ],
+            "data_type": ["Temperature", "Humidity"],
             "battery_percent": 98,
             "reachable": true,
             "firmware": 50,
@@ -80,9 +68,7 @@
             "type": "NAModule3",
             "module_name": "Pluviomètre maison Stark",
             "last_setup": 1605604312,
-            "data_type": [
-              "Rain"
-            ],
+            "data_type": ["Rain"],
             "battery_percent": 100,
             "reachable": true,
             "firmware": 12,
@@ -102,9 +88,7 @@
             "type": "NAModule2",
             "module_name": "Anémomètre maison Stark",
             "last_setup": 1605604559,
-            "data_type": [
-              "Wind"
-            ],
+            "data_type": ["Wind"],
             "battery_percent": 97,
             "reachable": true,
             "firmware": 25,
@@ -128,11 +112,7 @@
             "type": "NAModule4",
             "module_name": "Hygromètre cuisine",
             "last_setup": 1608046641,
-            "data_type": [
-              "Temperature",
-              "CO2",
-              "Humidity"
-            ],
+            "data_type": ["Temperature", "CO2", "Humidity"],
             "battery_percent": 100,
             "reachable": true,
             "firmware": 50,

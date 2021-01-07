@@ -1,4 +1,3 @@
-const netatmo = require('netatmo');
 const Bottleneck = require('bottleneck/es5');
 
 // commands
@@ -13,7 +12,6 @@ const { getStationsData } = require('./commands/netatmo.getStationsData.js');
 const { getHealthyHomeCoachData } = require('./commands/netatmo.getHealthyHomeCoachData.js');
 
 // event
-const { errorHandler } = require('./event/netatmo.errorHandler.js');
 const { newValueThermostat } = require('./event/netatmo.newValueThermostat.js');
 const { newValueStation } = require('./event/netatmo.newValueStation.js');
 const { newValueHomeCoach } = require('./event/netatmo.newValueHomeCoach.js');
@@ -38,13 +36,13 @@ const pollLimiter = new Bottleneck({
 const NetatmoManager = function NetatmoManager(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.Netatmo = netatmo;
-  this.api = undefined;
   this.sensors = {};
   this.devices = {};
   this.connected = false;
   this.topicBinds = {};
   this.configured = false;
+  this.baseUrl = 'https://api.netatmo.net';
+  this.token = undefined;
 };
 
 NetatmoManager.prototype.connect = connect;
@@ -57,7 +55,6 @@ NetatmoManager.prototype.getHomeData = getHomeData;
 NetatmoManager.prototype.getStationsData = getStationsData;
 NetatmoManager.prototype.getHealthyHomeCoachData = getHealthyHomeCoachData;
 
-NetatmoManager.prototype.errorHandler = errorHandler;
 NetatmoManager.prototype.newValueThermostat = newValueThermostat;
 NetatmoManager.prototype.newValueStation = newValueStation;
 NetatmoManager.prototype.newValueHomeCoach = newValueHomeCoach;

@@ -46,7 +46,7 @@
           "city": "Paris",
           "country": "FR",
           "timezone": "Europe/Paris"
-          },
+        },
         "cameras": [
           {
             "id": "17:cc:50:67:aa:00",

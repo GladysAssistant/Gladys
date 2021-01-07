@@ -13,23 +13,13 @@
         "wifi_status": 47,
         "reachable": true,
         "co2_calibrating": false,
-        "data_type": [
-          "Temperature",
-          "CO2",
-          "Humidity",
-          "Noise",
-          "Pressure",
-          "health_idx"
-        ],
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure", "health_idx"],
         "place": {
           "altitude": 123,
           "city": "Paris",
           "country": "FR",
           "timezone": "Europe/Paris",
-          "location": [
-            0.2348836678374973,
-            48.853492494796304
-          ]
+          "location": [0.2348836678374973, 48.853492494796304]
         },
         "dashboard_data": {
           "time_utc": 1608764304,

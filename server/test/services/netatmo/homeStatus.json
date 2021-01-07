@@ -82,64 +82,64 @@
           "date_max_wind_str": 1608764466,
           "WindHistoric": [
             {
-            "time_utc": 1608769593,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608769593,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608769304,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608769304,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608768997,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608768997,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608768702,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608768702,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608768401,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608768401,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608768093,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608768093,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608767792,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608767792,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608767490,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608767490,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608767189,
-            "WindStrength": 0,
-            "WindAngle": -1
+              "time_utc": 1608767189,
+              "WindStrength": 0,
+              "WindAngle": -1
             },
             {
-            "time_utc": 1608766888,
-            "WindStrength": 1,
-            "WindAngle": 126
+              "time_utc": 1608766888,
+              "WindStrength": 1,
+              "WindAngle": 126
             },
             {
-            "time_utc": 1608766587,
-            "WindStrength": 1,
-            "WindAngle": 135
+              "time_utc": 1608766587,
+              "WindStrength": 1,
+              "WindAngle": 135
             },
             {
-            "time_utc": 1608766279,
-            "WindStrength": 1,
-            "WindAngle": 236
+              "time_utc": 1608766279,
+              "WindStrength": 1,
+              "WindAngle": 236
             }
           ],
           "bridge": "17:cc:50:67:aa:09",

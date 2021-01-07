@@ -1,5 +1,5 @@
+const axios = require('axios');
 const logger = require('../../../../utils/logger');
-
 /**
  * @description Get Healthy HomeCoachs.
  * @example
@@ -7,19 +7,14 @@ const logger = require('../../../../utils/logger');
  */
 async function getHealthyHomeCoachData() {
   // we get the les homeCoachs
-  new Promise((resolve, reject) => {
-    this.api.getHealthyHomeCoachData((err, data) => {
-      resolve(data);
+  try {
+    const response = await axios.get(`${this.baseUrl}/api/gethomecoachsdata?access_token=${this.token}`);
+    response.data.body.devices.forEach((homecoach) => {
+      this.newValueHomeCoach(homecoach);
     });
-  })
-    .then((homeCoaches) => {
-      homeCoaches.forEach((homecoach) => {
-        this.newValueHomeCoach(homecoach);
-      });
-    })
-    .catch((err) => {
-      logger.info(`Error on getHealthyHomeCoachData - ${err}`);
-    });
+  } catch (err) {
+    logger.info(`Error on getStationsData (station) - ${err}`);
+  }
 }
 
 module.exports = {

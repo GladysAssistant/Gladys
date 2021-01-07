@@ -5,10 +5,7 @@
         "id": "3iuhef7oihih89kojoihoui3",
         "name": "Maison Stark",
         "altitude": 123,
-        "coordinates": [
-          0.2348836678374973,
-          48.853492494796304
-        ],
+        "coordinates": [0.2348836678374973, 48.853492494796304],
         "country": "FR",
         "timezone": "Europe/Paris",
         "rooms": [
@@ -16,29 +13,19 @@
             "id": "1111111111",
             "name": "Cuisine",
             "type": "kitchen",
-            "module_ids": [
-              "17:cc:50:67:aa:0d"
-            ]
+            "module_ids": ["17:cc:50:67:aa:0d"]
           },
           {
             "id": "1111111112",
             "name": "Extérieur",
             "type": "outdoor",
-            "module_ids": [
-              "17:cc:50:67:aa:0a",
-              "17:cc:50:67:aa:0b",
-              "17:cc:50:67:aa:0c"
-            ]
+            "module_ids": ["17:cc:50:67:aa:0a", "17:cc:50:67:aa:0b", "17:cc:50:67:aa:0c"]
           },
           {
             "id": "111111113",
             "name": "Salon",
             "type": "livingroom",
-            "module_ids": [
-              "17:cc:50:67:aa:09",
-              "17:cc:50:67:aa:0f",
-              "17:cc:50:67:aa:10"
-            ]
+            "module_ids": ["17:cc:50:67:aa:09", "17:cc:50:67:aa:0f", "17:cc:50:67:aa:10"]
           }
         ],
         "modules": [
@@ -48,12 +35,7 @@
             "name": "Hygrométrie Salon",
             "setup_date": 1605564990,
             "room_id": "1111111113",
-            "modules_bridged": [
-              "17:cc:50:67:aa:0a",
-              "17:cc:50:67:aa:0b",
-              "17:cc:50:67:aa:0c",
-              "17:cc:50:67:aa:0d"
-            ]
+            "modules_bridged": ["17:cc:50:67:aa:0a", "17:cc:50:67:aa:0b", "17:cc:50:67:aa:0c", "17:cc:50:67:aa:0d"]
           },
           {
             "id": "17:cc:50:67:aa:0a",
@@ -92,10 +74,7 @@
             "type": "NAPlug",
             "name": "Relais Salon",
             "setup_date": 1578400589,
-            "modules_bridged": [
-              "17:cc:50:67:aa:0f",
-              "17:cc:50:67:aa:10"
-            ]
+            "modules_bridged": ["17:cc:50:67:aa:0f", "17:cc:50:67:aa:10"]
           },
           {
             "id": "17:cc:50:67:aa:0f",
@@ -118,11 +97,7 @@
             "type": "NAPlug",
             "name": "Relais Cuisine",
             "setup_date": 1578496638,
-            "modules_bridged": [
-              "17:cc:50:67:aa:12",
-              "17:cc:50:67:aa:13",
-              "17:cc:50:67:aa:14"
-            ]
+            "modules_bridged": ["17:cc:50:67:aa:12", "17:cc:50:67:aa:13", "17:cc:50:67:aa:14"]
           },
           {
             "id": "17:cc:50:67:aa:12",
@@ -145,10 +120,7 @@
             "name": "Caméra Salle Maison",
             "setup_date": 1605543861,
             "room_id": "1111111112",
-            "modules_bridged": [
-              "17:cc:50:67:aa:01",
-              "17:cc:50:67:aa:02"
-            ]
+            "modules_bridged": ["17:cc:50:67:aa:01", "17:cc:50:67:aa:02"]
           },
           {
             "id": "17:cc:50:67:aa:01",
@@ -185,88 +157,88 @@
           {
             "timetable": [
               {
-              "zone_id": 1,
-              "m_offset": 0
+                "zone_id": 1,
+                "m_offset": 0
               },
               {
-              "zone_id": 0,
-              "m_offset": 420
+                "zone_id": 0,
+                "m_offset": 420
               },
               {
-              "zone_id": 5,
-              "m_offset": 1200
+                "zone_id": 5,
+                "m_offset": 1200
               },
               {
-              "zone_id": 1,
-              "m_offset": 1320
+                "zone_id": 1,
+                "m_offset": 1320
               },
               {
-              "zone_id": 0,
-              "m_offset": 1830
+                "zone_id": 0,
+                "m_offset": 1830
               },
               {
-              "zone_id": 5,
-              "m_offset": 2640
+                "zone_id": 5,
+                "m_offset": 2640
               },
               {
-              "zone_id": 1,
-              "m_offset": 2760
+                "zone_id": 1,
+                "m_offset": 2760
               },
               {
-              "zone_id": 0,
-              "m_offset": 3270
+                "zone_id": 0,
+                "m_offset": 3270
               },
               {
-              "zone_id": 5,
-              "m_offset": 4080
+                "zone_id": 5,
+                "m_offset": 4080
               },
               {
-              "zone_id": 1,
-              "m_offset": 4200
+                "zone_id": 1,
+                "m_offset": 4200
               },
               {
-              "zone_id": 0,
-              "m_offset": 4710
+                "zone_id": 0,
+                "m_offset": 4710
               },
               {
-              "zone_id": 5,
-              "m_offset": 5520
+                "zone_id": 5,
+                "m_offset": 5520
               },
               {
-              "zone_id": 1,
-              "m_offset": 5640
+                "zone_id": 1,
+                "m_offset": 5640
               },
               {
-              "zone_id": 0,
-              "m_offset": 6150
+                "zone_id": 0,
+                "m_offset": 6150
               },
               {
-              "zone_id": 5,
-              "m_offset": 6960
+                "zone_id": 5,
+                "m_offset": 6960
               },
               {
-              "zone_id": 1,
-              "m_offset": 7080
+                "zone_id": 1,
+                "m_offset": 7080
               },
               {
-              "zone_id": 0,
-              "m_offset": 7590
+                "zone_id": 0,
+                "m_offset": 7590
               },
               {
-              "zone_id": 5,
-              "m_offset": 8400
+                "zone_id": 5,
+                "m_offset": 8400
               },
               {
-              "zone_id": 1,
-              "m_offset": 8520
+                "zone_id": 1,
+                "m_offset": 8520
               },
               {
-              "zone_id": 0,
-              "m_offset": 9030
+                "zone_id": 0,
+                "m_offset": 9030
               },
               {
-              "zone_id": 1,
-              "m_offset": 9840
+                "zone_id": 1,
+                "m_offset": 9840
               }
             ],
             "zones": [
@@ -276,44 +248,44 @@
                 "type": 0,
                 "rooms_temp": [
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 17
+                    "room_id": "299775816",
+                    "temp": 17
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19.5
+                    "room_id": "566220101",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 19.5
+                    "room_id": "1456430165",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 20.5
+                    "room_id": "2812958323",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 19
+                    "room_id": "3442216559",
+                    "temp": 19
                   },
                   {
-                  "room_id": "3416175565",
-                  "temp": 19
+                    "room_id": "3416175565",
+                    "temp": 19
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 19.5
+                    "room_id": "1511630932",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 19
+                    "room_id": "3754455535",
+                    "temp": 19
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 19.5
+                    "room_id": "2114790157",
+                    "temp": 19.5
                   }
                 ]
               },
@@ -323,44 +295,44 @@
                 "type": 1,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 17
+                    "room_id": "3416175565",
+                    "temp": 17
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 16
+                    "room_id": "299775816",
+                    "temp": 16
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 16
+                    "room_id": "566220101",
+                    "temp": 16
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 16
+                    "room_id": "3442216559",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 18
+                    "room_id": "2812958323",
+                    "temp": 18
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 20
+                    "room_id": "1456430165",
+                    "temp": 20
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 18.5
+                    "room_id": "1511630932",
+                    "temp": 18.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 18
+                    "room_id": "3754455535",
+                    "temp": 18
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 17
+                    "room_id": "2114790157",
+                    "temp": 17
                   }
                 ]
               },
@@ -370,44 +342,44 @@
                 "type": 8,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 17
+                    "room_id": "3416175565",
+                    "temp": 17
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 19
+                    "room_id": "299775816",
+                    "temp": 19
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 17
+                    "room_id": "1456430165",
+                    "temp": 17
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 19
+                    "room_id": "2812958323",
+                    "temp": 19
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19
+                    "room_id": "566220101",
+                    "temp": 19
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 17
+                    "room_id": "3442216559",
+                    "temp": 17
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 16
+                    "room_id": "140642389",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 16
+                    "room_id": "1511630932",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 17
+                    "room_id": "3754455535",
+                    "temp": 17
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 17
+                    "room_id": "2114790157",
+                    "temp": 17
                   }
                 ]
               },
@@ -416,44 +388,44 @@
                 "type": 5,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 16
+                    "room_id": "3416175565",
+                    "temp": 16
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 16
+                    "room_id": "299775816",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 16
+                    "room_id": "1456430165",
+                    "temp": 16
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 16
+                    "room_id": "140642389",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 16
+                    "room_id": "2812958323",
+                    "temp": 16
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 16
+                    "room_id": "566220101",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 16
+                    "room_id": "3442216559",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 16
+                    "room_id": "1511630932",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 16
+                    "room_id": "3754455535",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 16
+                    "room_id": "2114790157",
+                    "temp": 16
                   }
                 ]
               },
@@ -463,44 +435,44 @@
                 "type": 4,
                 "rooms_temp": [
                   {
-                  "room_id": "299775816",
-                  "temp": 18
+                    "room_id": "299775816",
+                    "temp": 18
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19.5
+                    "room_id": "566220101",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "3416175565",
-                  "temp": 18
+                    "room_id": "3416175565",
+                    "temp": 18
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 20.5
+                    "room_id": "2812958323",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 17
+                    "room_id": "3442216559",
+                    "temp": 17
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 20.5
+                    "room_id": "1511630932",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 21.5
+                    "room_id": "1456430165",
+                    "temp": 21.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 19
+                    "room_id": "3754455535",
+                    "temp": 19
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 18
+                    "room_id": "2114790157",
+                    "temp": 18
                   }
                 ]
               }
@@ -536,88 +508,88 @@
           {
             "timetable": [
               {
-              "zone_id": 1,
-              "m_offset": 0
+                "zone_id": 1,
+                "m_offset": 0
               },
               {
-              "zone_id": 0,
-              "m_offset": 420
+                "zone_id": 0,
+                "m_offset": 420
               },
               {
-              "zone_id": 5,
-              "m_offset": 1200
+                "zone_id": 5,
+                "m_offset": 1200
               },
               {
-              "zone_id": 1,
-              "m_offset": 1320
+                "zone_id": 1,
+                "m_offset": 1320
               },
               {
-              "zone_id": 0,
-              "m_offset": 1830
+                "zone_id": 0,
+                "m_offset": 1830
               },
               {
-              "zone_id": 5,
-              "m_offset": 2640
+                "zone_id": 5,
+                "m_offset": 2640
               },
               {
-              "zone_id": 1,
-              "m_offset": 2760
+                "zone_id": 1,
+                "m_offset": 2760
               },
               {
-              "zone_id": 0,
-              "m_offset": 3270
+                "zone_id": 0,
+                "m_offset": 3270
               },
               {
-              "zone_id": 5,
-              "m_offset": 4080
+                "zone_id": 5,
+                "m_offset": 4080
               },
               {
-              "zone_id": 1,
-              "m_offset": 4200
+                "zone_id": 1,
+                "m_offset": 4200
               },
               {
-              "zone_id": 0,
-              "m_offset": 4710
+                "zone_id": 0,
+                "m_offset": 4710
               },
               {
-              "zone_id": 5,
-              "m_offset": 5520
+                "zone_id": 5,
+                "m_offset": 5520
               },
               {
-              "zone_id": 1,
-              "m_offset": 5640
+                "zone_id": 1,
+                "m_offset": 5640
               },
               {
-              "zone_id": 0,
-              "m_offset": 6150
+                "zone_id": 0,
+                "m_offset": 6150
               },
               {
-              "zone_id": 5,
-              "m_offset": 6960
+                "zone_id": 5,
+                "m_offset": 6960
               },
               {
-              "zone_id": 1,
-              "m_offset": 7080
+                "zone_id": 1,
+                "m_offset": 7080
               },
               {
-              "zone_id": 0,
-              "m_offset": 7590
+                "zone_id": 0,
+                "m_offset": 7590
               },
               {
-              "zone_id": 5,
-              "m_offset": 8400
+                "zone_id": 5,
+                "m_offset": 8400
               },
               {
-              "zone_id": 1,
-              "m_offset": 8520
+                "zone_id": 1,
+                "m_offset": 8520
               },
               {
-              "zone_id": 0,
-              "m_offset": 9030
+                "zone_id": 0,
+                "m_offset": 9030
               },
               {
-              "zone_id": 1,
-              "m_offset": 9840
+                "zone_id": 1,
+                "m_offset": 9840
               }
             ],
             "zones": [
@@ -627,86 +599,86 @@
                 "type": 0,
                 "rooms_temp": [
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 17
+                    "room_id": "299775816",
+                    "temp": 17
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19.5
+                    "room_id": "566220101",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 19.5
+                    "room_id": "1456430165",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 20.5
+                    "room_id": "2812958323",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 19
+                    "room_id": "3442216559",
+                    "temp": 19
                   },
                   {
-                  "room_id": "3416175565",
-                  "temp": 19
+                    "room_id": "3416175565",
+                    "temp": 19
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 19.5
+                    "room_id": "1511630932",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 19
+                    "room_id": "3754455535",
+                    "temp": 19
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 19.5
+                    "room_id": "2114790157",
+                    "temp": 19.5
                   }
                 ],
                 "rooms": [
                   {
-                  "id": "140642389",
-                  "therm_setpoint_temperature": 10
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
                   },
                   {
-                  "id": "299775816",
-                  "therm_setpoint_temperature": 17
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "566220101",
-                  "therm_setpoint_temperature": 19.5
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19.5
                   },
                   {
-                  "id": "1456430165",
-                  "therm_setpoint_temperature": 19.5
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 19.5
                   },
                   {
-                  "id": "2812958323",
-                  "therm_setpoint_temperature": 20.5
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 20.5
                   },
                   {
-                  "id": "3442216559",
-                  "therm_setpoint_temperature": 19
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "3416175565",
-                  "therm_setpoint_temperature": 19
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "1511630932",
-                  "therm_setpoint_temperature": 19.5
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 19.5
                   },
                   {
-                  "id": "3754455535",
-                  "therm_setpoint_temperature": 19
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "2114790157",
-                  "therm_setpoint_temperature": 19.5
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 19.5
                   }
                 ]
               },
@@ -716,86 +688,86 @@
                 "type": 1,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 17
+                    "room_id": "3416175565",
+                    "temp": 17
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 16
+                    "room_id": "299775816",
+                    "temp": 16
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 16
+                    "room_id": "566220101",
+                    "temp": 16
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 16
+                    "room_id": "3442216559",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 18
+                    "room_id": "2812958323",
+                    "temp": 18
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 20
+                    "room_id": "1456430165",
+                    "temp": 20
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 18.5
+                    "room_id": "1511630932",
+                    "temp": 18.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 18
+                    "room_id": "3754455535",
+                    "temp": 18
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 17
+                    "room_id": "2114790157",
+                    "temp": 17
                   }
                 ],
                 "rooms": [
                   {
-                  "id": "3416175565",
-                  "therm_setpoint_temperature": 17
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "299775816",
-                  "therm_setpoint_temperature": 16
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "566220101",
-                  "therm_setpoint_temperature": 16
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "140642389",
-                  "therm_setpoint_temperature": 10
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
                   },
                   {
-                  "id": "3442216559",
-                  "therm_setpoint_temperature": 16
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "2812958323",
-                  "therm_setpoint_temperature": 18
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 18
                   },
                   {
-                  "id": "1456430165",
-                  "therm_setpoint_temperature": 20
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 20
                   },
                   {
-                  "id": "1511630932",
-                  "therm_setpoint_temperature": 18.5
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 18.5
                   },
                   {
-                  "id": "3754455535",
-                  "therm_setpoint_temperature": 18
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 18
                   },
                   {
-                  "id": "2114790157",
-                  "therm_setpoint_temperature": 17
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 17
                   }
                 ]
               },
@@ -805,86 +777,86 @@
                 "type": 8,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 17
+                    "room_id": "3416175565",
+                    "temp": 17
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 19
+                    "room_id": "299775816",
+                    "temp": 19
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 17
+                    "room_id": "1456430165",
+                    "temp": 17
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 19
+                    "room_id": "2812958323",
+                    "temp": 19
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19
+                    "room_id": "566220101",
+                    "temp": 19
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 17
+                    "room_id": "3442216559",
+                    "temp": 17
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 16
+                    "room_id": "140642389",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 16
+                    "room_id": "1511630932",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 17
+                    "room_id": "3754455535",
+                    "temp": 17
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 17
+                    "room_id": "2114790157",
+                    "temp": 17
                   }
                 ],
                 "rooms": [
                   {
-                  "id": "3416175565",
-                  "therm_setpoint_temperature": 17
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "299775816",
-                  "therm_setpoint_temperature": 19
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "1456430165",
-                  "therm_setpoint_temperature": 17
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "2812958323",
-                  "therm_setpoint_temperature": 19
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "566220101",
-                  "therm_setpoint_temperature": 19
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "3442216559",
-                  "therm_setpoint_temperature": 17
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "140642389",
-                  "therm_setpoint_temperature": 16
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "1511630932",
-                  "therm_setpoint_temperature": 16
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "3754455535",
-                  "therm_setpoint_temperature": 17
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "2114790157",
-                  "therm_setpoint_temperature": 17
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 17
                   }
                 ]
               },
@@ -893,86 +865,86 @@
                 "type": 5,
                 "rooms_temp": [
                   {
-                  "room_id": "3416175565",
-                  "temp": 16
+                    "room_id": "3416175565",
+                    "temp": 16
                   },
                   {
-                  "room_id": "299775816",
-                  "temp": 16
+                    "room_id": "299775816",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 16
+                    "room_id": "1456430165",
+                    "temp": 16
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 16
+                    "room_id": "140642389",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 16
+                    "room_id": "2812958323",
+                    "temp": 16
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 16
+                    "room_id": "566220101",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 16
+                    "room_id": "3442216559",
+                    "temp": 16
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 16
+                    "room_id": "1511630932",
+                    "temp": 16
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 16
+                    "room_id": "3754455535",
+                    "temp": 16
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 16
+                    "room_id": "2114790157",
+                    "temp": 16
                   }
                 ],
                 "rooms": [
                   {
-                  "id": "3416175565",
-                  "therm_setpoint_temperature": 16
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "299775816",
-                  "therm_setpoint_temperature": 16
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "1456430165",
-                  "therm_setpoint_temperature": 16
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "140642389",
-                  "therm_setpoint_temperature": 16
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "2812958323",
-                  "therm_setpoint_temperature": 16
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "566220101",
-                  "therm_setpoint_temperature": 16
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "3442216559",
-                  "therm_setpoint_temperature": 16
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "1511630932",
-                  "therm_setpoint_temperature": 16
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "3754455535",
-                  "therm_setpoint_temperature": 16
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 16
                   },
                   {
-                  "id": "2114790157",
-                  "therm_setpoint_temperature": 16
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 16
                   }
                 ]
               },
@@ -982,86 +954,86 @@
                 "type": 4,
                 "rooms_temp": [
                   {
-                  "room_id": "299775816",
-                  "temp": 18
+                    "room_id": "299775816",
+                    "temp": 18
                   },
                   {
-                  "room_id": "566220101",
-                  "temp": 19.5
+                    "room_id": "566220101",
+                    "temp": 19.5
                   },
                   {
-                  "room_id": "3416175565",
-                  "temp": 18
+                    "room_id": "3416175565",
+                    "temp": 18
                   },
                   {
-                  "room_id": "140642389",
-                  "temp": 10
+                    "room_id": "140642389",
+                    "temp": 10
                   },
                   {
-                  "room_id": "2812958323",
-                  "temp": 20.5
+                    "room_id": "2812958323",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "3442216559",
-                  "temp": 17
+                    "room_id": "3442216559",
+                    "temp": 17
                   },
                   {
-                  "room_id": "1511630932",
-                  "temp": 20.5
+                    "room_id": "1511630932",
+                    "temp": 20.5
                   },
                   {
-                  "room_id": "1456430165",
-                  "temp": 21.5
+                    "room_id": "1456430165",
+                    "temp": 21.5
                   },
                   {
-                  "room_id": "3754455535",
-                  "temp": 19
+                    "room_id": "3754455535",
+                    "temp": 19
                   },
                   {
-                  "room_id": "2114790157",
-                  "temp": 18
+                    "room_id": "2114790157",
+                    "temp": 18
                   }
                 ],
                 "rooms": [
                   {
-                  "id": "299775816",
-                  "therm_setpoint_temperature": 18
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 18
                   },
                   {
-                  "id": "566220101",
-                  "therm_setpoint_temperature": 19.5
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19.5
                   },
                   {
-                  "id": "3416175565",
-                  "therm_setpoint_temperature": 18
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 18
                   },
                   {
-                  "id": "140642389",
-                  "therm_setpoint_temperature": 10
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
                   },
                   {
-                  "id": "2812958323",
-                  "therm_setpoint_temperature": 20.5
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 20.5
                   },
                   {
-                  "id": "3442216559",
-                  "therm_setpoint_temperature": 17
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 17
                   },
                   {
-                  "id": "1511630932",
-                  "therm_setpoint_temperature": 20.5
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 20.5
                   },
                   {
-                  "id": "1456430165",
-                  "therm_setpoint_temperature": 21.5
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 21.5
                   },
                   {
-                  "id": "3754455535",
-                  "therm_setpoint_temperature": 19
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 19
                   },
                   {
-                  "id": "2114790157",
-                  "therm_setpoint_temperature": 18
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 18
                   }
                 ]
               }
