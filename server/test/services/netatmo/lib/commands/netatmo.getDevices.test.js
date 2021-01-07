@@ -1,13 +1,7 @@
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
-const Netatmo = require('../netatmo.mock');
-
-const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {
-  api: {
-    netatmo: Netatmo,
-  },
-});
+const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {});
 
 const gladys = {
   event: {
@@ -20,10 +14,11 @@ const gladys = {
 describe('netatmoManager GetDevices', () => {
   it('should get all devices', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-    netatmoManager.getHomeStatusData = fake.returns(null);
-    netatmoManager.getHomeData = fake.returns(null);
-    netatmoManager.getStationsData = fake.returns(null);
-    netatmoManager.getHealthyHomeCoachData = fake.returns(null);
+    netatmoManager.getHomeStatusData = fake.resolves(null);
+    netatmoManager.getHomeData = fake.resolves(null);
+    netatmoManager.getStationsData = fake.resolves(null);
+    netatmoManager.getHealthyHomeCoachData = fake.resolves(null);
+    netatmoManager.getThermostatsData = fake.resolves(null);
     await netatmoManager.getDevices();
   });
 });

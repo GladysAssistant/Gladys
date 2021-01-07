@@ -13,7 +13,7 @@ async function getHealthyHomeCoachData() {
       this.newValueHomeCoach(homecoach);
     });
   } catch (err) {
-    logger.info(`Error on getStationsData (station) - ${err}`);
+    logger.info(`Error on gethomecoachsdata - ${err}`);
   }
 }
 
