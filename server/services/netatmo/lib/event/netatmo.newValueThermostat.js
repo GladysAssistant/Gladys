@@ -3,7 +3,6 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 
 /**
@@ -24,8 +23,7 @@ function newValueThermostat(data) {
     selector: `netatmo:${sid}`,
     external_id: `netatmo:${sid}`,
     model: 'netatmo-thermostat',
-    should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    should_poll: false,
     features: [
       {
         name: `Temperature - ${data.module_name}`,

@@ -1,5 +1,3 @@
-const Bottleneck = require('bottleneck/es5');
-
 // commands
 const { connect } = require('./commands/netatmo.connect.js');
 const { getSensors } = require('./commands/netatmo.getSensors.js');
@@ -18,13 +16,7 @@ const { newValueHomeCoach } = require('./event/netatmo.newValueHomeCoach.js');
 const { newValueSmokeDetector } = require('./event/netatmo.newValueSmokeDetector.js');
 const { newValueCamera } = require('./event/netatmo.newValueCamera.js');
 const { newValueValve } = require('./event/netatmo.newValueValve.js');
-const { poll } = require('./event/netatmo.poll.js');
-
-// we rate-limit the number of request per seconds to poll lights
-const pollLimiter = new Bottleneck({
-  maxConcurrent: 1,
-  minTime: 100, // 100 ms
-});
+const { pollManual } = require('./event/netatmo.pollManual.js');
 
 /**
  * @param {Object} gladys - The gladys object.
@@ -61,6 +53,6 @@ NetatmoManager.prototype.newValueHomeCoach = newValueHomeCoach;
 NetatmoManager.prototype.newValueSmokeDetector = newValueSmokeDetector;
 NetatmoManager.prototype.newValueCamera = newValueCamera;
 NetatmoManager.prototype.newValueValve = newValueValve;
-NetatmoManager.prototype.poll = pollLimiter.wrap(poll);
+NetatmoManager.prototype.pollManual = pollManual;
 
 module.exports = NetatmoManager;

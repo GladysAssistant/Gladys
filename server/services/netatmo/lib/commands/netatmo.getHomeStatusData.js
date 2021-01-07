@@ -21,7 +21,7 @@ async function getHomeStatusData() {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         // if (module.type === 'NSD') {
         //   smokedetectors = module;
-        //   const indexSmokedetectorsHomeStatus = homeStatus.modules.findIndex((element) =>
+        //   const indexSmokedetectorsHomeStatus = responseHomeStatus.data.body.home.modules.findIndex((element) =>
         //     element.id === smokedetectors.id
         //   );
         //   const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) =>
@@ -30,10 +30,10 @@ async function getHomeStatusData() {
         //
         //   // then we get the 2nd part of the smoke detectors - no interesting data for the moment -
         //   // pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
-        //   smokedetectors['homeStatus'] = homeStatus.modules[indexValveHomeStatus];
+        //   smokedetectors['homeStatus'] = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
         //   // then we get the 3rd part of the smoke detectors : rooms
-        //   smokedetectors['room'] = homeStatus.rooms[indexRoomHomeStatus];
-        //   this.newValueSmokeDetector( smokedetectors);
+        //   smokedetectors['room'] = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
+        //   this.newValueSmokeDetector(smokedetectors);
         // }
 
         if (module.type === 'NRV') {

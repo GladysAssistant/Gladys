@@ -3,7 +3,6 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 
 /**
@@ -23,8 +22,7 @@ function newValueCamera(data) {
   if (data.type === 'NOC') {
     newCamera = {
       name: data.name,
-      should_poll: true,
-      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+      should_poll: false,
       external_id: `netatmo:${sid}`,
       selector: `netatmo:${sid}`,
       service_id: this.serviceId,
@@ -94,8 +92,7 @@ function newValueCamera(data) {
   if (data.type === 'NACamera') {
     newCamera = {
       name: data.name,
-      should_poll: true,
-      poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+      should_poll: false,
       external_id: `netatmo:${sid}`,
       selector: `netatmo:${sid}`,
       service_id: this.serviceId,

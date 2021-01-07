@@ -45,7 +45,7 @@ async function connect() {
         data: querystring.stringify(authentificationForm),
       });
       this.token = response.data.access_token;
-      setTimeout(
+      setInterval(
         () => {
           const form = {
             grant_type: 'refresh_token',
@@ -70,6 +70,9 @@ async function connect() {
 
     this.getDevices();
 
+    setInterval(() => {
+      this.pollManual();
+    }, 60 * 1000);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
     });

@@ -6,19 +6,19 @@
  */
 async function getDevices() {
   // we get the thermostats
-  this.getThermostatsData();
+  await this.getThermostatsData();
 
   // We get the data from the house of Netatmo Energy
-  this.getHomeStatusData();
+  await this.getHomeStatusData();
 
   // We get the data from the house of Netatmo Security
-  this.getHomeData();
+  await this.getHomeData();
 
   // we get the weather stations
-  this.getStationsData();
+  await this.getStationsData();
 
   // we get the homeCoachs
-  this.getHealthyHomeCoachData();
+  await this.getHealthyHomeCoachData();
 }
 
 module.exports = {
