@@ -64,7 +64,7 @@ class ColorDeviceType extends Component {
 
   componentDidMount() {
     const deviceLastValue = this.props.deviceFeature.last_value;
-    const color = deviceLastValue === null ? undefined : `#${intToHex(deviceLastValue)}`;
+    const color = !deviceLastValue ? undefined : `#${intToHex(deviceLastValue)}`;
 
     this.colorPicker = new iro.ColorPicker(this.colorPickerRef.current, {
       width: 150,
