@@ -44,7 +44,7 @@ function newValueSmokeDetector(data) {
         selector: `netatmo:${sid}:battery`,
         external_id: `netatmo:${sid}:battery`,
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
         unit: DEVICE_FEATURE_UNITS.PERCENT,
         read_only: true,
         keep_history: true,

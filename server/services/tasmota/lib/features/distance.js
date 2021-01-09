@@ -10,7 +10,7 @@ module.exports = {
   // Gladys feature
   generateFeature: (device, key, value, fullKey) => {
     const keyParts = fullKey.split('.');
-    const unit = keyParts[1] === 'VL53L0X' ? DEVICE_FEATURE_UNITS.MM : DEVICE_FEATURE_UNITS.CM;
+    const unit = keyParts[1] === 'VL53L0X' ? DEVICE_FEATURE_UNITS.MILLIMETER : DEVICE_FEATURE_UNITS.CENTIMETER;
 
     return {
       category: DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR,

@@ -6,7 +6,10 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/edit-device';
 import { RequestStatus } from '../../utils/consts';
 import UpdateDevice from './UpdateDevice';
-
+import {
+  DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY
+} from '../../../../server/utils/constants';
 @connect('user,session', actions)
 class EditDevicePage extends Component {
   selectFeature(e) {
@@ -65,6 +68,7 @@ class EditDevicePage extends Component {
   }
 
   updateFeatureProperty(featureIndex, property, value) {
+    let device;
     if (
       property === 'external_id' &&
       this.props.requiredExternalIdBase &&
@@ -76,15 +80,37 @@ class EditDevicePage extends Component {
         value = `${this.props.requiredExternalIdBase}${value}`;
       }
     }
-    const device = update(this.state.device, {
-      features: {
-        [featureIndex]: {
-          [property]: {
-            $set: value
+    if ( property === 'type' && value !== null && value !== "" ) {
+      const category = this.state.device.features[featureIndex].category
+      let valueUnit;
+      try {
+        valueUnit = DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES[value][category][0];
+      } catch (e) {
+        valueUnit = "";
+      }
+      device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            },
+            'unit': {
+              $set: valueUnit
+            },
           }
         }
-      }
-    });
+      });
+    } else {
+      device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            }
+          }
+        }
+      });
+    }
 
     this.setState({
       device

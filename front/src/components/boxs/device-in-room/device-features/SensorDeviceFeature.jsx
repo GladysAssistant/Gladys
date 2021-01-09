@@ -24,12 +24,7 @@ const SPECIAL_SENSORS_TYPE = [DEVICE_FEATURE_CATEGORIES.SWITCH.BINARY];
 const SPECIAL_SENSORS_CATEGORY_TYPE = [
   DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + DEVICE_FEATURE_TYPES.SENSOR.STRING,
   DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER,
-  DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SENSOR.STRING
-];
-const SPECIAL_SENSORS = [
-  DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR
+  DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SETPOINT.STRING
 ];
 const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
 
@@ -55,39 +50,11 @@ const SensorDeviceType = ({ children, ...props }) => (
           {props.deviceFeature.last_value !== null && (
             <span>
               {' '}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PERCENT && '%'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS && '°C'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT && '°F'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.WATT && 'W'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT && 'kW'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOWATT_HOUR && 'kW/h'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.LUX && 'Lx'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PASCAL && 'Pa'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.AMPERE && 'A'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.VOLT && 'V'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.PPM && 'ppm'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DEGREE && '°'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.KILOMETER_HOUR && 'km/h'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER && 'mm'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIMETER_HOUR && 'mm/h'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.MILLIBAR && 'mbar'}
-              {props.deviceFeature.unit === DEVICE_FEATURE_UNITS.DECIBEL && 'dB'}
+              {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}
             </span>
           )}
         </td>
       )}
-    {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
-        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value !== null && (
-          <span>
-            {' '}
-            <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
-          </span>
-        )}
-      </td>
-    )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
       <td class="text-right">
         {props.deviceFeature.last_value === 1 && <i class="fe fe-shield" />}
@@ -158,7 +125,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         </td>
       )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT &&
-      props.deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.STRING && (
+      props.deviceFeature.type === DEVICE_FEATURE_TYPES.SETPOINT.STRING && (
         <td class="text-right">
           {props.deviceFeature.last_value !== null && (
             <Text

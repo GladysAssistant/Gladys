@@ -111,7 +111,7 @@ describe('Tasmota - MQTT - create device with VL53L0X distance features', () => 
         {
           category: DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-          unit: DEVICE_FEATURE_UNITS.MM,
+          unit: DEVICE_FEATURE_UNITS.MILLIMETER,
           external_id: 'tasmota:tasmota-device-topic:VL53L0X:Distance',
           selector: 'tasmota-tasmota-device-topic-vl53l0x-distance',
           name: 'Distance',
