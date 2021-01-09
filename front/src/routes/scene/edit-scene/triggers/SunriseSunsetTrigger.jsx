@@ -1,16 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import DatePicker from 'react-datepicker';
-import get from 'get-value';
-import { Text, Localizer } from 'preact-i18n';
-import { format } from 'date-fns';
-import Select from 'react-select';
-
-import fr from 'date-fns/locale/fr';
+import { Text } from 'preact-i18n';
 
 import 'react-datepicker/dist/react-datepicker.css';
-
-const DAYS_OF_THE_MONTH = new Array(31).fill(0, 0, 31).map((val, index) => index + 1);
 
 @connect('httpClient,user', {})
 class SunriseSunsetTrigger extends Component {
