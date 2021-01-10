@@ -1,12 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_TYPES_BY_CATEGORY,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
-} from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_TYPES_BY_CATEGORY, DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
@@ -21,7 +15,6 @@ class UpdateDeviceFeature extends Component {
 
   render({ feature, featureIndex, ...props }) {
     return (
-      
       <div class="col-md-4">
         <div class="card">
           <div class="card-header">
@@ -74,9 +67,6 @@ class UpdateDeviceFeature extends Component {
                     onChange={this.updateType}
                     class="form-control"
                   >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
                     {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category].map(type => (
                       <option value={type}>
                         <Text id={`deviceFeatureCategory.${feature.category}.${type}`}>{type}</Text>

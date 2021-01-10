@@ -11,7 +11,7 @@ async function getStationsData() {
   try {
     const response = await axios.post(`${this.baseUrl}/api/getstationsdata`, { access_token: this.token });
     response.data.body.devices.forEach((station) => {
-      this.newValueStation(station);
+      this.newValueStation(station); // , response.data.body.user);
     });
   } catch (err) {
     logger.info(`Error on getStationsData (station) - ${err}`);

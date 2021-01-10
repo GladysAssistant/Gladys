@@ -37,8 +37,8 @@ function newValueValve(data) {
           read_only: true,
           keep_history: true,
           has_feedback: true,
-          min: -20,
-          max: 60,
+          min: 0,
+          max: 50,
         },
         {
           name: `Battery - ${data.name}`,
@@ -63,8 +63,8 @@ function newValueValve(data) {
           read_only: true,
           keep_history: true,
           has_feedback: true,
-          min: -20,
-          max: 60,
+          min: 5,
+          max: 30,
         },
         {
           name: `Setpoint mode - ${data.name}`,
@@ -76,7 +76,7 @@ function newValueValve(data) {
           keep_history: true,
           has_feedback: true,
           min: 0,
-          max: 0,
+          max: 10,
         },
         {
           name: `Heating power request - ${data.name}`,
@@ -87,8 +87,8 @@ function newValueValve(data) {
           read_only: true,
           keep_history: true,
           has_feedback: true,
-          min: -20,
-          max: 60,
+          min: 0,
+          max: 100,
         },
         {
           name: `Reachable (WiFi or Power) - ${data.name}`,

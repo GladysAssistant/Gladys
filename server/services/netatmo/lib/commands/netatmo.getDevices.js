@@ -5,11 +5,11 @@
  * netatmo.getDevices(type);
  */
 async function getDevices() {
-  // we get the thermostats
-  await this.getThermostatsData();
-
   // We get the data from the house of Netatmo Energy
   await this.getHomeStatusData();
+
+  // we get the thermostats
+  await this.getThermostatsData();
 
   // We get the data from the house of Netatmo Security
   await this.getHomeData();

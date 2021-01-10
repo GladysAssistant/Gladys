@@ -6,10 +6,7 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/edit-device';
 import { RequestStatus } from '../../utils/consts';
 import UpdateDevice from './UpdateDevice';
-import {
-  DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
-} from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES } from '../../../../server/utils/constants';
 @connect('user,session', actions)
 class EditDevicePage extends Component {
   selectFeature(e) {
@@ -80,13 +77,13 @@ class EditDevicePage extends Component {
         value = `${this.props.requiredExternalIdBase}${value}`;
       }
     }
-    if ( property === 'type' && value !== null && value !== "" ) {
-      const category = this.state.device.features[featureIndex].category
+    if (property === 'type' && value !== null && value !== '') {
+      const category = this.state.device.features[featureIndex].category;
       let valueUnit;
       try {
         valueUnit = DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES[value][category][0];
       } catch (e) {
-        valueUnit = "";
+        valueUnit = '';
       }
       device = update(this.state.device, {
         features: {
@@ -94,9 +91,9 @@ class EditDevicePage extends Component {
             [property]: {
               $set: value
             },
-            'unit': {
+            unit: {
               $set: valueUnit
-            },
+            }
           }
         }
       });

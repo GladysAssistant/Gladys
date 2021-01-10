@@ -8,11 +8,7 @@ const { getCardinalDirection } = require('../../../../utils/cardinalPoints');
 
 dayjs.extend(relativeTime);
 
-import {
-  DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
-} from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS_CATEGORY = [
   DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
@@ -48,10 +44,7 @@ const SensorDeviceType = ({ children, ...props }) => (
           {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
           {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
           {props.deviceFeature.last_value !== null && (
-            <span>
-              {' '}
-              {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}
-            </span>
+            <span> {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}</span>
           )}
         </td>
       )}

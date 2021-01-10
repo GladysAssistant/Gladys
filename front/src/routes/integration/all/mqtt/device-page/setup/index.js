@@ -7,7 +7,10 @@ import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES
+} from '../../../../../../../../server/utils/constants';
 
 @connect('session,user,httpClient,houses,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
@@ -101,17 +104,37 @@ class MqttDeviceSetupPage extends Component {
         value = `mqtt:${value}`;
       }
     }
-
-    device = update(this.state.device, {
-      features: {
-        [featureIndex]: {
-          [property]: {
-            $set: value
+    if (property === 'type' && value !== null && value !== '') {
+      const category = this.state.device.features[featureIndex].category;
+      let valueUnit;
+      try {
+        valueUnit = DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES[value][category][0];
+      } catch (e) {
+        valueUnit = '';
+      }
+      device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            },
+            unit: {
+              $set: valueUnit
+            }
           }
         }
-      }
-    });
-
+      });
+    } else {
+      device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            }
+          }
+        }
+      });
+    }
     if (property === 'external_id') {
       device = update(device, {
         features: {

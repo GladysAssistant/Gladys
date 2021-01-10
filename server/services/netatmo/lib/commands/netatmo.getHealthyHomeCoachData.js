@@ -10,7 +10,7 @@ async function getHealthyHomeCoachData() {
   try {
     const response = await axios.get(`${this.baseUrl}/api/gethomecoachsdata?access_token=${this.token}`);
     response.data.body.devices.forEach((homecoach) => {
-      this.newValueHomeCoach(homecoach);
+      this.newValueHomeCoach(homecoach); // , response.data.body.user);
     });
   } catch (err) {
     logger.info(`Error on gethomecoachsdata - ${err}`);

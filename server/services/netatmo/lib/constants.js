@@ -12,10 +12,42 @@ const DEFAULT = {
 };
 
 const NETATMO_VALUES = {
+  UNITS: {
+    SYSTEM: {
+      TEMPERATURE: {
+        0: 'celsius',
+        1: 'fahrenheit',
+      },
+      DISTANCE: {
+        0: 'millimeter',
+        1: 'inch',
+      },
+      PRECIPITATION: {
+        0: 'millimeter-hour',
+        1: 'inch-hour',
+      },
+    },
+    WIND: {
+      0: 'kilometer-hour',
+      1: 'miles-hour',
+      2: 'meter-second',
+      3: 'beaufort',
+      4: 'knots',
+    },
+    PRESSURE: {
+      0: 'millibar',
+      1: 'inch-mercury',
+      2: 'millimeter-mercury',
+    },
+    FEEL_LIKE_ALGO: {
+      0: 'Based on Humidex',
+      1: 'Based on heat index',
+    },
+  },
   BATTERY: {
     VERY_LOW: 5,
     LOW: 25,
-    ADETERMINER1: 50,
+    MEDIUM: 50,
     HIGH: 75,
     FULL: 100,
   },

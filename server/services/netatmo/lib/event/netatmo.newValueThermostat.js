@@ -35,8 +35,8 @@ function newValueThermostat(data) {
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: -20,
-        max: 60,
+        min: 0,
+        max: 50,
       },
       {
         name: `Battery - ${data.module_name}`,
@@ -61,8 +61,8 @@ function newValueThermostat(data) {
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: -20,
-        max: 60,
+        min: 5,
+        max: 30,
       },
       {
         name: `Setpoint mode - ${data.module_name}`,
@@ -74,7 +74,7 @@ function newValueThermostat(data) {
         keep_history: true,
         has_feedback: true,
         min: 0,
-        max: 0,
+        max: 10,
       },
       {
         name: `Heating power request - ${data.module_name}`,
@@ -86,7 +86,7 @@ function newValueThermostat(data) {
         keep_history: true,
         has_feedback: true,
         min: 0,
-        max: 1,
+        max: 100,
       },
     ],
     params: [
