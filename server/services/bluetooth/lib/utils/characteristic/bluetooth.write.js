@@ -9,11 +9,12 @@ const { TIMERS } = require('../bluetooth.constants');
  * @description Try to write Noble characteristic.
  * @param {Object} characteristic - Noble characteristic.
  * @param {Array | Buffer} value - Value to send to peripheral.
+ * @param {boolean} withoutResponse - Use "write without response" property (default false).
  * @returns {Promise<Object>} Write value.
  * @example
  * await write(characteristic, [0x01]);
  */
-async function write(characteristic, value) {
+async function write(characteristic, value, withoutResponse = false) {
   if (!(characteristic.properties || []).includes('write')) {
     throw new BadParameters(`Bluetooth: not writable characteristic ${characteristic.uuid}`);
   }
@@ -22,13 +23,17 @@ async function write(characteristic, value) {
 
   const commandBuffer = Buffer.isBuffer(value) ? value : Buffer.from(value);
   return new Promise((resolve, reject) => {
-    characteristic.write(commandBuffer, false, (error) => {
+    characteristic.write(commandBuffer, withoutResponse, (error) => {
       if (error) {
-        reject(new Error(`Bluetooth: failed to write ${value} on characteristic ${characteristic.uuid} - ${error}`));
+        return reject(
+          new Error(
+            `Bluetooth: failed to write ${value.toString('hex')} on characteristic ${characteristic.uuid} - ${error}`,
+          ),
+        );
       }
 
-      logger.debug(`Bluetooth: write ${value} on characteristic ${characteristic.uuid}`);
-      resolve(value);
+      logger.debug(`Bluetooth: write ${value.toString('hex')} on characteristic ${characteristic.uuid}`);
+      return resolve(value);
     });
   }).timeout(TIMERS.WRITE);
 }

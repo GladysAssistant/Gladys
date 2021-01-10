@@ -91,8 +91,8 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBB feature', ()
             read_only: false,
             has_feedback: true,
             min: 0,
-            max: 16777215,
-            last_value: 16777215,
+            max: 6579300,
+            last_value: 6579300,
           },
         ],
       },
@@ -100,7 +100,7 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBB feature', ()
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tasmota:tasmota-device-topic:Channel',
-      state: 16777215,
+      state: 6579300,
     });
     assert.notCalled(gladys.stateManager.get);
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '8');
@@ -132,8 +132,8 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBB feature', ()
           read_only: false,
           has_feedback: true,
           min: 0,
-          max: 16777215,
-          last_value: 16777215,
+          max: 6579300,
+          last_value: 6579300,
         },
       ],
     };

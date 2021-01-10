@@ -13,8 +13,7 @@
 <p align="center">
   <a href="#the-project">The Project</a> •
   <a href="#getting-started">Getting Started</a> •
-   <a href="#links">Links</a> •
-  <a href="#contributors-">Contributors</a> •
+  <a href="#contributors">Contributors</a> •
   <a href="#copyright--license">Copyright & License</a> 
 </p>
 
@@ -26,28 +25,33 @@ Gladys is a home assistant who helps you in your everyday life.
 
 Like a kind of **JARVIS**!
 
-Gladys is connected to all your devices in your home. She is connected to your calendars and tons of other APIs to help you.
+Gladys is connected to all your devices in your home. She is connected to your calendars, lights, cameras and tons of other devices and APIs to help you.
 
-But let's pick an example:
+Let's look at a few examples:
 
-- It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 AM, and that according to the traffic, you'll need 30min to go to work with your car. She knows that you like 30 min to get ready. She wakes you up with a soft progressive warm light thanks to your Philips Hue, and puts a nice music in your room.
-- It's 8.10 AM, Gladys detects thanks to a motion sensor that you are getting out of bed. She immediately starts the wake-up scenario : she tells the coffee machine to prepare the coffee, and opens the blinds.
-- At 8.30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
-- At 6.30 PM, you are getting back home : Everything is ready when you arrive. You are going to sleep, so you simply put your phone on your nightstand where a NFC tag is sticked. It immediately sends a request to Gladys to tell here you are going to sleep. She starts the "Going to sleep" scenario, and turns off all lights.
+- It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 AM, and that according to the traffic, you'll need 30 minutes to go to work in your car. She knows that you like 30 minutes to get ready. She wakes you up with a soft progressive warm light thanks to your Philips Hue bulbs, and plays your favorite playlist in your room.
+- It's 8:10 AM, Gladys detects thanks to a motion sensor that you are getting out of bed. She immediately starts the wake-up scenario and tells the coffee machine to prepare the coffee and also opens the blinds.
+- At 8:30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
+- At 6:30 PM, you are getting back home. Everything is ready when you arrive. You are going to sleep, so you simply put your phone on your nightstand where a NFC tag is placed. It immediately sends a request to Gladys to tell her you are going to sleep. She starts the "Going to sleep" scenario, and turns off all your lights and devices.
 
-This is just a simple scenario, possibilities with Gladys are just endless. Don't hesitate to suggest yours. 😉
+These are just simple scenarios, possibilities with Gladys are endless. Don't hesitate to suggest yours! 😉
 
 ## Getting Started
 
 To get started, you can go to [our website](https://gladysassistant.com).
 
+You can also try Gladys Assistant on our demo website [here](https://demo.gladysassistant.com).
+
 ## Pull requests are welcome
 
-If you want to help us develop on Gladys Assistant, you need to first [setup your development environnement locally](https://gladysassistant.com/en/docs/api/setup-development-environnement).
+If you want to help us develop on Gladys Assistant, you need to first setup your development environment locally.
+
+- [MacOS/Linux instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-mac-linux/)
+- [Windows instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-windows/)
 
 Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
 
-## Contributors ✨
+## Contributors
 
 Thanks goes to these wonderful people 👏
 
@@ -82,6 +86,7 @@ Thanks goes to these wonderful people 👏
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

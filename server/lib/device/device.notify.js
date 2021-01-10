@@ -32,7 +32,7 @@ async function notify(device, event) {
     if (service === null) {
       logger.warn(`Service ${device.service_id} was not found.`);
     } else if (typeof get(service, `device.${serviceFuncName}`) !== 'function') {
-      logger.info(`Function device.${serviceFuncName} in service ${service.name} does not exist.`);
+      logger.debug(`Function device.${serviceFuncName} in service ${service.name} does not exist.`);
     } else {
       try {
         await service.device[serviceFuncName](device);
