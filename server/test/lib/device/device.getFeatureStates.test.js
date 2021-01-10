@@ -6,7 +6,7 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
-describe('Device.getFeatureStates', () => {
+describe.only('Device.getFeatureStates', () => {
   it('should getFeatureStates ', async () => {
     const stateManager = new StateManager(event);
     const service = {
@@ -16,16 +16,19 @@ describe('Device.getFeatureStates', () => {
     };
     const device = new Device(event, {}, stateManager, service);
 
+    // TODO injecter les mesure en debut
+
     const params = {
       device_feature_selector: ['test-temperature-sensor-2'],
-      begin_date: '2020-07-16 22:14:26.590 +00:00',
-      end_date: '2020-07-18 22:14:26.590 +00:00',
+      begin_date: '2020-12-31 22:14:26.590 +00:00',
+      end_date: '2021-01-01 22:14:26.590 +00:00',
     };
     // Choose attributes
     params.attributes_device = [];
     params.attributes_device.push('name');
     params.attributes_device.push('selector');
     params.attributes_device_feature = [];
+    params.attributes_device_feature.push('id');
     params.attributes_device_feature.push('name');
     params.attributes_device_feature.push('selector');
     params.attributes_device_feature.push('unit');
@@ -47,6 +50,6 @@ describe('Device.getFeatureStates', () => {
 
     expect(devices[0].features[0].device_feature_states)
       .to.be.instanceOf(Array)
-      .and.have.lengthOf(97);
+      .and.have.lengthOf(49);
   });
 });

@@ -80,7 +80,8 @@ describe('GET /api/v1/service/:service_name/device', () => {
   });
 });
 
-describe('GET /api/v1/device_feature_sate', () => {
+describe.only('GET /api/v1/device_feature_sate', () => {
+  // TODO injecter les mesure en debut
   it('should get device_feature_sate (default)', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature_sate/test-temperature-sensor-2?downsample=true&maxValue=10')
@@ -108,7 +109,7 @@ describe('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe('GET /api/v1/device_feature_sate', () => {
+describe.only('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1month)', async () => {
     await authenticatedRequest
       .get(
@@ -138,7 +139,7 @@ describe('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe('GET /api/v1/device_feature_sate', () => {
+describe.only('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1week)', async () => {
     await authenticatedRequest
       .get(
@@ -168,7 +169,7 @@ describe('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe('GET /api/v1/device_feature_sate', () => {
+describe.only('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last2day)', async () => {
     await authenticatedRequest
       .get(
@@ -198,7 +199,7 @@ describe('GET /api/v1/device_feature_sate', () => {
   });
 });
 
-describe('GET /api/v1/device_feature_sate', () => {
+describe.only('GET /api/v1/device_feature_sate', () => {
   it('should get device_feature_sate (default - last1year-selector)', async () => {
     await authenticatedRequest
       .get(

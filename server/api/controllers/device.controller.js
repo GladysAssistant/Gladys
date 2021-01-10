@@ -1,6 +1,7 @@
 const { LTTB } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
 
 module.exports = function DeviceController(gladys) {
   /**
@@ -131,7 +132,7 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeatureStates(req, res) {
-    const debut=new Date();
+    const debut = new Date();
     const params = Object.assign({}, req.query, {
       device_feature_selector: req.params.device_feature_selector.split(','),
     });
@@ -173,12 +174,13 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device_room = [];
     params.attributes_device_room.push('name');
     params.attributes_device_room.push('selector');
-console.log('============================================================');
+    console.log('============================================================');
     const devices = await gladys.device.getFeatureStates(params);
 
-    const finSQL=new Date();
+    const finSQL = new Date();
     console.log('============================================================');
-    console.log(`sql; ${debut} - ${finSQL}  =  ${(finSQL.getTime() - debut.getTime())}`);
+    console.log(`sql; ${debut} - ${finSQL}  =  ${finSQL.getTime() - debut.getTime()}`);
+    logger.error(`sql; ${debut} - ${finSQL}  =  ${finSQL.getTime() - debut.getTime()}`);
     // Downsample result to reduce nb of value in response
     if (params.downsample && params.downsample === 'true') {
       if (devices && devices.length > 0) {
@@ -206,8 +208,8 @@ console.log('============================================================');
                 smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
               }
               feature.device_feature_states = smoothFeatureStates;
-              feature.trend = newFeatureStateArray[newFeatureStateArray.length-1] - newFeatureStateArray[0];
-              
+              feature.trend = newFeatureStateArray[newFeatureStateArray.length - 1] - newFeatureStateArray[0];
+
               featureArray.push(feature);
             }
           });
@@ -216,10 +218,12 @@ console.log('============================================================');
       }
     }
 
-    const findownsampling=new Date(); 
-    console.log(`down; ${finSQL} - ${findownsampling}  =  ${(findownsampling.getTime() - finSQL.getTime())}`);
- 
-    console.log(`fin; ${debut} - ${new Date()}  =  ${(new Date().getTime() - debut.getTime())}`);
+    const findownsampling = new Date();
+    console.log(`down; ${finSQL} - ${findownsampling}  =  ${findownsampling.getTime() - finSQL.getTime()}`);
+    logger.error(`down; ${finSQL} - ${findownsampling}  =  ${findownsampling.getTime() - finSQL.getTime()}`);
+
+    console.log(`fin; ${debut} - ${new Date()}  =  ${new Date().getTime() - debut.getTime()}`);
+    logger.error(`fin; ${debut} - ${new Date()}  =  ${new Date().getTime() - debut.getTime()}`);
     res.json(devices);
   }
 

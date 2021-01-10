@@ -23,9 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       indexes: [
         {
-          name: 'created_at_index',
+          name: 'device_feature_id_created_at_index',
           using: 'BTREE',
-          fields: ['created_at'],
+          fields: ['device_feature_id', 'created_at'],
         },
       ],
     },
