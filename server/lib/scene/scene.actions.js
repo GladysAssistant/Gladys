@@ -104,10 +104,6 @@ const actionsFunc = {
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
-  [ACTIONS.SCENE.UPDATE_SUNSET_SUNRIZE]: async (self, action, scope) => {
-    // For
-    self.scene.addScene();
-  },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
