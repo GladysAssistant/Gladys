@@ -10,6 +10,7 @@ const logger = require('../../../../utils/logger');
 async function getHomeStatusData() {
   try {
     const responseHomes = await axios.post(`${this.baseUrl}/api/homesdata`, { access_token: this.token });
+
     responseHomes.data.body.homes.forEach(async (home) => {
       const options = {
         device_types: 'NRV',
@@ -17,7 +18,7 @@ async function getHomeStatusData() {
         access_token: this.token,
       };
       const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
-      responseHomeStatus.data.body.home.modules.forEach((module) => {
+      home.modules.forEach((module) => {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         // if (module.type === 'NSD') {
         //   smokedetectors = module;
@@ -50,7 +51,7 @@ async function getHomeStatusData() {
           valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
           // then we get the 3rd part of the valves : rooms
           valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-          this.newValueValve(valves);
+          this.newValueValve(valves); // , responseHomes.data.body.user);
         }
       });
     });

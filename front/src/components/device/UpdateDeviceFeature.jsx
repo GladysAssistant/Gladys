@@ -1,11 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
-} from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_TYPES_BY_CATEGORY, DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
@@ -59,6 +54,28 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
+            {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category] && (
+              <div class="form-group">
+                <label class="form-label" for={`externalid_${featureIndex}`}>
+                  <Text id="editDeviceForm.typeLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`unit_${featureIndex}`}
+                    type="text"
+                    value={feature.type}
+                    onChange={this.updateType}
+                    class="form-control"
+                  >
+                    {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category].map(type => (
+                      <option value={type}>
+                        <Text id={`deviceFeatureCategory.${feature.category}.${type}`}>{type}</Text>
+                      </option>
+                    ))}
+                  </select>
+                </Localizer>
+              </div>
+            )}
             {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${featureIndex}`}>
@@ -80,111 +97,6 @@ class UpdateDeviceFeature extends Component {
                         <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
                       </option>
                     ))}
-                  </select>
-                </Localizer>
-              </div>
-            )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.SETPOINT &&
-              props.feature.type !== DEVICE_FEATURE_TYPES.SENSOR.STRING && (
-                <div class="form-group">
-                  <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                    <Text id="editDeviceForm.unitLabel" />
-                  </label>
-                  <Localizer>
-                    <select
-                      id={`unit_${props.featureIndex}`}
-                      type="text"
-                      value={props.feature.unit}
-                      onChange={this.updateUnit}
-                      class="form-control"
-                    >
-                      <option value="">
-                        <Text id="global.emptySelectOption" />
-                      </option>
-                      <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
-                        <Text id="deviceFeatureUnit.celsius" />
-                      </option>
-                      <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
-                        <Text id="deviceFeatureUnit.fahrenheit" />
-                      </option>
-                    </select>
-                  </Localizer>
-                </div>
-              )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR && (
-              <div class="form-group">
-                <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                  <Text id="editDeviceForm.unitLabel" />
-                </label>
-                <Localizer>
-                  <select
-                    id={`unit_${props.featureIndex}`}
-                    type="text"
-                    value={props.feature.unit}
-                    onChange={this.updateUnit}
-                    class="form-control"
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.PERCENT}>
-                      <Text id="deviceFeatureUnit.percent" />
-                    </option>
-                    <option value={DEVICE_FEATURE_UNITS.PPM}>
-                      <Text id="deviceFeatureUnit.ppm" />
-                    </option>
-                  </select>
-                </Localizer>
-              </div>
-            )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.INDEX && (
-              <div class="form-group">
-                <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                  <Text id="editDeviceForm.unitLabel" />
-                </label>
-                <Localizer>
-                  <select
-                    id={`type_${props.featureIndex}`}
-                    type="text"
-                    value={props.feature.type}
-                    onChange={this.updateType}
-                    class="form-control"
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value={DEVICE_FEATURE_TYPES.INDEX.INTEGER}>
-                      <Text id="deviceFeatureCategory.index.integer" />
-                    </option>
-                    <option value={DEVICE_FEATURE_TYPES.INDEX.DIMMER}>
-                      <Text id="deviceFeatureCategory.index.dimmer" />
-                    </option>
-                  </select>
-                </Localizer>
-              </div>
-            )}
-            {props.feature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR && (
-              <div class="form-group">
-                <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                  <Text id="editDeviceForm.unitLabel" />
-                </label>
-                <Localizer>
-                  <select
-                    id={`type_${props.featureIndex}`}
-                    type="text"
-                    value={props.feature.type}
-                    onChange={this.updateType}
-                    class="form-control"
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value={DEVICE_FEATURE_TYPES.SENSOR.STRING}>
-                      <Text id="deviceFeatureCategory.angle-sensor.string" />
-                    </option>
-                    <option value={DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}>
-                      <Text id="deviceFeatureCategory.angle-sensor.decimal" />
-                    </option>
                   </select>
                 </Localizer>
               </div>

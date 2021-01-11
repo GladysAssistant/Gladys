@@ -1,5 +1,6 @@
 const axios = require('axios');
 const sharp = require('sharp');
+const btoa = require('btoa');
 const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 const { NETATMO_VALUES } = require('../constants');
@@ -79,6 +80,8 @@ async function pollManual() {
 
       // we process the data from the cameras
       if (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC') {
+        const externalIdCamera = `netatmo:${this.devices[key].id}`;
+        const selectorCamera = externalIdCamera.replace(/:/gi, '-');
         try {
           const responseImage = await axios.get(`${this.devices[key].vpn_url}/live/snapshot_720.jpg`, { responseType: 'arraybuffer' });
           const sharpData = await sharp(responseImage.data)
@@ -97,7 +100,7 @@ async function pollManual() {
           );
           const mimetype = 'image/jpeg';
           const base64image = `data:${mimetype};base64,${b64encoded}`;
-          this.gladys.this.devices[key].camera.setImage(this.devices[key].selector, base64image);
+          this.gladys.device.camera.setImage(selectorCamera, base64image);
 
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:power`,

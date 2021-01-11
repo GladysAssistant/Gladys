@@ -17,6 +17,14 @@ function newValueHomeCoach(data) {
   const sid = data._id;
   logger.debug(`Netatmo : New homecoach, sid = ${sid}`);
   this.devices[sid] = data;
+  const unitTemperature = DEVICE_FEATURE_UNITS.CELSIUS;
+  const minTemperature = 0;
+  const maxTemperature = 50;
+  const unitPressure = DEVICE_FEATURE_UNITS.MILLIBAR;
+  const minPressure = 260;
+  const maxPressure = 1260;
+
+  // this.userNetatmo = user;
   const newSensor = {
     service_id: this.serviceId,
     name: data.station_name,
@@ -31,12 +39,12 @@ function newValueHomeCoach(data) {
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        unit: unitTemperature,
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: -20,
-        max: 60,
+        min: minTemperature,
+        max: maxTemperature,
       },
       {
         name: `Humidity - ${data.station_name}`,
@@ -62,7 +70,7 @@ function newValueHomeCoach(data) {
         keep_history: true,
         has_feedback: true,
         min: 0,
-        max: 1000,
+        max: 5000,
       },
       {
         name: `Pressure - ${data.station_name}`,
@@ -70,12 +78,12 @@ function newValueHomeCoach(data) {
         external_id: `netatmo:${sid}:pressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.MILLIBAR,
+        unit: unitPressure,
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: 0,
-        max: 5000,
+        min: minPressure,
+        max: maxPressure,
       },
       {
         name: `Pressure absolue - ${data.station_name}`,
@@ -83,12 +91,12 @@ function newValueHomeCoach(data) {
         external_id: `netatmo:${sid}:absolutePressure`,
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.MILLIBAR,
+        unit: unitPressure,
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: 0,
-        max: 5000,
+        min: minPressure,
+        max: maxPressure,
       },
       {
         name: `Noise - ${data.station_name}`,
@@ -100,8 +108,8 @@ function newValueHomeCoach(data) {
         read_only: true,
         keep_history: true,
         has_feedback: true,
-        min: 0,
-        max: 150,
+        min: 35,
+        max: 120,
       },
       {
         name: `Health index - ${data.station_name}`,
