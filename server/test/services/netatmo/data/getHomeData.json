@@ -52,7 +52,7 @@
             "id": "17:cc:50:67:aa:00",
             "type": "NACamera",
             "status": "on",
-            "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.255.255/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH90,,",
+            "vpn_url": "https://test.com",
             "is_local": true,
             "sd_status": "on",
             "alim_status": "on",

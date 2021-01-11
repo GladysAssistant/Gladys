@@ -15,7 +15,7 @@ async function pollManual() {
   await this.getHomeData();
   await this.getHealthyHomeCoachData();
   await this.getStationsData();
-  Object.keys(this.devices).forEach((key) => {
+  Object.keys(this.devices).forEach(async (key) => {
     try {
       // we process the data from the thermostats
       if (this.devices[key].type === 'NATherm1') {
@@ -80,32 +80,25 @@ async function pollManual() {
       // we process the data from the cameras
       if (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC') {
         try {
-          axios
-            .get(`${this.devices[key].vpn_url}/live/snapshot_720.jpg`, { responseType: 'arraybuffer' })
-            .then((response) => {
-              sharp(response.data)
-                .rotate()
-                .resize(400)
-                .toBuffer()
-                .then((data) => {
-                  const btoa = require('btoa');
-                  const b64encoded = btoa(
-                    [].reduce.call(
-                      new Uint8Array(data),
-                      function(p, c) {
-                        return p + String.fromCharCode(c);
-                      },
-                      '',
-                    ),
-                  );
-                  const mimetype = 'image/jpeg';
-                  const base64image = `data:${mimetype};base64,${b64encoded}`;
-                  this.gladys.this.devices[key].camera.setImage(this.devices[key].selector, base64image);
-                });
-            })
-            .catch((error) => {
-              logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${error}`);
-            });
+          const responseImage = await axios.get(`${this.devices[key].vpn_url}/live/snapshot_720.jpg`, { responseType: 'arraybuffer' });
+          const sharpData = await sharp(responseImage.data)
+            .rotate()
+            .resize(400)
+            .toBuffer()
+          const btoa = require('btoa');
+          const b64encoded = btoa(
+            [].reduce.call(
+              new Uint8Array(sharpData),
+              function(p, c) {
+                return p + String.fromCharCode(c);
+              },
+              '',
+            ),
+          );
+          const mimetype = 'image/jpeg';
+          const base64image = `data:${mimetype};base64,${b64encoded}`;
+          this.gladys.this.devices[key].camera.setImage(this.devices[key].selector, base64image);
+
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:power`,
             state: NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].alim_status.toUpperCase()],
