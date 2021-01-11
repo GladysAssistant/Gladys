@@ -20,14 +20,14 @@ function newValueThermostat(data) {
   const newSensor = {
     service_id: this.serviceId,
     name: data.module_name,
-    selector: `netatmo:${sid}`,
+    selector: `netatmo-${sid}`,
     external_id: `netatmo:${sid}`,
     model: 'netatmo-thermostat',
     should_poll: false,
     features: [
       {
         name: `Temperature - ${data.module_name}`,
-        selector: `netatmo:${sid}:temperature`,
+        selector: `netatmo-${sid}-temperature`,
         external_id: `netatmo:${sid}:temperature`,
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
@@ -40,7 +40,7 @@ function newValueThermostat(data) {
       },
       {
         name: `Battery - ${data.module_name}`,
-        selector: `netatmo:${sid}:battery`,
+        selector: `netatmo-${sid}-battery`,
         external_id: `netatmo:${sid}:battery`,
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,
         type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
@@ -53,7 +53,7 @@ function newValueThermostat(data) {
       },
       {
         name: `Setpoint temperature - ${data.module_name}`,
-        selector: `netatmo:${sid}:therm_setpoint_temperature`,
+        selector: `netatmo-${sid}-therm-setpoint-temperature`,
         external_id: `netatmo:${sid}:therm_setpoint_temperature`,
         category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
         type: DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL,
@@ -66,7 +66,7 @@ function newValueThermostat(data) {
       },
       {
         name: `Setpoint mode - ${data.module_name}`,
-        selector: `netatmo:${sid}:therm_setpoint_mode`,
+        selector: `netatmo-${sid}-therm-setpoint-mode`,
         external_id: `netatmo:${sid}:therm_setpoint_mode`,
         category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
         type: DEVICE_FEATURE_TYPES.SETPOINT.STRING,
@@ -78,7 +78,7 @@ function newValueThermostat(data) {
       },
       {
         name: `Heating power request - ${data.module_name}`,
-        selector: `netatmo:${sid}:heating_power_request`,
+        selector: `netatmo-${sid}-heating-power-request`,
         external_id: `netatmo:${sid}:heating_power_request`,
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
