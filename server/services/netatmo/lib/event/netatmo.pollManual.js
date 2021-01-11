@@ -87,8 +87,7 @@ async function pollManual() {
           const sharpData = await sharp(responseImage.data)
             .rotate()
             .resize(400)
-            .toBuffer()
-          const btoa = require('btoa');
+            .toBuffer();
           const b64encoded = btoa(
             [].reduce.call(
               new Uint8Array(sharpData),

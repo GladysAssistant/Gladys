@@ -1,6 +1,7 @@
 const nock = require('nock');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const jest = require('jest');
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {});
 
@@ -36,6 +37,7 @@ describe('test connect netatmo', () => {
       .post('/oauth2/token')
       .reply(201, { access_token: 'XERTRXZEZREAR35346T4'});
     await netatmoManager.connect();
+    nockAuth.isDone();
   });
 
   it('should throw an error to netatmo', async () => {
