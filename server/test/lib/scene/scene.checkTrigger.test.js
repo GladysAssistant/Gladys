@@ -112,7 +112,7 @@ describe('scene.checkTrigger', () => {
       triggers: [
         {
           type: EVENTS.TIME.SUNRISE,
-          house: 'house-1'
+          house: 'house-1',
         },
       ],
     });
@@ -120,7 +120,7 @@ describe('scene.checkTrigger', () => {
       type: EVENTS.TIME.SUNRISE,
       house: {
         selector: addedScene.triggers[0].house,
-      }
+      },
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
@@ -152,7 +152,7 @@ describe('scene.checkTrigger', () => {
       triggers: [
         {
           type: EVENTS.TIME.SUNSET,
-          house: 'house-1'
+          house: 'house-1',
         },
       ],
     });
@@ -160,7 +160,7 @@ describe('scene.checkTrigger', () => {
       type: EVENTS.TIME.SUNSET,
       house: {
         selector: addedScene.triggers[0].house,
-      }
+      },
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
