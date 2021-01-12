@@ -37,7 +37,9 @@ describe('netatmoManager pollManual', () => {
     nock(`${netatmoManager.baseUrl}`)
       .get(`/api/getthermostatsdata?access_token=${this.token}`)
       .reply(200, jsonGetThermostatsData);
-    const response = await axios.get('https://upload.wikimedia.org/wikipedia/commons/3/3f/JPEG_example_flower.jpg', { responseType: 'arraybuffer' });
+    const response = await axios.get('https://upload.wikimedia.org/wikipedia/commons/3/3f/JPEG_example_flower.jpg', {
+      responseType: 'arraybuffer',
+    });
     nock('https://test.com')
       .get('/live/snapshot_720.jpg')
       .reply(200, response);
