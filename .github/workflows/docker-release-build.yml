@@ -1,9 +1,9 @@
-name: Pull request tests
+name: Release Gladys Production Images
 
 on:
-  pull_request:
-    branches: [ master ]
-    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   test-front:
@@ -102,7 +102,6 @@ jobs:
         name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
   build-front:
-    if: github.event.pull_request.draft == false
     name: Front build
     needs:
       - test-front
@@ -137,7 +136,6 @@ jobs:
           name: static
           path: front/build
   docker:
-    if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-latest
@@ -156,7 +154,11 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_REPO }}
           label-custom: |
-            org.opencontainers.image.title=Gladys PR Build
+            org.opencontainers.image.title=Gladys Assitant Production Image
+          tag-sha: true
+          tag-semver: |
+            {{raw}}
+            v{{major}}
       - 
         name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -178,11 +180,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - 
-        name: 🐳 Build AMD64 images
+        name: 🐳 Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./docker/Dockerfile.buildx
-          platforms: linux/amd64
-          push: false
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/s390x
+          push: true
+          pull: true
           tags: ${{ steps.docker_meta.outputs.tags }}
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
+          cache-to: type=inline
