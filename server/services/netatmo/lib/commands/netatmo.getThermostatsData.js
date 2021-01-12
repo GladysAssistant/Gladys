@@ -12,9 +12,7 @@ async function getThermostatsData() {
       sensor.modules.forEach((module) => {
         if (module.type === 'NATherm1') {
           // note: "boiler_status": true = Heating request = Boiler ignition
-          this.newValueThermostat(module); // , response.data.body.user);
-        } else {
-          logger.info(module);
+          this.newValueThermostat(module);
         }
       });
     });

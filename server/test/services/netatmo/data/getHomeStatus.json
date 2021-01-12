@@ -196,7 +196,10 @@
           "type": "NRV",
           "reachable": true,
           "bridge": "17:cc:50:67:aa:0e",
-          "battery_state": "full"
+          "battery_state": "full",
+          "room": {
+            "therm_setpoint_temperature": 20
+          }
         },
         {
           "id": "17:cc:50:67:aa:11",
@@ -214,7 +217,10 @@
           "type": "NRV",
           "reachable": true,
           "bridge": "17:cc:50:67:aa:11",
-          "battery_state": "full"
+          "battery_state": "full",
+          "room": {
+            "therm_measured_temperature": 20
+          }
         },
         {
           "id": "17:cc:50:67:aa:00",
@@ -223,7 +229,7 @@
           "sd_status": 4,
           "alim_status": 2,
           "locked": false,
-          "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.255.255/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH90,,",
+          "vpn_url": "https://test.com",
           "is_local": true,
           "firmware_revision": 460,
           "homekit_status": "enabled",

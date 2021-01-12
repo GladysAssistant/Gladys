@@ -69,6 +69,7 @@ async function connect() {
     }
 
     this.getDevices();
+    this.pollManual();
 
     setInterval(() => {
       this.pollManual();
