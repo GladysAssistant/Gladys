@@ -10,7 +10,7 @@ const logger = require('../../../../utils/logger');
 async function getHomeStatusData() {
   try {
     const responseHomes = await axios.post(`${this.baseUrl}/api/homesdata`, { access_token: this.token });
-
+dzdz
     responseHomes.data.body.homes.forEach(async (home) => {
       const options = {
         device_types: 'NRV',
