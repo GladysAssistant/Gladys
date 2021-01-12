@@ -1,4 +1,3 @@
-const axios = require('axios');
 const logger = require('../../../../utils/logger');
 /* eslint-disable jsdoc */
 /* eslint-disable jsdoc/require-returns */
