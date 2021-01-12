@@ -1120,6 +1120,17 @@
       "updated_at": "2020-10-30T07:44:07.731Z"
     },
     {
+      "id": "e64d0ceb-42d4-4941-b1bc-d6420bae9eeb",
+      "pod_id": null,
+      "name": "netatmo",
+      "selector": "netatmo",
+      "version": "0.1.0",
+      "has_message_feature": false,
+      "status": "RUNNING",
+      "created_at": "2021-01-10T18:41:40.052Z",
+      "updated_at": "2021-01-11T07:44:07.731Z"
+    },
+    {
       "id": "4cd73c14-a929-4af0-a5e2-baed35802224",
       "pod_id": null,
       "name": "rtsp-camera",
@@ -1424,15 +1435,15 @@
   "get /api/v1/service/netatmo/device": [
     {
       "id": "b2174c6b-8d27-49a2-adea-ad7c9023ebe3",
-      "name": "Netatmo Thermostat",
+      "name": "Netatmo Thermostat - Kitchen",
       "external_id": "netatmo:1234",
       "selector": "netatmo:1234",
       "room_id": "f99ab22a-e6a8-4756-b1fe-4d19dc8c8620",
       "service_id": "ab043fbc-6ba7-4f6f-8447-ffc1bb2d0df9",
       "features": [
         {
-          "name": "Temperature",
-          "selector": "netatmo:12344:temperature",
+          "name": "Temperature - Thermostat Kitchen",
+          "selector": "netatmo-12344-temperature",
           "external_id": "netatmo:12344:temperature",
           "category": "temperature-sensor",
           "type": "decimal",
@@ -1440,12 +1451,12 @@
           "read_only": true,
           "keep_history": true,
           "has_feedback": true,
-          "min": -20,
-          "max": 60
+          "min": 0,
+          "max": 50
         },
         {
-          "name": "Setpoint",
-          "selector": "netatmo:12344:setpoint",
+          "name": "Setpoint - Thermostat Kitchen",
+          "selector": "netatmo-12344-setpoint",
           "external_id": "netatmo:12344:setpoint",
           "category": "setpoint",
           "type": "decimal",
@@ -1453,16 +1464,40 @@
           "read_only": true,
           "keep_history": true,
           "has_feedback": true,
-          "min": -20,
-          "max": 60
+          "min": 5,
+          "max": 30
         },
         {
-          "name": "Battery",
-          "selector": "netatmo:12344:battery",
+          "name": "Setpoint mode - Thermostat Kitchen",
+          "selector": "netatmo-12344-therm-setpoint-mode",
+          "external_id": "netatmo:12344:setpoint",
+          "category": "setpoint",
+          "type": "string",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 10
+        },
+        {
+          "name": "Battery - Thermostat Kitchen",
+          "selector": "netatmo-12344-battery - Thermostat Kitchen",
           "external_id": "netatmo:12344:battery",
           "category": "battery",
           "type": "integer",
           "unit": "percent",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "Heating power request - Thermostat Kitchen",
+          "selector": "netatmo-${sid}-heating-power-request",
+          "external_id": "netatmo:${sid}:heating_power_request",
+          "category": "switch",
+          "type": "binary",
           "read_only": true,
           "keep_history": true,
           "has_feedback": true,
