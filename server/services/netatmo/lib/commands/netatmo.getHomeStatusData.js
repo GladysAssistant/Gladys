@@ -10,7 +10,6 @@ const logger = require('../../../../utils/logger');
 async function getHomeStatusData() {
   try {
     const responseHomes = await axios.post(`${this.baseUrl}/api/homesdata`, { access_token: this.token });
-dzdz
     responseHomes.data.body.homes.forEach(async (home) => {
       const options = {
         device_types: 'NRV',
@@ -18,7 +17,7 @@ dzdz
         access_token: this.token,
       };
       const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
-      home.modules.forEach((module) => {
+      responseHomeStatus.data.body.home.modules.forEach((module) => {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         // if (module.type === 'NSD') {
         //   smokedetectors = module;
