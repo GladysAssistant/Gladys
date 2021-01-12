@@ -32,17 +32,19 @@ describe('test connect netatmo', () => {
     await netatmoManager.connect();
     nockAuth.isDone();
   });
-  //
-  // it('should throw an error to netatmo', async () => {
-  //   gladys.variable = {
-  //     getValue: fake.resolves('true'),
-  //   };
-  //   const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-  //   netatmoManager.getDevices = fake.resolves(null);
-  //   netatmoManager.pollManual = fake.resolves(null);
-  //   nock(`${netatmoManager.baseUrl}`)
-  //     .post('/oauth2/token')
-  //     .reply(400, { data: 'Problem' });
-  //   await netatmoManager.connect();
-  // });
+
+  it('should throw an error on the result', async () => {
+    gladys.variable = {
+      getValue: fake.resolves('true'),
+    };
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.getDevices = fake.resolves(null);
+    netatmoManager.pollManual = fake.resolves(null);
+    const nockAuth = nock(`${netatmoManager.baseUrl}`)
+      .persist()
+      .post('/oauth2/token')
+      .reply(201);
+    await netatmoManager.connect();
+    nockAuth.isDone();
+  });
 });
