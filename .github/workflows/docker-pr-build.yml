@@ -141,22 +141,10 @@ jobs:
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
-      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
     steps:
       - 
         name: ⬇️ Checkout code
         uses: actions/checkout@v2
-      - 
-        name: 🐳 Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: ${{ secrets.DOCKERHUB_REPO }}
-          label-custom: |
-            org.opencontainers.image.title=Gladys PR Build
       - 
         name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -172,12 +160,6 @@ jobs:
         with:
           name: static
       - 
-        name: 🔑 Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - 
         name: 🐳 Build AMD64 images
         uses: docker/build-push-action@v2
         with:
@@ -185,4 +167,3 @@ jobs:
           file: ./docker/Dockerfile.buildx
           platforms: linux/amd64
           push: false
-          tags: ${{ steps.docker_meta.outputs.tags }}
