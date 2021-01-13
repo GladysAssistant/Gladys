@@ -7,6 +7,7 @@ const modules = require('./modules');
 // Features
 const power = require('./power');
 const dimmer = require('./dimmer');
+const distance = require('./distance');
 const energyCurrent = require('./energy.current');
 const energyPower = require('./energy.power');
 const energyVoltage = require('./energy.voltage');
@@ -21,6 +22,7 @@ const temperature = require('./temperature');
 const FEATURE_TEMPLATES = [
   power,
   dimmer,
+  distance,
   energyCurrent,
   energyPower,
   energyVoltage,
@@ -68,7 +70,7 @@ const addFeature = (device, featureTemplate, fullKey, command, value) => {
   if (existingFeature) {
     logger.debug(`Tasmota: duplicated feature handled for ${externalId}`);
   } else {
-    const generatedFeature = featureTemplate.generateFeature(device, command, value);
+    const generatedFeature = featureTemplate.generateFeature(device, command, value, fullKey);
 
     if (generatedFeature) {
       const convertedValue = generateValue(featureTemplate, value);

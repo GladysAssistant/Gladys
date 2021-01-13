@@ -1,0 +1,19 @@
+{
+  "online": true,
+  "name": "Switch 1",
+  "deviceid": "10004531ae",
+  "apikey": "validApikey",
+  "extra": {
+    "extra": {
+      "uiid": 5,
+      "model": "ITA-GZ1-GL"
+    }
+  },
+  "params": {
+    "fwVersion": "3.3.0"
+  },
+  "ip": "192.168.0.1",
+  "brandName": "Sonoff",
+  "productModel": "Pow",
+  "uiid": 5
+}

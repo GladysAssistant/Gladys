@@ -363,6 +363,31 @@
         "conflictError": "Current topic is already in use."
       }
     },
+    "tpLink": {
+      "title": "TP-Link",
+      "description": "Control TP-Link Bulbs and Plugs.",
+      "deviceTab": "Devices",
+      "device": {
+        "title": "Devices in Gladys",
+        "nameLabel": "Name",
+        "noNameLabel": "No name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "search": "Search devices",
+        "connectButton": "Connect/Reconnect",
+        "scanButton": "Scan network",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "noDevices": "No TP-Link device added yet.",
+        "noDevicesFound": "No devices found. Make sure you have connected one TP-Link Device (Bulb/Plug) to your WiFi.",
+        "deviceOnNetworkTitle": "Devices detected on network",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "createGithubIssue": "Suggest this device",
+        "saveError": "Error while saving, please try again.",
+        "deleteError": "Error when deleting, please try again."
+      }
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",
@@ -483,7 +508,6 @@
         "externalIdLabel": "Feature external ID",
         "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
         "externalIdPlaceholder": "Feature MQTT message key",
-        "unitLabel": "Unit",
         "minLabel": "Minimum value",
         "minPlaceholder": "Enter feature minimum value",
         "maxLabel": "Maximum value",
@@ -660,6 +684,60 @@
           "cancelLabel": "Cancel",
           "successLabel": "Done"
         }
+      }
+    },
+    "eWeLink": {
+      "title": "eWeLink",
+      "description": "Control your eWeLink devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "eWeLink discover",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan eWeLink devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed",
+      "status": {
+        "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
+        "setupPageLink": "eWeLink configuration page."
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "search": "Search devices",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No eWeLink device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your eWeLink cloud account",
+        "description": "eWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "error": "Error discovering eWeLink devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No eWeLink device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "eWeLink configuration",
+        "eweLinkDescription": "You can connect Gladys to your eWeLink cloud account to command the associated devices.",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter eWeLink username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter eWeLink password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
+        "connected": "Connected to the eWeLink cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
       }
     }
   },
@@ -936,10 +1014,6 @@
         "title": "Stopped",
         "detail": "Service stopped by user"
       },
-      "NOT_CONFIGURED": {
-        "title": "Not configured",
-        "detail": "Service is not configured"
-      },
       "ERROR": {
         "title": "Error",
         "detail": "Service failed to start."
@@ -1124,14 +1198,32 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
-    "percent": "%",
-    "ppm": "ppm"
+    "percent": "Percent (%)",
+    "pascal": "Pascal (Pa)",
+    "lux": "Lux",
+    "watt": "Watt (W)",
+    "kilowatt": "Kilowatt (kW)",
+    "kilowatt-hour": "Kilowatt per hour (kW/h)",
+    "ampere": "Ampere (A)",
+    "volt": "Volt (V)",
+    "ppm": "Parts per million (ppm)",
+    "cm": "Centimeter (cm)",
+    "mm": "Millimeter (mm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
     "percent": "%",
-    "ppm": "ppm"
+    "pascal": "Pa",
+    "lux": "lx",
+    "watt": "W",
+    "kilowatt": "KW",
+    "kilowatt-hour": "kW/h",
+    "ampere": "A",
+    "volt": "V",
+    "ppm": "ppm",
+    "cm": "cm",
+    "mm": "mm"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1159,6 +1251,10 @@
       "push": "Motion (push)",
       "binary": "Motion (binary)"
     },
+    "presence-sensor": {
+      "shortCategoryName": "Presence sensor",
+      "push": "Presence"
+    },
     "light-sensor": {
       "shortCategoryName": "Luminosity sensor",
       "integer": "Luminosity (integer)",
@@ -1167,6 +1263,10 @@
     "sismic-sensor": {
       "shortCategoryName": "Sismic sensor",
       "decimal": "Sismic (decimal)"
+    },
+    "distance-sensor": {
+      "shortCategoryName": "Distance",
+      "decimal": "Distance"
     },
     "camera": {
       "shortCategoryName": "Camera",
