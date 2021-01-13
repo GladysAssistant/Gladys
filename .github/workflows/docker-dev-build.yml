@@ -23,7 +23,7 @@ jobs:
         name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
-          npm install
+          npm ci
       - 
         name: 🏗️ Build front
         working-directory: ./front
