@@ -734,6 +734,7 @@
       "documentation": "Documentation",
       "configuration": "Configuration",
       "officialWebSite": "Withings site officiel"
+    },
     "eWeLink": {
       "title": "eWeLink",
       "description": "Contrôlez vos appareils eWeLink.",
@@ -1271,7 +1272,11 @@
     "volt": "V",
     "ppm": "ppm",
     "cm": "cm",
-    "mm": "mm"
+    "mm": "mm",
+    "kg": "kg",
+    "mmHg": "mmHg",
+    "bpm": "bpm",
+    "m/s": "m/s"
   },
   "deviceFeatureCategory": {
     "light": {
