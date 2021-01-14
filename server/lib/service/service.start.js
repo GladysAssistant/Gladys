@@ -36,7 +36,7 @@ async function start(name, pod_id = null) {
     } catch (e) {
       if (e instanceof ServiceNotConfiguredError) {
         // If service fails to start due to configuration error, set service status to not configured
-        status = SERVICE_STATUS.NOT_CONFIGURED;
+        status = SERVICE_STATUS.RUNNING;
         logger.info(`Service ${name} is not configured, so it was not started.`);
       } else {
         // If service fails to start, set service status to error

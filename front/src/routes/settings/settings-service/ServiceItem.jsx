@@ -1,13 +1,12 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router';
-import cx from 'classnames';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../utils/consts';
 import { SERVICE_STATUS } from '../../../../../server/utils/constants';
 
-const STARTED_STATUS = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.NOT_CONFIGURED];
+const STARTED_STATUS = [SERVICE_STATUS.RUNNING];
 const HIDDEN_ACTION_STATUS = [SERVICE_STATUS.UNKNOWN, SERVICE_STATUS.DISABLED];
 
 class ServiceItem extends Component {
@@ -73,11 +72,7 @@ class ServiceItem extends Component {
                 checked={started}
                 onClick={this.changeState}
               />
-              <span
-                class={cx('custom-switch-indicator', {
-                  'bg-secondary': service.status === SERVICE_STATUS.NOT_CONFIGURED
-                })}
-              />
+              <span class="custom-switch-indicator" />
             </label>
           )}
         </td>

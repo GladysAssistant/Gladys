@@ -1,29 +1,27 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import get from 'get-value';
 
-const MqttFeatureBox = ({ children, ...props }) => {
+const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
   return (
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
-          <i
-            class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${props.feature.category}.${props.feature.type}`)}`}
-          />
-          <Text id={`deviceFeatureCategory.${props.feature.category}.${props.feature.type}`} />
+          <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
         </div>
         <div class="card-body">
-          <div class="form-group form-label" for={`featureName_${props.featureIndex}`}>
+          <div class="form-group form-label" for={`featureName_${featureIndex}`}>
             <label>
               <Text id="integration.mqtt.feature.nameLabel" />
             </label>
             <Localizer>
               <input
-                id={`featureName_${props.featureIndex}`}
+                id={`featureName_${featureIndex}`}
                 type="text"
-                value={props.feature.name}
+                value={feature.name}
                 onInput={props.updateName}
                 class="form-control"
                 placeholder={<Text id="integration.mqtt.feature.namePlaceholder" />}
@@ -32,14 +30,14 @@ const MqttFeatureBox = ({ children, ...props }) => {
           </div>
 
           <div class="form-group">
-            <label class="form-label" for={`externalid_${props.featureIndex}`}>
+            <label class="form-label" for={`externalid_${featureIndex}`}>
               <Text id="integration.mqtt.feature.externalIdLabel" />
             </label>
             <Localizer>
               <input
-                id={`externalid_${props.featureIndex}`}
+                id={`externalid_${featureIndex}`}
                 type="text"
-                value={props.feature.external_id}
+                value={feature.external_id}
                 onInput={props.updateExternalId}
                 class="form-control"
                 placeholder={<Text id="integration.mqtt.feature.externalIdPlaceholder" />}
@@ -47,90 +45,41 @@ const MqttFeatureBox = ({ children, ...props }) => {
             </Localizer>
           </div>
 
-          {props.feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR && (
+          {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
             <div class="form-group">
-              <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                <Text id="integration.mqtt.feature.unitLabel" />
+              <label class="form-label" for={`externalid_${featureIndex}`}>
+                <Text id="editDeviceForm.unitLabel" />
               </label>
               <Localizer>
                 <select
-                  id={`unit_${props.featureIndex}`}
+                  id={`unit_${featureIndex}`}
                   type="text"
-                  value={props.feature.unit}
+                  value={feature.unit}
                   onChange={props.updateUnit}
                   class="form-control"
                 >
                   <option value="">
                     <Text id="global.emptySelectOption" />
                   </option>
-                  <option value={DEVICE_FEATURE_UNITS.CELSIUS}>
-                    <Text id="deviceFeatureUnit.celsius" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.FAHRENHEIT}>
-                    <Text id="deviceFeatureUnit.fahrenheit" />
-                  </option>
-                </select>
-              </Localizer>
-            </div>
-          )}
-
-          {props.feature.category === DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR && (
-            <div class="form-group">
-              <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                <Text id="integration.mqtt.feature.unitLabel" />
-              </label>
-              <Localizer>
-                <select
-                  id={`unit_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.unit}
-                  onChange={props.updateUnit}
-                  class="form-control"
-                >
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.PERCENT}>
-                    <Text id="deviceFeatureUnit.percent" />
-                  </option>
-                </select>
-              </Localizer>
-            </div>
-          )}
-
-          {props.feature.category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR && (
-            <div class="form-group">
-              <label class="form-label" for={`externalid_${props.featureIndex}`}>
-                <Text id="integration.mqtt.feature.unitLabel" />
-              </label>
-              <Localizer>
-                <select
-                  id={`unit_${props.featureIndex}`}
-                  type="text"
-                  value={props.feature.unit}
-                  onChange={props.updateUnit}
-                  class="form-control"
-                >
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value={DEVICE_FEATURE_UNITS.PPM}>
-                    <Text id="deviceFeatureUnit.ppm" />
-                  </option>
+                  {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category].map(unit => (
+                    <option value={unit}>
+                      <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
+                    </option>
+                  ))}
                 </select>
               </Localizer>
             </div>
           )}
 
           <div class="form-group">
-            <label class="form-label" for={`min_${props.featureIndex}`}>
+            <label class="form-label" for={`min_${featureIndex}`}>
               <Text id="integration.mqtt.feature.minLabel" />
             </label>
             <Localizer>
               <input
-                id={`min_${props.featureIndex}`}
+                id={`min_${featureIndex}`}
                 type="number"
-                value={props.feature.min}
+                value={feature.min}
                 onInput={props.updateMin}
                 class="form-control"
                 placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
@@ -138,14 +87,14 @@ const MqttFeatureBox = ({ children, ...props }) => {
             </Localizer>
           </div>
           <div class="form-group">
-            <label class="form-label" for={`max_${props.featureIndex}`}>
+            <label class="form-label" for={`max_${featureIndex}`}>
               <Text id="integration.mqtt.feature.maxLabel" />
             </label>
             <Localizer>
               <input
-                id={`max_${props.featureIndex}`}
+                id={`max_${featureIndex}`}
                 type="number"
-                value={props.feature.max}
+                value={feature.max}
                 onInput={props.updateMax}
                 class="form-control"
                 placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
@@ -160,8 +109,8 @@ const MqttFeatureBox = ({ children, ...props }) => {
             <label class="custom-switch">
               <input
                 type="checkbox"
-                name={`read_only_${props.featureIndex}`}
-                checked={props.feature.read_only}
+                name={`read_only_${featureIndex}`}
+                checked={feature.read_only}
                 onClick={props.updateReadOnly}
                 class="custom-switch-input"
               />
