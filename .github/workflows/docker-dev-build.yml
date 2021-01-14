@@ -2,6 +2,15 @@ name: Build Gladys dev images
 
 on:
     workflow_dispatch:
+      inputs:
+        tag:
+          description: 'Docker Tag to build'
+          required: true
+          default: 'dev'
+        platforms:
+          description: 'Docker platform to build'
+          required: true
+          default: 'linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/s390x'
 
 jobs:
   build-front:
@@ -81,9 +90,9 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile.buildx
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/s390x
+          platforms: ${{ github.event.inputs.platforms }}
           push: true
           pull: true
-          tags: ${{ secrets.DOCKERHUB_REPO }}:dev
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:dev
+          tags: ${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
           cache-to: type=inline
