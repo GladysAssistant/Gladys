@@ -1,5 +1,4 @@
 const schedule = require('node-schedule');
-const sunCalc = require('suncalc');
 const { EVENTS } = require('../../utils/constants');
 
 /**
@@ -14,7 +13,7 @@ async function dailyUpdate() {
   const jobs = [];
 
   houses.forEach((house) => {
-    const times = sunCalc.getTimes(new Date(), house.latitude, house.longitude);
+    const times = this.sunCalc.getTimes(new Date(), house.latitude, house.longitude);
 
     jobs.push(
       schedule.scheduleJob(times.sunrise, () =>

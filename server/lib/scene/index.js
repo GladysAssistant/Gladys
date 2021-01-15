@@ -1,3 +1,5 @@
+const sunCalc = require('suncalc');
+
 const queue = require('queue');
 const { addScene } = require('./scene.addScene');
 const { create } = require('./scene.create');
@@ -31,6 +33,7 @@ const SceneManager = function SceneManager(stateManager, event, device, message,
   this.queue = queue({
     autostart: true,
   });
+  this.sunCalc = sunCalc;
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
   // on timezone change, reload all scenes
