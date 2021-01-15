@@ -64,11 +64,10 @@ async function connect() {
       response.data.refresh_token,
     );
 
-    this.getDevices();
-    this.pollManual();
+    await this.getDevices();
 
-    setInterval(() => {
-      this.pollManual();
+    setInterval(async () => {
+      await this.pollManual();
     }, 60 * 1000);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,

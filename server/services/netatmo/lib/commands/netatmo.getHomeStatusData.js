@@ -17,7 +17,7 @@ async function getHomeStatusData() {
         access_token: this.token,
       };
       const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
-      responseHomeStatus.data.body.home.modules.forEach((module) => {
+      home.modules.forEach((module) => {
         // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
         // if (module.type === 'NSD') {
         //   smokedetectors = module;
