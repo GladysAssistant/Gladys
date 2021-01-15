@@ -14,10 +14,10 @@ const SceneManager = proxyquire('../../../lib/scene', {
     getTimes: () => {
       return {
         sunrise: new Date(Date.now()),
-        sunset:  new Date(Date.now())
+        sunset: new Date(Date.now()),
       };
-    }
-  }
+    },
+  },
 });
 
 const house = {
@@ -38,7 +38,6 @@ const variable = {
   getValue: fake.resolves('UTC'),
 };
 describe('SceneManager', () => {
-
   let sceneManager;
 
   beforeEach(async () => {
@@ -66,5 +65,4 @@ describe('SceneManager', () => {
     const jobs = await sceneManager.dailyUpdate();
     expect(jobs).to.have.lengthOf(0);
   });
-
 });
