@@ -849,10 +849,12 @@
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
-      "unmanagedModelButton": "Model not managed",
+      "unmanagedModelButton": "Model not managed or available",
       "status": {
         "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
-        "setupPageLink": "eWeLink configuration page."
+        "setupPageLink": "eWeLink configuration page.",
+        "online": "Online",
+        "offline": "Offline"
       },
       "device": {
         "title": "Devices in Gladys",

@@ -849,10 +849,12 @@
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "unmanagedModelButton": "Modèle non pris en charge",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
-        "setupPageLink": "page de configuration eWeLink."
+        "setupPageLink": "page de configuration eWeLink.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
       },
       "device": {
         "title": "Appareils eWeLink dans Gladys",
