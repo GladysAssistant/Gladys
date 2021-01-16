@@ -1,8 +1,9 @@
-const { DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
+const { parseExternalId } = require('../features');
+const power = require('../features/power');
 const { EWELINK_REGION_KEY } = require('../utils/constants');
-const { parseExternalId } = require('../utils/parseExternalId');
 
 /**
  * @description Change value of an eWeLink device.
@@ -20,7 +21,7 @@ async function setValue(device, deviceFeature, value) {
   const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
   const connection = new this.EweLinkApi({ at: this.accessToken, apiKey: this.apiKey, region });
 
-  const { deviceId, channel } = parseExternalId(device.external_id);
+  const { deviceId, channel } = parseExternalId(deviceFeature.external_id);
   const eweLinkDevice = await connection.getDevice(deviceId);
   await this.throwErrorIfNeeded(eweLinkDevice);
 
@@ -29,11 +30,9 @@ async function setValue(device, deviceFeature, value) {
   }
 
   let response;
-  let state;
   switch (deviceFeature.type) {
-    case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
-      state = value === STATE.ON ? 'on' : 'off';
-      response = await connection.setDevicePowerState(deviceId, state, channel);
+    case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
+      response = await connection.setDevicePowerState(deviceId, power.writeValue(value), channel);
       await this.throwErrorIfNeeded(response);
       break;
     default:

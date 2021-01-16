@@ -1,7 +1,7 @@
 {
   "online": true,
-  "name": "Switch 1",
-  "deviceid": "10004531ae",
+  "name": "Test 3",
+  "deviceid": "10004533ae",
   "apikey": "validApikey",
   "extra": {
     "extra": {
@@ -12,7 +12,7 @@
   "params": {
     "fwVersion": "3.3.0"
   },
-  "ip": "192.168.0.1",
+  "ip": "192.168.0.3",
   "brandName": "Sonoff",
   "productModel": "Pow",
   "uiid": 5

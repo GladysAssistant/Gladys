@@ -80,14 +80,7 @@ const variableNok = {
 };
 
 const deviceManagerFull = {
-  get: fake.resolves([
-    GladysPowDevice,
-    GladysOfflineDevice,
-    Gladys2Ch1Device,
-    Gladys2Ch2Device,
-    GladysUnhandledDevice,
-    GladysThDevice,
-  ]),
+  get: fake.resolves([Gladys2Ch1Device, GladysOfflineDevice, GladysPowDevice, GladysThDevice, GladysUnhandledDevice]),
 };
 
 const stateManagerWith0Devices = {
@@ -98,14 +91,14 @@ const stateManagerWith0Devices = {
 
 const stateManagerWith3Devices = {
   get: (key, externalId) => {
-    if (externalId === 'ewelink:10004531ae:0') {
-      return GladysPowDevice;
-    }
-    if (externalId === 'ewelink:10004533ae:1') {
+    if (externalId === 'ewelink:10004531ae:1') {
       return Gladys2Ch1Device;
     }
-    if (externalId === 'ewelink:10004533ae:2') {
+    if (externalId === 'ewelink:10004531ae:2') {
       return Gladys2Ch2Device;
+    }
+    if (externalId === 'ewelink:10004533ae:1') {
+      return GladysPowDevice;
     }
     return undefined;
   },
@@ -113,23 +106,23 @@ const stateManagerWith3Devices = {
 
 const stateManagerFull = {
   get: (key, externalId) => {
-    if (externalId === 'ewelink:10004531ae:0') {
-      return GladysPowDevice;
+    if (externalId === 'ewelink:10004531ae:1') {
+      return Gladys2Ch1Device;
     }
-    if (externalId === 'ewelink:10004532ae:0') {
+    if (externalId === 'ewelink:10004531ae:2') {
+      return Gladys2Ch2Device;
+    }
+    if (externalId === 'ewelink:10004532ae:1') {
       return GladysOfflineDevice;
     }
     if (externalId === 'ewelink:10004533ae:1') {
-      return Gladys2Ch1Device;
-    }
-    if (externalId === 'ewelink:10004533ae:2') {
-      return Gladys2Ch2Device;
+      return GladysPowDevice;
     }
     if (externalId === 'ewelink:10004534ae:1') {
-      return GladysUnhandledDevice;
-    }
-    if (externalId === 'ewelink:10004535ae:0') {
       return GladysThDevice;
+    }
+    if (externalId === 'ewelink:10004535ae:1') {
+      return GladysUnhandledDevice;
     }
     return undefined;
   },
