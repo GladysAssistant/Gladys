@@ -1,5 +1,3 @@
-const logger = require('../../../../utils/logger');
-
 /**
  * @description Poll value of a Netatmo devices
  * @example
@@ -21,22 +19,18 @@ async function pollManual() {
     }
     const deviceSelector = deviceExternalId.replace(/:/gi, '-');
     const device = this.gladys.device.getBySelector(deviceSelector);
-    try {
-      await this.updateThermostat(key, device, deviceSelector);
+    await this.updateThermostat(key, device, deviceSelector);
 
-      await this.updateCamera(key, device, deviceSelector);
+    await this.updateCamera(key, device, deviceSelector);
 
-      // we save the common data of home coaches and weather stations
-      await this.updateHomeCoachWeather(key, device, deviceSelector);
+    // we save the common data of home coaches and weather stations
+    await this.updateHomeCoachWeather(key, device, deviceSelector);
 
-      // we save other home coach data
-      await this.updateNHC(key, device, deviceSelector);
+    // we save other home coach data
+    await this.updateNHC(key, device, deviceSelector);
 
-      // we save the other weather station data
-      await this.updateWeatherStation(key, device, deviceSelector);
-    } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - error : ${e}`);
-    }
+    // we save the other weather station data
+    await this.updateWeatherStation(key, device, deviceSelector);
   });
 }
 
