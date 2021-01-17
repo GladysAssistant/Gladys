@@ -11,7 +11,12 @@ async function getStationsData() {
   try {
     const response = await axios.post(`${this.baseUrl}/api/getstationsdata`, { access_token: this.token });
     response.data.body.devices.forEach((station) => {
-      this.newValueStation(station); // , response.data.body.user);
+      // eslint-disable-next-line no-underscore-dangle
+      const sid = station._id;
+      if (this.devices[sid] === undefined) {
+        this.newValueStation(station);
+      }
+      this.devices[sid] = station;
     });
   } catch (err) {
     logger.info(`Error on getStationsData (station) - ${err}`);

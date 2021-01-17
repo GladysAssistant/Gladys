@@ -16,7 +16,6 @@ function newValueValve(data) {
   const sid = data.id;
   let newValve;
   logger.debug(`Netatmo : New valve, sid = ${sid}`);
-  this.devices[sid] = data;
   // we create the valve device
   if (data.type === 'NRV') {
     newValve = {

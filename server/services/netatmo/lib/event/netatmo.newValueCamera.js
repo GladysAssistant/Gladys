@@ -16,7 +16,6 @@ function newValueCamera(data) {
   const sid = data.id;
   let newCamera;
   logger.debug(`Netatmo : New camera, sid = ${sid}`);
-  this.devices[sid] = data;
 
   // we create the camera device
   if (data.type === 'NOC') {
@@ -134,12 +133,11 @@ function newValueCamera(data) {
         },
       ],
     };
-    this.devices[sid].modules.forEach((module) => {
+    data.modules.forEach((module) => {
       // if the "NACamera" camera module is present
       const sidModule = module.id;
       const moduleName = module.name;
       logger.debug(`Netatmo : New Module Camera, sid = ${sidModule}`);
-      this.devices[sidModule] = module;
       let newModuleCam;
       if (module.type === 'NIS') {
         // if siren module present, the device is created

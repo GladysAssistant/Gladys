@@ -16,7 +16,6 @@ function newValueThermostat(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
   logger.debug(`Netatmo : New value thermostat, sid = ${sid}`);
-  this.devices[sid] = data;
   const newSensor = {
     service_id: this.serviceId,
     name: data.module_name,
@@ -92,7 +91,7 @@ function newValueThermostat(data) {
     params: [
       {
         name: `Programs Thermostat ${data.module_name}`,
-        value: JSON.stringify(this.devices[sid].therm_program_list),
+        value: JSON.stringify(data.therm_program_list),
       },
     ],
   };

@@ -65,10 +65,8 @@ async function connect() {
     );
 
     await this.getDevices();
+    await this.pollManual();
 
-    setInterval(async () => {
-      await this.pollManual();
-    }, 60 * 1000);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
     });

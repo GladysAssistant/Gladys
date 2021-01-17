@@ -1,6 +1,6 @@
-const logger = require('../../../../../utils/logger');
-const { EVENTS } = require('../../../../../utils/constants');
-const { getDeviceFeatureBySelector } = require('../../../../../utils/device');
+const logger = require('../../../../utils/logger');
+const { EVENTS } = require('../../../../utils/constants');
+const { getDeviceFeatureBySelector } = require('../../../../utils/device');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -11,23 +11,28 @@ const { getDeviceFeatureBySelector } = require('../../../../../utils/device');
  * updateHomeCoachWeather();
  */
 async function updateHomeCoachWeather(key, device, deviceSelector) {
-  if (this.devices[key].type === 'NHC' || this.devices[key].type === 'NAMain') {
-    try {
-      const temperatureValue = this.devices[key].dashboard_data.Temperature;
-      const humidityValue = this.devices[key].dashboard_data.Humidity;
-      const co2Value = this.devices[key].dashboard_data.CO2;
-      const pressureValue = this.devices[key].dashboard_data.Pressure;
-      const absolutePressureValue = this.devices[key].dashboard_data.AbsolutePressure;
-      const noiseValue = this.devices[key].dashboard_data.Noise;
-      const reachableValue = this.devices[key].reachable;
+  try {
+    let feature;
+    const temperatureValue = this.devices[key].dashboard_data.Temperature;
+    const humidityValue = this.devices[key].dashboard_data.Humidity;
+    const co2Value = this.devices[key].dashboard_data.CO2;
+    const pressureValue = this.devices[key].dashboard_data.Pressure;
+    const absolutePressureValue = this.devices[key].dashboard_data.AbsolutePressure;
+    const noiseValue = this.devices[key].dashboard_data.Noise;
+    const reachableValue = this.devices[key].reachable;
 
-      let feature = getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
+    try {
+      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
       if (feature.last_value !== temperatureValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:temperature`,
           state: temperatureValue,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - temperature - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-humidity`);
       if (feature.last_value !== humidityValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -35,6 +40,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
           state: humidityValue,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - humidity - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-co2`);
       if (feature.last_value !== co2Value) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -42,6 +51,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
           state: co2Value,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - co2 - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-pressure`);
       if (feature.last_value !== pressureValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -49,6 +62,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
           state: pressureValue,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - pressure - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-absolutepressure`);
       if (feature.last_value !== absolutePressureValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -56,6 +73,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
           state: absolutePressureValue,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - absolute pressure - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-noise`);
       if (feature.last_value !== noiseValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -63,6 +84,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
           state: noiseValue,
         });
       }
+    } catch (e) {
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - noise - error : ${e}`);
+    }
+    try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
       if (feature.last_value !== reachableValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -71,8 +96,10 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach or  weather station - error : ${e}`);
+      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - reachable - error : ${e}`);
     }
+  } catch (e) {
+    logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach or weather station - error : ${e}`);
   }
 }
 

@@ -16,7 +16,6 @@ function newValueHomeCoach(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
   logger.debug(`Netatmo : New homecoach, sid = ${sid}`);
-  this.devices[sid] = data;
   const unitTemperature = DEVICE_FEATURE_UNITS.CELSIUS;
   const minTemperature = 0;
   const maxTemperature = 50;

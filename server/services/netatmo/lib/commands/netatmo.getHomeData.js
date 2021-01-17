@@ -11,7 +11,11 @@ async function getHomeData() {
     const response = await axios.post(`${this.baseUrl}/api/gethomedata`, { access_token: this.token });
     response.data.body.homes.forEach((home) => {
       home.cameras.forEach((camera) => {
-        this.newValueCamera(camera);
+        const sid = camera.id;
+        if (this.devices[sid] === undefined) {
+          this.newValueCamera(camera);
+        }
+        this.devices[sid] = camera;
       });
     });
   } catch (err) {

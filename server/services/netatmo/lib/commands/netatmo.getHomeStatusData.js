@@ -50,7 +50,12 @@ async function getHomeStatusData() {
           valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
           // then we get the 3rd part of the valves : rooms
           valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-          this.newValueValve(valves); // , responseHomes.data.body.user);
+          
+          const sid = valves.id;
+          if (this.devices[sid] === undefined) {
+            this.newValueValve(valves);
+          }
+          this.devices[sid] = valves;
         }
       });
     });

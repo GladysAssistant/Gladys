@@ -9,11 +9,12 @@ const { getHomeData } = require('./commands/netatmo.getHomeData.js');
 const { getStationsData } = require('./commands/netatmo.getStationsData.js');
 const { getHealthyHomeCoachData } = require('./commands/netatmo.getHealthyHomeCoachData.js');
 // update
-const { updateCamera } = require('./commands/update/netatmo.updateCamera.js');
-const { updateThermostat } = require('./commands/update/netatmo.updateThermostat.js');
-const { updateHomeCoachWeather } = require('./commands/update/netatmo.updateHomeCoachWeather.js');
-const { updateNHC } = require('./commands/update/netatmo.updateNHC.js');
-const { updateWeatherStation } = require('./commands/update/netatmo.updateWeatherStation.js');
+const { updateNetatmo } = require('./update/netatmo.updateNetatmo.js');
+const { updateCamera } = require('./update/netatmo.updateCamera.js');
+const { updateThermostat } = require('./update/netatmo.updateThermostat.js');
+const { updateHomeCoachWeather } = require('./update/netatmo.updateHomeCoachWeather.js');
+const { updateNHC } = require('./update/netatmo.updateNHC.js');
+const { updateWeatherStation } = require('./update/netatmo.updateWeatherStation.js');
 
 // event
 const { newValueThermostat } = require('./event/netatmo.newValueThermostat.js');
@@ -52,6 +53,8 @@ NetatmoManager.prototype.getHomeStatusData = getHomeStatusData;
 NetatmoManager.prototype.getHomeData = getHomeData;
 NetatmoManager.prototype.getStationsData = getStationsData;
 NetatmoManager.prototype.getHealthyHomeCoachData = getHealthyHomeCoachData;
+
+NetatmoManager.prototype.updateNetatmo = updateNetatmo;
 NetatmoManager.prototype.updateCamera = updateCamera;
 NetatmoManager.prototype.updateThermostat = updateThermostat;
 NetatmoManager.prototype.updateHomeCoachWeather = updateHomeCoachWeather;

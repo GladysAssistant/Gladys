@@ -16,7 +16,6 @@ function newValueStation(data) {
   /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
   const sid = data._id;
   logger.debug(`Netatmo : New station, sid = ${sid}`);
-  this.devices[sid] = data;
   const unitTemperature = DEVICE_FEATURE_UNITS.CELSIUS;
   const minTemperatureIndoor = 0;
   const maxTemperatureIndoor = 50;
@@ -162,11 +161,11 @@ function newValueStation(data) {
     ],
   };
 
-  this.devices[sid].modules.forEach((module) => {
+  data.modules.forEach((module) => {
     const sidModule = module._id;
     const moduleName = module.module_name;
     logger.debug(`Netatmo : New Module station, sid = ${sidModule}`);
-    this.devices[sidModule] = module;
+    // this.devices[sidModule] = module;
     let newSensor2;
     if (module.data_type[0] === 'Wind') {
       newSensor2 = {
