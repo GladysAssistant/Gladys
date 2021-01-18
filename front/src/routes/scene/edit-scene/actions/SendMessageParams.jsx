@@ -46,6 +46,38 @@ class SendMessageParams extends Component {
     }
     this.setState({ selectedOption });
   };
+  refreshVariables = nextProps => {
+    const variableWhileList = [];
+    let variableReady = null;
+    nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
+      actionGroup.forEach((action, index) => {
+        if (nextProps.variables[groupIndex][index]) {
+          nextProps.variables[groupIndex][index].forEach(option => {
+            if (option.ready && variableReady === null) {
+              variableReady = true;
+            }
+            if (!option.ready) {
+              variableReady = false;
+            }
+            variableWhileList.push({
+              id: `${groupIndex}.${index}.${option.name}`,
+              text: `${groupIndex + 1}. ${index + 1}. ${option.label}`,
+              title: `${groupIndex + 1}. ${index + 1}. ${option.label}`,
+              value: `${groupIndex}.${index}.${option.name}`
+            });
+          });
+        }
+      });
+    });
+    this.setState({ variableWhileList, variableReady });
+  };
+  parseText = e => {
+    let text = e.detail.textContent;
+    this.state.variableWhileList.forEach(variable => {
+      text = text.replace(variable.text, `{{${variable.id}}}`);
+    });
+    console.log(text);
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -61,25 +93,9 @@ class SendMessageParams extends Component {
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
+    this.refreshVariables(nextProps);
   }
-  render(props, { selectedOption, userOptions }) {
-    const variableWhileList = [];
-
-    props.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
-      actionGroup.forEach((action, index) => {
-        if (this.props.variables[groupIndex][index]) {
-          this.props.variables[groupIndex][index].forEach(option => {
-            variableWhileList.push({
-              id: `${groupIndex + 1}. ${option.label}`,
-              text: `${groupIndex + 1}. ${option.label}`,
-              title: `${groupIndex + 1}. ${option.label}`,
-              value: `${groupIndex}.${index}.${option.name}`
-            });
-          });
-        }
-      });
-    });
-    console.log(variableWhileList);
+  render(props, { selectedOption, userOptions, variableWhileList, variableReady }) {
     return (
       <div>
         <div class="form-group">
@@ -114,11 +130,11 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          {variableWhileList && variableWhileList.length > 0 && (
+          {variableWhileList && variableWhileList.length > 0 && variableReady && (
             <Tags
               InputMode="textarea"
-              onChange={console.log}
-              onInput={e => console.log(e.detail)}
+              /*onChange={e => console.log('CHANGED:', e.target.value)}*/
+              onInput={this.parseText}
               settings={{
                 mode: 'mix',
                 pattern: /{{/,
