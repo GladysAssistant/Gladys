@@ -58,8 +58,8 @@ for (let i = 0; i < NUMBER_OF_LISTENERS; i += 1) {
   }
 }
 
+// eslint-disable-next-line no-constant-condition
 while (1) {
-  // eslint-disable-line
   const start = process.hrtime();
   EVENTS_TO_THROW.forEach((item, index) => {
     event.emit(item, {});

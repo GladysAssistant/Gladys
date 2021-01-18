@@ -21,6 +21,7 @@ describe('service.stop', () => {
       selector: serviceName,
       name: serviceName,
       version: '0.1.0',
+      status: SERVICE_STATUS.UNKNOWN,
     };
 
     stateManager = new StateManager();
@@ -42,7 +43,7 @@ describe('service.stop', () => {
     sinon.reset();
   });
 
-  it('should stop a service, and set status to RUNNING', async () => {
+  it('should stop a service, and not change status', async () => {
     serviceImpl.stop = fake.resolves(null);
 
     const result = await service.stop(serviceName);
@@ -53,15 +54,15 @@ describe('service.stop', () => {
       },
     });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.STOPPED);
-    expect(result.status).eq(SERVICE_STATUS.STOPPED);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.UNKNOWN);
+    expect(result.status).eq(SERVICE_STATUS.UNKNOWN);
     assert.calledOnce(serviceImpl.stop);
   });
 
-  it('should fail stoping a service, and set status to ERROR', async () => {
+  it('should fail stoping a service, change status to STOPPED', async () => {
     serviceImpl.stop = fake.rejects(null);
 
-    const result = await service.stop(serviceName);
+    const result = await service.stop(serviceName, null, true);
 
     const serviceInDb = await db.Service.findOne({
       where: {
@@ -69,8 +70,8 @@ describe('service.stop', () => {
       },
     });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.ERROR);
-    expect(result.status).eq(SERVICE_STATUS.ERROR);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.STOPPED);
+    expect(result.status).eq(SERVICE_STATUS.STOPPED);
     assert.calledOnce(serviceImpl.stop);
   });
 
@@ -92,8 +93,8 @@ describe('service.stop', () => {
       },
     });
 
-    expect(serviceInDb.status).eq(SERVICE_STATUS.STOPPED);
-    expect(result.status).eq(SERVICE_STATUS.STOPPED);
+    expect(serviceInDb.status).eq(SERVICE_STATUS.LOADING);
+    expect(result.status).eq(SERVICE_STATUS.LOADING);
     assert.calledOnce(serviceImpl.stop);
   });
 });
