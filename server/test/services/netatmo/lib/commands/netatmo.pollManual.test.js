@@ -103,6 +103,20 @@ describe('netatmoManager pollManual', () => {
     netatmoManager.updateNetatmo('Security');
   });
 
+  it('should call updateNetatmo and have a name defined', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+        type: 'NHC',
+        name: 'coucou'
+      },
+    };
+    netatmoManager.updateNHC = fake.resolves(null);
+    netatmoManager.updateHomeCoachWeather = fake.resolves(null);
+    netatmoManager.updateNetatmo('HomeCoach_Weather');
+  });
+
   // it('should get all devices parsing the updates files', async () => {
   //   const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   //   nock(`${netatmoManager.baseUrl}`)
