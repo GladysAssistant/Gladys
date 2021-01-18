@@ -9,12 +9,35 @@ import actions from '../../actions/map';
 class Area extends Component {
 
   render(props, state) {
+    const token = "";
+    const url = "";
+    var callApi = `
+    function callAPI(token, path) {
+
+        var httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function(evt)  {
+         console.log("xhr.readyState :: "+httpRequest.readyState);
+         console.log("xhr.status :: "+httpRequest.status);
+         if (httpRequest.readyState==4 && httpRequest.status==200) {
+          console.log(evt.target.responseText);
+         }
+       }
+       httpRequest.open('POST', path);
+       httpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+       httpRequest.setRequestHeader('Authorization', 'Token token="'+token+'"');
+       httpRequest.send();
+     };
+     `
       return (
         <div class="form-group" style="margin-top: 20em;">
           <form onSubmit={props.createAreasWithLocation}>
           <fieldset>
             <legend>Area details</legend>
-              <div><label class="form-label">Label :</label>
+              <script type="text/javascript">
+                 {callApi}
+              </script>
+              <div>
+                <label class="form-label">Label :</label>
                 <input
                   type="text"
                   class="form-control"
@@ -61,6 +84,7 @@ class Area extends Component {
             </fieldset>
             </form>
         </div>
+
       );
     }
 };

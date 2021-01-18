@@ -65,7 +65,7 @@ class MapComponent extends Component {
     };
     var drawControl = new L.Control.Draw(options);
     map.addControl(drawControl);
-
+    let access_token = this.props.session.getAccessToken();
     // Generate popup content based on layer type
     var getPopupContent = function(layer) {
         // Marker - add lat/long
@@ -73,8 +73,10 @@ class MapComponent extends Component {
         const latitude = latlng.lat;
         const longitude = latlng.lng;
         const radius = _round(layer.getRadius(), 2);
+
         return `
         <div class="form-group" style="width:250px;">
+
           <fieldset>
           <legend>Area details</legend>
               <div>
@@ -92,9 +94,12 @@ class MapComponent extends Component {
                 <input class="form-control" name="radius" value="${radius}"/>
               </div>
               <div class="form-footer">
-                <button class="btn btn-primary mx-auto" onClick="">
+                <button class="btn btn-primary mx-auto" onClick="javascript:callAPI('AEZEZ', '/api/v1/area')">
                   Create
                 </button>
+
+
+
             </div>
           </fieldset>
         </div>`;
@@ -221,8 +226,12 @@ class MapComponent extends Component {
   };
 
   displayAreas = () => {
-    if (this.props.areas) {
-      this.props.areas.forEach(area => {
+    let areas = this.props.areas;
+    if (areas) {
+        if (!Array.isArray(areas)) {
+          areas = new Array(this.props.areas);
+        }
+        areas.forEach(area => {
         if (this.areaMarkers[area.id]) {
           this.areaMarkers[area.id].remove();
         }
@@ -236,7 +245,6 @@ class MapComponent extends Component {
               })
             .bindTooltip(`${area.name}`)
             .addTo(this.leafletMap);
-
           this.markerArray.push(this.areaMarkers[area.id]);
         }
       });

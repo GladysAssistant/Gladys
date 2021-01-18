@@ -23,7 +23,7 @@ class MapPage extends Component {
           </div>
         </div>
         <div>
-          <Area />
+            <Area />
         </div>
       </div>
     );
