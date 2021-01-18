@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {
   sharp: fake.returns(null),
-  btoa: fake.resolves(null)
+  btoa: fake.resolves(null),
 });
 
 const gladys = {
@@ -14,9 +14,9 @@ const gladys = {
   },
   device: {
     camera: {
-      setImage: fake.resolves(null)
-    }
-  }
+      setImage: fake.resolves(null),
+    },
+  },
 };
 
 describe('netatmoManager updateCamera', () => {
@@ -32,17 +32,20 @@ describe('netatmoManager updateCamera', () => {
       '10': {
         id: '10',
         vpn_url: 'https://fake.gladys.fr',
-        type: 'toto'
-      }
+        type: 'toto',
+      },
     };
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
-      type: 'toto'
-    }
-    const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-      responseType: 'arraybuffer',
-    });
+      type: 'toto',
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
     nock('https://fake.gladys.fr')
       .get('/live/snapshot_720.jpg')
       .reply(200, responseImage.data);
@@ -55,17 +58,14 @@ describe('netatmoManager updateCamera', () => {
       '10': {
         id: '10',
         vpn_url: 'https://fake.gladys.fr',
-        type: 'toto'
-      }
+        type: 'toto',
+      },
     };
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
-      type: 'toto'
-    }
-    const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-      responseType: 'arraybuffer',
-    });
+      type: 'toto',
+    };
     nock('https://fake.gladys.fr')
       .get('/live/snapshot_720.jpg')
       .reply(400, 'error');
@@ -79,8 +79,8 @@ describe('netatmoManager updateCamera', () => {
         id: '10',
         vpn_url: 'https://fake.gladys.fr',
         type: 'toto',
-        alim_status: 'off'
-      }
+        alim_status: 'off',
+      },
     };
     const device = {
       id: '10',
@@ -88,13 +88,16 @@ describe('netatmoManager updateCamera', () => {
       type: 'toto',
       features: [
         {
-          selector: 'netatmo-10-power'
-        }
-      ]
-    }
-    const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-      responseType: 'arraybuffer',
-    });
+          selector: 'netatmo-10-power',
+        },
+      ],
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
     nock('https://fake.gladys.fr')
       .get('/live/snapshot_720.jpg')
       .reply(200, responseImage.data);
@@ -110,8 +113,8 @@ describe('netatmoManager updateCamera', () => {
         type: 'NOC',
         alim_status: 'off',
         light_mode_status: 'off',
-        siren_status: 'no_news'
-      }
+        siren_status: 'no_news',
+      },
     };
     const device = {
       id: '10',
@@ -120,21 +123,24 @@ describe('netatmoManager updateCamera', () => {
       features: [
         {
           selector: 'netatmo-10-power',
-          last_value: 'on'
+          last_value: 'on',
         },
         {
           selector: 'netatmo-10-light',
-          last_value: 'on'
+          last_value: 'on',
         },
         {
           selector: 'netatmo-10-siren',
-          last_value: 'no_sound'
-        }
-      ]
-    }
-    const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-      responseType: 'arraybuffer',
-    });
+          last_value: 'no_sound',
+        },
+      ],
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
     nock('https://fake.gladys.fr')
       .get('/live/snapshot_720.jpg')
       .reply(200, responseImage.data);
@@ -150,18 +156,21 @@ describe('netatmoManager updateCamera', () => {
         type: 'NOC',
         alim_status: 'off',
         light_mode_status: 'off',
-        siren_status: 'no_news'
-      }
+        siren_status: 'no_news',
+      },
     };
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
       type: 'NOC',
-      features: []
-    }
-    const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-      responseType: 'arraybuffer',
-    });
+      features: [],
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
     nock('https://fake.gladys.fr')
       .get('/live/snapshot_720.jpg')
       .reply(200, responseImage.data);

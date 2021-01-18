@@ -109,7 +109,7 @@ describe('netatmoManager pollManual', () => {
       '10': {
         _id: '10',
         type: 'NHC',
-        name: 'coucou'
+        name: 'coucou',
       },
     };
     netatmoManager.updateNHC = fake.resolves(null);
