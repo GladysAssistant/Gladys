@@ -138,7 +138,7 @@ const actionsFunc = {
     const headersObject = {};
     action.headers.forEach((header) => {
       if (header.key && header.value) {
-        headersObject[header.key] = Handlebars.compile(header.value, scope);
+        headersObject[header.key] = Handlebars.compile(header.value)(scope);
       }
     });
     const urlWithVariables = Handlebars.compile(action.url)(scope);

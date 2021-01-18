@@ -273,7 +273,15 @@ describe('scene.executeActions', () => {
       ],
       scope,
     );
-    expect(scope).to.deep.equal({ '0.0.last_value': 15 });
+    expect(scope).to.deep.equal({
+      0: {
+        0: {
+          category: 'light',
+          type: 'binary',
+          last_value: 15,
+        },
+      },
+    });
   });
   it('should execute action user.setSeenAtHome', async () => {
     const stateManager = new StateManager(event);
