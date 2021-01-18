@@ -1,10 +1,10 @@
 import Select from 'react-select';
-import Tags from '@yaireo/tagify/dist/react.tagify';
+import Tagify from '@yaireo/tagify';
 import '@yaireo/tagify/dist/tagify.css';
 import { Component } from 'preact';
 import get from 'get-value';
 import { connect } from 'unistore/preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 
 @connect('httpClient', {})
 class SendMessageParams extends Component {
@@ -46,7 +46,7 @@ class SendMessageParams extends Component {
     }
     this.setState({ selectedOption });
   };
-  refreshVariables = nextProps => {
+  refreshVariables = async nextProps => {
     const variableWhileList = [];
     let variableReady = null;
     nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
@@ -69,14 +69,50 @@ class SendMessageParams extends Component {
         }
       });
     });
-    this.setState({ variableWhileList, variableReady });
+    await this.setState({ variableWhileList, variableReady });
+    if (variableReady) {
+      this.initTagify();
+    }
   };
-  parseText = e => {
-    let text = e.detail.textContent;
+  setRef = dom => (this.tagifyInputRef = dom);
+  initTagify = () => {
+    if (this.tagify) {
+      return null;
+    }
+    this.tagify = new Tagify(this.tagifyInputRef, {
+      mode: 'mix',
+      pattern: /{{/,
+      duplicates: true,
+      enforceWhitelist: true,
+      tagTextProp: 'text',
+      dropdown: {
+        enabled: 1,
+        position: 'text',
+        mapValueTo: 'title'
+      },
+      whitelist: this.state.variableWhileList,
+      mixTagsInterpolator: ['{{', '}}']
+    });
+    if (this.props.action.text.search('{{') !== -1 && this.props.action.text.search('}}') !== -1) {
+      const textFormatted = this.props.action.text.replace(/{{/i, '[[').replace(/}}/i, ']]');
+      this.tagify.loadOriginalValues(textFormatted);
+    } else {
+      this.tagify.loadOriginalValues(this.props.action.text);
+    }
+    this.tagify.on('input add remove change', e => {
+      const text = get(this.tagify, 'DOM.input.innerText', '');
+      this.parseText(text);
+    });
+  };
+  parseText = textContent => {
+    let text = textContent ? textContent : '';
     this.state.variableWhileList.forEach(variable => {
       text = text.replace(variable.text, `{{${variable.id}}}`);
     });
-    console.log(text);
+    text = text.replace(/\n{{/i, '{{');
+    text = text.replace(/}}\n/i, '}}');
+    text = text.trim();
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
   };
   constructor(props) {
     super(props);
@@ -114,43 +150,9 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Localizer>
-            <textarea
-              class="form-control"
-              value={props.action.text}
-              onChange={this.handleChangeText}
-              placeholder={<Text id="editScene.actionsCard.messageSend.textPlaceholder" />}
-            />
-          </Localizer>
-        </div>
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.messageSend.textLabel" />{' '}
-            <span class="form-required">
-              <Text id="global.requiredField" />
-            </span>
-          </label>
-          {variableWhileList && variableWhileList.length > 0 && variableReady && (
-            <Tags
-              InputMode="textarea"
-              /*onChange={e => console.log('CHANGED:', e.target.value)}*/
-              onInput={this.parseText}
-              settings={{
-                mode: 'mix',
-                pattern: /{{/,
-                duplicates: true,
-                enforceWhitelist: true,
-                tagTextProp: 'text',
-                dropdown: {
-                  enabled: 1,
-                  position: 'text',
-                  mapValueTo: 'title'
-                },
-                whitelist: variableWhileList,
-                mixTagsInterpolator: ['{{', '}}']
-              }}
-            />
-          )}
+          <div className="tags-input">
+            <textarea ref={this.setRef} class="form-control" />
+          </div>
         </div>
       </div>
     );
