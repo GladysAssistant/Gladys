@@ -47,6 +47,10 @@ class SendMessageParams extends Component {
     this.setState({ selectedOption });
   };
   refreshVariables = async nextProps => {
+    // if variables didn't change, it's useless to refresh the state
+    if (nextProps.variables === this.props.variables) {
+      return null;
+    }
     const variableWhileList = [];
     let variableReady = null;
     nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
@@ -77,6 +81,8 @@ class SendMessageParams extends Component {
   setRef = dom => (this.tagifyInputRef = dom);
   initTagify = () => {
     if (this.tagify) {
+      this.tagify.settings.whitelist.length = 0;
+      this.tagify.settings.whitelist.push(...this.state.variableWhileList);
       return null;
     }
     this.tagify = new Tagify(this.tagifyInputRef, {
@@ -94,7 +100,7 @@ class SendMessageParams extends Component {
       mixTagsInterpolator: ['{{', '}}']
     });
     if (this.props.action.text.search('{{') !== -1 && this.props.action.text.search('}}') !== -1) {
-      const textFormatted = this.props.action.text.replace(/{{/i, '[[').replace(/}}/i, ']]');
+      const textFormatted = this.props.action.text.replaceAll('{{', '[[').replaceAll('}}', ']]');
       this.tagify.loadOriginalValues(textFormatted);
     } else {
       this.tagify.loadOriginalValues(this.props.action.text);
@@ -107,10 +113,10 @@ class SendMessageParams extends Component {
   parseText = textContent => {
     let text = textContent ? textContent : '';
     this.state.variableWhileList.forEach(variable => {
-      text = text.replace(variable.text, `{{${variable.id}}}`);
+      text = text.replaceAll(variable.text, `{{${variable.id}}}`);
     });
-    text = text.replace(/\n{{/i, '{{');
-    text = text.replace(/}}\n/i, '}}');
+    text = text.replaceAll('\n{{', '{{');
+    text = text.replaceAll('}}\n', '}}');
     text = text.trim();
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
   };
