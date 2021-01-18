@@ -4,192 +4,1062 @@
       {
         "id": "3iuhef7oihih89kojoihoui3",
         "name": "Maison Stark",
-        "persons": [
+        "altitude": 123,
+        "coordinates": [0.2348836678374973, 48.853492494796304],
+        "country": "FR",
+        "timezone": "Europe/Paris",
+        "rooms": [
           {
-            "id": "98349902-ea01-2948-3094-c3298932b902",
-            "last_seen": 1608759346,
-            "out_of_sight": false,
-            "face": {
-              "id": "7bc8ffa879086786e90876aa",
-              "version": 1,
-              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie",
-              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aaeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie"
-            },
-            "pseudo": "Tony"
+            "id": "1111111111",
+            "name": "Cuisine",
+            "type": "kitchen",
+            "module_ids": ["17:cc:50:67:aa:0d"]
           },
           {
-            "id": "98349902-ea01-2948-3094-c3298932b903",
-            "last_seen": 0,
-            "out_of_sight": true,
-            "face": {
-              "id": "7bc8ffa879086786e90876ab",
-              "version": 1,
-              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif",
-              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876abeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif"
-            },
-            "pseudo": "Pepper"
+            "id": "1111111112",
+            "name": "Extérieur",
+            "type": "outdoor",
+            "module_ids": ["17:cc:50:67:aa:0a", "17:cc:50:67:aa:0b", "17:cc:50:67:aa:0c"]
           },
           {
-            "id": "98349902-ea01-2948-3094-c3298932b904",
-            "last_seen": 1608758099,
-            "out_of_sight": false,
-            "face": {
-              "id": "7bc8ffa879086786e90876ac",
-              "version": 1,
-              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osi0",
-              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aceqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osi0"
-            },
-            "pseudo": "Morgan"
+            "id": "111111113",
+            "name": "Salon",
+            "type": "livingroom",
+            "module_ids": ["17:cc:50:67:aa:09", "17:cc:50:67:aa:0f", "17:cc:50:67:aa:10"]
           }
         ],
-        "place": {
-          "city": "Paris",
-          "country": "FR",
-          "timezone": "Europe/Paris"
-        },
-        "cameras": [
+        "modules": [
           {
-            "id": "17:cc:50:67:aa:00",
-            "type": "NACamera",
-            "status": "on",
-            "vpn_url": "https://test.com",
-            "is_local": true,
-            "sd_status": "on",
-            "alim_status": "on",
-            "name": "Caméra Salle Maison",
-            "modules": [
-              {
-                "id": "17:cc:50:67:aa:01",
-                "type": "NACamDoorTag",
-                "name": "Porte Entrée Maison",
-                "battery_percent": 98,
-                "room": "2812958323",
-                "rf": 85,
-                "status": "closed",
-                "category": "door",
-                "last_activity": 1608752718
-              },
-              {
-                "id": "17:cc:50:67:aa:03",
-                "type": "NIS",
-                "battery_percent": 93,
-                "room": "2812958323",
-                "rf": 72,
-                "status": "no_sound",
-                "monitoring": "on",
-                "alim_source": "battery",
-                "name": "Caméra Salle Maison's Siren"
-              }
-            ],
-            "use_pin_code": true,
-            "last_setup": 1605543861
+            "id": "17:cc:50:67:aa:09",
+            "type": "NAMain",
+            "name": "Hygrométrie Salon",
+            "setup_date": 1605564990,
+            "room_id": "1111111113",
+            "modules_bridged": ["17:cc:50:67:aa:0a", "17:cc:50:67:aa:0b", "17:cc:50:67:aa:0c", "17:cc:50:67:aa:0d"]
+          },
+          {
+            "id": "17:cc:50:67:aa:0a",
+            "type": "NAModule1",
+            "name": "Hygrométrie Extérieur",
+            "setup_date": 1605564992,
+            "room_id": "1111111112",
+            "bridge": "17:cc:50:67:aa:09"
+          },
+          {
+            "id": "17:cc:50:67:aa:0b",
+            "type": "NAModule3",
+            "name": "Pluviomètre maison Stark",
+            "setup_date": 1605604312,
+            "room_id": "1111111112",
+            "bridge": "17:cc:50:67:aa:09"
+          },
+          {
+            "id": "17:cc:50:67:aa:0c",
+            "type": "NAModule2",
+            "name": "Anémomètre maison Stark",
+            "setup_date": 1605604559,
+            "room_id": "1111111112",
+            "bridge": "17:cc:50:67:aa:09"
+          },
+          {
+            "id": "17:cc:50:67:aa:0d",
+            "type": "NAModule4",
+            "name": "Hygromètre cuisine",
+            "setup_date": 1608046641,
+            "room_id": "1111111111",
+            "bridge": "17:cc:50:67:aa:09"
+          },
+          {
+            "id": "17:cc:50:67:aa:0e",
+            "type": "NAPlug",
+            "name": "Relais Salon",
+            "setup_date": 1578400589,
+            "modules_bridged": ["17:cc:50:67:aa:0f", "17:cc:50:67:aa:10"]
+          },
+          {
+            "id": "17:cc:50:67:aa:0f",
+            "type": "NATherm1",
+            "name": "Thermostat Maison",
+            "setup_date": 1578400590,
+            "room_id": "1111111113",
+            "bridge": "17:cc:50:67:aa:0e"
+          },
+          {
+            "id": "17:cc:50:67:aa:10",
+            "type": "NRV",
+            "name": "Vanne Salon",
+            "setup_date": 1578401893,
+            "room_id": "1111111113",
+            "bridge": "17:cc:50:67:aa:0e"
+          },
+          {
+            "id": "17:cc:50:67:aa:11",
+            "type": "NAPlug",
+            "name": "Relais Cuisine",
+            "setup_date": 1578496638,
+            "modules_bridged": ["17:cc:50:67:aa:12", "17:cc:50:67:aa:13", "17:cc:50:67:aa:14"]
+          },
+          {
+            "id": "17:cc:50:67:aa:12",
+            "type": "NRV",
+            "name": "Vanne Cuisine",
+            "setup_date": 1578498735,
+            "room_id": "1111111111",
+            "bridge": "70:ee:50:0f:f0:b4"
           },
           {
             "id": "17:cc:50:67:aa:04",
             "type": "NOC",
-            "status": "on",
-            "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.226.229/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH91,,",
-            "is_local": true,
-            "sd_status": "on",
-            "alim_status": "on",
             "name": "Camera Barrière",
-            "use_pin_code": false,
-            "last_setup": 1605566157,
-            "light_mode_status": "auto",
-            "siren_status": "no_sound"
+            "setup_date": 1605566157,
+            "room_id": "1111111112"
           },
           {
-            "id": "17:cc:50:67:aa:05",
-            "type": "NOC",
-            "status": "on",
-            "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.226.229/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH92,,",
-            "is_local": true,
-            "sd_status": "on",
-            "alim_status": "on",
-            "name": "Caméra Extérieure 2 Parking",
-            "last_setup": 1608493953,
-            "light_mode_status": "auto",
-            "siren_status": "warning"
+            "id": "17:cc:50:67:aa:00",
+            "type": "NACamera",
+            "name": "Caméra Salle Maison",
+            "setup_date": 1605543861,
+            "room_id": "1111111112",
+            "modules_bridged": ["17:cc:50:67:aa:01", "17:cc:50:67:aa:02"]
+          },
+          {
+            "id": "17:cc:50:67:aa:01",
+            "type": "NACamDoorTag",
+            "name": "Porte Entrée Maison",
+            "setup_date": 1607992571,
+            "room_id": "1111111113",
+            "bridge": "17:cc:50:67:aa:00"
+          },
+          {
+            "id": "17:cc:50:67:aa:02",
+            "type": "NIS",
+            "setup_date": 1608142230,
+            "room_id": "1111111111",
+            "bridge": "17:cc:50:67:aa:00",
+            "name": "Sirène de Caméra Salle Maison"
           },
           {
             "id": "17:cc:50:67:aa:06",
             "type": "NDB",
-            "status": "disconnected",
-            "websocket_connected": false,
-            "sd_status": "on",
-            "alim_status": "on",
             "name": "Sonnette Vidéo Intelligente",
-            "last_setup": 1608051497,
-            "quick_display_zone": 50,
-            "max_peers_reached": false
-          }
-        ],
-        "smokedetectors": [
+            "setup_date": 1608051497,
+            "room_id": "1111111112"
+          },
           {
             "id": "17:cc:50:67:aa:07",
             "type": "NSD",
-            "last_setup": 1608141580,
-            "name": "Détecteur de Fumée Etage"
+            "name": "Détecteur de Fumée Etage",
+            "setup_date": 1608141580,
+            "room_id": "1111111113"
           }
         ],
-        "events": [
+        "therm_schedules": [
           {
-            "id": "7bc8ffa879086786e90876ac",
-            "type": "outdoor",
-            "time": 1608761557,
-            "camera_id": "17:cc:50:67:aa:05",
-            "device_id": "17:cc:50:67:aa:05",
-            "video_id": "5d011d3d-49c4-4148-9216-ab7e02d25ccc",
-            "video_status": "recording",
-            "event_list": [
+            "timetable": [
               {
-                "type": "human",
-                "time": 1608761557,
-                "id": "a0e6a83e-7bae-4599-9129-eb43cfc2039a",
-                "offset": 0,
-                "message": "Personne détectée",
-                "snapshot": {
-                  "id": "7bc8ffa879086786e90876aa",
-                  "version": 1,
-                  "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie",
-                  "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aaeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie"
-                },
-                "vignette": {
-                  "id": "7bc8ffa879086786e90876ab",
-                  "version": 1,
-                  "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif",
-                  "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876abeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif"
-                }
+                "zone_id": 1,
+                "m_offset": 0
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 420
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 1200
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 1320
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 1830
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 2640
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 2760
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 3270
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 4080
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 4200
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 4710
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 5520
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 5640
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 6150
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 6960
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 7080
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 7590
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 8400
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 8520
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 9030
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 9840
               }
-            ]
+            ],
+            "zones": [
+              {
+                "name": "Confort",
+                "id": 0,
+                "type": 0,
+                "rooms_temp": [
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "3416175565",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 19.5
+                  }
+                ]
+              },
+              {
+                "name": "Nuit",
+                "id": 1,
+                "type": 1,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 20
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 18.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 17
+                  }
+                ]
+              },
+              {
+                "name": "Confort+",
+                "id": 3,
+                "type": 8,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 17
+                  }
+                ]
+              },
+              {
+                "id": 4,
+                "type": 5,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 16
+                  }
+                ]
+              },
+              {
+                "name": "Prénuit",
+                "id": 5,
+                "type": 4,
+                "rooms_temp": [
+                  {
+                    "room_id": "299775816",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "3416175565",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 21.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 18
+                  }
+                ]
+              }
+            ],
+            "name": "Confinement",
+            "default": false,
+            "away_temp": 12,
+            "hg_temp": 7,
+            "id": "3iuhef7oihi392kojoihoui4",
+            "type": "therm"
+          }
+        ],
+        "therm_mode": "schedule",
+        "therm_setpoint_default_duration": 180,
+        "persons": [
+          {
+            "id": "98349902-ea01-2948-3094-c3298932b902",
+            "pseudo": "Tony",
+            "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aaeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie"
           },
           {
-            "time": 1608758472,
-            "offset": 24,
-            "id": "ab86066f-60b3-402d-b32e-cb50a8ac08a6",
-            "type": "animal",
-            "message": "Animal détecté",
-            "snapshot": {
-              "filename": "vod/6c6ccf57-fc33-4410-822c-1a53f92ab68e/events/ab86066f-60b3-402d-b32e-cb50a8ac08a6/snapshot_ab86066f-60b3-402d-b32e-cb50a8ac08a6.jpg"
-            },
-            "vignette": {
-              "filename": "vod/6c6ccf57-fc33-4410-822c-1a53f92ab68e/events/ab86066f-60b3-402d-b32e-cb50a8ac08a6/vignette_ab86066f-60b3-402d-b32e-cb50a8ac08a6.jpg"
-            }
+            "id": "98349902-ea01-2948-3094-c3298932b903",
+            "pseudo": "Pepper",
+            "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876abeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif"
+          },
+          {
+            "id": "98349902-ea01-2948-3094-c3298932b904",
+            "pseudo": "Morgan",
+            "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aceqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osi0"
+          }
+        ],
+        "schedules": [
+          {
+            "timetable": [
+              {
+                "zone_id": 1,
+                "m_offset": 0
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 420
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 1200
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 1320
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 1830
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 2640
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 2760
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 3270
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 4080
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 4200
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 4710
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 5520
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 5640
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 6150
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 6960
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 7080
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 7590
+              },
+              {
+                "zone_id": 5,
+                "m_offset": 8400
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 8520
+              },
+              {
+                "zone_id": 0,
+                "m_offset": 9030
+              },
+              {
+                "zone_id": 1,
+                "m_offset": 9840
+              }
+            ],
+            "zones": [
+              {
+                "name": "Confort",
+                "id": 0,
+                "type": 0,
+                "rooms_temp": [
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "3416175565",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 19.5
+                  }
+                ],
+                "rooms": [
+                  {
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
+                  },
+                  {
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19.5
+                  },
+                  {
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 19.5
+                  },
+                  {
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 20.5
+                  },
+                  {
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 19.5
+                  },
+                  {
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 19.5
+                  }
+                ]
+              },
+              {
+                "name": "Nuit",
+                "id": 1,
+                "type": 1,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 20
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 18.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 17
+                  }
+                ],
+                "rooms": [
+                  {
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
+                  },
+                  {
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 18
+                  },
+                  {
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 20
+                  },
+                  {
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 18.5
+                  },
+                  {
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 18
+                  },
+                  {
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 17
+                  }
+                ]
+              },
+              {
+                "name": "Confort+",
+                "id": 3,
+                "type": 8,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 17
+                  }
+                ],
+                "rooms": [
+                  {
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 17
+                  }
+                ]
+              },
+              {
+                "id": 4,
+                "type": 5,
+                "rooms_temp": [
+                  {
+                    "room_id": "3416175565",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "299775816",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 16
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 16
+                  }
+                ],
+                "rooms": [
+                  {
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 16
+                  },
+                  {
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 16
+                  }
+                ]
+              },
+              {
+                "name": "Prénuit",
+                "id": 5,
+                "type": 4,
+                "rooms_temp": [
+                  {
+                    "room_id": "299775816",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "566220101",
+                    "temp": 19.5
+                  },
+                  {
+                    "room_id": "3416175565",
+                    "temp": 18
+                  },
+                  {
+                    "room_id": "140642389",
+                    "temp": 10
+                  },
+                  {
+                    "room_id": "2812958323",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "3442216559",
+                    "temp": 17
+                  },
+                  {
+                    "room_id": "1511630932",
+                    "temp": 20.5
+                  },
+                  {
+                    "room_id": "1456430165",
+                    "temp": 21.5
+                  },
+                  {
+                    "room_id": "3754455535",
+                    "temp": 19
+                  },
+                  {
+                    "room_id": "2114790157",
+                    "temp": 18
+                  }
+                ],
+                "rooms": [
+                  {
+                    "id": "299775816",
+                    "therm_setpoint_temperature": 18
+                  },
+                  {
+                    "id": "566220101",
+                    "therm_setpoint_temperature": 19.5
+                  },
+                  {
+                    "id": "3416175565",
+                    "therm_setpoint_temperature": 18
+                  },
+                  {
+                    "id": "140642389",
+                    "therm_setpoint_temperature": 10
+                  },
+                  {
+                    "id": "2812958323",
+                    "therm_setpoint_temperature": 20.5
+                  },
+                  {
+                    "id": "3442216559",
+                    "therm_setpoint_temperature": 17
+                  },
+                  {
+                    "id": "1511630932",
+                    "therm_setpoint_temperature": 20.5
+                  },
+                  {
+                    "id": "1456430165",
+                    "therm_setpoint_temperature": 21.5
+                  },
+                  {
+                    "id": "3754455535",
+                    "therm_setpoint_temperature": 19
+                  },
+                  {
+                    "id": "2114790157",
+                    "therm_setpoint_temperature": 18
+                  }
+                ]
+              }
+            ],
+            "name": "Confinement",
+            "default": false,
+            "away_temp": 12,
+            "hg_temp": 7,
+            "id": "3iuhef7oihi392kojoihoui3",
+            "type": "therm"
           }
         ]
       }
     ],
     "user": {
-      "reg_locale": "fr-FR",
-      "lang": "fr",
-      "country": "FR_FR",
-      "mail": "tony.stark@gmail.com"
-    },
-    "global_info": {
-      "show_tags": true
+      "email": "tony.stark@gmail.com",
+      "language": "fr",
+      "locale": "fr-FR",
+      "feel_like_algorithm": 0,
+      "unit_pressure": 0,
+      "unit_system": 0,
+      "unit_wind": 0,
+      "id": "3iuhef7oihih89kojoihouj3"
     }
   },
   "status": "ok",
-  "time_exec": 0.09904599189758301,
-  "time_server": 1608761677
+  "time_exec": 0.07446599006652832,
+  "time_server": 1608766673
 }

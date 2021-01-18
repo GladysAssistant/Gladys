@@ -42,6 +42,67 @@ describe('netatmoManager pollManual', () => {
     await netatmoManager.pollManual();
   });
 
+  it('should call updateNetatmo with a camera security type', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+        type: 'NACamera',
+      },
+    };
+    netatmoManager.updateCamera = fake.resolves(null);
+    netatmoManager.updateNetatmo('Security');
+  });
+
+  it('should call updateNetatmo with any type', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+        type: 'NRV',
+      },
+    };
+    netatmoManager.updateThermostat = fake.resolves(null);
+    netatmoManager.updateNetatmo('Energy');
+  });
+
+  it('should call updateNetatmo with type HomeCoach_Weather', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+        type: 'NAMain',
+      },
+    };
+    netatmoManager.updateWeatherStation = fake.resolves(null);
+    netatmoManager.updateHomeCoachWeather = fake.resolves(null);
+    netatmoManager.updateNetatmo('HomeCoach_Weather');
+  });
+
+  it('should call updateNetatmo with any type', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+        type: 'NHC',
+      },
+    };
+    netatmoManager.updateNHC = fake.resolves(null);
+    netatmoManager.updateHomeCoachWeather = fake.resolves(null);
+    netatmoManager.updateNetatmo('HomeCoach_Weather');
+  });
+
+  it('should call updateNetatmo and have issue on get device', async () => {
+    gladys.device = null;
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        _id: '10',
+      },
+    };
+    netatmoManager.updateNetatmo('Security');
+  });
+
   // it('should get all devices parsing the updates files', async () => {
   //   const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   //   nock(`${netatmoManager.baseUrl}`)

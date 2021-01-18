@@ -2,7 +2,7 @@ const nock = require('nock');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
-const jsonGetHomeData = require('../../data/getHomeData.json');
+const jsonGetHomeData = require('../../data/homeData.json');
 const jsonGetHomeStatus = require('../../data/getHomeStatus.json');
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {});
