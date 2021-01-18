@@ -418,4 +418,36 @@ describe('scene.executeActions', () => {
       scope,
     );
   });
+  it('should send message with value injected', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'Temperature in the living room is {{0.0.last_value}} °C.',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', 'Temperature in the living room is 15 °C.');
+  });
 });
