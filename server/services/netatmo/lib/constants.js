@@ -65,7 +65,7 @@ const NETATMO_VALUES = {
       NO_NEWS: -1,
       NO_SOUND: 0,
       SOUND: 1,
-      WARNING: 2
+      WARNING: 2,
     },
     DOOR_TAG: {
       UNDEFINED: -1,

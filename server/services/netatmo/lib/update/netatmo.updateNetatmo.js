@@ -1,12 +1,12 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Update value of a Netatmo devices
- * @param {string} Type
+ * @description  Update value of Netatmo devices.
+ * @param {string} typeUpdate - Data Type update.
  * @example
- * update();
+ * updateNetatmo('Security-devices-update');
  */
-async function updateNetatmo(Type) {
+async function updateNetatmo(typeUpdate) {
   Object.keys(this.devices).forEach(async (key) => {
     let deviceExternalId;
     if (this.devices[key].id !== undefined) {
@@ -17,26 +17,35 @@ async function updateNetatmo(Type) {
     }
     const deviceSelector = deviceExternalId.replace(/:/gi, '-');
     let device;
-    try { 
-      device = this.gladys.device.getBySelector(deviceSelector); 
-    } catch(e) { 
+    try {
+      device = this.gladys.device.getBySelector(deviceSelector);
+    } catch (e) {
       let deviceName;
-      if (this.devices[key].name !== undefined) { 
-        deviceName = this.devices[key].name; 
-      } else { 
-        deviceName = this.devices[key].station_name; 
+      if (this.devices[key].name !== undefined) {
+        deviceName = this.devices[key].name;
+      } else {
+        deviceName = this.devices[key].station_name;
       }
-      logger.error(`Netatmo : File netatmo.poll.js - device netatmo ${this.devices[key].type} ${deviceName} no save in DB - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - device netatmo ${this.devices[key].type} ${deviceName} no save in DB - error : ${e}`,
+      );
     }
 
-    if (Type === 'Security' && (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')) {
+    if (typeUpdate === 'Security' && (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')) {
       // we save the data of cameras
       await this.updateCamera(key, device, deviceSelector);
-    } else if (Type === 'Energy' && (this.devices[key].type === 'NATherm1' || this.devices[key].type === 'NRV') && device !== undefined) {
+    } else if (
+      typeUpdate === 'Energy' &&
+      (this.devices[key].type === 'NATherm1' || this.devices[key].type === 'NRV') &&
+      device !== undefined
+    ) {
       // we save the common data of thermostats and valves
       await this.updateThermostat(key, device, deviceSelector);
-    } else if (Type === 'HomeCoach_Weather' && (this.devices[key].type === 'NHC' || this.devices[key].type === 'NAMain')) {
-      if (device !== undefined) { 
+    } else if (
+      typeUpdate === 'HomeCoach_Weather' &&
+      (this.devices[key].type === 'NHC' || this.devices[key].type === 'NAMain')
+    ) {
+      if (device !== undefined) {
         // we save the common data of home coaches and weather stations
         await this.updateHomeCoachWeather(key, device, deviceSelector);
 

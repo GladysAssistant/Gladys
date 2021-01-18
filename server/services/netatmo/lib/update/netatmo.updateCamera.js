@@ -16,10 +16,10 @@ const { NETATMO_VALUES } = require('../constants');
  */
 async function updateCamera(key, device, deviceSelector) {
   // we process the data from the cameras
-  
+
   try {
     let feature;
-    if (device !== undefined) { 
+    if (device !== undefined) {
       try {
         const externalIdCamera = `netatmo:${this.devices[key].id}`;
         const selectorCamera = externalIdCamera.replace(/:/gi, '-');
@@ -43,7 +43,9 @@ async function updateCamera(key, device, deviceSelector) {
         const base64image = `data:${mimetype};base64,${b64encoded}`;
         this.gladys.device.camera.setImage(selectorCamera, base64image);
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - vpn_url - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - vpn_url - error : ${e}`,
+        );
       }
       try {
         const powerValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].alim_status.toUpperCase()];
@@ -55,12 +57,14 @@ async function updateCamera(key, device, deviceSelector) {
           });
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`,
+        );
       }
       if (this.devices[key].type === 'NOC') {
         const lightValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].light_mode_status.toUpperCase()];
         const sirenValue = NETATMO_VALUES.SECURITY.SIREN[this.devices[key].siren_status.toUpperCase()];
-        try{
+        try {
           feature = getDeviceFeatureBySelector(device, `${deviceSelector}-light`);
           if (feature.last_value !== lightValue) {
             this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -103,7 +107,9 @@ async function updateCamera(key, device, deviceSelector) {
             }
           }
         } catch (e) {
-          logger.error(`Netatmo : File netatmo.poll.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`);
+          logger.error(
+            `Netatmo : File netatmo.poll.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`,
+          );
         }
         try {
           // we save other indoor sirens data

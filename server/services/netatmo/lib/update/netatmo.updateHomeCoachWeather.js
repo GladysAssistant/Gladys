@@ -30,7 +30,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - temperature - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - temperature - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-humidity`);
@@ -41,7 +43,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - humidity - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - humidity - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-co2`);
@@ -52,7 +56,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - co2 - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - co2 - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-pressure`);
@@ -63,7 +69,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - pressure - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - pressure - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-absolutepressure`);
@@ -74,7 +82,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - absolute pressure - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - absolute pressure - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-noise`);
@@ -85,7 +95,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - noise - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - noise - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
@@ -96,7 +108,9 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - reachable - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].station_name} - reachable - error : ${e}`,
+      );
     }
   } catch (e) {
     logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach or weather station - error : ${e}`);

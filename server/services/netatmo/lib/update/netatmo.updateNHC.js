@@ -23,7 +23,9 @@ async function updateNHC(key, device, deviceSelector) {
       });
     }
   } catch (e) {
-    logger.error(`Netatmo : File netatmo.poll.js - Health Home Coach ${this.devices[key].station_name} - health index - error : ${e}`);
+    logger.error(
+      `Netatmo : File netatmo.poll.js - Health Home Coach ${this.devices[key].station_name} - health index - error : ${e}`,
+    );
   }
 }
 

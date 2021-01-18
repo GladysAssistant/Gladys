@@ -50,7 +50,7 @@ async function getHomeStatusData() {
           valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
           // then we get the 3rd part of the valves : rooms
           valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-          
+
           const sid = valves.id;
           if (this.devices[sid] === undefined) {
             this.newValueValve(valves);

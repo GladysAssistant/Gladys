@@ -25,14 +25,15 @@ async function updateThermostat(key, device, deviceSelector) {
         batteryValue = this.devices[key].battery_percent;
         temperatureValue = this.devices[key].measured.temperature;
         setpointTempValue = this.devices[key].measured.setpoint_temp;
-        setpointModeValue =
-          NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[key].setpoint.setpoint_mode.toUpperCase()];
+        setpointModeValue = NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[key].setpoint.setpoint_mode.toUpperCase()];
         heatPowerRequestValue = NETATMO_VALUES.ENERGY.HEATING_REQ[this.devices[key].therm_relay_cmd];
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`,
+        );
       }
     }
-  
+
     // we process the data from the valves
     if (this.devices[key].type === 'NRV') {
       try {
@@ -52,7 +53,9 @@ async function updateThermostat(key, device, deviceSelector) {
           });
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Valve ${this.devices[key].type} ${this.devices[key].name} - reachable - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Valve ${this.devices[key].type} ${this.devices[key].name} - reachable - error : ${e}`,
+        );
       }
     }
     // we save the common data of thermostats and valves
@@ -65,7 +68,9 @@ async function updateThermostat(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
@@ -76,7 +81,9 @@ async function updateThermostat(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-temperature`);
@@ -87,7 +94,9 @@ async function updateThermostat(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-mode`);
@@ -98,7 +107,9 @@ async function updateThermostat(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`,
+      );
     }
     try {
       feature = getDeviceFeatureBySelector(device, `${deviceSelector}-heating-power-request`);
@@ -109,7 +120,9 @@ async function updateThermostat(key, device, deviceSelector) {
         });
       }
     } catch (e) {
-      logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`);
+      logger.error(
+        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`,
+      );
     }
   } catch (e) {
     logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`);

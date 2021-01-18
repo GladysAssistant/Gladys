@@ -4,7 +4,6 @@
  * pollManual();
  */
 async function pollManual() {
- 
   await setInterval(async () => {
     await this.getHealthyHomeCoachData();
     await this.getStationsData();

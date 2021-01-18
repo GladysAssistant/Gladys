@@ -13,7 +13,7 @@ const { getDeviceFeatureBySelector } = require('../../../../utils/device');
 async function updateWeatherStation(key, device, deviceSelector) {
   try {
     let feature;
-    if (device !== undefined) { 
+    if (device !== undefined) {
       const minTempValue = this.devices[key].dashboard_data.min_temp;
       const maxTempValue = this.devices[key].dashboard_data.max_temp;
 
@@ -26,7 +26,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
           });
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Weather Station ${this.devices[key].type} ${this.devices[key].name} - min temp - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Weather Station ${this.devices[key].type} ${this.devices[key].name} - min temp - error : ${e}`,
+        );
       }
       try {
         feature = getDeviceFeatureBySelector(device, `${deviceSelector}-max-temp`);
@@ -37,7 +39,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
           });
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Weather Station ${this.devices[key].type} ${this.devices[key].name} - max temp - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Weather Station ${this.devices[key].type} ${this.devices[key].name} - max temp - error : ${e}`,
+        );
       }
     }
     // we process the data of the weather station modules
@@ -62,7 +66,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
               });
             }
           } catch (e) {
-            logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - battery percent - error : ${e}`);
+            logger.error(
+              `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - battery percent - error : ${e}`,
+            );
           }
           try {
             feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-reachable`);
@@ -73,7 +79,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
               });
             }
           } catch (e) {
-            logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - reachable - error : ${e}`);
+            logger.error(
+              `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - reachable - error : ${e}`,
+            );
           }
 
           // we process the data from the rain gauges
@@ -91,7 +99,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - rain - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - rain - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-1`);
@@ -102,7 +112,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - sum rain 1 hour - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - sum rain 1 hour - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-24`);
@@ -113,7 +125,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - sum rain 24 hours - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - sum rain 24 hours - error : ${e}`,
+              );
             }
           }
         } catch (e) {
@@ -138,7 +152,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - wind strength - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - wind strength - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-windangle`);
@@ -149,7 +165,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - wind angle - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - wind angle - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-guststrength`);
@@ -160,7 +178,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - gust strength - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - gust strength - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-gustangle`);
@@ -171,7 +191,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - gust angle - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - gust angle - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-str`);
@@ -182,7 +204,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max wind strength - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max wind strength - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-angle`);
@@ -193,7 +217,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max wind angle - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max wind angle - error : ${e}`,
+              );
             }
           }
         } catch (e) {
@@ -216,7 +242,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - temperature - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - temperature - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-humidity`);
@@ -227,7 +255,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - humidity - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - humidity - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-min-temp`);
@@ -238,7 +268,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - min temp - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - min temp - error : ${e}`,
+              );
             }
             try {
               feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-temp`);
@@ -249,7 +281,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 });
               }
             } catch (e) {
-              logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max temp - error : ${e}`);
+              logger.error(
+                `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - max temp - error : ${e}`,
+              );
             }
             // we save other indoor hygrometers data
             if (module.data_type.length === 3) {
@@ -263,15 +297,21 @@ async function updateWeatherStation(key, device, deviceSelector) {
                   });
                 }
               } catch (e) {
-                logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - co2 - error : ${e}`);
+                logger.error(
+                  `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - co2 - error : ${e}`,
+                );
               }
             }
           } catch (e) {
-            logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - Indoor or outdoor - error : ${e}`);
+            logger.error(
+              `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.name} - Indoor or outdoor - error : ${e}`,
+            );
           }
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.station_name} - error : ${e}`);
+        logger.error(
+          `Netatmo : File netatmo.poll.js - Module Weather Station ${module.type} ${module.station_name} - error : ${e}`,
+        );
       }
     });
   } catch (e) {
