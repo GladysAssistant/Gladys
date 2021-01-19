@@ -28,7 +28,6 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
       id: deviceFeature.id,
     },
   });
-  // logger.debug(deviceFeature.id, deviceFeatureInDB);
 
   await db.DeviceFeatureState.create(historicalState);
   if (

@@ -116,7 +116,7 @@ async function executeQuery(serviceId, userId, integrationName, queryType, query
       // Add param to body
       const data = {};
       const queryParamsExtract = queryString.parse(queryParams);
-      Object.keys(queryParamsExtract).forEach(function parseQueryParams(key) {
+      Object.keys(queryParamsExtract).forEach((key) => {
         logger.debug(key, queryParamsExtract[key]);
         data[key] = queryParamsExtract[key];
       });

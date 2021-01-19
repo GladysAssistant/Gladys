@@ -309,7 +309,6 @@ describe('WithingsHandler', () => {
 
   it('withings init/poll is good', async () => {
     const resultInit = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
-    // logger.debug(resultInit);
     await assert.isNotNull(resultInit);
 
     const deviceToPoll = resultInit.next();
@@ -448,7 +447,6 @@ describe('WithingsHandler', () => {
 
     resultPoll = await withingsHandler.poll(deviceToPoll);
 
-    // logger.debug(resultPoll);
     return assert.isNotNull(resultPoll);
   });
 

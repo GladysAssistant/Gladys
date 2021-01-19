@@ -1,6 +1,5 @@
 import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
-// import createDeviceActions from '../../device';
 import update from 'immutability-helper';
 import get from 'get-value';
 

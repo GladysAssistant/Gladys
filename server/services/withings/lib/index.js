@@ -13,7 +13,7 @@ const { poll } = require('./withings.poll');
  * @param {string} integrationName - [Optional] By default interationName='withings', param used only for test.
  * @description Create all device if not exist by listening
  * @example
- * const kodiManager = KodiManager(gladys, serviceId)
+ * const withingsHandler = WithingsHandler(gladys, serviceId)
  */
 const WithingsHandler = function WithingsHandler(gladys, serviceId, withingsServerUrl, integrationName) {
   this.gladys = gladys;

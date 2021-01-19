@@ -7,7 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
 class WithingsDeviceBox extends Component {
@@ -16,7 +16,7 @@ class WithingsDeviceBox extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.type === DEVICE_FEATURE_TYPES.SENSOR.INTEGER
+      deviceFeature => deviceFeature.type === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;

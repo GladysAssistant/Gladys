@@ -7,11 +7,10 @@ const logger = require('../../../utils/logger');
 /**
  * @description Poll value of a withings device.
  * @param {Object} device - The device to update value.
- * @returns {Promise} Resolve with withings device poll.
  * @example
  * poll(device);
  */
-async function poll(device) {
+function poll(device) {
   logger.debug('Device to poll:', device);
   if (device.features) {
     const oauth2Manager = new OAuth2Manager(this.gladys);
@@ -23,15 +22,14 @@ async function poll(device) {
     const { serviceId } = this;
 
     // Get all users of gladys
-    const users = await gladys.user.get();
-    await Promise.map(
+    const users = gladys.user.get();
+    Promise.map(
       users,
       async (user) => {
         const withingsClienId = await gladys.variable.getValue('WITHINGS_CLIENT_ID', serviceId, user.id);
 
         if (withingsClienId) {
           device.features.forEach(async (feat) => {
-            // logger.trace('Current feature : ', feat);
             // Convert type to int wihings
             // (cf https://developer.withings.com/oauth2/#tag/measure%2Fpaths%2Fhttps%3A~1~1wbsapi.withings.net~1measure%3Faction%3Dgetmeas%2Fget)
             let withingsType;
@@ -108,7 +106,6 @@ async function poll(device) {
                   1}`,
               );
 
-              // logger.trace('Poll result : ', measureResult);
               if (measureResult.data.body.measuregrps) {
                 const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
                 await measureResult.data.body.measuregrps.forEach((element) => {
@@ -123,8 +120,8 @@ async function poll(device) {
                   }
                 });
 
-                await mapOfMeasuresGrpsByWithingsDeviceId.forEach(function buildFeatureByGrps(value, key) {
-                  value.forEach(function parseMeasureGrous(currentGroup) {
+                await mapOfMeasuresGrpsByWithingsDeviceId.forEach((value, key) => {
+                  value.forEach((currentGroup) => {
                     if (key) {
                       logger.debug('currentGroup: ', currentGroup);
 
@@ -135,7 +132,7 @@ async function poll(device) {
                         const featureState = {
                           id: uniqueSateId,
                           device_feature_id: feat.id,
-                          value: element.value * 10 ** element.unit,
+                          value: (element.value * 10 ** element.unit).toFixed(2),
                           created_at: createDate,
                           updated_at: new Date(),
                         };
@@ -147,8 +144,7 @@ async function poll(device) {
               }
             }
 
-            // Update spcific feature battery
-
+            // Update specific feature battery
             if (withingsType === -1) {
               const userResult = await oauth2Manager.executeQuery(
                 serviceId,
@@ -159,7 +155,6 @@ async function poll(device) {
                 'action=getdevice',
               );
 
-              // logger.debug(userResult.data.body);
               if (userResult.data.body.devices) {
                 await userResult.data.body.devices.forEach((element) => {
                   logger.debug('withingsDeviceId: ', withingsDeviceId);

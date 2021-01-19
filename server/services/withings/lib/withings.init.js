@@ -246,9 +246,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
       const featureState = {
         id: uniqueSateId,
         device_feature_id: tmpFeature.id,
-        value: element.value * 10 ** element.unit,
-        // created_at: `${createDate.getFullYear()}-${createDate.getMonth() + 1}-${createDate.getDate()}
-        // ${createDate.getHours()}:${createDate.getMinutes()}:${createDate.getSeconds()}`,
+        value: (element.value * 10 ** element.unit).toFixed(2),
         created_at: createDate,
         updated_at: new Date(),
       };
@@ -310,7 +308,6 @@ async function init(userId) {
     'action=getmeas',
   );
 
-  // logger.warn(measureResult.data.body);
   const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
   await measureResult.data.body.measuregrps.forEach((element) => {
     if (element) {
@@ -325,8 +322,8 @@ async function init(userId) {
   });
 
   const mapOfFeatureByWithingsDeviceId = new Map();
-  await mapOfMeasuresGrpsByWithingsDeviceId.forEach(function buildFeatureByGrps(value, key) {
-    value.forEach(function parseMeasureGroups(currentGroup) {
+  await mapOfMeasuresGrpsByWithingsDeviceId.forEach((value, key) => {
+    value.forEach((currentGroup) => {
       if (key) {
         const currentFeatures = mapOfFeatureByWithingsDeviceId.get(key);
         const features = buildFeature(currentGroup, mapOfDeviceByWithingsDeviceId.get(key), currentFeatures);
@@ -340,7 +337,7 @@ async function init(userId) {
 
   // Save device with feature
   const { gladys } = this;
-  await mapOfDeviceByWithingsDeviceId.forEach(function saveDevice(value, key) {
+  await mapOfDeviceByWithingsDeviceId.forEach((value, key) => {
     if (key) {
       const arrayOfFeatures = mapOfFeatureByWithingsDeviceId.get(key);
       // Assign features to device

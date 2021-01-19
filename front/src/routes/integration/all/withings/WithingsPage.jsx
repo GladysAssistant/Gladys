@@ -36,7 +36,7 @@ const WithingsPage = ({ children, user, ...props }) => (
                   </Link>
                   <DeviceConfigurationLink
                     user={user}
-                    documentKey="withings-configuration"
+                    documentKey="withings"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
