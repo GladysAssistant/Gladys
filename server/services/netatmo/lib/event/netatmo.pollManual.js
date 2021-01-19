@@ -8,7 +8,7 @@ async function pollManual() {
     await this.getHealthyHomeCoachData();
     await this.getStationsData();
     await this.updateNetatmo('HomeCoach_Weather');
-  }, 5 * 60 * 1000);
+  }, 3 * 60 * 1000);
   setInterval(async () => {
     await this.getThermostatsData();
     await this.getHomeStatusData();

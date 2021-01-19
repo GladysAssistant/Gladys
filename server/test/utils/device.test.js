@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { getDeviceParam, setDeviceParam, getDeviceFeature } = require('../../utils/device');
+const { getDeviceParam, setDeviceParam, getDeviceFeature, getDeviceFeatureBySelector } = require('../../utils/device');
 
 const device = {
   features: [
@@ -89,6 +89,24 @@ describe('getDeviceFeature', () => {
   });
   it('should return null', () => {
     const value = getDeviceFeature({}, 'not-found', 'not-found');
+    expect(value).to.equal(null);
+  });
+});
+
+describe('getDeviceFeatureBySelector', () => {
+  it('should get a feature', () => {
+    const feature = getDeviceFeatureBySelector(device, 'test');
+    expect(feature).to.deep.equal({
+      id: 1,
+      selector: 'test',
+    });
+  });
+  it('should return null', () => {
+    const value = getDeviceFeatureBySelector(device, 'not-found');
+    expect(value).to.equal(null);
+  });
+  it('should return null', () => {
+    const value = getDeviceFeatureBySelector({}, 'not-found');
     expect(value).to.equal(null);
   });
 });

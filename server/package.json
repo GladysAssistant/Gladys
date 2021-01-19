@@ -97,7 +97,7 @@
     "sequelize": "^4.42.0",
     "sequelize-cli": "^5.5.1",
     "sinon": "^7.5.0",
-    "sqlite3": "^4.0.6",
+    "sqlite3": "^4.2.0",
     "tracer": "^0.9.8",
     "umzug": "^2.2.0",
     "uuid": "^3.3.2",
