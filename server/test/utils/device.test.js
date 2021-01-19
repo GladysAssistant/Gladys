@@ -5,6 +5,7 @@ const device = {
   features: [
     {
       id: 1,
+      selector: 'test',
       type: 'test',
       category: 'test',
     },

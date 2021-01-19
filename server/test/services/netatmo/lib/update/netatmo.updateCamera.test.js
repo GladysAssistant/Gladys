@@ -16,11 +16,12 @@ const gladys = {
     camera: {
       setImage: fake.resolves(null),
     },
+    getBySelector: fake.resolves(module),
   },
 };
 
 describe('netatmoManager updateCamera', () => {
-  it('should say error ', async () => {
+  it('should say error device undefined', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {};
     netatmoManager.updateCamera('10', undefined, 'netatmo-10');
@@ -31,14 +32,22 @@ describe('netatmoManager updateCamera', () => {
     netatmoManager.devices = {
       '10': {
         id: '10',
+        name: 'Camera Stark room',
         vpn_url: 'https://fake.gladys.fr',
         type: 'toto',
+        alim_status: 'off',
       },
     };
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
       type: 'toto',
+      features: [
+        {
+          selector: 'netatmo-10-power',
+          last_value: 'off',
+        },
+      ],
     };
     const responseImage = await axios.get(
       'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
@@ -52,31 +61,12 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should have device but failed on get axios', async () => {
+  it('should have device but failed on get axios - error code 400', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         id: '10',
-        vpn_url: 'https://fake.gladys.fr',
-        type: 'toto',
-      },
-    };
-    const device = {
-      id: '10',
-      vpn_url: 'https://fake.gladys.fr',
-      type: 'toto',
-    };
-    nock('https://fake.gladys.fr')
-      .get('/live/snapshot_720.jpg')
-      .reply(400, 'error');
-    await netatmoManager.updateCamera('10', device, 'netatmo-10');
-  });
-
-  it('should have device and update powerValue', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-    netatmoManager.devices = {
-      '10': {
-        id: '10',
+        name: 'Camera Stark room',
         vpn_url: 'https://fake.gladys.fr',
         type: 'toto',
         alim_status: 'off',
@@ -89,6 +79,35 @@ describe('netatmoManager updateCamera', () => {
       features: [
         {
           selector: 'netatmo-10-power',
+          last_value: 'off',
+        },
+      ],
+    };
+    nock('https://fake.gladys.fr')
+      .get('/live/snapshot_720.jpg')
+      .reply(400, 'error');
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should have device NACamera or NOC and update powerValue', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'toto',
+        alim_status: 'off',
+      },
+    };
+    const device = {
+      id: '10',
+      vpn_url: 'https://fake.gladys.fr',
+      type: 'toto',
+      features: [
+        {
+          selector: 'netatmo-10-power',
+          last_value: 'on',
         },
       ],
     };
@@ -109,6 +128,7 @@ describe('netatmoManager updateCamera', () => {
     netatmoManager.devices = {
       '10': {
         id: '10',
+        name: 'Camera Stark Outdoor',
         vpn_url: 'https://fake.gladys.fr',
         type: 'NOC',
         alim_status: 'off',
@@ -119,19 +139,19 @@ describe('netatmoManager updateCamera', () => {
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
-      type: 'NOC',
+      model: 'NOC',
       features: [
         {
           selector: 'netatmo-10-power',
-          last_value: 'on',
+          last_value: '1',
         },
         {
           selector: 'netatmo-10-light',
-          last_value: 'on',
+          last_value: '1',
         },
         {
           selector: 'netatmo-10-siren',
-          last_value: 'no_sound',
+          last_value: '0',
         },
       ],
     };
@@ -147,11 +167,12 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should add camera NOC and failed feature update', async () => {
+  it('should add camera NOC and failed feature update on "Cannot read property last_value of null"', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         id: '10',
+        name: 'Camera Stark Outdoor',
         vpn_url: 'https://fake.gladys.fr',
         type: 'NOC',
         alim_status: 'off',
@@ -177,72 +198,192 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  // it('should add camera NACamera and success update all feature', async () => {
-  //   gladys.device.getBySelector = fake.resolves()
-  //   const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-  //   netatmoManager.devices = {
-  //     '10': {
-  //       id: '10',
-  //       vpn_url: 'https://fake.gladys.fr',
-  //       type: 'NACamera',
-  //       modules: {
-  //         id: '10',
-  //         type: 'NIS'
-  //       }
-  //     }
-  //   };
-  //   const device = {
-  //     id: '10',
-  //     vpn_url: 'https://fake.gladys.fr',
-  //     type: 'NACamera',
-  //     features: [
-  //       {
-  //         selector: 'netatmo-10-power',
-  //         last_value: 'on'
-  //       },
-  //       {
-  //         selector: 'netatmo-10-light',
-  //         last_value: 'on'
-  //       },
-  //       {
-  //         selector: 'netatmo-10-siren',
-  //         last_value: 'no_sound'
-  //       }
-  //     ]
-  //   }
-  //   const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-  //     responseType: 'arraybuffer',
-  //   });
-  //   nock('https://fake.gladys.fr')
-  //     .get('/live/snapshot_720.jpg')
-  //     .reply(200, responseImage.data);
-  //   await netatmoManager.updateCamera('10', device, 'netatmo-10');
-  // });
-  //
-  // it('should add camera NACamera and failed feature update', async () => {
-  //   const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-  //   netatmoManager.devices = {
-  //     '10': {
-  //       id: '10',
-  //       vpn_url: 'https://fake.gladys.fr',
-  //       type: 'NACamera',
-  //       alim_status: 'off',
-  //       light_mode_status: 'off',
-  //       siren_status: 'no_news'
-  //     }
-  //   };
-  //   const device = {
-  //     id: '10',
-  //     vpn_url: 'https://fake.gladys.fr',
-  //     type: 'NACamera',
-  //     features: []
-  //   }
-  //   const responseImage = await axios.get('https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg', {
-  //     responseType: 'arraybuffer',
-  //   });
-  //   nock('https://fake.gladys.fr')
-  //     .get('/live/snapshot_720.jpg')
-  //     .reply(200, responseImage.data);
-  //   await netatmoManager.updateCamera('10', device, 'netatmo-10');
-  // });
+  it('should add camera NOC and failed feature update on "Cannot read property toUpperCase of undefined or other"', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark Outdoor',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NOC',
+      },
+    };
+    const device = {
+      id: '10',
+      vpn_url: 'https://fake.gladys.fr',
+      type: 'NOC',
+      features: [],
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
+    nock('https://fake.gladys.fr')
+      .get('/live/snapshot_720.jpg')
+      .reply(200, responseImage.data);
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should success update features NIS', async () => {
+    const device = undefined;
+    const module = {
+      id: '11',
+      selector: 'netatmo-11',
+      features: [
+        {
+          selector: 'netatmo-11-battery',
+          last_value: 0,
+        },
+        {
+          selector: 'netatmo-11-siren',
+          last_value: 0,
+        },
+      ],
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '11',
+            name: 'Siren Stark room',
+            type: 'NIS',
+            battery_percent: 100,
+            status: 'on',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should success update features NACamDoorTag', async () => {
+    const device = undefined;
+    const module = {
+      id: '12',
+      selector: 'netatmo-12',
+      features: [
+        {
+          selector: 'netatmo-12-battery',
+          last_value: 0,
+        },
+        {
+          selector: 'netatmo-12-doortag',
+          last_value: 0,
+        },
+      ],
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '12',
+            name: 'Door tag Stark room',
+            type: 'NACamDoorTag',
+            battery_percent: 100,
+            status: 'on',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should failed update features NACamDoorTag and NIS on "Cannot read property last_value of null"', async () => {
+    const device = undefined;
+    const module = {
+      id: '12',
+      selector: 'netatmo-12',
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '11',
+            name: 'Siren Stark room',
+            type: 'NIS',
+            battery_percent: 100,
+            status: 'on',
+          },
+          {
+            id: '12',
+            name: 'Door tag Stark room',
+            type: 'NACamDoorTag',
+            battery_percent: 100,
+            status: 'on',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should failed update features NACamDoorTag and NIS on "Cannot read property toUpperCase of undefined or other"', async () => {
+    const device = undefined;
+    const module = {
+      id: '12',
+      selector: 'netatmo-12',
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '11',
+            name: 'Siren Stark room',
+            type: 'NIS',
+          },
+          {
+            id: '12',
+            name: 'Door tag Stark room',
+            type: 'NACamDoorTag',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should failed global module of NACamera on "Cannot read property forEach of undefined"', async () => {
+    const device = undefined;
+    const module = {
+      id: '12',
+      selector: 'netatmo-12',
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
 });

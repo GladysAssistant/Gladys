@@ -532,7 +532,7 @@ describe('netatmoManager updateWeatherStation', () => {
     netatmoManager.updateWeatherStation('10', device, 'netatmo-10');
   });
 
-  it('should error global module of weather station', async () => {
+  it('should failed global module of NAMain on "Cannot read property forEach of undefined"', async () => {
     const device = {
       id: '10',
       features: [

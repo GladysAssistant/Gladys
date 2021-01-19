@@ -61,39 +61,47 @@ async function updateCamera(key, device, deviceSelector) {
           `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`,
         );
       }
-      if (this.devices[key].type === 'NOC') {
-        const lightValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].light_mode_status.toUpperCase()];
-        const sirenValue = NETATMO_VALUES.SECURITY.SIREN[this.devices[key].siren_status.toUpperCase()];
-        try {
-          feature = getDeviceFeatureBySelector(device, `${deviceSelector}-light`);
-          if (feature.last_value !== lightValue) {
-            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-              device_feature_external_id: `netatmo:${key}:light`,
-              state: lightValue,
-            });
+      try {
+        if (this.devices[key].type === 'NOC') {
+          const lightValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].light_mode_status.toUpperCase()];
+          const sirenValue = NETATMO_VALUES.SECURITY.SIREN[this.devices[key].siren_status.toUpperCase()];
+          try {
+            feature = getDeviceFeatureBySelector(device, `${deviceSelector}-light`);
+            if (feature.last_value !== lightValue) {
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                device_feature_external_id: `netatmo:${key}:light`,
+                state: lightValue,
+              });
+            }
+          } catch (e) {
+            logger.error(
+              `Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - light - error : ${e}`,
+            );
           }
-        } catch (e) {
-          logger.error(`Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - light - error : ${e}`);
-        }
-        try {
-          feature = getDeviceFeatureBySelector(device, `${deviceSelector}-siren`);
-          if (feature.last_value !== sirenValue) {
-            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-              device_feature_external_id: `netatmo:${key}:siren`,
-              state: sirenValue,
-            });
+          try {
+            feature = getDeviceFeatureBySelector(device, `${deviceSelector}-siren`);
+            if (feature.last_value !== sirenValue) {
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                device_feature_external_id: `netatmo:${key}:siren`,
+                state: sirenValue,
+              });
+            }
+          } catch (e) {
+            logger.error(
+              `Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - siren - error : ${e}`,
+            );
           }
-        } catch (e) {
-          logger.error(`Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - siren - error : ${e}`);
         }
+      } catch (e) {
+        logger.error(`Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - error : ${e}`);
       }
     }
     if (this.devices[key].type === 'NACamera') {
-      this.devices[key].modules.forEach((module) => {
+      this.devices[key].modules.forEach(async (module) => {
         const sidModule = module.id;
         const moduleExternalId = `netatmo:${sidModule}`;
         const moduleSelector = moduleExternalId.replace(/:/gi, '-');
-        const deviceModule = this.gladys.device.getBySelector(moduleSelector);
+        const deviceModule = await this.gladys.device.getBySelector(moduleSelector);
         try {
           // we save the common data of home coaches and weather stations
           if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
@@ -144,7 +152,9 @@ async function updateCamera(key, device, deviceSelector) {
       });
     }
   } catch (e) {
-    logger.error(`Netatmo : File netatmo.poll.js - Camera - error : ${e}`);
+    logger.error(
+      `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`,
+    );
   }
 }
 
