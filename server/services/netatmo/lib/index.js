@@ -45,7 +45,7 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
   this.valueSetInterval = {
     oneMinute: 1 * 60 * 1000,
     twoMinute: 2 * 60 * 1000,
-    fiveMinute: 5 * 60 * 1000
+    fiveMinute: 5 * 60 * 1000,
   };
 };
 
