@@ -24,6 +24,8 @@ describe('netatmoManager pollManual', () => {
         id: '10',
       },
     };
+    netatmoManager.valueSetInterval.fiveMinute = 1 * 60;
+    netatmoManager.valueSetInterval.twoMinute = 1 * 60;
     await netatmoManager.pollManual();
   });
 
