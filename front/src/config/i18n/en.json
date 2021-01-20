@@ -209,6 +209,10 @@
         "editRoomLabel": "Select the room you want to display here.",
         "noTemperatureRecorded": "No temperature recorded recently."
       },
+      "humidityInRoom": {
+        "editRoomLabel": "Select the room you want to display here.",
+        "noHumidityRecorded": "No humidity recorded recently."
+      },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes.",
         "left": "Left ({{since}})",

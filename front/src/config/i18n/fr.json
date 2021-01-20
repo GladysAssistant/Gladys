@@ -209,6 +209,10 @@
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
       },
+      "humidityInRoom": {
+        "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
+        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
+      },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
         "left": "Absent ({{since}})",
