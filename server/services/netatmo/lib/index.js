@@ -43,9 +43,9 @@ const NetatmoManager = function NetatmoManager(gladys, serviceId) {
   this.baseUrl = 'https://api.netatmo.net';
   this.token = undefined;
   this.valueSetInterval = {
-    oneMinute: 1 * 60,
-    twoMinute: 2 * 60,
-    fiveMinute: 5 * 60
+    oneMinute: 1 * 60 * 1000,
+    twoMinute: 2 * 60 * 1000,
+    fiveMinute: 5 * 60 * 1000
   };
 };
 

@@ -1,4 +1,5 @@
 const get = require('get-value');
+
 /**
  * @description Get Device param by name.
  * @param {Object} device - Device Object to parse.
@@ -69,14 +70,14 @@ function getDeviceFeature(device, category, type) {
 }
 
 /**
- * @description Get Device Feature by category and type.
+ * @description Get Device Feature by selector.
  * @param {Object} device - Device Object to parse.
  * @param {string} selector - The selector of the feature to get.
  * @returns {Object} Return feature.
  * @example
- * const value = getDeviceFeature({
- *  features: [{ category: 'light', type: 'binary' }]
- * }, 'light', 'binary');
+ * const value = getDeviceFeatureBySelector({
+ *  features: [{ selector: 'test'}]
+ * }, 'test');
  */
 function getDeviceFeatureBySelector(device, selector) {
   if (!get(device, 'features')) {
