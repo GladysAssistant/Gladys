@@ -19,7 +19,7 @@ class SendMessageParams extends Component {
       this.refreshSelectedOptions(this.props);
       return userOptions;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   handleChangeText = e => {

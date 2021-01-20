@@ -22,7 +22,7 @@ class SettingsSystem extends Component {
         value: option.value
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -36,7 +36,7 @@ class SettingsSystem extends Component {
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
