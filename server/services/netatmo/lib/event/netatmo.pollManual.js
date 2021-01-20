@@ -17,7 +17,7 @@ async function pollManual() {
   setInterval(async () => {
     await this.getHomeData();
     await this.updateNetatmo('Security');
-  }, 60 * 1000);
+  }, 2 * 60 * 1000);
 }
 
 module.exports = {
