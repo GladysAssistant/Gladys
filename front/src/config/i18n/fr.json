@@ -220,7 +220,8 @@
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
-        "editBoxNamePlaceholder": "Nom de la box"
+        "editBoxNamePlaceholder": "Nom de la box",
+        "noHistoric": "Aucun historique"
       }
     }
   },
@@ -414,7 +415,9 @@
       "title": "Netatmo",
       "description": "Contrôler les équipements Netatmo",
       "deviceTab": "Netatmo équipements",
+      "discoverTab": "Découverte appareils Netatmo",
       "settingTab": "Paramètre",
+      "alreadyCreatedButton": "Déjà créé",
       "device": {
         "title": "Equipements Netatmo dans Gladys",
         "noDevices": "Aucun appareil Netatmo n'a encore été ajouté.",

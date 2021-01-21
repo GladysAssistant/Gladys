@@ -26,7 +26,19 @@ const CameraBox = ({ children, ...props }) => (
           <div class="loader" />
         </div>
       )}
-      <h4>{props.box && props.box.name}</h4>
+      <div class="row">
+        <h4>{props.box && props.box.name}</h4>
+        <div class="col text-right">
+          <h6>
+            {props.camera &&
+              props.camera.last_value_changed &&
+              Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'long' }).format(
+                new Date(props.camera.last_value_changed)
+              )}
+            {props.camera && !props.camera.last_value_changed && <Text id="dashboard.boxes.camera.noHistoric" />}
+          </h6>
+        </div>
+      </div>
     </div>
   </div>
 );
@@ -56,8 +68,9 @@ class CameraBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Camera.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Camera.${props.x}_${props.y}`);
     const image = get(boxData, 'image');
+    const camera = get(boxData, 'camera');
     const error = boxStatus === RequestStatus.Error;
-    return <CameraBox {...props} image={image} boxStatus={boxStatus} error={error} />;
+    return <CameraBox {...props} image={image} camera={camera} boxStatus={boxStatus} error={error} />;
   }
 }
 

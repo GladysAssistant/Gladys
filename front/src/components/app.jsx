@@ -83,6 +83,7 @@ import TasmotaHttpDiscoverPage from '../routes/integration/all/tasmota/discover-
 
 // Netatmo integration
 import NetatmoDevicePage from '../routes/integration/all/netatmo/device-page';
+import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-device';
 import NetatmoSettingPage from '../routes/integration/all/netatmo/setting';
 import EditNetatmoPage from '../routes/integration/all/netatmo/device-page/edit-page';
 
@@ -197,6 +198,7 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <NetatmoDevicePage path="/dashboard/integration/device/netatmo" />
+        <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
         <NetatmoSettingPage path="/dashboard/integration/device/netatmo/setting" />
         <EditNetatmoPage path="/dashboard/integration/device/netatmo/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />

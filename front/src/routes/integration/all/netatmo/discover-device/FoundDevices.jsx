@@ -7,6 +7,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 const createDevice = (props, device) => () => {
   props.createDevice(device);
 };
+
 const FoundDevices = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
@@ -39,16 +40,18 @@ const FoundDevices = ({ children, ...props }) => (
                       <h3 class="card-title">{device.name}</h3>
                     </div>
                     <div class="card-body">
-                      {!device.not_handled && (
-                        <button class="btn btn-success" onClick={createDevice(props, device)}>
-                          <Text id="integration.netatmo.device.addDeviceButton" />
-                        </button>
-                      )}
-                      {device.not_handled && (
-                        <div class="alert alert-warning">
-                          <Text id="integration.netatmo.device.deviceNotHandled" />
-                        </div>
-                      )}
+                      <t>
+                        {!device.not_handled && (
+                          <button class="btn btn-success" onClick={createDevice(props, device)}>
+                            <Text id="integration.netatmo.device.addDeviceButton" />
+                          </button>
+                        )}
+                        {device.not_handled && (
+                          <button class="btn btn-primary mr-2" disabled="true">
+                            <Text id="integration.netatmo.alreadyCreatedButton" />
+                          </button>
+                        )}
+                      </t>
                     </div>
                   </div>
                 </div>

@@ -220,7 +220,8 @@
         "editCameraLabel": "Select the camera you want to display here.",
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
-        "editBoxNamePlaceholder": "Name of the box"
+        "editBoxNamePlaceholder": "Name of the box",
+        "noHistoric": "No historic"
       }
     }
   },
@@ -368,7 +369,9 @@
       "title": "Netatmo",
       "description": "Control Netatmo Devices",
       "deviceTab": "Netatmo Devices",
+      "discoverTab": "Discover Netatmo devices",
       "settingTab": "Settings",
+      "alreadyCreatedButton": "Already created",
       "device": {
         "title": "Netatmo devices in Gladys",
         "noDevices": "No Netatmo devices added yet.",

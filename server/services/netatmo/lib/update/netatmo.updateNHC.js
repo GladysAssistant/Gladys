@@ -15,16 +15,20 @@ async function updateNHC(key, device, deviceSelector) {
   try {
     const healthIndexValue = this.devices[key].dashboard_data.health_idx;
 
-    const feature = getDeviceFeatureBySelector(device, `${deviceSelector}-health-idx`);
+    const feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-health-idx`);
     if (feature.last_value !== healthIndexValue) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `netatmo:${key}:health_idx`,
         state: healthIndexValue,
       });
+    } else {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+        device_feature_external_id: `netatmo:${key}:health_idx`,
+      });
     }
   } catch (e) {
     logger.error(
-      `Netatmo : File netatmo.poll.js - Health Home Coach ${this.devices[key].station_name} - health index - error : ${e}`,
+      `Netatmo : File netatmo.updateNHC.js - Health Home Coach ${this.devices[key].station_name} - health index - error : ${e}`,
     );
   }
 }

@@ -8,16 +8,16 @@ async function pollManual() {
     await this.getHealthyHomeCoachData();
     await this.getStationsData();
     await this.updateNetatmo('HomeCoach_Weather');
-  }, 3 * 60 * 1000);
+  }, this.pollFrequencies.EVERY_5_MINUTES);
   setInterval(async () => {
     await this.getThermostatsData();
     await this.getHomeStatusData();
     await this.updateNetatmo('Energy');
-  }, 2 * 60 * 1000);
+  }, this.pollFrequencies.EVERY_2_MINUTES);
   setInterval(async () => {
     await this.getHomeData();
     await this.updateNetatmo('Security');
-  }, 2 * 60 * 1000);
+  }, this.pollFrequencies.EVERY_2_MINUTES);
 }
 
 module.exports = {

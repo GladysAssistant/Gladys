@@ -82,7 +82,7 @@ function newValueValve(data) {
           selector: `netatmo:${sid}:heating_power_request`,
           external_id: `netatmo:${sid}:heating_power_request`,
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          type: DEVICE_FEATURE_TYPES.SWITCH.INTEGER,
           read_only: true,
           keep_history: true,
           has_feedback: true,

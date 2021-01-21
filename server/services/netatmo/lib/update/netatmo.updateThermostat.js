@@ -29,7 +29,7 @@ async function updateThermostat(key, device, deviceSelector) {
         heatPowerRequestValue = NETATMO_VALUES.ENERGY.HEATING_REQ[this.devices[key].therm_relay_cmd];
       } catch (e) {
         logger.error(
-          `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`,
+          `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`,
         );
       }
     }
@@ -45,87 +45,113 @@ async function updateThermostat(key, device, deviceSelector) {
         heatPowerRequestValue = this.devices[key].room.heating_power_request;
         const reachableValue = this.devices[key].homeStatus.reachable;
 
-        feature = getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
+        feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
         if (feature.last_value !== reachableValue) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:reachable`,
             state: reachableValue,
           });
+        } else {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+            device_feature_external_id: `netatmo:${key}:reachable`,
+          });
         }
       } catch (e) {
         logger.error(
-          `Netatmo : File netatmo.poll.js - Valve ${this.devices[key].type} ${this.devices[key].name} - reachable - error : ${e}`,
+          `Netatmo : File netatmo.updateThermostat.js - Valve ${this.devices[key].type} ${this.devices[key].name} - reachable - error : ${e}`,
         );
       }
     }
     // we save the common data of thermostats and valves
     try {
-      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-battery`);
+      feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-battery`);
       if (feature.last_value !== batteryValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:battery`,
           state: batteryValue,
         });
+      } else {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+          device_feature_external_id: `netatmo:${key}:battery`,
+        });
       }
     } catch (e) {
       logger.error(
-        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`,
+        `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`,
       );
     }
     try {
-      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
+      feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
       if (feature.last_value !== temperatureValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:temperature`,
           state: temperatureValue,
         });
+      } else {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+          device_feature_external_id: `netatmo:${key}:temperature`,
+        });
       }
     } catch (e) {
       logger.error(
-        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`,
+        `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`,
       );
     }
     try {
-      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-temperature`);
+      feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-temperature`);
       if (feature.last_value !== setpointTempValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:therm_setpoint_temperature`,
           state: setpointTempValue,
         });
+      } else {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+          device_feature_external_id: `netatmo:${key}:therm_setpoint_temperature`,
+        });
       }
     } catch (e) {
       logger.error(
-        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`,
+        `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`,
       );
     }
     try {
-      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-mode`);
+      feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-mode`);
       if (feature.last_value !== setpointModeValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:therm_setpoint_mode`,
           state: setpointModeValue,
         });
+      } else {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+          device_feature_external_id: `netatmo:${key}:therm_setpoint_mode`,
+        });
       }
     } catch (e) {
       logger.error(
-        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`,
+        `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`,
       );
     }
     try {
-      feature = getDeviceFeatureBySelector(device, `${deviceSelector}-heating-power-request`);
+      feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-heating-power-request`);
       if (feature.last_value !== heatPowerRequestValue) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:heating_power_request`,
           state: heatPowerRequestValue,
         });
+      } else {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+          device_feature_external_id: `netatmo:${key}:heating_power_request`,
+        });
       }
     } catch (e) {
       logger.error(
-        `Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`,
+        `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`,
       );
     }
   } catch (e) {
-    logger.error(`Netatmo : File netatmo.poll.js - ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`);
+    logger.error(
+      `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`,
+    );
   }
 }
 

@@ -2,6 +2,12 @@ const db = require('../../models');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
+const DEFAULT_OPTIONS = {
+  skip: 0,
+  order_dir: 'DESC',
+  order_by: 'created_at',
+};
+
 /**
  * @description Save new device feature state in DB.
  * @param {Object} deviceFeature - A DeviceFeature object.
@@ -13,10 +19,23 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * }, 12);
  */
 async function saveState(deviceFeature, newValue) {
+  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS);
   logger.debug(`device.saveState of deviceFeature ${deviceFeature.selector}`);
   const now = new Date();
   const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
   const previousDeviceFeatureValue = previousDeviceFeature ? previousDeviceFeature.last_value : null;
+
+  const previousDeviceFeatureLastValueChanged = previousDeviceFeature ? previousDeviceFeature.last_value_changed : null;
+
+  const deviceFeaturesState = await db.DeviceFeatureState.findOne({
+    attributes: ['device_feature_id', 'value', 'created_at'],
+    order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
+    where: {
+      device_feature_id: deviceFeature.id,
+    },
+  });
+  const previousDeviceFeatureStateLastValueChanged = deviceFeaturesState ? deviceFeaturesState.created_at : null;
+
   // save local state in RAM
   this.stateManager.setState('deviceFeature', deviceFeature.selector, {
     last_value: newValue,
@@ -40,6 +59,20 @@ async function saveState(deviceFeature, newValue) {
     );
     // if the deviceFeature should keep history, we save a new deviceFeatureState
     if (deviceFeature.keep_history) {
+      // if the previous created deviceFeatureState is different of deviceFeature
+      // last value changed, we save a new deviceFeatureState of old state
+      if (previousDeviceFeatureLastValueChanged - previousDeviceFeatureStateLastValueChanged > 0) {
+        await db.DeviceFeatureState.create(
+          {
+            device_feature_id: deviceFeature.id,
+            value: previousDeviceFeatureValue,
+            created_at: previousDeviceFeatureLastValueChanged,
+          },
+          {
+            transaction: t,
+          },
+        );
+      }
       await db.DeviceFeatureState.create(
         {
           device_feature_id: deviceFeature.id,

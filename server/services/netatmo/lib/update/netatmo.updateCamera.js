@@ -28,7 +28,7 @@ async function updateCamera(key, device, deviceSelector) {
         });
         const sharpData = await sharp(responseImage.data)
           .rotate()
-          .resize(400)
+          .resize(300)
           .toBuffer();
         const b64encoded = btoa(
           [].reduce.call(
@@ -44,21 +44,25 @@ async function updateCamera(key, device, deviceSelector) {
         this.gladys.device.camera.setImage(selectorCamera, base64image);
       } catch (e) {
         logger.error(
-          `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - vpn_url - error : ${e}`,
+          `Netatmo : File netatmo.updateCamera.js - Camera ${this.devices[key].type} ${this.devices[key].name} - vpn_url - error : ${e}`,
         );
       }
       try {
         const powerValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].alim_status.toUpperCase()];
-        feature = getDeviceFeatureBySelector(device, `${deviceSelector}-power`);
+        feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-power`);
         if (feature.last_value !== powerValue) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:power`,
             state: powerValue,
           });
+        } else {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+            device_feature_external_id: `netatmo:${key}:power`,
+          });
         }
       } catch (e) {
         logger.error(
-          `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`,
+          `Netatmo : File netatmo.updateCamera.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`,
         );
       }
       try {
@@ -66,34 +70,42 @@ async function updateCamera(key, device, deviceSelector) {
           const lightValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].light_mode_status.toUpperCase()];
           const sirenValue = NETATMO_VALUES.SECURITY.SIREN[this.devices[key].siren_status.toUpperCase()];
           try {
-            feature = getDeviceFeatureBySelector(device, `${deviceSelector}-light`);
+            feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-light`);
             if (feature.last_value !== lightValue) {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${key}:light`,
                 state: lightValue,
               });
+            } else {
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+                device_feature_external_id: `netatmo:${key}:light`,
+              });
             }
           } catch (e) {
             logger.error(
-              `Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - light - error : ${e}`,
+              `Netatmo : File netatmo.updateCamera.js - Camera NOC ${this.devices[key].name} - light - error : ${e}`,
             );
           }
           try {
-            feature = getDeviceFeatureBySelector(device, `${deviceSelector}-siren`);
+            feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-siren`);
             if (feature.last_value !== sirenValue) {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${key}:siren`,
                 state: sirenValue,
               });
+            } else {
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+                device_feature_external_id: `netatmo:${key}:siren`,
+              });
             }
           } catch (e) {
             logger.error(
-              `Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - siren - error : ${e}`,
+              `Netatmo : File netatmo.updateCamera.js - Camera NOC ${this.devices[key].name} - siren - error : ${e}`,
             );
           }
         }
       } catch (e) {
-        logger.error(`Netatmo : File netatmo.poll.js - Camera NOC ${this.devices[key].name} - error : ${e}`);
+        logger.error(`Netatmo : File netatmo.updateCamera.js - Camera NOC ${this.devices[key].name} - error : ${e}`);
       }
     }
     if (this.devices[key].type === 'NACamera') {
@@ -101,59 +113,82 @@ async function updateCamera(key, device, deviceSelector) {
         const sidModule = module.id;
         const moduleExternalId = `netatmo:${sidModule}`;
         const moduleSelector = moduleExternalId.replace(/:/gi, '-');
-        const deviceModule = await this.gladys.device.getBySelector(moduleSelector);
+        let deviceModule;
         try {
-          // we save the common data of home coaches and weather stations
-          if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
-            const batteryValue = module.battery_percent;
-            feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-battery`);
-            if (feature.last_value !== batteryValue) {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                device_feature_external_id: `netatmo:${sidModule}:battery`,
-                state: batteryValue,
-              });
+          deviceModule = await this.gladys.device.getBySelector(moduleSelector);
+          try {
+            // we save the common data of home coaches and weather stations
+            if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
+              const batteryValue = module.battery_percent;
+              feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-battery`);
+              if (feature.last_value !== batteryValue) {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${sidModule}:battery`,
+                  state: batteryValue,
+                });
+              } else {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+                  device_feature_external_id: `netatmo:${sidModule}:battery`,
+                });
+              }
             }
+          } catch (e) {
+            logger.error(
+              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`,
+            );
+          }
+          try {
+            // we save other indoor sirens data
+            if (module.type === 'NIS') {
+              const sirenValue = NETATMO_VALUES.SECURITY.SIREN[module.status.toUpperCase()];
+              feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-siren`);
+              if (feature.last_value !== sirenValue) {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${sidModule}:siren`,
+                  state: sirenValue,
+                });
+              } else {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+                  device_feature_external_id: `netatmo:${sidModule}:siren`,
+                });
+              }
+            }
+          } catch (e) {
+            logger.error(
+              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
+            );
+          }
+          try {
+            // we save other interior door / window opening detectors data
+            if (module.type === 'NACamDoorTag') {
+              const doorTagValue = NETATMO_VALUES.SECURITY.DOOR_TAG[module.status.toUpperCase()];
+              feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-doortag`);
+              if (feature.last_value !== doorTagValue) {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${sidModule}:doorTag`,
+                  state: doorTagValue,
+                });
+              } else {
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
+                  device_feature_external_id: `netatmo:${sidModule}:doorTag`,
+                });
+              }
+            }
+          } catch (e) {
+            logger.error(
+              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
+            );
           }
         } catch (e) {
-          logger.error(
-            `Netatmo : File netatmo.poll.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`,
+          logger.debug(
+            `Netatmo : File netatmo.updateCamera.js - device netatmo ${module.type} ${module.name} no save in DB - error : ${e}`,
           );
-        }
-        try {
-          // we save other indoor sirens data
-          if (module.type === 'NIS') {
-            const sirenValue = NETATMO_VALUES.SECURITY.SIREN[module.status.toUpperCase()];
-            feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-siren`);
-            if (feature.last_value !== sirenValue) {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                device_feature_external_id: `netatmo:${sidModule}:siren`,
-                state: sirenValue,
-              });
-            }
-          }
-        } catch (e) {
-          logger.error(`Netatmo : File netatmo.poll.js - Module NACamera ${module.name} - state - error : ${e}`);
-        }
-        try {
-          // we save other interior door / window opening detectors data
-          if (module.type === 'NACamDoorTag') {
-            const doorTagValue = NETATMO_VALUES.SECURITY.DOOR_TAG[module.status.toUpperCase()];
-            feature = getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-doortag`);
-            if (feature.last_value !== doorTagValue) {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                device_feature_external_id: `netatmo:${sidModule}:doorTag`,
-                state: doorTagValue,
-              });
-            }
-          }
-        } catch (e) {
-          logger.error(`Netatmo : File netatmo.poll.js - Module NACamera ${module.name} - state - error : ${e}`);
         }
       });
     }
   } catch (e) {
     logger.error(
-      `Netatmo : File netatmo.poll.js - Camera ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`,
+      `Netatmo : File netatmo.updateCamera.js - Camera ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`,
     );
   }
 }

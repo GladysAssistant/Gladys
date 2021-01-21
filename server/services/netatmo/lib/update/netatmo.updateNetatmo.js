@@ -20,15 +20,15 @@ async function updateNetatmo(typeUpdate) {
     try {
       device = this.gladys.device.getBySelector(deviceSelector);
     } catch (e) {
-      let deviceName;
       if (this.devices[key].name !== undefined) {
-        deviceName = this.devices[key].name;
+        logger.debug(
+          `Netatmo : File netatmo.updateNetatmo.js - device netatmo ${this.devices[key].type} ${this.devices[key].name} no save in DB - error : ${e}`,
+        );
       } else {
-        deviceName = this.devices[key].station_name;
+        logger.debug(
+          `Netatmo : File netatmo.updateNetatmo.js - device netatmo ${this.devices[key].type} ${this.devices[key].station_name} no save in DB - error : ${e}`,
+        );
       }
-      logger.error(
-        `Netatmo : File netatmo.poll.js - device netatmo ${this.devices[key].type} ${deviceName} no save in DB - error : ${e}`,
-      );
     }
 
     if (typeUpdate === 'Security' && (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')) {

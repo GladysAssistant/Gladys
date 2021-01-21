@@ -1,3 +1,4 @@
+/* eslint-disable preact-i18n/no-unknown-key */
 import { Text } from 'preact-i18n';
 
 const MultiLevelDeviceType = ({ children, ...props }) => {

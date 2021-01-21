@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import NetatmoPage from '../NetatmoPage';
 import DeviceTab from './DeviceTab';
-import FoundDevices from './FoundDevices';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
@@ -23,8 +22,7 @@ class NetatmoDevicePage extends Component {
   render(props, {}) {
     return (
       <NetatmoPage>
-        {props.netatmoDevices && props.netatmoDevices.length ? <DeviceTab {...props} /> : <div />}
-        <FoundDevices {...props} />
+        <DeviceTab {...props} />
       </NetatmoPage>
     );
   }

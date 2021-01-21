@@ -45,6 +45,7 @@ const EVENTS = {
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
+    NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
     PURGE_STATES: 'device.purge-states',
   },
   GATEWAY: {
@@ -301,6 +302,7 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
+    INTEGER: 'integer',
   },
   CAMERA: {
     IMAGE: 'image',
@@ -508,6 +510,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   DEVICE: {
     NEW_STATE: 'device.new-state',
+    NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
     NEW_STRING_STATE: 'device.new-string-state',
   },
   MESSAGE: {

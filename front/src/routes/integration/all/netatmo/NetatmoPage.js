@@ -23,7 +23,16 @@ const DashboardSettings = ({ children, ...props }) => (
                     </span>
                     <Text id="integration.netatmo.deviceTab" />
                   </Link>
-
+                  <Link
+                    href="/dashboard/integration/device/netatmo/discover"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-radio" />
+                    </span>
+                    <Text id="integration.netatmo.discoverTab" />
+                  </Link>
                   <Link
                     href="/dashboard/integration/device/netatmo/setting"
                     activeClassName="active"
