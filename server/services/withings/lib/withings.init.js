@@ -111,10 +111,7 @@ function buildNewDevice(withingsDevice, serviceId) {
  */
 function buildFeature(currentGroup, device, currentFeatures) {
   // Build (or get) feature corresponding to the measure
-  let features = currentFeatures;
-  if (!features) {
-    features = [];
-  }
+  const features = currentFeatures || [];
 
   // Consider only real measures (not user objectives) => category = 1
   if (currentGroup.category === 1) {
@@ -312,10 +309,7 @@ async function init(userId) {
   await measureResult.data.body.measuregrps.forEach((element) => {
     if (element) {
       // Build map of measuregrps by withings device id
-      let measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid);
-      if (!measureList) {
-        measureList = [];
-      }
+      const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
       measureList.push(element);
       mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
     }

@@ -111,10 +111,7 @@ function poll(device) {
                 await measureResult.data.body.measuregrps.forEach((element) => {
                   if (element) {
                     // Build map of measuregrps by withings device id
-                    let measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid);
-                    if (!measureList) {
-                      measureList = [];
-                    }
+                    const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
                     measureList.push(element);
                     mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
                   }

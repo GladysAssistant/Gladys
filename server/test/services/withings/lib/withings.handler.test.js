@@ -6,8 +6,6 @@ const EventEmitter = require('events');
 const ServerMock = require('mock-http-server');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
-// const logger = require('../../../../utils/logger');
-
 const WithingsHandler = require('../../../../services/withings/lib');
 
 const serverOauth2 = new OAuth2Server();
@@ -30,6 +28,10 @@ const gladys = {
   device: {
     create: fake.returns(null),
     destroyBySelectorPattern: fake.returns(null),
+    saveHistoricalState: function shs(device, featureBattery, featureState) {
+      device.featureBattery = featureBattery;
+      device.featureBattery = featureState;
+    },
   },
   user: {
     get: fake.returns([{ id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }]),
@@ -309,7 +311,7 @@ describe('WithingsHandler', () => {
 
   it('withings init/poll is good', async () => {
     const resultInit = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
-    await assert.isNotNull(resultInit);
+    await assert.equal(resultInit.next().value.name, 'Withings - string');
 
     const deviceToPoll = resultInit.next();
     deviceToPoll.features = [
@@ -423,7 +425,7 @@ describe('WithingsHandler', () => {
       },
     ];
 
-    resultPoll = await withingsHandler.poll(deviceToPoll);
+    resultPoll = withingsHandler.poll(deviceToPoll);
     await assert.isNotNull(resultPoll);
 
     deviceToPoll.params = [
