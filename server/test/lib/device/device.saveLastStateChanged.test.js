@@ -2,7 +2,7 @@ const { assert, stub, useFakeTimers } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 
-describe.only('Device.saveLastStateChanged', () => {
+describe('Device.saveLastStateChanged', () => {
   it('should saveLastStateChanged', async () => {
     const event = {
       emit: stub().returns(null),
