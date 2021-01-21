@@ -44,18 +44,15 @@ async function connect() {
       data: querystring.stringify(authentificationForm),
     });
     this.token = response.data.access_token;
-    setInterval(
-      (token_refresh) => {
-        axios({
-          url: `${this.baseUrl}/oauth2/token`,
-          method: 'post',
-          data: querystring.stringify(authentificationForm),
-        }).then((token) => {
-          this.token = token.data.access_token;
-        });
-      },
-      response.data.expires_in * 1000,
-    );
+    setInterval(() => {
+      axios({
+        url: `${this.baseUrl}/oauth2/token`,
+        method: 'post',
+        data: querystring.stringify(authentificationForm),
+      }).then((token) => {
+        this.token = token.data.access_token;
+      });
+    }, response.data.expires_in * 1000);
 
     await this.getDevices();
     await this.pollManual();
