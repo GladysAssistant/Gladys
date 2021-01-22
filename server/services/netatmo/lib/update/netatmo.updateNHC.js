@@ -16,7 +16,7 @@ async function updateNHC(key, device, deviceSelector) {
     const healthIndexValue = this.devices[key].dashboard_data.health_idx;
 
     const feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-health-idx`);
-    if (feature.last_value !== healthIndexValue) {
+    if (parseInt(feature.last_value, 16) !== parseInt(healthIndexValue, 16)) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `netatmo:${key}:health_idx`,
         state: healthIndexValue,

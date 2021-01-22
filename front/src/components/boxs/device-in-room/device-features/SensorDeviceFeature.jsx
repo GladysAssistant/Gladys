@@ -67,7 +67,7 @@ const SensorDeviceType = ({ children, ...props }) => (
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
       props.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY && (
         <td class="text-right">
-          {props.deviceFeature.last_value === 1 && <i class="fe fe-power" />}
+          {props.deviceFeature.last_value >= 1 && <i class="fe fe-power" />}
           {props.deviceFeature.last_value === 0 ||
             (props.deviceFeature.last_value === null && <i class="fe fe-zap-off" />)}
         </td>
@@ -75,7 +75,13 @@ const SensorDeviceType = ({ children, ...props }) => (
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
       props.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.INTEGER && (
         <td class="text-right">
-          {props.deviceFeature.last_value >= 1 && <i class="fe fe-power" />}
+          {props.deviceFeature.last_value >= 1 && (
+            <span>
+              {props.deviceFeature.last_value}
+              {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}
+              <i class="fe fe-power" />
+            </span>
+          )}
           {props.deviceFeature.last_value === 0 ||
             (props.deviceFeature.last_value === null && <i class="fe fe-zap-off" />)}
         </td>

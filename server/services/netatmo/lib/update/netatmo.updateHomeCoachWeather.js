@@ -23,7 +23,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
 
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
-      if (feature.last_value !== temperatureValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(temperatureValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:temperature`,
           state: temperatureValue,
@@ -40,7 +40,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-humidity`);
-      if (feature.last_value !== humidityValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(humidityValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:humidity`,
           state: humidityValue,
@@ -57,7 +57,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-co2`);
-      if (feature.last_value !== co2Value) {
+      if (parseFloat(feature.last_value) !== parseFloat(co2Value)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:co2`,
           state: co2Value,
@@ -74,7 +74,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-pressure`);
-      if (feature.last_value !== pressureValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(pressureValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:pressure`,
           state: pressureValue,
@@ -91,7 +91,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-absolutepressure`);
-      if (feature.last_value !== absolutePressureValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(absolutePressureValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:absolutePressure`,
           state: absolutePressureValue,
@@ -108,7 +108,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-noise`);
-      if (feature.last_value !== noiseValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(noiseValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:noise`,
           state: noiseValue,
@@ -125,7 +125,7 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
-      if (feature.last_value !== reachableValue) {
+      if (parseInt(feature.last_value, 16) !== parseInt(reachableValue, 16)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:reachable`,
           state: reachableValue,

@@ -9,7 +9,7 @@ const gladys = {
 };
 
 describe('netatmoManager updateThermostat', () => {
-  it('should add NATherm1', async () => {
+  it('should success update all features NATherm1 with change value', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
@@ -96,7 +96,7 @@ describe('netatmoManager updateThermostat', () => {
     netatmoManager.updateThermostat('10', device, 'netatmo-10');
   });
 
-  it('should add NRV', async () => {
+  it('should success update all features NRV with change value', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
@@ -141,6 +141,57 @@ describe('netatmoManager updateThermostat', () => {
           therm_setpoint_temperature: 25,
           therm_setpoint_mode: 'program',
           heating_power_request: 100,
+        },
+      },
+    };
+    netatmoManager.updateThermostat('10', device, 'netatmo-10');
+  });
+
+  it('should success update all features NRV without change value but only change date value', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    const device = {
+      id: '10',
+      type: 'NRV',
+      features: [
+        {
+          selector: 'netatmo-10-temperature',
+          last_value: 20.6,
+        },
+        {
+          selector: 'netatmo-10-battery',
+          last_value: 50,
+        },
+        {
+          selector: 'netatmo-10-therm-setpoint-temperature',
+          last_value: 20.0,
+        },
+        {
+          selector: 'netatmo-10-therm-setpoint-mode',
+          last_value: 4,
+        },
+        {
+          selector: 'netatmo-10-heating-power-request',
+          last_value: 36,
+        },
+        {
+          selector: 'netatmo-10-reachable',
+          last_value: 1,
+        },
+      ],
+    };
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        type: 'NRV',
+        homeStatus: {
+          battery_state: 'medium',
+          reachable: 1,
+        },
+        room: {
+          therm_measured_temperature: 20.6,
+          therm_setpoint_temperature: 20.0,
+          therm_setpoint_mode: 'program',
+          heating_power_request: 36,
         },
       },
     };

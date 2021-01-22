@@ -19,7 +19,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
 
       try {
         feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-min-temp`);
-        if (feature.last_value !== minTempValue) {
+        if (parseFloat(feature.last_value) !== parseFloat(minTempValue)) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:min_temp`,
             state: minTempValue,
@@ -36,7 +36,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
       }
       try {
         feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-max-temp`);
-        if (feature.last_value !== maxTempValue) {
+        if (parseFloat(feature.last_value) !== parseFloat(maxTempValue)) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:max_temp`,
             state: maxTempValue,
@@ -68,7 +68,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
 
           try {
             feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-battery`);
-            if (feature.last_value !== batteryPercentValue) {
+            if (parseInt(feature.last_value, 16) !== parseInt(batteryPercentValue, 16)) {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${sidModule}:battery`,
                 state: batteryPercentValue,
@@ -85,7 +85,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
           }
           try {
             feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-reachable`);
-            if (feature.last_value !== reachableModuleValue) {
+            if (parseInt(feature.last_value, 16) !== parseInt(reachableModuleValue, 16)) {
               this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                 device_feature_external_id: `netatmo:${sidModule}:reachable`,
                 state: reachableModuleValue,
@@ -109,7 +109,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
 
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-rain`);
-                if (feature.last_value !== rainValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(rainValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:rain`,
                     state: rainValue,
@@ -126,7 +126,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-1`);
-                if (feature.last_value !== sumRain1Value) {
+                if (parseFloat(feature.last_value) !== parseFloat(sumRain1Value)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:sum_rain_1`,
                     state: sumRain1Value,
@@ -143,7 +143,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-24`);
-                if (feature.last_value !== sumRain24Value) {
+                if (parseFloat(feature.last_value) !== parseFloat(sumRain24Value)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:sum_rain_24`,
                     state: sumRain24Value,
@@ -176,7 +176,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
 
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-windstrength`);
-                if (feature.last_value !== windStrengthValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(windStrengthValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:WindStrength`,
                     state: windStrengthValue,
@@ -193,7 +193,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-windangle`);
-                if (feature.last_value !== windAngleValue) {
+                if (parseInt(feature.last_value, 16) !== parseInt(windAngleValue, 16)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:WindAngle`,
                     state: windAngleValue,
@@ -210,7 +210,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-guststrength`);
-                if (feature.last_value !== gustStrengthValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(gustStrengthValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:GustStrength`,
                     state: gustStrengthValue,
@@ -227,7 +227,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-gustangle`);
-                if (feature.last_value !== gustAngleValue) {
+                if (parseInt(feature.last_value, 16) !== parseInt(gustAngleValue, 16)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:GustAngle`,
                     state: gustAngleValue,
@@ -244,7 +244,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-str`);
-                if (feature.last_value !== maxWindStrValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(maxWindStrValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:max_wind_str`,
                     state: maxWindStrValue,
@@ -261,7 +261,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-angle`);
-                if (feature.last_value !== maxWindAngleValue) {
+                if (parseInt(feature.last_value, 16) !== parseInt(maxWindAngleValue, 16)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:max_wind_angle`,
                     state: maxWindAngleValue,
@@ -292,7 +292,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
 
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-temperature`);
-                if (feature.last_value !== temperatureModuleValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(temperatureModuleValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:temperature`,
                     state: temperatureModuleValue,
@@ -309,7 +309,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-humidity`);
-                if (feature.last_value !== humidityModuleValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(humidityModuleValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:humidity`,
                     state: humidityModuleValue,
@@ -326,7 +326,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-min-temp`);
-                if (feature.last_value !== minTempModuleValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(minTempModuleValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:min_temp`,
                     state: minTempModuleValue,
@@ -343,7 +343,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               }
               try {
                 feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-temp`);
-                if (feature.last_value !== maxTempModuleValue) {
+                if (parseFloat(feature.last_value) !== parseFloat(maxTempModuleValue)) {
                   this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                     device_feature_external_id: `netatmo:${sidModule}:max_temp`,
                     state: maxTempModuleValue,
@@ -363,7 +363,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
                 const co2ModuleValue = module.dashboard_data.CO2;
                 try {
                   feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-co2`);
-                  if (feature.last_value !== co2ModuleValue) {
+                  if (parseFloat(feature.last_value) !== parseFloat(co2ModuleValue)) {
                     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
                       device_feature_external_id: `netatmo:${sidModule}:co2`,
                       state: co2ModuleValue,
@@ -375,7 +375,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
                   }
                 } catch (e) {
                   logger.error(
-                    `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.type} ${module.name} - co2 - error : ${e}`,
+                    `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - co2 - error : ${e}`,
                   );
                 }
               }
@@ -387,7 +387,9 @@ async function updateWeatherStation(key, device, deviceSelector) {
           }
         } catch (e) {
           logger.debug(
-            `Netatmo : File netatmo.updateWeatherStation.js - device netatmo ${module.data_type} ${module.module_name} no save in DB - error : ${e}`,
+            `Netatmo : File netatmo.updateWeatherStation.js - device netatmo ${
+              module.data_type ? module.data_type : '"type"'
+            } ${module.module_name ? module.module_name : '"name"'} no save in DB - error : ${e}`,
           );
         }
       });

@@ -27,6 +27,14 @@ describe('Device', () => {
     const device = new Device(event, {}, stateManager);
     await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', state: 12 });
   });
+
+  it('should no save new state and error "DeviceFeature not found" and catch error', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', '', null);
+    const device = new Device(event, {}, stateManager);
+    await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', state: 12 });
+  });
+
   it('should save new state date but without value change', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeatureByExternalId', 'hue:binary:1', {
@@ -46,6 +54,13 @@ describe('Device', () => {
       created_at: '2019-02-12 07:49:07.556 +00:00',
       updated_at: '2019-02-12 07:49:07.556 +00:00',
     });
+    const device = new Device(event, {}, stateManager);
+    await device.newStateNoChangedEvent({ device_feature_external_id: 'hue:binary:1' });
+  });
+
+  it('should no save new state date and error "DeviceFeature not found" and catch error', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', '', null);
     const device = new Device(event, {}, stateManager);
     await device.newStateNoChangedEvent({ device_feature_external_id: 'hue:binary:1' });
   });

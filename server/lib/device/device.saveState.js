@@ -34,7 +34,7 @@ async function saveState(deviceFeature, newValue) {
       device_feature_id: deviceFeature.id,
     },
   });
-  const previousDeviceFeatureStateLastValueChanged = deviceFeaturesState ? deviceFeaturesState.created_at : null;
+  const previousDeviceFeatureStateLastValueChanged = deviceFeaturesState ? deviceFeaturesState.created_at : 0;
 
   // save local state in RAM
   this.stateManager.setState('deviceFeature', deviceFeature.selector, {

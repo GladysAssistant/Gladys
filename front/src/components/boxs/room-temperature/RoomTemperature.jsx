@@ -12,7 +12,6 @@ const RoomTemperatureBox = ({ children, ...props }) => (
         <i class="fe fe-thermometer" />
       </span>
       <div>
-        {console.log(props)}
         {props.temperature && (
           <h4 class="m-0">
             <Text id="global.degreeValue" fields={{ value: Math.round(props.temperature) }} />

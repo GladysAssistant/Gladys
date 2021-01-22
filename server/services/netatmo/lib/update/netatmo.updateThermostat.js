@@ -26,7 +26,7 @@ async function updateThermostat(key, device, deviceSelector) {
         temperatureValue = this.devices[key].measured.temperature;
         setpointTempValue = this.devices[key].measured.setpoint_temp;
         setpointModeValue = NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[key].setpoint.setpoint_mode.toUpperCase()];
-        heatPowerRequestValue = NETATMO_VALUES.ENERGY.HEATING_REQ[this.devices[key].therm_relay_cmd];
+        heatPowerRequestValue = this.devices[key].therm_relay_cmd;
       } catch (e) {
         logger.error(
           `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`,
@@ -46,7 +46,7 @@ async function updateThermostat(key, device, deviceSelector) {
         const reachableValue = this.devices[key].homeStatus.reachable;
 
         feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-reachable`);
-        if (feature.last_value !== reachableValue) {
+        if (parseInt(feature.last_value, 16) !== parseInt(reachableValue, 16)) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `netatmo:${key}:reachable`,
             state: reachableValue,
@@ -65,7 +65,7 @@ async function updateThermostat(key, device, deviceSelector) {
     // we save the common data of thermostats and valves
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-battery`);
-      if (feature.last_value !== batteryValue) {
+      if (parseInt(feature.last_value, 16) !== parseInt(batteryValue, 16)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:battery`,
           state: batteryValue,
@@ -82,7 +82,7 @@ async function updateThermostat(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-temperature`);
-      if (feature.last_value !== temperatureValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(temperatureValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:temperature`,
           state: temperatureValue,
@@ -99,7 +99,7 @@ async function updateThermostat(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-temperature`);
-      if (feature.last_value !== setpointTempValue) {
+      if (parseFloat(feature.last_value) !== parseFloat(setpointTempValue)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:therm_setpoint_temperature`,
           state: setpointTempValue,
@@ -116,7 +116,7 @@ async function updateThermostat(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-therm-setpoint-mode`);
-      if (feature.last_value !== setpointModeValue) {
+      if (parseInt(feature.last_value, 16) !== parseInt(setpointModeValue, 16)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:therm_setpoint_mode`,
           state: setpointModeValue,
@@ -133,7 +133,7 @@ async function updateThermostat(key, device, deviceSelector) {
     }
     try {
       feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-heating-power-request`);
-      if (feature.last_value !== heatPowerRequestValue) {
+      if (parseInt(feature.last_value, 16) !== parseInt(heatPowerRequestValue, 16)) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `netatmo:${key}:heating_power_request`,
           state: heatPowerRequestValue,
@@ -150,7 +150,9 @@ async function updateThermostat(key, device, deviceSelector) {
     }
   } catch (e) {
     logger.error(
-      `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - error : ${e}`,
+      `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key] ? this.devices[key].type : '"type"'} ${
+        this.devices[key] ? this.devices[key].name : '"name"'
+      } - error : ${e}`,
     );
   }
 }

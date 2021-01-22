@@ -83,6 +83,7 @@ function newValueValve(data) {
           external_id: `netatmo:${sid}:heating_power_request`,
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.INTEGER,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
           read_only: true,
           keep_history: true,
           has_feedback: true,

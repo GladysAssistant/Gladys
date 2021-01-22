@@ -16,14 +16,19 @@ const gladys = {
     camera: {
       setImage: fake.resolves(null),
     },
-    getBySelector: fake.resolves(module),
+    getBySelector: undefined,
   },
 };
 
 describe('netatmoManager updateCamera', () => {
   it('should say error device undefined', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-    netatmoManager.devices = {};
+    netatmoManager.devices = {
+      '10': {
+        name: 'Camera Stark room',
+        type: 'toto',
+      },
+    };
     netatmoManager.updateCamera('10', undefined, 'netatmo-10');
   });
 
@@ -41,11 +46,12 @@ describe('netatmoManager updateCamera', () => {
     const device = {
       id: '10',
       vpn_url: 'https://fake.gladys.fr',
+      selector: 'netatmo-10',
       type: 'toto',
       features: [
         {
           selector: 'netatmo-10-power',
-          last_value: 'off',
+          last_value: '1',
         },
       ],
     };
@@ -123,7 +129,7 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should add camera NOC and success update all feature', async () => {
+  it('should add camera NOC and success update all feature with change value', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
@@ -167,7 +173,51 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should add camera NOC and failed feature update on "Cannot read property last_value of null"', async () => {
+  it('should add camera NOC and success update all feature without change value but only change date value', async () => {
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark Outdoor',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NOC',
+        alim_status: 'off',
+        light_mode_status: 'auto',
+        siren_status: 'no_news',
+      },
+    };
+    const device = {
+      id: '10',
+      vpn_url: 'https://fake.gladys.fr',
+      model: 'NOC',
+      features: [
+        {
+          selector: 'netatmo-10-power',
+          last_value: '0',
+        },
+        {
+          selector: 'netatmo-10-light',
+          last_value: '2',
+        },
+        {
+          selector: 'netatmo-10-siren',
+          last_value: '-1',
+        },
+      ],
+    };
+    const responseImage = await axios.get(
+      'https://www.interactivesearchmarketing.com/wp-content/uploads/2014/06/png-vs-jpeg.jpg',
+      {
+        responseType: 'arraybuffer',
+      },
+    );
+    nock('https://fake.gladys.fr')
+      .get('/live/snapshot_720.jpg')
+      .reply(200, responseImage.data);
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should add camera NOC and failed features update on "Cannot read property last_value of null"', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
@@ -226,7 +276,27 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should success update features NIS', async () => {
+  it('should failed update features NIS on "no save in DB"', async () => {
+    const device = undefined;
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            name: 'Siren Stark room',
+            type: 'NIS',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should success update device module NIS and success update all feature with change value', async () => {
     const device = undefined;
     const module = {
       id: '11',
@@ -256,7 +326,7 @@ describe('netatmoManager updateCamera', () => {
             name: 'Siren Stark room',
             type: 'NIS',
             battery_percent: 100,
-            status: 'on',
+            status: 'sound',
           },
         ],
       },
@@ -264,7 +334,45 @@ describe('netatmoManager updateCamera', () => {
     await netatmoManager.updateCamera('10', device, 'netatmo-10');
   });
 
-  it('should success update features NACamDoorTag', async () => {
+  it('should success update device module NIS and success update all feature without change value but only change date value', async () => {
+    const device = undefined;
+    const module = {
+      id: '11',
+      selector: 'netatmo-11',
+      features: [
+        {
+          selector: 'netatmo-11-battery',
+          last_value: 50,
+        },
+        {
+          selector: 'netatmo-11-siren',
+          last_value: 2,
+        },
+      ],
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '11',
+            name: 'Siren Stark room',
+            type: 'NIS',
+            battery_percent: 100,
+            status: 'warning',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should success update device module NACamDoorTag and success update all feature with change value', async () => {
     const device = undefined;
     const module = {
       id: '12',
@@ -294,7 +402,45 @@ describe('netatmoManager updateCamera', () => {
             name: 'Door tag Stark room',
             type: 'NACamDoorTag',
             battery_percent: 100,
-            status: 'on',
+            status: 'open',
+          },
+        ],
+      },
+    };
+    await netatmoManager.updateCamera('10', device, 'netatmo-10');
+  });
+
+  it('should success update device module NACamDoorTag and success update all feature without change value but only change date value', async () => {
+    const device = undefined;
+    const module = {
+      id: '12',
+      selector: 'netatmo-12',
+      features: [
+        {
+          selector: 'netatmo-12-battery',
+          last_value: 100,
+        },
+        {
+          selector: 'netatmo-12-doortag',
+          last_value: -1,
+        },
+      ],
+    };
+    gladys.device.getBySelector = fake.resolves(module);
+    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    netatmoManager.devices = {
+      '10': {
+        id: '10',
+        name: 'Camera Stark room',
+        vpn_url: 'https://fake.gladys.fr',
+        type: 'NACamera',
+        modules: [
+          {
+            id: '12',
+            name: 'Door tag Stark room',
+            type: 'NACamDoorTag',
+            battery_percent: 100,
+            status: 'undefined',
           },
         ],
       },
