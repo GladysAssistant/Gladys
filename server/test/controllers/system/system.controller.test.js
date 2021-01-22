@@ -27,23 +27,10 @@ describe('GET /api/v1/system/disk', () => {
   });
 });
 
-describe('GET /api/v1/system/container', () => {
-  it('should return infos container', async () => {
-    await authenticatedRequest
-      .get('/api/v1/system/container')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).to.have.property('name');
-        expect(res.body).to.have.property('state');
-      });
-  });
-});
-
 describe('GET /api/v1/system/upgrade/download', () => {
   it('should return infos download', async () => {
     await authenticatedRequest
-      .get('/api/v1/system/upgrade/download')
+      .post('/api/v1/system/upgrade/download')
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
@@ -70,7 +57,7 @@ describe('GET /api/v1/system/upgrade/download/status', () => {
 describe('GET /api/v1/system/shutdown', () => {
   it('should return system will shutdown soon', async () => {
     await authenticatedRequest
-      .get('/api/v1/system/shutdown')
+      .post('/api/v1/system/shutdown')
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
