@@ -41,8 +41,8 @@ describe('netatmoManager pollManual', () => {
         _id: '10',
       },
     };
-    netatmoManager.pollFrequencies.EVERY_5_MINUTES = 1000;
-    netatmoManager.pollFrequencies.EVERY_2_MINUTES = 1000;
+    netatmoManager.pollFrequencies.EVERY_5_MINUTES = 60 * 1000;
+    netatmoManager.pollFrequencies.EVERY_2_MINUTES = 60 * 1000;
     await netatmoManager.pollManual();
   });
 

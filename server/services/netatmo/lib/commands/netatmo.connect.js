@@ -44,25 +44,15 @@ async function connect() {
       data: querystring.stringify(authentificationForm),
     });
     this.token = response.data.access_token;
-    setInterval(
-      () => {
-        const form = {
-          grant_type: 'refresh_token',
-          refresh_token: response.data.refresh_token,
-          client_id: netatmoClientId,
-          client_secret: netatmoPassword,
-        };
-        axios({
-          url: `${this.baseUrl}/oauth2/token`,
-          method: 'post',
-          data: querystring.stringify(form),
-        }).then((token) => {
-          this.token = token.data.access_token;
-        });
-      },
-      response.data.expires_in * 1000,
-      response.data.refresh_token,
-    );
+    setInterval(() => {
+      axios({
+        url: `${this.baseUrl}/oauth2/token`,
+        method: 'post',
+        data: querystring.stringify(authentificationForm),
+      }).then((token) => {
+        this.token = token.data.access_token;
+      });
+    }, response.data.expires_in * 1000);
 
     await this.getDevices();
     await this.pollManual();
