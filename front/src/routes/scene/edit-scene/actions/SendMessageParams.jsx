@@ -47,11 +47,8 @@ class SendMessageParams extends Component {
     this.setState({ selectedOption });
   };
   refreshVariables = async nextProps => {
-    // if variables didn't change, it's useless to refresh the state
-    if (nextProps.variables === this.props.variables) {
-      return null;
-    }
     const variableWhileList = [];
+    let variablesKey = '';
     let variableReady = null;
     nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
       actionGroup.forEach((action, index) => {
@@ -63,6 +60,9 @@ class SendMessageParams extends Component {
             if (!option.ready) {
               variableReady = false;
             }
+            // we create a "variablesKey" string to quickly compare the variables displayed
+            // instead of having to loop through 2 arrays. It's quicker :)
+            variablesKey += `${groupIndex}.${index}.${option.name}.${option.label}.${option.ready}`;
             variableWhileList.push({
               id: `${groupIndex}.${index}.${option.name}`,
               text: `${groupIndex + 1}. ${index + 1}. ${option.label}`,
@@ -73,17 +73,18 @@ class SendMessageParams extends Component {
         }
       });
     });
-    await this.setState({ variableWhileList, variableReady });
-    if (variableReady) {
+    const previousVariablesKey = this.state.variablesKey;
+    await this.setState({ variableWhileList, variableReady, variablesKey });
+    // we compare here the previous variables key
+    // and the new one, and we compare if they are the same
+    if (variablesKey !== previousVariablesKey) {
       this.initTagify();
     }
   };
   setRef = dom => (this.tagifyInputRef = dom);
   initTagify = () => {
     if (this.tagify) {
-      this.tagify.settings.whitelist.length = 0;
-      this.tagify.settings.whitelist.push(...this.state.variableWhileList);
-      return null;
+      this.tagify.destroy();
     }
     this.tagify = new Tagify(this.tagifyInputRef, {
       mode: 'mix',
@@ -99,11 +100,12 @@ class SendMessageParams extends Component {
       whitelist: this.state.variableWhileList,
       mixTagsInterpolator: ['{{', '}}']
     });
-    if (this.props.action.text.search('{{') !== -1 && this.props.action.text.search('}}') !== -1) {
-      const textFormatted = this.props.action.text.replaceAll('{{', '[[').replaceAll('}}', ']]');
+    const text = this.props.action.text || '';
+    if (text.search('{{') !== -1 && text.search('}}') !== -1) {
+      const textFormatted = text.replaceAll('{{', '[[').replaceAll('}}', ']]');
       this.tagify.loadOriginalValues(textFormatted);
     } else {
-      this.tagify.loadOriginalValues(this.props.action.text);
+      this.tagify.loadOriginalValues(text);
     }
     this.tagify.on('input add remove change', e => {
       const text = get(this.tagify, 'DOM.input.innerText', '');
@@ -124,18 +126,22 @@ class SendMessageParams extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: ''
+      selectedOption: '',
+      variableWhileList: []
     };
   }
   componentDidMount() {
-    if (!this.props.unit) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
-    }
     this.getOptions();
+    this.initTagify();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
     this.refreshVariables(nextProps);
+  }
+  componentWillUnmount() {
+    if (this.tagify) {
+      this.tagify.destroy();
+    }
   }
   render(props, { selectedOption, userOptions, variableWhileList, variableReady }) {
     return (
