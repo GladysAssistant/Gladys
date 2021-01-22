@@ -53,16 +53,3 @@ describe('GET /api/v1/system/upgrade/download/status', () => {
       });
   });
 });
-
-describe('GET /api/v1/system/shutdown', () => {
-  it('should return system will shutdown soon', async () => {
-    await authenticatedRequest
-      .post('/api/v1/system/shutdown')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).to.have.property('success');
-        expect(res.body).to.have.property('message');
-      });
-  });
-});
