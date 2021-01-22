@@ -93,6 +93,9 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    initNewUser(state, newUser) {
+      store.setState({ newUser, cropper: null });
+    },
     validatePassword(state) {
       store.setState({
         validPassword: state.newUser.password.length >= MIN_PASSWORD_LENGTH
@@ -113,6 +116,39 @@ function createActions(store) {
         months,
         years
       });
+    },
+    async createUser(state, e) {
+      e.preventDefault();
+      store.setState({
+        createUserStatus: RequestStatus.Getting
+      });
+      try {
+        const data = Object.assign({}, state.newUser);
+        const errored = actions.validateUser(state);
+        if (errored) {
+          throw new Error();
+        }
+        data.birthdate = new Date(data.birthdateYear, data.birthdateMonth - 1, data.birthdateDay);
+        delete data.birthdateYear;
+        delete data.birthdateMonth;
+        delete data.birthdateDay;
+        if (state.cropper) {
+          const profilePicture = await getCropperBase64Image(state.cropper);
+          if (profilePicture) {
+            data.picture = profilePicture;
+          }
+        }
+        await state.httpClient.post('/api/v1/user', data);
+        store.setState({
+          createUserStatus: RequestStatus.Success
+        });
+        actions.getMySelf(state);
+      } catch (e) {
+        console.log(e);
+        store.setState({
+          createUserStatus: RequestStatus.Error
+        });
+      }
     },
     async saveProfile(state, e) {
       e.preventDefault();

@@ -119,6 +119,21 @@ const Profile = ({ children, ...props }) => {
           </option>
         </select>
       </div>
+      {!props.disableRole && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.roleLabel" />
+          </label>
+          <select value={props.newUser.role} onChange={props.updateRole} class="form-control custom-select">
+            <option value="admin">
+              <Text id="profile.adminRole" />
+            </option>
+            <option value="user">
+              <Text id="profile.userRole" />
+            </option>
+          </select>
+        </div>
+      )}
       <div class="form-group">
         <label class="form-label">
           <Text id="profile.birthdateLabel" />
@@ -214,46 +229,50 @@ const Profile = ({ children, ...props }) => {
           )}
         </div>
       )}
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordLabel" />
-        </label>
-        <Localizer>
-          <input
-            type="password"
-            class={cx('form-control', {
-              'is-invalid': get(props, 'errors.password'),
-              'is-valid': props.validPassword && !get(props, 'errors.password')
-            })}
-            value={props.newUser.password}
-            onInput={props.updatePassword}
-            placeholder={<Text id="profile.passwordPlaceholder" />}
-          />
-        </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordError" />
+      {!props.disablePassword && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.passwordLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="password"
+              class={cx('form-control', {
+                'is-invalid': get(props, 'errors.password'),
+                'is-valid': props.validPassword && !get(props, 'errors.password')
+              })}
+              value={props.newUser.password}
+              onInput={props.updatePassword}
+              placeholder={<Text id="profile.passwordPlaceholder" />}
+            />
+          </Localizer>
+          <div class="invalid-feedback">
+            <Text id="profile.passwordError" />
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordRepeatLabel" />
-        </label>
-        <Localizer>
-          <input
-            type="password"
-            class={cx('form-control', {
-              'is-invalid': get(props, 'errors.passwordRepeat'),
-              'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
-            })}
-            value={props.newUser.passwordRepeat}
-            onInput={props.updatePasswordRepeat}
-            placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
-          />
-        </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordRepeatError" />
+      )}
+      {!props.disablePassword && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.passwordRepeatLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="password"
+              class={cx('form-control', {
+                'is-invalid': get(props, 'errors.passwordRepeat'),
+                'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
+              })}
+              value={props.newUser.passwordRepeat}
+              onInput={props.updatePasswordRepeat}
+              placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
+            />
+          </Localizer>
+          <div class="invalid-feedback">
+            <Text id="profile.passwordRepeatError" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

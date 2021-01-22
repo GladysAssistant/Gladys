@@ -944,6 +944,7 @@
     "languageLabel": "Language",
     "english": "English",
     "french": "Français",
+    "roleLabel": "Role",
     "passwordLabel": "Password (min 8 characters)",
     "passwordPlaceholder": "Enter your password",
     "passwordRepeatLabel": "Repeat your password",
@@ -964,6 +965,7 @@
   "settings": {
     "title": "Settings",
     "housesTab": "Houses",
+    "usersTab": "Users",
     "sessionsTab": "Sessions",
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
@@ -980,6 +982,13 @@
     "orderDirDesc": "Z - A",
     "defaultNewHouseName": "New House",
     "noHouseFound": "No houses found."
+  },
+  "usersSettings": {
+    "title": "Users",
+    "searchPlaceholder": "Search users",
+    "newUserButton": "New",
+    "editUserButton": "Edit",
+    "deleteUserButton": "Delete"
   },
   "sessionsSettings": {
     "registered": "Registered:",
