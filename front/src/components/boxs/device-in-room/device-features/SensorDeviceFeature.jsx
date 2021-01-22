@@ -76,13 +76,11 @@ const SensorDeviceType = ({ children, ...props }) => (
       props.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.INTEGER && (
         <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
           {props.deviceFeature.last_value > 0 && props.deviceFeature.last_value < 100 && (
-              <span>
-                {props.deviceFeature.last_value}
-                {" "}
-                {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}
-              </span>
+            <span>
+              {props.deviceFeature.last_value} {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}
+            </span>
           )}
-          {props.deviceFeature.last_value === 100 && (<i class="fe fe-power" />)}
+          {props.deviceFeature.last_value === 100 && <i class="fe fe-power" />}
           {props.deviceFeature.last_value === 0 ||
             (props.deviceFeature.last_value === null && <i class="fe fe-zap-off" />)}
         </td>
