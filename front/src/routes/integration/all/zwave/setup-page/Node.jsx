@@ -22,9 +22,7 @@ const createGithubUrl = node => {
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
 
-const displayRawNode = node => () => {
-  console.log(node);
-};
+const displayRawNode = node => () => {};
 
 class ZwaveNode extends Component {
   createDevice = async () => {
