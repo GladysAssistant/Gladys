@@ -8,7 +8,7 @@ import { RequestStatus, CreateUserErrors } from '../../../../utils/consts';
 import actions from '../../../../actions/profile';
 
 @connect(
-  'newUser,years,months,days,createUserStatus,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue',
+  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue',
   actions
 )
 class SettingsUsers extends Component {
@@ -22,6 +22,9 @@ class SettingsUsers extends Component {
   updateEmail = e => {
     this.props.updateNewUserProperty('email', e.target.value);
   };
+  updateRole = e => {
+    this.props.updateNewUserProperty('role', e.target.value);
+  };
   updateLanguage = e => {
     this.props.updateNewUserProperty('language', e.target.value);
   };
@@ -31,7 +34,7 @@ class SettingsUsers extends Component {
   };
   updatePasswordRepeat = e => {
     this.props.updateNewUserProperty('passwordRepeat', e.target.value);
-    this.validatePasswordRepeat();
+    this.props.validatePasswordRepeat();
   };
   updateBirthdateDay = e => {
     this.props.updateNewUserProperty('birthdateDay', e.target.value);
@@ -46,32 +49,42 @@ class SettingsUsers extends Component {
 
   componentDidMount() {
     this.props.initNewUser({
-      language: 'en'
+      firstname: '',
+      lastname: '',
+      email: '',
+      language: 'en',
+      role: 'admin'
     });
     this.props.updateDays();
   }
 
   render(props, {}) {
+    console.log(props);
     return (
-      <SettingsLayout>
+      <SettingsLayout currentUrl={props.currentUrl}>
         {props.newUser && (
           <CreateUserPage
             {...props}
             updateFirstname={this.updateFirstname}
             updateLastname={this.updateLastname}
             updateEmail={this.updateEmail}
+            updateRole={this.updateRole}
             updateLanguage={this.updateLanguage}
             updatePassword={this.updatePassword}
             updatePasswordRepeat={this.updatePasswordRepeat}
             updateBirthdateDay={this.updateBirthdateDay}
             updateBirthdateMonth={this.updateBirthdateMonth}
             updateBirthdateYear={this.updateBirthdateYear}
+            errors={props.profileUpdateErrors}
             networkError={props.createUserStatus === RequestStatus.NetworkError}
             emailAlreadyExistError={
               props.createUserStatus === RequestStatus.ConflictError &&
-              get(props.createLocalAccountError, 'error.attribute') === 'email'
+              get(props.createUserError, 'error.attribute') === 'email'
             }
-            instanceAlreadyConfiguredError={props.createUserStatus === CreateUserErrors.InstanceAlreadyConfigured}
+            selectorAlreadyExist={
+              props.createUserStatus === RequestStatus.ConflictError &&
+              get(props.createUserError, 'error.attribute') === 'selector'
+            }
             unknownError={props.createUserStatus === RequestStatus.Error}
           />
         )}

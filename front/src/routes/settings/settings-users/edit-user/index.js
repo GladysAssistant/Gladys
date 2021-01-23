@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 import EditUserPage from './EditUserPage';
 import actions from '../../../../actions/house';
+import SettingsLayout from '../../SettingsLayout';
 import { getYearsMonthsAndDays } from '../../../../utils/date';
 
 const user = {
@@ -14,7 +15,7 @@ const user = {
   img: 'https://pbs.twimg.com/profile_images/813506736854339584/4COxLo7p_400x400.jpg'
 };
 
-@connect('', actions)
+@connect('currentUrl', actions)
 class SettingsUsers extends Component {
   refreshBirthdate = () => {
     const { days, months, years } = getYearsMonthsAndDays(
@@ -42,8 +43,11 @@ class SettingsUsers extends Component {
   }
 
   render(props, { days, months, years }) {
-    console.log({ days, months, years });
-    return <EditUserPage newUser={user} days={days} months={months} years={years} />;
+    return (
+      <SettingsLayout currentUrl={props.currentUrl}>
+        <EditUserPage newUser={user} days={days} months={months} years={years} />
+      </SettingsLayout>
+    );
   }
 }
 

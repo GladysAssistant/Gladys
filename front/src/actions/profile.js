@@ -2,6 +2,7 @@ import { RequestStatus } from '../utils/consts';
 import validateEmail from '../utils/validateEmail';
 import update from 'immutability-helper';
 import get from 'get-value';
+import { route } from 'preact-router';
 import { fileToBase64, getCropperBase64Image } from '../utils/picture';
 import { getYearsMonthsAndDays } from '../utils/date';
 
@@ -94,7 +95,7 @@ function createActions(store) {
       store.setState(newState);
     },
     initNewUser(state, newUser) {
-      store.setState({ newUser, cropper: null });
+      store.setState({ newUser, cropper: null, profileUpdateErrors: null });
     },
     validatePassword(state) {
       store.setState({
@@ -120,6 +121,7 @@ function createActions(store) {
     async createUser(state, e) {
       e.preventDefault();
       store.setState({
+        createUserError: null,
         createUserStatus: RequestStatus.Getting
       });
       try {
@@ -142,12 +144,20 @@ function createActions(store) {
         store.setState({
           createUserStatus: RequestStatus.Success
         });
-        actions.getMySelf(state);
+        route('/dashboard/settings/user');
       } catch (e) {
         console.log(e);
-        store.setState({
-          createUserStatus: RequestStatus.Error
-        });
+        const status = get(e, 'response.status');
+        if (status === 409) {
+          store.setState({
+            createUserError: e.response.data,
+            createUserStatus: RequestStatus.ConflictError
+          });
+        } else {
+          store.setState({
+            createUserStatus: RequestStatus.Error
+          });
+        }
       }
     },
     async saveProfile(state, e) {

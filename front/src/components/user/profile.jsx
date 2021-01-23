@@ -47,7 +47,13 @@ const Profile = ({ children, ...props }) => {
                   })}
                   value={props.newUser.firstname}
                   onInput={props.updateFirstname}
-                  placeholder={<Text id="profile.firstnamePlaceholder" />}
+                  placeholder={
+                    props.editingOtherUser ? (
+                      <Text id="profile.firstnameOtherUserPlaceholder" />
+                    ) : (
+                      <Text id="profile.firstnamePlaceholder" />
+                    )
+                  }
                 />
               </Localizer>
               <div class="invalid-feedback">
@@ -68,7 +74,13 @@ const Profile = ({ children, ...props }) => {
                   })}
                   value={props.newUser.lastname}
                   onInput={props.updateLastname}
-                  placeholder={<Text id="profile.lastnamePlaceholder" />}
+                  placeholder={
+                    props.editingOtherUser ? (
+                      <Text id="profile.lastnameOtherUserPlaceholder" />
+                    ) : (
+                      <Text id="profile.lastnamePlaceholder" />
+                    )
+                  }
                 />
               </Localizer>
               <div class="invalid-feedback">
@@ -99,7 +111,13 @@ const Profile = ({ children, ...props }) => {
             })}
             value={props.newUser.email}
             onInput={props.updateEmail}
-            placeholder={<Text id="profile.emailPlaceholder" />}
+            placeholder={
+              props.editingOtherUser ? (
+                <Text id="profile.emailOtherUserPlaceholder" />
+              ) : (
+                <Text id="profile.emailPlaceholder" />
+              )
+            }
           />
         </Localizer>
         <div class="invalid-feedback">
@@ -243,7 +261,13 @@ const Profile = ({ children, ...props }) => {
               })}
               value={props.newUser.password}
               onInput={props.updatePassword}
-              placeholder={<Text id="profile.passwordPlaceholder" />}
+              placeholder={
+                props.editingOtherUser ? (
+                  <Text id="profile.passwordOtherUserPlaceholder" />
+                ) : (
+                  <Text id="profile.passwordPlaceholder" />
+                )
+              }
             />
           </Localizer>
           <div class="invalid-feedback">
@@ -254,7 +278,11 @@ const Profile = ({ children, ...props }) => {
       {!props.disablePassword && (
         <div class="form-group">
           <label class="form-label">
-            <Text id="profile.passwordRepeatLabel" />
+            {props.editingOtherUser ? (
+              <Text id="profile.passwordOtherUserRepeatLabel" />
+            ) : (
+              <Text id="profile.passwordRepeatLabel" />
+            )}
           </label>
           <Localizer>
             <input
@@ -265,7 +293,13 @@ const Profile = ({ children, ...props }) => {
               })}
               value={props.newUser.passwordRepeat}
               onInput={props.updatePasswordRepeat}
-              placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
+              placeholder={
+                props.editingOtherUser ? (
+                  <Text id="profile.passwordRepeatOtherUserPlaceholder" />
+                ) : (
+                  <Text id="profile.passwordRepeatPlaceholder" />
+                )
+              }
             />
           </Localizer>
           <div class="invalid-feedback">

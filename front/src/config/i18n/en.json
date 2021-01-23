@@ -929,8 +929,10 @@
     "invitationSuccess": "Accepted",
     "firstnameLabel": "First Name",
     "firstnamePlaceholder": "Enter your first name",
+    "firstnameOtherUserPlaceholder": "Enter the firstname",
     "lastnameLabel": "Last Name",
     "lastnamePlaceholder": "Enter your last name",
+    "lastnameOtherUserPlaceholder": "Enter the last name",
     "selectorLabel": "Selector",
     "birthdateLabel": "Birthdate",
     "year": "Year",
@@ -941,6 +943,7 @@
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",
     "emailPlaceholder": "Enter your email",
+    "emailOtherUserPlaceholder": "Enter the email",
     "languageLabel": "Language",
     "english": "English",
     "french": "Français",
@@ -949,6 +952,9 @@
     "passwordPlaceholder": "Enter your password",
     "passwordRepeatLabel": "Repeat your password",
     "passwordRepeatPlaceholder": "Repeat your password",
+    "passwordOtherUserPlaceholder": "Enter a password",
+    "passwordOtherUserRepeatLabel": "Repeat the password",
+    "passwordRepeatOtherUserPlaceholder": "Repeat the password",
     "saveButton": "Save your profile",
     "firstnameError": "First name is required.",
     "lastnameError": "Last name is required.",
@@ -988,7 +994,11 @@
     "searchPlaceholder": "Search users",
     "newUserButton": "New",
     "editUserButton": "Edit",
-    "deleteUserButton": "Delete"
+    "deleteUserButton": "Delete",
+    "createUser": {
+      "title": "Create a new user",
+      "createUserButton": "Create user"
+    }
   },
   "sessionsSettings": {
     "registered": "Registered:",

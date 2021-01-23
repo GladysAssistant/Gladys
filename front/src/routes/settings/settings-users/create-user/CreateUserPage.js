@@ -16,7 +16,7 @@ const UserPage = ({ children, ...props }) => (
                 <Text id="global.backButton" />
               </button>
             </Link>{' '}
-            <Text id="profile.editYourProfileTitle" />
+            <Text id="usersSettings.createUser.title" />
           </h3>
         </div>
         <div class="card-body">
@@ -25,10 +25,10 @@ const UserPage = ({ children, ...props }) => (
             <div class="dimmer-content">
               <div class="row justify-content-center">
                 <div class="col-lg-8">
-                  {props.newUser && <Profile {...props} language="en" />}
+                  {props.newUser && <Profile {...props} editingOtherUser language="en" />}
                   <div class="form-group">
                     <button onClick={props.createUser} class="btn btn-success">
-                      <Text id="profile.saveButton" />
+                      <Text id="usersSettings.createUser.createUserButton" />
                     </button>
                   </div>
                 </div>

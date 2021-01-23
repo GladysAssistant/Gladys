@@ -1,9 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
-import SettingsLayout from '../SettingsLayout';
+
 import { Link } from 'preact-router/match';
 
 const UserPage = ({ children, ...props }) => (
-  <SettingsLayout>
+  <div>
     <div class="page-header">
       <h1 class="page-title">
         <Text id="usersSettings.title" />
@@ -59,7 +59,7 @@ const UserPage = ({ children, ...props }) => (
                     <a href={`/dashboard/settings/user/edit/${user.selector}`} class="btn btn-secondary">
                       <Text id="usersSettings.editUserButton" />
                     </a>
-                    <button class="btn btn-danger btn-outline float-right">
+                    <button class="btn btn-outline-danger float-right">
                       <Text id="usersSettings.deleteUserButton" />
                     </button>
                   </div>
@@ -69,7 +69,7 @@ const UserPage = ({ children, ...props }) => (
         </div>
       </div>
     </div>
-  </SettingsLayout>
+  </div>
 );
 
 export default UserPage;

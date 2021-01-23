@@ -2,8 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import UserPage from './UserPage';
 import actions from '../../../actions/house';
+import SettingsLayout from '../SettingsLayout';
 
-@connect('httpClient', actions)
+@connect('currentUrl,httpClient', actions)
 class SettingsUsers extends Component {
   getUsers = async () => {
     try {
@@ -18,7 +19,11 @@ class SettingsUsers extends Component {
   }
 
   render(props, { users }) {
-    return <UserPage {...props} users={users} />;
+    return (
+      <SettingsLayout currentUrl={props.currentUrl}>
+        <UserPage {...props} users={users} />
+      </SettingsLayout>
+    );
   }
 }
 
