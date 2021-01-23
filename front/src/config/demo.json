@@ -1638,6 +1638,12 @@
     "name": "bluetooth",
     "enabled": true
   },
+  "get /api/v1/service/bluetooth/config": {
+    "presenceScanner": {
+      "status": "enabled",
+      "frequency": 60000
+    }
+  },
   "get /api/v1/service/bluetooth/device": [
     {
       "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
@@ -1693,7 +1699,7 @@
     }
   },
   "get /api/v1/service/bluetooth/status": {
-    "running": true
+    "ready": true
   },
   "get /api/v1/service/bluetooth/peripheral": [
     {

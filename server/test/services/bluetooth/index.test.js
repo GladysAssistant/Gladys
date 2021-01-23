@@ -26,6 +26,9 @@ const gladys = {
   device: {
     get: () => [],
   },
+  variable: {
+    getValue: () => 'value',
+  },
 };
 
 describe('BluetoothService', () => {
