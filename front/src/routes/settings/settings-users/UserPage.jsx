@@ -48,20 +48,24 @@ const UserPage = ({ children, ...props }) => (
                       class="avatar avatar-xl mb-3 avatar-rounded"
                       style={{ backgroundImage: `url(${user.picture})` }}
                     />
-                    <h3 class="m-0 mb-1">
+                    <h4 class="m-0 mb-1">
                       {user.firstname} {user.lastname}
-                    </h3>
+                    </h4>
                     <div class="mt-3">
                       <span class="tag tag-green">{user.role}</span>
                     </div>
                   </div>
                   <div class="card-footer">
-                    <a href={`/dashboard/settings/user/edit/${user.selector}`} class="btn btn-secondary">
-                      <Text id="usersSettings.editUserButton" />
-                    </a>
-                    <button class="btn btn-outline-danger float-right">
-                      <Text id="usersSettings.deleteUserButton" />
-                    </button>
+                    <div class="btn-list text-center">
+                      <a href={`/dashboard/settings/user/edit/${user.selector}`} class="btn btn-outline-primary btn-sm">
+                        <i class="fe fe-edit" />
+                        <Text id="usersSettings.editUserButton" />
+                      </a>
+                      <button class="btn btn-outline-danger btn-sm">
+                        <i class="fe fe-trash" />
+                        <Text id="usersSettings.deleteUserButton" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
