@@ -53,13 +53,27 @@ class SettingsUsers extends Component {
       lastname: '',
       email: '',
       language: 'en',
-      role: 'admin'
+      role: 'admin',
+      birthdateYear: null,
+      birthdateMonth: null,
+      newProfilePicture: null
     });
     this.props.updateDays();
   }
 
+  componentWillUnmount() {
+    this.props.initNewUser({
+      firstname: '',
+      lastname: '',
+      email: '',
+      language: 'en',
+      role: 'admin',
+      birthdateYear: null,
+      birthdateMonth: null
+    });
+  }
+
   render(props, {}) {
-    console.log(props);
     return (
       <SettingsLayout currentUrl={props.currentUrl}>
         {props.newUser && (

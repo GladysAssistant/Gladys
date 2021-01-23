@@ -95,7 +95,13 @@ function createActions(store) {
       store.setState(newState);
     },
     initNewUser(state, newUser) {
-      store.setState({ newUser, cropper: null, profileUpdateErrors: null });
+      store.setState({
+        newUser,
+        cropper: null,
+        profileUpdateErrors: null,
+        newProfilePicture: null,
+        newProfilePictureFormValue: null
+      });
     },
     validatePassword(state) {
       store.setState({
