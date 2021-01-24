@@ -7,19 +7,13 @@ import Select from 'react-select';
 class LightFadeInParams extends Component {
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.setState({ parameters: { ...this.state.parameters, durationValue: newValue}}, () => {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
-    })
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, durationValue: newValue });
   };
   handleChangeUnit = e => {
-    this.setState({ parameters: { ...this.state.parameters, durationUnit: e.target.value}}, () => {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
-    })
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, durationUnit: e.target.value });
   };
   handleChangeTargetBrightness = e => {
-    this.setState({ parameters: { ...this.state.parameters, targetBrightness: e.target.value}}, () => {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', this.state.parameters);
-    })
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, targetBrightness: e.target.value });
   }
   getOptions = async () => {
     try {

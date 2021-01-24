@@ -19,8 +19,14 @@ async function poll(device) {
     throw new NotFoundError(`HUE_API_NOT_FOUND`);
   }
   const state = await hueApi.lights.getLightState(lightId);
+
   const currentBinaryState = state.on ? 1 : 0;
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
+
+  const currentBrightnessState = state.bri;
+  const brightnessFeature = getDeviceFeature(
+    device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+  );
 
   // if the value is different from the value we have, save new state
   if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
@@ -28,6 +34,14 @@ async function poll(device) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
       state: currentBinaryState,
+    });
+  }
+
+  if (brightnessFeature && brightnessFeature.last_value !== currentBrightnessState) {
+    logger.debug(`Polling Philips Hue ${lightId}, new value = ${currentBrightnessState}`);
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
+      state: currentBrightnessState,
     });
   }
 }
