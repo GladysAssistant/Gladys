@@ -34,14 +34,14 @@ function createActions(store) {
     },
     async setValue(state, deviceFeatureSelector, value) {
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
-        value
+        parameters: { value }
       });
     },
     async updateValue(state, device, deviceFeature, roomIndex, deviceIndex, deviceFeatureIndex, value, oldValue) {
       actions.updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value);
       if (deviceFeature.category === 'light' && deviceFeature.type === 'binary') {
         await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-          value
+          parameters: { value }
         });
       }
     },

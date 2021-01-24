@@ -26,7 +26,7 @@ const actionsFunc = {
       device = self.stateManager.get('device', action.device);
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
-    return self.device.setValue(device, deviceFeature, action.value);
+    return self.device.setValue(device, deviceFeature, action.parameters.value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
@@ -67,7 +67,7 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
         );
-        await self.device.setValue(device, deviceFeature, action.value);
+        await self.device.setValue(device, deviceFeature, action.parameters.value);
       } catch (e) {
         logger.warn(e);
       }
@@ -135,28 +135,27 @@ const actionsFunc = {
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
       let timeToWaitMilliseconds;
-      switch (action.unit) {
+      switch (action.parameters.unit) {
         case 'milliseconds':
-          timeToWaitMilliseconds = action.value;
+          timeToWaitMilliseconds = action.parameters.value;
           break;
         case 'seconds':
-          timeToWaitMilliseconds = action.value * 1000;
+          timeToWaitMilliseconds = action.parameters.value * 1000;
           break;
         case 'minutes':
-          timeToWaitMilliseconds = action.value * 1000 * 60;
+          timeToWaitMilliseconds = action.parameters.value * 1000 * 60;
           break;
         case 'hours':
-          timeToWaitMilliseconds = action.value * 1000 * 60 * 60;
+          timeToWaitMilliseconds = action.parameters.value * 1000 * 60 * 60;
           break;
         default:
-          throw new Error(`Unit ${action.unit} not recognized`);
+          throw new Error(`Unit ${action.parameters.unit} not recognized`);
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    const textWithVariables = Handlebars.compile(action.text)(scope);
-    await self.message.sendToUser(action.user, textWithVariables);
+    await self.message.sendToUser(action.user, action.parameters.text);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);

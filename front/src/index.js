@@ -1,3 +1,4 @@
+import "preact/debug";
 import 'tabler-ui/dist/assets/css/dashboard.css';
 import 'dayjs/locale/en';
 import 'dayjs/locale/fr';

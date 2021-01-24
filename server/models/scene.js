@@ -3,6 +3,22 @@ const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
+const parametersSchema = Joi.alternatives().conditional('type', [
+  {
+    is: 'light.fade-in',
+    then: Joi.object({
+      durationValue: Joi.number().required(),
+      durationUnit: Joi.string().required(),
+      targetBrightness: Joi.number().required()
+    }),
+    otherwise: Joi.object({
+      unit: Joi.string(),
+      value: Joi.number(),
+      text: Joi.string()
+    })
+  }
+]);
+
 const actionSchema = Joi.array().items(
   Joi.array().items(
     Joi.object().keys({
@@ -16,7 +32,6 @@ const actionSchema = Joi.array().items(
       user: Joi.string(),
       house: Joi.string(),
       text: Joi.string(),
-      parameters: Joi.object(),
       value: Joi.number(),
       minutes: Joi.number(),
       unit: Joi.string(),
@@ -35,6 +50,7 @@ const actionSchema = Joi.array().items(
           value: Joi.string(),
         }),
       ),
+      parameters: parametersSchema,
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
