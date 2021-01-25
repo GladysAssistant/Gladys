@@ -22,7 +22,10 @@ const createGithubUrl = node => {
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
 
-const displayRawNode = node => () => {};
+const displayRawNode = node => () => {
+  // eslint-disable-next-line no-console
+  console.log(node);
+};
 
 class ZwaveNode extends Component {
   createDevice = async () => {
