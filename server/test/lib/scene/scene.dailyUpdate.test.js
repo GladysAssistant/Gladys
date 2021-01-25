@@ -53,7 +53,7 @@ describe('SceneManager', () => {
 
   it('should scheduleJob for sunrise/sunset for one house', async () => {
     await sceneManager.dailyUpdate();
-    expect(sceneManager.jobs).to.have.lengthOf.above(0);
+    expect(sceneManager.jobs).to.have.lengthOf(2);
 
     await sleep(10);
 
