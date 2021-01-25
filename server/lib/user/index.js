@@ -1,8 +1,10 @@
 const { create } = require('./user.create');
+const { destroy } = require('./user.destroy');
 const { login } = require('./user.login');
 const { init } = require('./user.init');
 const { get } = require('./user.get');
 const { getById } = require('./user.getById');
+const { getBySelector } = require('./user.getBySelector');
 const { getPicture } = require('./user.getPicture');
 const { getUserCount } = require('./user.getUserCount');
 const { getByTelegramUserId } = require('./user.getByTelegramUserId');
@@ -17,11 +19,13 @@ const User = function User(session, stateManager, variable) {
 };
 
 User.prototype.create = create;
+User.prototype.destroy = destroy;
 User.prototype.login = login;
 User.prototype.forgotPassword = forgotPassword;
 User.prototype.get = get;
 User.prototype.init = init;
 User.prototype.getById = getById;
+User.prototype.getBySelector = getBySelector;
 User.prototype.getPicture = getPicture;
 User.prototype.getUserCount = getUserCount;
 User.prototype.getByTelegramUserId = getByTelegramUserId;

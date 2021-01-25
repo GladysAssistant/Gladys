@@ -329,6 +329,15 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: userController.getUsers,
     },
+    'get /api/v1/user/:user_selector': {
+      authenticated: true,
+      controller: userController.getUserBySelector,
+    },
+    'delete /api/v1/user/:user_selector': {
+      authenticated: true,
+      admin: true,
+      controller: userController.deleteUser,
+    },
     'get /api/v1/me': {
       authenticated: true,
       controller: userController.getMySelf,
