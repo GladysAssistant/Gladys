@@ -161,7 +161,15 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
+          <Select
+            styles={{
+              // Fixes the overlapping problem of the component
+              menu: provided => ({ ...provided, zIndex: 2 })
+            }}
+            options={userOptions}
+            value={selectedOption}
+            onChange={this.handleChange}
+          />
         </div>
         <div class="form-group">
           <label class="form-label">
