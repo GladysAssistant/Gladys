@@ -52,8 +52,8 @@ describe('SceneManager', () => {
   });
 
   it('should scheduleJob for sunrise/sunset for one house', async () => {
-    const jobs = await sceneManager.dailyUpdate();
-    expect(jobs).to.have.lengthOf(2);
+    await sceneManager.dailyUpdate();
+    expect(sceneManager.jobs).to.have.lengthOf.above(0);
 
     await sleep(10);
 
@@ -67,13 +67,13 @@ describe('SceneManager', () => {
         longitude: null,
       },
     ]);
-    const jobs = await sceneManager.dailyUpdate();
-    expect(jobs).to.have.lengthOf(0);
+    await sceneManager.dailyUpdate();
+    expect(sceneManager.jobs).to.have.lengthOf(0);
   });
 
   it("shouldn't scheduleJob for sunrise/sunset when no house", async () => {
     house.get = fake.resolves([]);
-    const jobs = await sceneManager.dailyUpdate();
-    expect(jobs).to.have.lengthOf(0);
+    await sceneManager.dailyUpdate();
+    expect(sceneManager.jobs).to.have.lengthOf(0);
   });
 });
