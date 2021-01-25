@@ -897,8 +897,8 @@
       },
       "time": {
         "changed": "Déclenchement programmé",
-        "sunrise": "A chaque levé de soleil",
-        "sunset": "A chaque couché de soleil"
+        "sunrise": "A chaque lever de soleil",
+        "sunset": "A chaque coucher de soleil"
       }
     },
     "triggersCard": {

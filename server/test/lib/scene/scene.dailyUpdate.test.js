@@ -60,7 +60,18 @@ describe('SceneManager', () => {
     assert.called(event.emit);
   });
 
-  it("shouldn't scheduleJob for sunrise/sunset", async () => {
+  it("shouldn't scheduleJob for sunrise/sunset when house doesn't have location", async () => {
+    house.get = fake.resolves([
+      {
+        latitude: null,
+        longitude: null,
+      },
+    ]);
+    const jobs = await sceneManager.dailyUpdate();
+    expect(jobs).to.have.lengthOf(0);
+  });
+
+  it("shouldn't scheduleJob for sunrise/sunset when no house", async () => {
     house.get = fake.resolves([]);
     const jobs = await sceneManager.dailyUpdate();
     expect(jobs).to.have.lengthOf(0);

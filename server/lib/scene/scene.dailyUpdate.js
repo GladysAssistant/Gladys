@@ -13,25 +13,26 @@ async function dailyUpdate() {
   const jobs = [];
 
   houses.forEach((house) => {
-    const times = this.sunCalc.getTimes(new Date(), house.latitude, house.longitude);
+    if (house.latitude !== null && house.longitude !== null) {
+      const times = this.sunCalc.getTimes(new Date(), house.latitude, house.longitude);
+      jobs.push(
+        schedule.scheduleJob(times.sunrise, () =>
+          this.event.emit(EVENTS.TRIGGERS.CHECK, {
+            type: EVENTS.TIME.SUNRISE,
+            house,
+          }),
+        ),
+      );
 
-    jobs.push(
-      schedule.scheduleJob(times.sunrise, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNRISE,
-          house,
-        }),
-      ),
-    );
-
-    jobs.push(
-      schedule.scheduleJob(times.sunset, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNSET,
-          house,
-        }),
-      ),
-    );
+      jobs.push(
+        schedule.scheduleJob(times.sunset, () =>
+          this.event.emit(EVENTS.TRIGGERS.CHECK, {
+            type: EVENTS.TIME.SUNSET,
+            house,
+          }),
+        ),
+      );
+    }
   });
   return jobs;
 }
