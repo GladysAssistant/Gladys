@@ -333,6 +333,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: userController.getUserBySelector,
     },
+    'patch /api/v1/user/:user_selector': {
+      authenticated: true,
+      admin: true,
+      controller: userController.update,
+    },
     'delete /api/v1/user/:user_selector': {
       authenticated: true,
       admin: true,

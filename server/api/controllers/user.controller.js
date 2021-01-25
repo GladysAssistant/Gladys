@@ -86,6 +86,17 @@ module.exports = function UserController(gladys) {
   }
 
   /**
+   * @api {patch} /api/v1/user/:user_selector updateUser
+   * @apiName updateUser
+   * @apiGroup User
+   *
+   */
+  async function update(req, res) {
+    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body);
+    res.json(user);
+  }
+
+  /**
    * @api {delete} /api/v1/user/:user_selector deleteUser
    * @apiName deleteUser
    * @apiGroup User
@@ -194,6 +205,7 @@ module.exports = function UserController(gladys) {
     getMySelf: asyncMiddleware(getMySelf),
     getUsers: asyncMiddleware(getUsers),
     getUserBySelector: asyncMiddleware(getUserBySelector),
+    update: asyncMiddleware(update),
     deleteUser: asyncMiddleware(deleteUser),
     getMyPicture: asyncMiddleware(getMyPicture),
     updateMySelf: asyncMiddleware(updateMySelf),

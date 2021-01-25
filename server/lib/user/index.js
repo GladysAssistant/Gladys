@@ -10,6 +10,7 @@ const { getUserCount } = require('./user.getUserCount');
 const { getByTelegramUserId } = require('./user.getByTelegramUserId');
 const { forgotPassword } = require('./user.forgotPassword');
 const { update } = require('./user.update');
+const { updateBySelector } = require('./user.updateBySelector');
 const { updatePassword } = require('./user.updatePassword');
 
 const User = function User(session, stateManager, variable) {
@@ -30,6 +31,7 @@ User.prototype.getPicture = getPicture;
 User.prototype.getUserCount = getUserCount;
 User.prototype.getByTelegramUserId = getByTelegramUserId;
 User.prototype.update = update;
+User.prototype.updateBySelector = updateBySelector;
 User.prototype.updatePassword = updatePassword;
 
 module.exports = User;
