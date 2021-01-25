@@ -11,6 +11,9 @@ const helpTextStyle = {
   marginBottom: '.375rem'
 };
 
+const OPENING_VARIABLE = '{{';
+const CLOSING_VARIABLE = '}}';
+
 @connect('httpClient', {})
 class SendMessageParams extends Component {
   getOptions = async () => {
@@ -93,7 +96,7 @@ class SendMessageParams extends Component {
     }
     this.tagify = new Tagify(this.tagifyInputRef, {
       mode: 'mix',
-      pattern: /{{/,
+      pattern: new RegExp(OPENING_VARIABLE),
       duplicates: true,
       enforceWhitelist: true,
       tagTextProp: 'text',
@@ -103,11 +106,11 @@ class SendMessageParams extends Component {
         mapValueTo: 'title'
       },
       whitelist: this.state.variableWhileList,
-      mixTagsInterpolator: ['{{', '}}']
+      mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
     });
     const text = this.props.action.text || '';
-    if (text.search('{{') !== -1 && text.search('}}') !== -1) {
-      const textFormatted = text.replaceAll('{{', '[[').replaceAll('}}', ']]');
+    if (text.search(OPENING_VARIABLE) !== -1 && text.search(CLOSING_VARIABLE) !== -1) {
+      const textFormatted = text.replaceAll(OPENING_VARIABLE, '[[').replaceAll(CLOSING_VARIABLE, ']]');
       this.tagify.loadOriginalValues(textFormatted);
     } else {
       this.tagify.loadOriginalValues(text);
@@ -120,10 +123,10 @@ class SendMessageParams extends Component {
   parseText = textContent => {
     let text = textContent ? textContent : '';
     this.state.variableWhileList.forEach(variable => {
-      text = text.replaceAll(variable.text, `{{${variable.id}}}`);
+      text = text.replaceAll(variable.text, `${OPENING_VARIABLE}${variable.id}${CLOSING_VARIABLE}`);
     });
-    text = text.replaceAll('\n{{', '{{');
-    text = text.replaceAll('}}\n', '}}');
+    text = text.replaceAll(`\n${OPENING_VARIABLE}`, OPENING_VARIABLE);
+    text = text.replaceAll(`${CLOSING_VARIABLE}\n`, CLOSING_VARIABLE);
     text = text.trim();
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
   };
