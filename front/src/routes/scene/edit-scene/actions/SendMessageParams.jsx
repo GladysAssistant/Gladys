@@ -6,6 +6,11 @@ import get from 'get-value';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
+const helpTextStyle = {
+  fontSize: 12,
+  marginBottom: '.375rem'
+};
+
 @connect('httpClient', {})
 class SendMessageParams extends Component {
   getOptions = async () => {
@@ -162,6 +167,9 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
+          <div style={helpTextStyle}>
+            <Text id="editScene.actionsCard.messageSend.explanationText" />
+          </div>
           <div className="tags-input">
             <textarea ref={this.setRef} class="form-control" />
           </div>
