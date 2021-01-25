@@ -25,7 +25,7 @@ async function dailyUpdate() {
           house,
         }),
       );
-      if(sunriseJob){
+      if (sunriseJob) {
         this.jobs.push(sunriseJob);
       }
 
@@ -36,7 +36,7 @@ async function dailyUpdate() {
         }),
       );
 
-      if(sunsetJob){
+      if (sunsetJob) {
         this.jobs.push(sunsetJob);
       }
     }
