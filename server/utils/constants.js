@@ -231,6 +231,9 @@ const INTENTS = {
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
   },
+  HUMIDITY_SENSOR: {
+    GET_IN_ROOM: 'intent.humidity-sensor.get-in-room',
+  },
   WEATHER: {
     GET: 'intent.weather.get',
   },
@@ -436,6 +439,7 @@ const DASHBOARD_TYPE = {
 const DASHBOARD_BOX_TYPE = {
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
+  HUMIDITY_IN_ROOM: 'humidity-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
