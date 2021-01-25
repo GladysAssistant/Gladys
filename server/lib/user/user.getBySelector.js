@@ -19,7 +19,10 @@ async function getBySelector(selector) {
     throw new NotFoundError('User not found');
   }
 
-  return user.get({ plain: true });
+  const userPlain = user.get({ plain: true });
+  delete userPlain.password;
+  delete userPlain.telegram_user_id;
+  return userPlain;
 }
 
 module.exports = {

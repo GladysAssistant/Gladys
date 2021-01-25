@@ -25,7 +25,10 @@ async function updateBySelector(selector, newUser) {
   await user.update(newUser);
   const userPlain = user.get({ plain: true });
   this.stateManager.setState('user', user.selector, userPlain);
-  return userPlain;
+  const userPlainCopied = { ...userPlain };
+  delete userPlainCopied.password;
+  delete userPlainCopied.telegram_user_id;
+  return userPlainCopied;
 }
 
 module.exports = {
