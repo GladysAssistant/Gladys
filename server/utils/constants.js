@@ -133,6 +133,11 @@ const EVENTS = {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
   },
+  HOUSE: {
+    CREATE: 'house.create',
+    UPDATE: 'house.update',
+    DELETE: 'house.delete',
+  },
 };
 
 const LIFE_EVENTS = {
