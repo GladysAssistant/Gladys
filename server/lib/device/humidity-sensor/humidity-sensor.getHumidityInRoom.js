@@ -46,10 +46,7 @@ async function getHumidityInRoom(roomId) {
   let total = 0;
 
   deviceFeatures.forEach((deviceFeature) => {
-    let humidity;
-
-    humidity = deviceFeature.last_value;
-
+    const humidity = deviceFeature.last_value;
     total += humidity;
   });
 
