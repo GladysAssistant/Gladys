@@ -1,5 +1,7 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
+
 import { ACTIONS } from '../../../../../server/utils/constants';
 
 // Actions cards
@@ -32,7 +34,13 @@ const ACTION_ICON = {
 };
 
 const ActionCard = ({ children, ...props }) => (
-  <div class={props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ? 'col-lg-12' : 'col-lg-4'}>
+  <div
+    class={cx({
+      'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+      'col-lg-6': props.action.type === ACTIONS.MESSAGE.SEND,
+      'col-lg-4': props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF && props.action.type !== ACTIONS.MESSAGE.SEND
+    })}
+  >
     <div class="card">
       <div class="card-header">
         {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
@@ -118,6 +126,8 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
