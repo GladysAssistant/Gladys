@@ -4,7 +4,7 @@ import get from 'get-value';
 import CreateUserPage from './CreateUserPage';
 import SettingsLayout from '../../SettingsLayout';
 import slugify from '../../../../utils/slugify';
-import { RequestStatus, CreateUserErrors } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
 import actions from '../../../../actions/profile';
 
 @connect(

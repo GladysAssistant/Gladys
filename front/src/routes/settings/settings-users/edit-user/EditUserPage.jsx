@@ -25,7 +25,7 @@ const UserPage = ({ children, ...props }) => (
             <div class="dimmer-content">
               {props.newUser && <Profile {...props} language="en" disablePassword />}
               <div class="form-group">
-                <button onClick={props.saveProfile} class="btn btn-success">
+                <button onClick={props.updateUser} class="btn btn-success">
                   <Text id="profile.saveButton" />
                 </button>
               </div>
@@ -57,7 +57,7 @@ const UserPage = ({ children, ...props }) => (
                       'is-invalid': get(props, 'errors.password'),
                       'is-valid': props.validPassword && !get(props, 'errors.password')
                     })}
-                    value={props.newUser.password}
+                    value={get(props, 'newUser.password')}
                     onInput={props.updatePassword}
                     placeholder={<Text id="profile.passwordPlaceholder" />}
                   />
@@ -78,7 +78,7 @@ const UserPage = ({ children, ...props }) => (
                       'is-invalid': get(props, 'errors.passwordRepeat'),
                       'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
                     })}
-                    value={props.newUser.passwordRepeat}
+                    value={get(props, 'newUser.passwordRepeat')}
                     onInput={props.updatePasswordRepeat}
                     placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
                   />
