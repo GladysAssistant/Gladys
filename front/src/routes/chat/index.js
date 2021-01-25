@@ -10,10 +10,12 @@ class Chat extends Component {
   componentDidMount() {
     this.props.getMessages();
     this.props.session.dispatcher.addListener('message.new', this.newChatMessage);
+    this.props.session.dispatcher.addListener('message.sent', this.newChatMessage);
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener('message.new', this.newChatMessage);
+    this.props.session.dispatcher.removeListener('message.sent', this.newChatMessage);
   }
 
   render({}, {}) {

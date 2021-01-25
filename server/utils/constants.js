@@ -376,6 +376,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    SENT: 'message.sent',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',

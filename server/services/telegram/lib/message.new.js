@@ -30,7 +30,7 @@ async function newMessage(msg) {
     user_id: user.id,
     user,
     language: user.language,
-    date: msg.date,
+    created_at: new Date(msg.date * 1000).toISOString(),
     text: msg.text,
   };
   this.gladys.event.emit(EVENTS.MESSAGE.NEW, message);

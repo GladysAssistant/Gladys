@@ -43,13 +43,18 @@ function createActions(store) {
       });
     },
     pushMessage(state, message) {
+      let newMessages = store.getState().messages;
+      // Check if message is already in the list
+      if (message.id && newMessages.filter(m => m.id === message.id).length) {
+        return;
+      }
       store.setState({
         gladysIsTyping: true
       });
       actions.scrollToBottom();
       const randomWait = Math.floor(Math.random() * TYPING_MAX_TIME) + TYPING_MIN_TIME;
       setTimeout(() => {
-        let newMessages = update(store.getState().messages, {
+        newMessages = update(store.getState().messages, {
           $push: [message]
         });
         newMessages = sortMessages(newMessages);
@@ -74,15 +79,16 @@ function createActions(store) {
       });
       const messageText = state.currentMessageTextInput;
       try {
+        const id = uuid.v4();
         const newMessage = {
           text: messageText,
-          created_at: new Date()
+          created_at: new Date(),
+          id
         };
-        const tempId = uuid.v4();
         // we first push the message
         const newState = update(state, {
           messages: {
-            $push: [Object.assign({}, newMessage, { tempId })]
+            $push: [Object.assign({}, newMessage, { id })]
           },
           MessageSendStatus: {
             $set: RequestStatus.Getting
@@ -96,7 +102,7 @@ function createActions(store) {
         actions.scrollToBottom();
         // then we send the message
         const createdMessage = await state.httpClient.post('/api/v1/message', newMessage);
-        const messagesWithoutTempMessage = store.getState().messages.filter(message => message.tempId !== tempId);
+        const messagesWithoutTempMessage = store.getState().messages.filter(message => message.id !== id);
         messagesWithoutTempMessage.push(createdMessage);
         // then we remove the message loading
         const finalState = update(state, {
