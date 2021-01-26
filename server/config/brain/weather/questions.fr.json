@@ -2,6 +2,7 @@
   {
     "label": "weather.get",
     "questions": [
+      "Donne moi la météo",
       "Quel temps fait-il %day% ?",
       "Donne moi la météo pour %day%",
       "Quel temps fera t'il %day% ?",
