@@ -1,0 +1,21 @@
+# Default Owner
+*       @Pierre-Gilles
+
+# CI
+/docker @VonOx
+/.github/workflows @VonOx @Pierre-Gilles
+
+# Services Owners
+bluetooth/ @atrovato
+caldav/ @bertrandda
+ewelink/ @NickDub
+mqtt/ @atrovato
+openweather/ @callemand
+philips-hue/ @VonOx @hotfix31
+rtsp-camera/ @Pierre-Gilles
+tasmota/ @atrovato
+telegram/ @Pierre-Gilles
+tp-link/ @cicoub13
+usb/ @Pierre-Gilles @atrovato
+xiaomi/ @Pierre-Gilles
+netatmo/ @thibautmery @Terdious
