@@ -8,7 +8,7 @@ on:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout Gladys code
@@ -47,7 +47,7 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout Gladys code
@@ -107,7 +107,7 @@ jobs:
     needs:
       - test-front
       - test-server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout code
@@ -139,7 +139,7 @@ jobs:
   docker:
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
