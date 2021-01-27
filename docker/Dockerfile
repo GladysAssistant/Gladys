@@ -8,7 +8,7 @@ LABEL \
   org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.version=$VERSION
 
-# COPY qemu-* /usr/bin/
+COPY qemu-* /usr/bin/
 
 # System dependencies
 RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev
