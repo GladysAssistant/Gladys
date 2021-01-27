@@ -74,7 +74,7 @@ jobs:
         name: 💽 Install System Dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y libudev-dev sqlite3 openssl
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - 
         name: 📦 Install Global NPM Packages
         run: |
