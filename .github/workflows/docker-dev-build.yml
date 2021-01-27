@@ -15,7 +15,7 @@ on:
 jobs:
   build-front:
     name: Front build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout code
@@ -47,7 +47,7 @@ jobs:
   docker:
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
