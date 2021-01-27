@@ -97,13 +97,8 @@
     "semver": "^6.1.1",
     "sequelize": "^4.42.0",
     "sequelize-cli": "^5.5.1",
-<<<<<<< HEAD
-    "sinon": "^7.5.0",
-    "sqlite3": "^4.2.0",
-=======
     "set-value": "^3.0.2",
     "sqlite3": "^4.0.6",
->>>>>>> 65789bdadd9a48db0698e7ca631d196441765b4f
     "tracer": "^0.9.8",
     "umzug": "^2.2.0",
     "uuid": "^3.3.2",
