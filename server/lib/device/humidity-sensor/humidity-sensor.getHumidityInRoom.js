@@ -1,17 +1,24 @@
 const { Op } = require('sequelize');
 const logger = require('../../../utils/logger');
 const db = require('../../../models');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+
+const DEFAULT_PARAMETERS = {
+  unit: DEVICE_FEATURE_UNITS.PERCENT,
+};
 
 /**
  * @description Return the average value of the humidity in a room.
  * @param {string} roomId - The uuid of the room.
  * @returns {Promise} - Resolve with the humidity and the unit.
  * @example
- * getHumidityInRoom('d65deccf-d8fc-4674-ac50-3d98d1d87aba');
+ * getHumidityInRoom('d65deccf-d8fc-4674-ac50-3d98d1d87aba', {
+ *  unit: 'percent',
+ * });
  */
 async function getHumidityInRoom(roomId) {
   logger.debug(`Getting average humidity in room ${roomId}`);
+  const optionsWithDefault = Object.assign({}, DEFAULT_PARAMETERS);
 
   const oneHourAgo = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
   const deviceFeatures = await db.DeviceFeature.findAll({
@@ -40,6 +47,7 @@ async function getHumidityInRoom(roomId) {
   if (deviceFeatures.length === 0) {
     return {
       humidity: null,
+      unit: optionsWithDefault.unit,
     };
   }
 
@@ -56,6 +64,7 @@ async function getHumidityInRoom(roomId) {
   // return humidity and unit
   return {
     humidity: averageHumidity,
+    unit: optionsWithDefault.unit,
   };
 }
 

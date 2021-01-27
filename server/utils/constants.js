@@ -112,6 +112,9 @@ const EVENTS = {
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
   },
+  HUMIDITY_SENSOR: {
+    HUMIDITY_CHANGED: 'humidity.changed',
+  },
   SCHEDULED_SCENE: {
     ENABLED: 'scheduled-scene.enabled',
     DISABLED: 'scheduled-scene.disabled',
