@@ -78,6 +78,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static
+          path: static
       - 
         name: 🔑 Login to DockerHub
         uses: docker/login-action@v1
