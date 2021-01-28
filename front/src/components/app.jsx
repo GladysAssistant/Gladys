@@ -58,7 +58,9 @@ import TelegramPage from '../routes/integration/all/telegram';
 import CaldavPage from '../routes/integration/all/caldav';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
+import PhilipsHueDiscoverPage from '../routes/integration/all/philips-hue/discover-device';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
+import PhilipsHueEditPage from '../routes/integration/all/philips-hue/device-page/edit-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
@@ -172,7 +174,11 @@ const AppRouter = connect(
           to="/dashboard/integration/device/philips-hue/device"
         />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
+        <PhilipsHueDiscoverPage path="/dashboard/integration/device/philips-hue/discover" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
+        
+        <PhilipsHueEditPage path="/dashboard/integration/device/philips-hue/edit/:deviceSelector" />
+
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />

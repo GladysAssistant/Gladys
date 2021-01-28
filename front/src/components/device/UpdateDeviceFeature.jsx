@@ -11,6 +11,9 @@ class UpdateDeviceFeature extends Component {
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
+  updateCategory = e => {
+    //this.props.updateTriggerProperty(this.props.index, 'threshold_only', e.target.checked);
+  };
 
   render({ feature, featureIndex, ...props }) {
     return (
@@ -117,6 +120,21 @@ class UpdateDeviceFeature extends Component {
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">
                   <Text id="editDeviceForm.deleteLabel" />
                 </button>
+              </div>
+            )}
+            {feature.category === "switch" && feature.type === "binary" && (
+              <div class="col-12">
+                <label class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    checked={feature.changeCategory}
+                    onChange={this.updateCategory}
+                  />
+                  <span class="form-check-label">
+                    <Text id="editDeviceForm.checkbox.changeCategory" />
+                  </span>
+                </label>
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceForm from './DeviceForm';
@@ -47,6 +48,11 @@ class PhilipsHueDeviceBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.mqtt.device.deleteButton" />
                   </button>
+                  <Link href={`/dashboard/integration/device/philips-hue/edit/${props.device.selector}`}>
+                    <button class="btn btn-secondary float-right">
+                      <Text id="integration.philipsHue.device.editButton" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

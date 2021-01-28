@@ -364,6 +364,7 @@
       "title": "Philips Hue",
       "description": "Contrôler les lumières Philips Hue.",
       "deviceTab": "Appareils",
+      "discoverTab": "Découverte des appareils",
       "setupTab": "Configuration des Ponts",
       "setup": {
         "connectedBridgesTitle": "Ponts connectés",
@@ -380,6 +381,7 @@
         "title": "Appareils dans Gladys",
         "deviceOnNetworkTitle": "Appareils détectés sur le réseau",
         "connectButton": "Connecter/Reconnecter",
+        "editButton": "Editer",
         "search": "Recherche d'appareils",
         "noDevices": "Aucun appareil Philips Hue ajouté.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
@@ -1406,6 +1408,9 @@
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
     "notFound": "Appareil recherché introuvable.",
+    "checkbox":{
+      "changeCategory": "Cocher si cette prise doit être considérée comme un éclairage."
+    },
     "pollFrequency": {
       "label": "Fréquence de rafraîchissement",
       "everyMinutes": "Toutes les minutes (recommandé)",
