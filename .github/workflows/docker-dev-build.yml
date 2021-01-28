@@ -15,16 +15,16 @@ on:
 jobs:
   build-front:
     name: Front build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout code
         uses: actions/checkout@v2
       - 
         name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: '12'
       - 
         name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
@@ -40,14 +40,14 @@ jobs:
           npm run build
       - 
         name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: static
           path: front/build
   docker:
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
@@ -75,9 +75,10 @@ jobs:
           version: latest
       - 
         name: ↙️ Download build artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static
+          path: static
       - 
         name: 🔑 Login to DockerHub
         uses: docker/login-action@v1
