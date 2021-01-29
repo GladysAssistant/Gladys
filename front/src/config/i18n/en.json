@@ -999,6 +999,12 @@
     "createUser": {
       "title": "Create a new user",
       "createUserButton": "Create user"
+    },
+    "editUser": {
+      "resetPassword": "Reset password",
+      "editPreferences": "Edit preferences",
+      "resetPasswordButton": "Reset password",
+      "saveButton": "Save"
     }
   },
   "sessionsSettings": {

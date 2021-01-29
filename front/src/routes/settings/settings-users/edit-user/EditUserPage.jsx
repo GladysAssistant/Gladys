@@ -1,9 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import get from 'get-value';
-
+import ResetPassword from './ResetPassword';
 import Profile from '../../../../components/user/profile';
-import cx from 'classnames';
 
 const UserPage = ({ children, ...props }) => (
   <div class="row">
@@ -42,59 +40,7 @@ const UserPage = ({ children, ...props }) => (
             <Text id="usersSettings.editUser.resetPassword" />
           </h3>
         </div>
-        <div class="card-body">
-          <div class={props.loading ? 'dimmer active' : 'dimmer'}>
-            <div class="loader" />
-            <div class="dimmer-content">
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="profile.passwordLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    type="password"
-                    class={cx('form-control', {
-                      'is-invalid': get(props, 'errors.password'),
-                      'is-valid': props.validPassword && !get(props, 'errors.password')
-                    })}
-                    value={get(props, 'newUser.password')}
-                    onInput={props.updatePassword}
-                    placeholder={<Text id="profile.passwordPlaceholder" />}
-                  />
-                </Localizer>
-                <div class="invalid-feedback">
-                  <Text id="profile.passwordError" />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="profile.passwordRepeatLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    type="password"
-                    class={cx('form-control', {
-                      'is-invalid': get(props, 'errors.passwordRepeat'),
-                      'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
-                    })}
-                    value={get(props, 'newUser.passwordRepeat')}
-                    onInput={props.updatePasswordRepeat}
-                    placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
-                  />
-                </Localizer>
-                <div class="invalid-feedback">
-                  <Text id="profile.passwordRepeatError" />
-                </div>
-              </div>
-              <div class="form-group">
-                <button onClick={props.saveProfile} class="btn btn-success">
-                  <Text id="profile.saveButton" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="card-body">{props.newUser && <ResetPassword userSelector={props.newUser.selector} />}</div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -135,7 +81,7 @@ const UserPage = ({ children, ...props }) => (
               </div>
               <div class="form-group">
                 <button onClick={props.saveProfile} class="btn btn-success">
-                  <Text id="profile.saveButton" />
+                  <Text id="usersSettings.editUser.saveButton" />
                 </button>
               </div>
             </div>
