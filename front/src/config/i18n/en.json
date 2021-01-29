@@ -1004,6 +1004,7 @@
       "createUserButton": "Create user"
     },
     "editUser": {
+      "title": "Edit user",
       "resetPassword": "Reset password",
       "editPreferences": "Edit preferences",
       "resetPasswordButton": "Reset password",

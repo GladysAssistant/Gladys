@@ -15,7 +15,7 @@ const UserPage = ({ children, ...props }) => (
                 <Text id="global.backButton" />
               </button>
             </Link>{' '}
-            <Text id="profile.editYourProfileTitle" />
+            <Text id="usersSettings.editUser.title" />
           </h3>
         </div>
         <div class="card-body">

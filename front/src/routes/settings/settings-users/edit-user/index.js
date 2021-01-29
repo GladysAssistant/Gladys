@@ -1,20 +1,18 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
-import slugify from '../../../../utils/slugify';
 import EditUserPage from './EditUserPage';
 import actions from '../../../../actions/profile';
 import SettingsLayout from '../../SettingsLayout';
 import { RequestStatus } from '../../../../utils/consts';
 
 @connect(
-  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue',
+  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
   actions
 )
 class SettingsUsers extends Component {
   updateFirstname = e => {
     this.props.updateNewUserProperty('firstname', e.target.value);
-    this.props.updateNewUserProperty('selector', slugify(e.target.value));
   };
   updateLastname = e => {
     this.props.updateNewUserProperty('lastname', e.target.value);
@@ -58,10 +56,13 @@ class SettingsUsers extends Component {
   }
 
   render(props, {}) {
+    const loading =
+      props.ProfileGetStatus === RequestStatus.Getting || props.ProfilePatchStatus === RequestStatus.Getting;
     return (
       <SettingsLayout currentUrl={props.currentUrl}>
         <EditUserPage
           {...props}
+          loading={loading}
           updateFirstname={this.updateFirstname}
           updateLastname={this.updateLastname}
           updateEmail={this.updateEmail}

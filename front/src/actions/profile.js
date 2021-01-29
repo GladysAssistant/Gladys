@@ -253,7 +253,6 @@ function createActions(store) {
         }
         await state.httpClient.patch(`/api/v1/user/${data.selector}`, data);
         store.setState({
-          ProfileGetStatus: RequestStatus.Getting,
           ProfilePatchStatus: RequestStatus.Success
         });
       } catch (e) {
