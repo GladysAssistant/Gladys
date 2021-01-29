@@ -1,5 +1,6 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const passwordUtils = require('../../utils/password');
 
 /**
  * @description Update a user by his selector.
@@ -20,6 +21,14 @@ async function updateBySelector(selector, newUser) {
 
   if (user === null) {
     throw new NotFoundError(`User not found`);
+  }
+
+  if (newUser.password && newUser.password.length < 8) {
+    throw new BadParameters('Password is too short');
+  }
+
+  if (newUser.password) {
+    newUser.password = await passwordUtils.hash(newUser.password);
   }
 
   await user.update(newUser);

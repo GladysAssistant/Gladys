@@ -41,6 +41,18 @@ describe('user.updateBySelector', () => {
       updated_at: updatedUser.updated_at,
     });
   });
+  it('should update user password', async () => {
+    const updatedUser = await user.updateBySelector('pepper', {
+      password: 'mybigpassword',
+    });
+    await user.login(updatedUser.email, 'mybigpassword');
+  });
+  it('should return error, password too short', async () => {
+    const promise = user.updateBySelector('pepper', {
+      password: 'test12',
+    });
+    return assert.isRejected(promise, 'Password is too short');
+  });
   it('should return error, picture too long', async () => {
     const promise = user.updateBySelector('pepper', {
       picture: tooLongImage.picture,
