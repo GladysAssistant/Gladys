@@ -996,6 +996,9 @@
     "newUserButton": "New",
     "editUserButton": "Edit",
     "deleteUserButton": "Delete",
+    "confirmDeleteUserButton": "Confirm delete?",
+    "cancelDeleteUser": "Cancel",
+    "deleteUserWarning": "Deleting the user will delete all data associated with this user (dashboard, location, preferences). Do you confirm you want to delete this user?",
     "createUser": {
       "title": "Create a new user",
       "createUserButton": "Create user"

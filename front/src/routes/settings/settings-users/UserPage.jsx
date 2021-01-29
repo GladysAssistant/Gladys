@@ -1,6 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
-
 import { Link } from 'preact-router/match';
+import UserCard from './UserCard';
 
 const UserPage = ({ children, ...props }) => (
   <div>
@@ -40,34 +40,9 @@ const UserPage = ({ children, ...props }) => (
       <div class="col-lg-12">
         <div class="row row-cards">
           {props.users &&
-            props.users.map(user => (
+            props.users.map((user, index) => (
               <div class="col-md-4">
-                <div class="card">
-                  <div class="card-body p-4 text-center">
-                    <span
-                      class="avatar avatar-xl mb-3 avatar-rounded"
-                      style={{ backgroundImage: `url(${user.picture})` }}
-                    />
-                    <h4 class="m-0 mb-1">
-                      {user.firstname} {user.lastname}
-                    </h4>
-                    <div class="mt-3">
-                      <span class="tag tag-green">{user.role}</span>
-                    </div>
-                  </div>
-                  <div class="card-footer">
-                    <div class="btn-list text-center">
-                      <a href={`/dashboard/settings/user/edit/${user.selector}`} class="btn btn-outline-primary btn-sm">
-                        <i class="fe fe-edit" />
-                        <Text id="usersSettings.editUserButton" />
-                      </a>
-                      <button class="btn btn-outline-danger btn-sm">
-                        <i class="fe fe-trash" />
-                        <Text id="usersSettings.deleteUserButton" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <UserCard user={user} removeUserFromList={props.removeUserFromList} index={index} />
               </div>
             ))}
         </div>
