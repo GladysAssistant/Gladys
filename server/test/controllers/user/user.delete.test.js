@@ -18,6 +18,13 @@ describe('DELETE /api/v1/user/:user_selector', () => {
       .expect('Content-Type', /json/)
       .expect(404);
   });
+  it('should try to delete our own account and fail', async () => {
+    // delete john should return 400
+    await authenticatedRequest
+      .delete('/api/v1/user/john')
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
   it('should return 404 not found', async () => {
     await authenticatedRequest
       .delete('/api/v1/user/USER_DONT_EXIST')

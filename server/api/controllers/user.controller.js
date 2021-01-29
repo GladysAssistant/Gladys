@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const logger = require('../../utils/logger');
+const { BadParameters } = require('../../utils/coreErrors');
 
 const LOGIN_SESSION_VALIDITY_IN_SECONDS = 30 * 24 * 60 * 60;
 
@@ -103,6 +104,9 @@ module.exports = function UserController(gladys) {
    *
    */
   async function deleteUser(req, res) {
+    if (req.user.selector === req.params.user_selector) {
+      throw new BadParameters('You cannot delete yourself');
+    }
     await gladys.user.destroy(req.params.user_selector);
     res.json({
       success: true,
