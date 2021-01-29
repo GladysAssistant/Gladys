@@ -17,47 +17,50 @@ async function getHomeStatusData() {
         access_token: this.token,
       };
       const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
-      home.modules.forEach((module) => {
-        // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
-        // if (module.type === 'NSD') {
-        //   smokedetectors = module;
-        //   const indexSmokedetectorsHomeStatus = responseHomeStatus.data.body.home.modules.findIndex((element) =>
-        //     element.id === smokedetectors.id
-        //   );
-        //   const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) =>
-        //     element.id === smokedetectors.room_id
-        //   );
-        //
-        //   // then we get the 2nd part of the smoke detectors - no interesting data for the moment -
-        //   // pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
-        //   smokedetectors['homeStatus'] = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
-        //   // then we get the 3rd part of the smoke detectors : rooms
-        //   smokedetectors['room'] = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-        //   this.newValueSmokeDetector(smokedetectors);
-        // }
+      if (home.modules !== undefined) {
+        home.modules.forEach((module) => {
+          // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
+          // if (module.type === 'NSD') {
+          //   smokedetectors = module;
+          //   const indexSmokedetectorsHomeStatus = responseHomeStatus.data.body.home.modules.findIndex((element) =>
+          //     element.id === smokedetectors.id
+          //   );
+          //   const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) =>
+          //     element.id === smokedetectors.room_id
+          //   );
+          //
+          //   // then we get the 2nd part of the smoke detectors - no interesting data for the moment -
+          //   // pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
+          //   smokedetectors['homeStatus'] = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
+          //   // then we get the 3rd part of the smoke detectors : rooms
+          //   smokedetectors['room'] = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
+          //   this.newValueSmokeDetector(smokedetectors);
+          // }
+          if (module.type === 'NRV') {
+            // then we get the 1st part of the valves
+            const valves = module;
+            const indexValveHomeStatus = responseHomeStatus.data.body.home.modules.findIndex(
+              (element) => element.id === valves.id,
+            );
+            const indexRoomHomeStatus = responseHomeStatus.data.body.home.rooms.findIndex(
+              (element) => element.id === valves.room_id,
+            );
 
-        if (module.type === 'NRV') {
-          // then we get the 1st part of the valves
-          const valves = module;
-          const indexValveHomeStatus = responseHomeStatus.data.body.home.modules.findIndex(
-            (element) => element.id === valves.id,
-          );
-          const indexRoomHomeStatus = responseHomeStatus.data.body.home.rooms.findIndex(
-            (element) => element.id === valves.room_id,
-          );
+            // then we get the 2nd part of the valves
+            valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
+            // then we get the 3rd part of the valves : rooms
+            valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
 
-          // then we get the 2nd part of the valves
-          valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
-          // then we get the 3rd part of the valves : rooms
-          valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-
-          const sid = valves.id;
-          if (this.devices[sid] === undefined) {
-            this.newValueValve(valves);
+            const sid = valves.id;
+            if (this.devices[sid] === undefined) {
+              this.newValueValve(valves);
+            }
+            this.devices[sid] = valves;
           }
-          this.devices[sid] = valves;
-        }
-      });
+        });
+      } else {
+        logger.info(`Files getHomeStatusData - No data devices`);
+      }
     });
   } catch (err) {
     logger.info(`Error on getHomeStatusData - ${err}`);

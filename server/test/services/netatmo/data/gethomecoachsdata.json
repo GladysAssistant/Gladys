@@ -3,7 +3,7 @@
     "devices": [
       {
         "_id": "17:cc:50:67:aa:08",
-        "station_name": "Air Chambre parental ",
+        "station_name": "Air Chambre parental",
         "date_setup": 1605532232,
         "last_setup": 1605532232,
         "type": "NHC",

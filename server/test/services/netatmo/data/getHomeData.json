@@ -88,7 +88,7 @@
             "id": "17:cc:50:67:aa:04",
             "type": "NOC",
             "status": "on",
-            "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.255.255/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH91,,",
+            "vpn_url": "https://test.com",
             "is_local": true,
             "sd_status": "on",
             "alim_status": "on",
@@ -102,7 +102,7 @@
             "id": "17:cc:50:67:aa:05",
             "type": "NOC",
             "status": "on",
-            "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.226.229/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH92,,",
+            "vpn_url": "https://test.com",
             "is_local": true,
             "sd_status": "on",
             "alim_status": "on",
@@ -110,18 +110,6 @@
             "last_setup": 1608493953,
             "light_mode_status": "auto",
             "siren_status": "warning"
-          },
-          {
-            "id": "17:cc:50:67:aa:06",
-            "type": "NDB",
-            "status": "disconnected",
-            "websocket_connected": false,
-            "sd_status": "on",
-            "alim_status": "on",
-            "name": "Sonnette Vidéo Intelligente",
-            "last_setup": 1608051497,
-            "quick_display_zone": 50,
-            "max_peers_reached": false
           }
         ],
         "smokedetectors": [

@@ -1,6 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS } = require('../../../../utils/constants');
-const { getDeviceFeatureBySelector } = require('../../../../utils/device');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -14,18 +12,7 @@ async function updateNHC(key, device, deviceSelector) {
   // we save other home coach data
   try {
     const healthIndexValue = this.devices[key].dashboard_data.health_idx;
-
-    const feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-health-idx`);
-    if (parseInt(feature.last_value, 16) !== parseInt(healthIndexValue, 16)) {
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `netatmo:${key}:health_idx`,
-        state: healthIndexValue,
-      });
-    } else {
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-        device_feature_external_id: `netatmo:${key}:health_idx`,
-      });
-    }
+    await this.updateFeature(key, device, deviceSelector, 'health_idx', healthIndexValue);
   } catch (e) {
     logger.error(
       `Netatmo : File netatmo.updateNHC.js - Health Home Coach ${this.devices[key].station_name} - health index - error : ${e}`,

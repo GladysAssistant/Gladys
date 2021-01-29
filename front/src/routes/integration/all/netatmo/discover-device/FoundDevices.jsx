@@ -4,8 +4,8 @@ import cx from 'classnames';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const createDevice = (props, device) => () => {
-  props.createDevice(device);
+const createDevice = (props, device, index) => () => {
+  props.createDevice(device, index);
 };
 
 const FoundDevices = ({ children, ...props }) => (
@@ -42,7 +42,7 @@ const FoundDevices = ({ children, ...props }) => (
                     <div class="card-body">
                       <t>
                         {!device.not_handled && (
-                          <button class="btn btn-success" onClick={createDevice(props, device)}>
+                          <button class="btn btn-success" onClick={createDevice(props, device, index)}>
                             <Text id="integration.netatmo.device.addDeviceButton" />
                           </button>
                         )}

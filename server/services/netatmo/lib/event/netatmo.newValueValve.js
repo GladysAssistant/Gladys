@@ -14,11 +14,11 @@ const {
  */
 function newValueValve(data) {
   const sid = data.id;
-  let newValve;
-  logger.debug(`Netatmo : New valve, sid = ${sid}`);
+
   // we create the valve device
   if (data.type === 'NRV') {
-    newValve = {
+    logger.debug(`Netatmo : New valve, sid = ${sid} - ${data.type}`);
+    const newValve = {
       name: data.name,
       should_poll: false,
       external_id: `netatmo:${sid}`,
@@ -110,8 +110,8 @@ function newValueValve(data) {
         },
       ],
     };
+    this.addSensor(sid, newValve);
   }
-  this.addSensor(sid, newValve);
 }
 
 module.exports = {

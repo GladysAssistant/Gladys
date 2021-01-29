@@ -1,6 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS } = require('../../../../utils/constants');
-const { getDeviceFeatureBySelector } = require('../../../../utils/device');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -12,40 +10,19 @@ const { getDeviceFeatureBySelector } = require('../../../../utils/device');
  */
 async function updateWeatherStation(key, device, deviceSelector) {
   try {
-    let feature;
     if (device !== undefined) {
       const minTempValue = this.devices[key].dashboard_data.min_temp;
       const maxTempValue = this.devices[key].dashboard_data.max_temp;
 
       try {
-        feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-min-temp`);
-        if (parseFloat(feature.last_value) !== parseFloat(minTempValue)) {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: `netatmo:${key}:min_temp`,
-            state: minTempValue,
-          });
-        } else {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-            device_feature_external_id: `netatmo:${key}:min_temp`,
-          });
-        }
+        await this.updateFeature(key, device, deviceSelector, 'min_temp', minTempValue);
       } catch (e) {
         logger.error(
           `Netatmo : File netatmo.updateWeatherStation.js - Weather Station ${this.devices[key].type} ${this.devices[key].module_name} - min temp - error : ${e}`,
         );
       }
       try {
-        feature = await getDeviceFeatureBySelector(device, `${deviceSelector}-max-temp`);
-        if (parseFloat(feature.last_value) !== parseFloat(maxTempValue)) {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: `netatmo:${key}:max_temp`,
-            state: maxTempValue,
-          });
-        } else {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-            device_feature_external_id: `netatmo:${key}:max_temp`,
-          });
-        }
+        await this.updateFeature(key, device, deviceSelector, 'max_temp', maxTempValue);
       } catch (e) {
         logger.error(
           `Netatmo : File netatmo.updateWeatherStation.js - Weather Station ${this.devices[key].type} ${this.devices[key].module_name} - max temp - error : ${e}`,
@@ -67,34 +44,14 @@ async function updateWeatherStation(key, device, deviceSelector) {
           const reachableModuleValue = module.reachable;
 
           try {
-            feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-battery`);
-            if (parseInt(feature.last_value, 16) !== parseInt(batteryPercentValue, 16)) {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                device_feature_external_id: `netatmo:${sidModule}:battery`,
-                state: batteryPercentValue,
-              });
-            } else {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                device_feature_external_id: `netatmo:${sidModule}:battery`,
-              });
-            }
+            await this.updateFeature(sidModule, deviceModule, moduleSelector, 'battery', batteryPercentValue);
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - battery percent - error : ${e}`,
             );
           }
           try {
-            feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-reachable`);
-            if (parseInt(feature.last_value, 16) !== parseInt(reachableModuleValue, 16)) {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                device_feature_external_id: `netatmo:${sidModule}:reachable`,
-                state: reachableModuleValue,
-              });
-            } else {
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                device_feature_external_id: `netatmo:${sidModule}:reachable`,
-              });
-            }
+            await this.updateFeature(sidModule, deviceModule, moduleSelector, 'reachable', reachableModuleValue);
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - reachable - error : ${e}`,
@@ -108,51 +65,21 @@ async function updateWeatherStation(key, device, deviceSelector) {
               const sumRain24Value = module.dashboard_data.sum_rain_24;
 
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-rain`);
-                if (parseFloat(feature.last_value) !== parseFloat(rainValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:rain`,
-                    state: rainValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:rain`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'rain', rainValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - rain - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-1`);
-                if (parseFloat(feature.last_value) !== parseFloat(sumRain1Value)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:sum_rain_1`,
-                    state: sumRain1Value,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:sum_rain_1`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'sum_rain_1', sumRain1Value);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - sum rain 1 hour - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-sum-rain-24`);
-                if (parseFloat(feature.last_value) !== parseFloat(sumRain24Value)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:sum_rain_24`,
-                    state: sumRain24Value,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:sum_rain_24`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'sum_rain_24', sumRain24Value);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - sum rain 24 hours - error : ${e}`,
@@ -175,102 +102,42 @@ async function updateWeatherStation(key, device, deviceSelector) {
               const maxWindAngleValue = module.dashboard_data.max_wind_angle;
 
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-windstrength`);
-                if (parseFloat(feature.last_value) !== parseFloat(windStrengthValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:WindStrength`,
-                    state: windStrengthValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:WindStrength`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'WindStrength', windStrengthValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - wind strength - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-windangle`);
-                if (parseInt(feature.last_value, 16) !== parseInt(windAngleValue, 16)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:WindAngle`,
-                    state: windAngleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:WindAngle`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'WindAngle', windAngleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - wind angle - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-guststrength`);
-                if (parseFloat(feature.last_value) !== parseFloat(gustStrengthValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:GustStrength`,
-                    state: gustStrengthValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:GustStrength`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'GustStrength', gustStrengthValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - gust strength - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-gustangle`);
-                if (parseInt(feature.last_value, 16) !== parseInt(gustAngleValue, 16)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:GustAngle`,
-                    state: gustAngleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:GustAngle`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'GustAngle', gustAngleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - gust angle - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-str`);
-                if (parseFloat(feature.last_value) !== parseFloat(maxWindStrValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_wind_str`,
-                    state: maxWindStrValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_wind_str`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'max_wind_str', maxWindStrValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - max wind strength - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-wind-angle`);
-                if (parseInt(feature.last_value, 16) !== parseInt(maxWindAngleValue, 16)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_wind_angle`,
-                    state: maxWindAngleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_wind_angle`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'max_wind_angle', maxWindAngleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - max wind angle - error : ${e}`,
@@ -291,68 +158,34 @@ async function updateWeatherStation(key, device, deviceSelector) {
               const maxTempModuleValue = module.dashboard_data.max_temp;
 
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-temperature`);
-                if (parseFloat(feature.last_value) !== parseFloat(temperatureModuleValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:temperature`,
-                    state: temperatureModuleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:temperature`,
-                  });
-                }
+                await this.updateFeature(
+                  sidModule,
+                  deviceModule,
+                  moduleSelector,
+                  'temperature',
+                  temperatureModuleValue,
+                );
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - temperature - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-humidity`);
-                if (parseFloat(feature.last_value) !== parseFloat(humidityModuleValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:humidity`,
-                    state: humidityModuleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:humidity`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'humidity', humidityModuleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - humidity - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-min-temp`);
-                if (parseFloat(feature.last_value) !== parseFloat(minTempModuleValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:min_temp`,
-                    state: minTempModuleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:min_temp`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'min_temp', minTempModuleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - min temp - error : ${e}`,
                 );
               }
               try {
-                feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-max-temp`);
-                if (parseFloat(feature.last_value) !== parseFloat(maxTempModuleValue)) {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_temp`,
-                    state: maxTempModuleValue,
-                  });
-                } else {
-                  this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                    device_feature_external_id: `netatmo:${sidModule}:max_temp`,
-                  });
-                }
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'max_temp', maxTempModuleValue);
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - max temp - error : ${e}`,
@@ -362,17 +195,7 @@ async function updateWeatherStation(key, device, deviceSelector) {
               if (module.data_type.length === 3) {
                 const co2ModuleValue = module.dashboard_data.CO2;
                 try {
-                  feature = await getDeviceFeatureBySelector(deviceModule, `${moduleSelector}-co2`);
-                  if (parseFloat(feature.last_value) !== parseFloat(co2ModuleValue)) {
-                    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-                      device_feature_external_id: `netatmo:${sidModule}:co2`,
-                      state: co2ModuleValue,
-                    });
-                  } else {
-                    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, {
-                      device_feature_external_id: `netatmo:${sidModule}:co2`,
-                    });
-                  }
+                  await this.updateFeature(sidModule, deviceModule, moduleSelector, 'co2', co2ModuleValue);
                 } catch (e) {
                   logger.error(
                     `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - co2 - error : ${e}`,

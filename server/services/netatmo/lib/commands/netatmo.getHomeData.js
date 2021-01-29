@@ -9,15 +9,23 @@ async function getHomeData() {
   // we get the cameras gethomedata
   try {
     const response = await axios.post(`${this.baseUrl}/api/gethomedata`, { access_token: this.token });
-    response.data.body.homes.forEach((home) => {
-      home.cameras.forEach((camera) => {
-        const sid = camera.id;
-        if (this.devices[sid] === undefined) {
-          this.newValueCamera(camera);
+    if (response.data.body.homes !== undefined) {
+      response.data.body.homes.forEach((home) => {
+        if (home.cameras !== undefined) {
+          home.cameras.forEach((camera) => {
+            const sid = camera.id;
+            if (this.devices[sid] === undefined) {
+              this.newValueCamera(camera);
+            }
+            this.devices[sid] = camera;
+          });
+        } else {
+          logger.info(`Files getHomeData (camera) - No data cameras`);
         }
-        this.devices[sid] = camera;
       });
-    });
+    } else {
+      logger.info(`Files getHomeData (camera) - No data devices`);
+    }
   } catch (err) {
     logger.info(`Error on getHomeData (camera) - ${err}`);
   }

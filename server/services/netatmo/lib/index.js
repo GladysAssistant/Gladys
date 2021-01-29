@@ -10,6 +10,7 @@ const { getStationsData } = require('./commands/netatmo.getStationsData.js');
 const { getHealthyHomeCoachData } = require('./commands/netatmo.getHealthyHomeCoachData.js');
 // update
 const { updateNetatmo } = require('./update/netatmo.updateNetatmo.js');
+const { updateFeature } = require('./update/netatmo.update.js');
 const { updateCamera } = require('./update/netatmo.updateCamera.js');
 const { updateThermostat } = require('./update/netatmo.updateThermostat.js');
 const { updateHomeCoachWeather } = require('./update/netatmo.updateHomeCoachWeather.js');
@@ -57,6 +58,7 @@ NetatmoManager.prototype.getStationsData = getStationsData;
 NetatmoManager.prototype.getHealthyHomeCoachData = getHealthyHomeCoachData;
 
 NetatmoManager.prototype.updateNetatmo = updateNetatmo;
+NetatmoManager.prototype.updateFeature = updateFeature;
 NetatmoManager.prototype.updateCamera = updateCamera;
 NetatmoManager.prototype.updateThermostat = updateThermostat;
 NetatmoManager.prototype.updateHomeCoachWeather = updateHomeCoachWeather;

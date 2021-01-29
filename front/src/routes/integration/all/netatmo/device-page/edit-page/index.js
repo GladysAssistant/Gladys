@@ -7,7 +7,7 @@ import EditPage from './EditPage';
 const NETATMO_PAGE_PATH = '/dashboard/integration/device/netatmo';
 
 @connect('user,session,httpClient,currentIntegration,houses', actions)
-class EditNetatmoDevice extends Component {
+class NetatmoEditDevice extends Component {
   render(props, {}) {
     return (
       <NetatmoLayout>
@@ -17,4 +17,4 @@ class EditNetatmoDevice extends Component {
   }
 }
 
-export default EditNetatmoDevice;
+export default NetatmoEditDevice;

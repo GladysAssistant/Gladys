@@ -1,11 +1,12 @@
 const { fake } = require('sinon');
-// const { expect } = require('chai');
+const { expect } = require('chai');
 
 const NetatmoManager = require('../../../../../services/netatmo/lib');
 
 const sensor = {
   id: 'netatmo:1234',
   name: 'test',
+  selector: 'netatmo:1234',
   should_poll: true,
   poll_frequency: 2000,
   external_id: 'netatmo:1234',
@@ -17,7 +18,7 @@ const sensor = {
   features: [
     {
       name: 'test',
-      selector: null,
+      selector: 'netatmo-1234-camera',
       external_id: 'netatmo:1234:camera',
       category: 'camera',
       type: 'image',
@@ -42,11 +43,20 @@ const gladys = {
   },
 };
 
-describe('netatmoManager GetSensor', () => {
+describe.only('netatmoManager GetSensor', () => {
   it('should get sensors', async () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.sensors['1234'] = sensor;
-    await netatmoManager.getSensors();
-    // expect(sensors).to.deep.equal(netatmoManager.sensors);
+    const sensors = await netatmoManager.getSensors();
+
+    sensors.forEach((sensorDevice) => {
+      expect(sensorDevice).to.have.property('name');
+      expect(sensorDevice).to.have.property('selector');
+      expect(sensorDevice).to.have.property('features');
+      expect(sensorDevice.name).to.deep.equal(netatmoManager.sensors['1234'].name);
+      sensorDevice.features.forEach((sensorFeature) => {
+        expect(sensorFeature).to.have.property('name');
+      });
+    });
   });
 });
