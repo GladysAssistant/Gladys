@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { compareValue } = require('../../utils/format');
 
-describe.only('utils/format.js', () => {
+describe('utils/format.js', () => {
   describe('compareValue valid update - return true', () => {
     it('should get a valid update - with an integer', () => {
       const value = 1;
