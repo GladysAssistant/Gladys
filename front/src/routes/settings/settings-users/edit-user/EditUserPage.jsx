@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ResetPassword from './ResetPassword';
+import EditPreferences from './EditPreferences';
 import Profile from '../../../../components/user/profile';
 
 const UserPage = ({ children, ...props }) => (
@@ -49,44 +50,7 @@ const UserPage = ({ children, ...props }) => (
             <Text id="usersSettings.editUser.editPreferences" />
           </h3>
         </div>
-        <div class="card-body">
-          <div class={props.loading ? 'dimmer active' : 'dimmer'}>
-            <div class="loader" />
-            <div class="dimmer-content">
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="signup.preferences.temperatureUnitsLabel" />
-                </label>
-                <select value={props.temperature_unit_preference} onInput={() => {}} class="form-control">
-                  <option value="celsius">
-                    <Text id="signup.preferences.temperatureUnitsCelsius" />
-                  </option>
-                  <option value="fahrenheit">
-                    <Text id="signup.preferences.temperatureUnitsFahrenheit" />
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="signup.preferences.distanceUnit" />
-                </label>
-                <select value={props.distance_unit_preference} onInput={() => {}} class="form-control">
-                  <option value="metric">
-                    <Text id="signup.preferences.distanceUnitMeter" />
-                  </option>
-                  <option value="us">
-                    <Text id="signup.preferences.distanceUnitUs" />
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <button onClick={props.saveProfile} class="btn btn-success">
-                  <Text id="usersSettings.editUser.saveButton" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="card-body">{props.newUser && <EditPreferences newUser={props.newUser} />}</div>
       </div>
     </div>
   </div>
