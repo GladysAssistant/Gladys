@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import PhilipsHuePage from '../PhilipsHuePage';
 import DevicePage from './DevicePage';
-import FoundDevices from './FoundDevices';
 
 @connect(
   'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus',

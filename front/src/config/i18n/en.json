@@ -242,6 +242,114 @@
         "navigation": "navigation"
       }
     },
+    "caldav": {
+      "title": "CalDAV",
+      "description": "Sync your CalDAV calendars.",
+      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "hostLabel": "CalDAV host",
+      "hostInfo": "Choose your calendar host to be helped during configuration.",
+      "services": {
+        "apple": {
+          "name": "iCloud Calendar",
+          "url": "iCloud URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Apple ID",
+          "usernameInfo": "Enter your Apple ID.",
+          "password": "Password",
+          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "google": {
+          "name": "Google Calendar (deprecated)",
+          "url": "Google Calendar URL",
+          "urlInfo": "Let default URL, it will be set automatically.",
+          "username": "Email",
+          "usernameInfo": "Enter your Google email adress.",
+          "password": "Password",
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+        },
+        "synology": {
+          "name": "Synology Calendar",
+          "url": "Synology CalDAV URL",
+          "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
+          "username": "Synology username",
+          "usernameInfo": "Enter your username.",
+          "password": "Password",
+          "passwordInfo": "Enter your password."
+        },
+        "other": {
+          "name": "Other",
+          "url": "CalDAV URL",
+          "username": "CalDAV Username",
+          "password": "CalDAV Password"
+        }
+      },
+      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
+      "configurationSuccess": "Auto-configuration done.",
+      "configurationDefaultError": "An error occured during auto-configuration.",
+      "configurationError": "Check settings and CalDAV server status.",
+      "configurationBadCredentialsError": "Check your username/password.",
+      "configurationBadUrlError": "Check your CalDAV server URL.",
+      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
+      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
+      "cleanUpSuccess": "Clean up completed.",
+      "cleanUpError": "An error occured while trying clean up.",
+      "synchronizationSuccess": "Synchronization completed.",
+      "synchronizationDefaultError": "An error occured while trying synchronization.",
+      "synchronizationError": "Check CalDAV server state.",
+      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
+      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
+      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
+      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "buttonSave": "Save",
+      "buttonCleanUp": "Clean Up",
+      "buttonSync": "Sync now"
+    },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Control your Bluetooth devices.",
+      "deviceTab": "Devices",
+      "setupTab": "Setup",
+      "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
+      "device": {
+        "title": "Bluetooth Devices",
+        "search": "Search devices",
+        "noDevices": "No Bluetooth devices added yet.",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter device name",
+        "roomLabel": "Room",
+        "externalIdLabel": "External ID",
+        "manufacturerLabel": "Manufacturer",
+        "modelLabel": "Model",
+        "featuresLabel": "Features",
+        "noFeatureDiscovered": "No features discovered.",
+        "featureNamePlaceholder": "Enter feature name",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit"
+      },
+      "setup": {
+        "title": "Bluetooth Setup",
+        "scanButton": "Scan",
+        "reloadButton": "Reload",
+        "noDeviceFound": "No bluetooth device discovered.",
+        "createDeviceInGladys": "Connect in Gladys",
+        "updateDeviceInGladys": "Update in Gladys",
+        "deviceCreatedSuccess": "The device was successfully added",
+        "createDeviceError": "There was an error while creating this device in Gladys. ",
+        "notManagedByBluteoothButton": "Managed by \"{{service}}\" service",
+        "notManagedByBluteooth": "You cannot manage this device here as it is already manager by \"{{service}}\" service.",
+        "saveSuccess": "Bluetooth device successfully created.",
+        "saveError": "There was an error creating the device.",
+        "peripheral": {
+          "title": "Bluetooth Peripheral Configuration",
+          "notAvailable": "Peripheral is not available, please scan again.",
+          "createLabel": "Create",
+          "cancelLabel": "Cancel",
+          "successLabel": "Done"
+        }
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "description": "Talk to Gladys through Telegram.",
@@ -256,6 +364,7 @@
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights.",
       "deviceTab": "Devices",
+      "discoverTab": "Discover devices",
       "setupTab": "Setup Bridges",
       "setup": {
         "connectedBridgesTitle": "Connected bridges",
@@ -272,6 +381,7 @@
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
+        "editButton": "Edit",
         "search": "Search devices",
         "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
@@ -576,114 +686,6 @@
         "cube": "Cube",
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
-      }
-    },
-    "caldav": {
-      "title": "CalDAV",
-      "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "hostLabel": "CalDAV host",
-      "hostInfo": "Choose your calendar host to be helped during configuration.",
-      "services": {
-        "apple": {
-          "name": "iCloud Calendar",
-          "url": "iCloud URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
-          "username": "Apple ID",
-          "usernameInfo": "Enter your Apple ID.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
-        },
-        "google": {
-          "name": "Google Calendar (deprecated)",
-          "url": "Google Calendar URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
-          "username": "Email",
-          "usernameInfo": "Enter your Google email adress.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
-        },
-        "synology": {
-          "name": "Synology Calendar",
-          "url": "Synology CalDAV URL",
-          "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
-          "username": "Synology username",
-          "usernameInfo": "Enter your username.",
-          "password": "Password",
-          "passwordInfo": "Enter your password."
-        },
-        "other": {
-          "name": "Other",
-          "url": "CalDAV URL",
-          "username": "CalDAV Username",
-          "password": "CalDAV Password"
-        }
-      },
-      "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
-      "configurationSuccess": "Auto-configuration done.",
-      "configurationDefaultError": "An error occured during auto-configuration.",
-      "configurationError": "Check settings and CalDAV server status.",
-      "configurationBadCredentialsError": "Check your username/password.",
-      "configurationBadUrlError": "Check your CalDAV server URL.",
-      "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
-      "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
-      "cleanUpSuccess": "Clean up completed.",
-      "cleanUpError": "An error occured while trying clean up.",
-      "synchronizationSuccess": "Synchronization completed.",
-      "synchronizationDefaultError": "An error occured while trying synchronization.",
-      "synchronizationError": "Check CalDAV server state.",
-      "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
-      "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
-      "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
-      "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
-      "buttonSave": "Save",
-      "buttonCleanUp": "Clean Up",
-      "buttonSync": "Sync now"
-    },
-    "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Control your Bluetooth devices.",
-      "deviceTab": "Devices",
-      "setupTab": "Setup",
-      "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
-      "device": {
-        "title": "Bluetooth Devices",
-        "search": "Search devices",
-        "noDevices": "No Bluetooth devices added yet.",
-        "noFeatures": "No features",
-        "nameLabel": "Name",
-        "namePlaceholder": "Enter device name",
-        "roomLabel": "Room",
-        "externalIdLabel": "External ID",
-        "manufacturerLabel": "Manufacturer",
-        "modelLabel": "Model",
-        "featuresLabel": "Features",
-        "noFeatureDiscovered": "No features discovered.",
-        "featureNamePlaceholder": "Enter feature name",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit"
-      },
-      "setup": {
-        "title": "Bluetooth Setup",
-        "scanButton": "Scan",
-        "reloadButton": "Reload",
-        "noDeviceFound": "No bluetooth device discovered.",
-        "createDeviceInGladys": "Connect in Gladys",
-        "updateDeviceInGladys": "Update in Gladys",
-        "deviceCreatedSuccess": "The device was successfully added",
-        "createDeviceError": "There was an error while creating this device in Gladys. ",
-        "notManagedByBluteoothButton": "Managed by \"{{service}}\" service",
-        "notManagedByBluteooth": "You cannot manage this device here as it is already manager by \"{{service}}\" service.",
-        "saveSuccess": "Bluetooth device successfully created.",
-        "saveError": "There was an error creating the device.",
-        "peripheral": {
-          "title": "Bluetooth Peripheral Configuration",
-          "notAvailable": "Peripheral is not available, please scan again.",
-          "createLabel": "Create",
-          "cancelLabel": "Cancel",
-          "successLabel": "Done"
-        }
       }
     },
     "eWeLink": {
@@ -1406,6 +1408,10 @@
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
     "notFound": "Requested device not found.",
+    "categoryChange": "Base category : ",
+    "checkbox": {
+      "changeCategory": "Check if this socket should be considered as lighting."
+    },
     "pollFrequency": {
       "label": "Refresh frequency",
       "everyMinutes": "Every minutes",

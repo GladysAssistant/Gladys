@@ -15,7 +15,7 @@ class PhilipsHueDiscoveryPage extends Component {
     this.props.getPhilipsHueNewDevices();
     this.props.getIntegrationByName('philips-hue');
   }
-  
+
   render(props) {
     return (
       <PhilipsHuePage>

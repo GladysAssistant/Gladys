@@ -176,7 +176,7 @@ const AppRouter = connect(
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDiscoverPage path="/dashboard/integration/device/philips-hue/discover" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
-        
+
         <PhilipsHueEditPage path="/dashboard/integration/device/philips-hue/edit/:deviceSelector" />
 
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />

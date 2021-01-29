@@ -27,6 +27,12 @@ const getPlugOnOff = (philipsHueLight, bridgeSerialNumber, serviceId) => ({
       max: 1,
     },
   ],
+  params: [
+    {
+      name: `categoryCreate: ${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`,
+      value: 'switch',
+    },
+  ],
 });
 
 module.exports = {

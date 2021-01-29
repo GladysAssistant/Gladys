@@ -1408,7 +1408,8 @@
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
     "notFound": "Appareil recherché introuvable.",
-    "checkbox":{
+    "categoryChange": "Catégorie de base : ",
+    "checkbox": {
       "changeCategory": "Cocher si cette prise doit être considérée comme un éclairage."
     },
     "pollFrequency": {

@@ -11,7 +11,12 @@ class PhilipsHueEditPage extends Component {
   render(props, {}) {
     return (
       <PhilipsHueLayout>
-        <EditPage integrationName="philips-hue" allowModifyFeatures={false} previousPage={PHILIPS_HUE_PAGE_PATH} {...props} />
+        <EditPage
+          integrationName="philips-hue"
+          allowModifyFeatures={false}
+          previousPage={PHILIPS_HUE_PAGE_PATH}
+          {...props}
+        />
       </PhilipsHueLayout>
     );
   }
