@@ -18,6 +18,11 @@ const EditHouse = ({ children, ...props }) => (
           <Text id="signup.configureHouse.validationError" />
         </div>
       )}
+      {props.houseUpdateStatus === RequestStatus.HouseValidationError && (
+        <div class="alert alert-danger">
+          <Text id="signup.configureHouse.validationErrorHouse" />
+        </div>
+      )}
       {props.houseUpdateStatus === RequestStatus.ConflictError && (
         <div class="alert alert-danger">
           <Text id="signup.configureHouse.conflictError" />

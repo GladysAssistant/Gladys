@@ -79,6 +79,7 @@ export const RequestStatus = {
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
+  HouseValidationError: 'HouseValidationError',
   RoomValidationError: 'RoomValidationError'
 };
 

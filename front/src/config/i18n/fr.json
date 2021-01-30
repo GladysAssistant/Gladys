@@ -153,6 +153,7 @@
       "conflictError": "Une maison avec le même non existe déjà.",
       "roomConflictError": "Une pièce avec le même non existe déjà.",
       "validationError": "Erreur de validation : une maison ne peut pas avoir un nom vide.",
+      "validationErrorHouse": "Erreur de validation : le nom d'une maison doit être entre 1 et 40 caractères.",
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {

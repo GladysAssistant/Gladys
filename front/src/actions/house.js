@@ -233,6 +233,12 @@ function createActions(store) {
               [house.id]: RequestStatus.RoomValidationError
             }
           });
+        } else if (status === 422 && url.includes('/house')) {
+          store.setState({
+            houseUpdateStatus: {
+              [house.id]: RequestStatus.HouseValidationError
+            }
+          });
         } else if (status === 422) {
           store.setState({
             houseUpdateStatus: {
