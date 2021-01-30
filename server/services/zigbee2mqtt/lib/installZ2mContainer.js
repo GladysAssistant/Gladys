@@ -32,12 +32,11 @@ async function installZ2mContainer() {
       const brokerEnv = await exec(`sh ./services/zigbee2mqtt/docker/zigbee2mqtt-env.sh ${mqttUser} "${mqttPass}"`);
       logger.trace(brokerEnv);
 
-      logger.info(`Creating container...`);
       const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
-      await exec(
-        `sed -i 's%^"PathOnHost":.*%"PathOnHost": "${driverPath}",%' ./services/zigbee2mqtt/docker/zigbee2mqtt-container.json`,
-      );
+      logger.info(`Configuration of Device ${driverPath}`);
+      containerDescriptor.HostConfig.Devices[0].PathOnHost = driverPath;
 
+      logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerLog);
       logger.info('Zigbee2mqtt successfully installed as Docker container');

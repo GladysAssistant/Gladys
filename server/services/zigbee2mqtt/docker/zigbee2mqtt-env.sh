@@ -28,8 +28,7 @@ mqtt:
   password: $2
 serial:
   port: /dev/ttyACM0
-  # Optional: disable LED of the adapter if supported (default: false)
-  disable_led: true
+  # We don't put disable_led because some devices don't handle it
 frontend:
   port: 8080
 experimental:
