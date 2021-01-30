@@ -8,16 +8,16 @@ on:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
       - 
         name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: '12'
       - 
         name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
@@ -47,16 +47,18 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - 
         name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: '12'
       - 
         name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
@@ -74,7 +76,7 @@ jobs:
         name: 💽 Install System Dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y libudev-dev sqlite3 openssl
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - 
         name: 📦 Install Global NPM Packages
         run: |
@@ -108,16 +110,16 @@ jobs:
     needs:
       - test-front
       - test-server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout code
         uses: actions/checkout@v2
       - 
         name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: '12'
       - 
         name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
@@ -133,7 +135,7 @@ jobs:
           npm run build
       - 
         name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: static
           path: front/build
@@ -141,7 +143,7 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: ⬇️ Checkout code
@@ -157,9 +159,10 @@ jobs:
           version: latest
       - 
         name: ↙️ Download build artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static
+          path: static
       - 
         name: 🐳 Build AMD64 images
         uses: docker/build-push-action@v2
