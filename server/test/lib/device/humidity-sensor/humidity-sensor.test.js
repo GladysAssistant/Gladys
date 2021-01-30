@@ -14,7 +14,9 @@ describe('HumiditySensor.getHumidityInRoom', () => {
   it('should get average humidity in room', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, {});
-    const result = await deviceManager.humiditySensorManager.getHumidityInRoom('2398c689-8b47-43cc-ad32-e98d9be098b5');
+    const result = await deviceManager.humiditySensorManager.getHumidityInRoom('2398c689-8b47-43cc-ad32-e98d9be098b5', {
+      unit: 'percent',
+    });
     expect(result).to.deep.equal({
       humidity: 28.88888888888889,
       unit: 'percent',
@@ -25,6 +27,9 @@ describe('HumiditySensor.getHumidityInRoom', () => {
     const deviceManager = new Device(event, {}, stateManager, {});
     const humidityResult = await deviceManager.humiditySensorManager.getHumidityInRoom(
       'f08337ff-206e-4bd7-86c4-6d63d793d58e',
+      {
+        unit: 'percent',
+      },
     );
     expect(humidityResult).to.deep.equal({
       humidity: null,
