@@ -19,7 +19,9 @@ async function command(message, classification, context) {
         if (!context.room) {
           throw new NotFoundError('Room not found');
         }
-        humidityResult = await this.getHumidityInRoom(context.room);
+        humidityResult = await this.getHumidityInRoom(context.room, {
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+        });
         if (humidityResult.humidity === null) {
           throw new NoValuesFoundError('No humidity values found in this room.');
         }
