@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { NotFoundError, NoValuesFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 
 /**
  * @description Get the average humidity in a room.
@@ -23,6 +24,7 @@ async function command(message, classification, context) {
           throw new NoValuesFoundError('No humidity values found in this room.');
         }
         context.humidity = Math.round(humidityResult.humidity);
+        context.unit = humidityResult.unit === DEVICE_FEATURE_UNITS.PERCENT;
         context.roomName = roomEntity.sourceText;
         this.messageManager.replyByIntent(message, `humidity-sensor.get-in-room.success`, context);
         break;
