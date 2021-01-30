@@ -25,7 +25,7 @@ class UpdateDeviceFeature extends Component {
               <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
               <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
             </div>
-            {props.paramDeviceFeature[feature.external_id].toggleCategoryChange && (
+            {props.paramDeviceFeature[feature.external_id] && props.paramDeviceFeature[feature.external_id].toggleCategoryChange && (
               <div class="col-6 text-right">
                 <Text id="editDeviceForm.categoryChange" />
                 <Text
