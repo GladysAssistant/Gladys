@@ -25,14 +25,15 @@ class UpdateDeviceFeature extends Component {
               <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
               <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
             </div>
-            {props.paramDeviceFeature[feature.external_id] && props.paramDeviceFeature[feature.external_id].toggleCategoryChange && (
-              <div class="col-6 text-right">
-                <Text id="editDeviceForm.categoryChange" />
-                <Text
-                  id={`deviceFeatureCategory.${props.paramDeviceFeature[feature.external_id].value}.${feature.type}`}
-                />
-              </div>
-            )}
+            {props.paramDeviceFeature[feature.external_id] &&
+              props.paramDeviceFeature[feature.external_id].toggleCategoryChange && (
+                <div class="col-6 text-right">
+                  <Text id="editDeviceForm.categoryChange" />
+                  <Text
+                    id={`deviceFeatureCategory.${props.paramDeviceFeature[feature.external_id].value}.${feature.type}`}
+                  />
+                </div>
+              )}
           </div>
           <div class="card-body">
             <div class="form-group form-label" for={`featureName_${featureIndex}`}>
