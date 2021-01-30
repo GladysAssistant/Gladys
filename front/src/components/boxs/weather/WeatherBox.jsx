@@ -176,7 +176,7 @@ const WeatherBox = ({ children, ...props }) => (
                   color: 'grey'
                 }}
               >
-                {props.units === 'metric' ? 'm/h' : 'm/h'}
+                {props.units === 'metric' ? 'm/s' : 'm/h'}
               </span>
             </span>
           </div>
