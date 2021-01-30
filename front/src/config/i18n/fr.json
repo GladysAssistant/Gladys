@@ -13,7 +13,16 @@
     "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "daysOfTheWeek": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    }
   },
   "calendar": {
     "allDay": "Toute la journée",
