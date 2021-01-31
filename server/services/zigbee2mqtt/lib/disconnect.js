@@ -1,5 +1,5 @@
-const mqttContainerDescriptor = require('../docker/z2m-mqtt-container.json');
-const zigbee2mqttContainerDescriptor = require('../docker/zigbee2mqtt-container.json');
+const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
+const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 

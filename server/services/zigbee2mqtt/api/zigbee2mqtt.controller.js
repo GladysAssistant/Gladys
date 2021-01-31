@@ -31,11 +31,6 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
   async function connect(req, res) {
     logger.log('Entering connect step');
     await zigbee2mqttManager.init();
-    //    zigbee2mqttManager.z2mEnabled = true;
-    //    const configuration = await zigbee2mqttManager.getConfiguration();
-    //    if (configuration.z2mEnabled) {
-    //      await zigbee2mqttManager.connect(configuration);
-    //    }
 
     res.json({
       success: true,
@@ -51,13 +46,6 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     let response;
     try {
       await zigbee2mqttManager.installMqttContainer();
-
-      //      const mqttUrl = await gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, serviceId);
-      //      const mqttUsername = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, serviceId);
-      //      const mqttPassword = await gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, serviceId);
-
-      //      await zigbee2mqttManager.connect({ mqttUrl, mqttUsername, mqttPassword });
-      //      await zigbee2mqttManager.init();
 
       response = true;
     } catch (e) {
@@ -121,16 +109,6 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     res.json(response);
   }
 
-  /**
-   * @api {get} /api/v1/service/zigbee2mqtt/host_ip Get Host IP
-   * @apiName getHostIP
-   * @apiGroup Zigbee2mqtt
-   */
-  async function getHostIP(req, res) {
-    const response = await zigbee2mqttManager.getHostIP();
-    res.json(response);
-  }
-
   return {
     'post /api/v1/service/zigbee2mqtt/discover': {
       authenticated: true,
@@ -163,10 +141,6 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     'get /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
       controller: getPermitJoin,
-    },
-    'get /api/v1/service/zigbee2mqtt/host_ip': {
-      authenticated: true,
-      controller: getHostIP,
     },
   };
 };

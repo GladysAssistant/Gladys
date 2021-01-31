@@ -1,5 +1,5 @@
 {
-  "name": "z2m-mqtt",
+  "name": "gladys-z2m-mqtt",
   "Image": "eclipse-mosquitto:latest",
   "ExposedPorts": {
     "1884/tcp": {}

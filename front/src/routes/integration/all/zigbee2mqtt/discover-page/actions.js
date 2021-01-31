@@ -32,13 +32,6 @@ function createActions(store) {
         discoverZigbee2mqttError: null
       });
     },
-    async getHostIP(state) {
-      const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/host_ip');
-      const HostIP = `http://${value}:8080`;
-      store.setState({
-        zigbee2mqttFrontend: HostIP
-      });
-    },
     async getPermitJoin(state) {
       const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/permit_join');
       store.setState({

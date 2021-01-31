@@ -18,7 +18,6 @@ class Zigbee2mqttIntegration extends Component {
       this.props.updatePermitJoin(payload)
     );
 
-    this.props.getHostIP();
     this.props.checkStatus();
     this.props.getPermitJoin();
     this.props.setDiscoveredDevices(undefined);

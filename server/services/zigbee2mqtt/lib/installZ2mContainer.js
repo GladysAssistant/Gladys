@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const { exec } = require('../../../utils/childProcess');
 const { CONFIGURATION } = require('./constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const containerDescriptor = require('../docker/zigbee2mqtt-container.json');
+const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 const logger = require('../../../utils/logger');
 
 const sleep = promisify(setTimeout);
@@ -16,7 +16,7 @@ const sleep = promisify(setTimeout);
 async function installZ2mContainer() {
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
-    filters: { ancestor: [containerDescriptor.Image] },
+    filters: { name: [containerDescriptor.name] },
   });
   let [container] = dockerContainers;
 
@@ -29,7 +29,9 @@ async function installZ2mContainer() {
       logger.info(`Preparing Zigbee2mqtt environment...`);
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
       const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
-      const brokerEnv = await exec(`sh ./services/zigbee2mqtt/docker/zigbee2mqtt-env.sh ${mqttUser} "${mqttPass}"`);
+      const brokerEnv = await exec(
+        `sh ./services/zigbee2mqtt/docker/gladys-z2m-zigbee2mqtt-env.sh ${mqttUser} "${mqttPass}"`,
+      );
       logger.trace(brokerEnv);
 
       const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);

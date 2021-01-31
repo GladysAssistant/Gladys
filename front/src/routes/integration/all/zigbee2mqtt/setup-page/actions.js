@@ -55,31 +55,23 @@ const createActions = store => {
           container.created_at_formatted = dayjs(container.created_at * 1000)
             .locale(state.user.language)
             .fromNow();
-          if (container.name === '/zigbee2mqtt') {
+          if (container.name === '/gladys-z2m-zigbee2mqtt') {
             z2mContainerExists = true;
             if (container.state === 'running') {
               z2mContainerRunning = true;
             }
             dockerContainers.push(container);
           }
-          if (container.name === '/z2m-mqtt') {
+          if (container.name === '/gladys-z2m-mqtt') {
             mqtt4z2mContainerExists = true;
             if (container.state === 'running') {
               mqtt4z2mContainerRunning = true;
             }
             dockerContainers.push(container);
           }
-          //          dockerContainers.push(container);
         });
-        //        if (z2mEnabled && (!mqtt4z2mContainerRunning || !z2mContainerRunning)) {
-        //          this.startContainer();
-        //        }
-        //        if (mqtt4z2mContainerRunning && z2mContainerRunning) {
-        //          z2mEnabled = true;
-        //        }
         store.setState({
           dockerContainers,
-          //          z2mEnabled,
           z2mContainerExists,
           mqtt4z2mContainerExists,
           z2mContainerRunning,
@@ -88,7 +80,6 @@ const createActions = store => {
         });
       } catch (e) {
         store.setState({
-          //          z2mEnabled,
           z2mContainerExists,
           mqtt4z2mContainerExists,
           z2mContainerRunning,
@@ -112,17 +103,10 @@ const createActions = store => {
       });
 
       try {
-        //        await state.httpClient.post('/api/v1/service/zigbee2mqtt/mqtt/start');
         await state.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
       } catch (e) {
         error = error | get(e, 'response.status');
       }
-
-      // try {
-      //   await state.httpClient.post('/api/v1/service/zigbee2mqtt/z2m/start');
-      // } catch (e) {
-      //   error = error | get(e, 'response.status');
-      // }
 
       if (error) {
         store.setState({

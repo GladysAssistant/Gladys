@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const { exec } = require('../../../utils/childProcess');
 const { CONFIGURATION } = require('./constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const containerDescriptor = require('../docker/z2m-mqtt-container.json');
+const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const logger = require('../../../utils/logger');
 
 const sleep = promisify(setTimeout);
@@ -14,12 +14,6 @@ const sleep = promisify(setTimeout);
  * installMqttContainer();
  */
 async function installMqttContainer() {
-  //  logger.info(`Check Gladys network...`);
-  //    const networkModeValid = await this.checkDockerNetwork();
-  //    if (!networkModeValid) {
-  //      throw new PlatformNotCompatible('Gladys should be on host network');
-  //    }
-
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
@@ -35,7 +29,7 @@ async function installMqttContainer() {
 
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
-      const brokerEnv = await exec('sh ./services/zigbee2mqtt/docker/z2m-mqtt-env.sh');
+      const brokerEnv = await exec('sh ./services/zigbee2mqtt/docker/gladys-z2m-mqtt-env.sh');
       logger.trace(brokerEnv);
 
       logger.info(`Creating container...`);

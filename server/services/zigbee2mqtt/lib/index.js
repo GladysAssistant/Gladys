@@ -11,7 +11,6 @@ const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
-const { getHostIP } = require('./getHostIP');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -56,6 +55,5 @@ Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
 Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
-Zigbee2mqttManager.prototype.getHostIP = getHostIP;
 
 module.exports = Zigbee2mqttManager;

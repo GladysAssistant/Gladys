@@ -84,11 +84,11 @@ function handleMqttMessage(topic, message) {
             };
             this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
           } else {
-            logger.warn(`Zigbee2mqtt device ${splittedTopic[1]}, feature ${featureName} not found.`);
+            logger.warn(`Zigbee2mqtt device ${splittedTopic[1]}, feature ${featureName} not configured in Gladys.`);
           }
         });
       } else {
-        logger.info(`Zigbee2mqtt topic ${topic} not handled.`);
+        logger.log(`Zigbee2mqtt topic ${topic} not handled.`);
       }
     }
   }
