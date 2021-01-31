@@ -427,6 +427,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  RHASSPY: {
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
+  },
 };
 
 const DASHBOARD_TYPE = {
