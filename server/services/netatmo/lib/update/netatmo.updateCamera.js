@@ -78,54 +78,56 @@ async function updateCamera(key, device, deviceSelector) {
       }
     }
     if (this.devices[key].type === 'NACamera') {
-      this.devices[key].modules.forEach(async (module) => {
-        const sidModule = module.id;
-        const moduleExternalId = `netatmo:${sidModule}`;
-        const moduleSelector = moduleExternalId.replace(/:/gi, '-');
-        let deviceModule;
-        try {
-          deviceModule = await this.gladys.device.getBySelector(moduleSelector);
+      if (this.devices[key].modules !== undefined) {
+        this.devices[key].modules.forEach(async (module) => {
+          const sidModule = module.id;
+          const moduleExternalId = `netatmo:${sidModule}`;
+          const moduleSelector = moduleExternalId.replace(/:/gi, '-');
+          let deviceModule;
           try {
-            // we save the common data of home coaches and weather stations
-            if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
-              const batteryValue = module.battery_percent;
-              await this.updateFeature(sidModule, deviceModule, moduleSelector, 'battery', batteryValue);
+            deviceModule = await this.gladys.device.getBySelector(moduleSelector);
+            try {
+              // we save the common data of home coaches and weather stations
+              if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
+                const batteryValue = module.battery_percent;
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'battery', batteryValue);
+              }
+            } catch (e) {
+              logger.error(
+                `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`,
+              );
+            }
+            try {
+              // we save other indoor sirens data
+              if (module.type === 'NIS') {
+                const sirenValue = NETATMO_VALUES.SECURITY.SIREN[module.status.toUpperCase()];
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'siren', sirenValue);
+              }
+            } catch (e) {
+              logger.error(
+                `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
+              );
+            }
+            try {
+              // we save other interior door / window opening detectors data
+              if (module.type === 'NACamDoorTag') {
+                const doorTagValue = NETATMO_VALUES.SECURITY.DOOR_TAG[module.status.toUpperCase()];
+                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'doorTag', doorTagValue);
+              }
+            } catch (e) {
+              logger.error(
+                `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
+              );
             }
           } catch (e) {
-            logger.error(
-              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.type} ${module.name} - battery percent value - error : ${e}`,
+            logger.debug(
+              `Netatmo : File netatmo.updateCamera.js - device netatmo ${module.type ? module.type : '"type"'} ${
+                module.name
+              } no save in DB - error : ${e}`,
             );
           }
-          try {
-            // we save other indoor sirens data
-            if (module.type === 'NIS') {
-              const sirenValue = NETATMO_VALUES.SECURITY.SIREN[module.status.toUpperCase()];
-              await this.updateFeature(sidModule, deviceModule, moduleSelector, 'siren', sirenValue);
-            }
-          } catch (e) {
-            logger.error(
-              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
-            );
-          }
-          try {
-            // we save other interior door / window opening detectors data
-            if (module.type === 'NACamDoorTag') {
-              const doorTagValue = NETATMO_VALUES.SECURITY.DOOR_TAG[module.status.toUpperCase()];
-              await this.updateFeature(sidModule, deviceModule, moduleSelector, 'doorTag', doorTagValue);
-            }
-          } catch (e) {
-            logger.error(
-              `Netatmo : File netatmo.updateCamera.js - Module NACamera ${module.name} - state - error : ${e}`,
-            );
-          }
-        } catch (e) {
-          logger.debug(
-            `Netatmo : File netatmo.updateCamera.js - device netatmo ${module.type ? module.type : '"type"'} ${
-              module.name
-            } no save in DB - error : ${e}`,
-          );
-        }
-      });
+        });
+      }
     }
   } catch (e) {
     logger.error(
