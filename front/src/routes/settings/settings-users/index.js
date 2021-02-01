@@ -16,14 +16,6 @@ class SettingsUsers extends Component {
     }
   };
   removeUserFromList = index => {
-    console.log(
-      index,
-      update(this.state, {
-        users: {
-          $splice: [[index, 1]]
-        }
-      })
-    );
     this.setState(
       update(this.state, {
         users: {
