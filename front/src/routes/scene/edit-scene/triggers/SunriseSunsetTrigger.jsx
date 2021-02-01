@@ -11,6 +11,15 @@ class SunriseSunsetTrigger extends Component {
   };
 
   render({}, {}) {
+
+    const houseValid = false;
+    if(this.props.houses){
+      
+      if(selectedHouse.latitude && selectedHouse.longitude){
+        houseValid
+      }
+      console.log(selectedHouse);
+    }
     return (
       <div>
         <div class="row">
@@ -30,6 +39,9 @@ class SunriseSunsetTrigger extends Component {
                     </option>
                   ))}
               </select>
+              {
+                this.props.houses &&
+              }
             </div>
           </div>
         </div>
