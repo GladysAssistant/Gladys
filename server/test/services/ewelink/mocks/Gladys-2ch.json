@@ -1,16 +1,27 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Test 1 Ch1",
+  "name": "Test 1",
   "model": "2CH",
-  "external_id": "ewelink:10004531ae:1",
-  "selector": "ewelink:10004531ae:1",
+  "external_id": "ewelink:10004531ae",
+  "selector": "ewelink:10004531ae",
   "should_poll": true,
   "poll_frequency": 30000,
   "features": [
     {
-      "name": "Switch",
-      "external_id": "ewelink:10004531ae:1:power",
-      "selector": "ewelink:10004531ae:1:power",
+      "name": "Switch 1",
+      "external_id": "ewelink:10004531ae:power:1",
+      "selector": "ewelink:10004531ae:power:1",
+      "category": "switch",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": true,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Switch 2",
+      "external_id": "ewelink:10004531ae:power:2",
+      "selector": "ewelink:10004531ae:power:2",
       "category": "switch",
       "type": "binary",
       "read_only": false,

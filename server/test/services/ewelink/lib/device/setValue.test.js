@@ -2,8 +2,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const { event, serviceId, variableOk } = require('../../mocks/consts.test');
-const Gladys2Ch1Device = require('../../mocks/Gladys-2ch1.json');
-const Gladys2Ch2Device = require('../../mocks/Gladys-2ch2.json');
+const Gladys2ChDevice = require('../../mocks/Gladys-2ch.json');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
 const EweLinkApiMock = require('../../mocks/ewelink-api.mock.test');
@@ -33,15 +32,15 @@ describe('EweLinkHandler setValue', () => {
   it('should set the binary value of the channel 1 of the "2CH" device to 1', async () => {
     await eweLinkService.device.setValue(
       GladysPowDevice,
-      { external_id: 'ewelink:10004533ae:1:power', category: 'switch', type: 'binary' },
+      { external_id: 'ewelink:10004533ae:power:1', category: 'switch', type: 'binary' },
       1,
     );
     assert.calledWith(functionToTest, '10004533ae', 'on', 1);
   });
   it('should set the binary value of the channel 2 of the "2CH" device to 0', async () => {
     await eweLinkService.device.setValue(
-      Gladys2Ch2Device,
-      { external_id: 'ewelink:10004531ae:2:power', category: 'switch', type: 'binary' },
+      Gladys2ChDevice,
+      { external_id: 'ewelink:10004531ae:power:2', category: 'switch', type: 'binary' },
       0,
     );
     assert.calledWith(functionToTest, '10004531ae', 'off', 2);
@@ -49,7 +48,7 @@ describe('EweLinkHandler setValue', () => {
   it('should do nothing because of the feature type is not handled yet', async () => {
     await eweLinkService.device.setValue(
       GladysPowDevice,
-      { external_id: 'ewelink:10004533ae:1:power', category: 'switch', type: 'not_handled' },
+      { external_id: 'ewelink:10004533ae:power:1', category: 'switch', type: 'not_handled' },
       1,
     );
     assert.notCalled(functionToTest);
@@ -58,7 +57,7 @@ describe('EweLinkHandler setValue', () => {
     try {
       await eweLinkService.device.setValue(
         GladysOfflineDevice,
-        { external_id: 'ewelink:10004532ae:1:power', category: 'switch', type: 'binary' },
+        { external_id: 'ewelink:10004532ae:power:1', category: 'switch', type: 'binary' },
         1,
       );
       assert.fail();
@@ -72,8 +71,8 @@ describe('EweLinkHandler setValue', () => {
     eweLinkService.device.accessToken = 'NoMoreValidAccessToken';
     try {
       await eweLinkService.device.setValue(
-        Gladys2Ch1Device,
-        { external_id: 'ewelink:10004531ae:1:power:2', category: 'switch', type: 'binary' },
+        Gladys2ChDevice,
+        { external_id: 'ewelink:10004531ae:power:2', category: 'switch', type: 'binary' },
         1,
       );
       assert.fail();

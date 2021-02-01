@@ -2,9 +2,9 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../.
 
 module.exports = {
   // Gladys feature
-  generateFeature: () => {
+  generateFeature: (channel = 0) => {
     return {
-      name: 'Switch',
+      name: 'Switch'.concat(channel > 0 ? ` ${channel}` : ''),
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       read_only: false,

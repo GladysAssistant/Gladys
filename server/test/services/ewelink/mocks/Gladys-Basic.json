@@ -1,16 +1,16 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Test 1 Ch2",
-  "model": "2CH",
-  "external_id": "ewelink:10004531ae:2",
-  "selector": "ewelink:10004531ae:2",
+  "name": "Test 6",
+  "model": "Basic",
+  "external_id": "ewelink:10004536ae",
+  "selector": "ewelink:10004536ae",
   "should_poll": true,
   "poll_frequency": 30000,
   "features": [
     {
       "name": "Switch",
-      "external_id": "ewelink:10004531ae:2:power",
-      "selector": "ewelink:10004531ae:2:power",
+      "external_id": "ewelink:10004536ae:power:1",
+      "selector": "ewelink:10004536ae:power:1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
@@ -22,15 +22,15 @@
   "params": [
     {
       "name": "IP_ADDRESS",
-      "value": "192.168.0.1"
+      "value": "192.168.0.6"
     },
     {
       "name": "FIRMWARE",
-      "value": "3.3.0"
+      "value": "3.1.2"
     },
     {
       "name": "ONLINE",
-      "value": "1"
+      "value": "0"
     }
   ]
 }

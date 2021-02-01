@@ -3,8 +3,8 @@ const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const { deviceManagerFull, event, serviceId, stateManagerFull, variableOk } = require('../../mocks/consts.test');
-const Gladys2Ch1Device = require('../../mocks/Gladys-2ch1.json');
-const Gladys2Ch2Device = require('../../mocks/Gladys-2ch2.json');
+const Gladys2ChDevice = require('../../mocks/Gladys-2ch.json');
+const GladysBasicDevice = require('../../mocks/Gladys-Basic.json');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
 const GladysThDevice = require('../../mocks/Gladys-th.json');
@@ -32,61 +32,71 @@ describe('EweLinkHandler poll', () => {
     eweLinkService.device.accessToken = '';
   });
 
-  it('should poll device and emit 1 state for the channel 1 of the "2CH" device', async () => {
-    await eweLinkService.device.poll(Gladys2Ch1Device);
-    assert.callCount(gladys.event.emit, 2);
-    assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-    });
-    assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004531ae:1:power',
-      state: 1,
-    });
-  });
-  it('should poll device and emit 1 state for the channel 2 of the "2CH" device', async () => {
-    await eweLinkService.device.poll(Gladys2Ch2Device);
-    assert.callCount(gladys.event.emit, 2);
-    assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-    });
-    assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004531ae:2:power',
-      state: 0,
-    });
-  });
-  it('should poll device and emit 2 states for "energyPower" device', async () => {
-    await eweLinkService.device.poll(GladysPowDevice);
+  it('should poll device and emit 2 states for a "2CH" model', async () => {
+    await eweLinkService.device.poll(Gladys2ChDevice);
     assert.callCount(gladys.event.emit, 3);
     assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
     });
     assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004533ae:1:power',
+      device_feature_external_id: 'ewelink:10004531ae:power:1',
       state: 1,
     });
     assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004533ae:1:energyPower',
-      state: 22.3,
+      device_feature_external_id: 'ewelink:10004531ae:power:2',
+      state: 0,
     });
   });
-  it('should poll device and emit 3 states for "humidity" and "temperature" device', async () => {
+  it('should poll device and emit 1 state for a "POW" device', async () => {
+    await eweLinkService.device.poll(GladysPowDevice);
+    assert.callCount(gladys.event.emit, 2);
+    assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
+    });
+    assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'ewelink:10004533ae:power:1',
+      state: 1,
+    });
+    // assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
+    //   device_feature_external_id: 'ewelink:10004533ae:energyPower',
+    //   state: 22.3,
+    // });
+  });
+  it('should poll device and emit 3 states for a "TH" model', async () => {
     await eweLinkService.device.poll(GladysThDevice);
     assert.callCount(gladys.event.emit, 4);
     assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
     });
     assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004534ae:1:power',
+      device_feature_external_id: 'ewelink:10004534ae:power:1',
       state: 1,
     });
     assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004534ae:1:humidity',
+      device_feature_external_id: 'ewelink:10004534ae:humidity',
       state: 42,
     });
     assert.calledWith(gladys.event.emit.getCall(3), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004534ae:1:temperature',
+      device_feature_external_id: 'ewelink:10004534ae:temperature',
       state: 20,
     });
+  });
+  it('should poll device and update 2 params for a "Basic" model', async () => {
+    expect(GladysBasicDevice.params).to.deep.equal([
+      { name: 'IP_ADDRESS', value: '192.168.0.6' },
+      { name: 'FIRMWARE', value: '3.1.2' },
+      { name: 'ONLINE', value: '0' },
+    ]);
+    await eweLinkService.device.poll(GladysBasicDevice);
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit.getCall(0), EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
+    });
+    expect(GladysBasicDevice.params).to.deep.equal([
+      { name: 'IP_ADDRESS', value: '192.168.0.6' },
+      { name: 'FIRMWARE', value: '3.3.0' },
+      { name: 'ONLINE', value: '1' },
+    ]);
   });
   it('should throw an error when device is offline', async () => {
     try {
@@ -100,7 +110,7 @@ describe('EweLinkHandler poll', () => {
     eweLinkService.device.connected = true;
     eweLinkService.device.accessToken = 'NoMoreValidAccessToken';
     try {
-      await eweLinkService.device.poll(Gladys2Ch1Device);
+      await eweLinkService.device.poll(Gladys2ChDevice);
       assert.fail();
     } catch (error) {
       expect(error.status).to.equal(403);

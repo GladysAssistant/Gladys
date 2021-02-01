@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const EweLink2ChDevice = require('./eweLink-2ch.json');
+const EweLinkBasicDevice = require('./eweLink-basic.json');
 const EweLinkOfflineDevice = require('./eweLink-offline.json');
 const EweLinkPowDevice = require('./eweLink-pow.json');
 const EweLinkThDevice = require('./eweLink-th.json');
@@ -48,8 +49,20 @@ class EwelinkApi {
 
   getDevice(deviceId) {
     if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
-      const device = fakeDevices.find((fakeDevice) => fakeDevice.deviceid === deviceId);
+      const device = [...fakeDevices, EweLinkBasicDevice].find((fakeDevice) => fakeDevice.deviceid === deviceId);
       if (device) {
+        if (deviceId === '10004531ae') {
+          return Promise.resolve({ ...device, params: { switches: [{ switch: 'on' }, { switch: 'off' }] } });
+        }
+        if (deviceId === '10004533ae') {
+          return Promise.resolve({ ...device, params: { switch: 'on' } });
+        }
+        if (deviceId === '10004534ae') {
+          return Promise.resolve({ ...device, params: { switch: 'on', currentHumidity: 42, currentTemperature: 20 } });
+        }
+        if (deviceId === '10004536ae') {
+          return Promise.resolve(device);
+        }
         return Promise.resolve(device);
       }
       return Promise.resolve({ error: false, msg: 'Device does not exist' });

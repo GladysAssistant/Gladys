@@ -2,33 +2,21 @@
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
   "name": "Test 3",
   "model": "Pow",
-  "external_id": "ewelink:10004533ae:1",
-  "selector": "ewelink:10004533ae:1",
+  "external_id": "ewelink:10004533ae",
+  "selector": "ewelink:10004533ae",
   "should_poll": true,
   "poll_frequency": 30000,
   "features": [
     {
       "name": "Switch",
-      "external_id": "ewelink:10004533ae:1:power",
-      "selector": "ewelink:10004533ae:1:power",
+      "external_id": "ewelink:10004533ae:power:1",
+      "selector": "ewelink:10004533ae:power:1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
       "has_feedback": true,
       "min": 0,
       "max": 1
-    },
-    {
-      "name": "Power",
-      "external_id": "ewelink:10004533ae:1:energyPower",
-      "selector": "ewelink:10004533ae:1:energyPower",
-      "category": "switch",
-      "type": "power",
-      "read_only": true,
-      "has_feedback": false,
-      "min": 0,
-      "max": 10000,
-      "unit": "kilowatt"
     }
   ],
   "params": [

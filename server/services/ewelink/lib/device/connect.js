@@ -16,7 +16,7 @@ async function connect() {
   let region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
 
   if (!email || !password) {
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
       payload: 'Service is not configured',
     });
@@ -46,7 +46,7 @@ async function connect() {
   this.accessToken = auth.at;
   this.apiKey = auth.user.apikey;
 
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
   });
 }

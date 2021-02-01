@@ -1,10 +1,11 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
 const { titleize } = require('../../../../utils/titleize');
 const { DEVICE_EXTERNAL_ID_BASE, DEVICE_IP_ADDRESS, DEVICE_FIRMWARE, DEVICE_ONLINE } = require('../utils/constants');
 
 // Features
 const powerFeature = require('./power');
-const energyPowerFeature = require('./energy.power');
+// const energyPowerFeature = require('./energyPower');
 const humidityFeature = require('./humidity');
 const temperatureFeature = require('./temperature');
 
@@ -13,10 +14,10 @@ const AVAILABLE_FEATURE_MODELS = {
     uiid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15],
     feature: powerFeature,
   },
-  energyPower: {
-    uiid: [5],
-    feature: energyPowerFeature,
-  },
+  // energyPower: {
+  //   uiid: [5],
+  //   feature: energyPowerFeature,
+  // },
   humidity: {
     uiid: [15],
     feature: humidityFeature,
@@ -27,15 +28,14 @@ const AVAILABLE_FEATURE_MODELS = {
   },
 };
 
-const getDeviceName = (device, channel = null) => {
+const getDeviceName = (device) => {
   const name =
     device.name !== ''
-      ? device.name.concat(channel ? ` Ch${channel}` : '')
+      ? device.name
       : titleize(
           ''.concat(
             device.brandName && device.brandName.length > 0 ? ` ${device.brandName}` : '',
             device.productModel && device.productModel.length > 0 ? ` ${device.productModel}` : '',
-            channel ? ` Ch${channel}` : '',
           ),
         );
   return name.trim();
@@ -44,13 +44,12 @@ const getDeviceName = (device, channel = null) => {
 /**
  * @description Get the external ID of the eWeLink device.
  * @param {Object} device - The eWeLink device.
- * @param {number} channel - The channel of the device to control.
  * @returns {string} Return the external ID of the Gladys device.
  * @example
  * getExternalId(device, 1);
  */
-function getExternalId(device, channel = null) {
-  return [DEVICE_EXTERNAL_ID_BASE, device.deviceid, channel || 1].join(':');
+function getExternalId(device) {
+  return [DEVICE_EXTERNAL_ID_BASE, device.deviceid].join(':');
 }
 
 /**
@@ -58,12 +57,12 @@ function getExternalId(device, channel = null) {
  * @param {string} externalId - External ID of the Gladys device.
  * @returns {Object} Return the prefix, the device ID, the channel count and the type.
  * @example
- * parseExternalId('eWeLink:100069d0d4:4:power');
+ * parseExternalId('eWeLink:100069d0d4:power:4');
  */
 function parseExternalId(externalId) {
-  const [prefix, deviceId, channelString, type] = externalId.split(':');
+  const [prefix, deviceId, type, channelString] = externalId.split(':');
   const channel = parseInt(channelString || '0', 10);
-  return { prefix, deviceId, channel, type };
+  return { prefix, deviceId, type, channel };
 }
 
 /**
@@ -86,9 +85,9 @@ function readOnlineValue(online) {
  * @example
  * getDevice(serviceId, device, channel);
  */
-function getDevice(serviceId, device, channel = null) {
-  const name = getDeviceName(device, channel);
-  const externalId = [DEVICE_EXTERNAL_ID_BASE, device.deviceid, channel || 1].join(':');
+function getDevice(serviceId, device, channel = 0) {
+  const name = getDeviceName(device);
+  const externalId = getExternalId(device);
 
   const createdDevice = {
     name,
@@ -118,13 +117,19 @@ function getDevice(serviceId, device, channel = null) {
   if (device.online) {
     Object.keys(AVAILABLE_FEATURE_MODELS).forEach((type) => {
       if (AVAILABLE_FEATURE_MODELS[type].uiid.includes(device.uiid)) {
-        const featureExternalId = [externalId, type].join(':');
-        const feature = {
-          ...AVAILABLE_FEATURE_MODELS[type].feature.generateFeature(),
-          external_id: featureExternalId,
-          selector: featureExternalId,
-        };
-        createdDevice.features.push(feature);
+        let ch = 1;
+        do {
+          const featureExternalId = (type === 'power' ? [externalId, type, ch] : [externalId, type]).join(':');
+          const feature = {
+            ...AVAILABLE_FEATURE_MODELS[type].feature.generateFeature(channel > 1 ? ch : 0),
+            external_id: featureExternalId,
+            selector: featureExternalId,
+          };
+
+          logger.debug(`eWeLink: Add feature "${type}" to device "${device.deviceid}"`);
+          createdDevice.features.push(feature);
+          ch += channel > 0 ? 1 : 0;
+        } while (type === 'power' && ch <= channel);
       }
     });
   }

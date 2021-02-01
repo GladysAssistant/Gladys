@@ -2,14 +2,13 @@ const Promise = require('bluebird');
 const { fake } = require('sinon');
 const GladysPowDevice = require('./Gladys-pow.json');
 const GladysOfflineDevice = require('./Gladys-offline.json');
-const Gladys2Ch1Device = require('./Gladys-2ch1.json');
-const Gladys2Ch2Device = require('./Gladys-2ch2.json');
+const Gladys2ChDevice = require('./Gladys-2ch.json');
 const GladysUnhandledDevice = require('./Gladys-unhandled.json');
 const GladysThDevice = require('./Gladys-th.json');
 
 const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
 
-const event = { emit: fake.returns(null) };
+const event = { emit: fake.resolves(null) };
 
 const variableNotConfigured = {
   getValue: (valueId, notUsed) => {
@@ -80,7 +79,7 @@ const variableNok = {
 };
 
 const deviceManagerFull = {
-  get: fake.resolves([Gladys2Ch1Device, GladysOfflineDevice, GladysPowDevice, GladysThDevice, GladysUnhandledDevice]),
+  get: fake.resolves([Gladys2ChDevice, GladysOfflineDevice, GladysPowDevice, GladysThDevice, GladysUnhandledDevice]),
 };
 
 const stateManagerWith0Devices = {
@@ -89,15 +88,12 @@ const stateManagerWith0Devices = {
   },
 };
 
-const stateManagerWith3Devices = {
+const stateManagerWith2Devices = {
   get: (key, externalId) => {
-    if (externalId === 'ewelink:10004531ae:1') {
-      return Gladys2Ch1Device;
+    if (externalId === 'ewelink:10004531ae') {
+      return Gladys2ChDevice;
     }
-    if (externalId === 'ewelink:10004531ae:2') {
-      return Gladys2Ch2Device;
-    }
-    if (externalId === 'ewelink:10004533ae:1') {
+    if (externalId === 'ewelink:10004533ae') {
       return GladysPowDevice;
     }
     return undefined;
@@ -106,22 +102,19 @@ const stateManagerWith3Devices = {
 
 const stateManagerFull = {
   get: (key, externalId) => {
-    if (externalId === 'ewelink:10004531ae:1') {
-      return Gladys2Ch1Device;
+    if (externalId === 'ewelink:10004531ae') {
+      return Gladys2ChDevice;
     }
-    if (externalId === 'ewelink:10004531ae:2') {
-      return Gladys2Ch2Device;
-    }
-    if (externalId === 'ewelink:10004532ae:1') {
+    if (externalId === 'ewelink:10004532ae') {
       return GladysOfflineDevice;
     }
-    if (externalId === 'ewelink:10004533ae:1') {
+    if (externalId === 'ewelink:10004533ae') {
       return GladysPowDevice;
     }
-    if (externalId === 'ewelink:10004534ae:1') {
+    if (externalId === 'ewelink:10004534ae') {
       return GladysThDevice;
     }
-    if (externalId === 'ewelink:10004535ae:1') {
+    if (externalId === 'ewelink:10004535ae') {
       return GladysUnhandledDevice;
     }
     return undefined;
@@ -138,6 +131,6 @@ module.exports = {
   variableNok,
   deviceManagerFull,
   stateManagerWith0Devices,
-  stateManagerWith3Devices,
+  stateManagerWith2Devices,
   stateManagerFull,
 };

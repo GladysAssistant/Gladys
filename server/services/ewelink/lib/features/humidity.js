@@ -6,7 +6,7 @@ const {
 
 module.exports = {
   // Gladys feature
-  generateFeature: () => {
+  generateFeature: (channel = 0) => {
     return {
       name: 'Humidity',
       category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,

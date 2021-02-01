@@ -6,12 +6,11 @@ const {
   event,
   serviceId,
   stateManagerWith0Devices,
-  stateManagerWith3Devices,
+  stateManagerWith2Devices,
   variableNotConfigured,
   variableOk,
 } = require('../../mocks/consts.test');
-const Gladys2Ch1Device = require('../../mocks/Gladys-2ch1.json');
-const Gladys2Ch2Device = require('../../mocks/Gladys-2ch2.json');
+const Gladys2ChDevice = require('../../mocks/Gladys-2ch.json');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
 const GladysThDevice = require('../../mocks/Gladys-th.json');
@@ -33,10 +32,10 @@ const gladysWith0Devices = {
   event,
   stateManager: stateManagerWith0Devices,
 };
-const gladysWith3Devices = {
+const gladysWith2Devices = {
   variable: variableOk,
   event,
-  stateManager: stateManagerWith3Devices,
+  stateManager: stateManagerWith2Devices,
 };
 
 describe('EweLinkHandler discover', () => {
@@ -44,21 +43,20 @@ describe('EweLinkHandler discover', () => {
     sinon.reset();
   });
 
-  it('should found 6 devices, 6 of wich are new unknown devices', async () => {
+  it('should found 5 devices, 5 of wich are new unknown devices', async () => {
     const eweLinkService = EwelinkService(gladysWith0Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
-    expect(newDevices.length).to.equal(6);
+    expect(newDevices.length).to.equal(5);
     expect(newDevices).to.have.deep.members([
-      Gladys2Ch1Device,
-      Gladys2Ch2Device,
+      Gladys2ChDevice,
+      GladysUnhandledDevice,
+      GladysThDevice,
       GladysOfflineDevice,
       GladysPowDevice,
-      GladysThDevice,
-      GladysUnhandledDevice,
     ]);
   });
-  it('should found 6 devices, 3 of wich are already in Gladys and 3 are a new unknown device', async () => {
-    const eweLinkService = EwelinkService(gladysWith3Devices, serviceId);
+  it('should found 5 devices, 2 of wich are already in Gladys and 3 are a new unknown device', async () => {
+    const eweLinkService = EwelinkService(gladysWith2Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
     expect(newDevices.length).to.equal(3);
     expect(newDevices).to.have.deep.members([GladysOfflineDevice, GladysThDevice, GladysUnhandledDevice]);
