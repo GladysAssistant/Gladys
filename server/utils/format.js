@@ -1,7 +1,7 @@
 /**
  * @description Compare 2 value.
- * @param {string|number|boolean} value - Number.
- * @param {string|number|boolean} newValue - New number.
+ * @param {number|boolean} value - Number.
+ * @param {number|boolean} newValue - New number.
  * @returns {boolean} Return param.
  * @example
  * compareValue({
@@ -15,7 +15,7 @@
  * }, false);
  */
 function compareValue(value, newValue) {
-  if (value === null || newValue === null) {
+  if (newValue === null) {
     return false;
   }
   if (Number.isInteger(newValue) && Number.isInteger(value)) {
