@@ -25,14 +25,16 @@ const { forwardWebsockets } = require('./gateway.forwardWebsockets');
 const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
+const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user) {
+const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager) {
   this.variable = variable;
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
   this.config = config;
   this.user = user;
+  this.stateManager = stateManager;
   this.connected = false;
   this.restoreInProgress = false;
   this.GladysGatewayClient = GladysGatewayClient;
@@ -62,5 +64,6 @@ Gateway.prototype.forwardWebsockets = forwardWebsockets;
 Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
+Gateway.prototype.refreshUserKeys = refreshUserKeys;
 
 module.exports = Gateway;

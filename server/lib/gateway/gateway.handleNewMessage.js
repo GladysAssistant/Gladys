@@ -1,7 +1,7 @@
 const get = require('get-value');
 
 const { NotFoundError } = require('../../utils/coreErrors');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Handle a new Gladys Gateway message.
@@ -16,12 +16,9 @@ const { EVENTS } = require('../../utils/constants');
  */
 async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-api-call') {
-    // first, we verify that the user has the right to control the instance
-    const usersKeys = JSON.parse(await this.variable.getValue('GLADYS_GATEWAY_USERS_KEYS'));
     const rsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.rsaPublicKeyRaw);
     const ecdsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
-
-    const found = usersKeys.find(
+    const found = this.usersKeys.find(
       (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
     );
 
@@ -41,7 +38,9 @@ async function handleNewMessage(data, rawMessage, cb) {
       return;
     }
     try {
-      const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
+      // const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
+      const user = rawMessage.local_user_id ? this.stateManager.get('userById', rawMessage.local_user_id) : null;
+
       this.event.emit(
         EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
         user,
