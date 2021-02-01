@@ -53,7 +53,7 @@ describe('dashboard.get', () => {
         name: 'Test dashboard',
         type: 'main',
         selector: 'test-dashboard',
-        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: '2019-02-12 07:49:07.556 +00:00',
       },
     ]);
   });
