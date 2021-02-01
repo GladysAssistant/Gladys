@@ -3,6 +3,7 @@ const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError, NoValuesFoundError } = require('../../utils/coreErrors');
 const { INTENTS } = require('../../utils/constants');
 const { NoWeatherFoundError } = require('./weather.error');
+const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @description Capitalize First Letter.
@@ -75,7 +76,7 @@ async function command(message, classification, context) {
         }
       }
     } else {
-      throw new Error('Not found');
+      throw new NotFoundError('Not found');
     }
   } catch (e) {
     logger.debug(e);

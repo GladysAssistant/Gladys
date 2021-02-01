@@ -4,6 +4,8 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
+import { WEATHER_UNITS } from '../../../../../server/utils/constants';
+
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
   RequestStatus,
@@ -123,7 +125,7 @@ const WeatherBox = ({ children, ...props }) => (
                   fontSize: '30px'
                 }}
               >
-                {props.units === 'metric' ? 'C' : 'F'}
+                {props.units === WEATHER_UNITS.METRIC ? <Text id="global.celsius" /> : <Text id="global.fahrenheit" />}
               </span>
             </div>
           </div>
@@ -176,7 +178,11 @@ const WeatherBox = ({ children, ...props }) => (
                   color: 'grey'
                 }}
               >
-                {props.units === 'metric' ? 'm/s' : 'm/h'}
+                {props.units === WEATHER_UNITS.METRIC ? (
+                  <Text id="global.metersPerSec" />
+                ) : (
+                  <Text id="global.milesPerHour" />
+                )}
               </span>
             </span>
           </div>
