@@ -1,10 +1,10 @@
 /**
  * @description Send the Withings service id.
- * @returns {Promise} Resolve with withings service id.
+ * @returns {Object} Resolve with withings service id.
  * @example
  * withings.getServiceId();
  */
-async function getServiceId() {
+function getServiceId() {
   return { success: true, serviceId: this.serviceId };
 }
 

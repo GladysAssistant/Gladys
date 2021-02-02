@@ -2,7 +2,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function WithingsController(withingsHandler) {
   /**
-   * @description Init gladys devices ith withings devices.
+   * @description Init gladys devices with withings devices.
    * @api {post} /api/v1/service/withings/init Init gladys devices ith withings devices.
    * @apiName init
    * @apiGroup Withings
@@ -54,8 +54,8 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiName getServiceId
    * @apiGroup Withings
    */
-  async function getServiceId(req, res) {
-    const resultServiceId = await withingsHandler.getServiceId();
+  function getServiceId(req, res) {
+    const resultServiceId = withingsHandler.getServiceId();
     res.json({
       success: true,
       result: resultServiceId,
@@ -77,7 +77,7 @@ module.exports = function WithingsController(withingsHandler) {
     },
     'get /api/v1/service/withings/getServiceId': {
       authenticated: true,
-      controller: asyncMiddleware(getServiceId),
+      controller: getServiceId,
     },
   };
 };
