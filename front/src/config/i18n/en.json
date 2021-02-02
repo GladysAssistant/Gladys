@@ -424,8 +424,9 @@
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
         "enableZigbee2mqtt": "Enable Zigbee2mqtt",
-        "containersTitle": " Zigbee2mqtt Docker containers",
-        "containersStatus": "Zigbee2mqtt status",
+        "containersStatus": "Zigbee2mqtt Containers",
+        "serviceStatus": "Zigbee2mqtt Service Status",
+        "link": "Link",
         "connected": "Zigbee2mqtt was started with success.",
         "error": "An error occured while starting Zigbee2mqtt."
       },

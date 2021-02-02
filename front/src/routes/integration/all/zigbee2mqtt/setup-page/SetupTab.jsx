@@ -54,7 +54,7 @@ class SetupTab extends Component {
             <label for="enableZigbee2mqtt" class="form-label">
               <Text id={`integration.zigbee2mqtt.setup.enableLabel`} />
             </label>
-            <label class="custom-swith">
+            <label class="custom-switch">
               <input
                 type="checkbox"
                 id="enableZigbee2mqtt"
@@ -76,90 +76,188 @@ class SetupTab extends Component {
               </span>
             </label>
           </div>
-
-          <br />
-          <div class="card-header">
+          <div class="card-header d-none d-sm-block">
+            <h2 class="card-title">
+              <Text id="integration.zigbee2mqtt.setup.serviceStatus" />
+            </h2>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-auto">
+              <table class="table table-responsive table-borderless table-sm d-none d-sm-block">
+                <thead class="text-center">
+                  <tr>
+                    <th class="text-center">{`Gladys`}</th>
+                    <th class="text-center" />
+                    <th class="text-center">{props.mqttExist && 'MQTT'}</th>
+                    <th class="text-center" />
+                    <th class="text-center">{props.zigbee2mqttExist && 'Zigbee2mqtt'}</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  <tr>
+                    <td class="text-center">
+                      <img src={logoGladys} alt={`Gladys`} title={`Gladys`} width="80" height="80" />
+                    </td>
+                    <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
+                      {props.mqttRunning && (
+                        <hr
+                          style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }}
+                        />
+                      )}
+                      {props.mqttRunning && props.gladysConnected && (
+                        <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
+                      )}
+                      {props.mqttRunning && !props.gladysConnected && (
+                        <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
+                      )}
+                      {props.mqttRunning && (
+                        <hr
+                          style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }}
+                        />
+                      )}
+                    </td>
+                    <td class="text-center">
+                      {props.mqttExist && <img src={logoMqtt} alt={`MQTT`} title={`MQTT`} width="80" height="80" />}
+                    </td>
+                    <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
+                      {props.zigbee2mqttRunning && (
+                        <hr
+                          style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }}
+                        />
+                      )}
+                      {props.zigbee2mqttRunning && props.zigbee2mqttConnected && (
+                        <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
+                      )}
+                      {props.zigbee2mqttRunning && !props.zigbee2mqttConnected && (
+                        <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
+                      )}
+                      {props.zigbee2mqttRunning && (
+                        <hr
+                          style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }}
+                        />
+                      )}
+                    </td>
+                    <td class="text-center">
+                      {props.zigbee2mqttExist && (
+                        <img src={logoZigbee2mqtt} alt={`Zigbee2mqtt`} title={`Zigbee2mqtt`} width="80" height="80" />
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <div class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </div>
+                    </td>
+                    <td class="text-center" />
+                    <td class="text-center">
+                      {props.mqttRunning && (
+                        <span class="tag tag-success">
+                          <Text id={`systemSettings.containerState.running`} />
+                        </span>
+                      )}
+                    </td>
+                    <td class="text-center" />
+                    <td class="text-center">
+                      {props.zigbee2mqttRunning && (
+                        <span class="tag tag-success">
+                          <Text id={`systemSettings.containerState.running`} />
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-header d-sm-none">
             <h2 class="card-title">
               <Text id="integration.zigbee2mqtt.setup.containersStatus" />
             </h2>
           </div>
-          <table class="table table-responsive table-borderless table-sm">
-            <thead>
-              <tr>
-                <th class="text-center">{`Gladys`}</th>
-                <th class="text-center" />
-                <th class="text-center">{props.mqttExist && 'MQTT'}</th>
-                <th class="text-center" />
-                <th class="text-center">{props.zigbee2mqttExist && 'Zigbee2mqtt'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="text-center">
-                  <img src={logoGladys} alt={`Gladys`} title={`Gladys`} width="80" height="80" />
-                </td>
-                <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
-                  {props.mqttRunning && (
-                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
-                  )}
-                  {props.mqttRunning && props.gladysConnected && (
-                    <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
-                  )}
-                  {props.mqttRunning && !props.gladysConnected && (
-                    <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
-                  )}
-                  {props.mqttRunning && (
-                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
-                  )}
-                </td>
-                <td class="text-center">
-                  {props.mqttExist && <img src={logoMqtt} alt={`MQTT`} title={`MQTT`} width="80" height="80" />}
-                </td>
-                <td class="text-center" style="vertical-align:middle;display:flex;align-items:center;">
-                  {props.zigbee2mqttRunning && (
-                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
-                  )}
-                  {props.zigbee2mqttRunning && props.zigbee2mqttConnected && (
-                    <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
-                  )}
-                  {props.zigbee2mqttRunning && !props.zigbee2mqttConnected && (
-                    <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
-                  )}
-                  {props.zigbee2mqttRunning && (
-                    <hr style={{ color: '#00f', backgroundColor: '#00f', borderColor: '#00f', height: 2, width: 40 }} />
-                  )}
-                </td>
-                <td class="text-center">
-                  {props.zigbee2mqttExist && (
-                    <img src={logoZigbee2mqtt} alt={`Zigbee2mqtt`} title={`Zigbee2mqtt`} width="80" height="80" />
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="tag tag-success">
-                    <Text id={`systemSettings.containerState.running`} />
-                  </div>
-                </td>
-                <td class="text-center" />
-                <td class="text-center">
-                  {props.mqttRunning && (
-                    <span class="tag tag-success">
-                      <Text id={`systemSettings.containerState.running`} />
-                    </span>
-                  )}
-                </td>
-                <td class="text-center" />
-                <td class="text-center">
-                  {props.zigbee2mqttRunning && (
-                    <span class="tag tag-success">
-                      <Text id={`systemSettings.containerState.running`} />
-                    </span>
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="row justify-content-center d-sm-none">
+            <div class="col-auto">
+              <table class="table table-responsive table-borderless table-sm">
+                <thead class="text-center">
+                  <th>
+                    <Text id="systemSettings.containers" />
+                  </th>
+                  <th>{`Status`}</th>
+                </thead>
+                <tbody class="text-center">
+                  <tr>
+                    <td>{`Gladys`}</td>
+                    <td>
+                      <span class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>{`MQTT`}</td>
+                    <td>
+                      {props.mqttRunning && (
+                        <span class="tag tag-success">
+                          <Text id={`systemSettings.containerState.running`} />
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>{`Zigbee2mqtt`}</td>
+                    <td>
+                      {props.zigbee2mqttRunning && (
+                        <span class="tag tag-success">
+                          <Text id={`systemSettings.containerState.running`} />
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-header d-sm-none">
+            <h2 class="card-title">
+              <Text id="integration.zigbee2mqtt.setup.serviceStatus" />
+            </h2>
+          </div>
+          <div class="row justify-content-center d-sm-none">
+            <div class="col-auto">
+              <table class="table table-responsive table-borderless table-sm">
+                <thead class="text-center">
+                  <th>
+                    <Text id="integration.zigbee2mqtt.setup.link" />
+                  </th>
+                  <th>{`Status`}</th>
+                </thead>
+                <tbody class="text-center">
+                  <tr>
+                    <td>{`Gladys - MQTT`}</td>
+                    <td>
+                      {props.zigbee2mqttExist && props.zigbee2mqttConnected && (
+                        <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
+                      )}
+                      {props.zigbee2mqttExist && !props.zigbee2mqttConnected && (
+                        <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>{`MQTT - Zigbee`}</td>
+                    <td>
+                      {props.zigbee2mqttExist && props.zigbee2mqttConnected && (
+                        <i style={{ color: '#0f0', fontSize: '24px' }} class="fe fe-check" />
+                      )}
+                      {props.zigbee2mqttExist && !props.zigbee2mqttConnected && (
+                        <i style={{ color: '#f00', fontSize: '24px' }} class="fe fe-x" />
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     );

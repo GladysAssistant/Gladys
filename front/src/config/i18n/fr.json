@@ -545,8 +545,9 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "enableZigbee2mqtt": "Activer Zigbee2mqtt",
-        "containersTitle": "Containers associés au service Zigbee2mqtt",
-        "containersStatus": "Etat de fonctionnement du service Zigbee2mqtt",
+        "containersStatus": "Conteneurs liés à Zigbee2mqtt",
+        "serviceStatus": "Etat du service Zigbee2mqtt",
+        "link": "Lien",
         "connected": "Zigbee2mqtt démarré avec succès.",
         "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt."
       },
