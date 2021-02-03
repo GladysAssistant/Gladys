@@ -195,3 +195,21 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
           cache-to: type=inline
+      - 
+        name: 🐳 Legacy Tags
+        run: |
+          echo '{"experimental": true}' | sudo tee -a /etc/docker/daemon.json
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          sudo systemctl restart docker
+          export DIGESTARM=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm" and .value.platform.variant == "v6").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM ${{ env.DOCKERHUB_REPO }}:v4-arm
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm
+          export DIGESTARM64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm64").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64 ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
+          export DIGESTAMD64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "amd64").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64 ${{ env.DOCKERHUB_REPO }}:v4-amd64
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-amd64
