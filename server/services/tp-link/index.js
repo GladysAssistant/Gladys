@@ -15,7 +15,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
    * gladys.services['tplink'].start();
    */
   async function start() {
-    logger.log('starting TP-Link service');
+    logger.info('Starting TP-Link service');
   }
 
   /**
@@ -25,7 +25,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
    *  gladys.services['tplink'].stop();
    */
   async function stop() {
-    logger.log('stopping TP-Link service');
+    logger.info('Stopping TP-Link service');
   }
 
   return Object.freeze({
