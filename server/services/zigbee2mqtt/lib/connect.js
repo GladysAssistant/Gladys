@@ -17,7 +17,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       username: mqttUsername,
       password: mqttPassword,
       reconnectPeriod: 5000,
-      clientId: 'gladys-assistant-main-instance',
+      clientId: `gladys-main-instance-${Math.floor(Math.random() * 1000000)}`,
     });
     this.mqttClient.on('connect', () => {
       logger.info('Connected to MQTT container', mqttUrl);
@@ -53,9 +53,6 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   } else {
     logger.warn("Can't connect Gladys cause MQTT not running !");
   }
-
-  // Subscribe to Zigbee2mqtt topics
-  //      this.subscribe('zigbee2mqtt/#', this.handleMqttMessage.bind(this));
 }
 
 module.exports = {

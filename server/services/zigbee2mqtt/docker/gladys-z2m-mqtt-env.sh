@@ -19,10 +19,9 @@ if [ ! -f "$mosquitto_config_file" ]; then
   touch $mosquitto_config_file
 
   # Write defaults
-  echo "port 1884" >> $mosquitto_config_file
+  echo "listener 1884" >> $mosquitto_config_file
   echo "allow_anonymous false" >> $mosquitto_config_file
   echo "# connection_messages false" >> $mosquitto_config_file
-  echo "allow_duplicate_messages true" >> $mosquitto_config_file
   echo "password_file ${internal_mosquitto_passwd_file}" >> $mosquitto_config_file
 
   echo "Zigbee2mqtt : MQTT configuration written"
