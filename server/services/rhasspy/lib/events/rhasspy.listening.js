@@ -14,7 +14,6 @@ async function listening() {
   ws.on('message', async (data) => {
     obj = JSON.parse(data);
     const response = await this.gladys.message.getReply(obj.text, 'en');
-    logger.error(response)
     await axios.post('http://0.0.0.0:12101/api/text-to-speech?play=true', response);
   });
 }
