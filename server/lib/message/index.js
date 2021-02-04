@@ -5,6 +5,7 @@ const { reply } = require('./message.reply');
 const { handleEvent } = require('./message.handleEvent');
 const { replyByIntent } = require('./message.replyByIntent');
 const { sendToUser } = require('./message.sendToUser');
+const { getReply } = require('./message.getReply');
 
 const MessageHandler = function MessageHandler(event, brain, service, state) {
   this.event = event;
@@ -20,5 +21,6 @@ MessageHandler.prototype.handleEvent = handleEvent;
 MessageHandler.prototype.reply = reply;
 MessageHandler.prototype.replyByIntent = replyByIntent;
 MessageHandler.prototype.sendToUser = sendToUser;
+MessageHandler.prototype.getReply = getReply;
 
 module.exports = MessageHandler;

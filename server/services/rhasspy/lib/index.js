@@ -1,6 +1,7 @@
 const { connect } = require('./commands/rhasspy.connect.js');
 const { init } = require('./commands/rhasspy.init.js');
 const { installRhasspyContainer } = require('./commands/rhasspy.installRhasspyContainer.js');
+const { listening } = require('./events/rhasspy.listening.js');
 
 /**
  * @param {Object} gladys - The gladys object.
@@ -22,5 +23,6 @@ const RhasspyManager = function RhasspyManager(gladys, serviceId) {
 RhasspyManager.prototype.connect = connect;
 RhasspyManager.prototype.init = init;
 RhasspyManager.prototype.installRhasspyContainer = installRhasspyContainer;
+RhasspyManager.prototype.listening = listening;
 
 module.exports = RhasspyManager;

@@ -5,6 +5,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const containerDescriptor = require('../docker/gladys-rhasspy-container.json');
 const logger = require('../../../../utils/logger');
 const axios = require('axios');
+const { BadParameters } = require('../../../../utils/coreErrors');
 
 const sleep = promisify(setTimeout);
 
@@ -36,7 +37,7 @@ async function installRhasspyContainer() {
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.RHASSPY.STATUS_CHANGE,
       });
-      throw e;
+      throw new Error('Failed to create container');
     }
   }
 
@@ -51,9 +52,10 @@ async function installRhasspyContainer() {
     if (container.state !== 'running') {
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart
-      await sleep(5 * 1000);
+      await sleep(20 * 1000);
     }
 
+    logger.info('Modification of rhasspy profile');
     // Modifier le profile et redemarrer le service
     await axios.post('http://0.0.0.0:12101/api/profile?layers=profile', {
         "intent": {
@@ -63,14 +65,14 @@ async function installRhasspyContainer() {
             "system": "arecord"
         },
         "sounds": {
-            "system": "remote"
+            "system": "aplay"
         },
         "speech_to_text": {
             "system": "deepspeech"
         },
         "text_to_speech": {
             "nanotts": {
-                "language": "fr-FR",
+                "language": "en-GB",
                 "volume": "1"
             },
             "system": "nanotts"
@@ -86,6 +88,10 @@ async function installRhasspyContainer() {
 
     await sleep(5 * 1000);
 
+    // await axios.post('http://localhost:12101/api/download-profile');
+
+    await sleep(10 * 1000);
+
     logger.info('Rhasspy successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.RHASSPY.STATUS_CHANGE,
@@ -97,7 +103,7 @@ async function installRhasspyContainer() {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.RHASSPY.STATUS_CHANGE,
     });
-    throw e;
+    throw new Error('Failed to restart container');
   }
 }
 
