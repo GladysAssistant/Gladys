@@ -70,6 +70,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
+    "@abandonware/noble": "^1.9.2-11",
     "@gladysassistant/gladys-gateway-js": "^3.2.7",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",

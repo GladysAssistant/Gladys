@@ -16,8 +16,9 @@ async function applyOnPeripheral(peripheralUuid, applyFunc, keepConnected = fals
   this.peripheralLookup = true;
 
   return this.scan(true, peripheralUuid)
-    .then((peripheral) =>
-      connect(peripheral).then((connectedPerpheral) =>
+    .then((peripheral) => {
+      this.bluetooth.reset();
+      return connect(peripheral).then((connectedPerpheral) =>
         new Promise((resolve) => {
           try {
             return resolve(applyFunc(connectedPerpheral));
@@ -29,8 +30,8 @@ async function applyOnPeripheral(peripheralUuid, applyFunc, keepConnected = fals
             connectedPerpheral.disconnect();
           }
         }),
-      ),
-    )
+      );
+    })
     .finally(() => {
       this.peripheralLookup = false;
       this.broadcastStatus();
