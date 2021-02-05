@@ -53,12 +53,20 @@ describe('variable.setValue', () => {
     const promise = variable.setValue('SECURE_VARIABLE', null, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     return chaiAssert.isRejected(promise, 'notNull Violation: t_variable.value cannot be null');
   });
-  it.only('should create timezone variable and emit event', async () => {
+  it('should create timezone variable and emit event', async () => {
     const event = {
       emit: fake.returns(),
     };
     const customVariable = new Variable(event);
     await customVariable.setValue(SYSTEM_VARIABLE_NAMES.TIMEZONE, 'TIMEZONE');
     assert.calledWith(event.emit, EVENTS.SYSTEM.TIMEZONE_CHANGED);
+  });
+  it('should create gateway users keys variable and emit event', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    await customVariable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS, 'TIMEZONE');
+    assert.calledWith(event.emit, EVENTS.GATEWAY.USER_KEYS_CHANGED);
   });
 });
