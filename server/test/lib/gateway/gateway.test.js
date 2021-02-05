@@ -51,6 +51,29 @@ describe('gateway', () => {
       assert.calledOnce(gateway.gladysGatewayClient.createInstance);
     });
   });
+  describe('gateway.init', () => {
+    const userKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+      },
+    ];
+    const variable = {
+      getValue: fake.resolves(JSON.stringify(userKeys)),
+      setValue: fake.resolves(null),
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config);
+    it('should login two factor to gladys gateway', async () => {
+      await gateway.init();
+      expect(gateway.connected).to.equal(true);
+      expect(gateway.usersKeys).to.deep.equal(userKeys);
+    });
+  });
 
   describe('gateway.backup', () => {
     it('should backup gladys', async () => {
