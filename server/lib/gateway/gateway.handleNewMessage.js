@@ -1,7 +1,7 @@
 const get = require('get-value');
 
 const { NotFoundError } = require('../../utils/coreErrors');
-const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Handle a new Gladys Gateway message.
