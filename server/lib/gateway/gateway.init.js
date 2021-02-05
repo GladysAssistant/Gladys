@@ -12,7 +12,11 @@ async function init() {
     const gladysGatewayRefreshToken = await this.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
     const gladysGatewayRsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_RSA_PRIVATE_KEY');
     const gladysGatewayEcdsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
+
     if (gladysGatewayRefreshToken && gladysGatewayRsaPrivateKey && gladysGatewayEcdsaPrivateKey) {
+      // refreshing local cache of user keys
+      this.refreshUserKeys();
+      // connecting instance
       await this.gladysGatewayClient.instanceConnect(
         gladysGatewayRefreshToken,
         JSON.parse(gladysGatewayRsaPrivateKey),

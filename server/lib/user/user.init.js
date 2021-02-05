@@ -11,6 +11,7 @@ async function init() {
   const plainUsers = users.map((user) => {
     const plainUser = user.get({ plain: true });
     this.stateManager.setState('user', plainUser.selector, plainUser);
+    this.stateManager.setState('userById', plainUser.id, plainUser);
     return plainUser;
   });
   return plainUsers;
