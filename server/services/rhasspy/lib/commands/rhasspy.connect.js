@@ -9,7 +9,7 @@ async function connect() {
     logger.info('Connected to rhasspy, initialize websocket');
     // initialization of websocket
   } else {
-    logger.warn('Rhasspy is not running')
+    logger.warn('Rhasspy is not running');
   }
 }
 

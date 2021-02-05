@@ -1,20 +1,12 @@
 {
   "name": "gladys-rhasspy",
   "Image": "rhasspy/rhasspy",
-  "cmd": [
-    "--user-profiles",
-    "/profiles",
-    "--profile",
-    "en"
-  ],
+  "cmd": ["--user-profiles", "/profiles", "--profile", "en"],
   "ExposedPorts": {
     "12101/tcp": {}
   },
   "HostConfig": {
-    "Binds": [
-      "/var/lib/gladysassistant/rhasspy/profiles:/profiles",
-      "/etc/localtime:/etc/localtime:ro"
-    ],
+    "Binds": ["/var/lib/gladysassistant/rhasspy/profiles:/profiles", "/etc/localtime:/etc/localtime:ro"],
     "PortBindings": {
       "12101/tcp": [
         {
@@ -31,11 +23,11 @@
     "DnsSearch": [],
     "BlkioWeightDevice": [],
     "Devices": [
-        {
-            "PathOnHost": "/dev/snd",
-            "PathInContainer": "/dev/snd",
-            "CgroupPermissions": "rwm"
-        }
+      {
+        "PathOnHost": "/dev/snd",
+        "PathInContainer": "/dev/snd",
+        "CgroupPermissions": "rwm"
+      }
     ]
   }
 }

@@ -1,11 +1,8 @@
 const { promisify } = require('util');
-const { exec } = require('../../../../utils/childProcess');
-const { CONFIGURATION } = require('../constants');
+const axios = require('axios');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const containerDescriptor = require('../docker/gladys-rhasspy-container.json');
 const logger = require('../../../../utils/logger');
-const axios = require('axios');
-const { BadParameters } = require('../../../../utils/coreErrors');
 
 const sleep = promisify(setTimeout);
 
@@ -58,31 +55,31 @@ async function installRhasspyContainer() {
     logger.info('Modification of rhasspy profile');
     // Modifier le profile et redemarrer le service
     await axios.post('http://0.0.0.0:12101/api/profile?layers=profile', {
-        "intent": {
-            "system": "fsticuffs"
+      intent: {
+        system: 'fsticuffs',
+      },
+      microphone: {
+        system: 'arecord',
+      },
+      sounds: {
+        system: 'aplay',
+      },
+      speech_to_text: {
+        system: 'deepspeech',
+      },
+      text_to_speech: {
+        nanotts: {
+          language: 'en-GB',
+          volume: '1',
         },
-        "microphone": {
-            "system": "arecord"
+        system: 'nanotts',
+      },
+      wake: {
+        porcupine: {
+          keyword_path: 'jarvis_linux.ppn',
         },
-        "sounds": {
-            "system": "aplay"
-        },
-        "speech_to_text": {
-            "system": "deepspeech"
-        },
-        "text_to_speech": {
-            "nanotts": {
-                "language": "en-GB",
-                "volume": "1"
-            },
-            "system": "nanotts"
-        },
-        "wake": {
-            "porcupine": {
-                "keyword_path": "jarvis_linux.ppn"
-            },
-            "system": "porcupine"
-        }
+        system: 'porcupine',
+      },
     });
     await axios.post('http://0.0.0.0:12101/api/restart');
 

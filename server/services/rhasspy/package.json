@@ -12,5 +12,7 @@
   ],
   "scripts": {},
   "dependencies": {
+    "axios": "^0.21.1",
+    "ws": "^7.4.3"
   }
 }
