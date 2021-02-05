@@ -16,12 +16,6 @@ class ColorDeviceType extends Component {
     }
   };
 
-  scroll = () => {
-    this.colorPickerRef.current.parentElement.scrollIntoView({
-      behavior: 'smooth'
-    });
-  };
-
   closeColorPicker = () => {
     this.setColorPickerState(false);
   };
@@ -37,7 +31,6 @@ class ColorDeviceType extends Component {
 
     this.setState({ open, fromEvent }, () => {
       if (this.state.open) {
-        this.scroll();
         document.addEventListener('click', this.blur, true);
       }
     });
