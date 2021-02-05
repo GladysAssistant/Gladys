@@ -40,8 +40,7 @@ class SettingsSystem extends Component {
     }
   };
 
-  componentWillMount() {
-    this.props.ping();
+  componentDidMount() {
     this.props.getInfos();
     this.props.getDiskSpace();
     this.props.getContainers();
@@ -56,6 +55,14 @@ class SettingsSystem extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED, payload =>
       this.props.downloadFailed()
     );
+    // we start the ping a little bit after to give it some time to breathe
+    this.refreshPingIntervalId = setInterval(() => {
+      this.props.ping();
+    }, 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshPingIntervalId);
   }
 
   render(props, { selectedTimezone }) {
