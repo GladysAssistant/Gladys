@@ -1,5 +1,4 @@
 const TelegramService = require('../../../services/telegram');
-const { fake } = require('sinon');
 
 const gladys = {
   variable: {
