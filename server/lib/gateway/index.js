@@ -37,6 +37,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.stateManager = stateManager;
   this.connected = false;
   this.restoreInProgress = false;
+  this.usersKeys = [];
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));

@@ -38,8 +38,14 @@ async function handleNewMessage(data, rawMessage, cb) {
       return;
     }
     try {
-      // const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
-      const user = rawMessage.local_user_id ? this.stateManager.get('userById', rawMessage.local_user_id) : null;
+      let user = null;
+
+      if (rawMessage.local_user_id) {
+        user = this.stateManager.get('userById', rawMessage.local_user_id);
+        if (user === null) {
+          throw new NotFoundError(`User "${rawMessage.local_user_id}" not found`);
+        }
+      }
 
       this.event.emit(
         EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
