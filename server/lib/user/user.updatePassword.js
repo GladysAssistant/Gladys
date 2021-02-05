@@ -27,7 +27,10 @@ async function updatePassword(userId, newPassword) {
 
   await user.update({ password: hashedPassword });
 
-  this.stateManager.setState('user', user.selector, user.get({ plain: true }));
+  const plainUser = user.get({ plain: true });
+
+  this.stateManager.setState('user', plainUser.selector, plainUser);
+  this.stateManager.setState('userById', plainUser.id, plainUser);
 
   return {
     id: userId,
