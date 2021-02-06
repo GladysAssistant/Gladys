@@ -18,7 +18,7 @@ const Box = ({ children, ...props }) => {
     case 'devices-in-room':
       return <DevicesInRoomsBox {...props} />;
     case 'stockexchange':
-        return <StockExchangeBox {...props} />;
+      return <StockExchangeBox {...props} />;
   }
 };
 

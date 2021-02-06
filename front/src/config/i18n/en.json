@@ -482,8 +482,9 @@
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "stockExchange": {
-      "title": "Financial Modeling Prep API",
+      "name": "Money or your Life",
       "description": "Get the stock exchange indexes in Gladys.",
+      "title": "Financial Modeling Prep API",
       "introduction": "This integration helps you integrate with <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">Fmp API</a> to get the stock exchange indexes and values in Gladys.",
       "instructions": "You first need to create an account on <a href=\"https://financialmodelingprep.com/developer/docs/\" target=\"_blank\">FMP API website</a>.",
       "instructionsToUse": "To use this integration, go to the dashboard and create a stock exchange box.",

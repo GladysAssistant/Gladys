@@ -13,12 +13,12 @@ function createActions(store) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         const stockexchangedatas = await state.httpClient.get(`/api/v1/stockexchange/getStockExchangeIndexQuote`);
-        const error = stockexchangedatas["Error Message"];
-        if (error) {
-            boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetStockExchangeStatus.ServiceNotConfigured);
-            boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-              error: error
-            });
+        const errorMsg = stockexchangedatas['Error Message'];
+        if (errorMsg) {
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetStockExchangeStatus.ServiceNotConfigured);
+          boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+            error: errorMsg
+          });
         } else {
           boxActions.mergeBoxData(state, BOX_KEY, x, y, {
             stockexchangedatas
@@ -38,7 +38,6 @@ function createActions(store) {
         } else {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
         }
-
       }
     }
   };

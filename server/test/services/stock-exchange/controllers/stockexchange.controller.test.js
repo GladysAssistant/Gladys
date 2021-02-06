@@ -10,7 +10,7 @@ const stockexchangeService = {
 const res = {
   json: fake.returns(null),
   status: fake.returns({
-  send: fake.returns(null),
+    send: fake.returns(null),
   }),
 };
 

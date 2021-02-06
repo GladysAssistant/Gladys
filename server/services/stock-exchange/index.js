@@ -3,7 +3,6 @@ const StockExchangeController = require('./api/stockexchange.controller');
 const StockExchangeHandler = require('./lib');
 
 module.exports = function StockEchangeService(gladys, serviceId) {
-
   const stockExchangeHandler = new StockExchangeHandler(gladys, serviceId);
 
   /**

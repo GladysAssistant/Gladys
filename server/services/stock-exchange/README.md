@@ -45,16 +45,17 @@ For free you will have 200 request per day.
 
 * Stock Symbol (Ticker) : A stock symbol is an arrangement of characters—usually letters—representing publicly-traded securities on an exchange
 
+## Last Changes
+
+[x] 06/02/2021 Multi selection on tickers : as a user i can configure one or more tickers to be displayed in the stock exchange box (see front demo)
 
 ## To do
 
-* Stock exchange box :  as a user I am able to see the currency associated to the displayed stock quote information.
+[ ] Stock exchange box :  as a user I am able to see the currency associated to the displayed stock quote information.
 
-* Multi selection on tickers : as a user i can configure one or more tickers to be displayed in the stock exchange box (see front demo)
+[ ] Ask gladys for a information about a quote : as a user i can ask glady by chat to give me the actual information about a quote. IE : Tell me about quote Stark Industries
 
-* Ask gladys for a information about a quote : as a user i can ask glady by chat to give me the actual information about a quote. IE : Tell me about quote Stark Industries
-
-* Configure scenario around a stock quote : as a user i can create a scenario based on a stock quote value. IE : if Stark Industries stock quote value is below 500$ then send me a message.
+[ ] Configure scenario around a stock quote : as a user i can create a scenario based on a stock quote value. IE : if Stark Industries stock quote value is below 500$ then send me a message.
 
 
 ## Quotation

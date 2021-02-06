@@ -4,7 +4,10 @@ import StockExchangePage from './StockExchange';
 import { RequestStatus } from '../../../../utils/consts';
 import actions from './actions';
 
-@connect('user,stockExchangeApiKey,stockExchangeTickers,stockexchangeGetSettingsStatus,stockexchangeSetSettingsStatus', actions)
+@connect(
+  'user,stockExchangeApiKey,stockExchangeTickers,tickersOptions,selectedTickers,stockexchangeGetSettingsStatus,stockexchangeSetSettingsStatus',
+  actions
+)
 class StockExchangeIntegration extends Component {
   componentWillMount() {
     this.props.loadProps();
