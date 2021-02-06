@@ -8,7 +8,6 @@ const WebSocket = require('ws');
  */
 async function listening() {
   const ws = new WebSocket('ws://localhost:12101/api/events/intent');
-  ws.on('open', function open() {});
   ws.on('message', async (data) => {
     const obj = JSON.parse(data);
     const response = await this.gladys.message.getReply(obj.text, 'en');
