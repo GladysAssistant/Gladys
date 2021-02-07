@@ -70,7 +70,7 @@ class EditDeviceInRoom extends Component {
       });
       await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       this.setState({ loading: false });
     }
   };

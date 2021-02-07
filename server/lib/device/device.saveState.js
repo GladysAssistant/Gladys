@@ -41,20 +41,15 @@ async function saveState(deviceFeature, newValue) {
     last_value: newValue,
     last_value_changed: now,
   });
-  await db.sequelize.transaction(async (t) => {
-    // update deviceFeature lastValue in DB
-    await db.DeviceFeature.update(
-      {
-        last_value: newValue,
-        last_value_changed: now,
-      },
-      {
-        where: {
-          id: deviceFeature.id,
-        },
-      },
-      {
-        transaction: t,
+  // update deviceFeature lastValue in DB
+  await db.DeviceFeature.update(
+    {
+      last_value: newValue,
+      last_value_changed: now,
+    },
+    {
+      where: {
+        id: deviceFeature.id,
       },
     );
     // if the deviceFeature should keep history, we save a new deviceFeatureState
