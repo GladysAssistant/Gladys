@@ -12,6 +12,7 @@ const DEVICES_MODELS = {
   bslamp1: 'Bedside',
   bslamp: 'Bedside',
   desklamp: 'Desklamp',
+  ct_bulb: 'Color',
 };
 
 const COMMAND_TYPE = {
