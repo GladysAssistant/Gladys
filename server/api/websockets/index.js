@@ -22,7 +22,12 @@ function sendMessageUser({ type, payload, userId }) {
     return;
   }
   this.connections[userId].forEach((userConnection) => {
-    if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
+    if (
+      userConnection &&
+      userConnection.client &&
+      userConnection.client.readyState === WebSocket.OPEN &&
+      userConnection.subscriptions[type] > 0
+    ) {
       userConnection.client.send(formatWebsocketMessage(type, payload));
     }
   });
@@ -38,8 +43,15 @@ function sendMessageAllUsers({ type, payload }) {
   const usersIds = Object.keys(this.connections);
   usersIds.forEach((userId) => {
     this.connections[userId].forEach((userConnection) => {
-      if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
+      if (
+        userConnection &&
+        userConnection.client &&
+        userConnection.client.readyState === WebSocket.OPEN &&
+        userConnection.subscriptions[type] > 0
+      ) {
         userConnection.client.send(formatWebsocketMessage(type, payload));
+      } else {
+        logger.trace(`No subscriber on ${type}`);
       }
     });
   });
@@ -63,6 +75,7 @@ function userConnected(user, client) {
     this.connections[user.id].push({
       user,
       client,
+      subscriptions: {},
     });
   }
 
@@ -91,6 +104,50 @@ function userDisconnected(user, client) {
 }
 
 /**
+ * @description Add subscriber to client.
+ * @param {string} event - Event to subscribe to.
+ * @param {Object} client - Websocket client.
+ * @example
+ * addSubscriber('device.new', ws);
+ */
+function addSubscriber(event, client) {
+  logger.trace(`Websocket subscribed to ${event}`);
+
+  Object.values(this.connections).forEach((connection) => {
+    const connectionIndex = connection.findIndex((elem) => elem.client === client);
+
+    if (connectionIndex !== -1) {
+      const nbSubscribed = connection[connectionIndex].subscriptions[event] || 0;
+      connection[connectionIndex].subscriptions[event] = nbSubscribed + 1;
+    }
+  });
+
+  return null;
+}
+
+/**
+ * @description Remove subscriber from client.
+ * @param {string} event - Event to subscribe to.
+ * @param {Object} client - Websocket client.
+ * @example
+ * removeSubscriber('device.new', ws);
+ */
+function removeSubscriber(event, client) {
+  logger.trace(`Websocket unsubscribed from ${event}`);
+
+  Object.values(this.connections).forEach((connection) => {
+    const connectionIndex = connection.findIndex((elem) => elem.client === client);
+
+    if (connectionIndex !== -1) {
+      const nbSubscribed = connection[connectionIndex].subscriptions[event] || 0;
+      connection[connectionIndex].subscriptions[event] = Math.max(nbSubscribed - 1, 0);
+    }
+  });
+
+  return null;
+}
+
+/**
  * @description Init websocket server.
  * @example
  * init();
@@ -107,6 +164,12 @@ function init() {
     ws.on('message', async (data) => {
       const parsedMessage = parseWebsocketMessage(data);
       switch (parsedMessage.type) {
+        case WEBSOCKET_MESSAGE_TYPES.SUBSCRIPTION.SUBSCRIBE:
+          this.addSubscriber(parsedMessage.payload.event, ws);
+          break;
+        case WEBSOCKET_MESSAGE_TYPES.SUBSCRIPTION.UNSUBSCRIBE:
+          this.removeSubscriber(parsedMessage.payload.event, ws);
+          break;
         case WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.REQUEST:
           try {
             // we validate the token
@@ -139,5 +202,7 @@ WebsocketManager.prototype.userConnected = userConnected;
 WebsocketManager.prototype.userDisconnected = userDisconnected;
 WebsocketManager.prototype.sendMessageUser = sendMessageUser;
 WebsocketManager.prototype.sendMessageAllUsers = sendMessageAllUsers;
+WebsocketManager.prototype.addSubscriber = addSubscriber;
+WebsocketManager.prototype.removeSubscriber = removeSubscriber;
 
 module.exports = WebsocketManager;

@@ -4,6 +4,7 @@ import update from 'immutability-helper';
 import { route } from 'preact-router';
 
 import { RequestStatus } from '../../../utils/consts';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import EditScenePage from './EditScenePage';
 
 @connect('session,httpClient', {})
@@ -270,11 +271,24 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
-    this.props.session.dispatcher.addListener('scene.executing-action', payload =>
-      this.highlighCurrentlyExecutedAction(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
+      this.highlighCurrentlyExecutedAction
     );
-    this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
-      this.removeHighlighAction(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+      this.removeHighlighAction
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
+      this.highlighCurrentlyExecutedAction
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+      this.removeHighlighAction
     );
   }
 

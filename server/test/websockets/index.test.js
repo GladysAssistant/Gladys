@@ -19,6 +19,7 @@ describe('Websockets', () => {
       payload: 'test',
     };
     websocketManager.userConnected({ id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' }, client);
+    websocketManager.addSubscriber(message.type, client);
     websocketManager.sendMessageAllUsers(message);
     assert.calledWith(client.send, JSON.stringify(message));
   });
@@ -55,6 +56,7 @@ describe('Websockets', () => {
       payload: 'test',
     };
     websocketManager.userConnected({ id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' }, client);
+    websocketManager.addSubscriber(message.type, client);
     websocketManager.sendMessageUser({ ...message, userId: 'aa0eaee9-5b90-4287-841a-0237f9d75832' });
     assert.calledWith(client.send, JSON.stringify(message));
   });
