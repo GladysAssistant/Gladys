@@ -12,7 +12,7 @@ const Xiaomi = {
     WXKG12LM: [features.switch_sensor],
     WXKG03LM: [features.switch_sensor],
     WXKG02LM: [features.switch_sensor],
-    QBKG04LM: [features.switch_sensor],
+    QBKG04LM: [features.switch],
     QBKG11LM: [features.switch, features.power],
     QBKG03LM: [features.switch_sensor],
     QBKG12LM: [features.switch, features.power],

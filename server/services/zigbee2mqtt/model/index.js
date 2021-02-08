@@ -71,6 +71,8 @@ models.push(require('./Yale').Yale);
 models.push(require('./eCosy').eCosy);
 models.push(require('./iCasa').iCasa);
 models.push(require('./ilux').ilux);
+models.push(require('./TuYa').TuYa);
+models.push(require('./Lonsonho').Lonsonho);
 
 /**
  * @description Get features by model name.
