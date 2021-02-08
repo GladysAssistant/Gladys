@@ -442,7 +442,9 @@
         "noDeviceDiscovered": "No device discovered, please click on scan button.",
         "scanButton": "Scan",
         "noResponse": "Scan never answer, please check your network.",
-        "serverNoResponse": "Gladys server is not available."
+        "serverNoResponse": "Gladys server is not available.",
+        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
+        "createGithubIssue": "Suggest this device"
       },
       "noDeviceFound": "No zigbee2mqtt device found.",
       "nameLabel": "Device Name",

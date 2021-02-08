@@ -103,10 +103,7 @@ function createActions(store) {
         feature.name = feature.category.charAt(0).toUpperCase() + feature.category.slice(1);
       });
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
-      savedDevice.model = device.model;
-      const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-        $splice: [[index, 1, savedDevice]]
-      });
+      const zigbee2mqttDevices = state.zigbee2mqttDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({
         zigbee2mqttDevices
       });

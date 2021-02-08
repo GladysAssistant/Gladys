@@ -4,6 +4,14 @@ import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
+const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
+
+const createGithubUrl = device => {
+  const title = encodeURIComponent(`Zigbee2mqtt: Add device ${device.model}`);
+  const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(device, null, 2)}\n\`\`\``);
+  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
+};
+
 class DiscoveredBox extends Component {
   updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
@@ -61,78 +69,101 @@ class DiscoveredBox extends Component {
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.zigbee2mqtt.namePlaceholder" />}
+                      disabled={!props.device.supported}
                     />
                   </Localizer>
                 </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`room_${props.deviceIndex}`}>
-                    <Text id="integration.zigbee2mqtt.roomLabel" />
-                  </label>
-                  <select onChange={this.updateRoom} class="form-control" id={`room_${props.deviceIndex}`}>
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.housesWithRooms &&
-                      props.housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`topic_${props.deviceIndex}`}>
-                    <Text id="integration.zigbee2mqtt.topicLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      id={`topic_${props.deviceIndex}`}
-                      type="text"
-                      value={props.device.external_id}
-                      class="form-control"
-                      disabled="true"
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="integration.zigbee2mqtt.featuresLabel" />
-                  </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
+                {!props.device.supported && (
+                  <div>
+                    <div class="alert alert-warning">
+                      <Text id="integration.zigbee2mqtt.discover.deviceNotHandled" />
+                    </div>
+                    <a
+                      class="btn btn-primary"
+                      href={createGithubUrl(props.device)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Text id="integration.zigbee2mqtt.discover.createGithubIssue" />
+                    </a>
                   </div>
-                </div>
+                )}
 
-                <div class="form-group">
-                  {props.device.created_at && (
-                    <button disabled="true" class="btn btn-primary mr-2">
-                      <Text id="integration.zigbee2mqtt.alreadyExistsButton" />
-                    </button>
-                  )}
-                  {!props.device.created_at && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.zigbee2mqtt.saveButton" />
-                    </button>
-                  )}
-                </div>
+                {props.device.supported && (
+                  <div>
+                    <div class="form-group">
+                      <label class="form-label" for={`room_${props.deviceIndex}`}>
+                        <Text id="integration.zigbee2mqtt.roomLabel" />
+                      </label>
+                      <select onChange={this.updateRoom} class="form-control" id={`room_${props.deviceIndex}`}>
+                        <option value="">
+                          <Text id="global.emptySelectOption" />
+                        </option>
+                        {props.housesWithRooms &&
+                          props.housesWithRooms.map(house => (
+                            <optgroup label={house.name}>
+                              {house.rooms.map(room => (
+                                <option selected={room.id === props.device.room_id} value={room.id}>
+                                  {room.name}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label" for={`topic_${props.deviceIndex}`}>
+                        <Text id="integration.zigbee2mqtt.topicLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id={`topic_${props.deviceIndex}`}
+                          type="text"
+                          value={props.device.external_id}
+                          class="form-control"
+                          disabled="true"
+                        />
+                      </Localizer>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="integration.zigbee2mqtt.featuresLabel" />
+                      </label>
+                      <div class="tags">
+                        {props.device &&
+                          props.device.features &&
+                          props.device.features.map(feature => (
+                            <span class="tag">
+                              <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+                              <div class="tag-addon">
+                                <i
+                                  class={`fe fe-${get(
+                                    DeviceFeatureCategoriesIcon,
+                                    `${feature.category}.${feature.type}`
+                                  )}`}
+                                />
+                              </div>
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      {props.device.created_at && (
+                        <button disabled="true" class="btn btn-primary mr-2">
+                          <Text id="integration.zigbee2mqtt.alreadyExistsButton" />
+                        </button>
+                      )}
+                      {!props.device.created_at && (
+                        <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                          <Text id="integration.zigbee2mqtt.saveButton" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

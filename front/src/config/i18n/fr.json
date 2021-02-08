@@ -563,7 +563,9 @@
         "noDeviceDiscovered": "Aucun appareil trouvé. Veuillez autoriser l'association des appareils et appairez les.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "scanButton": "Scanner",
         "noResponse": "Aucune réponse au scan, veuillez vérifier le bon fonctionnement du service sur la page de configuration.",
-        "serverNoResponse": "Gladys n'est pas accessible."
+        "serverNoResponse": "Gladys n'est pas accessible.",
+        "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
+        "createGithubIssue": "Proposer ce périphérique"
       },
       "noDeviceFound": "Auncun appareil zigbee2mqtt n'a encore été ajouté.",
       "nameLabel": "Nom",

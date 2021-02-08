@@ -3,10 +3,13 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertDevice } = require('../utils/convertDevice');
 const { convertValue } = require('../utils/convertValue');
 
+const TYPE_COORDINATOR = 'Coordinator';
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
  * @param {Object} message - The message sent.
+ * @returns {Object} Device.
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
@@ -22,11 +25,18 @@ function handleMqttMessage(topic, message) {
       // Keep only "final/end" devices
       const devices = JSON.parse(message);
       const convertedDevices = devices
-        .map((d) => {
+        // Remove existing devices
+        .filter((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
-          return existingDevice || convertDevice(d, this.serviceId);
+          if (existingDevice) {
+            return false;
+          }
+          return true;
         })
-        .filter((d) => d);
+        // Remove Coordinator
+        .filter((d) => d.type !== TYPE_COORDINATOR)
+        // Add features
+        .map((d) => convertDevice(d, this.serviceId));
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
