@@ -128,27 +128,6 @@ function createActions(store) {
         getYeelightOrderDir: e.target.value
       });
       await actions.getYeelightDevices(store.getState());
-    },
-    async forceScan(state) {
-      store.setState({
-        loading: true
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/yeelight/discover');
-        store.setState({
-          discoveredDevices: [],
-          errorLoading: false
-        });
-
-        setTimeout(store.setState, 5000, {
-          loading: false
-        });
-      } catch (e) {
-        store.setState({
-          loading: false,
-          errorLoading: true
-        });
-      }
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

@@ -11,7 +11,7 @@ const { getDeviceFeature } = require('../../../../utils/device');
  * @example
  * emitNewState(gladys, device, featureType, currentValue);
  */
-function emitNewState(gladys, device, featureType, currentValue) {
+async function emitNewState(gladys, device, featureType, currentValue) {
   const feature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, featureType);
 
   if (feature && feature.last_value !== currentValue) {
@@ -21,7 +21,7 @@ function emitNewState(gladys, device, featureType, currentValue) {
     );
 
     const deviceFeatureExternalId = `${device.external_id}:${featureType}`;
-    gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+    await gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: deviceFeatureExternalId,
       state: currentValue,
     });
