@@ -1,9 +1,14 @@
+const { intToRgb } = require('../../../../utils/colors');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const { DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { getDeviceParam } = require('../../../../utils/device');
 const logger = require('../../../../utils/logger');
 const { DEVICE_IP_ADDRESS, DEVICE_PORT_ADDRESS } = require('../utils/constants');
 const { emitNewState } = require('../utils/emitNewState');
+
+const getIntValue = (value) => {
+  return parseInt(value.toString(), 10);
+};
 
 /**
  * @description Poll value of a Yeelight device.
@@ -30,16 +35,36 @@ async function poll(device) {
   const state = await yeelight.getProperty([
     this.yeelightApi.DevicePropery.POWER,
     this.yeelightApi.DevicePropery.BRIGHT,
+    this.yeelightApi.DevicePropery.CT,
+    this.yeelightApi.DevicePropery.RGB,
   ]);
   await yeelight.disconnect();
 
+  const [binary, brightness, temperature, color] = state.result.result;
+
   // BINARY
-  const currentBinaryValue = state.result.result[0] === 'on' ? STATE.ON : STATE.OFF;
-  emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentBinaryValue);
+  const currentBinaryValue = binary === 'on' ? STATE.ON : STATE.OFF;
+  logger.debug(`Yeelight: Power is ${binary}`);
 
   // BRIGHTNESS
-  const currentBrightnessValue = parseInt(state.result.result[1], 10);
-  emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightnessValue);
+  const currentBrightnessValue = getIntValue(brightness);
+  logger.debug(`Yeelight: Brightness at ${currentBrightnessValue}%`);
+
+  // COLOR TEMPERATURE
+  const currentTemperatureValue = getIntValue(temperature);
+  logger.debug(`Yeelight: Temperature: ${currentTemperatureValue}K`);
+
+  // COLOR
+  const currentColorValue = getIntValue(color);
+  const rgb = intToRgb(currentColorValue);
+  logger.debug(`Yeelight: RGB: ${rgb} (${currentColorValue})`);
+
+  await Promise.all([
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentBinaryValue),
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightnessValue),
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentTemperatureValue),
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentColorValue),
+  ]);
 }
 
 module.exports = {

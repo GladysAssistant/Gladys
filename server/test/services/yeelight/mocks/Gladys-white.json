@@ -28,6 +28,17 @@
       "has_feedback": false,
       "min": 1,
       "max": 100
+    },
+    {
+      "name": "Yeelight White Temperature",
+      "external_id": "yeelight:0x00000000035ac140:temperature",
+      "selector": "yeelight:0x00000000035ac140:temperature",
+      "category": "light",
+      "type": "temperature",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 1700,
+      "max": 6500
     }
   ],
   "params": [

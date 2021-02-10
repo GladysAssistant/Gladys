@@ -4,13 +4,13 @@ module.exports = {
   // Gladys feature
   generateFeature: (name) => {
     return {
-      name: `${name} Brightness`,
+      name: `${name} Temperature`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
       read_only: false,
       has_feedback: false,
-      min: 1,
-      max: 100,
+      min: 1700,
+      max: 6500,
     };
   },
 };

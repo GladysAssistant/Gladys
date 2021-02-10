@@ -25,16 +25,16 @@ describe('Yeelight utils emitNewState', () => {
     sinon.reset();
   });
 
-  it('should emit the new state, if the value has changed', () => {
-    emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.BINARY, 1);
+  it('should emit the new state, if the value has changed', async () => {
+    await emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.BINARY, 1);
     assert.callCount(gladys.event.emit, 1);
   });
-  it('should not emit the new state, if the value has not changed', () => {
-    emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.BINARY, 0);
+  it('should not emit the new state, if the value has not changed', async () => {
+    await emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.BINARY, 0);
     assert.callCount(gladys.event.emit, 0);
   });
-  it('should not emit the new state, if the feature does not exist', () => {
-    emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, 42);
+  it('should not emit the new state, if the feature does not exist', async () => {
+    await emitNewState(gladys, deviceWithLastValue, DEVICE_FEATURE_TYPES.LIGHT.SATURATION, 42);
     assert.callCount(gladys.event.emit, 0);
   });
 });

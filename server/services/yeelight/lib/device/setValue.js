@@ -1,8 +1,13 @@
+const { intToRgb } = require('../../../../utils/colors');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const { DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const { getDeviceParam } = require('../../../../utils/device');
 const logger = require('../../../../utils/logger');
 const { DEVICE_IP_ADDRESS, DEVICE_PORT_ADDRESS } = require('../utils/constants');
+
+const getIntValue = (value) => {
+  return parseInt(value.toString(), 10);
+};
 
 /**
  * @description Change value of a Yeelight device.
@@ -29,12 +34,29 @@ async function setValue(device, deviceFeature, value) {
   }
 
   switch (deviceFeature.type) {
-    case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
+    case DEVICE_FEATURE_TYPES.LIGHT.BINARY: {
+      logger.debug(`Yeelight: Set power ${value === STATE.ON ? 'on' : 'off'}`);
       await yeelight.setPower(value === STATE.ON);
       break;
-    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
-      await yeelight.setBright(value);
+    }
+    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS: {
+      const brightness = getIntValue(value);
+      logger.debug(`Yeelight: Set brightness to ${brightness}%`);
+      await yeelight.setBright(brightness); // 1 ~ 100%
       break;
+    }
+    case DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE: {
+      const temperature = getIntValue(value);
+      logger.debug(`Yeelight: Set temperature to ${temperature}K`);
+      await yeelight.setCtAbx(temperature); // 1700k ~ 6500k
+      break;
+    }
+    case DEVICE_FEATURE_TYPES.LIGHT.COLOR: {
+      const rgb = intToRgb(getIntValue(value));
+      logger.debug(`Yeelight: Set RGB: ${rgb}`);
+      await yeelight.setRGB(new this.yeelightApi.Color(rgb[0], rgb[1], rgb[2]), 'sudden');
+      break;
+    }
     default:
       logger.warn(`Yeelight: Feature type "${deviceFeature.type}" not handled yet !`);
       break;

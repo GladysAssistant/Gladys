@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const { EventEmitter } = require('events');
+const { Color } = require('./yeelight.mock.test');
 
 const DevicePropery = {
   POWER: 'power',
@@ -60,6 +61,16 @@ class Yeelight {
     return Promise.resolve(null);
   }
 
+  setCtAbx(ct, effect = 'sudden', duration = 500) {
+    this.test = 1; // useless, this is just for eslint
+    return Promise.resolve(null);
+  }
+
+  setRGB(color, effect = 'sudden', duration = 500) {
+    this.test = 1; // useless, this is just for eslint
+    return Promise.resolve(null);
+  }
+
   getProperty(params) {
     this.test = 1; // useless, this is just for eslint
     return Promise.resolve(null);
@@ -79,6 +90,7 @@ class Yeelight {
 const MockedYeelightApi = {
   Discover,
   Yeelight,
+  Color,
   DevicePropery,
 };
 

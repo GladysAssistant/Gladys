@@ -6,6 +6,7 @@ const { DEVICE_EXTERNAL_ID_BASE, DEVICE_IP_ADDRESS, DEVICE_PORT_ADDRESS } = requ
 // Features
 const binaryFeature = require('./binary');
 const brightnessFeature = require('./brightness');
+const temperatureFeature = require('./temperature');
 const colorFeature = require('./color');
 
 const AVAILABLE_FEATURE_MODELS = {
@@ -18,6 +19,11 @@ const AVAILABLE_FEATURE_MODELS = {
     id: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
     capabilities: ['set_bright'],
     feature: brightnessFeature,
+  },
+  temperature: {
+    id: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+    capabilities: ['set_ct_abx'],
+    feature: temperatureFeature,
   },
   color: {
     id: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
@@ -71,7 +77,7 @@ function getExternalId(device) {
 /**
  * @description Parse the external ID of the Gladys device.
  * @param {string} externalId - External ID of the Gladys device.
- * @returns {Object} Return the prefix, the device ID, the channel count and the type.
+ * @returns {Object} Return the prefix, the device ID and the type.
  * @example
  * parseExternalId('yeelight:0x00000000035ac142:power');
  */

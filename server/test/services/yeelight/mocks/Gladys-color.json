@@ -30,6 +30,17 @@
       "max": 100
     },
     {
+      "name": "Yeelight RGBW Temperature",
+      "external_id": "yeelight:0x00000000035ac142:temperature",
+      "selector": "yeelight:0x00000000035ac142:temperature",
+      "category": "light",
+      "type": "temperature",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 1700,
+      "max": 6500
+    },
+    {
       "name": "Yeelight RGBW Color",
       "external_id": "yeelight:0x00000000035ac142:color",
       "selector": "yeelight:0x00000000035ac142:color",
