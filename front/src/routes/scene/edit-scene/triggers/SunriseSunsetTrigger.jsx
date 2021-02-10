@@ -11,15 +11,16 @@ class SunriseSunsetTrigger extends Component {
   };
 
   render({}, {}) {
-
-    const houseValid = false;
-    if(this.props.houses){
-      
-      if(selectedHouse.latitude && selectedHouse.longitude){
-        houseValid
+    let houseValid = false;
+    if (this.props.trigger.house === undefined) {
+      houseValid = true;
+    } else if (this.props.houses) {
+      const selectedHouse = this.props.houses.find(house => house.selector === this.props.trigger.house);
+      if (selectedHouse !== undefined) {
+        houseValid = selectedHouse.latitude && selectedHouse.longitude;
       }
-      console.log(selectedHouse);
     }
+
     return (
       <div>
         <div class="row">
@@ -39,10 +40,14 @@ class SunriseSunsetTrigger extends Component {
                     </option>
                   ))}
               </select>
-              {
-                this.props.houses &&
-              }
             </div>
+          </div>
+          <div className="col-sm-8">
+            {!houseValid && (
+              <div className="alert alert-danger">
+                <Text id="editScene.triggersCard.warning.houseWithoutCoordinate" />
+              </div>
+            )}
           </div>
         </div>
       </div>

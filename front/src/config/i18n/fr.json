@@ -945,6 +945,9 @@
           "sunday": "Dimanche"
         },
         "house": "Maison"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Attention !! Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètes/Maisons et cliquer sur la carte pour en associer une."
       }
     }
   },
