@@ -8,9 +8,9 @@ const gladys = {
   },
 };
 
-describe('netatmoManager updateNHC', () => {
+describe.only('netatmoManager updateNHC', () => {
+  const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should add value NHC (Healthy Home Coach)', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NHC',
@@ -35,7 +35,6 @@ describe('netatmoManager updateNHC', () => {
   });
 
   it('should success update NHC (Healthy Home Coach) without change value but only change date value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NHC',
@@ -60,7 +59,6 @@ describe('netatmoManager updateNHC', () => {
   });
 
   it('should error on no value device', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NHC',

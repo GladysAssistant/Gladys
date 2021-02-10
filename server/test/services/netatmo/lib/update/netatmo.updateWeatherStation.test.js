@@ -2,7 +2,15 @@ const { fake } = require('sinon');
 
 const NetatmoManager = require('../../../../../services/netatmo/lib/index');
 
-describe('netatmoManager updateWeatherStation', () => {
+const gladys = {
+  event: {
+    emit: fake.returns(null),
+  },
+  device: {},
+};
+
+describe.only('netatmoManager updateWeatherStation', () => {
+  const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should success update all features NAMain with change value', async () => {
     const device = {
       id: '10',
@@ -17,12 +25,6 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -52,12 +54,6 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -78,12 +74,6 @@ describe('netatmoManager updateWeatherStation', () => {
       id: '10',
       features: [],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -101,12 +91,6 @@ describe('netatmoManager updateWeatherStation', () => {
 
   it('should failed update features Rain on "no save in DB"', async () => {
     const device = undefined;
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -155,15 +139,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -220,15 +196,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -297,15 +265,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -377,15 +337,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -449,15 +401,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -519,15 +463,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -593,15 +529,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -668,15 +596,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -713,15 +633,7 @@ describe('netatmoManager updateWeatherStation', () => {
       id: '13',
       selector: 'netatmo-13',
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -832,15 +744,7 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-      device: {
-        getBySelector: fake.resolves(module),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+    gladys.device.getBySelector = fake.resolves(module);
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -899,13 +803,6 @@ describe('netatmoManager updateWeatherStation', () => {
         },
       ],
     };
-
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',
@@ -925,12 +822,6 @@ describe('netatmoManager updateWeatherStation', () => {
       id: '10',
       selector: 'netatmo-10',
     };
-    const gladys = {
-      event: {
-        emit: fake.returns(null),
-      },
-    };
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     netatmoManager.devices = {
       '10': {
         _id: '10',

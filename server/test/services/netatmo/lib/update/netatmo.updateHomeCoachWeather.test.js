@@ -8,9 +8,9 @@ const gladys = {
   },
 };
 
-describe('netatmoManager updateHomeCoachWeather', () => {
+describe.only('netatmoManager updateHomeCoachWeather', () => {
+  const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should success update all features NHC or NAMain with change value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       name: 'Home Coach Sark bedroom',
@@ -65,7 +65,6 @@ describe('netatmoManager updateHomeCoachWeather', () => {
   });
 
   it('should success update all features NHC or NAMain without change value but only change date value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       name: 'Home Coach Sark bedroom',
@@ -120,7 +119,6 @@ describe('netatmoManager updateHomeCoachWeather', () => {
   });
 
   it('should error no last_value on device NHC or NAMain', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       name: 'Home Coach Sark bedroom',
@@ -144,7 +142,6 @@ describe('netatmoManager updateHomeCoachWeather', () => {
   });
 
   it('should error no dashboard_data on NHC or NAMain', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       name: 'Home Coach Sark bedroom',

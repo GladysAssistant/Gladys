@@ -8,9 +8,9 @@ const gladys = {
   },
 };
 
-describe('netatmoManager updateThermostat', () => {
+describe.only('netatmoManager updateThermostat', () => {
+  const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should success update all features NATherm1 with change value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NATherm1',
@@ -56,7 +56,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should get error on type NATherm1', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NATherm1',
@@ -97,7 +96,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should success update all features NRV with change value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NRV',
@@ -148,7 +146,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should success update all features NRV without change value but only change date value', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NRV',
@@ -199,7 +196,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should get error on type NRV', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NRV',
@@ -244,7 +240,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should say that there is no devices with specific key', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NRV',
@@ -279,7 +274,6 @@ describe('netatmoManager updateThermostat', () => {
   });
 
   it('should error on each features (get device selector)', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const device = {
       id: '10',
       type: 'NRV',

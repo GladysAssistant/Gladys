@@ -1,6 +1,5 @@
-const axios = require('axios');
-const sharp = require('sharp');
-const btoa = require('btoa');
+const fse = require('fs-extra');
+const path = require('path');
 const logger = require('../../../../utils/logger');
 const { NETATMO_VALUES } = require('../constants');
 
@@ -20,27 +19,41 @@ async function updateCamera(key, device, deviceSelector) {
       try {
         const externalIdCamera = `netatmo:${this.devices[key].id}`;
         const selectorCamera = externalIdCamera.replace(/:/gi, '-');
-        // @ts-ignore
-        const responseImage = await axios.get(`${this.devices[key].vpn_url}/live/snapshot_720.jpg`, {
-          responseType: 'arraybuffer',
-        });
-        const sharpData = await sharp(responseImage.data)
-          .rotate()
-          .resize(300)
-          .toBuffer();
-        const b64encoded = btoa(
-          [].reduce.call(
-            new Uint8Array(sharpData),
-            // eslint-disable-next-line func-names
-            function(p, c) {
-              return p + String.fromCharCode(c);
-            },
-            '',
-          ),
+        const cameraUrlParam = `${this.devices[key].vpn_url}/live/snapshot_720.jpg`;
+        // we create a temp folder
+        const now = new Date();
+        const filePath = path.join(
+          this.gladys.config.tempFolder,
+          `camera-${device.id}-${now.getMilliseconds()}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}.jpg`,
         );
-        const mimetype = 'image/jpeg';
-        const base64image = `data:${mimetype};base64,${b64encoded}`;
-        this.gladys.device.camera.setImage(selectorCamera, base64image);
+        // we create a writestream
+        const writeStream = fse.createWriteStream(filePath);
+        // and send a camera thumbnail to this stream
+        this.ffmpeg(cameraUrlParam)
+          .format('image2')
+          .outputOptions('-vframes 1')
+          // resize the image with max width = 640
+          .outputOptions('-vf scale=640:-1')
+          //  Effective range for JPEG is 2-31 with 31 being the worst quality.
+          .outputOptions('-qscale:v 15')
+          .output(writeStream)
+          .on('end', async () => {
+            const image = await fse.readFile(filePath);
+
+            // convert binary data to base64 encoded string
+            const cameraImageBase = Buffer.from(image).toString('base64');
+            const cameraImage = `image/png;base64,${cameraImageBase}`;
+            // logger.debug(cameraImage);
+            this.gladys.device.camera.setImage(selectorCamera, cameraImage);
+            await fse.remove(filePath);
+          })
+          .on('error', async (err, stdout, stderr) => {
+            logger.debug(`Cannot process video: ${err.message}`);
+            logger.debug(stderr);
+            logger.debug(err.message);
+            await fse.remove(filePath);
+          })
+          .run();
       } catch (e) {
         logger.error(
           `Netatmo : File netatmo.updateCamera.js - Camera ${this.devices[key].type} ${this.devices[key].name} - vpn_url - error : ${e}`,
