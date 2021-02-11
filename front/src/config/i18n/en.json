@@ -747,7 +747,7 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
-    }
+    },
     "todoist": {
       "title": "Todoist",
       "description": "List your Todoist tasks",

@@ -126,6 +126,9 @@
           "type": "devices-in-room",
           "room": "kitchen",
           "device_features": ["main-presence-sensor"]
+        },
+        {
+          "type": "todoist"
         }
       ]
     ],
@@ -1996,5 +1999,26 @@
         }
       ]
     }
-  ]
+  ],
+  "get /api/v1/service/todoist/tasks": [
+    {
+      "id": "1",
+      "content": "Task 1",
+      "pending": false
+    },
+    {
+      "id": "2",
+      "content": "Task 2",
+      "pending": true
+    },
+    {
+      "id": "3",
+      "content": "Task 3",
+      "pending": false,
+      "due": {
+        "date": "2021-11-21"
+      }
+    }
+  ],
+  "post /api/v1/service/todoist/tasks/1/complete": []
 }
