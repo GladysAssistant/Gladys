@@ -5,37 +5,55 @@ import { connect } from 'unistore/preact';
 import actions from '../../../actions/dashboard/boxes/todoist';
 import { DASHBOARD_BOX_DATA_KEY, DASHBOARD_BOX_STATUS_KEY, RequestStatus } from '../../../utils/consts';
 import style from './style.css';
+import dayjs from 'dayjs';
 
 const padding = {
-  paddingLeft: '25px',
-  paddingRight: '25px',
-  paddingTop: '10px',
-  paddingBottom: '10px'
+  padding: '1rem'
 };
 
-const BOX_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
+const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 1000;
 
-const Task = ({ task, onclick }) => {
+const Task = ({ task, onClick }) => {
   const icon = task.pending ? 'check-circle' : 'circle';
   const textStyle = {
-    verticalAlign: 'text-bottom',
     textDecoration: task.pending ? 'line-through' : undefined
   };
+
   return (
-    <div class={style.todoistTask} onclick={onclick}>
-      <i className={`fe fe-${icon}`} style={{ marginRight: '10px' }} />
-      <span style={textStyle}>{task.content}</span>
+    <div class={style.todoistTask}>
+      <div class="container">
+        <div class="row">
+          <span>
+            <i className={`fe fe-${icon}`} style={{ marginRight: '10px', cursor: 'pointer' }} onClick={onClick} />
+            <span style={textStyle}>{task.content}</span>
+          </span>
+        </div>
+        {task.due && (
+          <div class="row">
+            <span style={{ opacity: '50%', fontSize: '0.80rem' }}>
+              <i className={`fe fe-calendar`} style={{ marginLeft: '20px', marginRight: '6px' }} />
+              <span>{dayjs(task.due.date).format('D MMM')}</span>
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 const TodoistBox = ({ children, ...props }) => {
-  const onTaskClick = task => () => props.onTaskClick(task);
-
+  const onTaskClick = task => () => {
+    props.onTaskClick(task);
+  };
   return (
     <div class="card">
+      <div className="card-header">
+        <h3 class="card-title">
+          <i class="fe fe-list" />
+          <span class="m-1">{props.name || <Text id="dashboard.boxTitle.todoist" />}</span>
+        </h3>
+      </div>
       <div>
-        <h4 class="card-header">{props.name || <Text id="dashboard.boxTitle.todoist" />}</h4>
         {props.boxStatus === RequestStatus.Error && (
           <div class="card-body">
             <p class="alert alert-danger">
@@ -57,18 +75,16 @@ const TodoistBox = ({ children, ...props }) => {
           </div>
         )}
         {props.tasks && (
-          <div style={padding} class="card-block px-30 py-10">
-            <div class="row">
-              <div class="col-12">
-                {props.tasks.map(task => (
-                  <Task key={task.id} task={task} onclick={onTaskClick(task)} />
-                ))}
-                {!props.tasks.length && (
-                  <i>
-                    <Text id="dashboard.boxes.todoist.emptyTasks" />
-                  </i>
-                )}
-              </div>
+          <div style={padding} class="card-block o-auto">
+            <div>
+              {props.tasks.map(task => (
+                <Task key={task.id} task={task} onClick={onTaskClick(task)} />
+              ))}
+              {!props.tasks.length && (
+                <i>
+                  <Text id="dashboard.boxes.todoist.emptyTasks" />
+                </i>
+              )}
             </div>
           </div>
         )}
@@ -92,6 +108,7 @@ class TodoistBoxComponent extends Component {
     const { todoist_project_id: todoistProjectId } = this.props.box;
     // get tasks
     this.props.getTasks(todoistProjectId, this.props.x, this.props.y);
+
     // refresh tasks every interval
     this.refreshInterval = setInterval(
       () => this.props.getTasks(todoistProjectId, this.props.x, this.props.y),
