@@ -1,4 +1,3 @@
-const schedule = require('node-schedule');
 const db = require('../../models');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -25,13 +24,13 @@ async function init() {
   });
 
   // Recurrence rule (00:00 every day) to update sunrise/sunset time.
-  const rule = new schedule.RecurrenceRule();
+  const rule = new this.schedule.RecurrenceRule();
   rule.tz = this.timezone;
   rule.hour = 0;
   rule.minute = 0;
   rule.second = 0;
 
-  schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
+  this.schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
   await this.dailyUpdate();
 
   return plainScenes;

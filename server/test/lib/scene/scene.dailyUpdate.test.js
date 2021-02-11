@@ -1,11 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { promisify } = require('util');
-
 const { fake, assert } = sinon;
-
-const sleep = promisify(setTimeout);
 
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -17,6 +13,16 @@ const SceneManager = proxyquire('../../../lib/scene', {
         sunset: new Date(Date.now()),
       };
     },
+  },
+  'node-schedule': {
+    scheduleJob: (date, callback) => {
+      return {
+        callback,
+        date,
+        cancel: () => {},
+      };
+    },
+    RecurrenceRule: function RecurrenceRule() {},
   },
 });
 
@@ -55,8 +61,10 @@ describe('SceneManager', () => {
     await sceneManager.dailyUpdate();
     expect(sceneManager.jobs).to.have.lengthOf(2);
 
-    await sleep(10);
-
+    // Simulate schedule function
+    sceneManager.jobs.forEach((job) => {
+      job.callback();
+    });
     assert.called(event.emit);
   });
 

@@ -1,4 +1,5 @@
 const sunCalc = require('suncalc');
+const schedule = require('node-schedule');
 
 const queue = require('queue');
 const { addScene } = require('./scene.addScene');
@@ -34,6 +35,7 @@ const SceneManager = function SceneManager(stateManager, event, device, message,
     autostart: true,
   });
   this.sunCalc = sunCalc;
+  this.schedule = schedule;
   this.jobs = [];
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));

@@ -1,4 +1,3 @@
-const schedule = require('node-schedule');
 const { EVENTS } = require('../../utils/constants');
 
 /**
@@ -19,7 +18,7 @@ async function dailyUpdate() {
     if (house.latitude !== null && house.longitude !== null) {
       const times = this.sunCalc.getTimes(new Date(), house.latitude, house.longitude);
 
-      const sunriseJob = schedule.scheduleJob(times.sunrise, () =>
+      const sunriseJob = this.schedule.scheduleJob(times.sunrise, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.TIME.SUNRISE,
           house,
@@ -29,7 +28,7 @@ async function dailyUpdate() {
         this.jobs.push(sunriseJob);
       }
 
-      const sunsetJob = schedule.scheduleJob(times.sunset, () =>
+      const sunsetJob = this.schedule.scheduleJob(times.sunset, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.TIME.SUNSET,
           house,
