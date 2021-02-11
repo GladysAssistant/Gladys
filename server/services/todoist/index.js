@@ -3,7 +3,6 @@ const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const TodoistController = require('./api/todoist.controller');
-const { generateProjectsTree } = require('./lib');
 
 const TODOIST_API_KEY = 'TODOIST_API_KEY';
 
@@ -58,7 +57,6 @@ module.exports = function TodoistService(gladys, serviceId) {
     const url = `https://api.todoist.com/rest/v1/tasks`;
     try {
       const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` }, params: options });
-      logger.debug(`Found ${data.length} task(s).`);
       return data;
     } catch (e) {
       logger.error(e);
@@ -78,8 +76,7 @@ module.exports = function TodoistService(gladys, serviceId) {
     const url = `https://api.todoist.com/rest/v1/projects`;
     try {
       const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
-      logger.debug(`Found ${data.length} project(s).`);
-      return generateProjectsTree(data);
+      return data;
     } catch (e) {
       logger.error(e);
       throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
@@ -99,7 +96,6 @@ module.exports = function TodoistService(gladys, serviceId) {
     const url = `https://api.todoist.com/rest/v1/tasks/${taskId}/close`;
     try {
       await axios.post(url, {}, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
-      logger.debug(`Completed task #${taskId}`);
     } catch (e) {
       logger.error(e);
       throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
