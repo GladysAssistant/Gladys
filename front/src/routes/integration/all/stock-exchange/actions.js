@@ -9,7 +9,6 @@ const actions = store => ({
     let selectedOptions = [];
 
     try {
-
       stockExchangeApiKey = await state.httpClient.get(
         '/api/v1/service/stock-exchange/variable/STOCKEXCHANGE_API_KEY',
         {
@@ -46,7 +45,7 @@ const actions = store => ({
   onTickersChange(state, e) {
     store.setState({
       selectedTickers: e,
-      stockExchangeTickers: ( (JSON.stringify(e.map(ticker => ticker.value) ) )),
+      stockExchangeTickers: JSON.stringify(e.map(ticker => ticker.value))
     });
   },
 
