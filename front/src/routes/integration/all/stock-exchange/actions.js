@@ -24,9 +24,9 @@ const actions = store => ({
       );
     } finally {
       if (stockExchangeTickers) {
-      const ids = JSON.parse(stockExchangeTickers.value);
-      // Get from all tickers (label/value pair) the selected values (Reminder : values are stored as array (ie ["^FCHI", "GBI"])
-      ids.map(id => selectedOptions.push(tickers.find(e => e.value === id)));
+        const ids = JSON.parse(stockExchangeTickers.value);
+        // Get from all tickers (label/value pair) the selected values (Reminder : values are stored as array (ie ["^FCHI", "GBI"])
+        ids.map(id => selectedOptions.push(tickers.find(e => e.value === id)));
       }
       store.setState({
         stockExchangeApiKey: (stockExchangeApiKey || {}).value,
@@ -46,7 +46,7 @@ const actions = store => ({
   onTickersChange(state, e) {
     store.setState({
       selectedTickers: e,
-      stockExchangeTickers: ( { value: ['^FCHI'] } || (e && JSON.stringify(e.map(ticker => ticker.value) ))),
+      stockExchangeTickers: ( (JSON.stringify(e.map(ticker => ticker.value) ) )),
     });
   },
 
