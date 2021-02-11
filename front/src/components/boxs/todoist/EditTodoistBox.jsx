@@ -1,23 +1,8 @@
-import { Component, Fragment } from 'preact';
+import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import actions from '../../../actions/dashboard/edit-boxes/editTodoist';
 import BaseEditBox from '../baseEditBox';
-
-const ProjectOption = ({ project, todoistProjectIid, depth = 0 }) => {
-  return (
-    <Fragment>
-      <option selected={project.id === todoistProjectIid} value={project.id}>
-        {depth > 0 && <span>{new Array(depth + 1).join('|--- ')} </span>}
-        {project.name}
-      </option>
-      {project.children &&
-        project.children.map(child => (
-          <ProjectOption project={child} todoist_project_id={todoistProjectIid} depth={depth + 1} />
-        ))}
-    </Fragment>
-  );
-};
 
 const EditTodoistBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.todoist">
@@ -37,7 +22,9 @@ const EditTodoistBox = ({ children, ...props }) => (
         </option>
         {props.projects &&
           props.projects.map(project => (
-            <ProjectOption project={project} todoistProjectIid={props.box.todoist_project_id} />
+            <option selected={project.id === props.box.todoist_project_id} value={project.id}>
+              {project.name}
+            </option>
           ))}
       </select>
     </div>
