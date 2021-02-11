@@ -33,6 +33,7 @@ const SERVICE_STATUS = {
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
+  GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -53,6 +54,7 @@ const EVENTS = {
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
+    USER_KEYS_CHANGED: 'gateway.user-keys-changed',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',

@@ -25,16 +25,19 @@ const { forwardWebsockets } = require('./gateway.forwardWebsockets');
 const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
+const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user) {
+const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager) {
   this.variable = variable;
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
   this.config = config;
   this.user = user;
+  this.stateManager = stateManager;
   this.connected = false;
   this.restoreInProgress = false;
+  this.usersKeys = [];
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
@@ -43,6 +46,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event.on(EVENTS.SYSTEM.CHECK_UPGRADE, eventFunctionWrapper(this.getLatestGladysVersion.bind(this)));
   this.event.on(EVENTS.WEBSOCKET.SEND_ALL, eventFunctionWrapper(this.forwardWebsockets.bind(this)));
   this.event.on(EVENTS.WEBSOCKET.SEND, eventFunctionWrapper(this.forwardWebsockets.bind(this)));
+  this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -62,5 +66,6 @@ Gateway.prototype.forwardWebsockets = forwardWebsockets;
 Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
+Gateway.prototype.refreshUserKeys = refreshUserKeys;
 
 module.exports = Gateway;

@@ -24,7 +24,7 @@ const actions = store => ({
         services
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   },
   async actionOnService(state, serviceName, action, podId = null) {
@@ -58,7 +58,7 @@ const actions = store => ({
         currentIntegration
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   },
   getIntegrationByCategory(state, category) {
