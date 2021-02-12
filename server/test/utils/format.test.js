@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { compareValue } = require('../../utils/format');
+const { compareValue } = require('../../services/netatmo/lib/utils/format');
 
 describe('utils/format.js', () => {
   describe('compareValue valid update - return true', () => {

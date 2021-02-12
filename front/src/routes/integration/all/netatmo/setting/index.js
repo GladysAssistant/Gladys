@@ -13,12 +13,18 @@ class NetatmoNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('netatmo');
     this.props.loadProps();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED, () =>
-      this.props.displayConnectedMessage()
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
+      this.props.displayConnectedMessage
     );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR, () =>
-      this.props.displayNetatmoError()
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR, this.props.displayNetatmoError);
+  }
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.CONNECTED,
+      this.props.displayConnectedMessage
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR, this.props.displayNetatmoError);
   }
 
   render(props, {}) {

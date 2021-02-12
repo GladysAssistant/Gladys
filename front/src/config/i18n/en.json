@@ -371,7 +371,10 @@
       "deviceTab": "Netatmo Devices",
       "discoverTab": "Discover Netatmo devices",
       "settingTab": "Settings",
-      "alreadyCreatedButton": "Already created",
+      "box": {
+        "disconnect": "Status and commands are not available at the moment. Netatmo is disconnected",
+        "noCommand": "Commands are not available at the moment."
+      },
       "device": {
         "title": "Netatmo devices in Gladys",
         "noDevices": "No Netatmo devices added yet.",
@@ -388,6 +391,14 @@
         "deviceNotHandled": "Device is not handled",
         "foundDevice": "Device Found"
       },
+      "discover": {
+        "title": "Your Netatmo equipment compatible with Gladys",
+        "noDevices": "No Netatmo devices were found. Have you completed all the documentation steps to register your devices?",
+        "noConnect": "You must first configure and login to a Netatmo account from the 'Settings' menu.",
+        "disconnect": "No Netatmo devices can be detected. You must first log back in from the 'Settings' menu.",
+        "alreadyCreatedButton": "Already created",
+        "refreshButton": "Update datas"
+      },
       "setting": {
         "title": "Netatmo configuration",
         "usernamePlaceholder": "Username",
@@ -395,8 +406,13 @@
         "clientIdPlaceholder": "Client ID",
         "clientSecretPlaceholder": "Client Secret",
         "saveLabel": "Save",
+        "saveAndConnectLabel": "Save & Connect",
         "connectLabel": "Connect",
+        "disconnectLabel": "Disconnect",
         "configure": "Connect to Netatmo",
+        "connect": "Gladys is connected to Netatmo",
+        "disconnect": "Gladys is not connected to Netatmo",
+        "currentConnection": "Connection to Netatmo in progress",
         "error": "Connection with Netatmo failed"
       },
       "DeviceFeatureValues": {

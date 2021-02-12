@@ -13,7 +13,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    * gladys.services.netatmo.start();
    */
   async function start() {
-    logger.log('Starting netatmo service');
+    logger.info('Starting netatmo service');
     netatmoManager.connect();
     await fse.ensureDir(gladys.config.tempFolder);
   }
@@ -25,7 +25,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    *  gladys.services.netatmo.stop();
    */
   async function stop() {
-    logger.log('Stopping Netatmo service');
+    logger.info('Stopping Netatmo service');
   }
 
   return Object.freeze({

@@ -1,5 +1,6 @@
 /* eslint-disable preact-i18n/no-unknown-key */
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
+import { RequestStatus } from '../../../../../utils/consts';
 
 const SetupTab = ({ children, ...props }) => {
   return (
@@ -10,12 +11,22 @@ const SetupTab = ({ children, ...props }) => {
         </h3>
       </div>
       <div class="card-body">
-        {props.netatmoConnectedMessage === true && (
-          <p class="text-center alert alert-success">
-            <Text id="integration.netatmo.setting.configure" />
+        {props.connectNetatmoStatus === RequestStatus.Getting && (
+          <p class="text-center alert alert-info">
+            <Text id="integration.netatmo.setting.currentConnection" />
           </p>
         )}
-        {props.netatmoConnectedError === true && (
+        {props.connectNetatmoStatus === RequestStatus.ServiceConnected && (
+          <p class="text-center alert alert-success">
+            <Text id="integration.netatmo.setting.connect" />
+          </p>
+        )}
+        {props.connectNetatmoStatus === RequestStatus.ServiceDisconnected && (
+          <p class="text-center alert alert-danger">
+            <Text id="integration.netatmo.setting.disconnect" />
+          </p>
+        )}
+        {props.connectNetatmoStatus === RequestStatus.Error && (
           <p class="text-center alert alert-danger">
             <Text id="integration.netatmo.setting.error" />
           </p>
@@ -24,60 +35,75 @@ const SetupTab = ({ children, ...props }) => {
           <label class="form-label">
             <Text id="integration.netatmo.setting.usernamePlaceholder" />
           </label>
-          <input
-            type="text"
-            class="form-control"
-            name="netatmoUsername"
-            value={props.netatmoUsername}
-            onInput={props.updateConfiguration}
-            placeholder={<Text id="integration.netatmo.setting.usernamePlaceholder" />}
-          />
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              name="netatmoUsername"
+              value={props.netatmoUsername}
+              onInput={props.updateConfiguration}
+              placeholder={<Text id="integration.netatmo.setting.usernamePlaceholder" />}
+            />
+          </Localizer>
         </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.netatmo.setting.passwordPlaceholder" />
           </label>
-          <input
-            type="password"
-            class="form-control"
-            name="netatmoPassword"
-            value={props.netatmoPassword}
-            onInput={props.updateConfiguration}
-            placeholder={<Text id="integration.netatmo.setting.passwordPlaceholder" />}
-          />
+          <Localizer>
+            <input
+              type="password"
+              class="form-control"
+              name="netatmoPassword"
+              value={props.netatmoPassword}
+              onInput={props.updateConfiguration}
+              placeholder={<Text id="integration.netatmo.setting.passwordPlaceholder" />}
+            />
+          </Localizer>
         </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.netatmo.setting.clientIdPlaceholder" />
           </label>
-          <input
-            type="text"
-            class="form-control"
-            name="netatmoClientId"
-            value={props.netatmoClientId}
-            onInput={props.updateConfiguration}
-            placeholder={<Text id="integration.netatmo.setting.clientIdPlaceholder" />}
-          />
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              name="netatmoClientId"
+              value={props.netatmoClientId}
+              onInput={props.updateConfiguration}
+              placeholder={<Text id="integration.netatmo.setting.clientIdPlaceholder" />}
+            />
+          </Localizer>
         </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.netatmo.setting.clientSecretPlaceholder" />
           </label>
-          <input
-            type="password"
-            class="form-control"
-            name="netatmoClientSecret"
-            value={props.netatmoClientSecret}
-            onInput={props.updateConfiguration}
-            placeholder={<Text id="integration.netatmo.setting.clientSecretPlaceholder" />}
-          />
+          <Localizer>
+            <input
+              type="password"
+              class="form-control"
+              name="netatmoClientSecret"
+              value={props.netatmoClientSecret}
+              onInput={props.updateConfiguration}
+              placeholder={<Text id="integration.netatmo.setting.clientSecretPlaceholder" />}
+            />
+          </Localizer>
         </div>
       </div>
-      <div class="card-footer text-right">
+      <div class="card-footer">
         <div class="d-flex">
-          <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
-            <Text id="integration.netatmo.setting.saveLabel" />
-          </button>
+          <div class="col text-left">
+            <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+              <Text id="integration.netatmo.setting.saveAndConnectLabel" />
+            </button>
+          </div>
+          <div class="col text-right">
+            <button type="submit" class="btn btn-danger" onClick={props.disconnectAction}>
+              <Text id="integration.netatmo.setting.disconnectLabel" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

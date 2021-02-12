@@ -1,5 +1,6 @@
 // commands
 const { connect } = require('./commands/netatmo.connect.js');
+const { disconnect } = require('./commands/netatmo.disconnect.js');
 const { getSensors } = require('./commands/netatmo.getSensors.js');
 const { getDevices } = require('./commands/netatmo.getDevices.js');
 const { addSensor } = require('./commands/netatmo.addSensor.js');
@@ -48,9 +49,13 @@ const NetatmoManager = function NetatmoManager(gladys, ffmpeg, serviceId) {
   this.token = undefined;
   this.pollFrequencies = DEVICE_POLL_FREQUENCIES;
   this.setThermostat = {};
+  this.pollHomeCoachWeather = undefined;
+  this.pollEnergy = undefined;
+  this.pollSecurity = undefined;
 };
 
 NetatmoManager.prototype.connect = connect;
+NetatmoManager.prototype.disconnect = disconnect;
 NetatmoManager.prototype.getSensors = getSensors;
 NetatmoManager.prototype.getDevices = getDevices;
 NetatmoManager.prototype.addSensor = addSensor;

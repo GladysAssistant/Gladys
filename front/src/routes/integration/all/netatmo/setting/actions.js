@@ -9,22 +9,39 @@ const createActions = store => {
       let netatmoPassword;
       let netatmoClientId;
       let netatmoClientSecret;
+      let netatmoIsConnect;
       try {
         netatmoUsername = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_USERNAME');
         netatmoClientId = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_CLIENT_ID');
+        netatmoIsConnect = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_IS_CONNECT');
         if (netatmoUsername.value) {
           netatmoPassword = '*********'; // need to fill the field
         }
         if (netatmoClientId.value) {
           netatmoClientSecret = '*********'; // need to fill the field
+        } else {
+          store.setState({
+            connectNetatmoStatus: RequestStatus.ServiceNotConfigured,
+            netatmoConnected: false
+          });
+        }
+        if (netatmoIsConnect.value === 'connect') {
+          store.setState({
+            connectNetatmoStatus: RequestStatus.ServiceConnected,
+            netatmoConnected: true
+          });
+        } else {
+          store.setState({
+            connectNetatmoStatus: RequestStatus.ServiceDisconnected,
+            netatmoConnected: false
+          });
         }
       } finally {
         store.setState({
           netatmoUsername: (netatmoUsername || {}).value,
           netatmoPassword,
           netatmoClientId: (netatmoClientId || {}).value,
-          netatmoClientSecret,
-          connected: false
+          netatmoClientSecret
         });
       }
     },
@@ -62,6 +79,7 @@ const createActions = store => {
             value: state.netatmoClientSecret
           });
         }
+        await state.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_IS_CONNECT', { value: 'connect' });
         await state.httpClient.post(`/api/v1/service/netatmo/connect`);
         store.setState({
           connectNetatmoStatus: RequestStatus.Success
@@ -74,21 +92,45 @@ const createActions = store => {
         });
       }
     },
-    displayConnectedMessage(state) {
-      // display 3 seconds a message "NETATMO connected"
+    async disconnectAction(state) {
+      event.preventDefault();
       store.setState({
-        netatmoConnectedMessage: true,
-        netatmoConnectedError: false,
-        netatmoConnectionError: undefined
+        connectNetatmoStatus: RequestStatus.ServiceDisconnected,
+        netatmoConnected: false
       });
-      setTimeout(
-        () =>
-          store.setState({
-            netatmoConnectedMessage: false,
-            connectMqttStatus: undefined
-          }),
-        3000
-      );
+      try {
+        await state.httpClient.post(`/api/v1/service/netatmo/disconnect`);
+        store.setState({
+          disConnectNetatmoStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          connectNetatmoStatus: RequestStatus.Error,
+          passwordChanges: false,
+          clientSecretChanges: false
+        });
+      }
+    },
+    async displayConnectedMessage(state) {
+      // display 3 seconds a message "NETATMO connected"
+      const netatmoIsConnect = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_IS_CONNECT');
+      if (netatmoIsConnect.value === 'connect') {
+        store.setState({
+          netatmoConnectedMessage: true,
+          netatmoConnectedError: false,
+          netatmoConnectionError: undefined,
+          connectNetatmoStatus: RequestStatus.ServiceConnected,
+          netatmoConnected: true
+        });
+      } else {
+        store.setState({
+          netatmoConnectedMessage: true,
+          netatmoConnectedError: false,
+          netatmoConnectionError: undefined,
+          connectNetatmoStatus: RequestStatus.ServiceDisconnected,
+          netatmoConnected: false
+        });
+      }
     },
     displayNetatmoError(state) {
       store.setState({

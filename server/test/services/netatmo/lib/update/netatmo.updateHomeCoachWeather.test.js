@@ -8,7 +8,7 @@ const gladys = {
   },
 };
 
-describe.only('netatmoManager updateHomeCoachWeather', () => {
+describe('netatmoManager updateHomeCoachWeather', () => {
   const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should success update all features NHC or NAMain with change value', async () => {
     const device = {

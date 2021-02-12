@@ -14,6 +14,18 @@ module.exports = function NetatmoController(netatmoManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/netatmo/disconnect Disconnect NETATMO
+   * @apiName disconnect
+   * @apiGroup Netatmo
+   */
+  async function disconnect(req, res) {
+    const result = await netatmoManager.disconnect();
+    res.json({
+      success: result,
+    });
+  }
+
+  /**
    * @api {get} /api/v1/service/netatmo/sensor Get Netatmo sensors
    * @apiName getSensors
    * @apiGroup Netatmo
@@ -27,6 +39,10 @@ module.exports = function NetatmoController(netatmoManager) {
     'post /api/v1/service/netatmo/connect': {
       authenticated: true,
       controller: asyncMiddleware(connect),
+    },
+    'post /api/v1/service/netatmo/disconnect': {
+      authenticated: true,
+      controller: asyncMiddleware(disconnect),
     },
     'get /api/v1/service/netatmo/sensor': {
       authenticated: true,

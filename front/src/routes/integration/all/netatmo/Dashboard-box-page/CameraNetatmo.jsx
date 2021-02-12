@@ -28,6 +28,16 @@ const CameraBox = ({ children, ...props }) => (
       )}
       <div class="row">
         <h4>{props.box && props.box.name}</h4>
+        <div class="col text-right">
+          <h6>
+            {props.camera &&
+              props.camera.last_value_changed &&
+              Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'long' }).format(
+                new Date(props.camera.last_value_changed)
+              )}
+            {props.camera && !props.camera.last_value_changed && <Text id="dashboard.boxes.camera.noHistoric" />}
+          </h6>
+        </div>
       </div>
     </div>
   </div>

@@ -20,7 +20,7 @@ const gladys = {
   },
 };
 
-describe.only('netatmoManager updateCamera', () => {
+describe('netatmoManager updateCamera', () => {
   const netatmoManager = new NetatmoManager(gladys, FfmpegMock, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   before(async () => {
     await fse.ensureDir(gladys.config.tempFolder);

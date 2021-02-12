@@ -8,7 +8,7 @@ const gladys = {
   },
 };
 
-describe.only('netatmoManager updateNHC', () => {
+describe('netatmoManager updateNHC', () => {
   const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
   it('should add value NHC (Healthy Home Coach)', async () => {
     const device = {

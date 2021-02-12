@@ -414,10 +414,13 @@
     "netatmo": {
       "title": "Netatmo",
       "description": "Contrôler les équipements Netatmo",
-      "deviceTab": "Netatmo équipements",
+      "deviceTab": "Appareils Netatmo",
       "discoverTab": "Découverte appareils Netatmo",
-      "settingTab": "Paramètre",
-      "alreadyCreatedButton": "Déjà créé",
+      "settingTab": "Paramètres",
+      "box": {
+        "disconnect": "Les états et commandes ne sont pas disponibles pour le moment. Netatmo est déconnecté.",
+        "noCommand": "Les commandes ne sont pas disponibles pour le moment."
+      },
       "device": {
         "title": "Equipements Netatmo dans Gladys",
         "noDevices": "Aucun appareil Netatmo n'a encore été ajouté.",
@@ -434,6 +437,14 @@
         "deviceNotHandled": "Equipements non pris en charge",
         "foundDevice": "Equipements trouvés"
       },
+      "discover": {
+        "title": "Vos équipements Netatmo compatibles avec Gladys",
+        "noDevices": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils ?",
+        "noConnect": "Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
+        "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
+        "alreadyCreatedButton": "Déjà créé",
+        "refreshButton": "Mettre à jour"
+      },
       "setting": {
         "title": "Netatmo configuration",
         "usernamePlaceholder": "Utilisateur",
@@ -441,8 +452,13 @@
         "clientIdPlaceholder": "Identifiant client",
         "clientSecretPlaceholder": "Secret client",
         "saveLabel": "Sauvegarder",
+        "saveAndConnectLabel": "Sauvegarder & Connecter",
         "connectLabel": "Connecter",
+        "disconnectLabel": "Déconnecter",
         "configure": "Connexion à Netatmo",
+        "connect": "Gladys est connectée à Netatmo",
+        "disconnect": "Gladys n'est pas connectée à Netatmo",
+        "currentConnection": "Connexion à Netatmo en cours",
         "error": "La connexion à Netatmo a échoué"
       },
       "DeviceFeatureValues": {

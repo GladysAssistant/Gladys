@@ -79,7 +79,9 @@ export const RequestStatus = {
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
-  RoomValidationError: 'RoomValidationError'
+  RoomValidationError: 'RoomValidationError',
+  ServiceConnected: 'ServiceConnected',
+  ServiceDisconnected: 'ServiceDisconnected'
 };
 
 export const GetWeatherStatus = {

@@ -2,14 +2,18 @@ import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
-import CommandDeviceFeature from './device-features/CommandDeviceFeature';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import SensorDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/SensorDeviceFeatureNetatmo';
+import CommandDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/CommandDeviceFeatureNetatmo';
 
 const COMMAND_FEATURE_TYPES = [DEVICE_FEATURE_TYPES.LIGHT.STRING];
 
 const DeviceRow = ({ children, ...props }) => {
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
+    if (props.device.service.name === 'netatmo') {
+      return <SensorDeviceFeatureNetatmo user={props.user} deviceFeature={props.deviceFeature} />;
+    }
     return <SensorDeviceFeature user={props.user} deviceFeature={props.deviceFeature} />;
   }
 
@@ -58,18 +62,20 @@ const DeviceRow = ({ children, ...props }) => {
     );
   }
   if (COMMAND_FEATURE_TYPES.includes(props.deviceFeature.type) && !props.deviceFeature.read_only) {
-    return (
-      <CommandDeviceFeature
-        x={props.x}
-        y={props.y}
-        device={props.device}
-        deviceFeature={props.deviceFeature}
-        roomIndex={props.roomIndex}
-        deviceIndex={props.deviceIndex}
-        deviceFeatureIndex={props.deviceFeatureIndex}
-        updateValue={props.updateValue}
-      />
-    );
+    if (props.device.service.name === 'netatmo') {
+      return (
+        <CommandDeviceFeatureNetatmo
+          x={props.x}
+          y={props.y}
+          device={props.device}
+          deviceFeature={props.deviceFeature}
+          roomIndex={props.roomIndex}
+          deviceIndex={props.deviceIndex}
+          deviceFeatureIndex={props.deviceFeatureIndex}
+          updateValue={props.updateValue}
+        />
+      );
+    }
   }
   // if not, we return nothing
   return null;

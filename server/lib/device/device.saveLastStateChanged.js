@@ -18,22 +18,16 @@ async function saveLastStateChanged(deviceFeature) {
   this.stateManager.setState('deviceFeature', deviceFeature.selector, {
     last_value_changed: now,
   });
-  await db.sequelize.transaction(async (t) => {
-    // update deviceFeature lastValue in DB
-    await db.DeviceFeature.update(
-      {
-        last_value_changed: now,
+  await db.DeviceFeature.update(
+    {
+      last_value_changed: now,
+    },
+    {
+      where: {
+        id: deviceFeature.id,
       },
-      {
-        where: {
-          id: deviceFeature.id,
-        },
-      },
-      {
-        transaction: t,
-      },
-    );
-  });
+    },
+  );
 
   // send websocket event
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {

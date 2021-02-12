@@ -14,8 +14,11 @@ async function connect() {
   const netatmoCientSecret = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_SECRET, this.serviceId);
   const netatmoUsername = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_USERNAME, this.serviceId);
   const netatmoPassword = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_PASSWORD, this.serviceId);
+  const netatmoIsConnect = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_IS_CONNECT, this.serviceId);
+  if (!netatmoIsConnect) {
+    this.gladys.variable.setValue(CONFIGURATION.NETATMO_IS_CONNECT, '', this.serviceId);
+  }
   const variablesFound = netatmoClientId;
-
   // if no variable message
   if (!variablesFound) {
     this.configured = false;
@@ -23,7 +26,7 @@ async function connect() {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
     });
     logger.debug('NETATMO is not configured.');
-  } else {
+  } else if (netatmoIsConnect === 'connect') {
     // else is configured send websocket ok
     this.configured = true;
 
@@ -43,6 +46,7 @@ async function connect() {
       method: 'post',
       data: querystring.stringify(authentificationForm),
     });
+    this.connected = true;
     this.token = response.data.access_token;
     setInterval(() => {
       axios({
