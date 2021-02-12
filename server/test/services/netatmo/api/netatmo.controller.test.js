@@ -10,6 +10,7 @@ const sensors = [
 ];
 
 netatmoManager.connect = fake.returns(null);
+netatmoManager.disconnect = fake.returns(null);
 netatmoManager.getSensors = fake.returns(sensors);
 
 const res = {
@@ -22,6 +23,11 @@ describe('POST /api/v1/service/netatmo/connect', () => {
     const netatmoController = NetatmoController(netatmoManager);
     await netatmoController['post /api/v1/service/netatmo/connect'].controller({}, res);
     assert.called(netatmoManager.connect);
+  });
+  it('should disconnect', async () => {
+    const netatmoController = NetatmoController(netatmoManager);
+    await netatmoController['post /api/v1/service/netatmo/disconnect'].controller({}, res);
+    assert.called(netatmoManager.disconnect);
   });
 });
 

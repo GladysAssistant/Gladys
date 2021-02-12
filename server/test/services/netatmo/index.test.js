@@ -4,6 +4,12 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const NetatmoMock = require('./netatmo.mock.test');
 
+const gladys = {
+  config: {
+    tempFolder: '/tmp/gladys',
+  },
+};
+
 const NetatmoService = proxyquire('../../../services/netatmo/index', {
   './lib': NetatmoMock,
 });
@@ -33,7 +39,7 @@ describe('NetatmoService', () => {
 });
 
 describe('NetatmoService lifycycle', () => {
-  const netatmoService = NetatmoService();
+  const netatmoService = NetatmoService(gladys);
   it('should start service', async () => {
     await netatmoService.start();
   });

@@ -48,7 +48,6 @@ const NetatmoManager = function NetatmoManager(gladys, ffmpeg, serviceId) {
   this.baseUrl = 'https://api.netatmo.net';
   this.token = undefined;
   this.pollFrequencies = DEVICE_POLL_FREQUENCIES;
-  this.setThermostat = {};
   this.pollHomeCoachWeather = undefined;
   this.pollEnergy = undefined;
   this.pollSecurity = undefined;

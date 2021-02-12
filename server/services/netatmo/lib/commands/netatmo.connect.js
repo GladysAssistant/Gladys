@@ -1,6 +1,6 @@
 const axios = require('axios');
 const querystring = require('querystring');
-const logger = require('../../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { CONFIGURATION } = require('../constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 /**
@@ -24,8 +24,9 @@ async function connect() {
     this.configured = false;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
+      payload: 'Service is not configured',
     });
-    logger.debug('NETATMO is not configured.');
+    throw new ServiceNotConfiguredError('NETATMO: Error, service is not configured');
   } else if (netatmoIsConnect === 'connect') {
     // else is configured send websocket ok
     this.configured = true;
@@ -41,11 +42,20 @@ async function connect() {
         'read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_homecoach read_smokedetector',
     };
     // connect to netatmo api
-    const response = await axios({
-      url: `${this.baseUrl}/oauth2/token`,
-      method: 'post',
-      data: querystring.stringify(authentificationForm),
-    });
+    let response;
+    try {
+      response = await axios({
+        url: `${this.baseUrl}/oauth2/token`,
+        method: 'post',
+        data: querystring.stringify(authentificationForm),
+      });
+    } catch (error) {
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR,
+        payload: 'Service is not configured',
+      });
+      throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${error.response.status}`);
+    }
     this.connected = true;
     this.token = response.data.access_token;
     setInterval(() => {
