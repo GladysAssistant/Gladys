@@ -756,10 +756,12 @@
   },
   "editScene": {
     "editNamePlaceholder": "Entrez un nom de scène",
-    "startButton": "Démarrer",
+    "executeButton": "Exécuter",
     "saveButton": "Sauvegarder",
     "runButton": "Jouer",
     "deleteButton": "Supprimer",
+    "deactivateButton": "Desactiver",
+    "activateButton": "Activer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
     "addTriggerButton": "Ajouter déclencheur",
@@ -1173,7 +1175,7 @@
     "orderDirDesc": "Z - A",
     "newButton": "Nouveau",
     "editButton": "Editer",
-    "startButton": "Démarrer",
+    "executeButton": "Exéctuer",
     "searchPlaceholder": "Chercher une scène"
   },
   "gateway": {

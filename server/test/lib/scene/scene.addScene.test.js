@@ -20,6 +20,7 @@ describe('SceneManager.addScene', () => {
           time: '12:00',
         },
       ],
+      active: true,
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
@@ -37,6 +38,7 @@ describe('SceneManager.addScene', () => {
           time: '12:00',
         },
       ],
+      active: true,
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
@@ -53,6 +55,7 @@ describe('SceneManager.addScene', () => {
           time: '12:00',
         },
       ],
+      active: true,
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
@@ -73,6 +76,7 @@ describe('SceneManager.addScene', () => {
           time,
         },
       ],
+      active: true,
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
@@ -90,6 +94,7 @@ describe('SceneManager.addScene', () => {
           unit: 'hour',
         },
       ],
+      active: true,
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('jsInterval');
@@ -108,6 +113,7 @@ describe('SceneManager.addScene', () => {
             unit: 'hour',
           },
         ],
+        active: true,
         actions: [],
       }),
     ).to.throw(BadParameters, '10000 hour is too big for an interval');
@@ -126,8 +132,29 @@ describe('SceneManager.addScene', () => {
             unit: 'not-supported',
           },
         ],
+        active: true,
         actions: [],
       }),
     ).to.throw(BadParameters, 'not-supported not supported');
+  });
+  it('should return null, scene isn\'t active', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'interval',
+          interval: 10,
+          unit: 'not-supported',
+        },
+      ],
+      active: false,
+      actions: [],
+    });
+    expect(scene).to.be.eq(null);
+    expect(sceneManager.scenes).to.be.instanceOf(Object);
+    expect(sceneManager.scenes).to.deep.equal({});
   });
 });

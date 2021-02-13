@@ -15,6 +15,7 @@ describe('SceneManager.get', () => {
       expect(oneScene).not.to.have.property('actions');
       expect(oneScene).to.have.property('updated_at');
       expect(oneScene).to.have.property('last_executed');
+      expect(oneScene).to.have.property('active');
     });
   });
   it('should search scene, even in lowercase', async () => {
@@ -31,6 +32,7 @@ describe('SceneManager.get', () => {
         selector: 'test-scene',
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        active: true
       },
     ]);
   });

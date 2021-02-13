@@ -35,7 +35,7 @@ class EditScene extends Component {
       });
     }
   };
-  startScene = async () => {
+  executeScene = async () => {
     this.setState({ saving: true });
     try {
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene_selector}/start`);
@@ -44,6 +44,34 @@ class EditScene extends Component {
       this.setState({ saving: false });
     }
   };
+  deactivateScene = async () => {
+    await this.setActive(false);
+  }
+  activateScene = async () => {
+    await this.setActive(true);
+  }
+  setActive = async (value) => {
+    this.setState({ saving: true });
+    try {
+      const updateScene = await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
+        active: value
+      });
+      this.setState(prevState => {
+        const newState = update(prevState, {
+          scene: {
+            active: {
+              $set: updateScene.active
+            }
+          }
+        });
+        return newState;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    this.setState({ saving: false });
+  }
+
   saveScene = async e => {
     if (e) {
       e.preventDefault();
@@ -259,6 +287,8 @@ class EditScene extends Component {
     });
   };
 
+
+
   constructor(props) {
     super(props);
     this.state = {
@@ -284,7 +314,9 @@ class EditScene extends Component {
         <EditScenePage
           {...props}
           scene={scene}
-          startScene={this.startScene}
+          executeScene={this.executeScene}
+          activateScene={this.activateScene}
+          deactivateScene={this.deactivateScene}
           deleteScene={this.deleteScene}
           saveScene={this.saveScene}
           updateActionProperty={this.updateActionProperty}

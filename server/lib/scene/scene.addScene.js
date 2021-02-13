@@ -20,7 +20,7 @@ const nodeScheduleDaysOfWeek = {
 /**
  * @description Add a scene to the scene manager.
  * @param {Object} sceneRaw - Scene object from DB.
- * @returns {Object} Return the scene.
+ * @returns {Object|null} Return the scene.
  * @example
  * addScene({
  *  selector: 'test'
@@ -31,6 +31,10 @@ function addScene(sceneRaw) {
   const scene = cloneDeep(sceneRaw);
   // first, if the scene actually exist, we cancel all triggers
   this.cancelTriggers(scene.selector);
+
+  if(scene.active === false){
+    return null;
+  }
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled
   if (scene.triggers) {
     scene.triggers.forEach((trigger) => {

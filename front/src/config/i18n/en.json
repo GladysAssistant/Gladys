@@ -756,10 +756,12 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
-    "startButton": "Start",
+    "executeButton": "Execute",
     "saveButton": "Save",
     "runButton": "Run",
     "deleteButton": "Delete",
+    "deactivateButton": "Deactivate",
+    "activateButton": "Activate",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1173,7 +1175,7 @@
     "orderDirDesc": "Z - A",
     "newButton": "New",
     "editButton": "Edit",
-    "startButton": "Start",
+    "executeButton": "Execute",
     "searchPlaceholder": "Search scenes"
   },
   "gateway": {

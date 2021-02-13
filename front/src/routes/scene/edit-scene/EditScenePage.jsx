@@ -46,9 +46,21 @@ const EditScenePage = ({ children, ...props }) => (
               )}
             </h1>
             <div class="page-options d-flex">
-              <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
-                <Text id="editScene.startButton" /> <i class="fe fe-play" />
-              </button>
+              {
+                props.scene.active ?
+                  <button onClick={props.deactivateScene} type="button" className="btn btn-sm btn-info ml-2">
+                    <Text id="editScene.deactivateButton" />
+                  </button>
+                  :
+                  <button onClick={props.activateScene} type="button" className="btn btn-sm btn-info ml-2">
+                    <Text id="editScene.activateButton" />
+                  </button>
+              }
+              { props.scene.active &&
+                <button onClick={props.executeScene} className="btn btn-sm btn-primary ml-2">
+                  <Text id="editScene.executeButton" /> <i className="fe fe-play" />
+                </button>
+              }
               <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>

@@ -3,9 +3,10 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
+import update from "immutability-helper";
 
 class SceneCard extends Component {
-  startScene = async () => {
+  executeScene = async () => {
     try {
       await this.setState({ saving: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/start`);
@@ -17,7 +18,30 @@ class SceneCard extends Component {
     setTimeout(() => this.setState({ saving: false }), 200);
   };
 
+
+  deactivate = async () => {
+    await this.setActive(false);
+  }
+
+  activate = async () => {
+    await this.setActive(true);
+  }
+
+  setActive = async (value) => {
+    this.setState({ saving: true });
+    try {
+      const updatedScene = await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene.selector}`, {
+        active: value
+      });
+      this.props.scene.active = updatedScene.active;
+    } catch (e) {
+      console.error(e);
+    }
+    this.setState({ saving: false });
+  }
+
   render(props, { saving }) {
+    console.log(props.scene);
     return (
       <div class="col-sm-6 col-lg-3">
         <div class="card h-100">
@@ -32,6 +56,18 @@ class SceneCard extends Component {
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
+                <div style={{ position: "absolute", top: "5%", right: "5%"}}>
+                  {
+                    props.scene.active === false ?
+                      <button onClick={this.activate} type="button"  class="btn btn-outline-warning rounded-circle">
+                        <i className="fe fe-pause" />
+                      </button>
+                      :
+                      <button onClick={this.deactivate} type="button"  className="btn btn-outline-success rounded-circle">
+                        <i className="fe fe-play" />
+                      </button>
+                  }
+                </div>
                 <h4>{props.scene.name}</h4>
                 <div class="text-muted">{props.scene.description}</div>
               </div>
@@ -41,10 +77,13 @@ class SceneCard extends Component {
                     <i class="fe fe-edit" />
                     <Text id="scene.editButton" />
                   </Link>
-                  <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                    <i class="fe fe-play" />
-                    <Text id="scene.startButton" />
-                  </button>
+                  { props.scene.active &&
+                    <button onClick={this.executeScene} type="button" className="btn btn-outline-success btn-sm">
+                      <i className="fe fe-play"/>
+                      <Text id="scene.executeButton"/>
+                    </button>
+                  }
+
                 </div>
               </div>
             </div>

@@ -116,6 +116,10 @@ module.exports = (sequelize, DataTypes) => {
       last_executed: {
         type: DataTypes.DATE,
       },
+      active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      }
     },
     {},
   );
