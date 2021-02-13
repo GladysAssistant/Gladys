@@ -3,7 +3,6 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
-import update from 'immutability-helper';
 
 class SceneCard extends Component {
   executeScene = async () => {
@@ -36,7 +35,6 @@ class SceneCard extends Component {
   };
 
   render(props, { saving }) {
-    console.log(props.scene);
     return (
       <div class="col-sm-6 col-lg-3">
         <div class="card h-100">
