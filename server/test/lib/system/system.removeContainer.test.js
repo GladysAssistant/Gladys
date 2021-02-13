@@ -8,13 +8,8 @@ const proxyquire = require('proxyquire').noCallThru();
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
 
-const getNetworkMode = proxyquire('../../../lib/system/system.getNetworkMode', {
-  '../../utils/childProcess': { exec: () => 'containerId' },
-});
-
 const System = proxyquire('../../../lib/system', {
   dockerode: DockerodeMock,
-  './system.getNetworkMode': getNetworkMode,
 });
 
 const sequelize = {
@@ -30,7 +25,7 @@ const config = {
   tempFolder: '/tmp/gladys',
 };
 
-describe('system.getNetworkMode', () => {
+describe('system.removeContainer', () => {
   let system;
 
   beforeEach(async () => {
@@ -48,16 +43,26 @@ describe('system.getNetworkMode', () => {
     system.dockerode = undefined;
 
     try {
-      await system.getNetworkMode();
+      await system.removeContainer('my-container');
       assert.fail('should have fail');
     } catch (e) {
       expect(e).be.instanceOf(PlatformNotCompatible);
+
+      assert.notCalled(sequelize.close);
+      assert.notCalled(event.on);
+      assert.notCalled(event.emit);
     }
   });
 
-  it('should check network', async () => {
-    const network = await system.getNetworkMode();
-    expect(network).to.eq('host');
+  it('should removeContainer command with success', async () => {
+    const result = await system.removeContainer('my-container');
+
+    expect(result).to.be.eq(true);
+
+    assert.notCalled(sequelize.close);
+    assert.notCalled(event.on);
+    assert.notCalled(event.emit);
+
     assert.calledOnce(system.dockerode.getContainer);
   });
 });
