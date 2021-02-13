@@ -756,7 +756,7 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
-    "executeButton": "Execute",
+    "testButton": "Test",
     "saveButton": "Save",
     "runButton": "Run",
     "deleteButton": "Delete",
@@ -1175,7 +1175,7 @@
     "orderDirDesc": "Z - A",
     "newButton": "New",
     "editButton": "Edit",
-    "executeButton": "Execute",
+    "testButton": "Test",
     "searchPlaceholder": "Search scenes"
   },
   "gateway": {

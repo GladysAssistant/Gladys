@@ -756,7 +756,7 @@
   },
   "editScene": {
     "editNamePlaceholder": "Entrez un nom de scène",
-    "executeButton": "Exécuter",
+    "testButton": "Tester",
     "saveButton": "Sauvegarder",
     "runButton": "Jouer",
     "deleteButton": "Supprimer",
@@ -1175,7 +1175,7 @@
     "orderDirDesc": "Z - A",
     "newButton": "Nouveau",
     "editButton": "Editer",
-    "executeButton": "Exéctuer",
+    "testButton": "Tester",
     "searchPlaceholder": "Chercher une scène"
   },
   "gateway": {

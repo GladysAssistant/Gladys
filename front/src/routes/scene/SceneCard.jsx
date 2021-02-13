@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
-import update from "immutability-helper";
+import update from 'immutability-helper';
 
 class SceneCard extends Component {
   executeScene = async () => {
@@ -18,16 +18,11 @@ class SceneCard extends Component {
     setTimeout(() => this.setState({ saving: false }), 200);
   };
 
+  switchActive = async () => {
+    await this.setActive(!this.props.scene.active);
+  };
 
-  deactivate = async () => {
-    await this.setActive(false);
-  }
-
-  activate = async () => {
-    await this.setActive(true);
-  }
-
-  setActive = async (value) => {
+  setActive = async value => {
     this.setState({ saving: true });
     try {
       const updatedScene = await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene.selector}`, {
@@ -38,7 +33,7 @@ class SceneCard extends Component {
       console.error(e);
     }
     this.setState({ saving: false });
-  }
+  };
 
   render(props, { saving }) {
     console.log(props.scene);
@@ -56,17 +51,18 @@ class SceneCard extends Component {
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
-                <div style={{ position: "absolute", top: "5%", right: "5%"}}>
-                  {
-                    props.scene.active === false ?
-                      <button onClick={this.activate} type="button"  class="btn btn-outline-warning rounded-circle">
-                        <i className="fe fe-pause" />
-                      </button>
-                      :
-                      <button onClick={this.deactivate} type="button"  className="btn btn-outline-success rounded-circle">
-                        <i className="fe fe-play" />
-                      </button>
-                  }
+                <div style={{ position: 'absolute', top: '5%', right: '5%' }}>
+                  <label className="custom-switch m-0">
+                    <input
+                      type="checkbox"
+                      name="active"
+                      value="1"
+                      className="custom-switch-input"
+                      checked={props.scene.active}
+                      onClick={this.switchActive}
+                    />
+                    <span className="custom-switch-indicator" />
+                  </label>
                 </div>
                 <h4>{props.scene.name}</h4>
                 <div class="text-muted">{props.scene.description}</div>
@@ -77,13 +73,12 @@ class SceneCard extends Component {
                     <i class="fe fe-edit" />
                     <Text id="scene.editButton" />
                   </Link>
-                  { props.scene.active &&
+                  {props.scene.active && (
                     <button onClick={this.executeScene} type="button" className="btn btn-outline-success btn-sm">
-                      <i className="fe fe-play"/>
-                      <Text id="scene.executeButton"/>
+                      <i className="fe fe-play" />
+                      <Text id="scene.testButton" />
                     </button>
-                  }
-
+                  )}
                 </div>
               </div>
             </div>

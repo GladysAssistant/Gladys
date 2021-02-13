@@ -32,7 +32,7 @@ describe('SceneManager.get', () => {
         selector: 'test-scene',
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
-        active: true
+        active: true,
       },
     ]);
   });

@@ -44,13 +44,10 @@ class EditScene extends Component {
       this.setState({ saving: false });
     }
   };
-  deactivateScene = async () => {
-    await this.setActive(false);
-  }
-  activateScene = async () => {
-    await this.setActive(true);
-  }
-  setActive = async (value) => {
+  switchActiveScene = async () => {
+    await this.setActive(!this.state.scene.active);
+  };
+  setActive = async value => {
     this.setState({ saving: true });
     try {
       const updateScene = await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
@@ -70,7 +67,7 @@ class EditScene extends Component {
       console.error(e);
     }
     this.setState({ saving: false });
-  }
+  };
 
   saveScene = async e => {
     if (e) {
@@ -287,8 +284,6 @@ class EditScene extends Component {
     });
   };
 
-
-
   constructor(props) {
     super(props);
     this.state = {
@@ -315,8 +310,7 @@ class EditScene extends Component {
           {...props}
           scene={scene}
           executeScene={this.executeScene}
-          activateScene={this.activateScene}
-          deactivateScene={this.deactivateScene}
+          switchActiveScene={this.switchActiveScene}
           deleteScene={this.deleteScene}
           saveScene={this.saveScene}
           updateActionProperty={this.updateActionProperty}

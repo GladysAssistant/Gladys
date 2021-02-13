@@ -32,7 +32,7 @@ function addScene(sceneRaw) {
   // first, if the scene actually exist, we cancel all triggers
   this.cancelTriggers(scene.selector);
 
-  if(scene.active === false){
+  if (scene.active === false) {
     return null;
   }
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled

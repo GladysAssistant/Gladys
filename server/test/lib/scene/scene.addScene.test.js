@@ -137,7 +137,7 @@ describe('SceneManager.addScene', () => {
       }),
     ).to.throw(BadParameters, 'not-supported not supported');
   });
-  it('should return null, scene isn\'t active', async () => {
+  it("should return null, scene isn't active", async () => {
     const sceneManager = new SceneManager({}, event);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',

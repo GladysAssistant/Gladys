@@ -603,7 +603,16 @@
       "selector": "wake-up",
       "icon": "fe fe-bell",
       "name": "Wake Up",
-      "description": "Tony's wake up scene"
+      "description": "Tony's wake up scene",
+      "active": true
+    },
+    {
+      "id": "036bb793-f0e4-43e0-8093-3b1f1637869e",
+      "selector": "good-night",
+      "icon": "fe fe-bell",
+      "name": "Good Night",
+      "description": "Tony's good night scene",
+      "active": false
     }
   ],
   "get /api/v1/user": [
@@ -647,6 +656,7 @@
     "selector": "wake-up",
     "icon": "fe fe-bell",
     "name": "Wake Up",
+    "active": true,
     "triggers": [
       {
         "type": "device.new-state",
@@ -666,6 +676,37 @@
       [
         {
           "type": "light.turn-on",
+          "devices": ["light"]
+        }
+      ]
+    ]
+  },
+
+  "get /api/v1/scene/good-night": {
+    "id": "036bb793-f0e4-43e0-8093-3b1f1637869e",
+    "selector": "good-night",
+    "icon": "fe fe-bell",
+    "name": "Good Night",
+    "active": false,
+    "triggers": [
+      {
+        "type": "device.new-state",
+        "device_feature": "main-lamp-binary",
+        "operator": "=",
+        "value": 0
+      }
+    ],
+    "actions": [
+      [
+        {
+          "type": "delay",
+          "value": 2,
+          "unit": "seconds"
+        }
+      ],
+      [
+        {
+          "type": "light.turn-off",
           "devices": ["light"]
         }
       ]

@@ -45,22 +45,23 @@ const EditScenePage = ({ children, ...props }) => (
                 <span onClick={props.toggleIsNameEditable}>{props.scene.name}</span>
               )}
             </h1>
+            <label className="custom-switch m-0" style={{ paddingLeft: '1%' }}>
+              <input
+                type="checkbox"
+                name="active"
+                value="1"
+                className="custom-switch-input"
+                checked={props.scene.active}
+                onClick={props.switchActiveScene}
+              />
+              <span className="custom-switch-indicator" />
+            </label>
             <div class="page-options d-flex">
-              {
-                props.scene.active ?
-                  <button onClick={props.deactivateScene} type="button" className="btn btn-sm btn-info ml-2">
-                    <Text id="editScene.deactivateButton" />
-                  </button>
-                  :
-                  <button onClick={props.activateScene} type="button" className="btn btn-sm btn-info ml-2">
-                    <Text id="editScene.activateButton" />
-                  </button>
-              }
-              { props.scene.active &&
+              {props.scene.active && (
                 <button onClick={props.executeScene} className="btn btn-sm btn-primary ml-2">
-                  <Text id="editScene.executeButton" /> <i className="fe fe-play" />
+                  <Text id="editScene.testButton" /> <i className="fe fe-play" />
                 </button>
-              }
+              )}
               <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>
