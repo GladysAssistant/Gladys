@@ -12,7 +12,7 @@ const gladys = {
   },
 };
 
-describe.only('stockExchangeHandler.getStockExchangeIndexQuote', () => {
+describe('stockExchangeHandler.getStockExchangeIndexQuote', () => {
   it('should get stock exchange index quote', async () => {
     const stockExchangeHandler = new StockExchangeHandler(gladys, serviceId);
     await stockExchangeHandler.getStockExchangeIndexQuote();
