@@ -45,6 +45,7 @@ describe('GET /api/v1/scene', () => {
             selector: 'test-scene',
             last_executed: null,
             updated_at: '2019-02-12T07:49:07.556Z',
+            active: true
           },
         ]);
       });
