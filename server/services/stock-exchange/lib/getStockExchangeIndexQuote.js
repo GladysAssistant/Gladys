@@ -10,14 +10,11 @@ const { parseJsonIfJson } = require('../../../utils/json');
  */
 async function getStockExchangeIndexQuote(userId) {
   const apiKey = await this.gladys.variable.getValue('STOCKEXCHANGE_API_KEY', this.serviceId, userId);
-  const fmp = require('financialmodelingprep')(apiKey);
   const tickers = await this.gladys.variable.getValue('STOCKEXCHANGE_TICKERS', this.serviceId, userId);
+  const fmp = require('financialmodelingprep')(apiKey);
   let quotes = [];
 
   try {
-    logger.debug(`FMP API KEY used ${apiKey}`);
-    logger.debug(`TICKERS ======>  ${parseJsonIfJson(tickers)}`);
-
     quotes = await fmp.stock(parseJsonIfJson(tickers) || ['^FCHI', 'GIB']).quote();
   } catch (e) {
     logger.warn('Unable to get FMP datas');
