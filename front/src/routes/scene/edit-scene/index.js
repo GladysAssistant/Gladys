@@ -53,6 +53,10 @@ class EditScene extends Component {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
       this.setState({ isNameEditable: false });
     } catch (e) {
+<<<<<<< HEAD
+=======
+      console.error(e);
+>>>>>>> upstream/master
       this.setState({ error: true });
     }
     this.setState({ saving: false });

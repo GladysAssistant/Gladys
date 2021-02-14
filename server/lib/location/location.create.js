@@ -18,32 +18,21 @@ async function create(userSelector, location) {
       selector: userSelector,
     },
   });
-
   if (user === null) {
     throw new NotFoundError('User not found');
   }
-
-  return db.sequelize.transaction(async (t) => {
-    const locationWithUserId = Object.assign({}, location, {
-      user_id: user.id,
-    });
-    const createdLocation = await db.Location.create(locationWithUserId, {
-      transaction: t,
-    });
-    await user.update(
-      {
-        last_latitude: createdLocation.latitude,
-        last_longitude: createdLocation.longitude,
-        last_altitude: createdLocation.altitude,
-        last_accuracy: createdLocation.accuracy,
-        last_location_changed: createdLocation.created_at,
-      },
-      {
-        transaction: t,
-      },
-    );
-    return createdLocation.get({ plain: true });
+  const locationWithUserId = Object.assign({}, location, {
+    user_id: user.id,
   });
+  const createdLocation = await db.Location.create(locationWithUserId);
+  await user.update({
+    last_latitude: createdLocation.latitude,
+    last_longitude: createdLocation.longitude,
+    last_altitude: createdLocation.altitude,
+    last_accuracy: createdLocation.accuracy,
+    last_location_changed: createdLocation.created_at,
+  });
+  return createdLocation.get({ plain: true });
 }
 
 module.exports = {

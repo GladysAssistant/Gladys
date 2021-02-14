@@ -32,6 +32,7 @@ async function create(user) {
   delete plainUser.password;
   delete plainUser.picture;
   this.stateManager.setState('user', plainUser.selector, plainUser);
+  this.stateManager.setState('userById', plainUser.id, plainUser);
   // if the instance doesn't have a clientId yet, we create it.
   const clientId = await this.variable.getValue('GLADYS_INSTANCE_CLIENT_ID');
   if (clientId === null) {

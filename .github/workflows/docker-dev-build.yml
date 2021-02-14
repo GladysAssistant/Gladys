@@ -1,87 +1,86 @@
 name: Build Gladys dev images
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker Tag to build'
+        required: true
+        default: 'dev'
+      platforms:
+        description: 'Docker platform to build'
+        required: true
+        default: 'linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8'
 
 jobs:
   build-front:
-    runs-on: ubuntu-latest
+    name: Front build
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v2
-      - name: Setup nodejs
-        uses: actions/setup-node@v1
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
         with:
-            node-version: 12.x
-      - run: cd front && npm install && npm run build
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v1
+          node-version: '12'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build front
+        working-directory: ./front
+        run: |
+          npm run build
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v2
         with:
           name: static
           path: front/build
   docker:
     needs: build-front
-    name: Build and Push Gladys dev images
-    runs-on: ubuntu-latest
+    name: Docker magic !
+    runs-on: ubuntu-20.04
     env:
-      # Export environment variables for all stages.
-      DOCKER_CLI_EXPERIMENTAL: enabled # for 'docker buildx'
-      DOCKERHUB_USER:  ${{secrets.DOCKERHUB_USER}}
+      DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: gladysassistant/gladys
-      DOCKER_PLATFORMS: >
-        linux/amd64
-        linux/arm/v7
-        linux/arm/v6
-        linux/arm64/v8
+      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Download build artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: static
-    - name: Set up image tag
-      run: |
-          set -vx
-          echo "TAG=dev" >> $GITHUB_ENV
-          echo "DOCKER_BASE=${DOCKERHUB_REPO}" >> $GITHUB_ENV
-    - name: Install Docker buildx
-      run: |
-        set -vx
-        # Install up-to-date version of docker, with buildx support.
-        docker_apt_repo='https://download.docker.com/linux/ubuntu'
-        curl -fsSL "${docker_apt_repo}/gpg" | sudo apt-key add -
-        os="$(lsb_release -cs)"
-        sudo add-apt-repository "deb [arch=amd64] $docker_apt_repo $os stable"
-        sudo apt-get update
-        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-        # Enable docker daemon experimental support (for 'pull --platform').
-        config='/etc/docker/daemon.json'
-        if [[ -e "$config" ]]; then
-          sudo sed -i -e 's/{/{ "experimental": true, /' "$config"
-        else
-          echo '{ "experimental": true }' | sudo tee "$config"
-        fi
-        sudo systemctl restart docker
-        # Install QEMU multi-architecture support for docker buildx.
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-        # Instantiate docker buildx builder with multi-architecture support.
-        docker buildx create --name gladysbuilder
-        docker buildx use gladysbuilder
-        # Start up buildx and verify that all is OK.
-        docker buildx inspect --bootstrap
-    - name: Build multi arch images with buildx
-      run: |
-        set -vx
-        echo "$DOCKERHUB_PASSWORD" \
-        | docker login -u="$DOCKERHUB_USER" --password-stdin
-        function buildx() {
-          docker buildx build \
-            --platform ${DOCKER_PLATFORMS// /,} \
-            --push \
-            -f docker/Dockerfile.buildx \
-            "$@" \
-            .
-        }
-        buildx -t "$DOCKER_BASE:$TAG" --target gladys
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 🐳 Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: ${{ secrets.DOCKERHUB_REPO }}
+          label-custom: |
+            org.opencontainers.image.title=Gladys Assitant Preprod Image
+      - name: 💽 Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: 🐳 Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+      - name: ↙️ Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: static
+          path: static
+      - name: 🔑 Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: 🐳 Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile.buildx
+          platforms: ${{ github.event.inputs.platforms }}
+          push: true
+          pull: true
+          tags: ${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-to: type=inline

@@ -100,6 +100,10 @@ class SignupPage extends Component {
         } else if (error.response && error.response.status === 409) {
           this.setState({ accountAlreadyExist: true });
         } else {
+<<<<<<< HEAD
+=======
+          console.error(error);
+>>>>>>> upstream/master
           this.setState({ unknownError: true });
         }
       });

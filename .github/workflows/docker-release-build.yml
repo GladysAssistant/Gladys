@@ -1,0 +1,182 @@
+name: Release Gladys Production Images
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  test-front:
+    name: Front test
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 📦 Install Global NPM Packages
+        run: |
+          sudo npm install typescript node-gyp npm@latest -g
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🧐 Prettier check
+        working-directory: ./front
+        run: |
+          npm run prettier-check
+      - name: 👕 ESlint
+        working-directory: ./front
+        run: |
+          npm run eslint
+      - name: 🌐 Integration comparison
+        working-directory: ./front
+        run: |
+          npm run compare-translations
+  test-server:
+    name: Server test
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 🖥️ Setup OZW
+        run: |
+          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
+          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
+          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
+          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
+          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
+          sudo ldconfig
+          docker rm -f dummy
+      - name: 💽 Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      - name: 📦 Install Global NPM Packages
+        run: |
+          sudo npm install typescript node-gyp npm@latest -g
+      - name: 📦 Install NPM server packages
+        working-directory: ./server
+        run: |
+          npm ci
+      - name: 🧐 Prettier check
+        working-directory: ./server
+        run: |
+          npm run prettier-check
+      - name: 👕 ESlint
+        working-directory: ./server
+        run: |
+          npm run eslint
+      - name: ✅ Test with coverage
+        working-directory: ./server
+        run: |
+          npm run coverage
+      - name: 📄 Codecov report upload
+        uses: codecov/codecov-action@v1
+  build-front:
+    name: Front build
+    needs:
+      - test-front
+      - test-server
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build front
+        working-directory: ./front
+        run: |
+          npm run build
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: static
+          path: front/build
+  docker:
+    needs: build-front
+    name: Docker magic !
+    runs-on: ubuntu-20.04
+    env:
+      DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 🐳 Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: ${{ secrets.DOCKERHUB_REPO }}
+          label-custom: |
+            org.opencontainers.image.title=Gladys Assitant Production Image
+          tag-sha: true
+          tag-semver: |
+            {{raw}}
+            v{{major}}
+      - name: 💽 Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: 🐳 Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+      - name: ↙️ Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: static
+          path: static
+      - name: 🔑 Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: 🐳 Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile.buildx
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+          push: true
+          pull: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
+          cache-to: type=inline
+      - name: 🐳 Legacy Tags
+        run: |
+          echo '{"experimental": true}' | sudo tee -a /etc/docker/daemon.json
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          sudo systemctl restart docker
+          export DIGESTARM=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm" and .value.platform.variant == "v6").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM ${{ env.DOCKERHUB_REPO }}:v4-arm
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm
+          export DIGESTARM64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm64").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64 ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
+          export DIGESTAMD64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "amd64").value | .digest')
+          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64
+          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64 ${{ env.DOCKERHUB_REPO }}:v4-amd64
+          docker push ${{ env.DOCKERHUB_REPO }}:v4-amd64

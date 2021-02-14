@@ -1,32 +1,51 @@
-FROM node:lts-alpine as gladys
+# STEP 1
+# Get builded openzwave
+# http://old.openzwave.com/downloads/
+FROM chrisns/openzwave:alpine-1.6.1714 as ozw
+
+# STEP 2
+# Prepare server package*.json files
+FROM node:12-alpine as json-files
+COPY ./server /json-files/server
+WORKDIR /json-files/server/
+RUN find . -type f \! -name "package*.json" -exec rm -r {} \;
+COPY ./server/cli /json-files/server/cli
+COPY ./server/utils /json-files/server/utils
+
+
+# STEP 3
+# Gladys Bundle
+FROM node:12-alpine as gladys
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev bluez
+RUN apk add --no-cache \
+         tzdata \
+         nmap \
+         ffmpeg \
+         sqlite \
+         openssl \
+         gzip \
+         eudev \
+         bluez
 
-WORKDIR /tmp
+COPY --from=ozw /usr/local/include/openzwave /usr/local/include/openzwave
+COPY --from=ozw /openzwave/libopenzwave.so* /lib/
+COPY --from=ozw /openzwave/config /usr/local/etc/openzwave
+COPY --from=json-files /json-files/server /src/server
 
-# Install OZW in a dedicated RUN to benefit from Docker cache on local dev'
-RUN apk add --no-cache --virtual .build-deps make g++ git coreutils \
-    # Install OZW 1.6 - Commit 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 - March, 5th 2020
-    && git clone https://github.com/OpenZWave/open-zwave.git \
-    && cd open-zwave \
-    && git checkout 5d18bbfb21d8cdc61ee6baae6f478c963297dfc5 \
-    && make \
-    && make install \
-    && apk del .build-deps \
-    && cd /tmp \
-    && rm -rf /tmp/open-zwave
+ENV LD_LIBRARY_PATH /lib
 
-RUN mkdir /src
-WORKDIR /src
-ADD . /src
-COPY ./static /src/server/static
 WORKDIR /src/server
 
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
+
+# Copy builded front
+COPY ./static /src/server/static
+# Copy codebase
+COPY . /src
 
 ENV NODE_ENV production
 ENV SERVER_PORT 80

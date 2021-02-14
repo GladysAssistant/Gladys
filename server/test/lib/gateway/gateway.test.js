@@ -13,7 +13,6 @@ const Gateway = proxyquire('../../../lib/gateway', {
 
 const getConfig = require('../../../utils/getConfig');
 const { EVENTS } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -50,6 +49,29 @@ describe('gateway', () => {
       assert.called(variable.getValue);
       assert.called(variable.setValue);
       assert.calledOnce(gateway.gladysGatewayClient.createInstance);
+    });
+  });
+  describe('gateway.init', () => {
+    const userKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+      },
+    ];
+    const variable = {
+      getValue: fake.resolves(JSON.stringify(userKeys)),
+      setValue: fake.resolves(null),
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config);
+    it('should login two factor to gladys gateway', async () => {
+      await gateway.init();
+      expect(gateway.connected).to.equal(true);
+      expect(gateway.usersKeys).to.deep.equal(userKeys);
     });
   });
 
@@ -254,7 +276,6 @@ describe('gateway', () => {
   describe('gateway.handleNewMessage', () => {
     it('should handle a new gateway message and reject it', async () => {
       const variable = {
-        getValue: fake.resolves('[]'),
         setValue: fake.resolves(null),
       };
       const gateway = new Gateway(variable, event, system, sequelize, config);
@@ -278,25 +299,24 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and reject it, user not accepted', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: false,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.resolves({
+      const eventGateway = new EventEmitter();
+      const stateManager = {
+        get: fake.returns({
           id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         }),
       };
-      const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: false,
+        },
+      ];
 
       return new Promise((resolve, reject) => {
         gateway.handleNewMessage(
@@ -321,23 +341,21 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and reject it, user not found', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: true,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.rejects(new NotFoundError('User "0cd30aef-9c4e-4a23-88e3-3547971296e5" not found')),
+      const stateManager = {
+        get: fake.returns(null),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
 
       return new Promise((resolve, reject) => {
         gateway.handleNewMessage(
@@ -366,26 +384,23 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and handle it', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: true,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.resolves({
+      const stateManager = {
+        get: fake.returns({
           id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         }),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
       eventGateway.on(EVENTS.GATEWAY.NEW_MESSAGE_API_CALL, (one, two, three, four, five, cb) => {
         cb([
           {

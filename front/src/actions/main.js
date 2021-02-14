@@ -67,6 +67,10 @@ function createActions(store) {
         } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND') {
           route('/link-gateway-user');
         } else {
+<<<<<<< HEAD
+=======
+          console.error(e);
+>>>>>>> upstream/master
         }
       }
     },

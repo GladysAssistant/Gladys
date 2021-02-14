@@ -166,7 +166,13 @@ class EditDevicePage extends Component {
         device,
         loading: false
       });
+<<<<<<< HEAD
     } catch (e) {}
+=======
+    } catch (e) {
+      console.error(e);
+    }
+>>>>>>> upstream/master
   }
 
   render(props, state) {

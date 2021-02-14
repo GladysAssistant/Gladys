@@ -24,7 +24,7 @@ const actions = store => ({
         services
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   },
   async actionOnService(state, serviceName, action, podId = null) {
@@ -57,7 +57,13 @@ const actions = store => ({
       store.setState({
         currentIntegration
       });
+<<<<<<< HEAD
     } catch (e) {}
+=======
+    } catch (e) {
+      console.error(e);
+    }
+>>>>>>> upstream/master
   },
   getIntegrationByCategory(state, category) {
     const selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
