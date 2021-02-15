@@ -142,7 +142,8 @@ const actionsFunc = {
       }
     });
     const urlWithVariables = Handlebars.compile(action.url)(scope);
-    const bodyWithVariables = Handlebars.compile(action.body)(scope);
+    // body can be empty
+    const bodyWithVariables = action.body ? Handlebars.compile(action.body)(scope) : undefined;
     const response = await self.http.request(
       action.method,
       urlWithVariables,
