@@ -9,6 +9,12 @@ class Integration extends Component {
     this.props.getIntegrations(this.props.category);
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.user !== this.props.user) {
+      this.props.getIntegrations(this.props.category);
+    }
+  }
+
   render({ category }, {}) {
     return <IntegrationPage category={category} />;
   }
