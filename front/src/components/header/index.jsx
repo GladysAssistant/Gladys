@@ -150,14 +150,16 @@ const Header = ({ ...props }) => {
                     <i class="fe fe-map" /> <Text id="header.maps" />
                   </Link>
                 </li>
-                <li class="nav-item">
-                  <Link
-                    href="/dashboard/scene"
-                    class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
-                  >
-                    <i class="fe fe-play" /> <Text id="header.scenes" />
-                  </Link>
-                </li>
+                {props.user.role === USER_ROLE.ADMIN && (
+                  <li class="nav-item">
+                    <Link
+                      href="/dashboard/scene"
+                      class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
+                    >
+                      <i class="fe fe-play" /> <Text id="header.scenes" />
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
           </div>

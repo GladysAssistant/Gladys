@@ -1,15 +1,21 @@
 import get from 'get-value';
 import update from 'immutability-helper';
 
+import { USER_ROLE } from '../../../server/utils/constants';
 import { integrations, integrationsByType, categories } from '../config/integrations';
 
 const actions = store => ({
   getIntegrations(state, category = null) {
-    const selectedIntegrations = integrationsByType[category] || integrations;
+    let selectedIntegrations = integrationsByType[category] || integrations;
+    let categoriesFiltered = categories;
+    if (state.user && state.user.role !== USER_ROLE.ADMIN) {
+      selectedIntegrations = selectedIntegrations.filter(i => i.type !== 'device');
+      categoriesFiltered = categoriesFiltered.filter(i => i.type !== 'device');
+    }
     store.setState({
       integrations: selectedIntegrations,
       totalSize: selectedIntegrations.length,
-      integrationCategories: categories,
+      integrationCategories: categoriesFiltered,
       searchKeyword: ''
     });
   },
@@ -62,7 +68,10 @@ const actions = store => ({
     }
   },
   getIntegrationByCategory(state, category) {
-    const selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
+    let selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
+    if (state.user && state.user.role !== USER_ROLE.ADMIN) {
+      selectedIntegrations = selectedIntegrations.filter(i => i.type !== 'device');
+    }
     store.setState({
       integrations: selectedIntegrations,
       searchKeyword: ''
