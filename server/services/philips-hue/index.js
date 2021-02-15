@@ -15,7 +15,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
    * gladys.services['philips-hue'].start();
    */
   async function start() {
-    logger.log('starting Philips Hue service');
+    logger.info('Starting Philips Hue service');
     philipsHueLightHandler.init();
   }
 
@@ -26,7 +26,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
    *  gladys.services['philips-hue'].stop();
    */
   async function stop() {
-    logger.log('stopping Philips Hue service');
+    logger.info('Stopping Philips Hue service');
   }
 
   return Object.freeze({

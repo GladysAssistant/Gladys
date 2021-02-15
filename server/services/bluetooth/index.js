@@ -23,7 +23,7 @@ module.exports = function BluetoothService(gladys, serviceId) {
    * gladys.services.bluetooth.stop();
    */
   async function stop() {
-    logger.log('Stopping Bluetooth service');
+    logger.info('Stopping Bluetooth service');
     await bluetoothManager.stop();
   }
 
