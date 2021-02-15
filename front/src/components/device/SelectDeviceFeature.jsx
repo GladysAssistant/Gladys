@@ -54,13 +54,9 @@ class SelectDeviceFeature extends Component {
         );
       }
       return deviceOptions;
-<<<<<<< HEAD
-    } catch (e) {}
-=======
     } catch (e) {
       console.error(e);
     }
->>>>>>> upstream/master
   };
   handleChange = selectedOption => {
     const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;

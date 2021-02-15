@@ -150,10 +150,7 @@ function createActions(store) {
         });
         actions.getMySelf(state);
       } catch (e) {
-<<<<<<< HEAD
-=======
         console.error(e);
->>>>>>> upstream/master
         store.setState({
           ProfilePatchStatus: RequestStatus.Error
         });

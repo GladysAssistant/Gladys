@@ -17,10 +17,7 @@ class ForgotPasswordPage extends Component {
       .forgotPassword(this.state.email)
       .then(() => this.setState({ success: true, forgotInProgress: false }))
       .catch(e => {
-<<<<<<< HEAD
-=======
         console.error(e);
->>>>>>> upstream/master
         this.setState({ success: true, forgotInProgress: false });
       });
   };

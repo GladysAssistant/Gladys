@@ -57,13 +57,9 @@ const actions = store => ({
       store.setState({
         currentIntegration
       });
-<<<<<<< HEAD
-    } catch (e) {}
-=======
     } catch (e) {
       console.error(e);
     }
->>>>>>> upstream/master
   },
   getIntegrationByCategory(state, category) {
     const selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
