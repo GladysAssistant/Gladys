@@ -55,6 +55,18 @@ class SettingsUsers extends Component {
     this.getUser();
   }
 
+  componentWillUnmount() {
+    this.props.initNewUser({
+      firstname: '',
+      lastname: '',
+      email: '',
+      language: 'en',
+      role: 'admin',
+      birthdateYear: null,
+      birthdateMonth: null
+    });
+  }
+
   render(props, {}) {
     const loading =
       props.ProfileGetStatus === RequestStatus.Getting || props.ProfilePatchStatus === RequestStatus.Getting;

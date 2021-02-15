@@ -41,7 +41,7 @@ const UserPage = ({ children, ...props }) => (
         <div class="row row-cards">
           {props.users &&
             props.users.map((user, index) => (
-              <div class="col-md-4">
+              <div class="col-md-4" key={user.id}>
                 <UserCard user={user} removeUserFromList={props.removeUserFromList} index={index} />
               </div>
             ))}
