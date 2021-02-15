@@ -1,9 +1,7 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import get from 'get-value';
 
 import Profile from '../../../../components/user/profile';
-import cx from 'classnames';
 
 const UserPage = ({ children, ...props }) => (
   <div class="row">

@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ResetPassword from './ResetPassword';
 import EditPreferences from './EditPreferences';

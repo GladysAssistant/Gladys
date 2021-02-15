@@ -51,6 +51,7 @@ class SettingsUsers extends Component {
     this.props.initNewUser({
       firstname: '',
       lastname: '',
+      selector: '',
       email: '',
       language: 'en',
       role: 'admin',
