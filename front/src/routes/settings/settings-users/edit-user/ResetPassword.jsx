@@ -77,7 +77,7 @@ class ResetPassword extends Component {
                 })}
                 value={password}
                 onInput={this.updatePassword}
-                placeholder={<Text id="profile.passwordPlaceholder" />}
+                placeholder={<Text id="profile.passwordOtherUserPlaceholder" />}
               />
             </Localizer>
             <div class="invalid-feedback">
@@ -87,7 +87,7 @@ class ResetPassword extends Component {
 
           <div class="form-group">
             <label class="form-label">
-              <Text id="profile.passwordRepeatLabel" />
+              <Text id="profile.passwordOtherUserRepeatLabel" />
             </label>
             <Localizer>
               <input
@@ -98,7 +98,7 @@ class ResetPassword extends Component {
                 })}
                 value={passwordRepeat}
                 onInput={this.updatePasswordRepeat}
-                placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
+                placeholder={<Text id="profile.passwordRepeatOtherUserPlaceholder" />}
               />
             </Localizer>
             <div class="invalid-feedback">

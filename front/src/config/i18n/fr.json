@@ -930,8 +930,10 @@
     "invitationSuccess": "Acceptée",
     "firstnameLabel": "Prénom",
     "firstnamePlaceholder": "Entrez votre prénom",
+    "firstnameOtherUserPlaceholder": "Entrez le prénom",
     "lastnameLabel": "Nom de famille",
     "lastnamePlaceholder": "Entrez votre nom de famille",
+    "lastnameOtherUserPlaceholder": "Entrez le nom de famille",
     "selectorLabel": "Sélecteur",
     "birthdateLabel": "Date de naissance",
     "year": "Année",
@@ -942,13 +944,18 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailPlaceholder": "Entrez votre e-mail",
+    "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
     "english": "English",
     "french": "Français",
+    "roleLabel": "Rôle",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "passwordRepeatLabel": "Répétez votre mot de passe",
     "passwordRepeatPlaceholder": "Répétez votre mot de passe",
+    "passwordOtherUserPlaceholder": "Entrez le mot de passe",
+    "passwordOtherUserRepeatLabel": "Répétez le mot de passe",
+    "passwordRepeatOtherUserPlaceholder": "Répétez le mot de passe",
     "saveButton": "Sauvegarder votre profil",
     "firstnameError": "Le prénom est requis.",
     "lastnameError": "Le nom de famille est requis.",
@@ -965,6 +972,7 @@
   "settings": {
     "title": "Réglages",
     "housesTab": "Maisons",
+    "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
@@ -981,6 +989,27 @@
     "orderDirDesc": "Z - A",
     "defaultNewHouseName": "Nouvelle Maison",
     "noHouseFound": "Aucune maison trouvée"
+  },
+  "usersSettings": {
+    "title": "Utilisateurs",
+    "searchPlaceholder": "Chercher un utilisateur",
+    "newUserButton": "Nouveau",
+    "editUserButton": "Editer",
+    "deleteUserButton": "Supprimer",
+    "confirmDeleteUserButton": "Confirmer",
+    "cancelDeleteUser": "Annuler",
+    "deleteUserWarning": "Supprimer un utilisateur supprimera toutes les données associées à cet utilisateur (tableau de bord, localisation, préférences). Confirmez vous la suppression de cet utilisateur ?",
+    "createUser": {
+      "title": "Créer un nouvel utilisateur",
+      "createUserButton": "Créer utilisateur"
+    },
+    "editUser": {
+      "title": "Editer utilisateur",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "editPreferences": "Editer les préférences",
+      "resetPasswordButton": "Réinitialiser",
+      "saveButton": "Enregistrer"
+    }
   },
   "sessionsSettings": {
     "registered": "Connexion",
