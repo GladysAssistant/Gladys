@@ -947,7 +947,7 @@
         "house": "House"
       },
       "warning": {
-        "houseWithoutCoordinate": "Warning !! Your house has no coordinate. This trigger cannot function without this data. Please go to Settings / Houses and click on the map to associate one."
+        "houseWithoutCoordinate": "Your house has no coordinate. This trigger cannot function without this data. Please go to Settings / Houses and click on the map to associate one."
       }
     }
   },

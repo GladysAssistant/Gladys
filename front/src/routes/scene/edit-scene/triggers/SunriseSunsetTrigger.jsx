@@ -12,7 +12,7 @@ class SunriseSunsetTrigger extends Component {
 
   render({}, {}) {
     let houseValid = false;
-    if (this.props.trigger.house === undefined) {
+    if (this.props.trigger.house === undefined || this.props.trigger.house === '') {
       houseValid = true;
     } else if (this.props.houses) {
       const selectedHouse = this.props.houses.find(house => house.selector === this.props.trigger.house);
@@ -24,13 +24,18 @@ class SunriseSunsetTrigger extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-sm-4">
+          <div class="col-sm-12">
             <div class="form-group">
               <div class="form-label">
                 <Text id="editScene.triggersCard.scheduledTrigger.house" />
               </div>
+              {!houseValid && (
+                <div className="alert alert-danger">
+                  <Text id="editScene.triggersCard.warning.houseWithoutCoordinate" />
+                </div>
+              )}
               <select onChange={this.handleHouseChange} className="form-control">
-                <option>
+                <option value="">
                   <Text id="global.emptySelectOption" />
                 </option>
                 {this.props.houses &&
@@ -41,13 +46,6 @@ class SunriseSunsetTrigger extends Component {
                   ))}
               </select>
             </div>
-          </div>
-          <div className="col-sm-8">
-            {!houseValid && (
-              <div className="alert alert-danger">
-                <Text id="editScene.triggersCard.warning.houseWithoutCoordinate" />
-              </div>
-            )}
           </div>
         </div>
       </div>
