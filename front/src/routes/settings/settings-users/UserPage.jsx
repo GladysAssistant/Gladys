@@ -9,7 +9,7 @@ const UserPage = ({ children, ...props }) => (
         <Text id="usersSettings.title" />
       </h1>
       <div class="page-options d-flex">
-        <select class="form-control custom-select w-auto">
+        <select class="form-control custom-select w-auto" onChange={props.changeOrderDir}>
           <option value="asc">
             <Text id="global.orderDirAsc" />
           </option>
@@ -26,8 +26,8 @@ const UserPage = ({ children, ...props }) => (
               type="text"
               class="form-control w-10"
               placeholder={<Text id="usersSettings.searchPlaceholder" />}
-              value={props.SettingsLayoutsearchKeyword}
-              onInput={this.searchWithI18n}
+              value={props.userSearchTerms}
+              onInput={props.search}
             />
           </Localizer>
         </div>

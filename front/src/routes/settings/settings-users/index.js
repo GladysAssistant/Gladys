@@ -9,11 +9,28 @@ import SettingsLayout from '../SettingsLayout';
 class SettingsUsers extends Component {
   getUsers = async () => {
     try {
-      const users = await this.props.httpClient.get('/api/v1/user?fields=id,firstname,lastname,selector,role,picture');
+      const params = {
+        fields: 'id,firstname,lastname,selector,role,picture',
+        order_dir: this.state.getUsersOrderDir || 'asc'
+      };
+      if (this.state.userSearchTerms && this.state.userSearchTerms.length) {
+        params.search = this.state.userSearchTerms;
+      }
+      const users = await this.props.httpClient.get('/api/v1/user', params);
       this.setState({ users });
     } catch (e) {
       console.error(e);
     }
+  };
+  search = async e => {
+    await this.setState({ userSearchTerms: e.target.value });
+    this.getUsers();
+  };
+  changeOrderDir = async e => {
+    await this.setState({
+      getUsersOrderDir: e.target.value
+    });
+    this.getUsers();
   };
   removeUserFromList = index => {
     this.setState(
@@ -28,10 +45,17 @@ class SettingsUsers extends Component {
     this.getUsers();
   }
 
-  render(props, { users }) {
+  render(props, { users, userSearchTerms }) {
     return (
       <SettingsLayout currentUrl={props.currentUrl}>
-        <UserPage {...props} users={users} removeUserFromList={this.removeUserFromList} />
+        <UserPage
+          {...props}
+          users={users}
+          search={this.search}
+          removeUserFromList={this.removeUserFromList}
+          userSearchTerms={userSearchTerms}
+          changeOrderDir={this.changeOrderDir}
+        />
       </SettingsLayout>
     );
   }
