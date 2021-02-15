@@ -308,7 +308,8 @@
       "title": "Bluetooth",
       "description": "Contrôler vos appareils Bluetooth.",
       "deviceTab": "Appareils",
-      "setupTab": "Configuration",
+      "discoverTab": "Découverte",
+      "setupTab": "Scanner de présence",
       "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
       "device": {
         "title": "Appareils Bluetooth",
@@ -321,6 +322,7 @@
         "externalIdLabel": "ID externe",
         "manufacturerLabel": "Fabricant",
         "modelLabel": "Modèle",
+        "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
         "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
         "featureNamePlaceholder": "Nom de la fonctionnalité",
@@ -328,10 +330,9 @@
         "deleteButton": "Supprimer",
         "editButton": "Editer"
       },
-      "setup": {
-        "title": "Configuration Bluetooth",
+      "discover": {
+        "title": "Découverte Bluetooth",
         "scanButton": "Rechercher",
-        "reloadButton": "Recharger",
         "noDeviceFound": "Aucun périphérique Bluetooth détecté.",
         "createDeviceInGladys": "Connecter dans Gladys",
         "updateDeviceInGladys": "Mettre à jour dans Gladys",
@@ -348,6 +349,18 @@
           "cancelLabel": "Annuler",
           "successLabel": "Effectué"
         }
+      },
+      "setup": {
+        "title": "Scanner de présence",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "presenceScannerDescription": "Le scanner de présence analyse à intervalle régulier uniquement les périphériques Bluetooth ayant cette fonctionnalité. Dès qu’un appareil est détecté, son nouvel état est enregistré avec la date de déctection.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence d'analyse",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "presenceScannerButton": "Scanner la présence maintenant",
+        "saveLabel": "Enregistrer"
       }
     },
     "telegram": {

@@ -644,7 +644,8 @@
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices.",
       "deviceTab": "Devices",
-      "setupTab": "Setup",
+      "discoverTab": "Discover",
+      "setupTab": "Presence scanner",
       "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
@@ -657,6 +658,7 @@
         "externalIdLabel": "External ID",
         "manufacturerLabel": "Manufacturer",
         "modelLabel": "Model",
+        "presenceSensorLabel": "Use this device as presence sensor",
         "featuresLabel": "Features",
         "noFeatureDiscovered": "No features discovered.",
         "featureNamePlaceholder": "Enter feature name",
@@ -664,10 +666,9 @@
         "deleteButton": "Delete",
         "editButton": "Edit"
       },
-      "setup": {
-        "title": "Bluetooth Setup",
+      "discover": {
+        "title": "Bluetooth Discover",
         "scanButton": "Scan",
-        "reloadButton": "Reload",
         "noDeviceFound": "No bluetooth device discovered.",
         "createDeviceInGladys": "Connect in Gladys",
         "updateDeviceInGladys": "Update in Gladys",
@@ -684,6 +685,18 @@
           "cancelLabel": "Cancel",
           "successLabel": "Done"
         }
+      },
+      "setup": {
+        "title": "Presence scanner",
+        "noConfigLabel": "Configuration not loaded, please retry.",
+        "errorLabel": "An error occurred while loading configuration.",
+        "presenceScannerDescription": "Presence scanner looks, at defined time interval, for available Bluetooth devices with presence feature. Each time a device is detected, a new state will be stored to save the last seen date.",
+        "presenceScannerStatusLabel": "Enable or disable presence scanner",
+        "presenceScannerFrequencyLabel": "Scanner interval",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Only integers are accepted.",
+        "presenceScannerButton": "Scan device presence now",
+        "saveLabel": "Save configuration"
       }
     },
     "eWeLink": {
