@@ -690,7 +690,7 @@
         "title": "Presence scanner",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "errorLabel": "An error occurred while loading configuration.",
-        "presenceScannerDescription": "Presence scanner looks, at defined time interval, for available Bluetooth devices with presence feature. Each time a device is detected, a new state will be stored to save the last seen date.",
+        "presenceScannerDescription": "The presence scanner feature is doing a bluetooth scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
         "presenceScannerStatusLabel": "Enable or disable presence scanner",
         "presenceScannerFrequencyLabel": "Scanner interval",
         "presenceScannerFrequencyUnit": "minutes",
@@ -900,6 +900,7 @@
         "valuePlaceholder": "Value",
         "on": "On",
         "off": "Off",
+        "deviceSeen": "If the device is detected",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {

@@ -354,9 +354,9 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence analyse à intervalle régulier uniquement les périphériques Bluetooth ayant cette fonctionnalité. Dès qu’un appareil est détecté, son nouvel état est enregistré avec la date de déctection.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
-        "presenceScannerFrequencyLabel": "Fréquence d'analyse",
+        "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "presenceScannerButton": "Scanner la présence maintenant",
@@ -900,6 +900,7 @@
         "valuePlaceholder": "Valeur",
         "on": "On",
         "off": "Off",
+        "deviceSeen": "Si l'appareil est détecté",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
       },
       "scheduledTrigger": {
