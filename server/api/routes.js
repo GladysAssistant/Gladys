@@ -420,6 +420,7 @@ function getRoutes(gladys) {
     // scene
     'post /api/v1/scene': {
       authenticated: true,
+      admin: true,
       controller: sceneController.create,
     },
     'get /api/v1/scene': {
@@ -432,10 +433,12 @@ function getRoutes(gladys) {
     },
     'patch /api/v1/scene/:scene_selector': {
       authenticated: true,
+      admin: true,
       controller: sceneController.update,
     },
     'delete /api/v1/scene/:scene_selector': {
       authenticated: true,
+      admin: true,
       controller: sceneController.destroy,
     },
     'post /api/v1/scene/:scene_selector/start': {
