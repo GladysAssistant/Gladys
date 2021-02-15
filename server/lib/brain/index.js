@@ -10,8 +10,9 @@ const { load } = require('./brain.load');
 
 const Brain = function Brain() {
   this.nlpManager = new NlpManager({
-    forceNER: true,
     languages: SUPPORTED_LANGUAGES,
+    nlu: { log: false },
+    autoSave: false,
   });
 };
 

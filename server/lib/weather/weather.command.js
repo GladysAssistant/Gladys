@@ -36,7 +36,6 @@ async function command(message, classification, context) {
 
     if (`intent.${classification.intent}` === INTENTS.WEATHER.GET) {
       const dateEntity = classification.entities.find((entity) => entity.entity === 'date');
-      // console.log(dateEntity);
 
       if (dateEntity === undefined) {
         // current day
