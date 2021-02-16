@@ -10,7 +10,6 @@ async function pollManual() {
     await this.updateNetatmo('HomeCoach_Weather');
   }, this.pollFrequencies.EVERY_5_MINUTES);
   this.pollEnergy = setInterval(async () => {
-    await this.getThermostatsData();
     await this.getHomeStatusData();
     await this.updateNetatmo('Energy');
   }, this.pollFrequencies.EVERY_2_MINUTES);

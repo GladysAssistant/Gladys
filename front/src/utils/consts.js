@@ -80,6 +80,7 @@ export const RequestStatus = {
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
   RoomValidationError: 'RoomValidationError',
+  ConnectedNoDevice: 'ConnectedNoDevice',
   ServiceConnected: 'ServiceConnected',
   ServiceDisconnected: 'ServiceDisconnected'
 };

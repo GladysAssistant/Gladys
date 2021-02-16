@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
-import style from './style.css';
+import style from '../style.css';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">

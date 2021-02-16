@@ -439,8 +439,8 @@
       },
       "discover": {
         "title": "Vos équipements Netatmo compatibles avec Gladys",
-        "noDevices": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils ?",
-        "noConnect": "Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
+        "noDevices": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
+        "noConnect": "Aucun appareil Netatmo. Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
         "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
         "alreadyCreatedButton": "Déjà créé",
         "refreshButton": "Mettre à jour"
@@ -482,8 +482,7 @@
             "0": "Programme",
             "1": "Manuel Boost",
             "2": "Hors-gel",
-            "3": "Absent",
-            "4": "Programme"
+            "3": "Absent"
           },
           "heating_req": {
             "0": "0",
@@ -1446,7 +1445,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "integer": "Commutateur 0-100%"
     },
     "siren": {
       "shortCategoryName": "Sirène",

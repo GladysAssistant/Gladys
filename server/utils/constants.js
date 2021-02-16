@@ -560,6 +560,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'netatmo.connected',
     DISCONNECTED: 'netatmo.disconnected',
     ERROR: 'netatmo.error',
+    ERRORDATA: 'netatmo.errordata',
   },
   TASMOTA: {
     NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',

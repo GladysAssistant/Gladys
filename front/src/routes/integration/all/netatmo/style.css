@@ -1,0 +1,35 @@
+.emptyDiv {
+  min-height: 200px;
+}
+
+.tagsList {
+  min-height: 70px;
+}
+
+.emptyDiv {
+  min-height: 200px;
+}
+
+.tagsList {
+  min-height: 70px;
+}
+
+.deviceRowPopover {
+  top: auto;
+}
+.opacityLegerconnect {
+  opacity: 1;
+}
+.opacityLegerdisconnect {
+  opacity: 0.33;
+}
+.buttonSetPointTemp {
+  padding-left: '5px';
+  padding-right: '5px';
+  padding-top: '0px';
+  padding-bottom: '0px';
+  min-height: '30px';
+  max-height: '30px';
+  min-width: '30px';
+  max-width: '30px';
+}

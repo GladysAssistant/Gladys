@@ -80,7 +80,7 @@ const NETATMO_VALUES = {
       MANUAL: 1,
       HG: 2, // Hors Gel
       AWAY: 3, // Absent
-      PROGRAM: 4,
+      PROGRAM: 0,
     },
     HEATING_REQ: {
       0: 0,

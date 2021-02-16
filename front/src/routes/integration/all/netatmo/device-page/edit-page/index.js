@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from '../actions';
+import actions from '../../actions';
 import NetatmoLayout from '../NetatmoLayout';
 import EditPage from './EditPage';
 

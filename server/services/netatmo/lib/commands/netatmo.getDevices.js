@@ -1,24 +1,22 @@
 /**
  * @description Get Device.
  * @returns {Array} Return array of devices.
+ * @param {string} mode - Data received.
  * @example
  * netatmo.getDevices(type);
  */
-async function getDevices() {
-  // We get the data from the house of Netatmo Energy
-  await this.getHomeStatusData();
-
-  // we get the thermostats
-  await this.getThermostatsData();
+async function getDevices(mode = '') {
+  // We get the data from the house of Netatmo Energy (valves and thermostats)
+  await this.getHomeStatusData(mode);
 
   // We get the data from the house of Netatmo Security
-  await this.getHomeData();
+  await this.getHomeData(mode);
 
   // we get the weather stations
-  await this.getStationsData();
+  await this.getStationsData(mode);
 
   // we get the homeCoachs
-  await this.getHealthyHomeCoachData();
+  await this.getHealthyHomeCoachData(mode);
 }
 
 module.exports = {

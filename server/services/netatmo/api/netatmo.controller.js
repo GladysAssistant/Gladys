@@ -35,6 +35,16 @@ module.exports = function NetatmoController(netatmoManager) {
     res.json(sensors);
   }
 
+  /**
+   * @api {get} /api/v1/service/netatmo/refresh_device Get Netatmo devices
+   * @apiName getDevices
+   * @apiGroup Netatmo
+   */
+  async function getDevices(req, res) {
+    const devices = await netatmoManager.getDevices('refresh');
+    res.json(devices);
+  }
+
   return {
     'post /api/v1/service/netatmo/connect': {
       authenticated: true,
@@ -47,6 +57,10 @@ module.exports = function NetatmoController(netatmoManager) {
     'get /api/v1/service/netatmo/sensor': {
       authenticated: true,
       controller: asyncMiddleware(getSensors),
+    },
+    'get /api/v1/service/netatmo/refresh_device': {
+      authenticated: true,
+      controller: asyncMiddleware(getDevices),
     },
   };
 };

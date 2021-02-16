@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
-import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
+import { DEVICE_FEATURE_TYPES_BY_CATEGORY } from '../../../../../../../../../server/utils/constants';
+import { DeviceFeatureCategoriesIcon } from '../../../../../../../utils/consts';
 import get from 'get-value';
 
 class UpdateDeviceFeature extends Component {
@@ -10,6 +10,7 @@ class UpdateDeviceFeature extends Component {
   updateMin = e => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
+  updateType = e => this.props.updateFeatureProperty(this.props.featureIndex, 'type', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
   render({ feature, featureIndex, ...props }) {
@@ -53,25 +54,22 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
+            {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category] && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${featureIndex}`}>
-                  <Text id="editDeviceForm.unitLabel" />
+                  <Text id="editDeviceForm.typeLabel" />
                 </label>
                 <Localizer>
                   <select
                     id={`unit_${featureIndex}`}
                     type="text"
-                    value={feature.unit}
-                    onChange={this.updateUnit}
+                    value={feature.type}
+                    onChange={this.updateType}
                     class="form-control"
                   >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category].map(unit => (
-                      <option value={unit}>
-                        <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
+                    {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category].map(type => (
+                      <option value={type}>
+                        <Text id={`deviceFeatureCategory.${feature.category}.${type}`}>{type}</Text>
                       </option>
                     ))}
                   </select>

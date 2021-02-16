@@ -31,18 +31,21 @@ async function updateNetatmo(typeUpdate) {
       }
     }
 
-    if (typeUpdate === 'Security' && (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')) {
+    if (
+      (typeUpdate === 'All' || typeUpdate === 'Security') &&
+      (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')
+    ) {
       // we save the data of cameras
       await this.updateCamera(key, device, deviceSelector);
     } else if (
-      typeUpdate === 'Energy' &&
+      (typeUpdate === 'All' || typeUpdate === 'Energy') &&
       (this.devices[key].type === 'NATherm1' || this.devices[key].type === 'NRV') &&
       device !== undefined
     ) {
       // we save the common data of thermostats and valves
       await this.updateThermostat(key, device, deviceSelector);
     } else if (
-      typeUpdate === 'HomeCoach_Weather' &&
+      (typeUpdate === 'All' || typeUpdate === 'HomeCoach_Weather') &&
       (this.devices[key].type === 'NHC' || this.devices[key].type === 'NAMain')
     ) {
       if (device !== undefined) {

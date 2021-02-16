@@ -59,7 +59,7 @@ function newValueValve(data) {
           category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
           type: DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL,
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          read_only: true,
+          read_only: false,
           keep_history: true,
           has_feedback: true,
           min: 5,
@@ -71,7 +71,7 @@ function newValueValve(data) {
           external_id: `netatmo:${sid}:therm_setpoint_mode`,
           category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
           type: DEVICE_FEATURE_TYPES.SETPOINT.STRING,
-          read_only: true,
+          read_only: false,
           keep_history: true,
           has_feedback: true,
           min: 0,
@@ -105,8 +105,12 @@ function newValueValve(data) {
       ],
       params: [
         {
-          name: 'Room_id_valve',
-          value: data.room_id,
+          name: 'House_Room_id',
+          value: `${data.house_id}:${data.room_id}`,
+        },
+        {
+          name: 'NAPLUG',
+          value: `${data.bridge}`,
         },
       ],
     };

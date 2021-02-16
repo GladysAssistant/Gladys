@@ -11,22 +11,22 @@ const SetupTab = ({ children, ...props }) => {
         </h3>
       </div>
       <div class="card-body">
-        {props.connectNetatmoStatus === RequestStatus.Getting && (
+        {props.netatmoConnectStatus === RequestStatus.Getting && (
           <p class="text-center alert alert-info">
             <Text id="integration.netatmo.setting.currentConnection" />
           </p>
         )}
-        {props.connectNetatmoStatus === RequestStatus.ServiceConnected && (
+        {props.netatmoConnectStatus === RequestStatus.ServiceConnected && (
           <p class="text-center alert alert-success">
             <Text id="integration.netatmo.setting.connect" />
           </p>
         )}
-        {props.connectNetatmoStatus === RequestStatus.ServiceDisconnected && (
+        {props.netatmoConnectStatus === RequestStatus.ServiceDisconnected && (
           <p class="text-center alert alert-danger">
             <Text id="integration.netatmo.setting.disconnect" />
           </p>
         )}
-        {props.connectNetatmoStatus === RequestStatus.Error && (
+        {props.netatmoConnectStatus === RequestStatus.Error && (
           <p class="text-center alert alert-danger">
             <Text id="integration.netatmo.setting.error" />
           </p>

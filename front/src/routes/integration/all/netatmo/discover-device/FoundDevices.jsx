@@ -1,7 +1,7 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import style from './style.css';
+import style from '../style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const createDevice = (props, device, index) => () => {
@@ -17,36 +17,49 @@ const FoundDevices = ({ children, ...props }) => (
         </h3>
       </div>
       <div class="col text-right">
-        <button class="btn btn-outline-primary" onClick={''}>
-          <Text id="integration.netatmo.discover.refreshButton" />
-        </button>
+        {props.netatmoConnectStatus === RequestStatus.ServiceConnected && (
+          <button class="btn btn-outline-primary" onClick={props.refreshDevice}>
+            <Text id="integration.netatmo.discover.refreshButton" />
+          </button>
+        )}
+        <Localizer>
+          {props.netatmoConnectStatus !== RequestStatus.ServiceConnected && (
+            <button
+              class="btn btn-outline-primary"
+              disabled
+              title={<Text id="integration.netatmo.setting.disconnect" />}
+            >
+              <Text id="integration.netatmo.discover.refreshButton" />
+            </button>
+          )}
+        </Localizer>
       </div>
     </div>
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getNetatmoNewDevicesStatus === RequestStatus.Getting
+          active: props.getNetatmoDeviceSensorsStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.connectNetatmoStatus === RequestStatus.ServiceDisconnected && (
+          {props.netatmoConnectStatus === RequestStatus.ServiceDisconnected && (
             <div class="alert alert-danger">
               <Text id="integration.netatmo.discover.disconnect" />
             </div>
           )}
-          {props.connectNetatmoStatus === RequestStatus.ServiceNotConfigured && (
-            <div class="alert alert-danger">
+          {props.netatmoConnectStatus === RequestStatus.ServiceNotConfigured && (
+            <div class="alert alert-info">
               <Text id="integration.netatmo.discover.noConnect" />
             </div>
           )}
-          {props.getNetatmoNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
-          {props.connectNetatmoStatus === RequestStatus.ServiceConnected && (
+          {props.getNetatmoDeviceSensorsStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          {props.netatmoConnectStatus === RequestStatus.ServiceConnected && (
             <div class="row">
-              {props.netatmoNewDevices && props.netatmoNewDevices.length === 0 && (
+              {props.getNetatmoDeviceSensorsStatus === RequestStatus.ConnectedNoDevice && (
                 <div class="col-md-12">
                   <div class="alert alert-info">
-                    <Text id="integration.netatmo.device.noDevices" />
+                    <Text id="integration.netatmo.discover.noDevices" />
                   </div>
                 </div>
               )}

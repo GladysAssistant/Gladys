@@ -1,5 +1,7 @@
-const { fake } = require('sinon');
-
+const { expect } = require('chai');
+const { assert, fake } = require('sinon');
+const sinon = require('sinon');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const NetatmoManager = require('../../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -10,285 +12,332 @@ const gladys = {
 
 describe('netatmoManager updateThermostat', () => {
   const netatmoManager = new NetatmoManager(gladys, '/tmp/gladys', 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
-  it('should success update all features NATherm1 with change value', async () => {
-    const device = {
-      id: '10',
-      type: 'NATherm1',
-      features: [
-        {
-          selector: 'netatmo-10-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-battery',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 1,
-        },
-        {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 0,
-        },
-      ],
+
+  beforeEach(() => {
+    netatmoManager.devices = {};
+    gladys.event = {
+      emit: fake.returns(null),
     };
-    netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NATherm1',
-        battery_percent: '100',
-        measured: {
-          temperature: 10,
-          setpoint_temp: 10,
-        },
-        setpoint: {
-          setpoint_mode: 'program',
-        },
-        therm_relay_cmd: 100,
-      },
-    };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
   });
 
-  it('should get error on type NATherm1', async () => {
+  it('should success update all features NATherm1 with change value', async () => {
+    const ID_TEST = '10';
+    const NAME_TEST = 'Thermostat house';
+    const TYPE_TEST = 'NATherm1';
+    const VALUE_NUMBER_TEST = 0;
+    const NEWVALUE_NUMBER_TEST = 10;
+    const NEWVALUE_BOOL_TEST = true;
+    const NEWVALUE_STRING_SETPOINT = 'manual';
+
     const device = {
-      id: '10',
-      type: 'NATherm1',
+      id: ID_TEST,
+      model: `netatmo-${TYPE_TEST}`,
       features: [
         {
-          selector: 'netatmo-10-temperature',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-temperature`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-battery',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-battery`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-therm-setpoint-temperature`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 1,
+          selector: `netatmo-${ID_TEST}-therm-setpoint-mode`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 0,
+          selector: `netatmo-${ID_TEST}-heating-power-request`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-reachable`,
+          last_value: VALUE_NUMBER_TEST,
         },
       ],
     };
+
     netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NATherm1',
-        setpoint: {
-          setpoint_mode: 'program',
+      [ID_TEST]: {
+        id: ID_TEST,
+        name: NAME_TEST,
+        type: TYPE_TEST,
+        fullData: {
+          _id: ID_TEST,
+          type: TYPE_TEST,
+          battery_percent: NEWVALUE_NUMBER_TEST,
+          measured: {
+            temperature: NEWVALUE_NUMBER_TEST,
+            setpoint_temp: NEWVALUE_NUMBER_TEST,
+          },
+          setpoint: {
+            setpoint_mode: NEWVALUE_STRING_SETPOINT,
+          },
+          therm_relay_cmd: NEWVALUE_NUMBER_TEST,
         },
-        therm_relay_cmd: 100,
+        homeStatus: {
+          reachable: NEWVALUE_BOOL_TEST,
+        },
       },
     };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
+    await netatmoManager.updateThermostat(ID_TEST, device, `netatmo-${ID_TEST}`);
+    assert.callCount(gladys.event.emit, 12);
+    assert.alwaysCalledWithMatch(gladys.event.emit, `${WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE}`, {
+      device_feature_external_id: sinon.match(`netatmo:${ID_TEST}:`),
+    });
   });
 
   it('should success update all features NRV with change value', async () => {
+    const ID_TEST = '11';
+    const NAME_TEST = 'Valve house';
+    const TYPE_TEST = 'NRV';
+    const VALUE_NUMBER_TEST = 0;
+    const NEWVALUE_NUMBER_TEST = 10;
+    const NEWVALUE_BOOL_TEST = true;
+    const NEWVALUE_STRING_SETPOINT = 'manual';
+    const NEWVALUE_STRING_BATTERY = 'very_low';
+
     const device = {
-      id: '10',
-      type: 'NRV',
+      id: ID_TEST,
+      model: `netatmo-${TYPE_TEST}`,
       features: [
         {
-          selector: 'netatmo-10-temperature',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-temperature`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-battery',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-battery`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 12,
+          selector: `netatmo-${ID_TEST}-therm-setpoint-temperature`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 1,
+          selector: `netatmo-${ID_TEST}-therm-setpoint-mode`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 0,
+          selector: `netatmo-${ID_TEST}-heating-power-request`,
+          last_value: VALUE_NUMBER_TEST,
         },
         {
-          selector: 'netatmo-10-reachable',
-          last_value: false,
+          selector: `netatmo-${ID_TEST}-reachable`,
+          last_value: VALUE_NUMBER_TEST,
         },
       ],
     };
+
     netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NRV',
-        homeStatus: {
-          battery_state: 'very_low',
-          reachable: true,
-        },
+      [ID_TEST]: {
+        id: ID_TEST,
+        name: NAME_TEST,
+        type: TYPE_TEST,
         room: {
-          therm_measured_temperature: 25,
-          therm_setpoint_temperature: 25,
-          therm_setpoint_mode: 'program',
-          heating_power_request: 100,
+          therm_measured_temperature: NEWVALUE_NUMBER_TEST,
+          therm_setpoint_temperature: NEWVALUE_NUMBER_TEST,
+          therm_setpoint_mode: NEWVALUE_STRING_SETPOINT,
+          heating_power_request: NEWVALUE_NUMBER_TEST,
         },
-      },
-    };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
-  });
-
-  it('should success update all features NRV without change value but only change date value', async () => {
-    const device = {
-      id: '10',
-      type: 'NRV',
-      features: [
-        {
-          selector: 'netatmo-10-temperature',
-          last_value: 20.6,
-        },
-        {
-          selector: 'netatmo-10-battery',
-          last_value: 50,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 20.0,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 4,
-        },
-        {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 36,
-        },
-        {
-          selector: 'netatmo-10-reachable',
-          last_value: 1,
-        },
-      ],
-    };
-    netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NRV',
         homeStatus: {
-          battery_state: 'medium',
-          reachable: 1,
+          battery_state: NEWVALUE_STRING_BATTERY,
+          reachable: NEWVALUE_BOOL_TEST,
         },
+      },
+    };
+    await netatmoManager.updateThermostat(ID_TEST, device, `netatmo-${ID_TEST}`);
+    assert.callCount(gladys.event.emit, 12);
+    assert.alwaysCalledWithMatch(gladys.event.emit, `${WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE}`, {
+      device_feature_external_id: sinon.match(`netatmo:${ID_TEST}:`),
+    });
+  });
+
+  it('should fail on global type', async () => {
+    const device = {};
+    netatmoManager.devices = {};
+    try {
+      await netatmoManager.updateThermostat('10', device, 'netatmo-10');
+      assert.fail();
+    } catch (error) {
+      expect(error.message).to.include('NETATMO : File netatmo.updateThermostat.js - error : TypeError');
+    }
+  });
+
+  it('should fail NATherm1 on save values - reachable and UpperCase of setpoint_mode', async () => {
+    const ID_TEST = '12';
+    const NAME_TEST = 'Thermostat house';
+    const TYPE_TEST = 'NATherm1';
+    const VALUE_NUMBER_TEST = 0;
+    const NEWVALUE_NUMBER_TEST = 10;
+
+    const device = {
+      id: ID_TEST,
+      model: `netatmo-${TYPE_TEST}`,
+      features: [
+        {
+          selector: `netatmo-${ID_TEST}-temperature`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-battery`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-therm-setpoint-temperature`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-therm-setpoint-mode`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-heating-power-request`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-reachable`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+      ],
+    };
+
+    netatmoManager.devices = {
+      [ID_TEST]: {
+        id: ID_TEST,
+        name: NAME_TEST,
+        type: TYPE_TEST,
+        fullData: {
+          _id: ID_TEST,
+          type: TYPE_TEST,
+          battery_percent: NEWVALUE_NUMBER_TEST,
+          measured: {
+            temperature: NEWVALUE_NUMBER_TEST,
+            setpoint_temp: NEWVALUE_NUMBER_TEST,
+          },
+          setpoint: {},
+          therm_relay_cmd: NEWVALUE_NUMBER_TEST,
+        },
+      },
+    };
+    await netatmoManager.updateThermostat(ID_TEST, device, `netatmo-${ID_TEST}`);
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('reachable'),
+    });
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('toUpperCase'),
+    });
+    assert.neverCalledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('battery_percent'),
+    });
+  });
+
+  it('should fail NRV on save values - reachable, battery_state and UpperCase of setpoint_mode', async () => {
+    const ID_TEST = '13';
+    const NAME_TEST = 'Valve house';
+    const TYPE_TEST = 'NRV';
+    const VALUE_NUMBER_TEST = 0;
+    const NEWVALUE_NUMBER_TEST = 10;
+
+    const device = {
+      id: ID_TEST,
+      model: `netatmo-${TYPE_TEST}`,
+      features: [
+        {
+          selector: `netatmo-${ID_TEST}-temperature`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-battery`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-therm-setpoint-temperature`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-therm-setpoint-mode`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-heating-power-request`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+        {
+          selector: `netatmo-${ID_TEST}-reachable`,
+          last_value: VALUE_NUMBER_TEST,
+        },
+      ],
+    };
+
+    netatmoManager.devices = {
+      [ID_TEST]: {
+        id: ID_TEST,
+        name: NAME_TEST,
+        type: TYPE_TEST,
         room: {
-          therm_measured_temperature: 20.6,
-          therm_setpoint_temperature: 20.0,
-          therm_setpoint_mode: 'program',
-          heating_power_request: 36,
+          therm_measured_temperature: NEWVALUE_NUMBER_TEST,
+          therm_setpoint_temperature: NEWVALUE_NUMBER_TEST,
+          heating_power_request: NEWVALUE_NUMBER_TEST,
         },
       },
     };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
+    await netatmoManager.updateThermostat(ID_TEST, device, `netatmo-${ID_TEST}`);
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('reachable'),
+    });
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('battery_state'),
+    });
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('toUpperCase'),
+    });
+    assert.neverCalledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('heating_power_request'),
+    });
   });
 
-  it('should get error on type NRV', async () => {
-    const device = {
-      id: '10',
-      type: 'NRV',
-      features: [
-        {
-          selector: 'netatmo-10-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-battery',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 1,
-        },
-        {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 0,
-        },
-        {
-          selector: 'netatmo-10-reachable',
-          last_value: false,
-        },
-      ],
-    };
+  it('should fail on type unknown - no NATherm1 and no NRV - case "default" ', async () => {
+    const ID_TEST = '14';
+    const NAME_TEST = 'Thermostat house';
+    const TYPE_TEST = 'NATherm2';
+    const NEWVALUE_NUMBER_TEST = 10;
+
+    const device = {};
+
     netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NRV',
-        setpoint: {
-          setpoint_mode: 'program',
+      [ID_TEST]: {
+        id: ID_TEST,
+        name: NAME_TEST,
+        type: TYPE_TEST,
+        room: {
+          therm_measured_temperature: NEWVALUE_NUMBER_TEST,
+          therm_setpoint_temperature: NEWVALUE_NUMBER_TEST,
+          heating_power_request: NEWVALUE_NUMBER_TEST,
         },
-        therm_relay_cmd: 100,
       },
     };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
-  });
-
-  it('should say that there is no devices with specific key', async () => {
-    const device = {
-      id: '10',
-      type: 'NRV',
-      features: [
-        {
-          selector: 'netatmo-10-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-battery',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-temperature',
-          last_value: 12,
-        },
-        {
-          selector: 'netatmo-10-therm-setpoint-mode',
-          last_value: 1,
-        },
-        {
-          selector: 'netatmo-10-heating-power-request',
-          last_value: 0,
-        },
-        {
-          selector: 'netatmo-10-reachable',
-          last_value: false,
-        },
-      ],
-    };
-    netatmoManager.updateThermostat('10', device, 'netatmo-10');
-  });
-
-  it('should error on each features (get device selector)', async () => {
-    const device = {
-      id: '10',
-      type: 'NRV',
-      features: [],
-    };
-    netatmoManager.devices = {
-      '10': {
-        id: '10',
-        type: 'NRV',
-        setpoint: {
-          setpoint_mode: 'program',
-        },
-        therm_relay_cmd: 100,
-      },
-    };
-    netatmoManager.updateThermostat('10', device, 'anything');
+    await netatmoManager.updateThermostat(ID_TEST, device, `netatmo-${ID_TEST}`);
+    assert.calledWithExactly(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match(`Error ${TYPE_TEST} ${NAME_TEST} - type unknown`),
+    });
+    assert.neverCalledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match('heating_power_request'),
+    });
+    assert.neverCalledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: sinon.match("TypeError: Cannot read property 'last_value' of null"),
+    });
   });
 });

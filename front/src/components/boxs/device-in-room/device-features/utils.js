@@ -1,6 +1,6 @@
 import get from 'get-value';
 
-const DISPLAY_FEATURE_NAME_SERVICES = ['mqtt'];
+const DISPLAY_FEATURE_NAME_SERVICES = ['mqtt', 'netatmo'];
 
 export const getDeviceName = (device, feature) => {
   const service = get(device, 'service.name');

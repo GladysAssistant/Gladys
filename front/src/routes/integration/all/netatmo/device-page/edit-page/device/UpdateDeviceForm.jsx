@@ -1,8 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
+import { DeviceFeatureCategoriesIcon } from '../../../../../../../utils/consts';
 import get from 'get-value';
-import { DEVICE_POLL_FREQUENCIES } from '../../../../server/utils/constants';
+import { DEVICE_POLL_FREQUENCIES } from '../../../../../../../../../server/utils/constants';
 
 const maxWidth = {
   maxWidth: '400px'
@@ -60,6 +60,21 @@ class UpdateDeviceForm extends Component {
               <Text id="editDeviceForm.pollFrequency.label" />
             </label>
             <select onChange={this.updatePollFrequency} value={props.device.poll_frequency} class="form-control">
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_HOURS}>
+                <Text id="editDeviceForm.pollFrequency.everyHours" />
+              </option>
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_30_MINUTES}>
+                <Text id="editDeviceForm.pollFrequency.every30Minutes" />
+              </option>
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_10_MINUTES}>
+                <Text id="editDeviceForm.pollFrequency.every10Minutes" />
+              </option>
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES}>
+                <Text id="editDeviceForm.pollFrequency.every5Minutes" />
+              </option>
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_2_MINUTES}>
+                <Text id="editDeviceForm.pollFrequency.every2Minutes" />
+              </option>
               <option value={DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}>
                 <Text id="editDeviceForm.pollFrequency.everyMinutes" />
               </option>

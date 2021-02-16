@@ -1,4 +1,4 @@
-import UpdateDevice from '../../../../../../components/device';
+import UpdateDevice from './device';
 
 const EditPage = ({ children, ...props }) => <UpdateDevice {...props} />;
 

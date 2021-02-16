@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -221,6 +222,10 @@ function newValueCamera(data) {
             this.addSensor(sidModule, newModuleCam);
           } else {
             logger.info(`Files newValueStation - Module type unknown : ${module.type}`);
+            this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+              type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+              payload: `Files newValueStation - Module type unknown : ${module.type}`,
+            });
           }
         });
       }
@@ -228,6 +233,10 @@ function newValueCamera(data) {
     this.addSensor(sid, newCamera);
   } else {
     logger.info(`Files newValueCamera - Device type unknown : ${data.type}`);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: `Files newValueCamera - Device type unknown : ${data.type}`,
+    });
   }
 }
 
