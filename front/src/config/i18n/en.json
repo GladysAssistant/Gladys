@@ -1445,7 +1445,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "integer": "Switch 0-100%"
     },
     "siren": {
       "shortCategoryName": "Siren",
