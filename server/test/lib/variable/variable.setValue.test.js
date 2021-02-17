@@ -1,5 +1,7 @@
-const { expect, assert } = require('chai');
-
+const { expect } = require('chai');
+const chaiAssert = require('chai').assert;
+const { fake, assert } = require('sinon');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const Variable = require('../../../lib/variable');
 
 describe('variable.setValue', () => {
@@ -41,14 +43,30 @@ describe('variable.setValue', () => {
   });
   it('should not allow lowercase variable', async () => {
     const promise = variable.setValue('lowercasevariable', 'NEW_VALUE', 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    return assert.isRejected(promise, 'Validation error: Validation isUppercase on name failed');
+    return chaiAssert.isRejected(promise, 'Validation error: Validation isUppercase on name failed');
   });
   it('should not allow null varialbe', async () => {
     const promise = variable.setValue(null, 'NEW_VALUE', 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    return assert.isRejected(promise, 'notNull Violation: t_variable.name cannot be null');
+    return chaiAssert.isRejected(promise, 'notNull Violation: t_variable.name cannot be null');
   });
   it('should not allow variable with null content inside', async () => {
     const promise = variable.setValue('SECURE_VARIABLE', null, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    return assert.isRejected(promise, 'notNull Violation: t_variable.value cannot be null');
+    return chaiAssert.isRejected(promise, 'notNull Violation: t_variable.value cannot be null');
+  });
+  it('should create timezone variable and emit event', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    await customVariable.setValue(SYSTEM_VARIABLE_NAMES.TIMEZONE, 'TIMEZONE');
+    assert.calledWith(event.emit, EVENTS.SYSTEM.TIMEZONE_CHANGED);
+  });
+  it('should create gateway users keys variable and emit event', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    await customVariable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS, 'TIMEZONE');
+    assert.calledWith(event.emit, EVENTS.GATEWAY.USER_KEYS_CHANGED);
   });
 });

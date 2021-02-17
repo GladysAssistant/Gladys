@@ -13,7 +13,7 @@ module.exports = function MqttService(gladys, serviceId) {
    * gladys.services.mqtt.start();
    */
   async function start() {
-    logger.log('starting MQTT service');
+    logger.info('Starting MQTT service');
     await mqttHandler.init();
   }
 
@@ -24,7 +24,7 @@ module.exports = function MqttService(gladys, serviceId) {
    *  gladys.services.mqtt.stop();
    */
   async function stop() {
-    logger.log('stopping MQTT service');
+    logger.info('Stopping MQTT service');
     mqttHandler.disconnect();
   }
 

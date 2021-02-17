@@ -1080,6 +1080,7 @@
     "operations": "Operations",
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
+    "newUpgradeAvailableText": "Gladys will update itself automatically if you installed Gladys with the official Gladys Raspberry Pi OS image. If you installed Gladys manually, make sure you have watchtower running.",
     "download": "Download",
     "notAvailable": "Not available on custom install.",
     "containers": "Containers",

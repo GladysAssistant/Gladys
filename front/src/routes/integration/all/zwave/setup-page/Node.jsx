@@ -23,6 +23,7 @@ const createGithubUrl = node => {
 };
 
 const displayRawNode = node => () => {
+  // eslint-disable-next-line no-console
   console.log(node);
 };
 

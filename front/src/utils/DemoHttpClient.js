@@ -6,7 +6,7 @@ export class DemoHttpClient {
   async get(url, query) {
     const key = `get ${url}`;
     if (!responses[key]) {
-      console.log(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.json`);
       throw new Error(`${key} not found in demo.json`);
     }
     return Promise.resolve(responses[key]);
@@ -15,7 +15,7 @@ export class DemoHttpClient {
   async post(url, query) {
     const key = `post ${url}`;
     if (!responses[key]) {
-      console.log(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.json`);
       throw new Error(`${key} not found in demo.json`);
     }
     return Promise.resolve(responses[key]);
@@ -24,7 +24,7 @@ export class DemoHttpClient {
   async patch(url, query) {
     const key = `patch ${url}`;
     if (!responses[key]) {
-      console.log(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.json`);
       throw new Error(`${key} not found in demo.json`);
     }
     return Promise.resolve(responses[key]);
