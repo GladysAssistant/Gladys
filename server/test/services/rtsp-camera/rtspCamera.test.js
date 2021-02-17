@@ -80,4 +80,8 @@ describe('RtspCameraManager commands', () => {
     rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKI?NG');
     await rtspCameraManagerBroken.poll(device);
   });
+  it('should stop service', async () => {
+    const rtspCameraService = RtspCameraService(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    await rtspCameraService.stop();
+  });
 });

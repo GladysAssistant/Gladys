@@ -14,7 +14,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    * gladys.services.ewelink.start();
    */
   async function start() {
-    logger.log('starting eWeLink service');
+    logger.info('Starting eWeLink service');
     await eWeLinkHandler.connect();
   }
 
@@ -25,7 +25,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    * gladys.services.ewelink.stop();
    */
   async function stop() {
-    logger.log('stopping eWeLink service');
+    logger.info('Stopping eWeLink service');
   }
 
   return Object.freeze({

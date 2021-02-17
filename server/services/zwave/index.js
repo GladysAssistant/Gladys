@@ -28,7 +28,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
    * gladys.services.zwave.stop();
    */
   async function stop() {
-    logger.log('stopping zwave service');
+    logger.info('Stopping zwave service');
     zwaveManager.disconnect();
   }
 
