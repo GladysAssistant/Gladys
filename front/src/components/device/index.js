@@ -76,15 +76,40 @@ class EditDevicePage extends Component {
         value = `${this.props.requiredExternalIdBase}${value}`;
       }
     }
-    const device = update(this.state.device, {
-      features: {
-        [featureIndex]: {
-          [property]: {
-            $set: value
+    let device;
+    if (property === 'categorySwitchLight') {
+      if (value === true) {
+        device = update(this.state.device, {
+          features: {
+            [featureIndex]: {
+              category: {
+                $set: 'light'
+              }
+            }
+          }
+        });
+      } else {
+        device = update(this.state.device, {
+          features: {
+            [featureIndex]: {
+              category: {
+                $set: 'switch'
+              }
+            }
+          }
+        });
+      }
+    } else {
+      device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            }
           }
         }
-      }
-    });
+      });
+    }
 
     this.setState({
       device
@@ -136,9 +161,9 @@ class EditDevicePage extends Component {
   async componentWillMount() {
     let { deviceSelector } = this.props;
     let device;
+    let paramDeviceFeature = [];
 
     await Promise.all([this.props.getIntegrationByName(this.props.integrationName), this.props.getHouses()]);
-
     try {
       if (!deviceSelector) {
         const uniqueId = uuid.v4();
@@ -160,10 +185,25 @@ class EditDevicePage extends Component {
         ) {
           device = loadedDevice;
         }
+
+        device.features.forEach(feature => {
+          const indexParamsCategoryFeature = device.params.findIndex(
+            element => element.name === `categoryCreate: ${feature.external_id}`
+          );
+          if (!indexParamsCategoryFeature) {
+            paramDeviceFeature[feature.external_id] = { value: device.params[indexParamsCategoryFeature].value };
+            if (device.params[indexParamsCategoryFeature].value !== feature.category) {
+              paramDeviceFeature[feature.external_id].toggleCategoryChange = true;
+            } else {
+              paramDeviceFeature[feature.external_id].toggleCategoryChange = false;
+            }
+          }
+        });
       }
 
       this.setState({
         device,
+        paramDeviceFeature,
         loading: false
       });
     } catch (e) {

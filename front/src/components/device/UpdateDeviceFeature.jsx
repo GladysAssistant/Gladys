@@ -11,14 +11,29 @@ class UpdateDeviceFeature extends Component {
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
+  updateCategorySwitchLight = e => {
+    this.props.paramDeviceFeature[this.props.feature.external_id].toggleCategoryChange = e.target.checked;
+    this.props.updateFeatureProperty(this.props.featureIndex, 'categorySwitchLight', e.target.checked);
+  };
 
-  render({ feature, featureIndex, ...props }) {
+  render({ feature, featureIndex, param, ...props }) {
     return (
       <div class="col-md-4">
         <div class="card">
           <div class="card-header">
-            <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
-            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+            <div class="col-7">
+              <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+              <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+            </div>
+            {props.paramDeviceFeature[feature.external_id] &&
+              props.paramDeviceFeature[feature.external_id].toggleCategoryChange && (
+                <div class="col-6 text-right">
+                  <Text id="editDeviceForm.categoryChange" />
+                  <Text
+                    id={`deviceFeatureCategory.${props.paramDeviceFeature[feature.external_id].value}.${feature.type}`}
+                  />
+                </div>
+              )}
           </div>
           <div class="card-body">
             <div class="form-group form-label" for={`featureName_${featureIndex}`}>
@@ -117,6 +132,21 @@ class UpdateDeviceFeature extends Component {
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">
                   <Text id="editDeviceForm.deleteLabel" />
                 </button>
+              </div>
+            )}
+            {props.paramDeviceFeature[feature.external_id] && (
+              <div class="col-12">
+                <label class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    checked={props.paramDeviceFeature[feature.external_id].toggleCategoryChange}
+                    onChange={this.updateCategorySwitchLight}
+                  />
+                  <span class="form-check-label">
+                    <Text id="editDeviceForm.checkbox.changeCategory" />
+                  </span>
+                </label>
               </div>
             )}
           </div>
