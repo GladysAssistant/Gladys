@@ -369,7 +369,7 @@
       "title": "Netatmo",
       "description": "Control Netatmo Devices",
       "deviceTab": "Netatmo Devices",
-      "discoverTab": "Discover Netatmo devices",
+      "discoverTab": "Discovery Netatmo devices",
       "settingTab": "Settings",
       "box": {
         "disconnect": "Status and commands are not available at the moment. Netatmo is disconnected",
@@ -446,11 +446,12 @@
       },
       "healthHomeCoach": {
         "airQualityHealthIndex": {
-          "healthy": "Healthy",
-          "fine": "Fine",
-          "fair": "Fair",
-          "poor": "Poor",
-          "unhealthy": "Unhealthy",
+          "0": "Healthy",
+          "1": "Fine",
+          "2": "Fair",
+          "3": "Poor",
+          "4": "Unhealthy",
+          "-1": "No value",
           "null": "No value"
         }
       }

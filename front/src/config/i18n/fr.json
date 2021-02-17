@@ -492,11 +492,12 @@
       },
       "healthHomeCoach": {
         "airQualityHealthIndex": {
-          "healthy": "Sain",
-          "fine": "Agréable",
-          "fair": "Acceptable",
-          "poor": "Mauvais",
-          "unhealthy": "Médiocre",
+          "0": "Sain",
+          "1": "Agréable",
+          "2": "Acceptable",
+          "3": "Mauvais",
+          "4": "Médiocre",
+          "-1": "NC",
           "null": "NC"
         }
       }

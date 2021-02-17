@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import SensorDeviceFeature from '../../../../../components/boxs/device-in-room/device-features/SensorDeviceFeature';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { DeviceFeatureBadgeIcon } from './consts';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
 import style from '../style.css';
@@ -25,7 +26,6 @@ const SPECIAL_SENSORS_CATEGORY = [
 const SPECIAL_SENSORS_TYPE = [DEVICE_FEATURE_CATEGORIES.SWITCH.BINARY];
 const SPECIAL_SENSORS_CATEGORY_TYPE = [
   DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + DEVICE_FEATURE_TYPES.SENSOR.STRING,
-  DEVICE_FEATURE_CATEGORIES.INDEX + DEVICE_FEATURE_TYPES.INDEX.INTEGER,
   DEVICE_FEATURE_CATEGORIES.SETPOINT + DEVICE_FEATURE_TYPES.SETPOINT.STRING
 ];
 const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
@@ -110,37 +110,31 @@ const RenderCommandGlobal = ({ children, ...props }) => {
         {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.INDEX &&
           props.deviceFeature.type === DEVICE_FEATURE_TYPES.INDEX.DIMMER && (
             <td class="text-right">
-              {props.deviceFeature.last_value === 0 && (
-                <span class="badge badge-info">
-                  <Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.healthy" />
-                </span>
-              )}
-              {props.deviceFeature.last_value === 1 && (
-                <span class="badge badge-success">
-                  {<Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.fine" />}
-                </span>
-              )}
-              {props.deviceFeature.last_value === 2 && (
-                <span class="badge badge-secondary">
-                  {<Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.fair" />}
-                </span>
-              )}
-              {props.deviceFeature.last_value === 3 && (
-                <span class="badge badge-warning">
-                  {<Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.poor" />}
-                </span>
-              )}
-              {props.deviceFeature.last_value === 4 && (
-                <span class="badge badge-danger">
-                  <Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.unhealthy" />
-                </span>
-              )}
-              {props.deviceFeature.last_value === -1 ||
-                (props.deviceFeature.last_value === null && (
-                  <span class="badge badge-dark">
-                    <Text id="integration.netatmo.healthHomeCoach.airQualityHealthIndex.null" />
-                  </span>
-                ))}
+              <span
+                class={`mr-2 badge badge-${get(
+                  DeviceFeatureBadgeIcon,
+                  `netatmo.healthHomeCoach.airQualityHealthIndex.${props.deviceFeature.last_value}`
+                )}`}
+              >
+                {
+                  <Text
+                    id={`integration.netatmo.healthHomeCoach.airQualityHealthIndex.${props.deviceFeature.last_value}`}
+                  />
+                }
+              </span>
+            </td>
+          )}
+        {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.INDEX &&
+          props.deviceFeature.type === DEVICE_FEATURE_TYPES.INDEX.INTEGER && (
+            <td class="text-right">
+              <span class="inline-block">
+                {`${props.deviceFeature.last_value} = `}
+                {
+                  <Text
+                    id={`integration.netatmo.healthHomeCoach.airQualityHealthIndex.${props.deviceFeature.last_value}`}
+                  />
+                }
+              </span>
             </td>
           )}
         {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR &&
