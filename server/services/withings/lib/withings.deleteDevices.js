@@ -6,7 +6,7 @@
  */
 async function deleteDevices() {
   await this.gladys.device.destroyBySelectorPattern('withings');
-  return { sucess: true };
+  return { success: true };
 }
 
 module.exports = {
