@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const { authenticatedRequest } = require('../request.test');
 const db = require('../../../models');
 
-describe.only('GET /api/v1/device_feature_sate', () => {
+describe('GET /api/v1/device_feature_sate', () => {
   const featureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
 
   beforeEach(() => {
