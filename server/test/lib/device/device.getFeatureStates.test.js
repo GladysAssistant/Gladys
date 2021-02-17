@@ -1,27 +1,99 @@
+const { Op } = require('sequelize');
+const uuid = require('uuid');
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const { fake } = require('sinon');
+
+const db = require('../../../models');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
-describe.only('Device.getFeatureStates', () => {
-  it('should getFeatureStates ', async () => {
-    const stateManager = new StateManager(event);
-    const service = {
-      getLocalServiceByName: fake.resolves({
-        id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      }),
-    };
-    const device = new Device(event, {}, stateManager, service);
+const stateManager = new StateManager(event);
+const service = {};
+const device = new Device(event, {}, stateManager, service);
 
-    // TODO injecter les mesure en debut
+describe.only('Device.getFeatureStates', () => {
+  const featureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+  afterEach(() => {
+    // Remove value created during test
+    const queryInterface = db.sequelize.getQueryInterface();
+    queryInterface.bulkDelete('t_device_feature_state_light', {
+      device_feature_id: {
+        [Op.eq]: featureId,
+      },
+    });
+
+    queryInterface.bulkDelete('t_device_feature_state', {
+      device_feature_id: {
+        [Op.eq]: featureId,
+      },
+    });
+
+    // Reset last_downsampling of DeviceFeature
+    db.DeviceFeature.update(
+      { last_downsampling: null },
+      {
+        where: {
+          id: featureId,
+        },
+      },
+    );
+  });
+
+  it('should getFeatureStates ', async () => {
+    const beginDate = new Date();
+    beginDate.setDate(beginDate.getDate() - 2);
+    beginDate.setHours(0, 0, 0, 0);
+
+    let endDate = new Date();
+    endDate.setDate(endDate.getDate() - 1);
+    endDate.setHours(0, 0, 0, 0);
+
+    let myAllData = [];
+    for (let i = 0; beginDate < endDate; i += 1) {
+      myAllData.push({
+        id: `${uuid.v4()}`,
+        device_feature_id: featureId,
+        value: `${Math.floor(Math.random() * 50) + 1}`,
+        created_at: `${beginDate.toISOString()}`,
+        updated_at: `${beginDate.toISOString()}`,
+      });
+      beginDate.setMinutes(beginDate.getMinutes() + 14);
+    }
+    await db.DeviceFeatureStateLight.bulkCreate(myAllData);
+
+    endDate = new Date();
+    endDate.setHours(0, 0, 0, 0);
+    myAllData = [];
+    for (let i = 0; beginDate < endDate; i += 1) {
+      myAllData.push({
+        id: `${uuid.v4()}`,
+        device_feature_id: featureId,
+        value: `${Math.floor(Math.random() * 50) + 1}`,
+        created_at: `${beginDate.toISOString()}`,
+        updated_at: `${beginDate.toISOString()}`,
+      });
+      beginDate.setMinutes(beginDate.getMinutes() + 1);
+    }
+    await db.DeviceFeatureState.bulkCreate(myAllData);
+
+    beginDate.setDate(beginDate.getDate() - 1);
+    await db.DeviceFeature.update(
+      { last_downsampling: beginDate },
+      {
+        where: {
+          id: featureId,
+        },
+      },
+    );
+    beginDate.setDate(beginDate.getDate() - 1);
 
     const params = {
-      device_feature_selector: ['test-temperature-sensor-2'],
-      begin_date: '2020-12-31 22:14:26.590 +00:00',
-      end_date: '2021-01-01 22:14:26.590 +00:00',
+      device_feature_selector: ['test-device-feature'],
+      begin_date: beginDate,
+      end_date: endDate,
     };
     // Choose attributes
     params.attributes_device = [];
@@ -34,6 +106,7 @@ describe.only('Device.getFeatureStates', () => {
     params.attributes_device_feature.push('unit');
     params.attributes_device_feature.push('last_value');
     params.attributes_device_feature.push('last_value_changed');
+    params.attributes_device_feature.push('last_downsampling');
     params.attributes_device_room = [];
     params.attributes_device_room.push('name');
     params.attributes_device_room.push('selector');
@@ -50,6 +123,6 @@ describe.only('Device.getFeatureStates', () => {
 
     expect(devices[0].features[0].device_feature_states)
       .to.be.instanceOf(Array)
-      .and.have.lengthOf(49);
+      .and.have.lengthOf(1440 + 101);
   });
 });

@@ -16,6 +16,7 @@ const { init } = require('./device.init');
 const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
 const { purgeStates } = require('./device.purgeStates');
+const { downsamplingStates } = require('./device.downsamplingStates');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
 const { saveState } = require('./device.saveState');
@@ -54,6 +55,7 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(EVENTS.DEVICE.ADD_FEATURE, eventFunctionWrapper(this.addFeature.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.PURGE_STATES, eventFunctionWrapper(this.purgeStates.bind(this)));
+  this.eventManager.on(EVENTS.DEVICE.DOWNSAMPLING_STATES, eventFunctionWrapper(this.downsamplingStates.bind(this)));
 };
 
 DeviceManager.prototype.add = add;
@@ -65,6 +67,7 @@ DeviceManager.prototype.init = init;
 DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;
 DeviceManager.prototype.purgeStates = purgeStates;
+DeviceManager.prototype.downsamplingStates = downsamplingStates;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;

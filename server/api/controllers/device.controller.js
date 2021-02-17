@@ -171,15 +171,14 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device_feature.push('unit');
     params.attributes_device_feature.push('last_value');
     params.attributes_device_feature.push('last_value_changed');
+    params.attributes_device_feature.push('last_downsampling');
     params.attributes_device_room = [];
     params.attributes_device_room.push('name');
     params.attributes_device_room.push('selector');
-    console.log('============================================================');
+
     const devices = await gladys.device.getFeatureStates(params);
 
     const finSQL = new Date();
-    console.log('============================================================');
-    console.log(`sql; ${debut} - ${finSQL}  =  ${finSQL.getTime() - debut.getTime()}`);
     logger.error(`sql; ${debut} - ${finSQL}  =  ${finSQL.getTime() - debut.getTime()}`);
     // Downsample result to reduce nb of value in response
     if (params.downsample && params.downsample === 'true') {
@@ -193,7 +192,6 @@ module.exports = function DeviceController(gladys) {
         devices.forEach((device) => {
           device.features.forEach((feature) => {
             if (feature.device_feature_states && feature.device_feature_states.length > 0) {
-              console.log(`size: ${feature.device_feature_states.length}`);
               const newFeatureStateArray = [];
               feature.device_feature_states.forEach(function changeState(state, index) {
                 newFeatureStateArray.push({
@@ -219,10 +217,8 @@ module.exports = function DeviceController(gladys) {
     }
 
     const findownsampling = new Date();
-    console.log(`down; ${finSQL} - ${findownsampling}  =  ${findownsampling.getTime() - finSQL.getTime()}`);
     logger.error(`down; ${finSQL} - ${findownsampling}  =  ${findownsampling.getTime() - finSQL.getTime()}`);
 
-    console.log(`fin; ${debut} - ${new Date()}  =  ${new Date().getTime() - debut.getTime()}`);
     logger.error(`fin; ${debut} - ${new Date()}  =  ${new Date().getTime() - debut.getTime()}`);
     res.json(devices);
   }

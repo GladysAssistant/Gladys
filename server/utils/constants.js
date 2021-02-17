@@ -46,6 +46,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
+    DOWNSAMPLING_STATES: 'device.downsampling-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',

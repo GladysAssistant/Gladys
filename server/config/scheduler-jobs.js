@@ -16,6 +16,12 @@ const jobs = [
     frequencyInSeconds: 4 * 60 * 60,
     event: EVENTS.DEVICE.PURGE_STATES,
   },
+  {
+    // downsampling of device feature states
+    name: 'donwsampling-device-states',
+    frequencyInSeconds: 24 * 60 * 60, // Each day to treat states must be downsample
+    event: EVENTS.DEVICE.DOWNSAMPLING_STATES,
+  },
 ];
 
 module.exports = jobs;

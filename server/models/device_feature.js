@@ -78,6 +78,9 @@ module.exports = (sequelize, DataTypes) => {
       last_value_changed: {
         type: DataTypes.DATE,
       },
+      last_downsampling: {
+        type: DataTypes.DATE,
+      },
     },
     {},
   );

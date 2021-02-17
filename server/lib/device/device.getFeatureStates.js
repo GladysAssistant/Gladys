@@ -32,10 +32,9 @@ async function getFeatureStates(options) {
       },
     ],
     offset: optionsWithDefault.skip,
-    // order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
-  // fix attributes
+  // Fix attributes
   if (optionsWithDefault.attributes_device && optionsWithDefault.attributes_device.length > 0) {
     queryParams.attributes = optionsWithDefault.attributes_device;
   }
@@ -46,7 +45,7 @@ async function getFeatureStates(options) {
     queryParams.include[1].attributes = optionsWithDefault.attributes_device_room;
   }
 
-  // search by feature selector
+  // Search by feature selector
   if (optionsWithDefault.device_feature_selector) {
     if (optionsWithDefault.device_feature_selector.indexOf(',') > 0) {
       queryParams.include[0].where = {
@@ -58,88 +57,61 @@ async function getFeatureStates(options) {
       };
     }
   }
-  const result = await db.sequelize.transaction(async (t) => {
-    const devices = await db.Device.findAll(queryParams, { transaction: t });
 
-    const devicesPlain = devices.map((device) => device.get({ plain: true }));
+  const devices = await db.Device.findAll(queryParams);
+  const devicesPlain = await devices.map((device) => device.get({ plain: true }));
 
-    // Search feature state
-    // Build list of features id
-    let featuresId = '';
-    devicesPlain.forEach((device) => {
-      device.features.forEach((feature) => {
-        if (featuresId.length > 0) {
-          featuresId += ', ';
+  if (devicesPlain && devicesPlain.length > 0) {
+    for (let i = 0; i < devicesPlain.length; i += 1) {
+      // devicesPlain.forEach( (device, index) => {
+      const device = devicesPlain[i];
+      if (device.features && device.features.length > 0) {
+        for (let j = 0; j < device.features.length; j += 1) {
+          // device.features.forEach( async (feature, indexFeat, array)  => {
+          const feature = device.features[j];
+          // Search feature state of current feature
+          let beginStateSearchDate = optionsWithDefault.begin_date;
+          let currentState = [];
+
+          // If column last_downsampling is explicitly asked
+          // => part of data is extract from device_feature_state_light
+          if (
+            feature.last_downsampling &&
+            optionsWithDefault.attributes_device_feature &&
+            optionsWithDefault.attributes_device_feature.length > 0 &&
+            optionsWithDefault.attributes_device_feature.includes('last_downsampling')
+          ) {
+            const queryStateLightParams = {
+              where: {
+                device_feature_id: { [Op.eq]: feature.id },
+                created_at: { [Op.between]: [optionsWithDefault.begin_date, feature.last_downsampling] },
+              },
+              order: [['created_at', 'ASC']],
+              raw: true,
+            };
+            // eslint-disable-next-line no-await-in-loop
+            currentState = currentState.concat(await db.DeviceFeatureStateLight.findAll(queryStateLightParams));
+            beginStateSearchDate = feature.last_downsampling;
+          }
+
+          const queryStateParams = {
+            where: {
+              device_feature_id: { [Op.eq]: feature.id },
+              created_at: { [Op.between]: [beginStateSearchDate, optionsWithDefault.end_date] },
+            },
+            order: [['created_at', 'ASC']],
+            raw: true,
+          };
+
+          // eslint-disable-next-line no-await-in-loop
+          currentState = currentState.concat(await db.DeviceFeatureState.findAll(queryStateParams));
+          feature.device_feature_states = currentState;
         }
-        featuresId += feature.id;
-        feature.device_feature_states = [];
-      });
-    });
-    // Put where condition on feature id
-    let queryStateParams =
-      'SELECT ' +
-      'device_feature_id, ' +
-      'value, ' +
-      'created_at ' +
-      'FROM ' +
-      't_device_feature_state ' +
-      'WHERE ' +
-      'device_feature_id';
-    if (featuresId.indexOf(',') > 0) {
-      queryStateParams += ' in ( :feature_id )';
-    } else {
-      queryStateParams += ' = :feature_id ';
-    }
-
-    if (optionsWithDefault.begin_date || optionsWithDefault.end_date) {
-      if (optionsWithDefault.begin_date && !optionsWithDefault.end_date) {
-        queryStateParams += 'AND created_at >= :begin_date ';
-      }
-      if (!optionsWithDefault.begin_date && optionsWithDefault.end_date) {
-        queryStateParams += 'AND created_at < :end_date ';
-      }
-      if (optionsWithDefault.begin_date && optionsWithDefault.end_date) {
-        queryStateParams += 'AND created_at BETWEEN :begin_date AND :end_date ';
       }
     }
-    queryStateParams += 'ORDER BY created_at ASC';
+  }
 
-    const deviceFeaturesStates = [];
-    await db.sequelize
-      .query(queryStateParams, {
-        replacements: {
-          feature_id: featuresId,
-          begin_date: optionsWithDefault.begin_date,
-          end_date: optionsWithDefault.end_date,
-        },
-        type: db.sequelize.QueryTypes.SELECT,
-      })
-      .then(function buidArrayState(state) {
-        deviceFeaturesStates.push(state);
-      });
-
-    const mapOfState = new Map();
-    deviceFeaturesStates[0].forEach((state) => {
-      let tmpArray = mapOfState.get(state.device_feature_id);
-      if (!tmpArray) {
-        tmpArray = [];
-      }
-      tmpArray.push(state);
-      mapOfState.set(state.device_feature_id, tmpArray);
-    });
-
-    devicesPlain.forEach((device) => {
-      device.features.forEach((feature) => {
-        if (mapOfState.get(feature.id)) {
-          feature.device_feature_states = mapOfState.get(feature.id);
-        }
-      });
-    });
-
-    return devicesPlain;
-  });
-
-  return result;
+  return devicesPlain;
 }
 
 module.exports = {
