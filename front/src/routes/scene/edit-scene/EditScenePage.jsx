@@ -57,11 +57,9 @@ const EditScenePage = ({ children, ...props }) => (
               <span className="custom-switch-indicator" />
             </label>
             <div class="page-options d-flex">
-              {props.scene.active && (
-                <button onClick={props.executeScene} className="btn btn-sm btn-primary ml-2">
-                  <Text id="editScene.testButton" /> <i className="fe fe-play" />
-                </button>
-              )}
+              <button onClick={props.executeScene} className="btn btn-sm btn-primary ml-2">
+                <Text id="editScene.testButton" /> <i className="fe fe-play" />
+              </button>
               <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>

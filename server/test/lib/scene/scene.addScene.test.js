@@ -137,7 +137,7 @@ describe('SceneManager.addScene', () => {
       }),
     ).to.throw(BadParameters, 'not-supported not supported');
   });
-  it("should return null, scene isn't active", async () => {
+  it("should add scene without a scheduled trigger, scene isn't active", async () => {
     const sceneManager = new SceneManager({}, event);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
@@ -147,14 +147,13 @@ describe('SceneManager.addScene', () => {
           type: EVENTS.TIME.CHANGED,
           scheduler_type: 'interval',
           interval: 10,
-          unit: 'not-supported',
+          unit: 'hour',
         },
       ],
       active: false,
       actions: [],
     });
-    expect(scene).to.be.eq(null);
-    expect(sceneManager.scenes).to.be.instanceOf(Object);
-    expect(sceneManager.scenes).to.deep.equal({});
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('jsInterval');
   });
 });

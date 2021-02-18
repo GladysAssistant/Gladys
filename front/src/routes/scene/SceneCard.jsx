@@ -71,12 +71,10 @@ class SceneCard extends Component {
                     <i class="fe fe-edit" />
                     <Text id="scene.editButton" />
                   </Link>
-                  {props.scene.active && (
-                    <button onClick={this.executeScene} type="button" className="btn btn-outline-success btn-sm">
-                      <i className="fe fe-play" />
-                      <Text id="scene.testButton" />
-                    </button>
-                  )}
+                  <button onClick={this.executeScene} type="button" className="btn btn-outline-success btn-sm">
+                    <i className="fe fe-play" />
+                    <Text id="scene.testButton" />
+                  </button>
                 </div>
               </div>
             </div>
