@@ -5,7 +5,7 @@ const logger = require('../../../utils/logger');
 
 module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   /**
-   * @api {get} /api/v1/service/rflink/devices get rflink devices
+   * @api {get} /api/v1/service/rflink/newDevices get rflink devices
    * @apiName getDevices
    * @apiGroup RFlink
    */
@@ -13,7 +13,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     const NewDevices = RFlinkManager.getNewDevices();
     res.json(NewDevices);
     }
-
 
   /**
    * @api {post} /api/v1/service/rflink/connect connect to the gateway
@@ -25,10 +24,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     if (!rflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     }
-
     RFlinkManager.connect(rflinkPath);
     res.json({ succes: true });
   }
+
   /**
    * @api {post} /api/v1/service/rflink/disconnect discconnect the gateway
    * @apiName disconnect
@@ -40,6 +39,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
       success: true,
     });
   }
+
   /**
    * @api {get} /api/v1/service/rflink/status get the gateway's status
    * @apiName getStatus
@@ -103,6 +103,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
       milightZone,
     });
   }
+
   /**
    * @api {post} /api/v1/service/rflink/debug send a rflink command
    * @apiName debug
@@ -117,6 +118,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
       succes: true,
     });
   }
+
   /**
    * @apiName remove
    * @apiGroup RFlink
@@ -125,7 +127,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
   async function remove(req, res) {
     // Deleting the device from the new device list
     const index = RFlinkManager.newDevices.findIndex((element) => {
-      console.log(element.external_id);
+      logger.debug(element.external_id);
       if (element.external_id === req.body.external_id) {
         return true;
       }

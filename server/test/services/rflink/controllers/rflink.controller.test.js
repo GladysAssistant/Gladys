@@ -2,6 +2,7 @@ const { assert, fake, stub } = require('sinon');
 const RFLinkController = require('../../../../services/rflink/api/rflink.controller');
 
 const serviceId = 'service-uuid-random';
+
 const gladys = {
   event: {
     emit: fake.returns(null),
@@ -11,6 +12,11 @@ const gladys = {
   },
   variable: {
     getValue: fake.resolves('RFLINK_PATH'),
+  },
+};
+const gladysMilight = {
+  variable: {
+    getValue: fake.resolves('CURRENT_MILIGHT_GATEWAY'),
   },
 };
 const rflinkHandler = {
@@ -23,40 +29,87 @@ const rflinkHandler = {
   devices: fake.returns([]),
   currentMilightGateway: fake.returns('F746'),
   milightBridges: fake.returns({}),
+  pair: fake.resolves(true),
+  unpair: fake.resolves(true),
   getNewDevices: fake.resolves(true),
-  connect: stub(),
+  connect: fake.resolves(true),
   disconnect: fake.resolves(true),
   sendUsb: {
     write: stub().withArgs('command').resolves(),
   },
 };
 
-describe('GET /api/v1/service/rflink/devices', () => {
+describe('POST /api/v1/service/rflink/pair', () => {
   let controller;
 
   beforeEach(() => {
-    controller = RFLinkController(gladys, rflinkHandler, serviceId);
+    controller = RFLinkController(gladysMilight, rflinkHandler, serviceId);
   });
 
-  it('getDevices test', async () => {
-    const req = {};
+  it('Pair test', async () => {
+    const req = {
+      body: {
+        zone: 42
+      }
+    };
     const res = {
       json: fake.returns(null),
     };
-    await controller['get /api/v1/service/rflink/devices'].controller(req, res);
-    // assert.calledOnce(rflinkHandler.getNewDevices);
+    await controller['post /api/v1/service/rflink/pair'].controller(req, res);
+    assert.calledOnce(gladysMilight.variable.getValue);
+    assert.calledWith(rflinkHandler.pair, '', 42);
     assert.calledOnce(res.json);
   });
 });
 
-describe('POST /api/v1/service/rflink/connect', () => {
+describe('POST /api/v1/service/rflink/unpair', () => {
   let controller;
 
   beforeEach(() => {
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
   });
 
-  it('Connect test', async () => {
+  it('Unpair test', async () => {
+    const req = {
+      body: {
+        zone: 42
+      }
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['post /api/v1/service/rflink/unpair'].controller(req, res);
+    assert.calledOnce(rflinkHandler.unpair);
+    assert.calledOnce(res.json);
+  });
+});
+
+describe('GET /api/v1/service/rflink/newDevices', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = RFLinkController(gladys, rflinkHandler, serviceId);
+  });
+
+  it('should get new devices', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['get /api/v1/service/rflink/newDevices'].controller(req, res);
+    assert.calledOnce(rflinkHandler.getNewDevices);
+    assert.calledOnce(res.json);
+  });
+});
+
+describe.only('POST /api/v1/service/rflink/connect', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = RFLinkController(gladys, rflinkHandler, serviceId);
+  });
+
+  it('should connect successfully', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
@@ -67,14 +120,14 @@ describe('POST /api/v1/service/rflink/connect', () => {
   });
 });
 
-describe('POST /api/v1/service/rflink/disconnect', () => {
+describe.only('POST /api/v1/service/rflink/disconnect', () => {
   let controller;
 
   beforeEach(() => {
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
   });
 
-  it('Disconnect test', async () => {
+  it('should disconnect successfully', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
@@ -92,7 +145,7 @@ describe('GET /api/v1/service/rflink/status', () => {
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
   });
 
-  it('Status test', async () => {
+  it('should get status', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
