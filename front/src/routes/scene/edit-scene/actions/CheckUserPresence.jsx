@@ -3,8 +3,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
-import { getDeviceFeature } from '../../../../../../server/utils/device';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 @connect('httpClient', {})
 class CheckUserPresence extends Component {
@@ -27,11 +26,7 @@ class CheckUserPresence extends Component {
       }));
       const deviceOptions = [];
       presenceDevices.forEach(device => {
-        const feature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-          DEVICE_FEATURE_TYPES.SENSOR.PUSH
-        );
+        const feature = device.features.find(f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
         if (feature) {
           deviceOptions.push({
             label: feature.name,
