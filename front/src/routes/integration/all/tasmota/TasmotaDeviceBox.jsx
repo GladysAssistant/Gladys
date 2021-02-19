@@ -87,7 +87,7 @@ class TasmotaDeviceBox extends Component {
       };
       await httpClient.post('/api/v1/service/tasmota/discover/http', options);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       this.setState({
         authErrorMessage: 'integration.tasmota.discover.http.authError'
       });

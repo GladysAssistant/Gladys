@@ -91,4 +91,29 @@ describe('Device.saveState', () => {
       12,
     );
   });
+  // we want to make sure that inserting states at a face pace is working, and not causing concurrencies issues
+  it('should insert 200 states in parallel', async function Test() {
+    this.timeout(10000);
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager);
+    const promises = [];
+    for (let i = 0; i < 200; i += 1) {
+      promises.push(
+        device.saveState(
+          {
+            id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+            selector: 'test-device-feature',
+            has_feedback: false,
+            keep_history: true,
+          },
+          12,
+        ),
+      );
+    }
+    await Promise.all(promises);
+  });
 });

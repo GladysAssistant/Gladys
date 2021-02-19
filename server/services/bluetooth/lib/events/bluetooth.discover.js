@@ -14,13 +14,12 @@ function discover(noblePeripheral) {
 
   // Store device if not already there
   if (!this.peripheralLookup && !this.discoveredDevices[noblePeripheral.uuid]) {
-    let device = transformToDevice(noblePeripheral);
-    device = this.completeDevice(device);
+    const device = transformToDevice(noblePeripheral);
     this.discoveredDevices[noblePeripheral.uuid] = device;
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
-      payload: device,
+      payload: this.completeDevice(device),
     });
   }
 }

@@ -36,6 +36,7 @@
     "@gladysassistant/gladys-gateway-js": "^3.2.4",
     "apexcharts": "^3.22.2",
     "@jaames/iro": "^5.2.3",
+    "@yaireo/tagify": "^3.21.5",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "cropperjs": "^1.5.1",

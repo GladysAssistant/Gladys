@@ -2,11 +2,13 @@ const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const EventEmitter = require('events');
 const Location = require('../../../lib/location');
+const User = require('../../../lib/user');
 
 const event = new EventEmitter();
 
 describe('location.create', () => {
   const location = new Location({}, event);
+  const user = new User();
   it('should save user location', async () => {
     const newLocation = await location.create('john', {
       latitude: 12,
@@ -20,6 +22,22 @@ describe('location.create', () => {
       updated_at: newLocation.updated_at,
       created_at: newLocation.created_at,
     });
+  });
+  // this test was added because we add a performance problem with this function.
+  // The test is kept so that there is no regression on this function
+  it('should insert 100 locations in parallel and get user by id at the same time', async function Test() {
+    this.timeout(30000);
+    const promises = [];
+    for (let i = 0; i < 100; i += 1) {
+      promises.push(user.getById('0cd30aef-9c4e-4a23-88e3-3547971296e5'));
+      promises.push(
+        location.create('john', {
+          latitude: 12,
+          longitude: 12,
+        }),
+      );
+    }
+    await Promise.all(promises);
   });
   it('should return user not found', async () => {
     const promise = location.create('user-not-found', {
