@@ -980,7 +980,7 @@
     "backupTab": "Backups",
     "serviceTab": "Services",
     "billingTab": "Billing",
-    "gatewayUsersTab": "Users",
+    "gatewayUsersTab": "Plus Users",
     "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
