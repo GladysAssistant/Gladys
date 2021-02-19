@@ -132,7 +132,6 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeatureStates(req, res) {
-    const debut = new Date();
     const params = Object.assign({}, req.query, {
       device_feature_selector: req.params.device_feature_selector.split(','),
     });
@@ -178,8 +177,6 @@ module.exports = function DeviceController(gladys) {
 
     const devices = await gladys.device.getFeatureStates(params);
 
-    const finSQL = new Date();
-    logger.error(`sql; ${debut} - ${finSQL}  =  ${finSQL.getTime() - debut.getTime()}`);
     // Downsample result to reduce nb of value in response
     if (params.downsample && params.downsample === 'true') {
       if (devices && devices.length > 0) {
@@ -216,10 +213,6 @@ module.exports = function DeviceController(gladys) {
       }
     }
 
-    const findownsampling = new Date();
-    logger.error(`down; ${finSQL} - ${findownsampling}  =  ${findownsampling.getTime() - finSQL.getTime()}`);
-
-    logger.error(`fin; ${debut} - ${new Date()}  =  ${new Date().getTime() - debut.getTime()}`);
     res.json(devices);
   }
 

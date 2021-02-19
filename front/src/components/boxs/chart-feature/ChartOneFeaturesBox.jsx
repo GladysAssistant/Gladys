@@ -74,7 +74,9 @@ class ChartOneFeaturesBox extends Component {
               <div class="d-flex align-items-baseline">
                 <Text id="dashboard.boxes.devicesChart.lastValue" />
                 <div class="h6 " style="padding-left: 0.5em;">
-                  {lastValue && `${lastValue} ${unit}`}
+                  {lastValue && `${lastValue} ` && (
+                    <Text id={`deviceFeatureUnitShort.${unit}`} />
+                  )}
                   {!lastValue && `?`}
                   <span class="d-inline-flex align-items-baseline lh-1">
                     <svg
@@ -103,7 +105,7 @@ class ChartOneFeaturesBox extends Component {
           </div>
           <div class={cx('dimmer', { active: boxStatus === RequestStatus.Getting })}>
             <div class="loader" />
-            <div class="dimmer-content" style="height:50px">
+            <div class="dimmer-content" style="height:55px">
               {boxStatus === RequestStatus.Success && options && series && apexType && (
                 <Chart options={options} series={series} type={apexType} class="chart-sm" height="50" />
               )}

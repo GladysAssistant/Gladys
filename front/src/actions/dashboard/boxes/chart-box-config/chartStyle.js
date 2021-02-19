@@ -51,9 +51,9 @@ const OPTIONS_COMMON = {
   grid: {
     show: false,
     padding: {
-      top: 0,
+      top: 2,
       right: 0,
-      bottom: 40, // default value for multi feature set to 0 for one feature
+      bottom: 2, 
       left: 0
     }
   },
@@ -75,8 +75,8 @@ const OPTIONS_COMMON = {
   tooltip: {
     enabled: true,
     shared: true,
-    followCursor: true,
-    theme: 'dark',
+    followCursor: false,
+    theme: 'light',
     x: {
       show: true,
       format: 'dd MMM yyyy HH:mm:ss',
@@ -85,7 +85,13 @@ const OPTIONS_COMMON = {
     y: [],
     marker: {
       show: true
-    }
+    },
+    fixed: {
+        enabled: true,
+        position: 'topRight',
+        offsetX: 70,
+        offsetY: -70,
+    },
   }
 };
 

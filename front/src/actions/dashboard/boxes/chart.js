@@ -4,7 +4,6 @@ import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
 import chartConfig from './chart-box-config/chartConfig';
 import chartStyle from '../../../actions/dashboard/boxes/chart-box-config/chartStyle';
-import commons from './commons';
 
 const BOX_KEY = 'ChartBox';
 function createActions(store) {
@@ -107,7 +106,7 @@ function createActions(store) {
           device.features.forEach(feature => {
             const yData = [];
             // Format unit to display
-            unit = commons.formatUnitToDisplay(feature.unit);
+            unit = feature.unit;
 
             feature.device_feature_states.forEach(featureState => {
               xData.push(featureState.x);
@@ -149,7 +148,6 @@ function createActions(store) {
         let trend = 1;
         let trendColor = 'grey';
         if (box.type === 'chart-one-feature' && chartData.length > 0) {
-          options.grid.padding.bottom = 0;
           deviceName = chartData[0].name;
           roomName = chartData[0].room.name;
           if (chartData[0].features.length > 0) {
