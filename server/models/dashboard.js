@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         type: DataTypes.STRING,
       },
+      user_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_user',
+          key: 'id',
+        },
+      },
       type: {
         allowNull: false,
         type: DataTypes.ENUM(DASHBOARD_TYPE_LIST),

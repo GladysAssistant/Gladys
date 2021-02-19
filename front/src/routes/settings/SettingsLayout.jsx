@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
 import config from '../../../config';
 
 const DashboardSettings = ({ children, ...props }) => (
@@ -23,6 +24,19 @@ const DashboardSettings = ({ children, ...props }) => (
                       <i class="fe fe-home" />
                     </span>
                     <Text id="settings.housesTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/settings/user"
+                    activeClassName="active"
+                    class={cx('list-group-item list-group-item-action d-flex align-items-center', {
+                      active: props.currentUrl && props.currentUrl.startsWith('/dashboard/settings/user')
+                    })}
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-user" />
+                    </span>
+                    <Text id="settings.usersTab" />
                   </Link>
 
                   <Link

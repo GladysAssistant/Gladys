@@ -29,6 +29,7 @@ module.exports = function TasmotaController(tasmotaManager) {
     },
     'post /api/v1/service/tasmota/discover/:protocol': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(scan),
     },
   };

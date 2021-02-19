@@ -14,7 +14,7 @@ const EditProfile = ({ children, ...props }) => (
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
-          {props.newUser && <Profile {...props} language="en" />}
+          {props.newUser && <Profile {...props} disableRole language="en" />}
           <div class="form-group">
             <button onClick={props.saveProfile} class="btn btn-success">
               <Text id="profile.saveButton" />

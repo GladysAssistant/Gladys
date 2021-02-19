@@ -26,7 +26,7 @@ module.exports = function HouseController(gladys) {
    * @apiUse DashboardSuccess
    */
   async function create(req, res) {
-    const dashboard = await gladys.dashboard.create(req.body);
+    const dashboard = await gladys.dashboard.create(req.user.id, req.body);
     res.status(201).json(dashboard);
   }
 
@@ -36,7 +36,7 @@ module.exports = function HouseController(gladys) {
    * @apiGroup Dashboard
    */
   async function get(req, res) {
-    const dashboards = await gladys.dashboard.get();
+    const dashboards = await gladys.dashboard.get(req.user.id);
     res.json(dashboards);
   }
 
@@ -48,7 +48,7 @@ module.exports = function HouseController(gladys) {
    * @apiUse DashboardSuccess
    */
   async function update(req, res) {
-    const dashboard = await gladys.dashboard.update(req.params.dashboard_selector, req.body);
+    const dashboard = await gladys.dashboard.update(req.user.id, req.params.dashboard_selector, req.body);
     res.json(dashboard);
   }
 
@@ -59,7 +59,7 @@ module.exports = function HouseController(gladys) {
    * @apiUse DashboardSuccess
    */
   async function getBySelector(req, res) {
-    const dashboard = await gladys.dashboard.getBySelector(req.params.dashboard_selector);
+    const dashboard = await gladys.dashboard.getBySelector(req.user.id, req.params.dashboard_selector);
     res.json(dashboard);
   }
 
@@ -70,7 +70,7 @@ module.exports = function HouseController(gladys) {
    *
    */
   async function destroy(req, res) {
-    await gladys.dashboard.destroy(req.params.dashboard_selector);
+    await gladys.dashboard.destroy(req.user.id, req.params.dashboard_selector);
     res.json({
       success: true,
     });
