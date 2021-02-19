@@ -47,7 +47,7 @@ async function getFeatureStates(options) {
 
   // Search by feature selector
   if (optionsWithDefault.device_feature_selector) {
-    if (optionsWithDefault.device_feature_selector.indexOf(',') > 0) {
+    if (optionsWithDefault.device_feature_selector.length > 1) {
       queryParams.include[0].where = {
         selector: { [Op.in]: optionsWithDefault.device_feature_selector },
       };

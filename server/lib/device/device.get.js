@@ -60,6 +60,7 @@ async function get(options) {
   if (optionsWithDefault.attributes_device_service && optionsWithDefault.attributes_device_service.length > 0) {
     queryParams.include[3].attributes = optionsWithDefault.attributes_device_service;
   }
+
   // search by device feature category
   if (optionsWithDefault.device_feature_category) {
     queryParams.include[0].where = {

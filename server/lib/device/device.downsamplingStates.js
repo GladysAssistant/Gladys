@@ -93,11 +93,7 @@ async function downsamplingStates() {
                 });
               });
 
-              try {
-                db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave);
-              } catch (e) {
-                logger.error(e);
-              }
+              db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave);
             } else {
               // In this case all feature state was seed in feature state light
               db.DeviceFeatureStateLight.bulkCreate(value);
