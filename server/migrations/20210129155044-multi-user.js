@@ -26,6 +26,7 @@ module.exports = {
       await db.Dashboard.update(
         {
           user_id: adminUser.id,
+          selector: `${adminUser.selector}-home`,
         },
         { where: {} },
       );
