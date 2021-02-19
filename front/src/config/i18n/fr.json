@@ -823,6 +823,15 @@
         "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
       },
+      "checkUserPresence": {
+        "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnées ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionnée ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "deviceLabel": "Appareils",
+        "minutesLabel": "Appareil vu il y a moins de",
+        "minutesPlaceholder": "Durée (en minutes)",
+        "minutes": "minutes"
+      },
       "httpRequest": {
         "description": "Cette action permet d'envoyer une requête HTTP.",
         "methodLabel": "Méthode",
@@ -868,7 +877,8 @@
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
-        "set-out-of-home": "Utilisateur parti de la maison"
+        "set-out-of-home": "Utilisateur parti de la maison",
+        "check-presence": "Vérifier la présence"
       },
       "http": {
         "request": "Faire une requête HTTP"
