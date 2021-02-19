@@ -46,6 +46,12 @@ class SettingsUsers extends Component {
   updateBirthdateYear = e => {
     this.props.updateNewUserProperty('birthdateYear', e.target.value);
   };
+  updateTemperatureUnit = e => {
+    this.props.updateNewUserProperty('temperature_unit_preference', e.target.value);
+  };
+  updateDistanceUnit = e => {
+    this.props.updateNewUserProperty('distance_unit_preference', e.target.value);
+  };
 
   componentDidMount() {
     this.props.initNewUser({
@@ -90,6 +96,8 @@ class SettingsUsers extends Component {
             updateBirthdateDay={this.updateBirthdateDay}
             updateBirthdateMonth={this.updateBirthdateMonth}
             updateBirthdateYear={this.updateBirthdateYear}
+            updateTemperatureUnit={this.updateTemperatureUnit}
+            updateDistanceUnit={this.updateDistanceUnit}
             errors={props.profileUpdateErrors}
             networkError={props.createUserStatus === RequestStatus.NetworkError}
             emailAlreadyExistError={
