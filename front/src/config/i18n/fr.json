@@ -926,6 +926,7 @@
     "editYourProfileTitle": "Editez votre profil",
     "userRole": "Utilisateur",
     "adminRole": "Administrateur",
+    "roleDescription": "Un administrateur a tous les accès de l'instance Gladys. Un utilisateur ne peut gérer que son tableau de bord, discuter avec Gladys, voir son calendrier et la carte. Il ne peut pas créer de scènes, éditer les préférences, ni gérer les intégrations.",
     "invitationPending": "En attente",
     "invitationSuccess": "Acceptée",
     "firstnameLabel": "Prénom",

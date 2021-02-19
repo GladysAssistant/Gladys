@@ -142,6 +142,11 @@ const Profile = ({ children, ...props }) => {
           <label class="form-label">
             <Text id="profile.roleLabel" />
           </label>
+          <p>
+            <small>
+              <Text id="profile.roleDescription" />
+            </small>
+          </p>
           <select value={props.newUser.role} onChange={props.updateRole} class="form-control">
             <option value="admin">
               <Text id="profile.adminRole" />
