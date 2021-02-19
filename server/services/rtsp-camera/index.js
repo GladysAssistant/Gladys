@@ -13,7 +13,7 @@ module.exports = function RtspCameraService(gladys, serviceId) {
    * gladys.services['rtsp-camera'].start();
    */
   async function start() {
-    logger.log('starting RTSP service');
+    logger.info('Starting RTSP service');
     // make sure the tempFolder exists
     await fse.ensureDir(gladys.config.tempFolder);
   }
@@ -25,7 +25,7 @@ module.exports = function RtspCameraService(gladys, serviceId) {
    *  gladys.services['rtsp-camera'].stop();
    */
   async function stop() {
-    logger.log('stopping RTSP service');
+    logger.info('Stopping RTSP service');
   }
 
   return Object.freeze({

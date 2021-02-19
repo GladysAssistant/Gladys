@@ -35,11 +35,9 @@ class Session {
   }
 
   connect() {
-    console.log('Trying to connect...');
     const websocketUrl = config.webSocketUrl || window.location.origin.replace('http', 'ws');
     this.ws = new WebSocket(websocketUrl);
     this.ws.onopen = () => {
-      console.log('Connected!');
       this.websocketConnected = true;
       this.ws.send(
         JSON.stringify({
@@ -56,11 +54,10 @@ class Session {
       };
     };
     this.ws.onerror = e => {
-      console.log('Error', e);
+      console.error('Error', e);
     };
     this.ws.onclose = e => {
-      console.log(e);
-      console.log('disconnected');
+      console.error(e);
       this.websocketConnected = false;
       if (e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
         delete this.user.access_token;

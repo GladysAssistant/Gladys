@@ -16,7 +16,7 @@ module.exports = function TelegramService(gladys, serviceId) {
    * gladys.services.telegram.start();
    */
   async function start() {
-    logger.info('Starting telegram service');
+    logger.info('Starting Telegram service');
     const token = await gladys.variable.getValue('TELEGRAM_API_KEY', serviceId);
     if (!token) {
       throw new ServiceNotConfiguredError('No telegram api token found. Not starting telegram service');
@@ -31,7 +31,7 @@ module.exports = function TelegramService(gladys, serviceId) {
    * gladys.services.telegram.stop();
    */
   async function stop() {
-    logger.log('stopping telegram service');
+    logger.info('stopping Telegram service');
     await messageHandler.disconnect();
   }
 

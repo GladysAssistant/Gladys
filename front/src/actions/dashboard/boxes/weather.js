@@ -30,14 +30,14 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
-        weather.weather_icon = translateWeatherToFeIcon(weather.weather);
+        weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
 
         weather.hours.map(hour => {
-          hour.weather_icon = translateWeatherToFeIcon(hour.weather);
+          hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
           hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
         });
         weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.weatherIcon = translateWeatherToFeIcon(day.weather);
           day.datetime_beautiful = dayjs(day.datetime).format('D MMM');
         });
 

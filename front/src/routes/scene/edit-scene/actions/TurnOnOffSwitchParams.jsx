@@ -26,7 +26,7 @@ class TurnOnOffSwitch extends Component {
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   handleChange = selectedOptions => {
