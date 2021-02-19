@@ -36,25 +36,30 @@ const UserPage = ({ children, ...props }) => (
         </Link>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-12">
-        {props.users && props.users.length === 0 && (
-          <div class="alert alert-secondary">
-            <Text id="usersSettings.noUsersFound" />
-          </div>
-        )}
-        <div class="row row-cards">
-          {props.users &&
-            props.users.map((user, index) => (
-              <div class="col-md-4" key={user.id}>
-                <UserCard
-                  user={user}
-                  loggedUser={props.user}
-                  removeUserFromList={props.removeUserFromList}
-                  index={index}
-                />
+    <div class={props.loading ? 'dimmer active' : 'dimmer'} style={{ minHeight: '20rem' }}>
+      <div class="loader" />
+      <div class="dimmer-content">
+        <div class="row">
+          <div class="col-lg-12">
+            {props.users && props.users.length === 0 && (
+              <div class="alert alert-secondary">
+                <Text id="usersSettings.noUsersFound" />
               </div>
-            ))}
+            )}
+            <div class="row row-cards">
+              {props.users &&
+                props.users.map((user, index) => (
+                  <div class="col-md-4" key={user.id}>
+                    <UserCard
+                      user={user}
+                      loggedUser={props.user}
+                      removeUserFromList={props.removeUserFromList}
+                      index={index}
+                    />
+                  </div>
+                ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import SettingsLayout from '../SettingsLayout';
 class SettingsUsers extends Component {
   getUsers = async () => {
     try {
+      await this.setState({ loading: true });
       const params = {
         fields: 'id,firstname,lastname,selector,role,picture',
         order_dir: this.state.getUsersOrderDir || 'asc'
@@ -17,9 +18,10 @@ class SettingsUsers extends Component {
         params.search = this.state.userSearchTerms;
       }
       const users = await this.props.httpClient.get('/api/v1/user', params);
-      this.setState({ users });
+      this.setState({ users, loading: false });
     } catch (e) {
       console.error(e);
+      this.setState({ loading: false });
     }
   };
   search = async e => {
@@ -45,7 +47,7 @@ class SettingsUsers extends Component {
     this.getUsers();
   }
 
-  render(props, { users, userSearchTerms }) {
+  render(props, { users, userSearchTerms, loading }) {
     return (
       <SettingsLayout currentUrl={props.currentUrl}>
         <UserPage
@@ -55,6 +57,7 @@ class SettingsUsers extends Component {
           removeUserFromList={this.removeUserFromList}
           userSearchTerms={userSearchTerms}
           changeOrderDir={this.changeOrderDir}
+          loading={loading}
         />
       </SettingsLayout>
     );
