@@ -5,7 +5,7 @@ import UserPage from './UserPage';
 import actions from '../../../actions/house';
 import SettingsLayout from '../SettingsLayout';
 
-@connect('currentUrl,httpClient', actions)
+@connect('currentUrl,httpClient,user', actions)
 class SettingsUsers extends Component {
   getUsers = async () => {
     try {

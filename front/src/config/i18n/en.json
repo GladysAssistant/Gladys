@@ -993,6 +993,7 @@
   "usersSettings": {
     "title": "Users",
     "searchPlaceholder": "Search users",
+    "noUsersFound": "No users found with this search.",
     "newUserButton": "New",
     "editUserButton": "Edit",
     "deleteUserButton": "Delete",

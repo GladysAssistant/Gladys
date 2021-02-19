@@ -995,6 +995,7 @@
     "searchPlaceholder": "Chercher un utilisateur",
     "newUserButton": "Nouveau",
     "editUserButton": "Editer",
+    "noUsersFound": "Aucuns utilisateurs trouvés avec cette recherche.",
     "deleteUserButton": "Supprimer",
     "confirmDeleteUserButton": "Confirmer",
     "cancelDeleteUser": "Annuler",

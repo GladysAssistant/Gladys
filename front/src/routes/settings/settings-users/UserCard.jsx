@@ -26,7 +26,7 @@ class SettingsUsers extends Component {
       confirmUserDeletion: false
     });
   };
-  render({ user }, { confirmUserDeletion, loading }) {
+  render({ user, loggedUser }, { confirmUserDeletion, loading }) {
     return (
       <div class={cx('card dimmer', { active: loading === true })}>
         <div class="loader" />
@@ -53,7 +53,7 @@ class SettingsUsers extends Component {
                   <Text id="usersSettings.editUserButton" />
                 </Link>
               )}
-              {!confirmUserDeletion && (
+              {!confirmUserDeletion && loggedUser.id !== user.id && (
                 <button class="btn btn-outline-danger btn-sm" onClick={this.confirmUserDeletion}>
                   <i class="fe fe-trash" />
                   <Text id="usersSettings.deleteUserButton" />
