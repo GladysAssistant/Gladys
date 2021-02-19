@@ -1,7 +1,6 @@
 const { LTTB } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
-const logger = require('../../utils/logger');
 
 module.exports = function DeviceController(gladys) {
   /**

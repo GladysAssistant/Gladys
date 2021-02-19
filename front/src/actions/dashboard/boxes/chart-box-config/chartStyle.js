@@ -53,7 +53,7 @@ const OPTIONS_COMMON = {
     padding: {
       top: 2,
       right: 0,
-      bottom: 2, 
+      bottom: 2,
       left: 0
     }
   },
@@ -87,11 +87,11 @@ const OPTIONS_COMMON = {
       show: true
     },
     fixed: {
-        enabled: true,
-        position: 'topRight',
-        offsetX: 70,
-        offsetY: -70,
-    },
+      enabled: true,
+      position: 'topRight',
+      offsetX: 70,
+      offsetY: -70
+    }
   }
 };
 
