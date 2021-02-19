@@ -61,6 +61,7 @@ module.exports = function HueController(philipsHueLightHandler) {
     },
     'post /api/v1/service/philips-hue/bridge/configure': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(configureBridge),
     },
     'get /api/v1/service/philips-hue/light': {
@@ -73,6 +74,7 @@ module.exports = function HueController(philipsHueLightHandler) {
     },
     'post /api/v1/service/philips-hue/scene/:philipe_hue_scene_id/activate': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(activateScene),
     },
   };

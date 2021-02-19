@@ -1,9 +1,12 @@
 const express = require('express');
 
-// Middlewares
+// Middlewares with dependences
 const AuthMiddleware = require('./middlewares/authMiddleware');
 const IsInstanceConfiguredMiddleware = require('./middlewares/isInstanceConfigured');
 const CorsMiddleware = require('./middlewares/corsMiddleware');
+
+// Simple middleware
+const adminMiddleware = require('./middlewares/adminMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 
 // routes
@@ -37,6 +40,10 @@ function setupRoutes(gladys) {
     // if the route is marked as authenticated
     if (routes[routeKey].authenticated) {
       routerParams.push(authMiddleware);
+    }
+    // if the route is marked as admin
+    if (routes[routeKey].admin) {
+      routerParams.push(adminMiddleware);
     }
     // if the route need rate limit
     if (routes[routeKey].rateLimit) {

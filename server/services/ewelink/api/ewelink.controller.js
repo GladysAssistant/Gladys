@@ -36,6 +36,7 @@ module.exports = function EwelinkController(eweLinkHandler) {
   return {
     'post /api/v1/service/ewelink/connect': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(connect),
     },
     'get /api/v1/service/ewelink/status': {

@@ -3,17 +3,21 @@ const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const passwordUtils = require('../../utils/password');
 
 /**
- * @description Update a user.
- * @param {string} userId - The user id to update.
+ * @description Update a user by his selector.
+ * @param {string} selector - The user selector.
  * @param {Object} newUser - The new user.
  * @returns {Promise} Return the updated user.
  * @example
- * gladys.user.update('184515e8-27c0-45c3-97f5-f5e7d14aecce', {
+ * gladys.user.updateBySelector('tony', {
  *    picture: 'xxx'
  * });
  */
-async function update(userId, newUser) {
-  const user = await db.User.findByPk(userId);
+async function updateBySelector(selector, newUser) {
+  const user = await db.User.findOne({
+    where: {
+      selector,
+    },
+  });
 
   if (user === null) {
     throw new NotFoundError(`User not found`);
@@ -28,17 +32,14 @@ async function update(userId, newUser) {
   }
 
   await user.update(newUser);
-
-  const plainUser = user.get({ plain: true });
-
-  this.stateManager.setState('user', plainUser.selector, plainUser);
-  this.stateManager.setState('userById', plainUser.id, plainUser);
-
-  return {
-    id: userId,
-  };
+  const userPlain = user.get({ plain: true });
+  this.stateManager.setState('user', user.selector, userPlain);
+  const userPlainCopied = { ...userPlain };
+  delete userPlainCopied.password;
+  delete userPlainCopied.telegram_user_id;
+  return userPlainCopied;
 }
 
 module.exports = {
-  update,
+  updateBySelector,
 };

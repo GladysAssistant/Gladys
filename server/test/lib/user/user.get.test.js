@@ -33,4 +33,51 @@ describe('user.get', () => {
       },
     ]);
   });
+  it('should only return pepper', async () => {
+    const users = await user.get({ search: 'pepper' });
+    expect(users).to.deep.equal([
+      {
+        id: '7a137a56-069e-4996-8816-36558174b727',
+        firstname: 'Pepper',
+        lastname: 'Pots',
+        selector: 'pepper',
+        email: 'pepper@pots.com',
+      },
+    ]);
+  });
+  it('should only return pepper', async () => {
+    const users = await user.get({ search: 'pots' });
+    expect(users).to.deep.equal([
+      {
+        id: '7a137a56-069e-4996-8816-36558174b727',
+        firstname: 'Pepper',
+        lastname: 'Pots',
+        selector: 'pepper',
+        email: 'pepper@pots.com',
+      },
+    ]);
+  });
+  it('should return empty results', async () => {
+    const users = await user.get({ search: 'NOT_FOUND' });
+    expect(users).to.deep.equal([]);
+  });
+  it('should return list of users order by desc', async () => {
+    const users = await user.get({ order_dir: 'desc' });
+    expect(users).to.deep.equal([
+      {
+        id: '7a137a56-069e-4996-8816-36558174b727',
+        firstname: 'Pepper',
+        lastname: 'Pots',
+        selector: 'pepper',
+        email: 'pepper@pots.com',
+      },
+      {
+        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        firstname: 'John',
+        lastname: 'Doe',
+        selector: 'john',
+        email: 'demo@demo.com',
+      },
+    ]);
+  });
 });
