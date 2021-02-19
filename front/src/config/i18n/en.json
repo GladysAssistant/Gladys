@@ -823,6 +823,15 @@
         "userSeenDescription": "This action set the user as \"at home\".",
         "userLeftHomeDescription": "This action set the user as \"left home\"."
       },
+      "checkUserPresence": {
+        "description": "When this action is executed, Gladys checks if one of the selected device was seen at home in the last X minutes. If one of the device was seen, the action does nothing more. If no device was seen, the user is marked as \"left home\".",
+        "userLabel": "User",
+        "houseLabel": "House",
+        "deviceLabel": "Devices",
+        "minutesLabel": "Devices seen less than",
+        "minutesPlaceholder": "Duration (in minutes)",
+        "minutes": "minutes"
+      },
       "httpRequest": {
         "description": "This action let you make HTTP requests.",
         "methodLabel": "Method",
@@ -868,7 +877,8 @@
       },
       "user": {
         "set-seen-at-home": "User seen at home",
-        "set-out-of-home": "User left home"
+        "set-out-of-home": "User left home",
+        "check-presence": "Check user presence"
       },
       "http": {
         "request": "Make a HTTP request"
