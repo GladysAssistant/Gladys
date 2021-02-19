@@ -48,7 +48,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * gladys.services.caldav.start();
    */
   async function start() {
-    logger.log('starting CalDAV service');
+    logger.info('Starting CalDAV service');
     interval = setInterval(syncAllUsers, 1000 * 60 * 30);
   }
 
@@ -60,7 +60,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * gladys.services.caldav.stop();
    */
   async function stop() {
-    logger.log('stopping CalDAV service');
+    logger.info('Stopping CalDAV service');
     clearInterval(interval);
   }
 
