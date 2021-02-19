@@ -644,7 +644,8 @@
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices.",
       "deviceTab": "Devices",
-      "setupTab": "Setup",
+      "discoverTab": "Discover",
+      "setupTab": "Presence scanner",
       "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
@@ -657,6 +658,7 @@
         "externalIdLabel": "External ID",
         "manufacturerLabel": "Manufacturer",
         "modelLabel": "Model",
+        "presenceSensorLabel": "Use this device as presence sensor",
         "featuresLabel": "Features",
         "noFeatureDiscovered": "No features discovered.",
         "featureNamePlaceholder": "Enter feature name",
@@ -664,10 +666,9 @@
         "deleteButton": "Delete",
         "editButton": "Edit"
       },
-      "setup": {
-        "title": "Bluetooth Setup",
+      "discover": {
+        "title": "Bluetooth Discover",
         "scanButton": "Scan",
-        "reloadButton": "Reload",
         "noDeviceFound": "No bluetooth device discovered.",
         "createDeviceInGladys": "Connect in Gladys",
         "updateDeviceInGladys": "Update in Gladys",
@@ -684,6 +685,18 @@
           "cancelLabel": "Cancel",
           "successLabel": "Done"
         }
+      },
+      "setup": {
+        "title": "Presence scanner",
+        "noConfigLabel": "Configuration not loaded, please retry.",
+        "errorLabel": "An error occurred while loading configuration.",
+        "presenceScannerDescription": "The presence scanner feature is doing a bluetooth scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
+        "presenceScannerStatusLabel": "Enable or disable presence scanner",
+        "presenceScannerFrequencyLabel": "Scanner interval",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Only integers are accepted.",
+        "presenceScannerButton": "Scan device presence now",
+        "saveLabel": "Save configuration"
       }
     },
     "eWeLink": {
@@ -810,6 +823,15 @@
         "userSeenDescription": "This action set the user as \"at home\".",
         "userLeftHomeDescription": "This action set the user as \"left home\"."
       },
+      "checkUserPresence": {
+        "description": "When this action is executed, Gladys checks if one of the selected device was seen at home in the last X minutes. If one of the device was seen, the action does nothing more. If no device was seen, the user is marked as \"left home\".",
+        "userLabel": "User",
+        "houseLabel": "House",
+        "deviceLabel": "Devices",
+        "minutesLabel": "Devices seen less than",
+        "minutesPlaceholder": "Duration (in minutes)",
+        "minutes": "minutes"
+      },
       "httpRequest": {
         "description": "This action let you make HTTP requests.",
         "methodLabel": "Method",
@@ -855,7 +877,8 @@
       },
       "user": {
         "set-seen-at-home": "User seen at home",
-        "set-out-of-home": "User left home"
+        "set-out-of-home": "User left home",
+        "check-presence": "Check user presence"
       },
       "http": {
         "request": "Make a HTTP request"
@@ -887,6 +910,7 @@
         "valuePlaceholder": "Value",
         "on": "On",
         "off": "Off",
+        "deviceSeen": "If the device is detected",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
       },
       "scheduledTrigger": {

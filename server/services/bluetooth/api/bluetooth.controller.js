@@ -54,6 +54,36 @@ module.exports = function BluetoothController(bluetoothManager) {
     res.json(bluetoothManager.getStatus());
   }
 
+  /**
+   * @api {post} /api/v1/service/bluetooth/presence Start presence scanner
+   * @apiName scanPresence
+   * @apiGroup Bluetooth
+   */
+  async function scanPresence(req, res) {
+    bluetoothManager.scanPresence();
+    res.status(200);
+  }
+
+  /**
+   * @api {get} /api/v1/service/bluetooth/config Get Bluetooth configuration
+   * @apiName getConfiguration
+   * @apiGroup Bluetooth
+   */
+  async function getConfiguration(req, res) {
+    const config = bluetoothManager.getConfiguration();
+    res.json(config);
+  }
+
+  /**
+   * @api {post} /api/v1/service/bluetooth/config Save Bluetooth configuration
+   * @apiName saveConfiguration
+   * @apiGroup Bluetooth
+   */
+  async function saveConfiguration(req, res) {
+    const config = await bluetoothManager.saveConfiguration(req.body);
+    res.json(config);
+  }
+
   return {
     'get /api/v1/service/bluetooth/status': {
       authenticated: true,
@@ -66,6 +96,18 @@ module.exports = function BluetoothController(bluetoothManager) {
     'get /api/v1/service/bluetooth/peripheral/bluetooth-:uuid': {
       authenticated: true,
       controller: getDiscoveredDevice,
+    },
+    'post /api/v1/service/bluetooth/presence': {
+      authenticated: true,
+      controller: scanPresence,
+    },
+    'get /api/v1/service/bluetooth/config': {
+      authenticated: true,
+      controller: getConfiguration,
+    },
+    'post /api/v1/service/bluetooth/config': {
+      authenticated: true,
+      controller: saveConfiguration,
     },
     'post /api/v1/service/bluetooth/scan': {
       authenticated: true,

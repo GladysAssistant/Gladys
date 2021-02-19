@@ -308,7 +308,8 @@
       "title": "Bluetooth",
       "description": "Contrôler vos appareils Bluetooth.",
       "deviceTab": "Appareils",
-      "setupTab": "Configuration",
+      "discoverTab": "Découverte",
+      "setupTab": "Scanner de présence",
       "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
       "device": {
         "title": "Appareils Bluetooth",
@@ -321,6 +322,7 @@
         "externalIdLabel": "ID externe",
         "manufacturerLabel": "Fabricant",
         "modelLabel": "Modèle",
+        "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
         "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
         "featureNamePlaceholder": "Nom de la fonctionnalité",
@@ -328,10 +330,9 @@
         "deleteButton": "Supprimer",
         "editButton": "Editer"
       },
-      "setup": {
-        "title": "Configuration Bluetooth",
+      "discover": {
+        "title": "Découverte Bluetooth",
         "scanButton": "Rechercher",
-        "reloadButton": "Recharger",
         "noDeviceFound": "Aucun périphérique Bluetooth détecté.",
         "createDeviceInGladys": "Connecter dans Gladys",
         "updateDeviceInGladys": "Mettre à jour dans Gladys",
@@ -348,6 +349,18 @@
           "cancelLabel": "Annuler",
           "successLabel": "Effectué"
         }
+      },
+      "setup": {
+        "title": "Scanner de présence",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "presenceScannerButton": "Scanner la présence maintenant",
+        "saveLabel": "Enregistrer"
       }
     },
     "telegram": {
@@ -810,6 +823,15 @@
         "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
       },
+      "checkUserPresence": {
+        "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnées ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionnée ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "deviceLabel": "Appareils",
+        "minutesLabel": "Appareil vu il y a moins de",
+        "minutesPlaceholder": "Durée (en minutes)",
+        "minutes": "minutes"
+      },
       "httpRequest": {
         "description": "Cette action permet d'envoyer une requête HTTP.",
         "methodLabel": "Méthode",
@@ -855,7 +877,8 @@
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
-        "set-out-of-home": "Utilisateur parti de la maison"
+        "set-out-of-home": "Utilisateur parti de la maison",
+        "check-presence": "Vérifier la présence"
       },
       "http": {
         "request": "Faire une requête HTTP"
@@ -887,6 +910,7 @@
         "valuePlaceholder": "Valeur",
         "on": "On",
         "off": "Off",
+        "deviceSeen": "Si l'appareil est détecté",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
       },
       "scheduledTrigger": {
