@@ -44,6 +44,12 @@ class SettingsUsers extends Component {
   updateBirthdateYear = e => {
     this.props.updateNewUserProperty('birthdateYear', e.target.value);
   };
+  updateTemperatureUnit = e => {
+    this.props.updateNewUserProperty('temperature_unit_preference', e.target.value);
+  };
+  updateDistanceUnit = e => {
+    this.props.updateNewUserProperty('distance_unit_preference', e.target.value);
+  };
 
   getUser = () => {
     this.props.initNewUser(null);
@@ -53,6 +59,15 @@ class SettingsUsers extends Component {
 
   componentDidMount() {
     this.getUser();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.ProfilePatchStatus !== this.props.ProfilePatchStatus &&
+      this.props.ProfilePatchStatus === RequestStatus.Success
+    ) {
+      window.scrollTo({ top: 0 });
+    }
   }
 
   componentWillUnmount() {
@@ -70,6 +85,7 @@ class SettingsUsers extends Component {
   render(props, {}) {
     const loading =
       props.ProfileGetStatus === RequestStatus.Getting || props.ProfilePatchStatus === RequestStatus.Getting;
+    const profileSavedSuccess = props.ProfilePatchStatus === RequestStatus.Success;
     return (
       <SettingsLayout currentUrl={props.currentUrl}>
         <EditUserPage
@@ -85,6 +101,8 @@ class SettingsUsers extends Component {
           updateBirthdateDay={this.updateBirthdateDay}
           updateBirthdateMonth={this.updateBirthdateMonth}
           updateBirthdateYear={this.updateBirthdateYear}
+          updateTemperatureUnit={this.updateTemperatureUnit}
+          updateDistanceUnit={this.updateDistanceUnit}
           errors={props.profileUpdateErrors}
           networkError={props.createUserStatus === RequestStatus.NetworkError}
           emailAlreadyExistError={
@@ -96,6 +114,7 @@ class SettingsUsers extends Component {
             get(props.createUserError, 'error.attribute') === 'selector'
           }
           unknownError={props.createUserStatus === RequestStatus.Error}
+          profileSavedSuccess={profileSavedSuccess}
         />
       </SettingsLayout>
     );

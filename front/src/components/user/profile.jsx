@@ -128,7 +128,7 @@ const Profile = ({ children, ...props }) => {
         <label class="form-label">
           <Text id="profile.languageLabel" />
         </label>
-        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control custom-select">
+        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control">
           <option value="en">
             <Text id="profile.english" />
           </option>
@@ -142,7 +142,7 @@ const Profile = ({ children, ...props }) => {
           <label class="form-label">
             <Text id="profile.roleLabel" />
           </label>
-          <select value={props.newUser.role} onChange={props.updateRole} class="form-control custom-select">
+          <select value={props.newUser.role} onChange={props.updateRole} class="form-control">
             <option value="admin">
               <Text id="profile.adminRole" />
             </option>
@@ -221,6 +221,44 @@ const Profile = ({ children, ...props }) => {
           <Text id="profile.birthdateError" />
         </div>
       </div>
+      {!props.disablePreferences && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.preferences.temperatureUnitsLabel" />
+          </label>
+          <select
+            value={props.newUser.temperature_unit_preference}
+            onInput={props.updateTemperatureUnit}
+            class="form-control"
+          >
+            <option value="celsius">
+              <Text id="signup.preferences.temperatureUnitsCelsius" />
+            </option>
+            <option value="fahrenheit">
+              <Text id="signup.preferences.temperatureUnitsFahrenheit" />
+            </option>
+          </select>
+        </div>
+      )}
+      {!props.disablePreferences && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.preferences.distanceUnit" />
+          </label>
+          <select
+            value={props.newUser.distance_unit_preference}
+            onInput={props.updateDistanceUnit}
+            class="form-control"
+          >
+            <option value="metric">
+              <Text id="signup.preferences.distanceUnitMeter" />
+            </option>
+            <option value="us">
+              <Text id="signup.preferences.distanceUnitUs" />
+            </option>
+          </select>
+        </div>
+      )}
       {!props.disableProfilePicture && (
         <div class="form-group">
           <label class="form-label">

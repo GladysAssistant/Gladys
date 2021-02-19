@@ -1008,7 +1008,8 @@
       "resetPassword": "Réinitialiser le mot de passe",
       "editPreferences": "Editer les préférences",
       "resetPasswordButton": "Réinitialiser",
-      "saveButton": "Enregistrer"
+      "saveButton": "Enregistrer",
+      "success": "Profil enregistré avec succès !"
     }
   },
   "sessionsSettings": {

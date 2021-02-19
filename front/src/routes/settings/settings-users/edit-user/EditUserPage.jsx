@@ -1,7 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import ResetPassword from './ResetPassword';
-import EditPreferences from './EditPreferences';
 import Profile from '../../../../components/user/profile';
 
 const UserPage = ({ children, ...props }) => (
@@ -22,6 +21,11 @@ const UserPage = ({ children, ...props }) => (
           <div class={props.loading ? 'dimmer active' : 'dimmer'}>
             <div class="loader" />
             <div class="dimmer-content">
+              {props.profileSavedSuccess && (
+                <div class="alert alert-success">
+                  <Text id="usersSettings.editUser.success" />
+                </div>
+              )}
               {props.newUser && <Profile {...props} language="en" disablePassword />}
               <div class="form-group">
                 <button onClick={props.updateUser} class="btn btn-success">
@@ -42,15 +46,6 @@ const UserPage = ({ children, ...props }) => (
           </h3>
         </div>
         <div class="card-body">{props.newUser && <ResetPassword userSelector={props.newUser.selector} />}</div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            {' '}
-            <Text id="usersSettings.editUser.editPreferences" />
-          </h3>
-        </div>
-        <div class="card-body">{props.newUser && <EditPreferences newUser={props.newUser} />}</div>
       </div>
     </div>
   </div>

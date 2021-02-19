@@ -1008,7 +1008,8 @@
       "resetPassword": "Reset password",
       "editPreferences": "Edit preferences",
       "resetPasswordButton": "Reset password",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "success": "User saved with success !"
     }
   },
   "sessionsSettings": {

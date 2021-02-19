@@ -122,7 +122,8 @@ function createActions(store) {
         cropper: null,
         profileUpdateErrors: null,
         newProfilePicture: null,
-        newProfilePictureFormValue: null
+        newProfilePictureFormValue: null,
+        ProfilePatchStatus: null
       });
     },
     validatePassword(state) {
