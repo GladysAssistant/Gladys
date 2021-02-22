@@ -8,9 +8,9 @@
   "poll_frequency": 30000,
   "features": [
     {
-      "name": "Switch 1",
-      "external_id": "ewelink:10004531ae:power:1",
-      "selector": "ewelink:10004531ae:power:1",
+      "name": "Test 1 Ch1 On/Off",
+      "external_id": "ewelink:10004531ae:binary:1",
+      "selector": "ewelink:10004531ae:binary:1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
@@ -19,9 +19,9 @@
       "max": 1
     },
     {
-      "name": "Switch 2",
-      "external_id": "ewelink:10004531ae:power:2",
-      "selector": "ewelink:10004531ae:power:2",
+      "name": "Test 1 Ch2 On/Off",
+      "external_id": "ewelink:10004531ae:binary:2",
+      "selector": "ewelink:10004531ae:binary:2",
       "category": "switch",
       "type": "binary",
       "read_only": false,

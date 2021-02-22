@@ -145,9 +145,6 @@ class EwelinkApi {
 
   getFirmwareVersion(deviceId) {
     if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
-      // if (deviceId === '10004534ae') {
-      //   return Promise.resolve({ status: 'ok', fwVersion: '3.3.0' });
-      // }
       const device = fakeDevices.find((fakeDevice) => fakeDevice.deviceid === deviceId);
       if (device && device.params && device.params.fwVersion) {
         return Promise.resolve({ status: 'ok', fwVersion: device.params.fwVersion });

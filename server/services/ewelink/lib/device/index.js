@@ -41,7 +41,7 @@ async function throwErrorIfNeeded(response, emit = false, config = false) {
       this.accessToken = '';
       this.apiKey = '';
       if (emit) {
-        await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
           payload: response.msg,
         });
@@ -57,7 +57,7 @@ async function throwErrorIfNeeded(response, emit = false, config = false) {
       throw new Error403(`eWeLink: ${response.msg}`);
     }
     if (emit) {
-      await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR,
         payload: response.msg,
       });

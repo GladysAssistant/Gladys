@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const features = require('../features');
 const { EWELINK_REGION_KEY } = require('../utils/constants');
+const { getExternalId } = require('../utils/externalId');
 
 /**
  * @description Retrieve eWelink devices from cloud.
@@ -30,10 +31,7 @@ async function discover() {
       discoveredDevices,
       async (discoveredDevice) => {
         // ...if it is already in Gladys...
-        const deviceInGladys = await this.gladys.stateManager.get(
-          'deviceByExternalId',
-          features.getExternalId(discoveredDevice),
-        );
+        const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', getExternalId(discoveredDevice));
         if (deviceInGladys) {
           logger.debug(`eWeLink: Device "${discoveredDevice.deviceid}" is already in Gladys !`);
         } else {

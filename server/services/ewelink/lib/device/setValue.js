@@ -1,14 +1,14 @@
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
-const { parseExternalId } = require('../features');
-const power = require('../features/power');
+const { writeBinaryValue } = require('../features/binary');
 const { EWELINK_REGION_KEY } = require('../utils/constants');
+const { parseExternalId } = require('../utils/externalId');
 
 /**
  * @description Change value of an eWeLink device.
  * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The binary deviceFeature to control.
+ * @param {Object} deviceFeature - The deviceFeature to control.
  * @param {string|number} value - The new value.
  * @example
  * setValue(device, deviceFeature);
@@ -32,7 +32,7 @@ async function setValue(device, deviceFeature, value) {
   let response;
   switch (deviceFeature.type) {
     case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
-      response = await connection.setDevicePowerState(deviceId, power.writeValue(value), channel);
+      response = await connection.setDevicePowerState(deviceId, writeBinaryValue(value), channel);
       await this.throwErrorIfNeeded(response);
       break;
     default:

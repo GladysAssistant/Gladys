@@ -8,9 +8,9 @@
   "poll_frequency": 30000,
   "features": [
     {
-      "name": "Switch",
-      "external_id": "ewelink:10004533ae:power:1",
-      "selector": "ewelink:10004533ae:power:1",
+      "name": "Test 3 On/Off",
+      "external_id": "ewelink:10004533ae:binary:1",
+      "selector": "ewelink:10004533ae:binary:1",
       "category": "switch",
       "type": "binary",
       "read_only": false,

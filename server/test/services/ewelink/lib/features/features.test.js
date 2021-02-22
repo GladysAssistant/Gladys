@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const features = require('../../../../../services/ewelink/lib/features');
+const { parseExternalId } = require('../../../../../services/ewelink/lib/utils/externalId');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
 const GladysThDevice = require('../../mocks/Gladys-th.json');
@@ -13,7 +14,7 @@ const eweLinkUnhandledDevice = require('../../mocks/eweLink-unhandled.json');
 
 describe('eWeLink features parseExternalId', () => {
   it('should return prefix, deviceId, channel and type', () => {
-    const { prefix, deviceId, type, channel } = features.parseExternalId('ewelink:10004531ae:power:1');
+    const { prefix, deviceId, type, channel } = parseExternalId('ewelink:10004531ae:power:1');
     expect(prefix).to.equal('ewelink');
     expect(deviceId).to.equal('10004531ae');
     expect(type).to.equal('power');
@@ -37,15 +38,15 @@ describe('eWeLink features getDevice', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkOfflineDevice, 0);
     expect(device).to.deep.equal(GladysOfflineDevice);
   });
-  it('should return device with power feature for a "POW" model', () => {
+  it('should return device with binary feature for a "POW" model', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkPowDevice, 1);
     expect(device).to.deep.equal(GladysPowDevice);
   });
-  it('should return a device with 2 power features for a "2CH" model', () => {
+  it('should return a device with 2 binary features for a "2CH" model', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLink2ChDevice, 2);
     expect(device).to.deep.equal(Gladys2ChDevice);
   });
-  it('should return device with power, humidity and temperature features for a "TH" model', () => {
+  it('should return device with binary, humidity and temperature features for a "TH" model', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkThDevice, 1);
     expect(device).to.deep.equal(GladysThDevice);
   });

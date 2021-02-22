@@ -39,11 +39,11 @@ describe('EweLinkHandler poll', () => {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
     });
     assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004531ae:power:1',
+      device_feature_external_id: 'ewelink:10004531ae:binary:1',
       state: 1,
     });
     assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004531ae:power:2',
+      device_feature_external_id: 'ewelink:10004531ae:binary:2',
       state: 0,
     });
   });
@@ -54,13 +54,9 @@ describe('EweLinkHandler poll', () => {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
     });
     assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004533ae:power:1',
+      device_feature_external_id: 'ewelink:10004533ae:binary:1',
       state: 1,
     });
-    // assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
-    //   device_feature_external_id: 'ewelink:10004533ae:energyPower',
-    //   state: 22.3,
-    // });
   });
   it('should poll device and emit 3 states for a "TH" model', async () => {
     await eweLinkService.device.poll(GladysThDevice);
@@ -69,7 +65,7 @@ describe('EweLinkHandler poll', () => {
       type: WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
     });
     assert.calledWith(gladys.event.emit.getCall(1), EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'ewelink:10004534ae:power:1',
+      device_feature_external_id: 'ewelink:10004534ae:binary:1',
       state: 1,
     });
     assert.calledWith(gladys.event.emit.getCall(2), EVENTS.DEVICE.NEW_STATE, {
