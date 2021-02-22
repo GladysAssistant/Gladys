@@ -11,6 +11,10 @@ async function init() {
   });
 
   const configuration = await this.getConfiguration();
+
+  // Check for container configuration
+  await this.updateContainer(configuration);
+
   await this.connect(configuration);
 }
 

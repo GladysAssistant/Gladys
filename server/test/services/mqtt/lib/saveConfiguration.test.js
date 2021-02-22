@@ -136,11 +136,18 @@ describe('mqttHandler.saveConfiguration', function Describe() {
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
-    assert.callCount(gladys.variable.setValue, 2);
+    assert.callCount(gladys.variable.setValue, 3);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_URL_KEY, config.mqttUrl, serviceId);
     assert.calledWith(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
       config.useEmbeddedBroker,
+      serviceId,
+    );
+    assert.calledWith(
+      gladys.variable.setValue,
+      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+      DEFAULT.MOSQUITTO_VERSION,
       serviceId,
     );
 
@@ -176,11 +183,18 @@ describe('mqttHandler.saveConfiguration', function Describe() {
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
-    assert.callCount(gladys.variable.setValue, 2);
+    assert.callCount(gladys.variable.setValue, 3);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_URL_KEY, config.mqttUrl, serviceId);
     assert.calledWith(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
       config.useEmbeddedBroker,
+      serviceId,
+    );
+    assert.calledWith(
+      gladys.variable.setValue,
+      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+      DEFAULT.MOSQUITTO_VERSION,
       serviceId,
     );
 
@@ -217,11 +231,18 @@ describe('mqttHandler.saveConfiguration', function Describe() {
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
-    assert.callCount(gladys.variable.setValue, 2);
+    assert.callCount(gladys.variable.setValue, 3);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_URL_KEY, config.mqttUrl, serviceId);
     assert.calledWith(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
       config.useEmbeddedBroker,
+      serviceId,
+    );
+    assert.calledWith(
+      gladys.variable.setValue,
+      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+      DEFAULT.MOSQUITTO_VERSION,
       serviceId,
     );
 
@@ -259,11 +280,19 @@ describe('mqttHandler.saveConfiguration', function Describe() {
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 1);
-    assert.callCount(gladys.variable.setValue, 3);
+    assert.callCount(gladys.variable.setValue, 4);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_URL_KEY, config.mqttUrl, serviceId);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_USERNAME_KEY, config.mqttUsername, serviceId);
     assert.calledWith(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
       config.useEmbeddedBroker,
+      serviceId,
+    );
+    assert.calledWith(
+      gladys.variable.setValue,
+      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+      DEFAULT.MOSQUITTO_VERSION,
       serviceId,
     );
 

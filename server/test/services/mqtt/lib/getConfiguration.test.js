@@ -32,6 +32,7 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: false,
       brokerContainerAvailable: false,
       networkModeValid: false,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
@@ -47,6 +48,8 @@ describe('mqttHandler.getConfiguration', () => {
         getValue: sinon
           .stub()
           .onCall(3)
+          .resolves(null)
+          .onCall(4)
           .resolves(null)
           .resolves('value'),
       },
@@ -68,10 +71,11 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: true,
       brokerContainerAvailable: false,
       networkModeValid: false,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -84,6 +88,8 @@ describe('mqttHandler.getConfiguration', () => {
           .stub()
           .onCall(3)
           .resolves(null)
+          .onCall(4)
+          .resolves('2')
           .resolves('value'),
       },
       system: {
@@ -108,10 +114,11 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: true,
       brokerContainerAvailable: true,
       networkModeValid: false,
+      mosquittoVersion: '2',
     };
     expect(config).to.deep.eq(expectedConfig);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -124,6 +131,8 @@ describe('mqttHandler.getConfiguration', () => {
           .stub()
           .onCall(3)
           .resolves('0')
+          .onCall(4)
+          .resolves(null)
           .resolves('value'),
       },
       system: {
@@ -148,10 +157,11 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: true,
       brokerContainerAvailable: true,
       networkModeValid: true,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -180,10 +190,11 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: true,
       brokerContainerAvailable: false,
       networkModeValid: false,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -212,6 +223,7 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: false,
       brokerContainerAvailable: false,
       networkModeValid: false,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
@@ -244,10 +256,11 @@ describe('mqttHandler.getConfiguration', () => {
       dockerBased: true,
       brokerContainerAvailable: false,
       networkModeValid: true,
+      mosquittoVersion: null,
     };
     expect(config).to.deep.eq(expectedConfig);
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
