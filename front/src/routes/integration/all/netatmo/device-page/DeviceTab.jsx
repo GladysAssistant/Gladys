@@ -45,6 +45,9 @@ const DeviceTab = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.getNetatmoDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
+            {props.netatmoDevices && props.netatmoDevices.length === 0 && <div class="alert alert-info">
+              <Text id="integration.netatmo.device.noDevices" />
+            </div>}
             {props.netatmoDevices &&
               props.netatmoDevices.map((netatmoDevice, index) => (
                 <Device
@@ -56,11 +59,6 @@ const DeviceTab = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.netatmoDevices && props.netatmoDevices.length === 0 && (
-              <p class="text-center">
-                <Text id="integration.netatmo.device.noDevices" />
-              </p>
-            )}
           </div>
         </div>
       </div>
