@@ -42,19 +42,30 @@ function createActions(store) {
         currentMessageTextInput: e.target.value
       });
     },
-    pushMessage(state, message) {
+    syncMessage(state, message) {
       let newMessages = store.getState().messages;
       // Check if message is already in the list
-      if (message.id && newMessages.filter(m => m.id === message.id).length) {
+      if (message.id && newMessages.find(m => m.id === message.id)) {
         return;
       }
+      newMessages = update(store.getState().messages, {
+        $push: [message]
+      });
+      newMessages = sortMessages(newMessages);
+      store.setState({
+        gladysIsTyping: false,
+        messages: newMessages
+      });
+      actions.scrollToBottom();
+    },
+    pushMessage(state, message) {
       store.setState({
         gladysIsTyping: true
       });
       actions.scrollToBottom();
       const randomWait = Math.floor(Math.random() * TYPING_MAX_TIME) + TYPING_MIN_TIME;
       setTimeout(() => {
-        newMessages = update(store.getState().messages, {
+        let newMessages = update(store.getState().messages, {
           $push: [message]
         });
         newMessages = sortMessages(newMessages);
@@ -88,7 +99,7 @@ function createActions(store) {
         // we first push the message
         const newState = update(state, {
           messages: {
-            $push: [Object.assign({}, newMessage, { id })]
+            $push: [newMessage]
           },
           MessageSendStatus: {
             $set: RequestStatus.Getting
@@ -99,15 +110,12 @@ function createActions(store) {
         });
         newState.messages = sortMessages(newState.messages);
         store.setState(newState);
-        actions.scrollToBottom();
         // then we send the message
-        const createdMessage = await state.httpClient.post('/api/v1/message', newMessage);
-        const messagesWithoutTempMessage = store.getState().messages.filter(message => message.id !== id);
-        messagesWithoutTempMessage.push(createdMessage);
+        await state.httpClient.post('/api/v1/message', newMessage);
         // then we remove the message loading
         const finalState = update(state, {
           messages: {
-            $set: sortMessages(messagesWithoutTempMessage)
+            $set: sortMessages(newState.messages)
           },
           MessageSendStatus: {
             $set: RequestStatus.Success
