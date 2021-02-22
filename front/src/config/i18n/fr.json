@@ -857,7 +857,7 @@
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
       },
       "checkUserPresence": {
-        "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnées ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionnée ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
+        "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnés ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionné ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
         "userLabel": "Utilisateur",
         "houseLabel": "Maison",
         "deviceLabel": "Appareils",
