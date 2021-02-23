@@ -12,26 +12,21 @@ class ConfigurePeripheral extends Component {
     this.props.resetSaveStatus();
   }
 
-  render({ peripheral, bluetoothSaveStatus, bluetoothStatus, reloadDevice }) {
+  render({ device, bluetoothSaveStatus }) {
     return (
       <div>
-        <h4>{peripheral.name || peripheral.address}</h4>
+        <h4>{device.name}</h4>
 
         {bluetoothSaveStatus === RequestStatus.Error && (
           <div class="alert alert-danger">
-            <Text id="integration.bluetooth.setup.saveError" />
+            <Text id="integration.bluetooth.discover.saveError" />
           </div>
         )}
 
         {bluetoothSaveStatus === RequestStatus.Success && <ConfigurePeripheralSuccess />}
 
         {bluetoothSaveStatus !== RequestStatus.Success && (
-          <ConfigurePeripheralForm
-            peripheral={peripheral}
-            bluetoothSaveStatus={bluetoothSaveStatus}
-            bluetoothStatus={bluetoothStatus}
-            reloadDevice={reloadDevice}
-          />
+          <ConfigurePeripheralForm device={device} bluetoothSaveStatus={bluetoothSaveStatus} />
         )}
       </div>
     );

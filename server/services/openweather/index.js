@@ -31,7 +31,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
    * gladys.services.openWeather.stop();
    */
   async function stop() {
-    logger.log('stopping Open Weather service');
+    logger.info('Stopping Open Weather service');
   }
 
   /**

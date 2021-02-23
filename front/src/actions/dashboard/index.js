@@ -3,13 +3,6 @@ import update from 'immutability-helper';
 import get from 'get-value';
 import { DASHBOARD_TYPE } from '../../../../server/utils/constants';
 
-const EMPTY_DASHBOARD = {
-  name: 'Home',
-  selector: 'home',
-  type: DASHBOARD_TYPE.MAIN,
-  boxes: [[], [], []]
-};
-
 function createActions(store) {
   const actions = {
     editDashboard(state) {
@@ -120,23 +113,31 @@ function createActions(store) {
         DashboardGetBoxesStatus: RequestStatus.Getting
       });
       try {
-        const homeDashboard = await state.httpClient.get('/api/v1/dashboard/home');
-        store.setState({
-          gatewayInstanceNotFound: false,
-          homeDashboard,
-          DashboardGetBoxesStatus: RequestStatus.Success
-        });
+        const dashboards = await state.httpClient.get('/api/v1/dashboard');
+        if (dashboards.length) {
+          const homeDashboard = await state.httpClient.get(`/api/v1/dashboard/${dashboards[0].selector}`);
+          store.setState({
+            gatewayInstanceNotFound: false,
+            homeDashboard,
+            DashboardGetBoxesStatus: RequestStatus.Success
+          });
+        } else {
+          store.setState({
+            dashboardNotConfigured: true,
+            homeDashboard: {
+              name: `${state.user.firstname} home`,
+              selector: `${state.user.selector}-home`,
+              type: DASHBOARD_TYPE.MAIN,
+              boxes: [[], [], []]
+            }
+          });
+        }
       } catch (e) {
         const status = get(e, 'response.status');
         const errorMessage = get(e, 'response.error_message');
         if (status === 404 && errorMessage === 'NO_INSTANCE_FOUND') {
           store.setState({
             gatewayInstanceNotFound: true
-          });
-        } else if (status === 404) {
-          store.setState({
-            dashboardNotConfigured: true,
-            homeDashboard: EMPTY_DASHBOARD
           });
         } else {
           store.setState({
@@ -168,9 +169,17 @@ function createActions(store) {
       try {
         let homeDashboard;
         if (state.homeDashboard.id) {
-          homeDashboard = await state.httpClient.patch('/api/v1/dashboard/home', state.homeDashboard);
+          homeDashboard = await state.httpClient.patch(
+            `/api/v1/dashboard/${state.homeDashboard.selector}`,
+            state.homeDashboard
+          );
         } else {
-          homeDashboard = await state.httpClient.post('/api/v1/dashboard', state.homeDashboard);
+          const homeDashboardToCreate = {
+            ...state.homeDashboard,
+            name: `${state.user.firstname} home`,
+            selector: `${state.user.selector}-home`
+          };
+          homeDashboard = await state.httpClient.post('/api/v1/dashboard', homeDashboardToCreate);
         }
         store.setState({
           homeDashboard,

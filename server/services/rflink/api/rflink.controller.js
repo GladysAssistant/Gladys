@@ -3,7 +3,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
-module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
+module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   /**
    * @api {get} /api/v1/service/rflink/newDevices get rflink devices
    * @apiName getDevices
@@ -20,10 +20,12 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
    * @apiGroup RFlink
    */
   async function connect(req, res) {
-    const rflinkPath = await gladys.variable.getValue('RFLINK_PATH');
+    const rflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
     if (!rflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     }
+    console.log(rflinkPath);
+    console.log(RFlinkManager);
     RFlinkManager.connect(rflinkPath);
     res.json({ succes: true });
   }
@@ -65,7 +67,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     if (milightZone === undefined || milightZone === null) {
       milightZone = 1;
     }
-    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
     if (currentMilightGateway === null) {
       currentMilightGateway = RFlinkManager.currentMilightGateway;
     }
@@ -90,7 +92,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceID) {
     if (milightZone === undefined || milightZone === null) {
       milightZone = 1;
     }
-    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceID);
+    let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
     if (currentMilightGateway === null) {
       currentMilightGateway = RFlinkManager.currentMilightGateway;
     }

@@ -3,21 +3,25 @@ const RfLinkManager = require('./lib');
 const RflinkController = require('./api/rflink.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
+const RFLINK_PATH = 'RFLINK_PATH';
+
 module.exports = function RfLink(gladys, serviceId) {
   const rfLinkManager = new RfLinkManager(gladys, serviceId);
+  let RflinkPath;
 
   /**
+   * @public
    * @description start rflink module
    * @example
    * gladys.services.rflink.start();
    */
   async function start() {
-    const RflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
+    RflinkPath = await gladys.variable.getValue(RFLINK_PATH, serviceId);
 
     if (!RflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     } else {
-      logger.log('Starting Rflink service');
+      logger.info('Starting Rflink service');
     }
 
     if (rfLinkManager === undefined) {
@@ -37,13 +41,14 @@ module.exports = function RfLink(gladys, serviceId) {
   }
 
   /**
+   * @public
    * @description stop rfllink module
    * @example
    * gladys.services.rflink.stop();
    */
   async function stop() {
-    logger.log('Stopping Rflink service');
-    rfLinkManager.disconnect();
+    logger.info('Stopping Rflink service');
+    await rfLinkManager.disconnect();
   }
 
   return Object.freeze({
