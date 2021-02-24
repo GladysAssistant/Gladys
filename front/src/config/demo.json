@@ -134,6 +134,12 @@
           "type": "devices-in-room",
           "room": "kitchen",
           "device_features": ["main-presence-sensor"]
+        },
+        {
+          "type": "chart-one-feature",
+          "chartType": "area-selector",
+          "chartPeriod": "last1month-selector",
+          "device_features": ["test-temperature-sensor"]
         }
       ]
     ],
@@ -2031,6 +2037,78 @@
           "max": 1
         }
       ]
+    }
+  ],
+  "get /api/v1/device_feature_sate/test-temperature-sensor?downsample=true&maxValue=100&chartPeriod=last1month-selector": [
+    {
+      "name": "Test device",
+      "selector": "test-device",
+      "features": [
+        {
+          "id": "f07c5b27-9301-4482-a059-9f91329d30e7",
+          "name": "Test temperature sensor fahrenheit",
+          "selector": "test-temperature-sensor",
+          "unit": "fahrenheit",
+          "last_value": 100,
+          "last_value_changed": "2021-02-21 23:00:00",
+          "device_feature_states": [
+            { "x": "2021-02-21 23:00:00", "y": "45" },
+            { "x": "2021-02-22 23:00:00", "y": "58" },
+            { "x": "2021-02-23 23:00:00", "y": "10" },
+            { "x": "2021-02-24 23:00:00", "y": "11" },
+            { "x": "2021-02-25 23:00:00", "y": "12" },
+            { "x": "2021-02-26 23:00:00", "y": "13" },
+            { "x": "2021-02-27 23:00:00", "y": "13" },
+            { "x": "2021-02-28 23:00:00", "y": "13" },
+            { "x": "2021-03-01 23:00:00", "y": "54" },
+            { "x": "2021-03-02 23:00:00", "y": "13" },
+            { "x": "2021-03-03 23:00:00", "y": "13" },
+            { "x": "2021-03-04 23:00:00", "y": "13" },
+            { "x": "2021-03-05 23:00:00", "y": "13" },
+            { "x": "2021-03-06 23:00:00", "y": "13" },
+            { "x": "2021-03-07 23:00:00", "y": "13" },
+            { "x": "2021-03-08 23:00:00", "y": "13" },
+            { "x": "2021-03-09 23:00:00", "y": "56" },
+            { "x": "2021-03-10 23:00:00", "y": "13" },
+            { "x": "2021-03-11 23:00:00", "y": "13" },
+            { "x": "2021-03-12 23:00:00", "y": "13" },
+            { "x": "2021-03-13 23:00:00", "y": "13" },
+            { "x": "2021-03-14 23:00:00", "y": "54" },
+            { "x": "2021-03-15 23:00:00", "y": "13" },
+            { "x": "2021-03-16 23:00:00", "y": "13" },
+            { "x": "2021-03-17 23:00:00", "y": "13" },
+            { "x": "2021-03-18 23:00:00", "y": "85" },
+            { "x": "2021-03-19 23:00:00", "y": "13" },
+            { "x": "2021-03-20 23:00:00", "y": "13" },
+            { "x": "2021-03-21 23:00:00", "y": "13" },
+            { "x": "2021-03-22 23:00:00", "y": "13" },
+            { "x": "2021-03-23 23:00:00", "y": "13" },
+            { "x": "2021-03-24 23:00:00", "y": "22" },
+            { "x": "2021-03-25 23:00:00", "y": "41" }
+          ],
+          "trend": 2
+        }
+      ],
+      "room": { "name": "Test room", "selector": "test-room" }
+    }
+  ],
+  "get /api/v1/device/device_feature/test-temperature-sensor": [
+    {
+      "name": "Test device",
+      "selector": "test-device",
+      "features": [
+        {
+          "id": "f07c5b27-9301-4482-a059-9f91329d30e7",
+          "name": "Test temperature sensor fahrenheit",
+          "selector": "test-temperature-sensor",
+          "unit": "fahrenheit",
+          "last_value": 100,
+          "last_value_changed": "2021-02-21 23:00:00",
+          "device_feature_states": [],
+          "trend": 2
+        }
+      ],
+      "room": { "name": "Test room", "selector": "test-room" }
     }
   ]
 }
