@@ -41,6 +41,11 @@ async function setValue(key, value, serviceId = null, userId = null) {
     this.event.emit(EVENTS.SYSTEM.TIMEZONE_CHANGED);
   }
 
+  // if the variable updated is the gateway user keys, send event
+  if (key === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS) {
+    this.event.emit(EVENTS.GATEWAY.USER_KEYS_CHANGED);
+  }
+
   return createdOrUpdatedVariable;
 }
 

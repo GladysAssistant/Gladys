@@ -15,7 +15,7 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
         <p>
           <Text id="signup.createLocalAccount.description" />
         </p>
-        <Profile {...props} />
+        <Profile {...props} disablePreferences disableRole />
         <div class="form-group">
           <button onClick={props.createUser} class="btn btn-success">
             <Text id="signup.createLocalAccount.createAccountButton" />

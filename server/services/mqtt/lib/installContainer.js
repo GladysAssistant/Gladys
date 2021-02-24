@@ -9,13 +9,15 @@ const containerDescriptor = require('../docker/eclipse-mosquitto-container.json'
 
 /**
  * @description Get MQTT configuration.
+ * @param {boolean} saveConfiguration - Save new configuration.
  * @returns {Promise} Current MQTT network configuration.
  * @example
  * installContainer();
  */
-async function installContainer() {
+async function installContainer(saveConfiguration = true) {
   logger.info('MQTT broker is being installed as Docker container...');
 
+  let container;
   try {
     logger.info(`Check Gladys network...`);
     const networkModeValid = await this.checkDockerNetwork();
@@ -32,7 +34,7 @@ async function installContainer() {
     logger.trace(brokerEnv);
 
     logger.info(`Creating container...`);
-    const container = await this.gladys.system.createContainer(containerDescriptor);
+    container = await this.gladys.system.createContainer(containerDescriptor);
     logger.trace(container);
 
     logger.info('MQTT broker successfully installed as Docker container');
@@ -54,12 +56,16 @@ async function installContainer() {
     throw e;
   }
 
-  await this.saveConfiguration({
-    mqttUrl: 'mqtt://localhost',
-    mqttUsername: 'gladys',
-    mqttPassword: generate(20, { number: true, lowercase: true, uppercase: true }),
-    useEmbeddedBroker: true,
-  });
+  if (saveConfiguration) {
+    await this.saveConfiguration({
+      mqttUrl: 'mqtt://localhost',
+      mqttUsername: 'gladys',
+      mqttPassword: generate(20, { number: true, lowercase: true, uppercase: true }),
+      useEmbeddedBroker: true,
+    });
+  }
+
+  return container;
 }
 
 module.exports = {

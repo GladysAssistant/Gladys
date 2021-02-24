@@ -66,6 +66,7 @@ const StateManager = function StateManager(event) {
   this.state = {
     house: {},
     user: {},
+    userById: {},
     device: {},
     deviceByExternalId: {},
     deviceById: {},

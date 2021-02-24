@@ -22,35 +22,25 @@ async function saveState(deviceFeature, newValue) {
     last_value: newValue,
     last_value_changed: now,
   });
-  await db.sequelize.transaction(async (t) => {
-    // update deviceFeature lastValue in DB
-    await db.DeviceFeature.update(
-      {
-        last_value: newValue,
-        last_value_changed: now,
+  // update deviceFeature lastValue in DB
+  await db.DeviceFeature.update(
+    {
+      last_value: newValue,
+      last_value_changed: now,
+    },
+    {
+      where: {
+        id: deviceFeature.id,
       },
-      {
-        where: {
-          id: deviceFeature.id,
-        },
-      },
-      {
-        transaction: t,
-      },
-    );
-    // if the deviceFeature should keep history, we save a new deviceFeatureState
-    if (deviceFeature.keep_history) {
-      await db.DeviceFeatureState.create(
-        {
-          device_feature_id: deviceFeature.id,
-          value: newValue,
-        },
-        {
-          transaction: t,
-        },
-      );
-    }
-  });
+    },
+  );
+  // if the deviceFeature should keep history, we save a new deviceFeatureState
+  if (deviceFeature.keep_history) {
+    await db.DeviceFeatureState.create({
+      device_feature_id: deviceFeature.id,
+      value: newValue,
+    });
+  }
 
   // send websocket event
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
