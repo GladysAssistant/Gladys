@@ -27,19 +27,17 @@ function connect(Path) {
       autoOpen: false,
     });
 
-    port.open(function (err) {
+    port.open(function(err) {
       if (err) {
-        logger.log('error');
         this.connected = false;
         this.ready = false;
         this.scanInProgress = false;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
         });
-        return logger.log(`Error opening port: : ${err.message}`);
+        return logger.error(`Error opening port: : ${err.message}`);
       }
-      logger.log('info');
-      return logger.log(`Success on opening port`);
+      return logger.info(`Success on opening port`);
     });
 
     const readline = new Readline({

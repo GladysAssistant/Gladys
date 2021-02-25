@@ -2,6 +2,8 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 
 const DEVICES = [
   {
+    id: '86aa7',
+    switch: 'switch',
     service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
     name: `Prise `,
     selector: `rflink:86aa7:11`,
@@ -25,6 +27,8 @@ const DEVICES = [
     ],
   },
   {
+    id: '86aa70',
+    switch: 'switch',
     service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
     name: `Prise `,
     selector: `rflink:86aa70:10`,

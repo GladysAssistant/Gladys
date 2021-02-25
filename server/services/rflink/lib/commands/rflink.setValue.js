@@ -4,10 +4,10 @@ const logger = require('../../../../utils/logger');
 /**
  * @description send a message to change a device's value
  * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The name of feature to control.
- * @param {any} state - The new state.
+ * @param {string} deviceFeature - The name of feature to control.
+ * @param {string} state - The new state.
  * @example
- * rflink.SetValue();
+ * rflink.setValue();
  */
 function setValue(device, deviceFeature, state) {
   let msg;
@@ -76,7 +76,6 @@ function setValue(device, deviceFeature, state) {
   }
   logger.debug(`Message send to USB : "${msg}"`);
   this.sendUsb.write(msg, (error) => {});
-
 }
 
 module.exports = {

@@ -2,10 +2,10 @@ const { expect } = require('chai');
 const { fake, stub } = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
-const RflinkMock = require('./rflinkMock.test');
+const SerialPortMock = require('./SerialPortMock.test');
 
 const RflinkService = proxyquire('../../../services/rflink/index', {
-  SerialPort: RflinkMock,
+  serialport: SerialPortMock,
 });
 
 describe('RFlinkService', () => {

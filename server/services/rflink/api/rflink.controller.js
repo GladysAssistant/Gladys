@@ -12,7 +12,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   async function getNewDevices(req, res) {
     const NewDevices = RFlinkManager.getNewDevices();
     res.json(NewDevices);
-    }
+  }
 
   /**
    * @api {post} /api/v1/service/rflink/connect connect to the gateway
@@ -24,8 +24,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     if (!rflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     }
-    console.log(rflinkPath);
-    console.log(RFlinkManager);
     RFlinkManager.connect(rflinkPath);
     res.json({ succes: true });
   }
@@ -72,7 +70,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
       currentMilightGateway = RFlinkManager.currentMilightGateway;
     }
     RFlinkManager.currentMilightGateway = currentMilightGateway;
-
     RFlinkManager.pair(currentMilightGateway, milightZone);
 
     res.json({

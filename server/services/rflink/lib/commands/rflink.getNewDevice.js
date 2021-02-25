@@ -6,6 +6,7 @@
  */
 function getNewDevices() {
   const devices = this.newDevices;
+  console.log(devices);
   return devices;
 }
 

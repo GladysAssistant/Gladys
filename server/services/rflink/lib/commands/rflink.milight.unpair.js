@@ -21,7 +21,7 @@ function unpair(currentMilightGateway, milightZone) {
       logger.log(error);
     });
   } // else {
-  // show a message in setup tab to tell user that gatewa y is undefined
+  // show a message in setup tab to tell user that gateway is undefined
   // }
 }
 

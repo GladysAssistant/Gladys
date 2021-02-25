@@ -5,6 +5,7 @@ const { EVENTS } = require('../../../../utils/constants');
  * @description When a new value is received.
  * @param {Object} device - Device to update.
  * @param {string} deviceFeature - Feature to update.
+ * @param {string} state - State.
  * @example
  *  newValue(Object, 'temperature', 30)
  */
