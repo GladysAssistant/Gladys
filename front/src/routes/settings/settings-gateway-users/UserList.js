@@ -20,7 +20,6 @@ const UserList = ({ children, ...props }) => (
         <table class="table card-table table-striped table-vcenter">
           <thead>
             <tr>
-              <th />
               <th>
                 <Text id="gatewayUsers.columnName" />
               </th>
@@ -44,7 +43,6 @@ const UserList = ({ children, ...props }) => (
             ))}
 
             <tr>
-              <td />
               <td>
                 <Localizer>
                   <input

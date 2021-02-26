@@ -21,7 +21,7 @@ const BluetoothPeripheralTab = ({
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">
-          <Text id="integration.bluetooth.setup.title" />
+          <Text id="integration.bluetooth.discover.title" />
         </h3>
         <div class="page-options d-flex">
           <button
@@ -32,7 +32,7 @@ const BluetoothPeripheralTab = ({
             onClick={scan}
             disabled={!bluetoothStatus.ready || bluetoothStatus.peripheralLookup}
           >
-            <Text id="integration.bluetooth.setup.scanButton" /> <i class="fe fe-radio" />
+            <Text id="integration.bluetooth.discover.scanButton" /> <i class="fe fe-radio" />
           </button>
         </div>
       </div>
@@ -48,7 +48,7 @@ const BluetoothPeripheralTab = ({
           <div class="dimmer-content">
             <div class="row">
               {bluetoothStatus.ready && bluetoothPeripherals.length === 0 && (
-                <EmptyState id="integration.bluetooth.setup.noDeviceFound" />
+                <EmptyState id="integration.bluetooth.discover.noDeviceFound" />
               )}
               {bluetoothStatus.ready &&
                 bluetoothPeripherals.map((peripheral, index) => (
@@ -57,7 +57,6 @@ const BluetoothPeripheralTab = ({
                     peripheralIndex={index}
                     createDevice={createDevice}
                     scan={scan}
-                    bluetoothStatus={bluetoothStatus}
                     currentIntegration={currentIntegration}
                   />
                 ))}

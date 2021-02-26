@@ -9,12 +9,6 @@ const UserRow = ({ children, ...props }) => {
 
   return (
     <tr>
-      <td class="w-1">
-        <span
-          class="avatar"
-          style={`background-image: url(${props.user.profile_url || '/assets/images/undraw_profile_pic.svg'}')`}
-        />
-      </td>
       <td>
         {props.user.name}
         <div class="small text-muted">{props.user.email}</div>

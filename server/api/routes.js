@@ -210,10 +210,12 @@ function getRoutes(gladys) {
     // house
     'post /api/v1/house': {
       authenticated: true,
+      admin: true,
       controller: houseController.create,
     },
     'patch /api/v1/house/:house_selector': {
       authenticated: true,
+      admin: true,
       controller: houseController.update,
     },
     'get /api/v1/house': {
@@ -222,6 +224,7 @@ function getRoutes(gladys) {
     },
     'delete /api/v1/house/:house_selector': {
       authenticated: true,
+      admin: true,
       controller: houseController.destroy,
     },
     'get /api/v1/house/:house_selector/room': {
@@ -235,22 +238,27 @@ function getRoutes(gladys) {
     // gateway
     'get /api/v1/gateway/status': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.getStatus,
     },
     'post /api/v1/gateway/login': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.login,
     },
     'post /api/v1/gateway/logout': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.logout,
     },
     'post /api/v1/gateway/login-two-factor': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.loginTwoFactor,
     },
     'get /api/v1/gateway/key': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.getUsersKeys,
     },
     'patch /api/v1/gateway/key': {
@@ -259,22 +267,27 @@ function getRoutes(gladys) {
     },
     'get /api/v1/gateway/backup': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.getBackups,
     },
     'post /api/v1/gateway/backup': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.createBackup,
     },
     'post /api/v1/gateway/backup/restore': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.getRestoreStatus,
     },
     'get /api/v1/gateway/instance/key': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
     // room
@@ -288,14 +301,17 @@ function getRoutes(gladys) {
     },
     'post /api/v1/house/:house_selector/room': {
       authenticated: true,
+      admin: true,
       controller: roomController.create,
     },
     'patch /api/v1/room/:room_selector': {
       authenticated: true,
+      admin: true,
       controller: roomController.update,
     },
     'delete /api/v1/room/:room_selector': {
       authenticated: true,
+      admin: true,
       controller: roomController.destroy,
     },
     // message
@@ -310,10 +326,12 @@ function getRoutes(gladys) {
     // service
     'post /api/v1/service/:service_name/start': {
       authenticated: true,
+      admin: true,
       controller: serviceController.start,
     },
     'post /api/v1/service/:service_name/stop': {
       authenticated: true,
+      admin: true,
       controller: serviceController.stop,
     },
     'get /api/v1/service/:service_name': {
@@ -328,6 +346,20 @@ function getRoutes(gladys) {
     'get /api/v1/user': {
       authenticated: true,
       controller: userController.getUsers,
+    },
+    'get /api/v1/user/:user_selector': {
+      authenticated: true,
+      controller: userController.getUserBySelector,
+    },
+    'patch /api/v1/user/:user_selector': {
+      authenticated: true,
+      admin: true,
+      controller: userController.update,
+    },
+    'delete /api/v1/user/:user_selector': {
+      authenticated: true,
+      admin: true,
+      controller: userController.deleteUser,
     },
     'get /api/v1/me': {
       authenticated: true,
@@ -388,6 +420,7 @@ function getRoutes(gladys) {
     // scene
     'post /api/v1/scene': {
       authenticated: true,
+      admin: true,
       controller: sceneController.create,
     },
     'get /api/v1/scene': {
@@ -400,10 +433,12 @@ function getRoutes(gladys) {
     },
     'patch /api/v1/scene/:scene_selector': {
       authenticated: true,
+      admin: true,
       controller: sceneController.update,
     },
     'delete /api/v1/scene/:scene_selector': {
       authenticated: true,
+      admin: true,
       controller: sceneController.destroy,
     },
     'post /api/v1/scene/:scene_selector/start': {
@@ -425,10 +460,12 @@ function getRoutes(gladys) {
     },
     'post /api/v1/system/shutdown': {
       authenticated: true,
+      admin: true,
       controller: systemController.shutdown,
     },
     'post /api/v1/system/upgrade/download': {
       authenticated: true,
+      admin: true,
       controller: systemController.downloadUpgrade,
     },
     'get /api/v1/system/upgrade/download/status': {
@@ -438,6 +475,7 @@ function getRoutes(gladys) {
     // user
     'post /api/v1/user': {
       authenticated: true,
+      admin: true,
       controller: userController.create,
     },
     // weather
