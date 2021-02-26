@@ -4,7 +4,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description send a message to change a device's value
  * @param {Object} device - The device to control.
- * @param {string} deviceFeature - The name of feature to control.
+ * @param {Object} deviceFeature - The name of feature to control.
  * @param {string} state - The new state.
  * @example
  * rflink.setValue();

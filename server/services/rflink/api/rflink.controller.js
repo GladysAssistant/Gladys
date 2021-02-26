@@ -119,9 +119,9 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   }
 
   /**
+   * @api {post} /api/v1/service/rflink/remove remove a device from the device list
    * @apiName remove
    * @apiGroup RFlink
-   * @api {post} /api/v1/service/rflink/remove remove a device from the device list
    */
   async function remove(req, res) {
     // Deleting the device from the new device list
