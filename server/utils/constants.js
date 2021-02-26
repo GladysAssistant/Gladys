@@ -440,6 +440,7 @@ const DASHBOARD_BOX_TYPE = {
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
+  PIHOLE: 'pihole',
   DEVICES_IN_ROOM: 'devices-in-room',
 };
 

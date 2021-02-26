@@ -35,6 +35,14 @@ export const TelegramSaveApiKeyStatus = {
   Success: 'Success'
 };
 
+export const GetPiholeStatus = {
+  Getting: 'Getting',
+  GetError: 'GetError',
+  Success: 'Success',
+  ServiceNotConfigured: 'ServiceNotConfigured',
+  RequestToThirdPartyFailed: 'RequestToThirdPartyFailed'
+};
+
 export const DeviceGetByRoomStatus = {
   Getting: 'Getting',
   Success: 'Success',

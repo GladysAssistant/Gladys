@@ -69,6 +69,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import PiholePage from '../routes/integration/all/pihole';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -163,8 +164,10 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" category="health" />
         <IntegrationPage path="/dashboard/integration/weather" category="weather" />
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        <IntegrationPage path="/dashboard/integration/network" category="network" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
+        <PiholePage path="/dashboard/integration/network/pihole" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect

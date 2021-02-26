@@ -176,12 +176,19 @@
       "temperature-in-room": "Temperature in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "pihole": "Pi-hole"
     },
     "boxes": {
       "column": "Column {{index}}",
       "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
+      "pihole": {
+        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
+        "requestToThirdPartyFailed": "The request to Pi-Hole API failed. Is your Gladys instance connected to the same network? Please go to the Pi-hole configuration panel to troubleshoot this problem.",
+        "clickHere": "Click here to access the OpenWeather configuration panel.",
+        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+      },
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
         "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
@@ -239,7 +246,8 @@
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "Navigation",
+        "network": "Network"
       }
     },
     "telegram": {
@@ -739,6 +747,16 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "pihole": {
+      "title": "Pi-hole",
+      "description": "Gather Pi-hole statistic to Gladys.",
+      "introduction": "The Pi-hole integration allows you to retrieve statistics and interact with a Pi-hole system.",
+      "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
+      "note": "This link is unique to your account, do not send it to other users.",
+      "configurationError": "We were not able to configure your account. Are you sure this token is valid?",
+      "piholeIp": "Pihole IP Adress",
+      "saveButton": "Save"
     }
   },
   "editScene": {

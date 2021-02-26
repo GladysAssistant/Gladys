@@ -1,0 +1,22 @@
+{
+  "name": "pihole",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Vincent Kulak <vkulak62@gmail.com>",
+  "license": "MIT",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}

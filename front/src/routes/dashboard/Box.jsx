@@ -3,6 +3,7 @@ import RoomTemperatureBox from '../../components/boxs/room-temperature/RoomTempe
 import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
+import PiholeBox from '../../components/boxs/pihole/PiholeBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -16,6 +17,8 @@ const Box = ({ children, ...props }) => {
       return <RoomTemperatureBox {...props} />;
     case 'devices-in-room':
       return <DevicesInRoomsBox {...props} />;
+    case 'pihole':
+      return <PiholeBox {...props} />;
   }
 };
 
