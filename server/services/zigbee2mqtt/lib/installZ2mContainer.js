@@ -44,6 +44,7 @@ async function installZ2mContainer() {
       logger.info('Zigbee2mqtt successfully installed as Docker container');
       this.zigbee2mqttExist = true;
     } catch (e) {
+      this.zigbee2mqttExist = false;
       logger.error('Zigbee2mqtt failed to install as Docker container:', e);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,

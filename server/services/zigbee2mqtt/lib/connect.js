@@ -12,7 +12,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   if (this.mqttRunning) {
     // Loads MQTT service
     logger.log('Connecting Gladys to ', mqttUrl);
-    // set LAN IP instead of mqtt4z2m for development tests
+
     this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
       username: mqttUsername,
       password: mqttPassword,
@@ -36,7 +36,6 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
         payload: err,
       });
       this.gladysConnected = false;
-      //      this.disconnect();
     });
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);

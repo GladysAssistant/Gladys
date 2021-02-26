@@ -25,6 +25,8 @@ function handleMqttMessage(topic, message) {
       // Keep only "final/end" devices
       const devices = JSON.parse(message);
       const convertedDevices = devices
+        // Remove Coordinator
+        .filter((d) => d.type !== TYPE_COORDINATOR)
         // Remove existing devices
         .filter((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
@@ -33,8 +35,6 @@ function handleMqttMessage(topic, message) {
           }
           return true;
         })
-        // Remove Coordinator
-        .filter((d) => d.type !== TYPE_COORDINATOR)
         // Add features
         .map((d) => convertDevice(d, this.serviceId));
 

@@ -1,5 +1,6 @@
 const { loadFeatures } = require('./loadFeatures');
 const logger = require('../../../utils/logger');
+const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constants');
 
 /**
  * @description Converts an MQTT device to a Gladys device.
@@ -13,7 +14,7 @@ function convertDevice(device, serviceId) {
   const features = loadFeatures(device.friendly_name, device.model, device.powerSource === 'Battery');
 
   // Not managed device
-  if (features.length === 0) {
+  if (features.length === 0 || (features.length === 1 && features[0].category === DEVICE_FEATURE_CATEGORIES.BATTERY)) {
     const gladysDevice = {
       name: device.friendly_name,
       external_id: `zigbee2mqtt:${device.friendly_name}`,

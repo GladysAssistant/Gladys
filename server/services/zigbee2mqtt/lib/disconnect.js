@@ -9,8 +9,6 @@ const logger = require('../../../utils/logger');
  * disconnect();
  */
 async function disconnect() {
-  this.gladysConnected = false;
-  this.zigbee2mqttConnected = false;
   let container;
 
   await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
@@ -49,6 +47,7 @@ async function disconnect() {
   [container] = dockerContainer;
   await this.gladys.system.stopContainer(container.id);
   this.zigbee2mqttRunning = false;
+  this.zigbee2mqttConnected = false;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
   });

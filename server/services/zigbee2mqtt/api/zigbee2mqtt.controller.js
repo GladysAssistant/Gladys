@@ -51,7 +51,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     } catch (e) {
       logger.error('Error while connecting to MQTT:', e);
       response = false;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
         payload: e,
       });

@@ -560,7 +560,7 @@
         "title": "Découverte du réseau Zigbee",
         "device": "Appareils",
         "permitJoin": "Autoriser l'association",
-        "noDeviceDiscovered": "Aucun appareil trouvé. Veuillez autoriser l'association des appareils et appairez les.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
+        "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "scanButton": "Scanner",
         "noResponse": "Aucune réponse au scan, veuillez vérifier le bon fonctionnement du service sur la page de configuration.",
         "serverNoResponse": "Gladys n'est pas accessible.",

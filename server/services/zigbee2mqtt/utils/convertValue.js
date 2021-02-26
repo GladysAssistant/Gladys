@@ -1,10 +1,10 @@
 /**
- * @description Convert Zigbee2mqtt device state into Gladys compliant.
+ * @description Convert Zigbee2mqtt device value into Gladys compliant.
  * @param {string} feature - Device feature.
- * @param {number|string|boolean} state - Device state.
- * @returns {number} Gladys value.
+ * @param {number|string|boolean} state - Device value.
+ * @returns {Object} Gladys value.
  * @example
- * convertValue('state', 'ON');
+ * convertValue('binary', 'ON');
  */
 function convertValue(feature, state) {
   let result;

@@ -6,7 +6,7 @@ const ports = [
     path: '/dev/path',
     manufacturer: '/dev/tty.HC-05-DevB',
     productId: '/dev/comPID',
-    vendorId: '/dev/comVID'
+    vendorId: '/dev/comVID',
   },
 ];
 
@@ -22,11 +22,13 @@ describe('GET /api/v1/service/usb/port', () => {
     const req = {};
     await usbController['get /api/v1/service/usb/port'].controller(req, res);
     assert.calledOnce(list);
-    assert.calledOnceWithExactly(res.json, [{
-      comPath: '/dev/path',
-      comName: '/dev/tty.HC-05-DevB',
-      comPID: '/dev/comPID',
-      comVID: '/dev/comVID'
-    }]);
+    assert.calledOnceWithExactly(res.json, [
+      {
+        comPath: '/dev/path',
+        comName: '/dev/tty.HC-05-DevB',
+        comPID: '/dev/comPID',
+        comVID: '/dev/comVID',
+      },
+    ]);
   });
 });

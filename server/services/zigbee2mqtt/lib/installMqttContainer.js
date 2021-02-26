@@ -71,6 +71,9 @@ async function installMqttContainer() {
       logger.info('MQTT broker container successfully started');
       this.mqttRunning = true;
       this.mqttExist = true;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      });
     } catch (e) {
       logger.error('MQTT broker container failed to start:', e);
       this.mqttRunning = false;

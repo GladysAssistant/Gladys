@@ -15,9 +15,7 @@ async function init() {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  //  const networkMode = await this.gladys.system.getNetworkMode();
-  // For testing
-  const networkMode = 'host';
+  const networkMode = await this.gladys.system.getNetworkMode();
   if (networkMode !== 'host') {
     this.networkModeValid = false;
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
@@ -51,15 +49,10 @@ async function init() {
     });
     if (!this.usbConfigured) {
       logger.info(`Zigbee2mqtt USB dongle detached to ${zigbee2mqttDriverPath}`);
-      if (this.z2mEnabled) {
-        await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-        this.z2mEnabled = false;
-      }
+      await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+      this.z2mEnabled = false;
     }
   }
-  //  if (!this.usbConfigured) {
-  //    throw new ServiceNotConfiguredError('ZIGBEE2MQTT_DRIVER_PATH_NOT_FOUND');
-  //  }
 
   // Generate credentials for Gladys & Z2M for connection to broker
   const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
@@ -86,6 +79,7 @@ async function init() {
       this.serviceId,
     );
     await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+    this.z2mEnabled = false;
   }
 
   if (this.usbConfigured) {
