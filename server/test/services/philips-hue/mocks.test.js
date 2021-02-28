@@ -8,7 +8,7 @@ const fakes = {
   on: fake.returns(STATE_ON),
   off: fake.returns(STATE_ON),
   rgb: fake.returns(null),
-  brightness: fake.returns(null)
+  brightness: fake.returns(null),
 };
 
 class LightState {}
