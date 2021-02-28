@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { intToRgb } = require('../../../../utils/colors');
 
 const logger = require('../../../../utils/logger');
