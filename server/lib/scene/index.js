@@ -42,9 +42,9 @@ const SceneManager = function SceneManager(stateManager, event, device, message,
   // on timezone change, reload all scenes
   this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.init.bind(this)));
 
-  this.event.on(EVENTS.HOUSE.CREATE, eventFunctionWrapper(this.dailyUpdate.bind(this)));
-  this.event.on(EVENTS.HOUSE.UPDATE, eventFunctionWrapper(this.dailyUpdate.bind(this)));
-  this.event.on(EVENTS.HOUSE.DELETE, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.CREATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;

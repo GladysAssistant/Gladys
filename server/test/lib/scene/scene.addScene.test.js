@@ -13,7 +13,7 @@ describe('SceneManager.addScene', () => {
       get: fake.resolves([]),
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -33,7 +33,7 @@ describe('SceneManager.addScene', () => {
       get: fake.resolves([]),
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -53,7 +53,7 @@ describe('SceneManager.addScene', () => {
       get: fake.resolves([]),
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -75,7 +75,7 @@ describe('SceneManager.addScene', () => {
     const in30Minutes = new Date(new Date().getTime() + 30 * 60 * 1000);
     const date = in30Minutes.toISOString().slice(0, 10);
     const time = in30Minutes.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -98,7 +98,7 @@ describe('SceneManager.addScene', () => {
       }),
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -119,7 +119,7 @@ describe('SceneManager.addScene', () => {
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     try {
-      await sceneManager.addScene({
+      sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
         triggers: [
@@ -143,7 +143,7 @@ describe('SceneManager.addScene', () => {
     };
     const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     try {
-      await sceneManager.addScene({
+      sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
         triggers: [
@@ -163,7 +163,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should add a scene with a scheduled trigger, sunrise', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [
@@ -178,7 +178,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should add a scene with a scheduled trigger, sunset', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
-    const scene = await sceneManager.addScene({
+    const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       triggers: [

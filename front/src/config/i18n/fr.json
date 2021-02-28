@@ -947,7 +947,7 @@
         "house": "Maison"
       },
       "warning": {
-        "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètes/Maisons et cliquer sur la carte pour en associer une."
+        "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       }
     }
   },

@@ -295,11 +295,7 @@ describe('OpenWeatherService', () => {
   it('should return error, unable to contact third party provider', async () => {
     const OpenWeatherService = proxyquire('../../../services/openweather/index', brokenAxios);
     const openWeatherService = OpenWeatherService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    try {
-      await openWeatherService.start();
-    } catch (e) {
-      assert.equal(e.message, 'REQUEST_TO_THIRD_PARTY_FAILED');
-    }
+    await openWeatherService.start();
 
     const promise = openWeatherService.weather.get({
       latitude: 12,

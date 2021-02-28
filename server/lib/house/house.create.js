@@ -17,7 +17,7 @@ const { EVENTS } = require('../../utils/constants');
  */
 async function create(house) {
   const newHouse = await db.House.create(house);
-  this.event.emit(EVENTS.HOUSE.CREATE);
+  this.event.emit(EVENTS.HOUSE.CREATED, newHouse.get({ plain: true }));
   return newHouse;
 }
 

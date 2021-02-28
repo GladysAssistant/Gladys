@@ -25,7 +25,7 @@ describe('House', () => {
       });
       expect(newHouse).to.have.property('name', 'My test house');
       expect(newHouse).to.have.property('selector', 'my-test-house');
-      assert.calledWith(event.emit, EVENTS.HOUSE.CREATE);
+      assert.calledWith(event.emit, EVENTS.HOUSE.CREATED);
     });
     it('should not create a house (name is empty)', async () => {
       const promise = house.create({
@@ -49,7 +49,7 @@ describe('House', () => {
       });
       expect(updatedHouse).to.have.property('name', 'Updated house');
       expect(updatedHouse).to.have.property('selector', 'test-house');
-      assert.calledWith(event.emit, EVENTS.HOUSE.UPDATE);
+      assert.calledWith(event.emit, EVENTS.HOUSE.UPDATED);
     });
     it('should return not found', async () => {
       const promise = house.update('house-does-not-exist', {
@@ -63,7 +63,7 @@ describe('House', () => {
     const house = new House(event);
     it('should delete a house', async () => {
       await house.destroy('test-house');
-      assert.calledWith(event.emit, EVENTS.HOUSE.DELETE);
+      assert.calledWith(event.emit, EVENTS.HOUSE.DELETED);
     });
     it('should return house not found', async () => {
       const promise = house.destroy('house-not-found');

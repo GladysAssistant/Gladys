@@ -134,9 +134,9 @@ const EVENTS = {
     SEND_ALL: 'websocket.send-all',
   },
   HOUSE: {
-    CREATE: 'house.create',
-    UPDATE: 'house.update',
-    DELETE: 'house.delete',
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
   },
 };
 

@@ -21,7 +21,7 @@ async function destroy(selector) {
   }
 
   await house.destroy();
-  this.event.emit(EVENTS.HOUSE.DELETE);
+  this.event.emit(EVENTS.HOUSE.DELETED, house.get({ plain: true }));
 }
 
 module.exports = {

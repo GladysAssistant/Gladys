@@ -8,23 +8,6 @@ import EditScenePage from './EditScenePage';
 
 @connect('session,httpClient', {})
 class EditScene extends Component {
-  getHouses = async () => {
-    this.setState({
-      SceneGetHouses: RequestStatus.Getting
-    });
-    try {
-      const houses = await this.props.httpClient.get('/api/v1/house');
-      this.setState({
-        houses,
-        SceneGetHouses: RequestStatus.Success
-      });
-    } catch (e) {
-      this.setState({
-        SceneGetHouses: RequestStatus.Error
-      });
-    }
-  };
-
   getSceneBySelector = async () => {
     this.setState({
       SceneGetStatus: RequestStatus.Getting
@@ -287,7 +270,7 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
-    this.getHouses();
+
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );
@@ -296,7 +279,7 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving, error, variables, scene, isNameEditable, houses }) {
+  render(props, { saving, error, variables, scene, isNameEditable }) {
     return (
       scene && (
         <EditScenePage
@@ -319,7 +302,6 @@ class EditScene extends Component {
           isNameEditable={isNameEditable}
           updateSceneName={this.updateSceneName}
           setNameInputRef={this.setNameInputRef}
-          houses={houses}
         />
       )
     );

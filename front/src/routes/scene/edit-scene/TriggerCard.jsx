@@ -56,7 +56,6 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
-          houses={props.houses}
         />
       )}
       {props.trigger.type === EVENTS.TIME.SUNRISE && (
@@ -64,7 +63,6 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
-          houses={props.houses}
         />
       )}
       {props.trigger.type === EVENTS.TIME.SUNSET && (

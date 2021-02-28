@@ -3,19 +3,41 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import { RequestStatus } from '../../../../utils/consts';
 
 @connect('httpClient,user', {})
 class SunriseSunsetTrigger extends Component {
+  getHouses = async () => {
+    this.setState({
+      SceneGetHouses: RequestStatus.Getting
+    });
+    try {
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      this.setState({
+        houses,
+        SceneGetHouses: RequestStatus.Success
+      });
+    } catch (e) {
+      this.setState({
+        SceneGetHouses: RequestStatus.Error
+      });
+    }
+  };
+
   handleHouseChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'house', e.target.value);
   };
 
-  render({}, {}) {
+  componentDidMount() {
+    this.getHouses();
+  }
+
+  render({}, { houses }) {
     let houseValid = false;
     if (this.props.trigger.house === undefined || this.props.trigger.house === '') {
       houseValid = true;
-    } else if (this.props.houses) {
-      const selectedHouse = this.props.houses.find(house => house.selector === this.props.trigger.house);
+    } else if (houses) {
+      const selectedHouse = houses.find(house => house.selector === this.props.trigger.house);
       if (selectedHouse !== undefined) {
         houseValid = selectedHouse.latitude && selectedHouse.longitude;
       }
@@ -38,8 +60,8 @@ class SunriseSunsetTrigger extends Component {
                 <option value="">
                   <Text id="global.emptySelectOption" />
                 </option>
-                {this.props.houses &&
-                  this.props.houses.map(house => (
+                {houses &&
+                  houses.map(house => (
                     <option selected={house.selector === this.props.trigger.house} value={house.selector}>
                       {house.name}
                     </option>

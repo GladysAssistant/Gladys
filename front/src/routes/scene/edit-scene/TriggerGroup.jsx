@@ -44,7 +44,6 @@ const TriggerGroup = ({ children, ...props }) => (
                       deleteTrigger={props.deleteTrigger}
                       index={index}
                       updateTriggerProperty={props.updateTriggerProperty}
-                      houses={props.houses}
                     />
                   </div>
                 ))}
