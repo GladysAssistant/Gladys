@@ -40,8 +40,8 @@ const BrightnessDeviceType = ({ children, ...props }) => {
             onChange={updateValue}
             class="form-control custom-range"
             step="1"
-            min="0"
-            max="100"
+            min={props.deviceFeature.min}
+            max={props.deviceFeature.max}
           />
         </div>
       </td>
