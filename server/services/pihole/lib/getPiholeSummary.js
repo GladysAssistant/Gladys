@@ -18,7 +18,9 @@ async function getPiholeSummary() {
     return data;
   } catch (e) {
     logger.error(e);
+    return null;
   }
+  
 }
 
 module.exports = {

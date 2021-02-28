@@ -7,7 +7,6 @@ module.exports = function PiholeController(piholeHandler) {
    * @apiGroup PiHole
    * @apiSuccessExample {json} Success-Example
    */
-
   async function getPiholeSummary(req, res) {
     const result = await piholeHandler.getPiholeSummary(req.user.id);
     res.json(result);
