@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { getDeviceName } from './utils';
 
 const BrightnessDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
@@ -17,18 +17,9 @@ const BrightnessDeviceType = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class="fe fe-toggle-right" />
+        <i class="fe fe-sun" />
       </td>
-      {props.deviceFeature.deviceFeatureName && <td>{props.deviceFeature.deviceFeatureName}</td>}
-      {!props.deviceFeature.deviceFeatureName && (
-        <td>
-          <Text
-            id="dashboard.boxes.devicesInRoom.deviceTitle"
-            fields={{ name: props.deviceFeature.name, type: props.deviceFeature.type }}
-          />
-        </td>
-      )}
-
+      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
       <td class="text-right" style="padding-top: 0px; padding-bottom: 0px">
         <div class="col">
           <input
