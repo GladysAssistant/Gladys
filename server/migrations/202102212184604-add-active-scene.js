@@ -4,6 +4,7 @@ module.exports = {
       queryInterface.addColumn('t_scene', 'active', {
         type: Sequelize.BOOLEAN,
         defaultValue: true,
+        allowNull: false,
       }),
     ]);
   },
