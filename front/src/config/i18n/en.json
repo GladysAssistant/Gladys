@@ -14,15 +14,7 @@
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
     "save": "Save",
-    "daysOfTheWeek": {
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday",
-      "saturday": "Saturday",
-      "sunday": "Sunday"
-    },
+
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",

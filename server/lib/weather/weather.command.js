@@ -44,12 +44,14 @@ async function command(message, classification, context) {
 
         await this.messageManager.replyByIntent(message, `weather.get.success.now.${weather.weather}`, context);
       } else {
-        let diff;
+        let diffDate;
         if (dateEntity.resolution.type === 'interval') {
-          diff = dayjs(dateEntity.resolution.strFutureValue).diff(dayjs().startOf('day'), 'day');
+          diffDate = dateEntity.resolution.strFutureValue;
         } else {
-          diff = dayjs(dateEntity.resolution.date).diff(dayjs().startOf('day'), 'day');
+          diffDate = dateEntity.resolution.date;
         }
+        const diff = dayjs(diffDate).diff(dayjs().startOf('day'), 'day');
+
         const weatherDay = weather.days[diff];
 
         if (weatherDay !== undefined) {

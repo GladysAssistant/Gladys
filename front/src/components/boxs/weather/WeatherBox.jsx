@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import dayjs from 'dayjs';
 
 import { WEATHER_UNITS } from '../../../../../server/utils/constants';
 
@@ -211,7 +212,7 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather', actions)
+@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather,user', actions)
 class WeatherBoxComponent extends Component {
   componentDidMount() {
     // get the weather
@@ -273,8 +274,10 @@ class WeatherBoxComponent extends Component {
         daysDisplay = days.map(day => {
           return (
             <div className="row" style={{ marginTop: '0.5em' }}>
-              <div className="col-5">
-                {<Text id={`global.daysOfTheWeek.${day.datetime_beautiful.toLowerCase()}`} />}
+              <div className="col-5" style={{ textTransform: 'capitalize' }}>
+                {dayjs(day.datetime)
+                  .locale(props.user.language)
+                  .format('dddd')}
               </div>
               <div className="col-3">
                 <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
