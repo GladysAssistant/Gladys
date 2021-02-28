@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 const { intToRgb } = require('../../../../utils/colors');
 
 const logger = require('../../../../utils/logger');
@@ -27,6 +27,9 @@ async function setValue(device, deviceFeature, value) {
       break;
     case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
       state = new this.LightState().rgb(intToRgb(value));
+      break;
+    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
+      state = new this.LightState().brightness(value);
       break;
     default:
       logger.debug(`Philips Hue : Feature type = "${deviceFeature.type}" not handled`);
