@@ -17,7 +17,7 @@ async function discover() {
       this.discoveryInProgress = true;
 
       if (!this.discovery || this.discovery.isDestroyed) {
-        this.discovery = new this.yeelightApi.Discover();
+        this.discovery = new this.yeelightApi.Discover({ fallback: false });
       }
 
       // On device found...
@@ -35,7 +35,7 @@ async function discover() {
         }
       });
 
-      this.discovery.once('error', (error) => reject(error));
+      this.discovery.on('error', (error) => reject(error));
 
       this.discovery
         .start()
@@ -54,10 +54,8 @@ async function discover() {
       resolve([]);
     }
   })
-    .timeout(10000)
-    .then((discoveredDeviced) => {
-      return discoveredDeviced;
-    })
+    .timeout(12000)
+    .then((discoveredDeviced) => discoveredDeviced)
     .catch((error) => {
       logger.warn(`Yeelight: ${error}`);
       this.discovery.destroy().catch((err) => logger.warn(`Yeelight: ${err}`));
