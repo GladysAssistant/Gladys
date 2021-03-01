@@ -24,52 +24,83 @@ class SunriseSunsetTrigger extends Component {
     }
   };
 
-  handleHouseChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'house', e.target.value);
+  onHouseChange = houseSelector => {
+    this.props.updateTriggerProperty(this.props.index, 'house', houseSelector);
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      houseValid: true,
+      houses: []
+    };
+  }
 
   componentDidMount() {
     this.getHouses();
   }
 
-  render({}, { houses }) {
-    let houseValid = false;
-    if (this.props.trigger.house === undefined || this.props.trigger.house === '') {
-      houseValid = true;
-    } else if (houses) {
-      const selectedHouse = houses.find(house => house.selector === this.props.trigger.house);
-      if (selectedHouse !== undefined) {
-        houseValid = selectedHouse.latitude && selectedHouse.longitude;
-      }
-    }
-
+  render({}, { houses, houseValid }) {
+    console.log('houseValid', houseValid);
     return (
       <div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="form-group">
-              <div class="form-label">
-                <Text id="editScene.triggersCard.scheduledTrigger.house" />
-              </div>
-              {!houseValid && (
-                <div className="alert alert-danger">
-                  <Text id="editScene.triggersCard.warning.houseWithoutCoordinate" />
-                </div>
-              )}
-              <select onChange={this.handleHouseChange} className="form-control">
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
-                {houses &&
-                  houses.map(house => (
-                    <option selected={house.selector === this.props.trigger.house} value={house.selector}>
-                      {house.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
+            <SelectSunriseSunset houses={houses} house={this.props.trigger.house} onHouseChange={this.onHouseChange} />
           </div>
         </div>
+      </div>
+    );
+  }
+}
+
+class SelectSunriseSunset extends Component {
+  handleHouseChange = e => {
+    const houseSelector = e.target.value;
+
+    const houses = this.props.houses;
+    let houseValid = false;
+    if (houseSelector === undefined || houseSelector === '') {
+      houseValid = true;
+    } else if (houses) {
+      const selectedHouse = houses.find(house => house.selector === houseSelector);
+      if (selectedHouse !== undefined) {
+        houseValid = selectedHouse.latitude && selectedHouse.longitude;
+      }
+    }
+    this.setState({ houseValid });
+    this.props.onHouseChange(houseSelector);
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      houseValid: true
+    };
+  }
+
+  render({}, { houseValid }) {
+    return (
+      <div className="form-group">
+        <div className="form-label">
+          <Text id="editScene.triggersCard.scheduledTrigger.house" />
+        </div>
+        {!houseValid && (
+          <div className="alert alert-danger">
+            <Text id="editScene.triggersCard.warning.houseWithoutCoordinate" />
+          </div>
+        )}
+        <select onChange={this.handleHouseChange} className="form-control">
+          <option value="">
+            <Text id="global.emptySelectOption" />
+          </option>
+          {this.props.houses &&
+            this.props.houses.map(house => (
+              <option selected={house.selector === this.props.house} value={house.selector}>
+                {house.name}
+              </option>
+            ))}
+        </select>
       </div>
     );
   }

@@ -270,7 +270,6 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
-
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );

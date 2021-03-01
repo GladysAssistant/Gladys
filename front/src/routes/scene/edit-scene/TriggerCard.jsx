@@ -70,7 +70,6 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
-          houses={props.houses}
         />
       )}
     </div>
