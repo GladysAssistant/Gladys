@@ -22,7 +22,8 @@
     "build-front": "cd front && npm run build",
     "copy-front": "shx cp -R front/build server/static",
     "build": "npm run build:clean && npm run build-front && npm run copy-front",
-    "generate-changelog": "auto-changelog"
+    "generate-changelog": "auto-changelog",
+    "clean-node-modules": "npx rimraf ./**/node_modules"
   },
   "repository": {
     "type": "git",
