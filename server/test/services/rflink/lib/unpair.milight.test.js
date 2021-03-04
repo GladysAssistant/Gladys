@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('../SerialPortMock.test');
 
@@ -6,7 +7,7 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
-const { fake } = sinon;
+const { assert, fake, stub } = sinon;
 
 describe('RFLinkHandler.unpair', () => {
   beforeEach(() => {
@@ -20,15 +21,14 @@ describe('RFLinkHandler.unpair', () => {
       },
     };
 
-    const currentMilightGateway = '1';
+    const currentMilightGateway = 'F746';
     const milightZone = '2';
     const rflinkHandler = new RFLinkHandler(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
-    rflinkHandler.sendUsb = SerialPortMock;
-    await rflinkHandler.connect('/dev/tty1');
+    rflinkHandler.sendUsb = { write: stub().withArgs('msg').resolves(true), };
     await rflinkHandler.unpair(currentMilightGateway, milightZone);
-    // @Todo assert.calledOnce(rflinkHandler.sendUsb.write);
-    // @Todo assert.calledOnce(rflinkHandler.addDevices);
-    // @Todo assert.calledOnce(rflinkHandler.sendUsb.write);
+    assert.called(rflinkHandler.sendUsb.write);
+    const expectedMsg = `10;MiLightv1;${currentMilightGateway};0${milightZone};34BC;UNPAIR;`;
+    expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
   });
 
 });
