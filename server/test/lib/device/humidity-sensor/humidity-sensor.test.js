@@ -18,7 +18,7 @@ describe('HumiditySensor.getHumidityInRoom', () => {
       unit: 'percent',
     });
     expect(result).to.deep.equal({
-      humidity: 28.88888888888889,
+      humidity: 56.2,
       unit: 'percent',
     });
   });
@@ -61,7 +61,7 @@ describe('HumiditySensor.command', () => {
     assert.calledWith(messageManager.replyByIntent, message, 'humidity-sensor.get-in-room.success', {
       room: '2398c689-8b47-43cc-ad32-e98d9be098b5',
       roomName: 'kitchen',
-      humidity: 29,
+      humidity: 56,
       unit: 'percent',
     });
   });
