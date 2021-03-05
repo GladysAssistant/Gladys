@@ -4,7 +4,7 @@ import { Link } from 'preact-router/match';
 const PeripheralNotFound = ({ uuid }) => (
   <div>
     <div class="alert alert-danger">
-      <Text id={'integration.bluetooth.setup.peripheral.notAvailable'} />
+      <Text id={'integration.bluetooth.discover.peripheral.notAvailable'} />
     </div>
     <Link href="/dashboard/integration/device/bluetooth/setup">
       <button type="button" class="btn btn-outline-secondary btn-sm">

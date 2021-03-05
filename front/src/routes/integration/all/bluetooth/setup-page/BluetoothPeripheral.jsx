@@ -12,7 +12,7 @@ class BluetoothPeripheral extends Component {
     this.props.scan(this.props.peripheral.selector);
   };
 
-  render({ peripheral, bluetoothStatus, currentIntegration }) {
+  render({ peripheral, currentIntegration }) {
     const params = peripheral.params || [];
     const manufacturerParam = params.find(p => p.name === PARAMS.MANUFACTURER);
     const manufacturerValue = (manufacturerParam || { value: null }).value;
@@ -44,23 +44,18 @@ class BluetoothPeripheral extends Component {
               </label>
               <input type="text" class="form-control" disabled value={peripheral.model} />
             </div>
-            <BluetoothPeripheralFeatures
-              peripheral={peripheral}
-              bluetoothStatus={bluetoothStatus}
-              scan={this.scan}
-              bluetoothDevice={bluetoothDevice}
-            />
+            <BluetoothPeripheralFeatures device={peripheral} />
             <div class="form-group">
               {bluetoothDevice && (
                 <Link href={`/dashboard/integration/device/bluetooth/setup/${peripheral.selector}`}>
                   {!peripheralService && (
                     <button class="btn btn-success">
-                      <Text id="integration.bluetooth.setup.createDeviceInGladys" />
+                      <Text id="integration.bluetooth.discover.createDeviceInGladys" />
                     </button>
                   )}
                   {peripheralService && (
                     <button class="btn btn-primary">
-                      <Text id="integration.bluetooth.setup.updateDeviceInGladys" />
+                      <Text id="integration.bluetooth.discover.updateDeviceInGladys" />
                     </button>
                   )}
                 </Link>
@@ -68,7 +63,7 @@ class BluetoothPeripheral extends Component {
               {!bluetoothDevice && (
                 <button class="btn btn-outline-secondary" disabled>
                   <Text
-                    id="integration.bluetooth.setup.notManagedByBluteoothButton"
+                    id="integration.bluetooth.discover.notManagedByBluteoothButton"
                     fields={{ service: peripheral.service.name }}
                   />
                 </button>

@@ -3,6 +3,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @description Update a dashboard.
+ * @param {string} userId - The userId querying.
  * @param {string} selector - The selector.
  * @param {Object} newDashboard - The new dashboard object.
  * @example
@@ -10,9 +11,10 @@ const { NotFoundError } = require('../../utils/coreErrors');
  *    name: 'new name',
  * });
  */
-async function update(selector, newDashboard) {
+async function update(userId, selector, newDashboard) {
   const dashboard = await db.Dashboard.findOne({
     where: {
+      user_id: userId,
       selector,
     },
   });

@@ -13,12 +13,17 @@ const peripherals = [
   },
 ];
 
+const config = { config: true };
+
 const bluetoothManager = function bluetoothManager() {};
 
 bluetoothManager.getStatus = fake.returns(status);
 bluetoothManager.getDiscoveredDevices = fake.returns(peripherals);
 bluetoothManager.scan = fake.returns(null);
 bluetoothManager.scanDevice = fake.resolves(null);
+bluetoothManager.scanPresence = fake.resolves(null);
+bluetoothManager.getConfiguration = fake.returns(config);
+bluetoothManager.saveConfiguration = fake.resolves(config);
 
 const res = {
   json: fake.returns(null),
@@ -112,5 +117,48 @@ describe('POST /api/v1/service/bluetooth/scan/bluetooth-:uuid', () => {
     assert.calledWith(bluetoothManager.scanDevice, 'uuid');
     assert.calledOnce(bluetoothManager.getStatus);
     assert.calledWith(res.json, status);
+  });
+});
+
+describe('POST /api/v1/service/bluetooth/presence', () => {
+  beforeEach(() => {
+    sinon.reset();
+  });
+
+  it('should start presence scanner', async () => {
+    const bluetoothController = BluetoothController(bluetoothManager);
+    const req = {};
+    await bluetoothController['post /api/v1/service/bluetooth/presence'].controller(req, res);
+    assert.calledOnce(bluetoothManager.scanPresence);
+    assert.calledWith(res.status, 200);
+  });
+});
+
+describe('GET /api/v1/service/bluetooth/config', () => {
+  beforeEach(() => {
+    sinon.reset();
+  });
+
+  it('should get config', async () => {
+    const bluetoothController = BluetoothController(bluetoothManager);
+    const req = {};
+    await bluetoothController['get /api/v1/service/bluetooth/config'].controller(req, res);
+    assert.calledOnce(bluetoothManager.getConfiguration);
+    assert.calledWith(res.json, config);
+  });
+});
+
+describe('POST /api/v1/service/bluetooth/config', () => {
+  beforeEach(() => {
+    sinon.reset();
+  });
+
+  it('should save config', async () => {
+    const bluetoothController = BluetoothController(bluetoothManager);
+    const body = {};
+    const req = { body };
+    await bluetoothController['post /api/v1/service/bluetooth/config'].controller(req, res);
+    assert.calledWith(bluetoothManager.saveConfiguration, body);
+    assert.calledWith(res.json, config);
   });
 });

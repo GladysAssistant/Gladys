@@ -151,30 +151,37 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
     },
     'post /api/v1/service/zwave/connect': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(connect),
     },
     'post /api/v1/service/zwave/disconnect': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(disconnect),
     },
     'post /api/v1/service/zwave/heal': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(healNetwork),
     },
     'post /api/v1/service/zwave/params/refresh': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(refreshNodeParams),
     },
     'post /api/v1/service/zwave/node/add': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(addNode),
     },
     'post /api/v1/service/zwave/node/remove': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(removeNode),
     },
     'post /api/v1/service/zwave/cancel': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(cancelControllerCommand),
     },
   };

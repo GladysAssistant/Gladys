@@ -84,6 +84,14 @@
       "last_house_changed": "2019-05-16T07:22:19.014Z"
     }
   ],
+  "get /api/v1/dashboard": [
+    {
+      "id": "329897d2-0620-458c-addf-4009ff5bc205",
+      "name": "Home",
+      "type": "main",
+      "selector": "home"
+    }
+  ],
   "get /api/v1/dashboard/home": {
     "id": "329897d2-0620-458c-addf-4009ff5bc205",
     "name": "Home",
@@ -603,15 +611,37 @@
       "id": "d84ced32-d937-4cf6-a32e-105ffb584226",
       "firstname": "Tony",
       "lastname": "Stark",
-      "selector": "tony"
+      "selector": "tony",
+      "role": "admin"
     },
     {
       "id": "2a16e6bb-34a8-46b9-90d3-275e4d059b41",
       "firstname": "Pepper",
       "lastname": "Pots",
-      "selector": "pepper"
+      "selector": "pepper",
+      "role": "user"
     }
   ],
+  "get /api/v1/user/tony": {
+    "id": "d84ced32-d937-4cf6-a32e-105ffb584226",
+    "firstname": "Tony",
+    "lastname": "Stark",
+    "selector": "tony",
+    "email": "tony.stark@gladysassistant.com",
+    "birthdate": "2011-02-04",
+    "language": "en",
+    "role": "admin"
+  },
+  "get /api/v1/user/pepper": {
+    "id": "d84ced32-d937-4cf6-a32e-105ffb584226",
+    "firstname": "Pepper",
+    "lastname": "Pots",
+    "selector": "pepper",
+    "email": "pepper.pots@gladysassistant.com",
+    "birthdate": "2011-02-04",
+    "language": "en",
+    "role": "admin"
+  },
   "get /api/v1/scene/wake-up": {
     "id": "5f515235-2a00-45f7-993f-cb24b463feec",
     "selector": "wake-up",
@@ -1638,6 +1668,12 @@
     "name": "bluetooth",
     "enabled": true
   },
+  "get /api/v1/service/bluetooth/config": {
+    "presenceScanner": {
+      "status": "enabled",
+      "frequency": 60000
+    }
+  },
   "get /api/v1/service/bluetooth/device": [
     {
       "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
@@ -1693,7 +1729,7 @@
     }
   },
   "get /api/v1/service/bluetooth/status": {
-    "running": true
+    "ready": true
   },
   "get /api/v1/service/bluetooth/peripheral": [
     {
