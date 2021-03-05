@@ -10,7 +10,7 @@ const RflinkManager = require('../../../../services/rflink/lib');
 const DEVICES = require('./devicesToTest.test');
 // const RflinkMock = require('../rflinkMock.test');
 
-describe.only('Rflink Manager Commands', () => {
+describe('Rflink Manager Commands', () => {
   const gladys = {
     event: new EventEmitter(),
   };

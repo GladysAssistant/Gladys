@@ -17,21 +17,17 @@ module.exports = function RfLink(gladys, serviceId) {
    */
   async function start() {
     RflinkPath = await gladys.variable.getValue(RFLINK_PATH, serviceId);
-
     if (!RflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
+    } else if (rfLinkManager === undefined) {
+      throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
     } else {
       logger.info('Starting Rflink service');
     }
-
-    if (rfLinkManager === undefined) {
-      throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
-    } else {
-      try {
-        rfLinkManager.connect(RflinkPath);
-      } catch (err) {
-        Promise.reject(Error(err));
-      }
+    try {
+      rfLinkManager.connect(RflinkPath);
+    } catch (err) {
+      Promise.reject(Error(err));
     }
     const currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
     rfLinkManager.currentMilightGateway = currentMilightGateway;
