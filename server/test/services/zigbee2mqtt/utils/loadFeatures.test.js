@@ -12,8 +12,10 @@ const expectedFeaturesWithBattery = [
     has_feedback: false,
     min: 0,
     max: 1,
-    external_id: 'zigbee2mqtt:Device:click',
-    selector: 'zigbee2mqtt:Device:click',
+    name: 'Button',
+    external_id: 'zigbee2mqtt:Device:button:click:action',
+    selector: 'zigbee2mqtt:Device:button:click:action',
+    zigbeeField: 'action',
   },
   {
     category: 'battery',
@@ -23,8 +25,10 @@ const expectedFeaturesWithBattery = [
     has_feedback: false,
     min: 0,
     max: 100,
-    external_id: 'zigbee2mqtt:Device:battery',
-    selector: 'zigbee2mqtt:Device:battery',
+    name: 'Battery',
+    external_id: 'zigbee2mqtt:Device:battery:integer:battery',
+    selector: 'zigbee2mqtt:Device:battery:integer:battery',
+    zigbeeField: 'battery',
   },
 ];
 
@@ -36,8 +40,10 @@ const expectedFeatures = [
     has_feedback: false,
     min: 0,
     max: 1,
-    external_id: 'zigbee2mqtt:Device:click',
-    selector: 'zigbee2mqtt:Device:click',
+    name: 'Button',
+    external_id: 'zigbee2mqtt:Device:button:click:action',
+    selector: 'zigbee2mqtt:Device:button:click:action',
+    zigbeeField: 'action',
   },
 ];
 

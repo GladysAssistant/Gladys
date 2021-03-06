@@ -2,6 +2,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertDevice } = require('../utils/convertDevice');
 const { convertValue } = require('../utils/convertValue');
+const { convertFeature } = require('../utils/convertFeature');
 
 const TYPE_COORDINATOR = 'Coordinator';
 
@@ -22,7 +23,6 @@ function handleMqttMessage(topic, message) {
   switch (topic) {
     case 'zigbee2mqtt/bridge/config/devices': {
       logger.log('Getting config devices from Zigbee2mqtt');
-      // Keep only "final/end" devices
       const devices = JSON.parse(message);
       const convertedDevices = devices
         // Remove Coordinator
@@ -77,26 +77,30 @@ function handleMqttMessage(topic, message) {
     }
     default: {
       const splittedTopic = topic.split('/');
-      if (splittedTopic.length === 2) {
-        const friendlyName = splittedTopic[1];
+      if (!message) {
+        logger.warn(`Zigbee2mqtt topic ${topic} empty message.`);
+      } else if (splittedTopic.length === 2) {
+        const deviceName = splittedTopic[1];
         const incomingFeatures = JSON.parse(message);
-
-        Object.keys(incomingFeatures).forEach((featureName) => {
-          const feature = this.gladys.stateManager.get(
-            'deviceFeatureByExternalId',
-            `zigbee2mqtt:${friendlyName}:${featureName}`,
-          );
-
-          if (feature) {
-            const newState = {
-              device_feature_external_id: `${feature.external_id}`,
-              state: convertValue(featureName, incomingFeatures[featureName]),
-            };
-            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
-          } else {
-            logger.warn(`Zigbee2mqtt device ${splittedTopic[1]}, feature ${featureName} not configured in Gladys.`);
-          }
-        });
+        // Fetch device from name
+        const device = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${deviceName}`);
+        if (device) {
+          Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
+            // Find the feature regarding the field name
+            const feature = convertFeature(device.features, zigbeeFeatureField);
+            if (feature) {
+              const newState = {
+                device_feature_external_id: `${feature.external_id}`,
+                state: convertValue(feature.type, incomingFeatures[zigbeeFeatureField]),
+              };
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+            } else {
+              logger.warn(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
+            }
+          });
+        } else {
+          logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
+        }
       } else {
         logger.log(`Zigbee2mqtt topic ${topic} not handled.`);
       }

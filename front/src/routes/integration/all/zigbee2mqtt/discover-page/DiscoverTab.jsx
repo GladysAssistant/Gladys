@@ -19,9 +19,9 @@ const DiscoverTab = ({ children, ...props }) => (
           <td>
             {props.zigbee2mqttDevices && (
               <div>
-                &nbsp;{`( ${props.zigbee2mqttDevices.length} `}
+                &nbsp;{`(${props.zigbee2mqttDevices.length} `}
                 <Text id="integration.zigbee2mqtt.discover.device" />
-                {` )`}
+                {`)`}
               </div>
             )}
           </td>
@@ -71,7 +71,7 @@ const DiscoverTab = ({ children, ...props }) => (
               props.zigbee2mqttDevices.map((device, index) => (
                 <DiscoveredBox {...props} device={device} deviceIndex={index} />
               ))}
-            {!props.zigbee2mqttDevices || (props.zigbee2mqttDevices.length === 0 && <EmptyState />)}
+            {(!props.zigbee2mqttDevices || props.zigbee2mqttDevices.length === 0) && <EmptyState />}
           </div>
         </div>
       </div>

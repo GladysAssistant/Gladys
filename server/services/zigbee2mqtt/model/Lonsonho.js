@@ -6,7 +6,8 @@ const { features } = require('../utils/features');
 const Lonsonho = {
   brand: 'Lonsonho',
   models: {
-    'QS-Zigbee-D02-TRIAC-LN': [features.switch, features.brightness],
+    'QS-Zigbee-D02-TRIAC-L': [features.light, features.brightness],
+    'QS-Zigbee-D02-TRIAC-LN': [features.light, features.brightness],
   },
 };
 

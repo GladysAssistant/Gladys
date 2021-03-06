@@ -19,7 +19,6 @@ const HEIMAN = {
     'HS1-WL-E': [features.water],
     'HS1RC-M': [features.switch_sensor],
     'HS1CA-E': [features.smoke],
-    'HS2WD-E': [features.siren],
   },
 };
 

@@ -19,7 +19,7 @@ const Xiaomi = {
     WSDCGQ01LM: [features.temperature, features.humidity],
     WSDCGQ11LM: [features.temperature, features.humidity, features.pressure],
     RTCGQ01LM: [features.motion],
-    RTCGQ11LM: [features.motion, features.illuminance],
+    RTCGQ11LM: [features.motion, features.illuminance, features.temperature, features.voltage],
     MCCGQ01LM: [features.door],
     MCCGQ11LM: [features.door],
     SJCGQ11LM: [features.water],

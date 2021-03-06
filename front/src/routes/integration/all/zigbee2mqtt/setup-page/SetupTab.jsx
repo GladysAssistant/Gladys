@@ -8,17 +8,12 @@ import logoZigbee2mqtt from './logo_zigbee2mqtt.png';
 
 class SetupTab extends Component {
   toggle = e => {
-    console.log('toggle : ', checked);
     let checked = this.props.z2mEnabled;
     checked = !checked;
-    console.log('toggle : ', checked);
-    console.log(this.props.dockerContainers);
 
     if (checked) {
-      console.log('Starting Containers :');
       this.props.startContainer();
     } else {
-      console.log('Stopping Containers :');
       this.props.stopContainer();
     }
 

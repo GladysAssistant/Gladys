@@ -1,5 +1,4 @@
 const { features } = require('./features');
-const { convertCategory } = require('./convertCategory');
 const { getFeaturesByModel } = require('../model');
 
 /**
@@ -22,7 +21,7 @@ function loadFeatures(name, model, addBattery) {
   }
 
   loadedFeatures.forEach((feature) => {
-    feature.external_id = `zigbee2mqtt:${name}:${convertCategory(feature)}`;
+    feature.external_id = `zigbee2mqtt:${name}:${feature.category}:${feature.type}:${feature.zigbeeField}`;
     feature.selector = feature.external_id;
   });
 

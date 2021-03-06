@@ -30,13 +30,15 @@ const managedGladysDevice = {
   features: [
     {
       category: 'button',
-      external_id: `zigbee2mqtt:${managedDevice.friendly_name}:click`,
+      external_id: `zigbee2mqtt:${managedDevice.friendly_name}:button:click:action`,
       has_feedback: false,
       max: 1,
       min: 0,
       read_only: true,
-      selector: `zigbee2mqtt:${managedDevice.friendly_name}:click`,
+      name: 'Button',
+      selector: `zigbee2mqtt:${managedDevice.friendly_name}:button:click:action`,
       type: 'click',
+      zigbeeField: 'action',
     },
   ],
   should_poll: false,

@@ -60,47 +60,55 @@ const expectedDevicesPayload = [
     features: [
       {
         category: 'temperature-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal',
+        external_id: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal:temperature',
         has_feedback: false,
         max: 125,
         min: -50,
         read_only: true,
-        selector: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal',
+        name: 'Temperature',
+        selector: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal:temperature',
         type: 'decimal',
         unit: 'celsius',
+        zigbeeField: 'temperature',
       },
       {
         category: 'humidity-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal',
+        external_id: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal:humidity',
         has_feedback: false,
         max: 100,
         min: 0,
         read_only: true,
-        selector: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal',
+        name: 'Humidity',
+        selector: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal:humidity',
         type: 'decimal',
         unit: 'percent',
+        zigbeeField: 'humidity',
       },
       {
         category: 'pressure-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal',
+        external_id: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
         has_feedback: false,
         max: 10000,
         min: 0,
+        name: 'Pressure Sensor',
         read_only: true,
-        selector: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal',
+        selector: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
         type: 'decimal',
-        unit: undefined,
+        unit: 'hPa',
+        zigbeeField: 'pressure',
       },
       {
         category: 'battery',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
+        external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
         has_feedback: false,
         max: 100,
         min: 0,
         read_only: true,
-        selector: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
+        name: 'Battery',
+        selector: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
         type: 'integer',
         unit: 'percent',
+        zigbeeField: 'battery',
       },
     ],
     model: 'WSDCGQ11LM',
@@ -194,42 +202,50 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   it('it should get good topic', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
-    stateManagerGetStub
-      .onFirstCall()
-      .returns(null)
-      .onSecondCall()
-      .returns({
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
-        type: 'battery',
-      });
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          type: 'battery',
+        },
+      ],
+    });
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
+      device_feature_external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
       state: 59,
     });
+  });
+
+  it('it should get good topic but device not managed', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns(null);
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
+    // ASSERT
+    assert.calledOnce(gladys.event.emit);
   });
 
   it('it should get good topic but feature not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
-    stateManagerGetStub
-      .onFirstCall()
-      .throws()
-      .onSecondCall()
-      .returns({
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
-        type: 'battery',
-      });
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          type: 'battery',
+        },
+      ],
+    });
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86}`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer',
-      state: 59,
-    });
+    assert.calledOnce(gladys.event.emit);
   });
 });
