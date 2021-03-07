@@ -20,12 +20,15 @@ function message(msgRF) {
   });
   logger.log(`sending new message ${msgRF}`);
   const msg = RFtoObj(msgRF);
+  logger.debug(`message RFtoObj => ${msg}`);
+  console.log(msg);
   let newDevice;
   let doesntExistYet = true;
 
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
       this.newDevices.forEach((d) => {
+        console.log(d.external_id);
         if (`rflink:${msg.id}:${msg.switch}` === d.external_id) {
           doesntExistYet = false;
         }
@@ -311,7 +314,7 @@ function message(msgRF) {
             max: 8,
           });
         }
-
+        console.log(newDevice);
         this.addNewDevice(newDevice);
       } else if (doesntExistYet === false) {
         if (msg.temp !== undefined) {
@@ -335,9 +338,6 @@ function message(msgRF) {
         if (msg.rain !== undefined) {
           this.newValue(msg, 'rain', msg.rain);
         }
-        if (msg.temp !== undefined) {
-          this.newValue(msg, 'temperature', msg.temp);
-        }
         if (msg.winsp !== undefined) {
           this.newValue(msg, 'wind-speed', msg.winsp);
         }
@@ -352,9 +352,6 @@ function message(msgRF) {
         }
         if (msg.co2 !== undefined) {
           this.newValue(msg, 'co2', msg.co2);
-        }
-        if (msg.wings !== undefined) {
-          this.newValue(msg, 'wind-speed', msg.wings);
         }
         if (
           msg.switch !== undefined &&
