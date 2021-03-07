@@ -6,6 +6,7 @@ const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
 const caldavService = {
   config: stub(),
   cleanUp: stub(),
+  enableCalendar: stub(),
   syncUserCalendars: stub(),
 };
 
@@ -53,5 +54,19 @@ describe('get /api/v1/service/caldav/sync', () => {
     };
     await caldavController['get /api/v1/service/caldav/sync'].controller(req, res);
     assert.calledWith(caldavService.syncUserCalendars, userId);
+  });
+});
+
+describe('patch /api/v1/service/caldav/enable', () => {
+  it('should disable caldav calendar synchronization', async () => {
+    const caldavController = CaldavController(caldavService);
+    const req = {
+      body: {
+        selector: 'personnal',
+        sync: false,
+      },
+    };
+    await caldavController['patch /api/v1/service/caldav/enable'].controller(req, res);
+    assert.calledWith(caldavService.enableCalendar, 'personnal', false);
   });
 });
