@@ -257,7 +257,7 @@
       "syncTab": "Synchronisation",
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
-      "syncIntroduction": "Choisissez quels calendriers vous souhaitez synchroniser.",
+      "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -313,7 +313,7 @@
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
-      "calendarChoiceSuccess": "Choix des calendriers validé avec succès.",
+      "calendarChoiceSuccess": "Choix des calendriers enregistré avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",

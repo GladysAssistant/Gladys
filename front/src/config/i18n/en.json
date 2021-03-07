@@ -727,7 +727,7 @@
       "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
       "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
       "calendarChoiceSuccess": "Your choices have been saved.",
-      "calendarChoiceError": "Failure while saving.",
+      "calendarChoiceError": "An error occurred while saving.",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
