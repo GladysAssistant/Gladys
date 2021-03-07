@@ -47,7 +47,6 @@ function Gladys(params = {}) {
   const variable = new Variable(event);
   const brain = new Brain();
   const cache = new Cache();
-  const calendar = new Calendar();
   const area = new Area();
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
@@ -65,6 +64,7 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager);
+  const calendar = new Calendar(service);
 
   const gladys = {
     version: '0.1.0', // todo, read package.json

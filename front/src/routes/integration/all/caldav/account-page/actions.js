@@ -1,4 +1,4 @@
-import { CalDAVStatus } from '../../../../utils/consts';
+import { CalDAVStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
 const actions = store => ({
@@ -41,12 +41,14 @@ const actions = store => ({
     let caldavUrl = '';
     let caldavUsername = '';
     let caldavPassword = '';
+    let caldavCalendars = [];
 
     store.setState({
       caldavHost,
       caldavUrl,
       caldavUsername,
-      caldavPassword
+      caldavPassword,
+      caldavCalendars
     });
 
     try {
@@ -70,6 +72,11 @@ const actions = store => ({
       });
       caldavPassword = password;
 
+      const calendars = await state.httpClient.get('/api/v1/calendar', {
+        serviceName: 'caldav'
+      });
+      caldavCalendars = calendars;
+
       store.setState({
         caldavGetSettingsStatus: CalDAVStatus.Success
       });
@@ -83,7 +90,8 @@ const actions = store => ({
       caldavHost,
       caldavUrl,
       caldavUsername,
-      caldavPassword
+      caldavPassword,
+      caldavCalendars
     });
   },
   async saveCaldavSettings(state) {

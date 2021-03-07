@@ -666,8 +666,11 @@
     },
     "caldav": {
       "title": "CalDAV",
+      "accountTab": "Account",
+      "syncTab": "Synchronization",
       "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "syncIntroduction": "Choose the calendars to synchronize.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -722,6 +725,9 @@
       "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
       "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
       "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
+      "calendarChoiceSuccess": "Your choices have been saved.",
+      "calendarChoiceError": "Failure while saving.",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"

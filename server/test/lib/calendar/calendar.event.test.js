@@ -49,6 +49,13 @@ describe('calendar.destroy', () => {
   });
 });
 
+describe('calendar.destroyEvents', () => {
+  const calendar = new Calendar();
+  it("should destroy all calendar's event", async () => {
+    await calendar.destroyEvents('0dc03aef-4a23-9c4e-88e3-5437971269e5');
+  });
+});
+
 describe('calendar.getEvents', () => {
   const calendar = new Calendar();
   it('should get events of a user', async () => {
