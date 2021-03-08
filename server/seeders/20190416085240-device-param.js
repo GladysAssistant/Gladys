@@ -15,5 +15,5 @@ module.exports = {
       {},
     ),
 
-  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('t_device_param', null, {}),
+  down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('t_device_param', null, {}),
 };

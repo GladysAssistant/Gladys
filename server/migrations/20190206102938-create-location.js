@@ -45,5 +45,5 @@ module.exports = {
     await queryInterface.addIndex('t_location', ['user_id']);
     await queryInterface.addIndex('t_location', ['created_at']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_location'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_location'),
 };

@@ -19,5 +19,5 @@ module.exports = {
       {},
     ),
 
-  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('t_dashboard', null, {}),
+  down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('t_dashboard', null, {}),
 };
