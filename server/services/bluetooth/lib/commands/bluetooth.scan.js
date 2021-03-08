@@ -9,13 +9,23 @@ const { TIMERS } = require('../utils/bluetooth.constants');
  * @description Scan Bluetooth peripherals.
  * @param {boolean} state - Set _true_ to start scanning, default _false_.
  * @param {string} peripheralUuid - Peripheral UUID to look for.
- * @returns {Promise<Array|Object>} Found peripherals.
+ * @returns {Promise<Object>} Found peripherals by uuid, or single requested peripheral.
  * @example
  * bluetooth.scan(true);
  */
 async function scan(state, peripheralUuid = undefined) {
   if (state) {
-    logger.trace(`Bluetooth: scanning for ${peripheralUuid} peripheral`);
+    if (peripheralUuid) {
+      logger.trace(`Bluetooth: scanning for ${peripheralUuid} peripheral`);
+      const peripheral = this.getPeripheral(peripheralUuid);
+      if (peripheral) {
+        return peripheral;
+      }
+    } else {
+      logger.trace(`Bluetooth: scanning for all peripherals`);
+      this.discoveredDevices = {};
+    }
+
     this.scanCounter += 1;
 
     if (this.scanPromise && this.scanPromise.isPending()) {
@@ -46,7 +56,7 @@ async function scan(state, peripheralUuid = undefined) {
             reject(new NotFoundError(`Bluetooth: peripheral ${peripheralUuid} not found`));
           }
         } else {
-          resolve(Object.values(peripherals));
+          resolve(peripherals);
         }
       };
 

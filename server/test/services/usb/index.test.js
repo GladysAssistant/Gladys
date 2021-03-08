@@ -7,7 +7,10 @@ const UsbService = proxyquire('../../../services/usb/index', {
 });
 
 describe('usb', () => {
-  const usbService = UsbService();
+  const usbService = UsbService({}, '1bf2c438-4f76-44af-b433-0588d8328fff');
+  it('should start service', async () => {
+    await usbService.start();
+  });
   it('should connect to zwave driver', async () => {
     const ports = await usbService.list();
     expect(ports).to.deep.equal([
@@ -21,5 +24,8 @@ describe('usb', () => {
         productId: undefined,
       },
     ]);
+  });
+  it('should stop service', async () => {
+    await usbService.stop();
   });
 });

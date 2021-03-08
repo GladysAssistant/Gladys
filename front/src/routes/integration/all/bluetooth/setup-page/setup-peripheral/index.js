@@ -37,15 +37,6 @@ class BluetoothConnnectPage extends Component {
     }
   };
 
-  reloadDevice = async () => {
-    let bluetoothStatus;
-    try {
-      bluetoothStatus = await this.props.httpClient.post(`/api/v1/service/bluetooth/scan/${this.state.uuid}`);
-    } finally {
-      this.props.updateStatus(bluetoothStatus);
-    }
-  };
-
   constructor(props) {
     super(props);
 
@@ -82,13 +73,7 @@ class BluetoothConnnectPage extends Component {
           );
           break;
         case RequestStatus.Success:
-          content = (
-            <ConfigurePeripheral
-              peripheral={peripheral}
-              bluetoothStatus={bluetoothStatus}
-              reloadDevice={this.reloadDevice}
-            />
-          );
+          content = <ConfigurePeripheral device={peripheral} />;
           break;
         case RequestStatus.Error:
         default:
@@ -101,7 +86,7 @@ class BluetoothConnnectPage extends Component {
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">
-              <Text id="integration.bluetooth.setup.peripheral.title" />
+              <Text id="integration.bluetooth.discover.peripheral.title" />
             </h3>
           </div>
           <div class="card-body">

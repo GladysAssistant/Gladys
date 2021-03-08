@@ -45,6 +45,9 @@ import TriggerPage from '../routes/trigger';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
+import SettingsUserPage from '../routes/settings/settings-users';
+import SettingsEditUserPage from '../routes/settings/settings-users/edit-user';
+import SettingsCreateUserPage from '../routes/settings/settings-users/create-user';
 import SettingsSystemPage from '../routes/settings/settings-system';
 import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
@@ -86,6 +89,7 @@ import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page
 import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
 import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
 import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
+import BluetoothSettingsPage from '../routes/integration/all/bluetooth/settings-page';
 
 // StockExchange integrations
 import StockExchangePage from '../routes/integration/all/stock-exchange';
@@ -207,6 +211,7 @@ const AppRouter = connect(
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
+        <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
@@ -218,6 +223,9 @@ const AppRouter = connect(
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
+        <SettingsUserPage path="/dashboard/settings/user" />
+        <SettingsEditUserPage path="/dashboard/settings/user/edit/:user_selector" />
+        <SettingsCreateUserPage path="/dashboard/settings/user/new" />
         <SettingsSystemPage path="/dashboard/settings/system" />
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsServicePage path="/dashboard/settings/service" />

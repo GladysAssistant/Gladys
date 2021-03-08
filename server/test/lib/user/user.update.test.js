@@ -22,6 +22,19 @@ describe('user.update', () => {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
   });
+  it('should update user password', async () => {
+    await user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      password: 'mybigpassword',
+    });
+    const res = await user.login('demo@demo.com', 'mybigpassword');
+    expect(res).to.have.property('id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+  });
+  it('should return error, password too short', async () => {
+    const promise = user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      password: 'test12',
+    });
+    return assert.isRejected(promise, 'Password is too short');
+  });
   it('should return error, picture too long', async () => {
     const promise = user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       picture: tooLongImage.picture,

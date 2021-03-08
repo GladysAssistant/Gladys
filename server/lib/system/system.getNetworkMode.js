@@ -1,8 +1,6 @@
 const get = require('get-value');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
-const getConfig = require('../../utils/getConfig');
-
-const config = getConfig();
+const { exec } = require('../../utils/childProcess');
 
 /**
  * @description Get Gladys network into Docker environment.
@@ -16,9 +14,11 @@ async function getNetworkMode() {
   }
 
   if (!this.networkMode) {
-    const containers = await this.dockerode.listContainers();
-    const gladysContainer = containers.find((c) => c.Image.startsWith(config.dockerImage));
-    this.networkMode = get(gladysContainer, 'HostConfig.NetworkMode', { default: 'unknown' });
+    const cmdResult = await exec('head -1 /proc/self/cgroup | cut -d/ -f3');
+    const [containerId] = cmdResult.split('\n');
+    const gladysContainer = this.dockerode.getContainer(containerId);
+    const gladysContainerInspect = await gladysContainer.inspect();
+    this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
   }
 
   return this.networkMode;
