@@ -12,7 +12,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 >>>>>>> Enable/disable caldav calendar synchronization:front/src/routes/integration/all/caldav/account-page/index.js
 
 @connect(
-  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavCalendars,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
+  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
   actions
 )
 class AccountPage extends Component {
