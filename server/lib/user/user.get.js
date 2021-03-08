@@ -1,9 +1,13 @@
+const { Op } = require('sequelize');
+const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
   fields: ['id', 'firstname', 'lastname', 'selector', 'email'],
   expand: [],
   skip: 0,
+  order_dir: 'ASC',
+  order_by: 'firstname',
 };
 
 /**
@@ -32,11 +36,24 @@ async function get(options) {
     attributes: optionsWithDefault.fields,
     include: includeExpand,
     offset: optionsWithDefault.skip,
-    order: [['created_at', 'ASC']],
+    order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
 
   if (optionsWithDefault.take) {
     queryParams.limit = optionsWithDefault.take;
+  }
+
+  if (optionsWithDefault.search) {
+    queryParams.where = {
+      [Op.or]: [
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstname')), {
+          [Op.like]: `%${optionsWithDefault.search}%`,
+        }),
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('lastname')), {
+          [Op.like]: `%${optionsWithDefault.search}%`,
+        }),
+      ],
+    };
   }
 
   const users = await db.User.findAll(queryParams);

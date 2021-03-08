@@ -14,6 +14,7 @@ module.exports = function RtspCameraController(rtspCameraHandler) {
   return {
     'post /api/v1/service/rtsp-camera/camera/test': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(testConnection),
     },
   };

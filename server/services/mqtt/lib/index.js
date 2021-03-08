@@ -10,6 +10,7 @@ const { status } = require('./status');
 const { getConfiguration } = require('./getConfiguration');
 const { saveConfiguration } = require('./saveConfiguration');
 const { installContainer } = require('./installContainer');
+const { updateContainer } = require('./updateContainer');
 const { checkDockerNetwork } = require('./checkDockerNetwork');
 const { setValue } = require('./setValue');
 
@@ -44,6 +45,7 @@ MqttHandler.prototype.status = status;
 MqttHandler.prototype.getConfiguration = getConfiguration;
 MqttHandler.prototype.saveConfiguration = saveConfiguration;
 MqttHandler.prototype.installContainer = installContainer;
+MqttHandler.prototype.updateContainer = updateContainer;
 MqttHandler.prototype.checkDockerNetwork = checkDockerNetwork;
 MqttHandler.prototype.setValue = setValue;
 

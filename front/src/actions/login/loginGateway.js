@@ -91,7 +91,7 @@ function createActions(store) {
           route('/link-gateway-user');
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
         const error = get(e, 'response.data.error');
         const errorMessage = get(e, 'response.data.error_message');
         // if user was previously linked to another instance, we reset the user id

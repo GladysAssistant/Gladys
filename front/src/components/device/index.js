@@ -167,7 +167,7 @@ class EditDevicePage extends Component {
         loading: false
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 

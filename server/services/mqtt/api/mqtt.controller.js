@@ -50,6 +50,7 @@ module.exports = function MqttController(mqttManager) {
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(connect),
     },
     'get /api/v1/service/mqtt/status': {
@@ -62,6 +63,7 @@ module.exports = function MqttController(mqttManager) {
     },
     'post /api/v1/service/mqtt/config/docker': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(installContainer),
     },
   };

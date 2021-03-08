@@ -16,7 +16,7 @@ module.exports = function ExampleService(gladys) {
    * gladys.services.example.start();
    */
   async function start() {
-    logger.log('starting example service');
+    logger.info('Starting example service');
   }
 
   /**
@@ -26,7 +26,7 @@ module.exports = function ExampleService(gladys) {
    * gladys.services.example.stop();
    */
   async function stop() {
-    logger.log('stopping example service');
+    logger.info('Stopping example service');
   }
 
   return Object.freeze({

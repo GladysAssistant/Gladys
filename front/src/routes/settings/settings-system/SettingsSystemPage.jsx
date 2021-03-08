@@ -83,74 +83,24 @@ const SystemPage = ({ children, ...props }) => (
           <h3 class="card-header">
             <Text id="systemSettings.operations" />
           </h3>
-          <div class="table-responsive">
-            <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
-              <tbody>
-                {props.upgradeAvailable && props.isDocker && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.newUpgradeAvailable" />
-                    </td>
-                    <td class="text-right">
-                      <button onClick={props.downloadUpgrade} class="btn btn-success btn-sm">
-                        <Text id="systemSettings.download" /> {props.systemInfos.latest_gladys_version}
-                      </button>
-                    </td>
-                  </tr>
-                )}
-                {props.upgradeAvailable && !props.isDocker && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.newUpgradeAvailable" />
-                    </td>
-                    <td class="text-right">
-                      <span class="badge badge-warning">
-                        <Text id="systemSettings.notAvailable" />
-                      </span>
-                    </td>
-                  </tr>
-                )}
-                {props.upgradeDownloadInProgress && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.newUpgradeAvailable" />
-                    </td>
-                    <td>
-                      <div>
-                        <div class="clearfix">
-                          <div class="float-left">
-                            <strong>
-                              <Text id="global.percentValue" fields={{ value: props.downloadUpgradeProgress }} />
-                            </strong>
-                          </div>
-                        </div>
-                        <div class="progress progress-sm">
-                          <div
-                            class="progress-bar bg-green"
-                            style={{
-                              width: `${props.downloadUpgradeProgress}%`
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
 
-                {props.upgradeDownloadFinished && (
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.downloadFinished" />
-                    </td>
-                    <td class="text-right">
-                      <span class="badge badge-success">
-                        <Text id="systemSettings.restartingGladys" />
-                      </span>
-                    </td>
-                  </tr>
-                )}
+          {props.systemInfos && props.systemInfos.new_release_available === true && (
+            <div class="card-body">
+              <div>
+                <h4>
+                  <Text id="systemSettings.newUpgradeAvailable" />
+                </h4>
+                <p>
+                  <Text id="systemSettings.newUpgradeAvailableText" />
+                </p>
+              </div>
+            </div>
+          )}
 
-                {props.systemInfos && props.systemInfos.new_release_available === false && (
+          {props.systemInfos && props.systemInfos.new_release_available === false && (
+            <div class="table-responsive">
+              <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
+                <tbody>
                   <tr>
                     <td>
                       <Text id="systemSettings.upToDate" />
@@ -164,11 +114,12 @@ const SystemPage = ({ children, ...props }) => (
                       </span>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
+
         <div class="card">
           <h3 class="card-header">
             <Text id="systemSettings.configurationTitle" />

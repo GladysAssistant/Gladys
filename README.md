@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="#the-project">The Project</a> •
+  <a href="#try-gladys-assistant">Try</a> •
   <a href="#getting-started">Getting Started</a> •
   <a href="#contributors">Contributors</a> •
   <a href="#copyright--license">Copyright & License</a> 
@@ -19,28 +19,13 @@
 
 <img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
 
-## The Project
+## Try Gladys Assistant
 
-Gladys is a home assistant who helps you in your everyday life.
-
-Like a kind of **JARVIS**!
-
-Gladys is connected to all your devices in your home. She is connected to your calendars, lights, cameras and tons of other devices and APIs to help you.
-
-Let's look at a few examples:
-
-- It's 8 AM. Gladys wakes you up automatically because she knows that you need to be at work at 9 AM, and that according to the traffic, you'll need 30 minutes to go to work in your car. She knows that you like 30 minutes to get ready. She wakes you up with a soft progressive warm light thanks to your Philips Hue bulbs, and plays your favorite playlist in your room.
-- It's 8:10 AM, Gladys detects thanks to a motion sensor that you are getting out of bed. She immediately starts the wake-up scenario and tells the coffee machine to prepare the coffee and also opens the blinds.
-- At 8:30 AM, you leave the house. Gladys detects thanks to your smartphone that you are not at home anymore, and shuts down everything inside.
-- At 6:30 PM, you are getting back home. Everything is ready when you arrive. You are going to sleep, so you simply put your phone on your nightstand where a NFC tag is placed. It immediately sends a request to Gladys to tell her you are going to sleep. She starts the "Going to sleep" scenario, and turns off all your lights and devices.
-
-These are just simple scenarios, possibilities with Gladys are endless. Don't hesitate to suggest yours! 😉
+You can try Gladys Assistant on our [demo website](https://demo.gladysassistant.com).
 
 ## Getting Started
 
-To get started, you can go to [our website](https://gladysassistant.com).
-
-You can also try Gladys Assistant on our demo website [here](https://demo.gladysassistant.com).
+To get started and install Gladys Assistant, you'll find everything on [our website](https://gladysassistant.com).
 
 ## Pull requests are welcome
 
@@ -95,4 +80,4 @@ Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.gi
 
 ## Copyright & License
 
-Copyright (c) 2013-2020 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2021 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).

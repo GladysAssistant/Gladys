@@ -1,9 +1,20 @@
+const VARIABLES = {
+  PRESENCE_STATUS: 'BLUETOOTH_PRESENCE_STATUS',
+  PRESENCE_FREQUENCY: 'BLUETOOTH_PRESENCE_FREQUENCY',
+};
+
+const PRESENCE_STATUS = {
+  ENABLED: 'enabled',
+  DISABLED: 'disabled',
+};
+
 const TIMERS = {
   SCAN: 5000,
   CONNECT: 5000,
   DISCOVER: 5000,
   READ: 2000,
   WRITE: 2000,
+  PRESENCE: 60000,
 };
 
 const PARAMS = {
@@ -12,4 +23,4 @@ const PARAMS = {
   MANUFACTURER: 'manufacturer',
 };
 
-module.exports = { TIMERS, PARAMS };
+module.exports = { VARIABLES, PRESENCE_STATUS, TIMERS, PARAMS };

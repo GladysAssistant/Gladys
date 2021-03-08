@@ -4,7 +4,7 @@ import get from 'get-value';
 import timezones from '../../../config/timezones';
 import SettingsSystemPage from './SettingsSystemPage';
 import actions from '../../../actions/system';
-import { WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
+import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 import { RequestStatus } from '../../../utils/consts';
 
 @connect(
@@ -22,7 +22,7 @@ class SettingsSystem extends Component {
         value: option.value
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -36,26 +36,23 @@ class SettingsSystem extends Component {
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
-  componentWillMount() {
-    this.props.ping();
+  componentDidMount() {
     this.props.getInfos();
     this.props.getDiskSpace();
     this.props.getContainers();
-    this.props.getUpgradeDownloadStatus();
     this.getTimezone();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_PROGRESS, payload =>
-      this.props.newDownloadProgress(payload)
-    );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FINISHED, payload =>
-      this.props.downloadFinished()
-    );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.UPGRADE.DOWNLOAD_FAILED, payload =>
-      this.props.downloadFailed()
-    );
+    // we start the ping a little bit after to give it some time to breathe
+    this.refreshPingIntervalId = setInterval(() => {
+      this.props.ping();
+    }, 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshPingIntervalId);
   }
 
   render(props, { selectedTimezone }) {

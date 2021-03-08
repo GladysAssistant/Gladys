@@ -142,7 +142,8 @@ const actionsFunc = {
       }
     });
     const urlWithVariables = Handlebars.compile(action.url)(scope);
-    const bodyWithVariables = Handlebars.compile(action.body)(scope);
+    // body can be empty
+    const bodyWithVariables = action.body ? Handlebars.compile(action.body)(scope) : undefined;
     const response = await self.http.request(
       action.method,
       urlWithVariables,
@@ -150,6 +151,28 @@ const actionsFunc = {
       headersObject,
     );
     set(scope, `${columnIndex}.${rowIndex}`, response);
+  },
+  [ACTIONS.USER.CHECK_PRESENCE]: async (self, action, scope, columnIndex, rowIndex) => {
+    let deviceSeenRecently = false;
+    // we want to see if a device was seen before now - XX minutes
+    const thresholdDate = new Date(Date.now() - action.minutes * 60 * 1000);
+    // foreach selected device
+    action.device_features.forEach((deviceFeatureSelector) => {
+      // we get the time when the device was last seen
+      const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
+      // if it's recent, we save true
+      if (deviceFeature.last_value_changed > thresholdDate) {
+        deviceSeenRecently = true;
+      }
+    });
+    // if no device was seen, the user has left home
+    if (deviceSeenRecently === false) {
+      logger.info(
+        `CheckUserPresence action: No devices of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
+      );
+      logger.info(`CheckUserPresence action: Set "${action.user}" to left home of house "${action.house}"`);
+      await self.house.userLeft(action.house, action.user);
+    }
   },
 };
 

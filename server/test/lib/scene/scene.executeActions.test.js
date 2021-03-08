@@ -325,6 +325,60 @@ describe('scene.executeActions', () => {
     );
     assert.calledWith(house.userLeft, 'my-house', 'john');
   });
+  it('should execute action user.checkPresence and not call userLeft because user was seen', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now(),
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(house.userLeft);
+  });
+  it('should execute action user.checkPresence and call userLeft because user was not seen', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now() - 15 * 60 * 1000,
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(house.userLeft, 'my-house', 'john');
+  });
   it('should execute action http.request', async () => {
     const stateManager = new StateManager(event);
     const http = {
@@ -352,6 +406,33 @@ describe('scene.executeActions', () => {
       scope,
     );
     assert.calledWith(http.request, 'post', 'http://test.test', { toto: 'toto' }, { authorization: 'token' });
+  });
+  it('should execute action http.request with empty body', async () => {
+    const stateManager = new StateManager(event);
+    const http = {
+      request: fake.resolves({ success: true }),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, http },
+      [
+        [
+          {
+            type: ACTIONS.HTTP.REQUEST,
+            method: 'post',
+            url: 'http://test.test',
+            headers: [
+              {
+                key: 'authorization',
+                value: 'token',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(http.request, 'post', 'http://test.test', undefined, { authorization: 'token' });
   });
   it('should abort scene, condition is not verified', async () => {
     const stateManager = new StateManager(event);
