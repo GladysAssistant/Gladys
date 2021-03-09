@@ -563,6 +563,7 @@
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "scanButton": "Scanner",
         "serverNoResponse": "Gladys n'est pas accessible.",
+        "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
         "createGithubIssue": "Proposer ce périphérique"
       },

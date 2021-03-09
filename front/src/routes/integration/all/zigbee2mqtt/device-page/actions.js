@@ -97,9 +97,6 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.zigbee2mqttDevices[index];
-      device.features.forEach(feature => {
-        feature.name = `${device.name} - ${feature.category}`;
-      });
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       savedDevice.model = device.model;
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {

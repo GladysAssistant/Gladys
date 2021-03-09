@@ -28,7 +28,7 @@ class Zigbee2mqttIntegration extends Component {
   render(props, {}) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <DiscoverTab {...props} />
+        <DiscoverTab {...props} dictionary={this.context.intl.dictionary} />
       </Zigbee2mqttPage>
     );
   }

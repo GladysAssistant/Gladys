@@ -442,6 +442,7 @@
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "scanButton": "Scan",
         "serverNoResponse": "Gladys server is not available.",
+        "serverNoResponseWebSocker": "Gladys server is not available. Pleash refresh the page.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "createGithubIssue": "Suggest this device"
       },

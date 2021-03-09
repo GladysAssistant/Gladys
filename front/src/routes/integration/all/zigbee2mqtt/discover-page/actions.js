@@ -9,18 +9,29 @@ function createActions(store) {
   const actions = {
     async discover(state) {
       store.setState({
-        discoverZigbee2mqtt: true
+        discoverZigbee2mqtt: true,
+        discoverZigbee2mqttError: null
       });
-      try {
-        await state.httpClient.post('/api/v1/service/zigbee2mqtt/discover');
-        scanTimer = setTimeout(store.setState, 5000, {
-          discoverZigbee2mqtt: false,
-          discoverZigbee2mqttError: null
-        });
-      } catch (e) {
+      if (state.session.websocketConnected) {
+        try {
+          await state.httpClient.post('/api/v1/service/zigbee2mqtt/discover');
+          scanTimer = setTimeout(store.setState, 5000, {
+            discoverZigbee2mqtt: false,
+            discoverZigbee2mqttError: null
+          });
+        } catch (e) {
+          clearTimeout(scanTimer);
+          store.setState({
+            zigbee2mqttDevices: [],
+            discoverZigbee2mqtt: false,
+            discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponse'
+          });
+        }
+      } else {
         store.setState({
+          zigbee2mqttDevices: [],
           discoverZigbee2mqtt: false,
-          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponse'
+          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponseWebSocker'
         });
       }
     },
@@ -99,6 +110,12 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.zigbee2mqttDevices[index];
+      device.features.forEach(feature => {
+        const featureName = this.dictionary.deviceFeatureCategory[feature.category][feature.type];
+        if (featureName) {
+          feature.name = featureName;
+        }
+      });
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const zigbee2mqttDevices = state.zigbee2mqttDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({

@@ -27,6 +27,8 @@ function handleMqttMessage(topic, message) {
       const convertedDevices = devices
         // Remove Coordinator
         .filter((d) => d.type !== TYPE_COORDINATOR)
+        // Remove Empty models
+        .filter((d) => d.model && d.model !== '')
         // Remove existing devices
         .filter((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
