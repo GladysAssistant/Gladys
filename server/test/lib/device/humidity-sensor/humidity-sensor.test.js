@@ -69,11 +69,13 @@ describe('HumiditySensor.command', () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, {});
     const message = {};
-    await deviceManager.humiditySensorManager.command(message, {
-      intent: 'humidity-sensor.get-in-room',
-      entities: [],
-    },
-    {},
+    await deviceManager.humiditySensorManager.command(
+      message,
+      {
+        intent: 'humidity-sensor.get-in-room',
+        entities: [],
+      },
+      {},
     );
     assert.calledWith(messageManager.replyByIntent, message, 'humidity-sensor.get-in-room.fail.room-not-found', {});
   });
