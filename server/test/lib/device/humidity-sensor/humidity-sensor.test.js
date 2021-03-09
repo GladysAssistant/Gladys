@@ -72,7 +72,9 @@ describe('HumiditySensor.command', () => {
     await deviceManager.humiditySensorManager.command(message, {
       intent: 'humidity-sensor.get-in-room',
       entities: [],
-    });
+    },
+    {},
+    );
     assert.calledWith(messageManager.replyByIntent, message, 'humidity-sensor.get-in-room.fail.room-not-found', {});
   });
 });
