@@ -26,7 +26,7 @@ async function command(message, classification, context) {
           throw new NoValuesFoundError('No humidity values found in this room.');
         }
         context.humidity = Math.round(humidityResult.humidity);
-        context.unit = humidityResult.unit === DEVICE_FEATURE_UNITS.PERCENT;
+        context.unit = DEVICE_FEATURE_UNITS.PERCENT;
         context.roomName = roomEntity.sourceText;
         this.messageManager.replyByIntent(message, `humidity-sensor.get-in-room.success`, context);
         break;
