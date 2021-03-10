@@ -640,6 +640,57 @@
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
     },
+    "awox": {
+      "title": "AwoX",
+      "description": "Control your AwoX devices.",
+      "deviceTab": "Devices",
+      "bluetoothTab": "Setup Bluetooth",
+      "documentationLabel": "AwoX documentation",
+      "device": {
+        "title": "AwoX Devices",
+        "search": "Search devices",
+        "noDevices": "No AwoX devices added yet.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter device name",
+        "roomLabel": "Room",
+        "externalIdLabel": "External ID",
+        "awoxTypeLabel": "AwoX type",
+        "awoxTypes": {
+          "legacy": "Lecagy",
+          "mesh": "Ble Mesh"
+        },
+        "featuresLabel": "Features",
+        "noFeatureDiscovered": "No features discovered.",
+        "saveButton": "Save",
+        "editButton": "Edit",
+        "deleteButton": "Delete"
+      },
+      "setup": {
+        "title": "Setup AwoX Bluetooth devices",
+        "scanButton": "Scan",
+        "noDeviceFound": "No AwoX Bluetooth devices discovered.",
+        "createDeviceInGladys": "Connect in Gladys",
+        "updateDeviceInGladys": "Update in Gladys",
+        "notAwoxDevice": "Not an Awox Device",
+        "notManagedByAwox": "You cannot manage this device here as it is already manager by \"{{service}}\" service.",
+        "saveSuccess": "AwoX device successfully created.",
+        "saveError": "There was an error creating the device.",
+        "scanInfo": "Be sure to well follow documentation instructions to link you device.",
+        "testOnButton": "Switch ON",
+        "testOffButton": "Switch OFF",
+        "testErrorMessage": "An error occured while testing, please try again.",
+        "meshTestErrorMessage": "An error occured while testing, please try to pair first, or try again.",
+        "pairAlert": "Failed to pair device. Check your device is in pairing mode or reachable.",
+        "peripheral": {
+          "title": "AwoX Peripheral Configuration",
+          "notAvailable": "Peripheral is not available, please scan again.",
+          "createLabel": "Create",
+          "pairLabel": "Pair",
+          "cancelLabel": "Cancel",
+          "successLabel": "Done"
+        }
+      }
+    },
     "bluetooth": {
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices.",

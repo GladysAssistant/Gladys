@@ -304,6 +304,57 @@
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
     },
+    "awox": {
+      "title": "AwoX",
+      "description": "Controllez vos appareils AwoX.",
+      "deviceTab": "Appareils",
+      "bluetoothTab": "Configuration Bluetooth",
+      "documentationLabel": "Documentation AwoX",
+      "device": {
+        "title": "Appareils AwoX",
+        "search": "Recherche d'appareils",
+        "noDevices": "Aucun appareil AwoX n'a encore été ajouté.",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "externalIdLabel": "ID externe",
+        "awoxTypeLabel": "Type AwoX",
+        "awoxTypes": {
+          "legacy": "Traditionnel",
+          "mesh": "Ble Mesh"
+        },
+        "featuresLabel": "Fonctionnalités",
+        "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
+        "saveButton": "Enregistrer",
+        "editButton": "Modifier",
+        "deleteButton": "Supprimer"
+      },
+      "setup": {
+        "title": "Configurez les appareils AwoX Bluetooth",
+        "scanButton": "Rechercher",
+        "noDeviceFound": "Aucun apparail AwoX Bluetooth découvert.",
+        "createDeviceInGladys": "Connecter dans Gladys",
+        "updateDeviceInGladys": "Mettre à jours dans Gladys",
+        "notAwoxDevice": "Pas un appareil Awox",
+        "notManagedByAwox": "Vous ne pouvez gérer cet appareil ici car il est déjà attaché au service \"{{service}}\".",
+        "saveSuccess": "L'appareil AwoX a été créé avec succés.",
+        "saveError": "Une erreur est survenue lors de la création de l'appareil.",
+        "scanInfo": "Merci de bien suivre les instructions de la documentation afin de connecter votre appareil.",
+        "testOnButton": "Allumer",
+        "testOffButton": "Eteindre",
+        "testErrorMessage": "Une erreur est survenue lors du test, merci de réessayer.",
+        "meshTestErrorMessage": "Une erreur est survenue lors du test, merci d'appairer en premier, ou de réessayer.",
+        "pairAlert": "Erreur lors de l'appairage. Vérifiez que l'appareil est en mode appairage ou joignable.",
+        "peripheral": {
+          "title": "Configuration d'un appareil AwoX Bluetooth",
+          "notAvailable": "L'appareil n'est pas disponible, merci de faire une nouvelle recherche.",
+          "createLabel": "Créer",
+          "pairLabel": "Appairer",
+          "cancelLabel": "Annuler",
+          "successLabel": "Effectué"
+        }
+      }
+    },
     "bluetooth": {
       "title": "Bluetooth",
       "description": "Contrôler vos appareils Bluetooth.",
