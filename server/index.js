@@ -1,4 +1,4 @@
-const Gladys = require('./lib');
+const Gladys = require('./lib/');
 const server = require('./api/');
 
 if (process.env.NODE_ENV === 'development') {

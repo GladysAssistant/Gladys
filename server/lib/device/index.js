@@ -19,11 +19,12 @@ const { purgeStates } = require('./device.purgeStates');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
 const { saveState } = require('./device.saveState');
+const { saveLastStateChanged } = require('./device.saveLastStateChanged');
 const { saveStringState } = require('./device.saveStringState');
 const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
 const { setupPoll } = require('./device.setupPoll');
-const { newStateEvent } = require('./device.newStateEvent');
+const { newStateEvent, newStateNoChangedEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
 
 const DeviceManager = function DeviceManager(
@@ -48,6 +49,7 @@ const DeviceManager = function DeviceManager(
 
   this.devicesByPollFrequency = {};
   // listen to events
+  this.eventManager.on(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, this.newStateNoChangedEvent.bind(this));
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
   this.eventManager.on(EVENTS.DEVICE.NEW, eventFunctionWrapper(this.create.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_FEATURE, eventFunctionWrapper(this.addFeature.bind(this)));
@@ -67,7 +69,9 @@ DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;
+DeviceManager.prototype.newStateNoChangedEvent = newStateNoChangedEvent;
 DeviceManager.prototype.saveState = saveState;
+DeviceManager.prototype.saveLastStateChanged = saveLastStateChanged;
 DeviceManager.prototype.saveStringState = saveStringState;
 DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;

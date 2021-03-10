@@ -79,7 +79,10 @@ export const RequestStatus = {
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
-  RoomValidationError: 'RoomValidationError'
+  RoomValidationError: 'RoomValidationError',
+  ConnectedNoDevice: 'ConnectedNoDevice',
+  ServiceConnected: 'ServiceConnected',
+  ServiceDisconnected: 'ServiceDisconnected'
 };
 
 export const GetWeatherStatus = {
@@ -123,10 +126,16 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: 'sun',
     [DEVICE_FEATURE_TYPES.LIGHT.POWER]: 'zap',
     [DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE]: 'play',
-    [DEVICE_FEATURE_TYPES.LIGHT.EFFECT_SPEED]: 'activity'
+    [DEVICE_FEATURE_TYPES.LIGHT.EFFECT_SPEED]: 'activity',
+    [DEVICE_FEATURE_TYPES.LIGHT.STRING]: 'sun'
   },
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'thermometer'
+  },
+  [DEVICE_FEATURE_CATEGORIES.SETPOINT]: {
+    [DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL]: 'sliders',
+    [DEVICE_FEATURE_TYPES.SETPOINT.INTEGER]: 'sliders',
+    [DEVICE_FEATURE_TYPES.SETPOINT.STRING]: 'sliders'
   },
   [DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR]: {
     [DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.STATUS]: 'alert-circle',
@@ -150,7 +159,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: 'zap',
     [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: 'zap',
     [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: 'zap',
-    [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: 'bar-chart-2'
+    [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: 'bar-chart-2',
+    [DEVICE_FEATURE_TYPES.SWITCH.INTEGER]: 'power'
   },
   [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'wind',
@@ -158,6 +168,20 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'cloud'
+  },
+  [DEVICE_FEATURE_CATEGORIES.WINDSPEED_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: 'wind',
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'wind'
+  },
+  [DEVICE_FEATURE_CATEGORIES.RAINFALL_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'cloud'
+  },
+  [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.STRING]: 'rotate-cw',
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'rotate-cw'
+  },
+  [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: 'volume'
   },
   [DEVICE_FEATURE_CATEGORIES.SIREN]: {
     [DEVICE_FEATURE_TYPES.SIREN.BINARY]: 'bell'
@@ -186,6 +210,10 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.BUTTON]: {
     [DEVICE_FEATURE_TYPES.BUTTON.CLICK]: 'circle'
+  },
+  [DEVICE_FEATURE_CATEGORIES.INDEX]: {
+    [DEVICE_FEATURE_TYPES.INDEX.INTEGER]: 'heart',
+    [DEVICE_FEATURE_TYPES.INDEX.DIMMER]: 'heart'
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
     [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'

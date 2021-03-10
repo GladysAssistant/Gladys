@@ -10,5 +10,6 @@ module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports.tasmota = require('./tasmota');
 module.exports.bluetooth = require('./bluetooth');
+module.exports.netatmo = require('./netatmo');
 module.exports.ewelink = require('./ewelink');
 module.exports['tp-link'] = require('./tp-link');

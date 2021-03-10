@@ -220,7 +220,8 @@
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
-        "editBoxNamePlaceholder": "Nom de la box"
+        "editBoxNamePlaceholder": "Nom de la box",
+        "noHistoric": "Aucun historique"
       }
     }
   },
@@ -422,6 +423,97 @@
       "deleteButton": "Supprimer",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
+    },
+    "netatmo": {
+      "title": "Netatmo",
+      "description": "Contrôler les équipements Netatmo",
+      "deviceTab": "Appareils Netatmo",
+      "discoverTab": "Découverte appareils Netatmo",
+      "settingTab": "Paramètres",
+      "box": {
+        "disconnect": "Les états et commandes ne sont pas disponibles pour le moment. Netatmo est déconnecté.",
+        "noCommand": "Les commandes ne sont pas disponibles pour le moment."
+      },
+      "device": {
+        "title": "Equipements Netatmo dans Gladys",
+        "noDevices": "Aucun appareil Netatmo n'a encore été ajouté.",
+        "searchPlaceholder": "Chercher un appareil",
+        "sidLabel": "SID Netatmo",
+        "roomLabel": "Pièce",
+        "ipLabel": "Adresse IP",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "editButton": "Modifier",
+        "noFeatures": "Aucune fonctionnalité",
+        "addDeviceButton": "Ajouter",
+        "deviceNotHandled": "Equipements non pris en charge",
+        "foundDevice": "Equipements trouvés"
+      },
+      "discover": {
+        "title": "Vos équipements Netatmo compatibles avec Gladys",
+        "noDevices": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
+        "noConnect": "Aucun appareil Netatmo. Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
+        "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
+        "alreadyCreatedButton": "Déjà créé",
+        "refreshButton": "Mettre à jour"
+      },
+      "setting": {
+        "title": "Netatmo configuration",
+        "usernamePlaceholder": "Utilisateur",
+        "passwordPlaceholder": "Mot de passe",
+        "clientIdPlaceholder": "Identifiant client",
+        "clientSecretPlaceholder": "Secret client",
+        "saveLabel": "Sauvegarder",
+        "saveAndConnectLabel": "Sauvegarder & Connecter",
+        "connectLabel": "Connecter",
+        "disconnectLabel": "Déconnecter",
+        "configure": "Connexion à Netatmo",
+        "connect": "Gladys est connectée à Netatmo",
+        "disconnect": "Gladys n'est pas connectée à Netatmo",
+        "currentConnection": "Connexion à Netatmo en cours",
+        "error": "La connexion à Netatmo a échoué"
+      },
+      "DeviceFeatureValues": {
+        "security": {
+          "status": {
+            "0": "Off",
+            "1": "On"
+          },
+          "light": {
+            "0": "Off",
+            "1": "On",
+            "2": "Auto"
+          },
+          "siren": {
+            "0": "volume-x",
+            "1": "volume-2"
+          }
+        },
+        "energy": {
+          "setpointmode": {
+            "0": "Programme",
+            "1": "Manuel Boost",
+            "2": "Hors-gel",
+            "3": "Absent"
+          },
+          "heating_req": {
+            "0": "0",
+            "1": "100"
+          }
+        }
+      },
+      "healthHomeCoach": {
+        "airQualityHealthIndex": {
+          "0": "Sain",
+          "1": "Agréable",
+          "2": "Acceptable",
+          "3": "Mauvais",
+          "4": "Médiocre",
+          "-1": "NC",
+          "null": "NC"
+        }
+      }
     },
     "tasmota": {
       "title": "Tasmota",
@@ -1256,32 +1348,60 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "degree": "Degré (°)",
+    "null": "Pas d'unité",
     "percent": "Pourcent (%)",
+    "millibar": "Millibar (mbar)",
     "pascal": "Pascal (Pa)",
-    "lux": "Lux",
-    "watt": "Watt",
-    "kilowatt": "Kilowatt",
+    "inch-mercury": "Pouce de mercure (inHg)",
+    "millimeter-mercury": "Millimètre de mercure (mmHg)",
+    "lux": "Luxmen (lux)",
+    "watt": "Watt (W)",
+    "kilowatt": "Kilowatt (kW)",
     "kilowatt-hour": "Kilowatt heure (kW/h)",
     "ampere": "Ampère (A)",
     "volt": "Volt (V)",
+    "decibel": "Décibel (dB)",
     "ppm": "Partie par million (ppm)",
-    "cm": "Centimètre (cm)",
-    "mm": "Millimètre (mm)"
+    "inch": "Pouce (\")",
+    "centimeter": "Centimètre (cm)",
+    "millimeter": "Millimètre (mm)",
+    "miles-hour": "Miles par heure (mph)",
+    "inch-hour": "Pouce par heure (in/h)",
+    "millimeter-hour": "Millimètre par heure (mm/h)",
+    "kilometer-hour": "Kilomètre par heure (km/h)",
+    "meter-second": "Mètre par seconde (m/s)",
+    "beaufort": "Beaufort (Bf)",
+    "knots": "Noeud (kn)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
     "percent": "%",
+    "degree": "°",
+    "null": "",
+    "millibar": "mbar",
     "pascal": "Pa",
+    "inch-mercury": "inHg",
+    "millimeter-mercury": "mmHg",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "KW",
     "kilowatt-hour": "kW/h",
     "ampere": "A",
     "volt": "V",
+    "decibel": "dB",
     "ppm": "ppm",
-    "cm": "cm",
-    "mm": "mm"
+    "inch": "\"",
+    "centimeter": "cm",
+    "millimeter": "mm",
+    "miles-hour": "mph",
+    "inch-hour": "in/h",
+    "millimeter-hour": "mm/h",
+    "kilometer-hour": "km/h",
+    "meter-second": "m/s",
+    "beaufort": "Bf",
+    "knots": "kn"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1294,7 +1414,8 @@
       "temperature": "Température éclairage",
       "power": "Puissance consommée éclairage",
       "effect-mode": "Effet",
-      "effect-speed": "Vitesse de l'effet"
+      "effect-speed": "Vitesse de l'effet",
+      "string": "Mode d'éclairage On/Off/Auto"
     },
     "battery": {
       "shortCategoryName": "Batterie",
@@ -1303,6 +1424,11 @@
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
       "decimal": "Température"
+    },
+    "setpoint": {
+      "shortCategoryName": "Consigne",
+      "decimal": "Température de consigne",
+      "string": "Mode de consigne"
     },
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
@@ -1347,6 +1473,28 @@
       "shortCategoryName": "Capteur de Co2",
       "decimal": "Niveau de CO2"
     },
+    "windspeed-sensor": {
+      "shortCategoryName": "Capteur de Vitesse",
+      "decimal": "Vitesse vent"
+    },
+    "rainfall-sensor": {
+      "shortCategoryName": "Capteur de pluie",
+      "decimal": "Pluviomètre"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Capteur d'angle",
+      "decimal": "Angle",
+      "string": "Point Cardinal"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Capteur de bruit",
+      "integer": "Niveau sonore"
+    },
+    "index": {
+      "shortCategoryName": "Index",
+      "integer": "Index",
+      "dimmer": "Jauge d'index"
+    },
     "switch": {
       "shortCategoryName": "Prise",
       "voltage": "Tension moyenne",
@@ -1355,7 +1503,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "integer": "Commutateur 0-100%"
     },
     "siren": {
       "shortCategoryName": "Sirène",
@@ -1451,6 +1600,7 @@
     "namePlaceholder": "Entrez un nom",
     "externalIdLabel": "ID externe",
     "externalIdPlaceholder": "Entrez une ID externe",
+    "typeLabel": "Type",
     "unitLabel": "Unité",
     "saveButton": "Sauvegarder",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
@@ -1465,11 +1615,16 @@
     "notFound": "Appareil recherché introuvable.",
     "pollFrequency": {
       "label": "Fréquence de rafraîchissement",
+      "everyHours": "Toutes les heures",
+      "every30Minutes": "Toutes les 30 minutes",
+      "every10Minutes": "Toutes les 10 minutes",
+      "every5Minutes": "Toutes les 5 minutes (recommandé pour certains équipements)",
+      "every2Minutes": "Toutes les 2 minutes",
       "everyMinutes": "Toutes les minutes (recommandé)",
       "every30Seconds": "Toutes les 30 secondes",
       "every10Seconds": "Toutes les 10 secondes",
-      "every2Seconds": "Toutes les 2 secondes",
-      "every1Seconds": "Chaque seconde"
+      "every2Seconds": "Toutes les 2 secondes (déconseillé)",
+      "every1Seconds": "Chaque seconde (déconseillé)"
     }
   },
   "gatewaySignup": {
@@ -1582,6 +1737,32 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
-    "stripeButton": "Gérer la facturation dans Stripe"
+    "stripeButton": "Gérer la facturation dans Stripe",
+    "cardTypeLabel": "Type",
+    "cardLastDigitsLabel": "4 derniers chiffres",
+    "cardExpirationLabel": "Date d'expiration",
+    "updateInformationTitle": "Mettre à jour les informations de la carte",
+    "updateInformationDescription": "Si votre carte a expirée, ou si vous souhaitez changer de carte de crédit, vous pouvez mettre à jour ici les informations de votre carte.",
+    "cancelSubscriptionTitle": "Annuler l'abonnement",
+    "cancelSubscriptionError": "Avertissement : une erreur s'est produite lors de la tentative d'annulation de votre compte. Veuillez réessayer ultérieurement.",
+    "cancelSubscriptionSuccess": "Votre abonnement a été annulé avec succès !",
+    "cancelSubscriptionDescription": "Si vous souhaitez annuler votre abonnement, cliquez ici :",
+    "cancelSubscriptionButton": "Annuler l'abonnement",
+    "accountCancelled": "Votre abonnement a été annulé le {{date}}",
+    "subscriptionButton": "S'abonner à nouveau"
+  },
+  "cardinalPoints": {
+    "north": "↑ N (Nord)",
+    "northNorthEast": "↗ NNE (Nord Nord Est)",
+    "northEast": "↗ NE (Nord Est)",
+    "east": "→ E (Est)",
+    "southEast": "↘ SE (Sud Est)",
+    "southSouthEast": "↘ SSE (Sud Sud Est)",
+    "south": "↓ S (Sud)",
+    "southSouthWest": "↙ SSO (Sud Sud Ouest)",
+    "southWest": "↙ SO (Sud Ouest)",
+    "west": "← O (Ouest)",
+    "northWest": "↖ NO (Nord Ouest)",
+    "northNorthWest": "↖ NNO (Nord Nord Ouest)"
   }
 }

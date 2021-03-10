@@ -29,7 +29,7 @@ class RoomSelector extends Component {
                     room
                   };
 
-                  if (newProps.selectedRoom === room.selector) {
+                  if (newProps.selectedRoom === room.selector || newProps.selectedRoom === room.id) {
                     selectedRoom = option;
                   }
 

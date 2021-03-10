@@ -111,7 +111,7 @@ describe('Tasmota - MQTT - create device with SR04 distance features', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-          unit: DEVICE_FEATURE_UNITS.CM,
+          unit: DEVICE_FEATURE_UNITS.CENTIMETER,
           external_id: 'tasmota:tasmota-device-topic:SR04:Distance',
           selector: 'tasmota-tasmota-device-topic-sr04-distance',
           name: 'Distance',
