@@ -53,7 +53,10 @@ describe('calendar.destroyEvents', () => {
   const calendar = new Calendar();
   it("should destroy all calendar's event", async () => {
     await calendar.destroyEvents('07ec2599-3221-4d6c-ac56-41443973201b');
-    const allCalendarEvents = await calendar.getEvents('0cd30aef-9c4e-4a23-88e3-3547971296e5', '07ec2599-3221-4d6c-ac56-41443973201b');
+    const allCalendarEvents = await calendar.getEvents(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      '07ec2599-3221-4d6c-ac56-41443973201b',
+    );
     assert.deepEqual(allCalendarEvents, []);
   });
 });
