@@ -33,6 +33,7 @@ describe('scene.checkTrigger', () => {
           operator: '=',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
@@ -74,6 +75,7 @@ describe('scene.checkTrigger', () => {
           time: '12:00',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.TIME.CHANGED,
@@ -114,6 +116,7 @@ describe('scene.checkTrigger', () => {
           operator: '=',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
@@ -156,6 +159,7 @@ describe('scene.checkTrigger', () => {
           threshold_only: true,
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
@@ -199,6 +203,7 @@ describe('scene.checkTrigger', () => {
           threshold_only: true,
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
@@ -241,6 +246,7 @@ describe('scene.checkTrigger', () => {
           operator: '=',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
@@ -296,6 +302,7 @@ describe('scene.checkTrigger', () => {
           unit: 'hour',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.TIME.CHANGED,
@@ -339,6 +346,7 @@ describe('scene.checkTrigger', () => {
           unit: 'hour',
         },
       ],
+      active: true,
     });
     sceneManager.checkTrigger({
       type: EVENTS.TIME.CHANGED,

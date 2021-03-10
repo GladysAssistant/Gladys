@@ -1,4 +1,5 @@
 const { assert, fake } = require('sinon');
+const { expect } = require('chai');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
@@ -28,6 +29,7 @@ describe('SceneManager', () => {
           },
         ],
       ],
+      active: true,
     };
     sceneManager.addScene(scene);
     await sceneManager.execute('my-scene');
@@ -41,6 +43,29 @@ describe('SceneManager', () => {
         }
       });
     });
+  });
+  it('scene is not active', async () => {
+    const stateManager = new StateManager(event);
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    const scene = {
+      selector: 'my-scene',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      active: false,
+    };
+    sceneManager.addScene(scene);
+    await sceneManager.execute('my-scene');
+    expect(sceneManager.queue.length).to.equal(0);
   });
   it('scene does not exist', async () => {
     const sceneManager = new SceneManager(light, event);
