@@ -31,7 +31,6 @@ class SunriseSunsetTrigger extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      houseValid: true,
       houses: []
     };
   }
@@ -40,8 +39,7 @@ class SunriseSunsetTrigger extends Component {
     this.getHouses();
   }
 
-  render({}, { houses, houseValid }) {
-    console.log('houseValid', houseValid);
+  render({}, { houses }) {
     return (
       <div>
         <div class="row">
@@ -56,8 +54,10 @@ class SunriseSunsetTrigger extends Component {
 
 class SelectSunriseSunset extends Component {
   handleHouseChange = e => {
-    const houseSelector = e.target.value;
+    this.props.onHouseChange(e.target.value);
+  };
 
+  houseIsValid(houseSelector) {
     const houses = this.props.houses;
     let houseValid = false;
     if (houseSelector === undefined || houseSelector === '') {
@@ -69,14 +69,19 @@ class SelectSunriseSunset extends Component {
       }
     }
     this.setState({ houseValid });
-    this.props.onHouseChange(houseSelector);
-  };
+  }
 
   constructor(props) {
     super(props);
     this.state = {
       houseValid: true
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.houses !== this.props.houses || prevProps.house !== this.props.house) {
+      this.houseIsValid(this.props.house);
+    }
   }
 
   render({}, { houseValid }) {
