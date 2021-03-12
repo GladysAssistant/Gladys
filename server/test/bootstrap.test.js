@@ -42,7 +42,7 @@ before(async function before() {
   // @ts-ignore
   global.TEST_BACKEND_APP = server.start(gladys, SERVER_PORT, {
     serveFront: false,
-  });
+  }).app;
   // @ts-ignore
   global.TEST_GLADYS_INSTANCE = gladys;
 });
