@@ -13,11 +13,6 @@ const DEFAULT = {
   TOPICS: [
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
-  INSTALLATION_STATUS: {
-    DONE: 'DONE',
-    IN_PROGRESS: 'IN_PROGRESS',
-    ERROR: 'ERROR',
-  },
 };
 
 module.exports = {

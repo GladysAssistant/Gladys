@@ -5,8 +5,8 @@ const { getFeaturesByModel } = require('../model');
  * @description Retreive feature related to device.
  * @param {string} name - Device name.
  * @param {string} model - Device model.
- * @param {boolean} addBattery - Add battery feature.
- * @returns {*} Device for Gladys.
+ * @param {boolean} addBattery - Automatically add battery feature.
+ * @returns {Object} Device for Gladys.
  * @example
  * loadFeatures('MyDevice', 'MODEL', true);
  */

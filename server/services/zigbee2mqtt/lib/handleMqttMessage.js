@@ -50,7 +50,9 @@ function handleMqttMessage(topic, message) {
       // Keep only "permit_join" value
       const config = JSON.parse(message);
       this.z2mPermitJoin = config.permit_join;
+
       logger.log('Getting config from Zigbee2mqtt : permit_joint =', this.z2mPermitJoin);
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
         payload: this.z2mPermitJoin,
@@ -60,7 +62,9 @@ function handleMqttMessage(topic, message) {
     case 'zigbee2mqtt/bridge/response/permit_join': {
       const config = JSON.parse(message);
       this.z2mPermitJoin = config.data.value;
+
       logger.log('Getting permit_joint :', this.z2mPermitJoin);
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
         payload: this.z2mPermitJoin,
@@ -70,7 +74,9 @@ function handleMqttMessage(topic, message) {
     case 'zigbee2mqtt/bridge/config/permit_join': {
       const config = JSON.parse(message);
       this.z2mPermitJoin = config;
+
       logger.log('Getting permit_joint :', this.z2mPermitJoin);
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
         payload: this.z2mPermitJoin,

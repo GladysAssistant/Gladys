@@ -1,8 +1,8 @@
 /**
- * @description Convert Zigbee2mqtt device state into Gladys compliant.
+ * @description Convert Zigbee2mqtt device value into Gladys value.
  * @param {string} feature - Device feature.
  * @param {number|string|boolean} value - Device value.
- * @returns {number} Gladys value.
+ * @returns {number|string|boolean} Gladys value.
  * @example
  * convertValue('state', 'ON');
  */

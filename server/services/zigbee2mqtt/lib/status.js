@@ -1,6 +1,6 @@
 /**
  * @description Get Zigbee2mqtt status.
- * @returns {Object} Current Zigbee2mqtt network status.
+ * @returns {Object} Current Zigbee2mqtt containers and configuration status.
  * @example
  * status();
  */

@@ -4,7 +4,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Disconnect service from dependencies.
+ * @description Disconnect service from dependent containers.
  * @example
  * disconnect();
  */
@@ -14,6 +14,7 @@ async function disconnect() {
   await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
   this.z2mEnabled = false;
 
+  // Disconnect from MQTT broker
   if (this.mqttClient) {
     logger.debug(`Disconnecting existing MQTT server...`);
     this.mqttClient.end();
@@ -27,7 +28,7 @@ async function disconnect() {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
   });
 
-  // Stop broker container
+  // Stop MQTT container
   let dockerContainer = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [mqttContainerDescriptor.name] },

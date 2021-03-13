@@ -8,8 +8,7 @@ const logger = require('../../../utils/logger');
 const sleep = promisify(setTimeout);
 
 /**
- * @description Get MQTT configuration.
- * @returns {Promise} Current MQTT network configuration.
+ * @description Install and starts MQTT container.
  * @example
  * installMqttContainer();
  */
@@ -46,7 +45,7 @@ async function installMqttContainer() {
     }
 
     try {
-      logger.info('Zigbee2MQTT MQTT broker is starting...');
+      logger.info('MQTT broker is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
@@ -63,12 +62,14 @@ async function installMqttContainer() {
       await this.gladys.system.exec(containerMqtt.id, {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
       });
+
       // Container restart to inintialize users configuration
-      logger.info('Zigbee2MQTT MQTT broker is starting...');
+      logger.info('MQTT broker is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
-      logger.info('MQTT broker container successfully started');
+      logger.info('MQTT broker container successfully started and configured');
+
       this.mqttRunning = true;
       this.mqttExist = true;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -85,13 +86,13 @@ async function installMqttContainer() {
   } else {
     this.mqttExist = true;
     try {
-      logger.info('Zigbee2MQTT MQTT broker is starting...');
       dockerContainers = await this.gladys.system.getContainers({
         all: true,
         filters: { name: [containerDescriptor.name] },
       });
       [container] = dockerContainers;
       if (container.state !== 'running') {
+        logger.info('MQTT broker is starting...');
         await this.gladys.system.restartContainer(container.id);
         // wait 5 seconds for the container to restart
         await sleep(5 * 1000);

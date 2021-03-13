@@ -8,8 +8,7 @@ const logger = require('../../../utils/logger');
 const sleep = promisify(setTimeout);
 
 /**
- * @description Get Zigbee2MQTT configuration.
- * @returns {Promise} Current MQTT network configuration.
+ * @description Install and starts Zigbee2mqtt container.
  * @example
  * installZ2mContainer();
  */
@@ -25,6 +24,7 @@ async function installZ2mContainer() {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
       await this.gladys.system.pull(containerDescriptor.Image);
+
       // Prepare Z2M env
       logger.info(`Preparing Zigbee2mqtt environment...`);
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
@@ -41,7 +41,7 @@ async function installZ2mContainer() {
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptor);
       logger.trace(containerLog);
-      logger.info('Zigbee2mqtt successfully installed as Docker container');
+      logger.info('Zigbee2mqtt successfully installed and configured as Docker container');
       this.zigbee2mqttExist = true;
     } catch (e) {
       this.zigbee2mqttExist = false;
@@ -54,19 +54,19 @@ async function installZ2mContainer() {
   }
 
   try {
-    logger.info('Zigbee2mqtt is starting...');
     dockerContainers = await this.gladys.system.getContainers({
       all: true,
       filters: { name: [containerDescriptor.name] },
     });
     [container] = dockerContainers;
     if (container.state !== 'running') {
+      logger.info('Zigbee2mqtt container is starting...');
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
     }
 
-    logger.info('Zigbee2mqtt successfully started');
+    logger.info('Zigbee2mqtt container successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });

@@ -4,9 +4,9 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constant
 
 /**
  * @description Converts an MQTT device to a Gladys device.
- * @param {*} device - Zigbee2mqtt device.
+ * @param {Object} device - Zigbee2mqtt device.
  * @param {string} serviceId - Service ID.
- * @returns {*} Device for Gladys.
+ * @returns {Object} Device for Gladys.
  * @example
  * convertDevice({ friendly_name: 'name', model: 'featureMapper' }, '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
  */

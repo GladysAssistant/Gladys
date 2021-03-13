@@ -31,8 +31,6 @@ serial:
   # We don't put disable_led because some devices don't handle it
 frontend:
   port: 8080
-experimental:
-  new_api: true
 # Optional: networkmap options
 map_options:
   graphviz:

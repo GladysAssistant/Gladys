@@ -4,7 +4,7 @@ const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
- * @description Prepares service and starts connection with broker.
+ * @description Prepares service and starts connection with broker if needed.
  * @example
  * init();
  */

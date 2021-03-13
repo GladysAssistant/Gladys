@@ -32,6 +32,6 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
     start,
     stop,
     device: zigbee2mqttManager,
-    controllers: Zigbee2mqttController(gladys, zigbee2mqttManager, serviceId),
+    controllers: Zigbee2mqttController(gladys, zigbee2mqttManager),
   });
 };

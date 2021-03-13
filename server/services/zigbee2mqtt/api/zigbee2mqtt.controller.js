@@ -2,23 +2,25 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
-module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serviceId) {
+module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   /**
-   * @api {post} /api/v1/service/zigbee2mqtt/discover Get discovered Zigbee2mqtt devices
+   * @api {post} /api/v1/service/zigbee2mqtt/discover Launch Zigbee2mqtt devices discovery
    * @apiName discover
    * @apiGroup Zigbee2mqtt
    */
-  function discover(req, res) {
-    zigbee2mqttManager.discoverDevices();
+  async function discover(req, res) {
+    logger.log('Launching devices discovery');
+    await zigbee2mqttManager.discoverDevices();
     res.json({ status: 'discovering' });
   }
 
   /**
-   * @api {get} /api/v1/service/zigbee2mqtt/status Get Zigbee2mqtt connection status.
+   * @api {get} /api/v1/service/zigbee2mqtt/status Get Zigbee2mqtt connection status
    * @apiName status
    * @apiGroup Zigbee2mqtt
    */
   async function status(req, res) {
+    logger.log('Get status');
     const response = await zigbee2mqttManager.status();
     res.json(response);
   }
@@ -31,7 +33,6 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
   async function connect(req, res) {
     logger.log('Entering connect step');
     await zigbee2mqttManager.init();
-
     res.json({
       success: true,
     });
@@ -40,13 +41,13 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
   /**
    * @api {post} /api/v1/service/zigbee2mqtt/mqtt/start Install & start MQTT container.
    * @apiName installMqttContainer
-   * @apiGroup Mqtt
+   * @apiGroup Zigbee2mqtt
    */
   async function installMqttContainer(req, res) {
+    logger.log('Install MQTT container');
     let response;
     try {
       await zigbee2mqttManager.installMqttContainer();
-
       response = true;
     } catch (e) {
       logger.error('Error while connecting to MQTT:', e);
@@ -67,8 +68,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function installZ2mContainer(req, res) {
+    logger.log('Install Z2M container');
     await zigbee2mqttManager.installZ2mContainer();
-
     res.json({
       success: true,
     });
@@ -88,12 +89,13 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
   }
 
   /**
-   * @api {post} /api/v1/service/zigbee2mqtt/permit_join Permit joining Zigbee devices
+   * @api {post} /api/v1/service/zigbee2mqtt/permit_join Toggle permit_join Zigbee devices
    * @apiName togglePermitJoin
    * @apiGroup Zigbee2mqtt
    */
   async function togglePermitJoin(req, res) {
-    zigbee2mqttManager.setPermitJoin();
+    logger.log('Toggle permit_join');
+    await zigbee2mqttManager.setPermitJoin();
     res.json({
       success: true,
     });
@@ -105,22 +107,23 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
    * @apiGroup Zigbee2mqtt
    */
   async function getPermitJoin(req, res) {
-    const response = await zigbee2mqttManager.getPermitJoin();
+    logger.log('Get permit_join');
+    const response = zigbee2mqttManager.getPermitJoin();
     res.json(response);
   }
 
   return {
     'post /api/v1/service/zigbee2mqtt/discover': {
       authenticated: true,
-      controller: discover,
+      controller: asyncMiddleware(discover),
     },
     'get /api/v1/service/zigbee2mqtt/status': {
       authenticated: true,
-      controller: status,
+      controller: asyncMiddleware(status),
     },
     'post /api/v1/service/zigbee2mqtt/connect': {
       authenticated: true,
-      controller: connect,
+      controller: asyncMiddleware(connect),
     },
     'post /api/v1/service/zigbee2mqtt/mqtt/start': {
       authenticated: true,
@@ -132,15 +135,15 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager, serv
     },
     'post /api/v1/service/zigbee2mqtt/disconnect': {
       authenticated: true,
-      controller: disconnect,
+      controller: asyncMiddleware(disconnect),
     },
     'post /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
-      controller: togglePermitJoin,
+      controller: asyncMiddleware(togglePermitJoin),
     },
     'get /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
-      controller: getPermitJoin,
+      controller: asyncMiddleware(getPermitJoin),
     },
   };
 };

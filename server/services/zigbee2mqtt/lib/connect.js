@@ -19,6 +19,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       reconnectPeriod: 5000,
       clientId: `gladys-main-instance-${Math.floor(Math.random() * 1000000)}`,
     });
+
     this.mqttClient.on('connect', () => {
       logger.info('Connected to MQTT container', mqttUrl);
       DEFAULT.TOPICS.forEach((topic) => {
@@ -29,6 +30,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       });
     });
+
     this.mqttClient.on('error', (err) => {
       logger.warn(`Error while connecting to MQTT - ${err}`);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -37,6 +39,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       });
       this.gladysConnected = false;
     });
+
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

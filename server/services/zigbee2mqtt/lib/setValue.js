@@ -2,7 +2,7 @@ const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Send the new device value over MQTT.
+ * @description Set the new device value from Gladys to MQTT.
  * @param {Object} device - Updated Gladys device.
  * @param {Object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.

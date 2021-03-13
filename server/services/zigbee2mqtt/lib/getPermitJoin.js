@@ -4,7 +4,7 @@
  * @example
  * init();
  */
-async function getPermitJoin() {
+function getPermitJoin() {
   return this.z2mPermitJoin;
 }
 

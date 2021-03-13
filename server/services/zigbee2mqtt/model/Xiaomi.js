@@ -21,7 +21,7 @@ const Xiaomi = {
     RTCGQ01LM: [features.motion],
     RTCGQ11LM: [features.motion, features.illuminance, features.temperature, features.voltage],
     MCCGQ01LM: [features.door],
-    MCCGQ11LM: [features.door, feature.temperature],
+    MCCGQ11LM: [features.door, features.temperature],
     SJCGQ11LM: [features.water],
     MFKZQ01LM: [features.switch_sensor],
     ZNCZ02LM: [features.switch, features.power],
