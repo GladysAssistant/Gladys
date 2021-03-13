@@ -12,7 +12,7 @@ const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
  */
 async function command(message, classification, context) {
   let humidityResult;
-  const roomEntity = classification.entities.find((entity) => entity.entity === 'room');
+  let roomEntity;
   try {
     switch (classification.intent) {
       case 'humidity-sensor.get-in-room':
@@ -25,6 +25,7 @@ async function command(message, classification, context) {
         if (humidityResult.humidity === null) {
           throw new NoValuesFoundError('No humidity values found in this room.');
         }
+        roomEntity = classification.entities.find((entity) => entity.entity === 'room');
         context.humidity = Math.round(humidityResult.humidity);
         context.unit = DEVICE_FEATURE_UNITS.PERCENT;
         context.roomName = roomEntity.sourceText;

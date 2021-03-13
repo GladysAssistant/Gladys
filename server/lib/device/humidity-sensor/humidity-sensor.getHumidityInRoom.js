@@ -52,12 +52,7 @@ async function getHumidityInRoom(roomId, options) {
     };
   }
 
-  let total = 0;
-
-  deviceFeatures.forEach((deviceFeature) => {
-    const humidity = deviceFeature.last_value;
-    total += humidity;
-  });
+  const total = deviceFeatures.reduce((prev, deviceFeature) => deviceFeature.last_value + prev, 0);
 
   // we calculate the average value
   const averageHumidity = total / deviceFeatures.length;
