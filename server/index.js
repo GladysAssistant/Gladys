@@ -1,5 +1,6 @@
 const Gladys = require('./lib');
-const server = require('./api/');
+const db = require('./models');
+const { start } = require('./api/');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config(); // eslint-disable-line
@@ -20,6 +21,25 @@ process.on('uncaughtException', (error, promise) => {
   logger.error(error);
 });
 
+let server;
+
+const shutdown = async (signal) => {
+  logger.info(`${signal} received.`);
+  logger.info('Closing database connection.');
+  await db.sequelize.close();
+  if (server) {
+    logger.info('Closing server connections.');
+    server.close(() => {
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
 (async () => {
   // create Gladys object
   const gladys = Gladys({
@@ -30,7 +50,7 @@ process.on('uncaughtException', (error, promise) => {
   await gladys.start();
 
   // start server
-  server.start(gladys, SERVER_PORT, {
+  ({ server } = start(gladys, SERVER_PORT, {
     serveFront: SERVE_FRONT,
-  });
+  }));
 })();

@@ -70,7 +70,7 @@ const MockedPhilipsHueClient = {
       }),
     },
     discovery: {
-      nupnpSearch: () =>
+      upnpSearch: () =>
         Promise.resolve([
           {
             name: 'Philips Hue Bridge',
