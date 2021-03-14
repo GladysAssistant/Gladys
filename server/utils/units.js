@@ -67,8 +67,22 @@ function hslToRgb(h, s, l) {
   ];
 }
 
+/**
+ * @description Get the value (between min/max) according to incoming percent.
+ * @param {number} value - Percent value between 0 and 100.
+ * @param {number} min - The min allowed value.
+ * @param {number} max - The maw allowed value.
+ * @returns {number} The percent transformed into value.
+ * @example
+ * percentageToValue(75, 1, 4); // = 3
+ */
+function percentageToValue(value, min, max) {
+  return Math.round(min + (value * (max - min)) / 100);
+}
+
 module.exports = {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   hslToRgb,
+  percentageToValue,
 };

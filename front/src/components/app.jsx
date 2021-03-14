@@ -97,6 +97,12 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// AwoX
+import AwoxDevicePage from '../routes/integration/all/awox/device-page';
+import AwoxEditDevicePage from '../routes/integration/all/awox/edit-page';
+import AwoxBluetoothPage from '../routes/integration/all/awox/bluetooth-page';
+import AwoxDeviceSetupPage from '../routes/integration/all/awox/bluetooth-page/setup-peripheral';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -207,6 +213,11 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
+        <AwoxDevicePage path="/dashboard/integration/device/awox" />
+        <AwoxEditDevicePage path="/dashboard/integration/device/awox/:deviceSelector" />
+        <AwoxBluetoothPage path="/dashboard/integration/device/awox/bluetooth" />
+        <AwoxDeviceSetupPage path="/dashboard/integration/device/awox/bluetooth/:uuid" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

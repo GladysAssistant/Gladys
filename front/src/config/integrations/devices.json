@@ -37,5 +37,9 @@
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg"
+  },
+  {
+    "key": "awox",
+    "img": "/assets/integrations/cover/awox.jpg"
   }
 ]
