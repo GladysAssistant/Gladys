@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { fake, assert } = sinon;
@@ -75,14 +76,46 @@ describe('bluetooth.scan command', () => {
     assert.calledOnce(stopScanningAsync);
   });
 
-  it('should clear timeout', async () => {
+  it('should clear timeout, and discovered devices', async () => {
     bluetoothManager.ready = true;
+    bluetoothManager.discoveredDevices = { one: {}, two: {} };
+
     bluetoothManager.scan(true);
+    await bluetoothManager.scan(false);
+
+    assert.calledOnce(bluetooth.startScanning);
+    assert.notCalled(stopScanning);
+    assert.calledOnce(stopScanningAsync);
+
+    expect(bluetoothManager.discoveredDevices).deep.eq({});
+  });
+
+  it('should clear timeout, and keep discovered devices', async () => {
+    bluetoothManager.ready = true;
+    bluetoothManager.discoveredDevices = { one: {}, two: {} };
+    bluetoothManager.scan(true, 'any');
 
     await bluetoothManager.scan(false);
 
     assert.calledOnce(bluetooth.startScanning);
     assert.notCalled(stopScanning);
     assert.calledOnce(stopScanningAsync);
+
+    expect(bluetoothManager.discoveredDevices).deep.eq({ one: {}, two: {} });
+  });
+
+  it('scan for in memory peripheral', async () => {
+    bluetoothManager.ready = true;
+    bluetoothManager.discoveredDevices = { one: {}, two: {} };
+    // eslint-disable-next-line no-underscore-dangle
+    bluetooth._peripherals.any = { uuid: 'any' };
+
+    const peripheral = await bluetoothManager.scan(true, 'any');
+
+    assert.notCalled(bluetooth.startScanning);
+    assert.notCalled(stopScanning);
+    assert.notCalled(stopScanningAsync);
+
+    expect(peripheral).deep.eq({ uuid: 'any' });
   });
 });
