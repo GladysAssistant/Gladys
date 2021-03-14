@@ -1,8 +1,6 @@
-const { expect } = require('chai');
 const ServerMock = require('mock-http-server');
 const { OAuth2Server } = require('oauth2-mock-server');
 const sinon = require('sinon');
-const uuid = require('uuid');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
@@ -16,11 +14,11 @@ const gladys = {
   variable: {
     getValue: fake.resolves(
       '{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,' +
-      '"token_type":"Bearer",' +
-      '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
-      '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
-      '"userid":"33669966",' +
-      '"expires_at":"2020-11-13T20:46:50.042Z"}',
+        '"token_type":"Bearer",' +
+        '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
+        '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
+        '"userid":"33669966",' +
+        '"expires_at":"2020-11-13T20:46:50.042Z"}',
     ),
     setValue: fake.resolves(null),
     destroy: fake.returns(null),
@@ -64,33 +62,6 @@ describe('WithingsHandler poll', () => {
                 timezone: 'string',
                 last_session_date: 0,
               },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'no',
-                deviceid: 'withingsDevideId2',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'medium',
-                deviceid: 'withingsDevideId3',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'high',
-                deviceid: 'withingsDevideId4',
-                timezone: 'string',
-                last_session_date: 0,
-              },
             ],
           },
         }),
@@ -125,134 +96,6 @@ describe('WithingsHandler poll', () => {
                     fm: 0,
                     fw: 0,
                   },
-                  {
-                    value: 0,
-                    type: 0,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 4,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 5,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 6,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 8,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 9,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 10,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 11,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 12,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 54,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 71,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 73,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 76,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 77,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 88,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                  {
-                    value: 0,
-                    type: 91,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
                 ],
                 comment: 'string',
               },
@@ -278,126 +121,119 @@ describe('WithingsHandler poll', () => {
     serverOauth2.stop();
   });
 
-  const now = new Date();
-  let clock;
-
-  beforeEach(() => {
-    sinon.reset();
-    clock = sinon.useFakeTimers(now.getTime());
-  });
-
-  afterEach(() => {
-    clock.restore();
-  });
-
   it('should poll devices', async () => {
-    const resultInit = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
-    expect(resultInit.next().value.name).to.equal('Withings - string');
-
-    const deviceToPoll = resultInit.next();
+    const deviceToPoll = {
+      id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
+      name: 'Withings - string',
+      model: 'string',
+      poll_frequency: 86400000,
+      selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
+      service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
+      should_poll: true,
+      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
+      params: [
+        {
+          name: 'withingsDeviceId',
+          value: 'withingsDevideId',
+        },
+      ],
+    };
     deviceToPoll.features = [
       {
-        id: uuid.v4(),
+        id: '02b64a40-1de8-4e33-a4bc-03d86e1c567e',
         type: DEVICE_FEATURE_TYPES.HEALTH.WEIGHT,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'b4d554e0-f0f3-469d-89e2-903464eaa9d9',
         type: DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '5ee4d59b-5a7f-440f-8225-0493b0a68547',
         type: DEVICE_FEATURE_TYPES.HEALTH.TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '13e6dfbd-3fb1-4754-b4d2-5bc3352df9b1',
         type: DEVICE_FEATURE_TYPES.HEALTH.SYSTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'ca17a161-2b93-4b0a-8539-b2e19543a3bb',
         type: DEVICE_FEATURE_TYPES.HEALTH.SPO2,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '759f03c6-f57f-4bf4-bc21-2aa3df104d8e',
         type: DEVICE_FEATURE_TYPES.HEALTH.SKIN_TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'ca1f332d-d098-4718-80bc-76ca44689d54',
         type: DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'b4029e8d-c836-4599-913f-ce7775c2a79d',
         type: DEVICE_FEATURE_TYPES.HEALTH.MUSCLE_MASS,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'c0d48de3-41bb-4ac0-8584-496bf9681a91',
         type: DEVICE_FEATURE_TYPES.HEALTH.HYDRATION,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '976bea5c-5a48-4602-b521-5b392f08ac1e',
         type: DEVICE_FEATURE_TYPES.HEALTH.HEIGHT,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '8bcea9af-990b-4a95-bd92-c0410e53a82a',
         type: DEVICE_FEATURE_TYPES.HEALTH.HEARTH_PULSE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '74a3193b-eb39-4d69-b56d-d7d92813dddb',
         type: DEVICE_FEATURE_TYPES.HEALTH.FAT_RATIO,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'f984aa1f-92bc-4e5e-958b-2ec09aa4c6f3',
         type: DEVICE_FEATURE_TYPES.HEALTH.FAT_MASS_WEIGHT,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'f70459f5-6671-4c9f-bc27-3c4da4eb7fa1',
         type: DEVICE_FEATURE_TYPES.HEALTH.FAT_FREE_MASS,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'eb7e1015-180d-41a7-a77a-f89b768c3da9',
         type: DEVICE_FEATURE_TYPES.HEALTH.DIASTOLIC_BLOOD_PRESSURE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '7143a011-7393-48dd-b819-9b9a93d0a33a',
         type: DEVICE_FEATURE_TYPES.HEALTH.BONE_MASS,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: 'feb624ed-5d88-47ae-aaee-33f8069a78e5',
         type: DEVICE_FEATURE_TYPES.HEALTH.BODY_TEMPERATURE,
         last_value_changed: new Date(),
       },
       {
-        id: uuid.v4(),
+        id: '832fd6ce-9c2b-4806-bd0f-fbc9bb2432a4',
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         last_value_changed: new Date(),
-      },
-    ];
-    deviceToPoll.params = [
-      {
-        device_id: deviceToPoll.id,
-        name: 'withingsDeviceId',
-        value: 'withingsDevideId',
       },
     ];
 
     await withingsHandler.poll(deviceToPoll);
 
-    assert.callCount(gladys.variable.getValue, 58);
+    assert.callCount(gladys.variable.getValue, 52);
     assert.calledWithExactly(
       gladys.variable.getValue,
       'WITHINGS_CLIENT_ID',
@@ -405,122 +241,21 @@ describe('WithingsHandler poll', () => {
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     );
 
-    const expectedValues = {
-      done: false,
-      features: [{
-        id: 'eb38855f-34d2-4fa5-9462-9f27fa7b7f28',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'weight'
-      }, {
-        id: '6e0483c9-fa83-4604-8551-9e2fac92a22d',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'unknown'
-      }, {
-        id: '76e8e4bd-c918-4189-8be8-62b4ae5d87a2',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'temperature'
-      }, {
-        id: '439f5272-5f71-434d-93c9-546ff5224ea0',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'systolic-blood-pressure'
-      }, {
-        id: 'eec9c397-f1cb-4308-903a-5195f54db496',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'sp-o2'
-      }, {
-        id: '1075b0de-1588-4312-b18c-122f0e574ea2',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'skin-temperature'
-      }, {
-        id: '7e8a94ce-895f-418e-b227-8203c1e424cc',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'pulse-wave-velocity'
-      }, {
-        id: '0049b2a0-31b6-4f4a-b4da-c4d0bb991d23',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'muscle-mass'
-      }, {
-        id: '97da2348-9acf-430e-b3d1-0f5c1046a7d4',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'hydration'
-      }, {
-        id: 'd34ee631-e405-494c-a215-6fb69df24781',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'height'
-      }, {
-        id: 'e4a91381-e4b2-4a44-b531-46528541cba1',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'heart-pulse'
-      }, {
-        id: '25be3e06-4624-4da3-9b6e-2ef31c5cd79c',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'fat-ratio'
-      }, {
-        id: '5f754d75-6775-464a-9502-fe773e92ec2c',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'fat-mass-weight'
-      }, {
-        id: '11994e2d-c184-45e9-a211-6124a8bc7a7f',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'fat-free-mass'
-      }, {
-        id: '13aa3279-6255-44b8-9416-d8cda1cdf66f',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'diastolic-blood-pressure'
-      }, {
-        id: '2913dba8-9825-4a6a-baf9-709022b30247',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'bone-mass'
-      }, {
-        id: '06497a58-69c3-461f-aaea-81b99184f361',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'body-temperature'
-      }, {
-        id: '332f6ae2-b9b4-493c-9cba-769673c16a60',
-        last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-        type: 'integer'
-      }],
-      params: [{ device_id: undefined, name: 'withingsDeviceId', value: 'withingsDevideId' }],
-      value: {
-        external_id: 'ced8145f-c641-4ddd-ac09-3e21dd33f966',
-        features: [{
-          category: 'battery',
-          device_id: 'ced8145f-c641-4ddd-ac09-3e21dd33f966',
-          external_id: 'ced8145f-c641-4ddd-ac09-3e21dd33f966',
-          feature_state: [{
-            created_at: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-            device_feature_id: 'ce508dc0-1b37-4018-a5c2-99d1581f9ced',
-            id: '282e2835-efe8-4b48-ac12-e36a068beacb',
-            updated_at: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-            value: 0
-          }],
-          has_feedback: false,
-          id: 'ce508dc0-1b37-4018-a5c2-99d1581f9ced',
-          keep_history: false,
-          last_value: 0,
-          last_value_changed: 'Mon Feb 01 2021 09:09:48 GMT+0100 (GMT+01:00)',
-          last_value_string: 'No value',
-          max: 0,
-          min: 0,
-          name: 'Battery',
-          read_only: true,
-          selector: 'withings-battery-ced8145f-c641-4ddd-ac09-3e21dd33f966',
-          type: 'integer',
-          unit: 'percent'
-        }, undefined],
-        id: 'ced8145f-c641-4ddd-ac09-3e21dd33f966',
-        model: 'string',
-        name: 'Withings - string',
-        params: [{ name: 'withingsDeviceId', value: 'withingsDevideId2' }],
-        poll_frequency: 86400000,
-        room_id: null,
-        selector: 'withings-string-ced8145f-c641-4ddd-ac09-3e21dd33f966',
-        service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
-        should_poll: true
-      }
+    const deviceDef = {
+      id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
+      name: 'Withings - string',
+      model: 'string',
+      poll_frequency: 86400000,
+      selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
+      service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
+      should_poll: true,
+      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
+      params: [{ name: 'withingsDeviceId', value: 'withingsDevideId' }],
+      features: deviceToPoll.features,
     };
 
-    assert.callCount(gladys.device.saveHistoricalState, 1);
-    assert.calledWithExactly(gladys.device.saveHistoricalState, expectedValues);
+    // 18 feature - 1 feature unknown = 17 state to save
+    assert.callCount(gladys.device.saveHistoricalState, 17);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
   });
 });

@@ -47,14 +47,13 @@ describe('WithingsController POST /api/v1/service/withings/saveVar', () => {
 describe('WithingsController GET /api/v1/service/withings/deleteConfig', () => {
   const controller = WithingsController(withingsHandler);
 
-  it('shoulmd delete config', async () => {
+  it('should delete config', async () => {
     const req = { user: { id: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd' } };
     const res = { json: fake.returns(null) };
 
     await controller['get /api/v1/service/withings/deleteConfig'].controller(req, res);
     assert.calledOnce(withingsHandler.deleteVar);
     assert.calledOnce(withingsHandler.deleteDevices);
-    assert.calledOnce(res.json);
   });
 });
 

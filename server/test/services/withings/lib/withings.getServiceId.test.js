@@ -6,6 +6,6 @@ describe('WithingsHandler getServiceId', () => {
 
   it('returns serviceId', () => {
     const result = withingsHandler.getServiceId();
-    expect(result).to.equal({ success: true, serviceId: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4' });
+    expect(result).to.eql({ success: true, serviceId: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4' });
   });
 });
