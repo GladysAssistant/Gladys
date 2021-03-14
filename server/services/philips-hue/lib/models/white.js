@@ -46,7 +46,7 @@ const getPhilipsHueWhiteLight = (philipsHueLight, bridgeSerialNumber, serviceId)
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.FADE_IN,
       min: 0,
-      max: 0
+      max: 0,
     },
   ],
 });

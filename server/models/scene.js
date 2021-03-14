@@ -9,14 +9,14 @@ const parametersSchema = Joi.alternatives().conditional('type', [
     then: Joi.object({
       durationValue: Joi.number().required(),
       durationUnit: Joi.string().required(),
-      targetBrightness: Joi.number().required()
+      targetBrightness: Joi.number().required(),
     }),
     otherwise: Joi.object({
       unit: Joi.string(),
       value: Joi.number(),
-      text: Joi.string()
-    })
-  }
+      text: Joi.string(),
+    }),
+  },
 ]);
 
 const actionSchema = Joi.array().items(

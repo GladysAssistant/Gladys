@@ -34,7 +34,10 @@ class SendMessageParams extends Component {
     }
   };
   handleChangeText = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.parameters, text: e.target.value });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+      ...this.props.parameters,
+      text: e.target.value
+    });
   };
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
@@ -140,7 +143,10 @@ class SendMessageParams extends Component {
   }
   componentDidMount() {
     if (!this.props.unit) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.parameters, unit: 'seconds' });
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+        ...this.props.parameters,
+        unit: 'seconds'
+      });
     }
     this.getOptions();
     this.initTagify();

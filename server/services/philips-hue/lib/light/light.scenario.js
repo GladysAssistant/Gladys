@@ -18,7 +18,7 @@ const logger = require('../../../../utils/logger');
  * @example wait(1000)
  */
 async function wait(duration) {
-  return new Promise(res => setTimeout(res, duration));
+  return new Promise((res) => setTimeout(res, duration));
 }
 
 /**
@@ -33,8 +33,11 @@ async function wait(duration) {
 async function fadeIn(device, hueApi, lightId, { duration = 0, targetBrightness = 100 } = {}) {
   const targetBrightnessHue = targetBrightness;
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
-  const brightnessFeature =
-    getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
+  const brightnessFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.LIGHT,
+    DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+  );
   const initialBinaryState = binaryFeature.last_value;
   const initialBrightnessState = brightnessFeature.last_value;
 
@@ -54,22 +57,22 @@ async function fadeIn(device, hueApi, lightId, { duration = 0, targetBrightness 
   const deviceBrightnessFeatureExternalId = `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
   const hueTargetValue = transformBrightnessValue(targetBrightnessHue);
   await new Promise(async (resolve) => {
-      const listener = async (event) => {
-        if (event.device_feature_external_id === deviceBrightnessFeatureExternalId) {
-          if (event.state === hueTargetValue) {
-            // Target brightness reached, resolve
-            resolve();
-            this.gladys.event.removeListener(EVENTS.DEVICE.NEW_STATE, listener);
-          } else {
-            // Target brightness not reached, wait 5 seconds before next poll
-            await wait(5000);
-            this.poll(device);
-          }
+    const listener = async (event) => {
+      if (event.device_feature_external_id === deviceBrightnessFeatureExternalId) {
+        if (event.state === hueTargetValue) {
+          // Target brightness reached, resolve
+          resolve();
+          this.gladys.event.removeListener(EVENTS.DEVICE.NEW_STATE, listener);
+        } else {
+          // Target brightness not reached, wait 5 seconds before next poll
+          await wait(5000);
+          this.poll(device);
         }
-      };
-      this.gladys.event.on(EVENTS.DEVICE.NEW_STATE, listener);
+      }
+    };
+    this.gladys.event.on(EVENTS.DEVICE.NEW_STATE, listener);
 
-      await this.poll(device);
+    await this.poll(device);
   });
 }
 

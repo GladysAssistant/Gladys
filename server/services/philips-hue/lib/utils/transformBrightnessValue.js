@@ -15,9 +15,9 @@ function transformBrightnessValue(value) {
   if (Number(value) <= DIMMER_VALUES.MIN) {
     return LIGHT_BRIGHTNESS.MIN;
   }
-  return Math.round(Number(value) * LIGHT_BRIGHTNESS.MAX / DIMMER_VALUES.MAX);
+  return Math.round((Number(value) * LIGHT_BRIGHTNESS.MAX) / DIMMER_VALUES.MAX);
 }
 
 module.exports = {
-  transformBrightnessValue
+  transformBrightnessValue,
 };

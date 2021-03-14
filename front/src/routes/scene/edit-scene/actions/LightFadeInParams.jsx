@@ -7,14 +7,23 @@ import Select from 'react-select';
 class LightFadeInParams extends Component {
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, durationValue: newValue });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+      ...this.props.action.parameters,
+      durationValue: newValue
+    });
   };
   handleChangeUnit = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, durationUnit: e.target.value });
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+      ...this.props.action.parameters,
+      durationUnit: e.target.value
+    });
   };
   handleChangeTargetBrightness = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', { ...this.props.action.parameters, targetBrightness: e.target.value });
-  }
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+      ...this.props.action.parameters,
+      targetBrightness: e.target.value
+    });
+  };
   getOptions = async () => {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
@@ -110,7 +119,11 @@ class LightFadeInParams extends Component {
             </Localizer>
           </div>
           <div className="col-md-6">
-            <select className="custom-select" value={parameters ? parameters.durationUnit : 'seconds'} onChange={this.handleChangeUnit}>
+            <select
+              className="custom-select"
+              value={parameters ? parameters.durationUnit : 'seconds'}
+              onChange={this.handleChangeUnit}
+            >
               <option value="seconds">
                 <Text id="editScene.actionsCard.fadeInLights.seconds" />
               </option>

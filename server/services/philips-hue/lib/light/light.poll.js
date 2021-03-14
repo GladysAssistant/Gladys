@@ -25,7 +25,9 @@ async function poll(device) {
 
   const currentBrightnessState = state.bri;
   const brightnessFeature = getDeviceFeature(
-    device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+    device,
+    DEVICE_FEATURE_CATEGORIES.LIGHT,
+    DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
   );
 
   // if the value is different from the value we have, save new state

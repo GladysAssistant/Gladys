@@ -406,7 +406,7 @@ const DEVICE_POLL_FREQUENCIES = {
 
 const DIMMER_VALUES = {
   MIN: 0,
-  MAX: 100
+  MAX: 100,
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {
