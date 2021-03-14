@@ -1187,17 +1187,6 @@
       "updated_at": "2020-10-30T07:44:07.660Z"
     },
     {
-      "id": "8070fb7c-908f-426a-bbbf-12dce1f27549",
-      "pod_id": null,
-      "name": "darksky",
-      "selector": "darksky",
-      "version": "0.1.0",
-      "has_message_feature": false,
-      "status": "UNKNOWN",
-      "created_at": "2020-04-11T18:41:40.054Z",
-      "updated_at": "2020-04-11T18:41:40.054Z"
-    },
-    {
       "id": "366fd9d7-bfbf-4c13-bd8c-4cc777799142",
       "pod_id": null,
       "name": "xiaomi",

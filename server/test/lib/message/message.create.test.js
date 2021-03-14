@@ -23,6 +23,7 @@ describe('message.create', () => {
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         language: 'en',
       },
+      id: '5cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
     expect(newMessage).to.have.property('message');
   });

@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 
 const logger = require('../../../../utils/logger');
 
-const { VARIABLES, TIMERS } = require('../utils/bluetooth.constants');
+const { VARIABLES } = require('../utils/bluetooth.constants');
 
 /**
  * @description Starts to Bluetooth device.
@@ -24,7 +24,6 @@ async function start() {
 
   // Handle new peripheral discovered
   this.bluetooth.on('discover', this.discover.bind(this));
-  this.bluetooth.on('connect', (peripheral) => Promise.delay(TIMERS.CONNECTION).then(() => peripheral.disconnect()));
 
   // Load configuration
   const scanPresenceStatus = await this.gladys.variable.getValue(VARIABLES.PRESENCE_STATUS, this.serviceId);

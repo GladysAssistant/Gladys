@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
+const Promise = require('bluebird');
 const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
@@ -85,6 +86,19 @@ describe('gateway', () => {
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.backup();
       assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
+    });
+    it('should backup gladys and test progress bar', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.gladysGatewayClient.uploadBackup = async (form, func) => {
+        func({ loaded: 1, total: 100 });
+        await Promise.delay(100);
+      };
+      await gateway.backup();
     });
     it('should not backup, no backup key found', async () => {
       const variable = {

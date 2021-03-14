@@ -63,7 +63,7 @@ function start(gladys, port, options) {
     logger.info(`Server listening on port ${port}`);
   });
 
-  return app;
+  return { app, server };
 }
 
 module.exports = {
