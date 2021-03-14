@@ -53,7 +53,7 @@ const PiholeBox = ({ children, ...props }) => (
         </div>
       </div>
     )}
-    {props.datas && <DataList {...props} datas={props.datas} />}
+    {props.piholedatas && <DataList {...props} piholedatas={props.piholedatas} />}
   </div>
 );
 
@@ -68,9 +68,9 @@ class PiholeBoxComponent extends Component {
   render(props, {}) {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}pihole.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}pihole.${props.x}_${props.y}`);
-    const datas = get(boxData, 'piholedatas');
+    const piholedatas = get(boxData, 'piholedatas');
     const error = get(boxData, 'error');
-    return <PiholeBox {...props} datas={datas} boxStatus={boxStatus} error={error} />;
+    return <PiholeBox {...props} piholedatas={piholedatas} boxStatus={boxStatus} error={error} />;
   }
 }
 

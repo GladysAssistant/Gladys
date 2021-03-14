@@ -15,7 +15,7 @@ function createActions(store) {
         const piholedatas = await state.httpClient.get(`/api/v1/pihole/getPiholeSummary`);
         const errorMsg = piholedatas['Error Message'];
         if (errorMsg) {
-          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetStockExchangeStatus.ServiceNotConfigured);
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetPiholeStatus.ServiceNotConfigured);
           boxActions.mergeBoxData(state, BOX_KEY, x, y, {
             error: errorMsg
           });
