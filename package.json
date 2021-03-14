@@ -2,6 +2,9 @@
   "name": "gladys",
   "version": "4.3.0",
   "description": "A privacy-first, open-source home assistant",
+  "engines": {
+    "node": "12"
+  },
   "main": "index.js",
   "engines": {
     "node": "14.x",
