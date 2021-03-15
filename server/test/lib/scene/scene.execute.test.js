@@ -71,4 +71,27 @@ describe('SceneManager', () => {
     const sceneManager = new SceneManager(light, event);
     return sceneManager.execute('thisscenedoesnotexist');
   });
+
+  it('should execute one scene with invalid action', async () => {
+    const stateManager = new StateManager(event);
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device);
+    const scene = {
+      selector: 'my-bad-scene',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: 'BAD-TYPE',
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      active: true,
+    };
+    sceneManager.addScene(scene);
+    await sceneManager.execute('my-bad-scene');
+  });
 });
