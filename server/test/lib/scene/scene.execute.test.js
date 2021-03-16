@@ -6,7 +6,6 @@ const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 
-
 const event = new EventEmitter();
 
 const light = {
