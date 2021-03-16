@@ -1,9 +1,11 @@
 const { assert, fake } = require('sinon');
 const { expect } = require('chai');
+
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
+
 
 const event = new EventEmitter();
 
@@ -77,6 +79,7 @@ describe('SceneManager', () => {
     const device = {
       setValue: fake.resolves(null),
     };
+
     const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-bad-scene',
@@ -93,5 +96,16 @@ describe('SceneManager', () => {
     };
     sceneManager.addScene(scene);
     await sceneManager.execute('my-bad-scene');
+    expect(sceneManager.queue.length).to.equal(1);
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.callCount(device.setValue, 0);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
   });
 });
