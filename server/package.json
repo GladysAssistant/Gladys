@@ -70,7 +70,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.2.6",
+    "@gladysassistant/gladys-gateway-js": "^3.2.8",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "axios": "^0.21.0",
@@ -96,6 +96,7 @@
     "semver": "^6.1.1",
     "sequelize": "^4.42.0",
     "sequelize-cli": "^5.5.1",
+    "set-value": "^3.0.2",
     "sqlite3": "^4.0.6",
     "tracer": "^0.9.8",
     "umzug": "^2.2.0",

@@ -3,13 +3,15 @@ const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @description Delete a dashboard.
+ * @param {string} userId - The userId querying.
  * @param {string} selector - The selector.
  * @example
  * gladys.dashboard.destroy('main-dashboard');
  */
-async function destroy(selector) {
+async function destroy(userId, selector) {
   const dashboard = await db.Dashboard.findOne({
     where: {
+      user_id: userId,
       selector,
     },
   });

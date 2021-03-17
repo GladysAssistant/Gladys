@@ -2,6 +2,7 @@ import { RequestStatus } from '../utils/consts';
 import validateEmail from '../utils/validateEmail';
 import update from 'immutability-helper';
 import get from 'get-value';
+import { route } from 'preact-router';
 import { fileToBase64, getCropperBase64Image } from '../utils/picture';
 import { getYearsMonthsAndDays } from '../utils/date';
 
@@ -18,6 +19,28 @@ function createActions(store) {
       });
       try {
         const user = await state.httpClient.get('/api/v1/me');
+        user.birthdateDay = parseInt(user.birthdate.substr(8, 2), 10);
+        user.birthdateMonth = parseInt(user.birthdate.substr(5, 2), 10);
+        user.birthdateYear = parseInt(user.birthdate.substr(0, 4), 10);
+        store.setState({
+          newUser: user,
+          ProfileGetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          ProfileGetStatus: RequestStatus.Error
+        });
+      }
+    },
+    async getUser(state, selector) {
+      store.setState({
+        ProfileGetStatus: RequestStatus.Getting,
+        cropper: null,
+        newProfilePicture: null,
+        newProfilePictureFormValue: null
+      });
+      try {
+        const user = await state.httpClient.get(`/api/v1/user/${selector}`);
         user.birthdateDay = parseInt(user.birthdate.substr(8, 2), 10);
         user.birthdateMonth = parseInt(user.birthdate.substr(5, 2), 10);
         user.birthdateYear = parseInt(user.birthdate.substr(0, 4), 10);
@@ -93,6 +116,16 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    initNewUser(state, newUser) {
+      store.setState({
+        newUser,
+        cropper: null,
+        profileUpdateErrors: null,
+        newProfilePicture: null,
+        newProfilePictureFormValue: null,
+        ProfilePatchStatus: null
+      });
+    },
     validatePassword(state) {
       store.setState({
         validPassword: state.newUser.password.length >= MIN_PASSWORD_LENGTH
@@ -113,6 +146,48 @@ function createActions(store) {
         months,
         years
       });
+    },
+    async createUser(state, e) {
+      e.preventDefault();
+      store.setState({
+        createUserError: null,
+        createUserStatus: RequestStatus.Getting
+      });
+      try {
+        const data = Object.assign({}, state.newUser);
+        const errored = actions.validateUser(state);
+        if (errored) {
+          throw new Error();
+        }
+        data.birthdate = new Date(data.birthdateYear, data.birthdateMonth - 1, data.birthdateDay);
+        delete data.birthdateYear;
+        delete data.birthdateMonth;
+        delete data.birthdateDay;
+        if (state.cropper) {
+          const profilePicture = await getCropperBase64Image(state.cropper);
+          if (profilePicture) {
+            data.picture = profilePicture;
+          }
+        }
+        await state.httpClient.post('/api/v1/user', data);
+        store.setState({
+          createUserStatus: RequestStatus.Success
+        });
+        route('/dashboard/settings/user');
+      } catch (e) {
+        console.log(e);
+        const status = get(e, 'response.status');
+        if (status === 409) {
+          store.setState({
+            createUserError: e.response.data,
+            createUserStatus: RequestStatus.ConflictError
+          });
+        } else {
+          store.setState({
+            createUserStatus: RequestStatus.Error
+          });
+        }
+      }
     },
     async saveProfile(state, e) {
       e.preventDefault();
@@ -150,10 +225,50 @@ function createActions(store) {
         });
         actions.getMySelf(state);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         store.setState({
           ProfilePatchStatus: RequestStatus.Error
         });
+      }
+    },
+    async updateUser(state, e) {
+      e.preventDefault();
+      store.setState({
+        ProfilePatchStatus: RequestStatus.Getting
+      });
+      try {
+        const data = Object.assign({}, state.newUser);
+        const errored = actions.validateUser(state);
+        if (errored) {
+          throw new Error();
+        }
+        data.birthdate = new Date(data.birthdateYear, data.birthdateMonth - 1, data.birthdateDay);
+        delete data.birthdateYear;
+        delete data.birthdateMonth;
+        delete data.birthdateDay;
+        if (state.cropper) {
+          const profilePicture = await getCropperBase64Image(state.cropper);
+          if (profilePicture) {
+            data.picture = profilePicture;
+          }
+        }
+        await state.httpClient.patch(`/api/v1/user/${data.selector}`, data);
+        store.setState({
+          ProfilePatchStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        console.error(e);
+        const status = get(e, 'response.status');
+        if (status === 409) {
+          store.setState({
+            ProfilePatchError: e.response.data,
+            ProfilePatchStatus: RequestStatus.ConflictError
+          });
+        } else {
+          store.setState({
+            ProfilePatchStatus: RequestStatus.Error
+          });
+        }
       }
     }
   };

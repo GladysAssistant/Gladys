@@ -27,6 +27,7 @@ class DeviceGetValue extends Component {
       {
         name: 'last_value',
         type: 'device_feature',
+        ready: device && deviceFeature,
         label:
           device && deviceFeature
             ? getDeviceFeatureName(this.context.intl.dictionary, device, deviceFeature)

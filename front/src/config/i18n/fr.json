@@ -308,7 +308,8 @@
       "title": "Bluetooth",
       "description": "Contrôler vos appareils Bluetooth.",
       "deviceTab": "Appareils",
-      "setupTab": "Configuration",
+      "discoverTab": "Découverte",
+      "setupTab": "Scanner de présence",
       "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
       "device": {
         "title": "Appareils Bluetooth",
@@ -321,6 +322,7 @@
         "externalIdLabel": "ID externe",
         "manufacturerLabel": "Fabricant",
         "modelLabel": "Modèle",
+        "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
         "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
         "featureNamePlaceholder": "Nom de la fonctionnalité",
@@ -328,10 +330,9 @@
         "deleteButton": "Supprimer",
         "editButton": "Editer"
       },
-      "setup": {
-        "title": "Configuration Bluetooth",
+      "discover": {
+        "title": "Découverte Bluetooth",
         "scanButton": "Rechercher",
-        "reloadButton": "Recharger",
         "noDeviceFound": "Aucun périphérique Bluetooth détecté.",
         "createDeviceInGladys": "Connecter dans Gladys",
         "updateDeviceInGladys": "Mettre à jour dans Gladys",
@@ -348,6 +349,18 @@
           "cancelLabel": "Annuler",
           "successLabel": "Effectué"
         }
+      },
+      "setup": {
+        "title": "Scanner de présence",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "presenceScannerButton": "Scanner la présence maintenant",
+        "saveLabel": "Enregistrer"
       }
     },
     "telegram": {
@@ -777,7 +790,8 @@
       "messageSend": {
         "userLabel": "Utilisateur",
         "textLabel": "Message",
-        "textPlaceholder": "Texte du message"
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
         "label": "Sélectionnez les lumière que vous souhaitez allumer"
@@ -808,6 +822,15 @@
         "houseLabel": "Maison",
         "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
+      },
+      "checkUserPresence": {
+        "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnés ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionné ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison",
+        "deviceLabel": "Appareils",
+        "minutesLabel": "Appareil vu il y a moins de",
+        "minutesPlaceholder": "Durée (en minutes)",
+        "minutes": "minutes"
       },
       "httpRequest": {
         "description": "Cette action permet d'envoyer une requête HTTP.",
@@ -854,7 +877,8 @@
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
-        "set-out-of-home": "Utilisateur parti de la maison"
+        "set-out-of-home": "Utilisateur parti de la maison",
+        "check-presence": "Vérifier la présence"
       },
       "http": {
         "request": "Faire une requête HTTP"
@@ -886,6 +910,7 @@
         "valuePlaceholder": "Valeur",
         "on": "On",
         "off": "Off",
+        "deviceSeen": "Si l'appareil est détecté",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
       },
       "scheduledTrigger": {
@@ -925,12 +950,15 @@
     "editYourProfileTitle": "Editez votre profil",
     "userRole": "Utilisateur",
     "adminRole": "Administrateur",
+    "roleDescription": "Un administrateur a tous les accès de l'instance Gladys. Un utilisateur ne peut gérer que son tableau de bord, discuter avec Gladys, voir son calendrier et la carte. Il ne peut pas créer de scènes, éditer les préférences, ni gérer les intégrations.",
     "invitationPending": "En attente",
     "invitationSuccess": "Acceptée",
     "firstnameLabel": "Prénom",
     "firstnamePlaceholder": "Entrez votre prénom",
+    "firstnameOtherUserPlaceholder": "Entrez le prénom",
     "lastnameLabel": "Nom de famille",
     "lastnamePlaceholder": "Entrez votre nom de famille",
+    "lastnameOtherUserPlaceholder": "Entrez le nom de famille",
     "selectorLabel": "Sélecteur",
     "birthdateLabel": "Date de naissance",
     "year": "Année",
@@ -941,13 +969,18 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailPlaceholder": "Entrez votre e-mail",
+    "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
     "english": "English",
     "french": "Français",
+    "roleLabel": "Rôle",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "passwordRepeatLabel": "Répétez votre mot de passe",
     "passwordRepeatPlaceholder": "Répétez votre mot de passe",
+    "passwordOtherUserPlaceholder": "Entrez le mot de passe",
+    "passwordOtherUserRepeatLabel": "Répétez le mot de passe",
+    "passwordRepeatOtherUserPlaceholder": "Répétez le mot de passe",
     "saveButton": "Sauvegarder votre profil",
     "firstnameError": "Le prénom est requis.",
     "lastnameError": "Le nom de famille est requis.",
@@ -964,13 +997,14 @@
   "settings": {
     "title": "Réglages",
     "housesTab": "Maisons",
+    "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
     "serviceTab": "Services",
     "billingTab": "Facturation",
-    "gatewayUsersTab": "Utilisateurs",
+    "gatewayUsersTab": "Utilisateurs Plus",
     "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
@@ -980,6 +1014,29 @@
     "orderDirDesc": "Z - A",
     "defaultNewHouseName": "Nouvelle Maison",
     "noHouseFound": "Aucune maison trouvée"
+  },
+  "usersSettings": {
+    "title": "Utilisateurs",
+    "searchPlaceholder": "Chercher un utilisateur",
+    "newUserButton": "Nouveau",
+    "editUserButton": "Editer",
+    "noUsersFound": "Aucuns utilisateurs trouvés avec cette recherche.",
+    "deleteUserButton": "Supprimer",
+    "confirmDeleteUserButton": "Confirmer",
+    "cancelDeleteUser": "Annuler",
+    "deleteUserWarning": "Supprimer un utilisateur supprimera toutes les données associées à cet utilisateur (tableau de bord, localisation, préférences). Confirmez vous la suppression de cet utilisateur ?",
+    "createUser": {
+      "title": "Créer un nouvel utilisateur",
+      "createUserButton": "Créer utilisateur"
+    },
+    "editUser": {
+      "title": "Editer utilisateur",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "editPreferences": "Editer les préférences",
+      "resetPasswordButton": "Réinitialiser",
+      "saveButton": "Enregistrer",
+      "success": "Profil enregistré avec succès !"
+    }
   },
   "sessionsSettings": {
     "registered": "Connexion",
@@ -1077,6 +1134,7 @@
     "operations": "Opérations",
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
+    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez l'image Raspberry Pi OS Gladys officielle. Pour une installation manuellle, vous devez avoir configuré Watchtower pour que Gladys Assistant se mette à jour.",
     "download": "Télécharger",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",

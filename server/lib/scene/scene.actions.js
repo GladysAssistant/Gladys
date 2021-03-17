@@ -1,4 +1,7 @@
 const Promise = require('bluebird');
+const Handlebars = require('handlebars');
+const set = require('set-value');
+const get = require('get-value');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
@@ -102,16 +105,17 @@ const actionsFunc = {
     }),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    await self.message.sendToUser(action.user, action.text);
+    const textWithVariables = Handlebars.compile(action.text)(scope);
+    await self.message.sendToUser(action.user, textWithVariables);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
-    scope[`${columnIndex}.${rowIndex}.last_value`] = deviceFeature.last_value;
+    set(scope, `${columnIndex}.${rowIndex}`, deviceFeature);
   },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
-      const conditionVerified = compare(condition.operator, scope[condition.variable], condition.value);
+      const conditionVerified = compare(condition.operator, get(scope, condition.variable), condition.value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
@@ -134,11 +138,41 @@ const actionsFunc = {
     const headersObject = {};
     action.headers.forEach((header) => {
       if (header.key && header.value) {
-        headersObject[header.key] = header.value;
+        headersObject[header.key] = Handlebars.compile(header.value)(scope);
       }
     });
-    const response = await self.http.request(action.method, action.url, parseJsonIfJson(action.body), headersObject);
-    scope[`${columnIndex}.${rowIndex}.data`] = response;
+    const urlWithVariables = Handlebars.compile(action.url)(scope);
+    // body can be empty
+    const bodyWithVariables = action.body ? Handlebars.compile(action.body)(scope) : undefined;
+    const response = await self.http.request(
+      action.method,
+      urlWithVariables,
+      parseJsonIfJson(bodyWithVariables),
+      headersObject,
+    );
+    set(scope, `${columnIndex}.${rowIndex}`, response);
+  },
+  [ACTIONS.USER.CHECK_PRESENCE]: async (self, action, scope, columnIndex, rowIndex) => {
+    let deviceSeenRecently = false;
+    // we want to see if a device was seen before now - XX minutes
+    const thresholdDate = new Date(Date.now() - action.minutes * 60 * 1000);
+    // foreach selected device
+    action.device_features.forEach((deviceFeatureSelector) => {
+      // we get the time when the device was last seen
+      const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
+      // if it's recent, we save true
+      if (deviceFeature.last_value_changed > thresholdDate) {
+        deviceSeenRecently = true;
+      }
+    });
+    // if no device was seen, the user has left home
+    if (deviceSeenRecently === false) {
+      logger.info(
+        `CheckUserPresence action: No devices of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
+      );
+      logger.info(`CheckUserPresence action: Set "${action.user}" to left home of house "${action.house}"`);
+      await self.house.userLeft(action.house, action.user);
+    }
   },
 };
 

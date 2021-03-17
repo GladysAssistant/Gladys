@@ -28,5 +28,10 @@ else
   echo "eclipse-mosquitto configuration file already exists."
 fi
 
+# Check for breaking change
+if ! grep -q "listener 1883" "$mosquitto_config_file"; then
+  echo "listener 1883" >> $mosquitto_config_file
+fi
+
 # Create passwd file if not exists
 touch ${mosquitto_passwd_file}

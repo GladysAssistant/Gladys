@@ -12,7 +12,7 @@ module.exports = function TasmotaService(gladys, serviceId) {
    * gladys.services.tasmota.start();
    */
   function start() {
-    logger.log('starting Tasmota service');
+    logger.info('Starting Tasmota service');
     tasmotaHandler.connect();
   }
 
@@ -23,7 +23,7 @@ module.exports = function TasmotaService(gladys, serviceId) {
    *  gladys.services.tasmota.stop();
    */
   function stop() {
-    logger.log('stopping Tasmota service');
+    logger.info('Stopping Tasmota service');
     tasmotaHandler.disconnect();
   }
 
