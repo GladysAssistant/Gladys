@@ -13,6 +13,7 @@ const { stop } = require('./commands/bluetooth.stop');
 const { scan } = require('./commands/bluetooth.scan');
 const { scanPresence } = require('./commands/bluetooth.scanPresence');
 const { completeDevice } = require('./commands/bluetooth.completeDevice');
+const { getPeripheral } = require('./commands/bluetooth.getPeripheral');
 const { getDiscoveredDevice } = require('./commands/bluetooth.getDiscoveredDevice');
 const { getDiscoveredDevices } = require('./commands/bluetooth.getDiscoveredDevices');
 const { getStatus } = require('./commands/bluetooth.getStatus');
@@ -34,7 +35,7 @@ const BluetoothManager = function BluetoothManager(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
 
-  this.scanTimer = undefined;
+  this.scanPromise = undefined;
   this.scanCounter = 0;
 
   this.ready = false;
@@ -62,6 +63,7 @@ BluetoothManager.prototype.stop = stop;
 BluetoothManager.prototype.scan = scan;
 BluetoothManager.prototype.scanPresence = scanPresence;
 BluetoothManager.prototype.completeDevice = completeDevice;
+BluetoothManager.prototype.getPeripheral = getPeripheral;
 BluetoothManager.prototype.getDiscoveredDevice = getDiscoveredDevice;
 BluetoothManager.prototype.getDiscoveredDevices = getDiscoveredDevices;
 BluetoothManager.prototype.getStatus = getStatus;

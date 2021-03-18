@@ -2,31 +2,35 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
-
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import localeData from 'dayjs/plugin/localeData';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-const localizer = momentLocalizer(moment);
+dayjs.extend(localeData);
+dayjs.extend(localizedFormat);
 
-@connect('eventsFormated,user', actions, moment)
+const localizer = momentLocalizer(dayjs);
+
+@connect('eventsFormated,user', actions, dayjs)
 class Map extends Component {
   onRangeChange = range => {
     let from, to;
 
     if (Array.isArray(range)) {
-      from = moment(range[0])
+      from = dayjs(range[0])
         .subtract(7, 'day')
         .toDate();
-      to = moment(range[range.length - 1])
+      to = dayjs(range[range.length - 1])
         .add(7, 'day')
         .toDate();
     } else {
-      from = moment(range.start)
+      from = dayjs(range.start)
         .subtract(7, 'day')
         .toDate();
-      to = moment(range.end)
+      to = dayjs(range.end)
         .add(7, 'day')
         .toDate();
     }
@@ -42,11 +46,11 @@ class Map extends Component {
     };
 
   componentWillMount() {
-    const from = moment()
+    const from = dayjs()
       .startOf('week')
       .subtract(7, 'day')
       .toDate();
-    const to = moment()
+    const to = dayjs()
       .endOf('week')
       .add(7, 'day')
       .toDate();
@@ -73,7 +77,7 @@ class Map extends Component {
                         defaultView="week"
                         culture={props.user.language}
                         messages={this.context.intl.dictionary.calendar}
-                        scrollToTime={moment().subtract(2, 'hours')}
+                        scrollToTime={dayjs().subtract(2, 'hour')}
                         eventPropGetter={this.eventPropGetter}
                       />
                     </div>
