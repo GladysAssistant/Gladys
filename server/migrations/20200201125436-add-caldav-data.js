@@ -1,5 +1,5 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize) => {
     return Promise.all([
       queryInterface.addColumn('t_calendar', 'ctag', {
         type: Sequelize.STRING,
@@ -10,5 +10,5 @@ module.exports = {
     ]);
   },
 
-  down: (queryInterface, Sequelize) => {},
+  down: async (queryInterface, Sequelize) => {},
 };
