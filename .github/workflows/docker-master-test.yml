@@ -2,45 +2,37 @@ name: Master branch tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   test-front:
     name: Front test
     runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout Gladys code
+      - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
-      - 
-        name: 💽 Setup nodejs
+      - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
-      - 
-        name: 📇 Use npm cache
+          node-version: '14'
+      - name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
-      - 
-        name: 📦 Install Global NPM Packages
+      - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
-      - 
-        name: 📦 Install NPM front packages
+      - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
           npm ci
-      - 
-        name: 🧐 Prettier check
+      - name: 🧐 Prettier check
         working-directory: ./front
         run: |
           npm run prettier-check
-      - 
-        name: 👕 ESlint
+      - name: 👕 ESlint
         working-directory: ./front
         run: |
           npm run eslint
-      - 
-        name: 🌐 Integration comparison
+      - name: 🌐 Integration comparison
         working-directory: ./front
         run: |
           npm run compare-translations
@@ -48,21 +40,17 @@ jobs:
     name: Server test
     runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout Gladys code
+      - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
-      - 
-        name: 💽 Setup nodejs
+      - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
-      - 
-        name: 📇 Use npm cache
+          node-version: '14'
+      - name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
-      - 
-        name: 🖥️ Setup OZW
+      - name: 🖥️ Setup OZW
         run: |
           docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
           sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
@@ -71,35 +59,28 @@ jobs:
           sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
           sudo ldconfig
           docker rm -f dummy
-      - 
-        name: 💽 Install System Dependencies
+      - name: 💽 Install System Dependencies
         run: |
           sudo apt update
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
-      - 
-        name: 📦 Install Global NPM Packages
+      - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
-      - 
-        name: 📦 Install NPM server packages
+      - name: 📦 Install NPM server packages
         working-directory: ./server
         run: |
           npm ci
-      - 
-        name: 🧐 Prettier check
+      - name: 🧐 Prettier check
         working-directory: ./server
         run: |
           npm run prettier-check
-      - 
-        name: 👕 ESlint
+      - name: 👕 ESlint
         working-directory: ./server
         run: |
           npm run eslint
-      - 
-        name: ✅ Test with coverage
+      - name: ✅ Test with coverage
         working-directory: ./server
         run: |
           npm run coverage
-      - 
-        name: 📄 Codecov report upload
+      - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
