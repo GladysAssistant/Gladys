@@ -25,6 +25,7 @@ module.exports = function MessageController(gladys) {
       source_user_id: req.user.id,
       user: req.user,
       created_at: req.body.created_at || new Date(),
+      id: req.body.id,
     };
     gladys.event.emit(EVENTS.MESSAGE.NEW, messageToSend);
     res.status(201).json({

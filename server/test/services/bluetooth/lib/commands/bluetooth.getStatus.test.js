@@ -37,6 +37,7 @@ describe('bluetooth.getStatus command', () => {
   });
 
   it('should get status ready and scanning', () => {
+    bluetoothManager.bluetooth = 'any';
     bluetoothManager.ready = true;
     bluetoothManager.scanning = true;
     const result = bluetoothManager.getStatus();
@@ -45,10 +46,19 @@ describe('bluetooth.getStatus command', () => {
   });
 
   it('should get status ready not scanning', () => {
+    bluetoothManager.bluetooth = 'any';
     bluetoothManager.ready = true;
     bluetoothManager.scanning = false;
     const result = bluetoothManager.getStatus();
     expect(result).deep.eq({ ready: true, scanning: false, peripheralLookup: false });
+    assert.notCalled(eventWS);
+  });
+
+  it('should get status not ready (no bluetooth instance)', () => {
+    bluetoothManager.ready = true;
+    bluetoothManager.scanning = false;
+    const result = bluetoothManager.getStatus();
+    expect(result).deep.eq({ ready: false, scanning: false, peripheralLookup: false });
     assert.notCalled(eventWS);
   });
 

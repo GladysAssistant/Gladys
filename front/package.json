@@ -1,7 +1,7 @@
 {
   "name": "gladys-front",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "scripts": {
@@ -47,7 +47,6 @@
     "immutability-helper": "^3.0.0",
     "leaflet": "^1.4.0",
     "linkstate": "^1.1.1",
-    "moment": "^2.24.0",
     "preact": "^10.3.2",
     "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-i18n": "^2.0.0-preactx.2",

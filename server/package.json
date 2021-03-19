@@ -3,7 +3,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "scripts": {
@@ -70,7 +70,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.2.7",
+    "@gladysassistant/gladys-gateway-js": "^3.2.8",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "axios": "^0.21.0",
@@ -94,8 +94,8 @@
     "path-to-regexp": "^3.0.0",
     "queue": "^6.0.0",
     "semver": "^6.1.1",
-    "sequelize": "^4.42.0",
-    "sequelize-cli": "^5.5.1",
+    "sequelize": "^6.5.0",
+    "sequelize-cli": "^6.2.0",
     "set-value": "^3.0.2",
     "sqlite3": "^4.0.6",
     "suncalc": "^1.8.0",
