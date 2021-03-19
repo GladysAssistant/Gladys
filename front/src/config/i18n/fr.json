@@ -549,7 +549,13 @@
         "serviceStatus": "Etat du service Zigbee2mqtt",
         "link": "Lien",
         "connected": "Zigbee2mqtt démarré avec succès.",
-        "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt."
+        "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt.",
+        "mqttZigbeeLink": "MQTT - Zigbee",
+        "gladysMqttLink": "Gladys - MQTT",
+        "zigbee2Mqtt": "Zigbee2mqtt",
+        "gladys": "Gladys",
+        "mqtt": "MQTT",
+        "status": "Status"
       },
       "device": {
         "title": "Appareils Zigbee",
@@ -558,7 +564,7 @@
       },
       "discover": {
         "title": "Découverte du réseau Zigbee",
-        "device": "Appareils",
+        "device": "({{nbDevices}}) Appareils",
         "permitJoin": "Autoriser l'association",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "scanButton": "Scanner",

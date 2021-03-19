@@ -19,9 +19,10 @@ const DiscoverTab = ({ children, ...props }) => (
           <td>
             {props.zigbee2mqttDevices && (
               <div>
-                &nbsp;{`(${props.zigbee2mqttDevices.length} `}
-                <Text id="integration.zigbee2mqtt.discover.device" />
-                {`)`}
+                <Text
+                  id="integration.zigbee2mqtt.discover.device"
+                  fields={{ nbDevices: props.zigbee2mqttDevices.length }}
+                />
               </div>
             )}
           </td>

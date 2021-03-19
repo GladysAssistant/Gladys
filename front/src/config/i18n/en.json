@@ -428,7 +428,13 @@
         "serviceStatus": "Zigbee2mqtt Service Status",
         "link": "Link",
         "connected": "Zigbee2mqtt was started with success.",
-        "error": "An error occured while starting Zigbee2mqtt."
+        "error": "An error occured while starting Zigbee2mqtt.",
+        "mqttZigbeeLink": "MQTT - Zigbee",
+        "gladysMqttLink": "Gladys - MQTT",
+        "zigbee2Mqtt": "Zigbee2mqtt",
+        "gladys": "Gladys",
+        "mqtt": "MQTT",
+        "status": "Status"
       },
       "device": {
         "title": "Zigbee2mqtt devices",
@@ -437,7 +443,7 @@
       },
       "discover": {
         "title": "Zigbee2mqtt discover",
-        "device": "Devices",
+        "device": "({{nbDevices}}) Devices",
         "permitJoin": "Permit joining",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "scanButton": "Scan",

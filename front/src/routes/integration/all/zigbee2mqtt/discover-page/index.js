@@ -11,11 +11,13 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 )
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER, payload => {
-      this.props.setDiscoveredDevices(payload);
-    });
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN, payload =>
-      this.props.updatePermitJoin(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
+      this.props.setDiscoveredDevices
+    );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      this.props.updatePermitJoin
     );
 
     this.props.checkStatus();
@@ -23,6 +25,17 @@ class Zigbee2mqttIntegration extends Component {
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
+      this.props.setDiscoveredDevices
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      this.props.updatePermitJoin
+    );
   }
 
   render(props, {}) {

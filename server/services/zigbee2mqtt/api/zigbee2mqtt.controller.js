@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
@@ -45,21 +44,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function installMqttContainer(req, res) {
     logger.log('Install MQTT container');
-    let response;
-    try {
-      await zigbee2mqttManager.installMqttContainer();
-      response = true;
-    } catch (e) {
-      logger.error('Error while connecting to MQTT:', e);
-      response = false;
-      gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
-        payload: e,
-      });
-      throw e;
-    }
-
-    res.json(response);
+    await zigbee2mqttManager.installMqttContainer();
+    res.json({
+      success: true,
+    });
   }
 
   /**

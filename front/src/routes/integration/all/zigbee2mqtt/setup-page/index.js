@@ -6,17 +6,24 @@ import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected,dockerContainers',
+  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected',
   actions
 )
 class Zigbee2mqttSetupPage extends Component {
   async componentWillMount() {
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, payload =>
-      this.props.checkStatus(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      this.props.checkStatus
     );
 
     await this.props.checkStatus();
-    await this.props.getContainers();
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      this.props.checkStatus
+    );
   }
 
   render(props, {}) {

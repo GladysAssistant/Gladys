@@ -48,15 +48,13 @@ const actions = store => {
       });
       try {
         // If DriverPath contains '---------' then we remove ZIGBEE2MQTT_DRIVER_PATH variable
-        if (state.zigbee2mqttDriverPath.indexOf('/dev/') === -1) {
-          await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH', {
-            value: ''
-          });
-        } else {
-          await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH', {
-            value: state.zigbee2mqttDriverPath
-          });
+        let zigbee2MqttDriverPath = '';
+        if (state.zigbee2mqttDriverPath.indexOf('/dev/') !== -1) {
+          zigbee2MqttDriverPath = state.zigbee2mqttDriverPath;
         }
+        await state.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH', {
+          value: zigbee2MqttDriverPath
+        });
         await state.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
         const zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
         store.setState({

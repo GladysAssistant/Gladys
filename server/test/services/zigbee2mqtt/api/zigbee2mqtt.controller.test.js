@@ -1,9 +1,7 @@
 const sinon = require('sinon');
-const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 const Zigbee2MqttController = require('../../../../services/zigbee2mqtt/api/zigbee2mqtt.controller');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const event = {
   emit: fake.resolves(null),
@@ -73,27 +71,7 @@ describe('zigbee2mqtt API', () => {
 
     await controller['post /api/v1/service/zigbee2mqtt/mqtt/start'].controller(req, res);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
-    assert.calledWith(res.json, true);
-  });
-
-  it('post /api/v1/service/zigbee2mqtt/mqtt/start error', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-    const error = new Error('error');
-    zigbee2mqttManager.installMqttContainer = fake.throws(error);
-    try {
-      await controller['post /api/v1/service/zigbee2mqtt/mqtt/start'].controller(req, res);
-    } catch (e) {
-      expect(e).to.be.eq(error);
-      assert.calledOnce(zigbee2mqttManager.installMqttContainer);
-      assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
-        payload: error,
-      });
-      assert.calledWith(res.json, false);
-    }
+    assert.calledWith(res.json, { success: true });
   });
 
   it('post /api/v1/service/zigbee2mqtt/z2m/start', async () => {

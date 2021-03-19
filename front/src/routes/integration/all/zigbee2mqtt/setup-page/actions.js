@@ -39,55 +39,6 @@ const createActions = store => {
         });
       }
     },
-    async getContainers(state) {
-      let mqtt4z2mContainerExists = false;
-      let z2mContainerExists = false;
-      let mqtt4z2mContainerRunning = false;
-      let z2mContainerRunning = false;
-      //      let z2mEnabled = state.z2mEnabled;
-      let dockerContainers = [];
-      store.setState({
-        DockerGetContainersStatus: RequestStatus.Getting
-      });
-      try {
-        const containers = await state.httpClient.get('/api/v1/system/container');
-        containers.forEach(container => {
-          container.created_at_formatted = dayjs(container.created_at * 1000)
-            .locale(state.user.language)
-            .fromNow();
-          if (container.name === '/gladys-z2m-zigbee2mqtt') {
-            z2mContainerExists = true;
-            if (container.state === 'running') {
-              z2mContainerRunning = true;
-            }
-            dockerContainers.push(container);
-          }
-          if (container.name === '/gladys-z2m-mqtt') {
-            mqtt4z2mContainerExists = true;
-            if (container.state === 'running') {
-              mqtt4z2mContainerRunning = true;
-            }
-            dockerContainers.push(container);
-          }
-        });
-        store.setState({
-          dockerContainers,
-          z2mContainerExists,
-          mqtt4z2mContainerExists,
-          z2mContainerRunning,
-          mqtt4z2mContainerRunning,
-          DockerGetContainersStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          z2mContainerExists,
-          mqtt4z2mContainerExists,
-          z2mContainerRunning,
-          mqtt4z2mContainerRunning,
-          DockerGetContainersStatus: RequestStatus.Error
-        });
-      }
-    },
 
     async startContainer(state) {
       let z2mEnabled = true;

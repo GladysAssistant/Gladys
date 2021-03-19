@@ -1,5 +1,5 @@
 /**
- * @description Prepares service and starts connection with broker.
+ * @description Get permit_join state from Gladys.
  * @returns {boolean} Status of Zigbee2mqtt Permit join.
  * @example
  * init();
