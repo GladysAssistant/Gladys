@@ -98,6 +98,7 @@
     "sequelize-cli": "^6.2.0",
     "set-value": "^3.0.2",
     "sqlite3": "^4.0.6",
+    "suncalc": "^1.8.0",
     "tracer": "^0.9.8",
     "umzug": "^2.2.0",
     "uuid": "^3.3.2",
