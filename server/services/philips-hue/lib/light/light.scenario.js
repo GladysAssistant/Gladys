@@ -56,7 +56,7 @@ async function fadeIn(device, hueApi, lightId, { duration = 0, targetBrightness 
   const { bridgeSerialNumber } = parseExternalId(device.external_id);
   const deviceBrightnessFeatureExternalId = `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`;
   const hueTargetValue = transformBrightnessValue(targetBrightnessHue);
-  await new Promise(async (resolve) => {
+  await new Promise((resolve) => {
     const listener = async (event) => {
       if (event.device_feature_external_id === deviceBrightnessFeatureExternalId) {
         if (event.state === hueTargetValue) {
@@ -72,7 +72,7 @@ async function fadeIn(device, hueApi, lightId, { duration = 0, targetBrightness 
     };
     this.gladys.event.on(EVENTS.DEVICE.NEW_STATE, listener);
 
-    await this.poll(device);
+    this.poll(device);
   });
 }
 
