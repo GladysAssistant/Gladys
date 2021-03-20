@@ -60,6 +60,7 @@ async function executeAction(self, action, scope, columnIndex, rowIndex) {
  */
 async function executeActions(self, actions, scope) {
   // first array level should be executed in serie
+  console.dir(actions)
   await Promise.mapSeries(actions, async (parallelActions, columnIndex) => {
     // then, second level is executed in parallel
     await Promise.map(parallelActions, async (action, rowIndex) => {

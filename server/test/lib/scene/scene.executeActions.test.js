@@ -2,12 +2,17 @@ const { assert, fake, useFakeTimers } = require('sinon');
 const chaiAssert = require('chai').assert;
 const { expect } = require('chai');
 const dayjs = require('dayjs');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const { AbortScene } = require('../../../utils/coreErrors');
 const { executeActions } = require('../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../lib/state');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const event = new EventEmitter();
 
@@ -184,7 +189,9 @@ describe('scene.executeActions', () => {
           {
             type: ACTIONS.DEVICE.SET_VALUE,
             device_feature: 'my-device-feature',
-            value: 11,
+            parameters: {
+              value: 11
+            }
           },
         ],
       ],
@@ -227,7 +234,9 @@ describe('scene.executeActions', () => {
             device: 'my-device',
             feature_category: 'light',
             feature_type: 'binary',
-            value: 1,
+            parameters: {
+              value: 1
+            },
           },
         ],
       ],
@@ -532,7 +541,9 @@ describe('scene.executeActions', () => {
           {
             type: ACTIONS.MESSAGE.SEND,
             user: 'pepper',
-            text: 'Temperature in the living room is {{0.0.last_value}} °C.',
+            parameters: {
+              text: 'Temperature in the living room is {{0.0.last_value}} °C.',
+            }
           },
         ],
       ],

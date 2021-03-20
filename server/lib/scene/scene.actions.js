@@ -155,7 +155,8 @@ const actionsFunc = {
     }),
   [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    await self.message.sendToUser(action.user, action.parameters.text);
+    const textWithVariables = Handlebars.compile(action.parameters.text)(scope);
+    await self.message.sendToUser(action.user, textWithVariables);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
