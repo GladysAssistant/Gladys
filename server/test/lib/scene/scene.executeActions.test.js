@@ -190,8 +190,8 @@ describe('scene.executeActions', () => {
             type: ACTIONS.DEVICE.SET_VALUE,
             device_feature: 'my-device-feature',
             parameters: {
-              value: 11
-            }
+              value: 11,
+            },
           },
         ],
       ],
@@ -235,7 +235,7 @@ describe('scene.executeActions', () => {
             feature_category: 'light',
             feature_type: 'binary',
             parameters: {
-              value: 1
+              value: 1,
             },
           },
         ],
@@ -543,7 +543,7 @@ describe('scene.executeActions', () => {
             user: 'pepper',
             parameters: {
               text: 'Temperature in the living room is {{0.0.last_value}} °C.',
-            }
+            },
           },
         ],
       ],
