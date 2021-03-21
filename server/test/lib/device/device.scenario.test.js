@@ -38,7 +38,7 @@ describe('Device scenario', () => {
       getService: () => {},
     };
     const device = new Device(event, {}, stateManager, service);
-    const promise = device.setValue(
+    const promise = device.scenario(
       {
         service: {
           name: 'my-service',
@@ -51,6 +51,6 @@ describe('Device scenario', () => {
         targetBrightness: 50,
       },
     );
-    return chai.assert.isRejected(promise, 'Function device.setValue in service my-service does not exist.');
+    return chai.assert.isRejected(promise, 'Function device.scenario in service my-service does not exist.');
   });
 });
