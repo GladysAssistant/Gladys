@@ -94,7 +94,7 @@ const actionsFunc = {
             durationMilliseconds = action.parameters.durationValue * 1000 * 60 * 60;
             break;
           default:
-            throw new Error(`Unit ${action.unit} not recognized`);
+            throw new Error(`Unit ${action.parameters.durationUnit} not recognized`);
         }
         await self.device.scenario(device, deviceFeature, { ...action.parameters, duration: durationMilliseconds });
       } catch (e) {

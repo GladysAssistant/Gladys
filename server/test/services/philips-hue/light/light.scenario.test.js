@@ -1,9 +1,9 @@
 const chai = require('chai');
 const chaiAssert = require('chai').assert;
 const sinon = require('sinon');
-const EventEmitter = require('events');
 const chaiAsPromised = require('chai-as-promised');
 const proxyquire = require('proxyquire').noCallThru();
+const Event = require('../../../../lib/event');
 const { MockedPhilipsHueClient } = require('../mocks.test');
 
 const { fake, stub } = sinon;
@@ -17,7 +17,7 @@ const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
 const StateManager = require('../../../../lib/state');
 const { transformBrightnessValue } = require('../../../../services/philips-hue/lib/utils/transformBrightnessValue');
 
-const event = new EventEmitter();
+const event = new Event();
 const stateManager = new StateManager(event);
 const deviceManager = {
   get: fake.resolves([
