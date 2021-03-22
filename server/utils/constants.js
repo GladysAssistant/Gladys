@@ -243,6 +243,9 @@ const INTENTS = {
   },
   WEATHER: {
     GET: 'intent.weather.get',
+    TOMORROW: 'intent.weather.tomorrow',
+    AFTER_TOMORROW: 'intent.weather.after-tomorrow',
+    DAY: 'intent.weather.day',
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
@@ -350,6 +353,10 @@ const DEVICE_FEATURE_UNITS = {
   PPM: 'ppm',
   MM: 'mm',
   CM: 'cm',
+};
+
+const WEATHER_UNITS = {
+  METRIC: 'metric',
 };
 
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
@@ -533,3 +540,5 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.WEATHER_UNITS = WEATHER_UNITS;
