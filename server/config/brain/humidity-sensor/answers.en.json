@@ -1,11 +1,11 @@
 [
   {
     "label": "humidity-sensor.get-in-room.success",
-    "answers": ["It's {{ humidity }} {{ unit }} in the {{ roomName }}."]
+    "answers": ["The humidity level is {{ humidity }}% in the {{ roomName }}."]
   },
   {
     "label": "humidity-sensor.get-in-room.fail.no-results",
-    "answers": ["No humidity values were recorded in the last 12 hours in this room."]
+    "answers": ["No humidity values were recorded in the last hour in this room."]
   },
   {
     "label": "humidity-sensor.get-in-room.fail.room-not-found",
