@@ -6,22 +6,22 @@ function createActions(store) {
   const actions = {
     updateBoxChartName(state, x, y, chartName) {
       boxActions.updateBoxConfig(state, x, y, {
-        chartName
+        chart_name: chartName
       });
     },
     updateBoxChartType(state, x, y, chartType) {
       boxActions.updateBoxConfig(state, x, y, {
-        chartType
+        chart_type: chartType
       });
     },
     updateBoxChartPeriod(state, x, y, chartPeriod) {
       boxActions.updateBoxConfig(state, x, y, {
-        chartPeriod
+        chart_period: chartPeriod
       });
     },
     updateBoxChartLimitClass(state, x, y, chartLimitClass) {
       boxActions.updateBoxConfig(state, x, y, {
-        chartLimitClass
+        chart_limit_class: chartLimitClass
       });
     },
     updateBoxRoom(state, x, y, room) {
