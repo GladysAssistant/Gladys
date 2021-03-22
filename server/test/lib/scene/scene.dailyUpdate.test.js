@@ -9,8 +9,8 @@ const SceneManager = proxyquire('../../../lib/scene', {
   suncalc: {
     getTimes: () => {
       return {
-        sunrise: new Date(Date.now()),
-        sunset: new Date(Date.now()),
+        sunrise: new Date(Date.now() + 60 * 60 * 1000),
+        sunset: new Date(Date.now() + 60 * 60 * 1000),
       };
     },
   },
@@ -21,6 +21,23 @@ const SceneManager = proxyquire('../../../lib/scene', {
         date,
         cancel: () => {},
       };
+    },
+    RecurrenceRule: function RecurrenceRule() {},
+  },
+});
+
+const SceneManagerWithPastSunriseSunset = proxyquire('../../../lib/scene', {
+  suncalc: {
+    getTimes: () => {
+      return {
+        sunrise: new Date(Date.now() - 60 * 60 * 1000),
+        sunset: new Date(Date.now() - 60 * 60 * 1000),
+      };
+    },
+  },
+  'node-schedule': {
+    scheduleJob: (date, callback) => {
+      return null;
     },
     RecurrenceRule: function RecurrenceRule() {},
   },
@@ -43,6 +60,7 @@ const event = {
 const variable = {
   getValue: fake.resolves('UTC'),
 };
+
 describe('SceneManager.dailyUpdate', () => {
   let sceneManager;
 
@@ -66,6 +84,12 @@ describe('SceneManager.dailyUpdate', () => {
       job.callback();
     });
     assert.called(event.emit);
+  });
+
+  it('should not scheduleJob for sunrise/sunset, sunset/sunrise is in the past', async () => {
+    const sceneManagerPast = new SceneManagerWithPastSunriseSunset({}, event, {}, {}, variable, house);
+    await sceneManagerPast.dailyUpdate();
+    expect(sceneManagerPast.jobs).to.deep.equal([]);
   });
 
   it("shouldn't scheduleJob for sunrise/sunset when house doesn't have location", async () => {
