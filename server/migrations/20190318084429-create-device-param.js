@@ -39,5 +39,5 @@ module.exports = {
       unique: true,
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_device_param'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_device_param'),
 };

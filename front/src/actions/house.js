@@ -9,6 +9,10 @@ import debounce from 'debounce';
 import get from 'get-value';
 import uuid from 'uuid';
 
+function sortRoomsInHouses(houses) {
+  houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+}
+
 function createActions(store) {
   const actions = {
     async getHouses(state) {
@@ -25,6 +29,7 @@ function createActions(store) {
           params.search = state.housesSearch;
         }
         const houses = await state.httpClient.get(`/api/v1/house`, params);
+        sortRoomsInHouses(houses);
         store.setState({
           houses,
           housesGetStatus: RequestStatus.Success

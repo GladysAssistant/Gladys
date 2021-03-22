@@ -46,5 +46,5 @@ module.exports = {
     await queryInterface.addIndex('t_life_event', ['house_id']);
     await queryInterface.addIndex('t_life_event', ['type']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_life_event'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_life_event'),
 };

@@ -99,7 +99,7 @@ class BluetoothSettingsTab extends Component {
                 <button
                   class="btn btn-outline-primary"
                   onClick={this.scanPresence}
-                  disabled={saving || bluetoothStatus.scanning}
+                  disabled={saving || bluetoothStatus.scanning || !bluetoothStatus.ready}
                 >
                   <i class="fe fe-radio mr-2" />
                   <Text id="integration.bluetooth.setup.presenceScannerButton" />

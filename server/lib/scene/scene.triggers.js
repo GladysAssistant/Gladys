@@ -17,6 +17,8 @@ const triggersFunc = {
     return newValueValidateRule;
   },
   [EVENTS.TIME.CHANGED]: (event, trigger) => event.key === trigger.key,
+  [EVENTS.TIME.SUNRISE]: (event, trigger) => event.house.selector === trigger.house,
+  [EVENTS.TIME.SUNSET]: (event, trigger) => event.house.selector === trigger.house,
 };
 
 module.exports = {

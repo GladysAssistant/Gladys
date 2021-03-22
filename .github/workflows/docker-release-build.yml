@@ -15,7 +15,7 @@ jobs:
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
       - name: 📦 Install Global NPM Packages
@@ -48,7 +48,7 @@ jobs:
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
       - name: 🖥️ Setup OZW
@@ -97,7 +97,7 @@ jobs:
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - name: 📇 Use npm cache
         uses: c-hive/gha-npm-cache@v1
       - name: 📦 Install NPM front packages
