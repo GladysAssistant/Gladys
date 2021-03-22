@@ -58,7 +58,7 @@ class SetupTab extends Component {
                 class="custom-switch-input"
                 checked={props.z2mEnabled}
                 onClick={this.toggle}
-                disabled={!props.dockerBased || !props.networkModeValid}
+                disabled={!props.dockerBased || !props.networkModeValid || !props.usbConfigured}
               />
               <span class="custom-switch-indicator" />
               <span class="custom-switch-description">

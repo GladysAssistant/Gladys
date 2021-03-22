@@ -6,7 +6,7 @@ import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected',
+  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected,usbConfigured',
   actions
 )
 class Zigbee2mqttSetupPage extends Component {

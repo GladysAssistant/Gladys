@@ -6,7 +6,7 @@ import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,zigbee2mqttFrontend',
+  'user,session,housesWithRooms,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,zigbee2mqttFrontend,usbConfigured,z2mEnabled',
   actions
 )
 class Zigbee2mqttIntegration extends Component {
