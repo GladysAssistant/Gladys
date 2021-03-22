@@ -90,7 +90,6 @@ jobs:
     name: Front build
     needs:
       - test-front
-      - test-server
     runs-on: ubuntu-20.04
     steps:
       - name: ⬇️ Checkout code
