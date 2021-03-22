@@ -17,9 +17,15 @@ async function command(message, classification, context) {
     if (!house || !house.latitude || !house.longitude) {
       throw new NoValuesFoundError();
     }
+    const options = {
+      latitude: house.latitude,
+      longitude: house.longitude,
+      units: message.user.distance_unit_preference,
+      language: message.user.language,
+    };
     switch (classification.intent) {
       case 'weather.get':
-        weather = await this.get(house);
+        weather = await this.get(options);
         context.temperature = weather.temperature;
         context.units = weather.units === 'metric' ? '°C' : '°F';
         await this.messageManager.replyByIntent(message, `weather.get.success.${weather.weather}`, context);
