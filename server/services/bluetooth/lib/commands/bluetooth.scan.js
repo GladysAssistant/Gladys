@@ -17,6 +17,10 @@ async function scan(state, peripheralUuid = undefined) {
   if (state) {
     if (peripheralUuid) {
       logger.trace(`Bluetooth: scanning for ${peripheralUuid} peripheral`);
+      const peripheral = this.getPeripheral(peripheralUuid);
+      if (peripheral) {
+        return peripheral;
+      }
     } else {
       logger.trace(`Bluetooth: scanning for all peripherals`);
       this.discoveredDevices = {};
@@ -63,7 +67,7 @@ async function scan(state, peripheralUuid = undefined) {
         this.bluetooth.startScanning([], true);
       }
 
-      this.scanTimer = Promise.delay(TIMERS.SCAN).then(() => this.bluetooth.stopScanning());
+      this.scanPromise = Promise.delay(TIMERS.SCAN).then(() => this.bluetooth.stopScanning());
     });
   }
 

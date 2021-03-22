@@ -53,5 +53,5 @@ module.exports = {
       unique: true,
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_service'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_service'),
 };

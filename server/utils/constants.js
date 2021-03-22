@@ -107,6 +107,8 @@ const EVENTS = {
   },
   TIME: {
     CHANGED: 'time.changed',
+    SUNRISE: 'time.sunrise',
+    SUNSET: 'time.sunset',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
@@ -130,6 +132,11 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+  },
+  HOUSE: {
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
   },
 };
 
@@ -379,6 +386,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    SENT: 'message.sent',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',

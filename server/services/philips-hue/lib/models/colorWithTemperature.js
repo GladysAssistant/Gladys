@@ -56,8 +56,8 @@ const getPhilipsHueColorTemperatureLight = (philipsHueLight, bridgeSerialNumber,
       selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-      min: philipsHueLight._rawData.capabilities.control.ct.min, // eslint-disable-line no-underscore-dangle
-      max: philipsHueLight._rawData.capabilities.control.ct.max, // eslint-disable-line no-underscore-dangle
+      min: philipsHueLight._data.capabilities.control.ct.min, // eslint-disable-line no-underscore-dangle
+      max: philipsHueLight._data.capabilities.control.ct.max, // eslint-disable-line no-underscore-dangle
     },
   ],
 });

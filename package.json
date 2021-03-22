@@ -1,10 +1,10 @@
 {
   "name": "gladys",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "scripts": {
@@ -22,7 +22,8 @@
     "build-front": "cd front && npm run build",
     "copy-front": "shx cp -R front/build server/static",
     "build": "npm run build:clean && npm run build-front && npm run copy-front",
-    "generate-changelog": "auto-changelog"
+    "generate-changelog": "auto-changelog",
+    "clean-node-modules": "npx rimraf ./**/node_modules"
   },
   "repository": {
     "type": "git",

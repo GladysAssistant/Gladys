@@ -41,5 +41,5 @@ module.exports = {
       },
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_trigger'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_trigger'),
 };

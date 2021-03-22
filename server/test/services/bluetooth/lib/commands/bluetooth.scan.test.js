@@ -103,4 +103,19 @@ describe('bluetooth.scan command', () => {
 
     expect(bluetoothManager.discoveredDevices).deep.eq({ one: {}, two: {} });
   });
+
+  it('scan for in memory peripheral', async () => {
+    bluetoothManager.ready = true;
+    bluetoothManager.discoveredDevices = { one: {}, two: {} };
+    // eslint-disable-next-line no-underscore-dangle
+    bluetooth._peripherals.any = { uuid: 'any' };
+
+    const peripheral = await bluetoothManager.scan(true, 'any');
+
+    assert.notCalled(bluetooth.startScanning);
+    assert.notCalled(stopScanning);
+    assert.notCalled(stopScanningAsync);
+
+    expect(peripheral).deep.eq({ uuid: 'any' });
+  });
 });

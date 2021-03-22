@@ -42,5 +42,5 @@ module.exports = {
       },
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_area'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_area'),
 };

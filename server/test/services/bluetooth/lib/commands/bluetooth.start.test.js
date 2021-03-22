@@ -45,10 +45,9 @@ describe('bluetooth.start command', () => {
     expect(bluetooth.listenerCount('scanStart')).eq(1);
     expect(bluetooth.listenerCount('scanStop')).eq(1);
     expect(bluetooth.listenerCount('discover')).eq(1);
-    expect(bluetooth.listenerCount('connect')).eq(1);
 
     // All listeners
-    expect(bluetooth.eventNames().length).eq(5);
+    expect(bluetooth.eventNames().length).eq(4);
 
     assert.callCount(gladys.variable.getValue, 2);
     assert.callCount(gladys.variable.setValue, 2);
@@ -63,10 +62,9 @@ describe('bluetooth.start command', () => {
     expect(bluetooth.listenerCount('scanStart')).eq(1);
     expect(bluetooth.listenerCount('scanStop')).eq(1);
     expect(bluetooth.listenerCount('discover')).eq(1);
-    expect(bluetooth.listenerCount('connect')).eq(1);
 
     // All listeners
-    expect(bluetooth.eventNames().length).eq(5);
+    expect(bluetooth.eventNames().length).eq(4);
 
     assert.callCount(gladys.variable.getValue, 2);
     assert.notCalled(gladys.variable.setValue);

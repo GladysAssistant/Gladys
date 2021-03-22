@@ -5,7 +5,7 @@ import Select from 'react-select';
 
 import { EVENTS } from '../../../../../../server/utils/constants';
 
-const TRIGGER_LIST = [EVENTS.DEVICE.NEW_STATE, EVENTS.TIME.CHANGED];
+const TRIGGER_LIST = [EVENTS.DEVICE.NEW_STATE, EVENTS.TIME.CHANGED, EVENTS.TIME.SUNRISE, EVENTS.TIME.SUNSET];
 
 @connect('httpClient', {})
 class ChooseTriggerType extends Component {
