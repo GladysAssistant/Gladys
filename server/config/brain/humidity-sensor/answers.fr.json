@@ -1,7 +1,7 @@
 [
   {
     "label": "humidity-sensor.get-in-room.success",
-    "answers": ["Il fait {{ humidity }} {{ unit }} dans la pièce {{ roomName }}."]
+    "answers": ["Le taux d'humidité est de {{ humidity }} {{ unit }} dans la pièce {{ roomName }}."]
   },
   {
     "label": "humidity-sensor.get-in-room.fail.no-results",
