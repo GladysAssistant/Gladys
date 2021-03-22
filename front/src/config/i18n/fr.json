@@ -896,7 +896,9 @@
         "new-state": "Changement d'état de l'appareil"
       },
       "time": {
-        "changed": "Déclenchement programmé"
+        "changed": "Déclenchement programmé",
+        "sunrise": "A chaque lever de soleil",
+        "sunset": "A chaque coucher de soleil"
       }
     },
     "triggersCard": {
@@ -941,7 +943,11 @@
           "friday": "Vendredi",
           "saturday": "Samedi",
           "sunday": "Dimanche"
-        }
+        },
+        "house": "Maison"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       }
     }
   },
