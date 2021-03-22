@@ -4,6 +4,7 @@ const { CONFIGURATION } = require('./constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const logger = require('../../../utils/logger');
+const { basePath } = require('../utils/basePath');
 
 const sleep = promisify(setTimeout);
 
@@ -28,8 +29,10 @@ async function installMqttContainer() {
 
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
-      const brokerEnv = await exec('sh ./services/zigbee2mqtt/docker/gladys-z2m-mqtt-env.sh');
+
+      const brokerEnv = await exec(`sh ./services/zigbee2mqtt/docker/gladys-z2m-mqtt-env.sh ${basePath()}`);
       logger.trace(brokerEnv);
+      containerDescriptor.HostConfig.Binds.push(`${basePath()}/zigbee2mqtt/mqtt:/mosquitto/config`);
 
       logger.info(`Creating container...`);
       containerMqtt = await this.gladys.system.createContainer(containerDescriptor);

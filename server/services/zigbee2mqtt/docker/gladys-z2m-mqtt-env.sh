@@ -1,7 +1,10 @@
 #!/bin/sh
 
+# Base path
+base_path=$1
+
 # Configuration path
-mosquitto_dir=/var/lib/gladysassistant/zigbee2mqtt/mqtt
+mosquitto_dir=${base_path}/zigbee2mqtt/mqtt
 # Configuration file
 mosquitto_config_file=${mosquitto_dir}/mosquitto.conf
 # Password file

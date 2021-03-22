@@ -1,7 +1,10 @@
 #!/bin/sh
 
+# Base path
+base_path=$1
+
 # Configuration path
-zigbee2mqtt_dir=/var/lib/gladysassistant/zigbee2mqtt/z2m
+zigbee2mqtt_dir=${base_path}/zigbee2mqtt/z2m
 # Configuration file
 zigbee2mqtt_config_file=${zigbee2mqtt_dir}/configuration.yaml
 
@@ -24,8 +27,8 @@ permit_join: false
 mqtt:
   base_topic: zigbee2mqtt
   server: 'mqtt://localhost:1884'
-  user: $1
-  password: $2
+  user: $2
+  password: $3
 serial:
   port: /dev/ttyACM0
   # We don't put disable_led because some devices don't handle it

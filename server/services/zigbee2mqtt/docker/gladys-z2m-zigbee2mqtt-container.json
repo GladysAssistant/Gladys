@@ -3,7 +3,7 @@
   "Image": "koenkk/zigbee2mqtt:latest",
   "ExposedPorts": {},
   "HostConfig": {
-    "Binds": ["/var/lib/gladysassistant/zigbee2mqtt/z2m:/app/data"],
+    "Binds": [],
     "PortBindings": {},
     "RestartPolicy": {
       "Name": "always"
