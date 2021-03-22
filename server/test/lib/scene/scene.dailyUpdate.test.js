@@ -43,7 +43,7 @@ const event = {
 const variable = {
   getValue: fake.resolves('UTC'),
 };
-describe('SceneManager', () => {
+describe('SceneManager.dailyUpdate', () => {
   let sceneManager;
 
   beforeEach(async () => {
