@@ -1,11 +1,13 @@
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc'); // dependent on utc plugin
 const timezone = require('dayjs/plugin/timezone');
+const relativeTime = require('dayjs/plugin/relativeTime');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
 /**
  * @description Add Schedule job for sunset and sunrise for each house
@@ -62,7 +64,7 @@ async function dailyUpdate() {
         }),
       );
       if (sunriseJob) {
-        logger.info(`Sunrise is scheduled!`);
+        logger.info(`Sunrise is scheduled, ${dayjs(sunriseTime).fromNow()}.`);
         this.jobs.push(sunriseJob);
       } else {
         logger.info(`The sun rose this morning. Not scheduling for today.`);
@@ -76,7 +78,7 @@ async function dailyUpdate() {
       );
 
       if (sunsetJob) {
-        logger.info(`Sunset is scheduled!`);
+        logger.info(`Sunset is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
         this.jobs.push(sunsetJob);
       } else {
         logger.info(`The sun has already set. Not scheduling for today.`);
