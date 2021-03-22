@@ -124,6 +124,7 @@
             "main-lamp-binary",
             "tv-lamp-binary",
             "tv-lamp-color",
+            "tv-lamp-brightness",
             "mqtt-living-room-switch",
             "mqtt-living-room-temp"
           ]
@@ -266,6 +267,17 @@
             "max": 16777215,
             "read_only": false,
             "last_value": 65000,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "TV Lamp brightness",
+            "selector": "tv-lamp-brightness",
+            "category": "light",
+            "type": "brightness",
+            "min": 0,
+            "max": 100,
+            "read_only": false,
+            "last_value": 55,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
           }
         ]

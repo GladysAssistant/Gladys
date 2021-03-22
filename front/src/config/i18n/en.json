@@ -901,7 +901,9 @@
         "new-state": "Device state change"
       },
       "time": {
-        "changed": "Scheduled trigger"
+        "changed": "Scheduled trigger",
+        "sunrise": "Every sunrise",
+        "sunset": "Every sunset"
       }
     },
     "triggersCard": {
@@ -946,7 +948,11 @@
           "friday": "Friday",
           "saturday": "Saturday",
           "sunday": "Sunday"
-        }
+        },
+        "house": "House"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
       }
     }
   },

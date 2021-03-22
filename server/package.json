@@ -3,7 +3,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "scripts": {
@@ -78,6 +78,7 @@
     "bluebird": "^3.5.3",
     "compression": "^1.7.4",
     "cross-env": "^5.2.0",
+    "dayjs": "^1.10.4",
     "dockerode": "^2.5.8",
     "express": "^4.16.4",
     "express-rate-limit": "^4.0.3",
@@ -94,10 +95,11 @@
     "path-to-regexp": "^3.0.0",
     "queue": "^6.0.0",
     "semver": "^6.1.1",
-    "sequelize": "^4.42.0",
-    "sequelize-cli": "^5.5.1",
+    "sequelize": "^6.5.0",
+    "sequelize-cli": "^6.2.0",
     "set-value": "^3.0.2",
     "sqlite3": "^4.0.6",
+    "suncalc": "^1.8.0",
     "tracer": "^0.9.8",
     "umzug": "^2.2.0",
     "uuid": "^3.3.2",

@@ -85,6 +85,16 @@ const gladys = {
   variable: {
     getValue: () => Promise.resolve('OPEN_WEATHER_API_KEY'),
   },
+  house: {
+    get: () =>
+      Promise.resolve([
+        {
+          selector: 'house1',
+          latitude: '1212111',
+          longitude: '1212111',
+        },
+      ]),
+  },
 };
 
 describe('OpenWeatherService', () => {
@@ -286,6 +296,7 @@ describe('OpenWeatherService', () => {
     const OpenWeatherService = proxyquire('../../../services/openweather/index', brokenAxios);
     const openWeatherService = OpenWeatherService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await openWeatherService.start();
+
     const promise = openWeatherService.weather.get({
       latitude: 12,
       longitude: 10,

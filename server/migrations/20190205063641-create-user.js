@@ -101,5 +101,5 @@ module.exports = {
 
     await queryInterface.addIndex('t_user', ['role']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_user'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_user'),
 };
