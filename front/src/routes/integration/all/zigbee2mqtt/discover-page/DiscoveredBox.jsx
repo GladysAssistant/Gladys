@@ -99,8 +99,8 @@ class DiscoveredBox extends Component {
                         <option value="">
                           <Text id="global.emptySelectOption" />
                         </option>
-                        {props.housesWithRooms &&
-                          props.housesWithRooms.map(house => (
+                        {props.houses &&
+                          props.houses.map(house => (
                             <optgroup label={house.name}>
                               {house.rooms.map(room => (
                                 <option selected={room.id === props.device.room_id} value={room.id}>

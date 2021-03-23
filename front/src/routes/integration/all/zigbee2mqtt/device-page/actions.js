@@ -3,9 +3,11 @@ import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
+import createActionsHouse from '../../../../../actions/house';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
+  const houseActions = createActionsHouse(store);
   const actions = {
     async getZigbee2mqttDevices(state, take, skip) {
       store.setState({
@@ -76,25 +78,6 @@ function createActions(store) {
         zigbee2mqttDevices
       });
     },
-    async getHouses(state) {
-      store.setState({
-        housesGetStatus: RequestStatus.Getting
-      });
-      try {
-        const params = {
-          expand: 'rooms'
-        };
-        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
-        store.setState({
-          housesWithRooms,
-          housesGetStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          housesGetStatus: RequestStatus.Error
-        });
-      }
-    },
     async saveDevice(state, index) {
       const device = state.zigbee2mqttDevices[index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
@@ -133,7 +116,7 @@ function createActions(store) {
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 
-  return Object.assign({}, integrationActions, actions);
+  return Object.assign({}, integrationActions, houseActions, actions);
 }
 
 export default createActions;
