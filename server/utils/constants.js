@@ -3,6 +3,14 @@ const STATE = {
   OFF: 0,
 };
 
+const BUTTON_STATUS = {
+  CLICK: 1,
+  DOUBLE_CLICK: 2,
+  LONG_CLICK_PRESS: 3,
+  LONG_CLICK_RELEASE: 4,
+  LONG_CLICK: 5,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -496,6 +504,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 
 module.exports.STATE = STATE;
+module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

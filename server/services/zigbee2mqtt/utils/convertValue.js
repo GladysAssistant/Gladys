@@ -1,3 +1,5 @@
+const { BUTTON_STATUS } = require('../../../utils/constants');
+
 /**
  * @description Convert Zigbee2mqtt device value into Gladys value.
  * @param {string} feature - Device feature.
@@ -16,7 +18,19 @@ function convertValue(feature, value) {
     }
     // Case for Button devices
     case 'click': {
-      result = value;
+      switch (value) {
+        case 'single':
+          result = BUTTON_STATUS.CLICK;
+          break;
+        case 'double':
+          result = BUTTON_STATUS.DOUBLE_CLICK;
+          break;
+        case 'hold':
+          result = BUTTON_STATUS.LONG_CLICK;
+          break;
+        default:
+          result = value;
+      }
       break;
     }
 
