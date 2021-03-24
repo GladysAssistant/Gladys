@@ -6,6 +6,7 @@ import { USER_ROLE } from '../../../../server/utils/constants';
 
 const PAGES_WITHOUT_HEADER = [
   '/login',
+  '/authorize',
   '/signup',
   '/signup/create-account-local',
   '/signup/create-account-gladys-gateway',

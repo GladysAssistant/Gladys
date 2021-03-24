@@ -175,7 +175,7 @@ function createActions(store) {
         });
         route('/dashboard/settings/user');
       } catch (e) {
-        console.log(e);
+        console.error(e);
         const status = get(e, 'response.status');
         if (status === 409) {
           store.setState({

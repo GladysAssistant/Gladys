@@ -87,6 +87,19 @@ module.exports = {
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
+        {
+          // oauth valid
+          id: 'd7a30cc5-b862-44fe-8a37-23420d14533e',
+          user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          token_type: SESSION_TOKEN_TYPES.REFRESH_TOKEN,
+          token_hash: 'd3d96a75e6746685699d9be56622a81c8a4cecacd5fbcdcaec9f2458883a3367', // hash of 'refresh-token-test'
+          scope: 'reset-password:write',
+          revoked: false,
+          client_id: 'oauth_client_1',
+          valid_until: new Date(new Date().getTime() + 10000000),
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
       ],
       {},
     ),

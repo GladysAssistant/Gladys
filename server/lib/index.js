@@ -24,6 +24,7 @@ const System = require('./system');
 const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
+const Oauth = require('./oauth');
 
 /**
  * @description Start a new Gladys instance
@@ -65,6 +66,7 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager);
+  const oauth = new Oauth(user, session);
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
@@ -89,6 +91,7 @@ function Gladys(params = {}) {
     system,
     variable,
     weather,
+    oauth,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');
