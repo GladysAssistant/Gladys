@@ -1660,6 +1660,7 @@
     "nameLabel": "Nom",
     "roomLabel": "Pièce",
     "featuresLabel": "Fonctionnalités",
+    "featureCategoryLabel": "Categorie",
     "noFeatures": "Aucune fonctionnalité",
     "namePlaceholder": "Entrez un nom",
     "externalIdLabel": "ID externe",
