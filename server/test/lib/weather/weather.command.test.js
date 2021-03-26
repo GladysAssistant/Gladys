@@ -130,6 +130,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo ?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -148,6 +152,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo Today?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -175,6 +183,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo Tomorrow?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -204,6 +216,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo After Tomorrow?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -234,6 +250,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo next sunday?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -265,6 +285,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo next?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,
@@ -283,6 +307,10 @@ describe('weather.command', () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
       text: 'Meteo next far day?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
     };
     await weather.command(
       message,

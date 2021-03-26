@@ -32,7 +32,13 @@ async function command(message, classification, context) {
     if (!house || !house.latitude || !house.longitude) {
       throw new NoValuesFoundError();
     }
-    const weather = await this.get(house);
+    const options = {
+      latitude: house.latitude,
+      longitude: house.longitude,
+      units: message.user.distance_unit_preference,
+      language: message.user.language,
+    };
+    const weather = await this.get(options);
 
     if (`intent.${classification.intent}` === INTENTS.WEATHER.GET) {
       const dateEntity = classification.entities.find((entity) => entity.entity === 'date');
