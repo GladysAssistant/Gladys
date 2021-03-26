@@ -15,6 +15,7 @@ async function getPiholeSummary() {
   try {
     logger.debug(`PiHole summary URL : ${url}`);
     const { data } = await axios.get(url);
+    logger.debug(`PiHole datas : ${JSON.stringify(data, null, 2)}`);
     return data;
   } catch (e) {
     logger.error(e);
