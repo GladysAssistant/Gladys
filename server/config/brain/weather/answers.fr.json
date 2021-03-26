@@ -1,36 +1,233 @@
 [
   {
-    "label": "weather.get.success.snow",
+    "label": "weather.get.success.now.snow",
     "answers": ["Il neige dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.rain",
+    "label": "weather.get.success.now.rain",
     "answers": ["Il pleut dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.clear",
+    "label": "weather.get.success.now.clear",
     "answers": ["Le ciel est dégagé dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.cloud",
+    "label": "weather.get.success.now.cloud",
     "answers": ["Il fait nuageux dehors et la température est de  {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.fog",
+    "label": "weather.get.success.now.fog",
     "answers": ["Il y a du brouillard dehors et la température est de {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.sleet",
-    "answers": ["Il fait {{ temperature }} {{ units }} dehors avec une pluie glaciale..."]
+    "label": "weather.get.success.now.sleet",
+    "answers": ["Il fait {{ temperature }} {{ units }} dehors avec une pluie glaciale."]
   },
   {
-    "label": "weather.get.success.wind",
+    "label": "weather.get.success.now.wind",
     "answers": ["Le temps est venteux aujourd'hui, et il fait {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.unknown",
+    "label": "weather.get.success.now.unknown",
     "answers": ["La température est de {{ temperature }} {{ units }}."]
   },
+
+  {
+    "label": "weather.get.success.today.snow",
+    "answers": [
+      "Aujourd'hui, il neige et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.rain",
+    "answers": [
+      "Aujourd'hui, il pleut et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.clear",
+    "answers": [
+      "Aujourd'hui, le ciel est degagé et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.cloud",
+    "answers": [
+      "Aujourd'hui, le ciel est nuageux et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.fog",
+    "answers": [
+      "Aujourd'hui, il y a du brouillard et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.sleet",
+    "answers": [
+      "Aujourd'hui, la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }} avec une pluie glacial."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.wind",
+    "answers": [
+      "Aujourd'hui, Il y a beaucoup de vent et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.unknown",
+    "answers": [
+      "Aujourd'hui, la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+
+  {
+    "label": "weather.get.success.tomorrow.snow",
+    "answers": [
+      "Demain il va neiger dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.rain",
+    "answers": [
+      "Demain il va pleuvoir dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.clear",
+    "answers": [
+      "Demain le ciel sera dégagé dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.cloud",
+    "answers": [
+      "Demain il y aura des nuages dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.fog",
+    "answers": [
+      "Demain il y aura du brouillard dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.sleet",
+    "answers": [
+      "Demain la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }} avec une pluie glacial."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.wind",
+    "answers": [
+      "Demain le temps sera venteux dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.unknown",
+    "answers": [
+      "Demain la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+
+  {
+    "label": "weather.get.success.after-tomorrow.snow",
+    "answers": [
+      "Après demain il va neiger dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.rain",
+    "answers": [
+      "Après demain il va pleuvoir dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.clear",
+    "answers": [
+      "Après demain le ciel sera dégagé dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.cloud",
+    "answers": [
+      "Après demain il y aura des nuages dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.fog",
+    "answers": [
+      "Après demain il y aura du brouillard dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.sleet",
+    "answers": [
+      "Après demain la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }} avec une pluie glacial."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.wind",
+    "answers": [
+      "Après demain le temps sera venteux dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.unknown",
+    "answers": [
+      "Après demain la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+
+  {
+    "label": "weather.get.success.day.snow",
+    "answers": [
+      "{{ day }} il va neiger dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.rain",
+    "answers": [
+      "{{ day }} il va pleuvoir dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.clear",
+    "answers": [
+      "{{ day }} le ciel sera dégagé dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.cloud",
+    "answers": [
+      "{{ day }} il y aura des nuages dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.fog",
+    "answers": [
+      "{{ day }} il y aura du brouillard dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.sleet",
+    "answers": [
+      "{{ day }} la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }} avec une pluie glacial."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.wind",
+    "answers": [
+      "{{ day }} le temps sera venteux dehors et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.unknown",
+    "answers": [
+      "{{ day }} la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+
   {
     "label": "weather.get.fail",
     "answers": ["Je n'ai pas réussi à récupérer la météo..."]
@@ -38,6 +235,10 @@
   {
     "label": "weather.get.fail.not-configured",
     "answers": ["Vous devez configurer un service de météo avant de pouvoir utiliser cette fonctionnalité."]
+  },
+  {
+    "label": "weather.get.fail.no-weather",
+    "answers": ["Les prévision météorologiques pour ce jour sont introuvables."]
   },
   {
     "label": "weather.get.fail.no-house",

@@ -1,5 +1,6 @@
 const { NlpManager } = require('node-nlp');
 const { SUPPORTED_LANGUAGES } = require('../../config/brain/index');
+
 const { addRoom } = require('./brain.addRoom');
 const { removeRoom } = require('./brain.removeRoom');
 const { train } = require('./brain.train');
@@ -8,7 +9,11 @@ const { getReply } = require('./brain.getReply');
 const { load } = require('./brain.load');
 
 const Brain = function Brain() {
-  this.nlpManager = new NlpManager({ languages: SUPPORTED_LANGUAGES });
+  this.nlpManager = new NlpManager({
+    languages: SUPPORTED_LANGUAGES,
+    nlu: { log: false },
+    autoSave: false,
+  });
 };
 
 Brain.prototype.addRoom = addRoom;
