@@ -1,11 +1,7 @@
 {
   "name": "pihole",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "scripts": {},
-  "author": "Vincent Kulak <vkulak62@gmail.com>",
-  "license": "MIT",
   "os": [
     "darwin",
     "linux",
