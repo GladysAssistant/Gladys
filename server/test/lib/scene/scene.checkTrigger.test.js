@@ -7,6 +7,9 @@ const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
+const house = {
+  get: fake.resolves([]),
+};
 
 describe('scene.checkTrigger', () => {
   it('should execute scene', async () => {
@@ -14,7 +17,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -55,7 +58,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -90,12 +93,93 @@ describe('scene.checkTrigger', () => {
       });
     });
   });
+  it('should execute scene', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const addedScene = sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: addedScene.triggers[0].house,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const addedScene = sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNSET,
+          house: 'house-1',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNSET,
+      house: {
+        selector: addedScene.triggers[0].house,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
   it('should not execute scene, condition not verified', async () => {
     const stateManager = new StateManager();
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -136,7 +220,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -179,7 +263,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -222,7 +306,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -263,7 +347,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     expect(() => {
       sceneManager.checkTrigger({
         type: 'one-unknown-event',
@@ -277,7 +361,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       actions: [
@@ -320,7 +404,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device);
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
       actions: [

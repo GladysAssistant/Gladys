@@ -13,7 +13,11 @@
     "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Work in progress...",
-    "save": "Save"
+    "save": "Save",
+    "celsius": "C",
+    "fahrenheit": "F",
+    "metersPerSec": "m/s",
+    "milesPerHour": "m/h"
   },
   "calendar": {
     "allDay": "All Day",
@@ -174,6 +178,7 @@
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
+      "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
@@ -214,6 +219,10 @@
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
         "noTemperatureRecorded": "No temperature recorded recently."
+      },
+      "humidityInRoom": {
+        "editRoomLabel": "Select the room you want to display here.",
+        "noHumidityRecorded": "No humidity recorded recently."
       },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes.",
@@ -914,7 +923,9 @@
         "new-state": "Device state change"
       },
       "time": {
-        "changed": "Scheduled trigger"
+        "changed": "Scheduled trigger",
+        "sunrise": "Every sunrise",
+        "sunset": "Every sunset"
       }
     },
     "triggersCard": {
@@ -959,7 +970,11 @@
           "friday": "Friday",
           "saturday": "Saturday",
           "sunday": "Sunday"
-        }
+        },
+        "house": "House"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
       }
     }
   },

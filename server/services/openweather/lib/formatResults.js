@@ -68,7 +68,7 @@ function formatResults(options, result) {
   if (result.daily) {
     const dataDaily = result.daily;
     dataToReturn.days = [];
-    for (let i = 1; i < dataDaily.length; i += 1) {
+    for (let i = 0; i < dataDaily.length; i += 1) {
       dataToReturn.days.push({
         temperature_min: Math.round(dataDaily[i].temp.min),
         temperature_max: Math.round(dataDaily[i].temp.max),

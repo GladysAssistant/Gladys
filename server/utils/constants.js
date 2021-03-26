@@ -107,12 +107,17 @@ const EVENTS = {
   },
   TIME: {
     CHANGED: 'time.changed',
+    SUNRISE: 'time.sunrise',
+    SUNSET: 'time.sunset',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
+  },
+  HUMIDITY_SENSOR: {
+    HUMIDITY_CHANGED: 'humidity.changed',
   },
   SCHEDULED_SCENE: {
     ENABLED: 'scheduled-scene.enabled',
@@ -130,6 +135,11 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+  },
+  HOUSE: {
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
   },
 };
 
@@ -234,8 +244,14 @@ const INTENTS = {
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
   },
+  HUMIDITY_SENSOR: {
+    GET_IN_ROOM: 'intent.humidity-sensor.get-in-room',
+  },
   WEATHER: {
     GET: 'intent.weather.get',
+    TOMORROW: 'intent.weather.tomorrow',
+    AFTER_TOMORROW: 'intent.weather.after-tomorrow',
+    DAY: 'intent.weather.day',
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
@@ -345,6 +361,10 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
 };
 
+const WEATHER_UNITS = {
+  METRIC: 'metric',
+};
+
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
@@ -440,6 +460,7 @@ const DASHBOARD_TYPE = {
 const DASHBOARD_BOX_TYPE = {
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
+  HUMIDITY_IN_ROOM: 'humidity-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   PIHOLE: 'pihole',
@@ -527,3 +548,5 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.WEATHER_UNITS = WEATHER_UNITS;

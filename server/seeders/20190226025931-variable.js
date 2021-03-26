@@ -41,5 +41,5 @@ module.exports = {
       {},
     ),
 
-  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('t_variable', null, {}),
+  down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('t_variable', null, {}),
 };

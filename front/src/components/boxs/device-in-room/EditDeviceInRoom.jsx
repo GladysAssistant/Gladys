@@ -10,7 +10,11 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 import actions from '../../../actions/dashboard/edit-boxes/editDevicesInRoom';
 
-const SUPPORTED_FEATURE_TYPES = [DEVICE_FEATURE_TYPES.LIGHT.BINARY, DEVICE_FEATURE_TYPES.LIGHT.COLOR];
+const SUPPORTED_FEATURE_TYPES = [
+  DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+  DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+];
 
 @connect('httpClient', actions)
 class EditDeviceInRoom extends Component {

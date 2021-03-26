@@ -85,6 +85,16 @@ const gladys = {
   variable: {
     getValue: () => Promise.resolve('OPEN_WEATHER_API_KEY'),
   },
+  house: {
+    get: () =>
+      Promise.resolve([
+        {
+          selector: 'house1',
+          latitude: '1212111',
+          longitude: '1212111',
+        },
+      ]),
+  },
 };
 
 describe('OpenWeatherService', () => {
@@ -172,6 +182,17 @@ describe('OpenWeatherService', () => {
   ];
 
   const days = [
+    {
+      datetime: new Date('2020-11-16T11:00:00.000Z'),
+      humidity: 54,
+      pressure: 1021,
+      temperature_max: 17,
+      temperature_min: 14,
+      units: 'metric',
+      weather: 'rain',
+      wind_direction: 319,
+      wind_speed: 7.08,
+    },
     {
       datetime: new Date('2020-11-17T11:00:00.000Z'),
       humidity: 48,
@@ -286,6 +307,7 @@ describe('OpenWeatherService', () => {
     const OpenWeatherService = proxyquire('../../../services/openweather/index', brokenAxios);
     const openWeatherService = OpenWeatherService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await openWeatherService.start();
+
     const promise = openWeatherService.weather.get({
       latitude: 12,
       longitude: 10,

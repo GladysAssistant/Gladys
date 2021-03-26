@@ -1,7 +1,7 @@
 {
   "name": "gladys-front",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "scripts": {
@@ -33,10 +33,10 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^3.2.4",
+    "@gladysassistant/gladys-gateway-js": "^3.2.9",
     "@jaames/iro": "^5.2.3",
     "@yaireo/tagify": "^3.21.5",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "cropperjs": "^1.5.1",
     "date-fns": "^2.10.0",
@@ -47,7 +47,6 @@
     "immutability-helper": "^3.0.0",
     "leaflet": "^1.4.0",
     "linkstate": "^1.1.1",
-    "moment": "^2.24.0",
     "preact": "^10.3.2",
     "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-i18n": "^2.0.0-preactx.2",

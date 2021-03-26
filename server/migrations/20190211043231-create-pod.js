@@ -37,5 +37,5 @@ module.exports = {
 
     await queryInterface.addIndex('t_pod', ['room_id']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_pod'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_pod'),
 };

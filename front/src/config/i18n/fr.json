@@ -13,7 +13,11 @@
     "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "celsius": "C",
+    "fahrenheit": "F",
+    "metersPerSec": "m/s",
+    "milesPerHour": "m/h"
   },
   "calendar": {
     "allDay": "Toute la journée",
@@ -174,6 +178,7 @@
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
+      "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
@@ -223,6 +228,10 @@
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
+      },
+      "humidityInRoom": {
+        "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
+        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
       },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
@@ -923,7 +932,9 @@
         "new-state": "Changement d'état de l'appareil"
       },
       "time": {
-        "changed": "Déclenchement programmé"
+        "changed": "Déclenchement programmé",
+        "sunrise": "A chaque lever de soleil",
+        "sunset": "A chaque coucher de soleil"
       }
     },
     "triggersCard": {
@@ -968,7 +979,11 @@
           "friday": "Vendredi",
           "saturday": "Samedi",
           "sunday": "Dimanche"
-        }
+        },
+        "house": "Maison"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       }
     }
   },
