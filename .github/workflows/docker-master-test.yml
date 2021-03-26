@@ -82,5 +82,8 @@ jobs:
         working-directory: ./server
         run: |
           npm run coverage
+      - name: 🔐 Dependencies security audit
+        working-directory: ./server
+        run: npm audit --audit-level=high
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
