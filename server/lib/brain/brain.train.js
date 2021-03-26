@@ -26,7 +26,7 @@ async function train() {
       question.slots.forEach((slot) => {
         if (slot.betweenCondition) {
           this.nlpManager.addBetweenCondition(
-            'en',
+            question.language,
             slot.key,
             slot.betweenCondition.between[0],
             slot.betweenCondition.between[1],
@@ -35,7 +35,7 @@ async function train() {
         }
         if (slot.afterLastCondition) {
           this.nlpManager.addAfterLastCondition(
-            'en',
+            question.language,
             slot.key,
             slot.afterLastCondition.after,
             slot.afterLastCondition.options,
