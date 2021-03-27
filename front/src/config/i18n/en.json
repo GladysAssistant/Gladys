@@ -189,10 +189,12 @@
       "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
       "pihole": {
-        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
-        "requestToThirdPartyFailed": "The request to Pi-Hole API failed. Is your Gladys instance connected to the same network? Please go to the Pi-hole configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?"
+        "headerToday": "Today Statistics",
+        "headerGravitySettings": "Gravity",
+        "domainsBlocked": "Domains blocked",
+        "adsBlocked": "Ads blocked",
+        "dnsQuery": "DNS Queries",
+        "gravityLastUpdate": "Last update"
       },
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
