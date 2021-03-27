@@ -1,36 +1,231 @@
 [
   {
-    "label": "weather.get.success.snow",
+    "label": "weather.get.success.now.snow",
     "answers": ["It's snowing outside and the temperature is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.rain",
+    "label": "weather.get.success.now.rain",
     "answers": ["It's raining and temperature outside is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.clear",
+    "label": "weather.get.success.now.clear",
     "answers": ["It's a clear day today. Temperature outside is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.cloud",
+    "label": "weather.get.success.now.cloud",
     "answers": ["It's cloudy outside and temperature is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.fog",
+    "label": "weather.get.success.now.fog",
     "answers": ["Foggy day today. Temperature outside is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.sleet",
+    "label": "weather.get.success.now.sleet",
     "answers": ["Temperature outside is {{ temperature }} {{ units }}, with freezing rain and sleet."]
   },
   {
-    "label": "weather.get.success.wind",
+    "label": "weather.get.success.now.wind",
     "answers": ["Windy day today. Temperature outside is {{ temperature }} {{ units }}."]
   },
   {
-    "label": "weather.get.success.unknown",
+    "label": "weather.get.success.now.unknown",
     "answers": ["Temperature outside is {{ temperature }} {{ units }}."]
   },
+
+  {
+    "label": "weather.get.success.today.snow",
+    "answers": [
+      "Today, it's snowing and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.rain",
+    "answers": [
+      "Today, it's raining and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.clear",
+    "answers": [
+      "Today, the sky is clear and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.cloud",
+    "answers": [
+      "Today, the sky is cloudy and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.fog",
+    "answers": [
+      "Today, it is foggy and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.sleet",
+    "answers": [
+      "Today, the temperature is between {{temperature min}} {{units}} and {{temperature max}} {{units}} with freezing rain."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.wind",
+    "answers": [
+      "Today, it's very windy and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.unknown",
+    "answers": ["Today, the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."]
+  },
+
+  {
+    "label": "weather.get.success.tomorrow.snow",
+    "answers": [
+      "Tomorrow snow will fall out and the temperature will be between {{ temperature_min }} {{ units }} and {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.rain",
+    "answers": [
+      "Tomorrow it will rain outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.clear",
+    "answers": [
+      "Tomorrow the sky will be clear outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.cloud",
+    "answers": [
+      "Tomorrow there will be clouds outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.fog",
+    "answers": [
+      "Tomorrow there will be fog outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.sleet",
+    "answers": [
+      "Tomorrow the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}} with freezing rain."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.wind",
+    "answers": [
+      "Tomorrow the weather will be windy outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.unknown",
+    "answers": [
+      "Tomorrow the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+
+  {
+    "label": "weather.get.success.after-tomorrow.snow",
+    "answers": [
+      "The day after tomorrow it will snow outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.rain",
+    "answers": [
+      "The day after tomorrow it will rain outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.clear",
+    "answers": [
+      "The day after tomorrow the sky will be clear outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.cloud",
+    "answers": [
+      "The day after tomorrow there will be clouds outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.fog",
+    "answers": [
+      "The day after tomorrow there will be fog outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.sleet",
+    "answers": [
+      "The day after tomorrow the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}} with freezing rain."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.wind",
+    "answers": [
+      "The day after tomorrow it will be windy outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.unknown",
+    "answers": [
+      "The day after tomorrow the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+
+  {
+    "label": "weather.get.success.day.snow",
+    "answers": [
+      "{{day}}, it's going to snow outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.rain",
+    "answers": [
+      "{{ day }}, it will rain outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.clear",
+    "answers": [
+      "{{ day }}, the sky will be clear outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.cloud",
+    "answers": [
+      "{{ day }}, there will be clouds outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.fog",
+    "answers": [
+      "{{ day }} there will be fog outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.sleet",
+    "answers": [
+      "{{ day }} the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}} with freezing rain."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.wind",
+    "answers": [
+      "{{ day }} it will be windy outside and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.unknown",
+    "answers": [
+      "{{ day }} the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+
   {
     "label": "weather.get.fail",
     "answers": ["There was an error while getting the weather."]
@@ -38,6 +233,10 @@
   {
     "label": "weather.get.fail.not-configured",
     "answers": ["You need to configure the OpenWeather API in the Integration tab before using this feature."]
+  },
+  {
+    "label": "weather.get.fail.no-weather",
+    "answers": ["The weather forecast for that day couldn't be found."]
   },
   {
     "label": "weather.get.fail.no-house",
