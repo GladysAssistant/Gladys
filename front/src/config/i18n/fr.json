@@ -177,8 +177,8 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart-one-feature": "Graphique 1 feature",
-      "chart-multi-feature": "Graphique multi feature"
+      "chart-one-feature": "Graphique mono capteur",
+      "chart-multi-feature": "Graphique multi capteur"
     },
     "boxes": {
       "column": "Colonne {{index}}",

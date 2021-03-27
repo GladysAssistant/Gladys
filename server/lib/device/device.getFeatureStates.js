@@ -63,11 +63,9 @@ async function getFeatureStates(options) {
 
   if (devicesPlain && devicesPlain.length > 0) {
     for (let i = 0; i < devicesPlain.length; i += 1) {
-      // devicesPlain.forEach( (device, index) => {
       const device = devicesPlain[i];
       if (device.features && device.features.length > 0) {
         for (let j = 0; j < device.features.length; j += 1) {
-          // device.features.forEach( async (feature, indexFeat, array)  => {
           const feature = device.features[j];
           // Search feature state of current feature
           let beginStateSearchDate = optionsWithDefault.begin_date;

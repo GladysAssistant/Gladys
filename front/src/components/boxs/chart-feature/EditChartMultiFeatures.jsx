@@ -59,7 +59,7 @@ class EditChartMultiFeatures extends Component {
     try {
       this.setState({ loading: true });
 
-      const excludeFeatyreType = [
+      const excludeFeatureType = [
         DEVICE_FEATURE_TYPES.SENSOR.BINARY,
         DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
         DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
@@ -84,7 +84,7 @@ class EditChartMultiFeatures extends Component {
       devices.forEach(device => {
         const roomDeviceFeatures = [];
         device.features.forEach(feature => {
-          if (!excludeFeatyreType.includes(feature.type)) {
+          if (!excludeFeatureType.includes(feature.type)) {
             const featureOption = {
               value: feature.selector,
               label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)

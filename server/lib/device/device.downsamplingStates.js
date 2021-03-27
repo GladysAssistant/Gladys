@@ -23,7 +23,7 @@ async function downsamplingStates() {
     const deviceFeatures = await db.DeviceFeature.findAll(featuresQueryParams, { transaction: t });
     logger.trace('List of features to treat: ', deviceFeatures);
 
-    deviceFeatures.forEach((feature) => {
+    deviceFeatures.forEach(async (feature) => {
       // date interval
       let beginDate;
       if (feature.last_downsampling) {
@@ -49,14 +49,14 @@ async function downsamplingStates() {
       };
 
       // Delete possible featue state light in conflict
-      const queryInterface = db.sequelize.getQueryInterface();
+      const queryInterface = await db.sequelize.getQueryInterface();
       queryInterface.bulkDelete('t_device_feature_state_light', {
         device_feature_id: { [Op.eq]: feature.id },
         created_at: { [Op.between]: [beginDate, endDate] },
       });
 
       // Get feature state and downsample it to save in feature state light
-      db.DeviceFeatureState.findAll(statesQueryParams, { transaction: t }).then((data) => {
+      await db.DeviceFeatureState.findAll(statesQueryParams, { transaction: t }).then((data) => {
         logger.debug(data.length);
 
         if (data.length > 0) {
@@ -72,7 +72,7 @@ async function downsamplingStates() {
             mapOfFeatureState.get(currentDayStateDate.getTime()).push(state);
           });
 
-          mapOfFeatureState.forEach((value) => {
+          mapOfFeatureState.forEach(async (value) => {
             if (value.length > MAX_STATE_BY_DAY) {
               const newFeatureStateArray = [];
               value.forEach((state) => {
@@ -93,14 +93,14 @@ async function downsamplingStates() {
                 });
               });
 
-              db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave);
+              await db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave);
             } else {
               // In this case all feature state was seed in feature state light
-              db.DeviceFeatureStateLight.bulkCreate(value);
+              await db.DeviceFeatureStateLight.bulkCreate(value);
             }
 
             // Change date of downsampling
-            db.DeviceFeature.update(
+            await db.DeviceFeature.update(
               { last_downsampling: value[value.length - 1].created_at },
               {
                 where: {

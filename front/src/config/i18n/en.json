@@ -177,8 +177,8 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart-one-feature": "Chart 1 feature",
-      "chart-multi-feature": "Chart multi feature"
+      "chart-one-feature": "Chart mono feature",
+      "chart-multi-feature": "Chart multi features"
     },
     "boxes": {
       "column": "Column {{index}}",

@@ -25,7 +25,7 @@ function createActions(store) {
         const chartData = await state.httpClient.get(`/api/v1/device/device_feature/${box.device_features}`);
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          chartPeriod: box.chartPeriod,
+          chartPeriod: box.chart_period,
           roomName: chartData[0].room.name,
           deviceName: chartData[0].name,
           showDropDownChartBox: false
@@ -37,7 +37,7 @@ function createActions(store) {
     async getChartOption(state, box, x, y, chartPeriod) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        let newChartPeriod = box.chartPeriod;
+        let newChartPeriod = box.chart_period;
         if (chartPeriod) {
           newChartPeriod = chartPeriod;
           boxActions.mergeBoxData(state, BOX_KEY, x, y, {
@@ -52,7 +52,7 @@ function createActions(store) {
 
         let chartTypeStyle;
         let apexType;
-        switch (box.chartType) {
+        switch (box.chart_type) {
           case chartConfig.CHART_TYPE_SELECTOR.LINE.name:
             chartTypeStyle = chartStyle.OPTIONS_LINE;
             apexType = chartConfig.CHART_TYPE_SELECTOR.LINE.apexName;
