@@ -181,7 +181,8 @@
       "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "remote-control": "Remote control"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -230,6 +231,9 @@
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box"
+      },
+      "remote-control": {
+        "editRemoteControlDevice": "Select the device to display here."
       }
     }
   },
@@ -630,6 +634,60 @@
         "connected": "Connected to the MQTT broker with success !",
         "connectionError": "Error while connecting, please check your configuration.",
         "disconnected": "Disconnected from MQTT broker."
+      }
+    },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Interface with Broadlink devices.",
+      "remoteTab": "Devices",
+      "peripheralTab": "Discover devices",
+      "peripheral": {
+        "title": "Compatible available devices",
+        "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
+        "noPeripherals": "No peripheral discovered on network, please check the connectivity.",
+        "noNameLabel": "Type not recognized",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "saveButton": "Save",
+        "alreadyCreatedButton": "Already created",
+        "createRemoteButton": "Create remote control"
+      },
+      "remote": {
+        "title": "Devices in Gladys",
+        "searchPlaceholder": "Search for devices",
+        "noRemoteFound": "No device found.",
+        "saveError": "There was an error saving the device.",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter the name of your device",
+        "roomLabel": "Room",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "featuresLabel": "Features"
+      },
+      "setup": {
+        "cancel": "Cancel",
+        "noNameLabel": "No name",
+        "saveError": "Error saving or deleting device",
+        "notFound": "Requested device not found.",
+        "saveButton": "Save",
+        "peripheralLabel": "Linked peripheral",
+        "learnModeTitle": "Entering learn mode from your remote",
+        "learningModeInProgress": "Please push button on your remote to learn its IR code or click again to cancel learn mode",
+        "peripheralNotFound": "Peripheral not available.",
+        "peripheralNotLearn": "Peripheral is not able to learn code.",
+        "cancelLearnFailed": "Failed to cancel learning mode.",
+        "learnFailed": "Failed to enter in learn mode.",
+        "selectButtonLabel": "Select a button on the remote control or click button bellow.",
+        "selectedButtonLabel": "Selected remote button",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Test button",
+        "deleteLabel": "Delete button",
+        "learnAllLabel": "Learn all buttons",
+        "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Stop learning all buttons"
       }
     },
     "xiaomi": {
@@ -1489,9 +1547,56 @@
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
     },
+    "television": {
+      "shortCategoryName": "Television",
+      "power-button": "Power",
+      "source-button": "Source",
+      "channel-0-button": "Channel 0",
+      "channel-1-button": "Channel 1",
+      "channel-2-button": "Channel 2",
+      "channel-3-button": "Channel 3",
+      "channel-4-button": "Channel 4",
+      "channel-5-button": "Channel 5",
+      "channel-6-button": "Channel 6",
+      "channel-7-button": "Channel 7",
+      "channel-8-button": "Channel 8",
+      "channel-9-button": "Channel 9",
+      "guide-button": "Guide",
+      "menu-button": "Menu",
+      "volume-up-button": "Volume up",
+      "volume-mute-button": "Mute",
+      "volume-down-button": "Volume down",
+      "channel-up-button": "Channel up",
+      "channel-previous-button": "Previous channel",
+      "channel-down-button": "Channel down",
+      "tools-button": "Tools",
+      "info-button": "Info",
+      "return-button": "Return",
+      "exit-button": "Exit",
+      "up-button": "Up",
+      "down-button": "Down",
+      "left-button": "Left",
+      "right-button": "Right",
+      "enter-button": "Enter",
+      "red-button": "Red",
+      "green-button": "Green",
+      "yellow-button": "Yellow",
+      "blue-button": "Blue",
+      "rewind-button": "Rewind",
+      "forward-button": "Forward",
+      "play-button": "Play",
+      "pause-button": "Pause",
+      "stop-button": "Stop",
+      "record-button": "Record"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
+    }
+  },
+  "remoteControl": {
+    "creation": {
+      "selectTypeLabel": "Type of device to control"
     }
   },
   "errorPage": {

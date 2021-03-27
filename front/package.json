@@ -45,6 +45,7 @@
     "dotenv": "^6.2.0",
     "get-value": "^3.0.1",
     "immutability-helper": "^3.0.0",
+    "interactjs": "^1.6.2",
     "leaflet": "^1.4.0",
     "linkstate": "^1.1.1",
     "preact": "^10.3.2",

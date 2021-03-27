@@ -4,6 +4,7 @@ import RoomHumidityBox from '../../components/boxs/room-humidity/RoomHumidity';
 import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
+import RemoteControlBox from '../../components/boxs/remote-control/RemoteControlBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -19,6 +20,8 @@ const Box = ({ children, ...props }) => {
       return <RoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <DevicesInRoomsBox {...props} />;
+    case 'remote-control':
+      return <RemoteControlBox {...props} />;
   }
 };
 

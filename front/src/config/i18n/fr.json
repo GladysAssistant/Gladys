@@ -181,7 +181,8 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "remote-control": "Télécommande"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -230,6 +231,9 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "remote-control": {
+        "editRemoteControlDevice": "Sélectionner l'appareil à afficher."
       }
     }
   },
@@ -751,6 +755,60 @@
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "disconnected": "Déconnecté du broker MQTT."
+      }
+    },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Communiquer avec les appareils Broadlink.",
+      "remoteTab": "Télécommandes",
+      "peripheralTab": "Appareils disponibles",
+      "peripheral": {
+        "title": "Appareils compatibles disponibles",
+        "description": "Ici vous trouverez les appareils Broadlink disponible. Si celui que vous cherchez est manquant, merci de vérifier qu'il est bien connecté au réseau.",
+        "noPeripherals": "Aucun appareil découvert sur le réseau, merci de vérifier les branchements.",
+        "noNameLabel": "Type non reconnu",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "saveButton": "Enregistrer",
+        "alreadyCreatedButton": "Déjà créé",
+        "createRemoteButton": "Créer une télécommande"
+      },
+      "remote": {
+        "title": "Appareils dans Gladys",
+        "searchPlaceholder": "Rechercher des appareils",
+        "noRemoteFound": "Aucune télécommande trouvée.",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "setup": {
+        "cancel": "Annuler",
+        "noNameLabel": "Pas de nom",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "notFound": "Appareil introuvable.",
+        "saveButton": "Enregistrer",
+        "peripheralLabel": "Appareil lié",
+        "learnModeTitle": "Copier le signal de la télécommande",
+        "learningModeInProgress": "Merci d'appuyer sur le bouton de votre télécommande pour apprendre le code infra-rouge ou appuyez de nouveau pour annuler",
+        "peripheralNotFound": "Appareil non trouvé.",
+        "peripheralNotLearn": "Cette appareil n'a pas de mode d'apprentissage.",
+        "cancelLearnFailed": "Impossible d'annuler le mode apprentissage.",
+        "learnFailed": "Impossible de passer en mode apprentissage.",
+        "selectButtonLabel": "Choisissez un bouton sur la télécommande ou cliquez sur le bouton suivant.",
+        "selectedButtonLabel": "Bouton sélectionné",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Tester le bouton",
+        "deleteLabel": "Supprimer",
+        "learnAllLabel": "Mode apprentissage",
+        "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Arrêter le mode apprentissage"
       }
     },
     "xiaomi": {
@@ -1489,9 +1547,56 @@
       "acceleration-z": "Accélération Z",
       "bed-activity": "Activité Lit"
     },
+    "television": {
+      "shortCategoryName": "Télévision",
+      "power-button": "Power",
+      "source-button": "Source",
+      "channel-0-button": "Chaîne 0",
+      "channel-1-button": "Chaîne 1",
+      "channel-2-button": "Chaîne 2",
+      "channel-3-button": "Chaîne 3",
+      "channel-4-button": "Chaîne 4",
+      "channel-5-button": "Chaîne 5",
+      "channel-6-button": "Chaîne 6",
+      "channel-7-button": "Chaîne 7",
+      "channel-8-button": "Chaîne 8",
+      "channel-9-button": "Chaîne 9",
+      "guide-button": "Guide",
+      "menu-button": "Menu",
+      "volume-up-button": "Augmenter volume",
+      "volume-mute-button": "Muet",
+      "volume-down-button": "Diminuer volume",
+      "channel-up-button": "Chaîne suivante",
+      "channel-previous-button": "Dernière chaîne",
+      "channel-down-button": "Chaîne précédente",
+      "tools-button": "Outils",
+      "info-button": "Info",
+      "return-button": "Retour",
+      "exit-button": "Quitter",
+      "up-button": "Haut",
+      "down-button": "Bas",
+      "left-button": "Gauche",
+      "right-button": "Droite",
+      "enter-button": "Entrer",
+      "red-button": "Rouge",
+      "green-button": "Vert",
+      "yellow-button": "Jaune",
+      "blue-button": "Bleu",
+      "rewind-button": "Retour rapide",
+      "forward-button": "Avance rapide",
+      "play-button": "Lecture",
+      "pause-button": "Pause",
+      "stop-button": "Stop",
+      "record-button": "Enregistrer"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
+    }
+  },
+  "remoteControl": {
+    "creation": {
+      "selectTypeLabel": "Type de télécommande"
     }
   },
   "errorPage": {

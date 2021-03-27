@@ -135,6 +135,16 @@
           "type": "devices-in-room",
           "room": "kitchen",
           "device_features": ["main-presence-sensor"]
+        },
+        {
+          "type": "remote-control",
+          "remoteType": "light",
+          "remote": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb"
+        },
+        {
+          "type": "remote-control",
+          "remoteType": "television",
+          "remote": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0"
         }
       ]
     ],
@@ -175,6 +185,16 @@
         {
           "type": "devices-in-room",
           "room": "kitchen"
+        },
+        {
+          "type": "remote-control",
+          "remoteType": "light",
+          "remote": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb"
+        },
+        {
+          "type": "remote-control",
+          "remoteType": "television",
+          "remote": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0"
         }
       ]
     ],
@@ -836,6 +856,381 @@
       }
     }
   ],
+  "get /api/v1/service/broadlink": {
+    "id": "a810b8db-6d04-4697-bed3-c4b72c996279"
+  },
+  "get /api/v1/service/broadlink/peripheral": [
+    {
+      "address": "210.248.100.245",
+      "mac": "4bf75cf0fdbb",
+      "name": "MP1",
+      "device": {
+        "name": "MP1",
+        "external_id": "broadlink:1cee8bf16731",
+        "selector": "broadlink:1cee8bf16731",
+        "model": "MP1",
+        "service_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "created_at": "2019-02-12T07:49:07.556Z",
+        "should_poll": true,
+        "poll_frequency": 60000,
+        "features": [
+          {
+            "name": "MP1 1",
+            "category": "switch",
+            "type": "binary",
+            "external_id": "broadlink:1cee8bf16731:0",
+            "selector": "broadlink:1cee8bf16731:0",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "has_feedback": true
+          },
+          {
+            "name": "MP1 2",
+            "category": "switch",
+            "type": "binary",
+            "external_id": "broadlink:1cee8bf16731:1",
+            "selector": "broadlink:1cee8bf16731:1",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "has_feedback": true
+          },
+          {
+            "name": "MP1 3",
+            "category": "switch",
+            "type": "binary",
+            "external_id": "broadlink:1cee8bf16731:2",
+            "selector": "broadlink:1cee8bf16731:2",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "has_feedback": true
+          },
+          {
+            "name": "MP1 4",
+            "category": "switch",
+            "type": "binary",
+            "external_id": "broadlink:1cee8bf16731:3",
+            "selector": "broadlink:1cee8bf16731:3",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "has_feedback": true
+          }
+        ]
+      }
+    },
+    {
+      "address": "227.154.146.114",
+      "name": "SP2",
+      "mac": "7396e6541fb0",
+      "canLearn": false,
+      "device": {
+        "external_id": "broadlink:7396e6541fb0",
+        "selector": "broadlink:7396e6541fb0",
+        "model": "SP2",
+        "name": "SP2",
+        "service_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "should_poll": true,
+        "poll_frequency": 60000,
+        "features": [
+          {
+            "name": "SP2",
+            "category": "switch",
+            "type": "binary",
+            "external_id": "broadlink:7396e6541fb0:0",
+            "selector": "broadlink:7396e6541fb0:0",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "has_feedback": true
+          }
+        ]
+      }
+    },
+    {
+      "address": "220.156.58.18",
+      "name": "RM3 Pro Plus",
+      "mac": "1cee8bf16731",
+      "canLearn": true
+    }
+  ],
+  "get /api/v1/service/broadlink/device": [
+    {
+      "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "TV Remote",
+      "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0",
+      "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0",
+      "should_poll": false,
+      "poll_frequency": null,
+      "model": "remote-control:television",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updated_at": "2019-02-12T07:49:07.556Z",
+      "room": {
+        "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "name": "Living Room",
+        "selector": "living-room"
+      }
+    },
+    {
+      "id": "197018ef-5110-4e3d-9022-cecb85fce5cb",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "LED remote",
+      "selector": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb",
+      "external_id": "broadlink:1cee8bf16731:197018ef-5110-4e3d-9022-cecb85fce5cb",
+      "should_poll": false,
+      "poll_frequency": null,
+      "model": "remote-control:light",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updated_at": "2019-02-12T07:49:07.556Z",
+      "room": {
+        "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "name": "Living Room",
+        "selector": "living-room"
+      }
+    },
+    {
+      "id": "1e5412c3-a6b7-4c5f-aede-20c40adbd85d",
+      "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "SP2",
+      "selector": "broadlink-1cee8bf16731-1e5412c3-a6b7-4c5f-aede-20c40adbd85d",
+      "external_id": "broadlink:1cee8bf16731:1e5412c3-a6b7-4c5f-aede-20c40adbd85d",
+      "should_poll": false,
+      "poll_frequency": null,
+      "model": "sp2",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "updated_at": "2019-02-12T07:49:07.556Z",
+      "room": {
+        "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+        "name": "Living Room",
+        "selector": "living-room"
+      },
+      "features": [
+        {
+          "name": "sp2",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:1cee8bf16731:0",
+          "selector": "broadlink-1cee8bf16731-0",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        }
+      ]
+    }
+  ],
+  "get /api/v1/device/broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb": {
+    "id": "197018ef-5110-4e3d-9022-cecb85fce5cb",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "name": "LED remote",
+    "model": "light",
+    "selector": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb",
+    "external_id": "broadlink:1cee8bf16731:197018ef-5110-4e3d-9022-cecb85fce5cb",
+    "should_poll": false,
+    "poll_frequency": null,
+    "created_at": "2019-02-12T07:49:07.556Z",
+    "updated_at": "2019-02-12T07:49:07.556Z",
+    "features": [
+      {
+        "id": "db05402f-8795-4942-903e-351716ee04f9",
+        "name": "Power ON",
+        "external_id": "broadlink:1cee8bf16731:197018ef-5110-4e3d-9022-cecb85fce5cb:power-on-button",
+        "selector": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb-power-on-button",
+        "category": "light",
+        "type": "power-on-button"
+      },
+      {
+        "id": "239c3bee-1652-4ccf-959d-5b01b516520e",
+        "name": "Power OFF",
+        "external_id": "broadlink:1cee8bf16731:197018ef-5110-4e3d-9022-cecb85fce5cb:power-off-button",
+        "selector": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb-power-off-button",
+        "category": "light",
+        "type": "power-off-button"
+      },
+      {
+        "id": "239c3bee-1652-4ccf-959d-5b01b516520e",
+        "name": "Red",
+        "external_id": "broadlink:1cee8bf16731:197018ef-5110-4e3d-9022-cecb85fce5cb:red-button",
+        "selector": "broadlink-1cee8bf16731-197018ef-5110-4e3d-9022-cecb85fce5cb-red-button",
+        "category": "light",
+        "type": "red-button"
+      }
+    ],
+    "params": []
+  },
+  "get /api/v1/device/broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0": {
+    "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+    "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+    "name": "TV Remote",
+    "model": "television",
+    "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0",
+    "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0",
+    "should_poll": false,
+    "poll_frequency": null,
+    "created_at": "2019-02-12T07:49:07.556Z",
+    "updated_at": "2019-02-12T07:49:07.556Z",
+    "features": [
+      {
+        "id": "22d37c48-6805-4118-ba1c-fa44052c2d3c",
+        "name": "Power",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:power-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-power-button",
+        "category": "television",
+        "type": "power-button"
+      },
+      {
+        "id": "1667855b-a58d-4a8c-9ac6-c40c2a544db8",
+        "name": "Source",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:source-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-source-button",
+        "category": "television",
+        "type": "source-button"
+      },
+      {
+        "id": "8d8a9fb1-dbd0-4f31-bbc7-8ffebf1e9f93",
+        "name": "Channel 0",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-0-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-0-button",
+        "category": "television",
+        "type": "channel-0-button"
+      },
+      {
+        "id": "f4c4752d-a8a6-4d66-92ba-356d66107324",
+        "name": "Channel 1",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-1-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-1-button",
+        "category": "television",
+        "type": "channel-1-button"
+      },
+      {
+        "id": "bf830dac-44dd-437e-ab20-5f8759f00fcc",
+        "name": "Channel 2",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-2-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-2-button",
+        "category": "television",
+        "type": "channel-2-button"
+      },
+      {
+        "id": "bf25bc00-2b7f-40e5-9be7-ad0e3f8c203d",
+        "name": "Channel 3",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-3-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-3-button",
+        "category": "television",
+        "type": "channel-3-button"
+      },
+      {
+        "id": "8997069f-0467-4506-b78c-363934ff3665",
+        "name": "Channel 4",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-4-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-4-button",
+        "category": "television",
+        "type": "channel-4-button"
+      },
+      {
+        "id": "58056998-b20f-49c5-a7be-720a0287700e",
+        "name": "Channel 5",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-5-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-5-button",
+        "category": "television",
+        "type": "channel-5-button"
+      },
+      {
+        "id": "8721a8b9-4b7c-474b-990b-849eaabafa31",
+        "name": "Channel 6",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-6-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-6-button",
+        "category": "television",
+        "type": "channel-6-button"
+      },
+      {
+        "id": "5acfafc7-33d6-4d3e-a769-25051fb5b5e2",
+        "name": "Channel 7",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-7-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-7-button",
+        "category": "television",
+        "type": "channel-7-button"
+      },
+      {
+        "id": "74d91c15-8282-4f4e-9e46-b7ef0e0ac8eb",
+        "name": "Channel 8",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-8-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-8-button",
+        "category": "television",
+        "type": "channel-8-button"
+      },
+      {
+        "id": "601773d5-1017-4387-a41b-13a6a045a76e",
+        "name": "Channel 9",
+        "external_id": "broadlink:1cee8bf16731:fbedb47f-4d25-4381-8923-2633b23192a0:channel-9-button",
+        "selector": "broadlink-1cee8bf16731-fbedb47f-4d25-4381-8923-2633b23192a0-channel-9-button",
+        "category": "television",
+        "type": "channel-9-button"
+      }
+    ],
+    "params": [
+      {
+        "name": "code_power-button",
+        "value": "POWER"
+      },
+      {
+        "name": "code_source-button",
+        "value": "SOURCE"
+      },
+      {
+        "name": "code_channel-0-button",
+        "value": "CHANNEL_0"
+      },
+      {
+        "name": "code_channel-1-button",
+        "value": "CHANNEL_1"
+      },
+      {
+        "name": "code_channel-2-button",
+        "value": "CHANNEL_2"
+      },
+      {
+        "name": "code_channel-3-button",
+        "value": "CHANNEL_3"
+      },
+      {
+        "name": "code_channel-4-button",
+        "value": "CHANNEL_4"
+      },
+      {
+        "name": "code_channel-5-button",
+        "value": "CHANNEL_5"
+      },
+      {
+        "name": "code_channel-6-button",
+        "value": "CHANNEL_6"
+      },
+      {
+        "name": "code_channel-7-button",
+        "value": "CHANNEL_7"
+      },
+      {
+        "name": "code_channel-8-button",
+        "value": "CHANNEL_8"
+      },
+      {
+        "name": "code_channel-9-button",
+        "value": "CHANNEL_9"
+      }
+    ],
+    "room": {
+      "id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "name": "Living Room",
+      "selector": "living-room"
+    }
+  },
   "get /api/v1/service/mqtt": {},
   "get /api/v1/service/mqtt/status": {
     "configured": true,

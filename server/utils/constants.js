@@ -289,6 +289,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  TELEVISION: 'television',
   UNKNOWN: 'unknown',
 };
 
@@ -347,6 +348,47 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+  },
+  TELEVISION: {
+    POWER_BUTTON: 'power-button',
+    SOURCE_BUTTON: 'source-button',
+    GUIDE_BUTTON: 'guide-button',
+    MENU_BUTTON: 'menu-button',
+    TOOLS_BUTTON: 'tools-button',
+    INFO_BUTTON: 'info-button',
+    ENTER_BUTTON: 'enter-button',
+    RETURN_BUTTON: 'return-button',
+    EXIT_BUTTON: 'exit-button',
+    RED_BUTTON: 'red-button',
+    GREEN_BUTTON: 'green-button',
+    YELLOW_BUTTON: 'yellow-button',
+    BLUE_BUTTON: 'blue-button',
+    LEFT_BUTTON: 'left-button',
+    RIGHT_BUTTON: 'right-button',
+    UP_BUTTON: 'up-button',
+    DOWN_BUTTON: 'down-button',
+    CHANNEL_UP_BUTTON: 'channel-up-button',
+    CHANNEL_DOWN_BUTTON: 'channel-down-button',
+    CHANNEL_PREVIOUS_BUTTON: 'channel-previous-button',
+    CHANNEL_0_BUTTON: 'channel-0-button',
+    CHANNEL_1_BUTTON: 'channel-1-button',
+    CHANNEL_2_BUTTON: 'channel-2-button',
+    CHANNEL_3_BUTTON: 'channel-3-button',
+    CHANNEL_4_BUTTON: 'channel-4-button',
+    CHANNEL_5_BUTTON: 'channel-5-button',
+    CHANNEL_6_BUTTON: 'channel-6-button',
+    CHANNEL_7_BUTTON: 'channel-7-button',
+    CHANNEL_8_BUTTON: 'channel-8-button',
+    CHANNEL_9_BUTTON: 'channel-9-button',
+    VOLUME_UP_BUTTON: 'volume-up-button',
+    VOLUME_DOWN_BUTTON: 'volume-down-button',
+    VOLUME_MUTE_BUTTON: 'volume-mute-button',
+    PLAY_BUTTON: 'play-button',
+    PAUSE_BUTTON: 'pause-button',
+    STOP_BUTTON: 'stop-button',
+    REWIND_BUTTON: 'rewind-button',
+    FORWARD_BUTTON: 'forward-button',
+    RECORD_BUTTON: 'record-button',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
@@ -466,6 +508,15 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  BROADLINK: {
+    LEARN_MODE_SUCCESS: 'broadlink.learn-mode.success',
+    LEARN_MODE_ERROR: 'broadlink.learn-mode.error',
+    CANCEL_LEARN_MODE_SUCCESS: 'broadlink.cancel-learn-mode.success',
+    CANCEL_LEARN_MODE_ERROR: 'broadlink.cancel-learn-mode.error',
+    NO_PERIPHERAL: 'broadlink.no-peripheral',
+    SEND_MODE_ERROR: 'broadlink.send-mode.error',
+    SEND_MODE_SUCCESS: 'broadlink.send-mode.success',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -479,6 +530,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  REMOTE_CONTROL: 'remote-control',
 };
 
 const ERROR_MESSAGES = {

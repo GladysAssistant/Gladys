@@ -5,6 +5,7 @@ import EditRoomHumidityBox from '../../components/boxs/room-humidity/EditRoomHum
 import EditCameraBox from '../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
+import EditRemoteControlBox from '../../components/boxs/remote-control/EditRemoteControlBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -20,6 +21,8 @@ const Box = ({ children, ...props }) => {
       return <EditRoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <EditDevicesInRoom {...props} />;
+    case 'remote-control':
+      return <EditRemoteControlBox {...props} />;
   }
 };
 
