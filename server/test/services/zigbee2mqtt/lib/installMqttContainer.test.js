@@ -52,6 +52,10 @@ describe('zigbee2mqtt installMqttContainer', () => {
     sinon.reset();
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
+    zigbee2mqttManager.basePath = fake.resolves({
+      basePathOnHost: '/var/lib/gladysassistant',
+      basePathOnContainer: '/var/lib/gladysassistant',
+    });
   });
 
   it('it should restart MQTT container', async function Test() {

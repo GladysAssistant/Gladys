@@ -11,6 +11,7 @@ const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
+const { basePath } = require('./basePath');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -44,6 +45,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
 Zigbee2mqttManager.prototype.init = init;
 Zigbee2mqttManager.prototype.connect = connect;
 Zigbee2mqttManager.prototype.getConfiguration = getConfiguration;
+Zigbee2mqttManager.prototype.basePath = basePath;
 Zigbee2mqttManager.prototype.disconnect = disconnect;
 Zigbee2mqttManager.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttManager.prototype.discoverDevices = discoverDevices;

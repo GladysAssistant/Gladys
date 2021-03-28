@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # Base path
-base_path=$1
+base_path_container=$1
 
 # Configuration path
-zigbee2mqtt_dir=${base_path}/zigbee2mqtt/z2m
+zigbee2mqtt_dir=${base_path_container}/zigbee2mqtt/z2m
 # Configuration file
 zigbee2mqtt_config_file=${zigbee2mqtt_dir}/configuration.yaml
 
