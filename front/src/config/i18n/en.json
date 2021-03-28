@@ -189,10 +189,12 @@
       "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
       "pihole": {
+        "description": "Edit box description",
         "headerToday": "Today Statistics",
         "headerGravitySettings": "Gravity",
         "domainsBlocked": "Domains blocked",
         "adsBlocked": "Ads blocked",
+        "adsBlockedPercentValue": "({{value}}%)",
         "dnsQuery": "DNS Queries",
         "gravityLastUpdate": "Last update"
       },

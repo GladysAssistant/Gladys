@@ -61,8 +61,8 @@ const PiholeBox = ({ children, ...props }) => (
                   <Text id="dashboard.boxes.pihole.adsBlocked" />
                 </td>
                 <td class="text-right">
-                  {props.adsBlockedToday} ({' '}
-                  <Text id="global.percentValue" fields={{ value: Math.round(props.percentAdsBlockedToday) }} /> )
+                  {props.adsBlockedToday} {' '}
+                  <Text id="dashboard.boxes.pihole.adsBlockedPercentValue" fields={{ value: Math.round(props.percentAdsBlockedToday) }} />
                 </td>
               </tr>
             )}
