@@ -1,7 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
 
-
 /**
  * @description Get the pihole summary datas.
  * @returns {Promise<Array>} Resolve with array of pihole summary datas.
@@ -20,7 +19,6 @@ async function getPiholeSummary() {
     logger.error(e);
     return null;
   }
-  
 }
 
 module.exports = {
