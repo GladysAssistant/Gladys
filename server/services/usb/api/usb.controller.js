@@ -13,7 +13,9 @@ module.exports = function UsbController({ list }) {
       ports.map((port) => {
         return {
           comPath: port.path,
-          comName: port.path,
+          comName: port.manufacturer,
+          comPID: port.productId,
+          comVID: port.vendorId,
         };
       }),
     );
