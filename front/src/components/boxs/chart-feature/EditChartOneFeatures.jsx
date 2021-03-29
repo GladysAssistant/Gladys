@@ -109,7 +109,7 @@ class EditChartMultiFeatures extends Component {
                 <Text id="dashboard.boxes.devicesChart.editChartType" />
               </label>
               <ChartTypeSelector
-                selectedChartType={props.box.chartType}
+                selectedChartType={props.box.chart_type}
                 updateChartTypeSelection={this.updateBoxChartType}
               />
             </div>
@@ -118,7 +118,7 @@ class EditChartMultiFeatures extends Component {
                 <Text id="dashboard.boxes.devicesChart.editChartPeriod" />
               </label>
               <ChartPeriodSelector
-                selectedChartPeriod={props.box.chartPeriod}
+                selectedChartPeriod={props.box.chart_period}
                 updateChartPeriodSelection={this.updateBoxChartPeriod}
               />
             </div>

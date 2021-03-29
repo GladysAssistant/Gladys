@@ -154,20 +154,17 @@ module.exports = function DeviceController(gladys) {
     params.end_date = new Date();
 
     // Choose attributes
-    params.attributes_device = [];
-    params.attributes_device.push('name');
-    params.attributes_device.push('selector');
-    params.attributes_device_feature = [];
-    params.attributes_device_feature.push('id');
-    params.attributes_device_feature.push('name');
-    params.attributes_device_feature.push('selector');
-    params.attributes_device_feature.push('unit');
-    params.attributes_device_feature.push('last_value');
-    params.attributes_device_feature.push('last_value_changed');
-    params.attributes_device_feature.push('last_downsampling');
-    params.attributes_device_room = [];
-    params.attributes_device_room.push('name');
-    params.attributes_device_room.push('selector');
+    params.attributes_device = ['name', 'selector'];
+    params.attributes_device_feature = [
+      'name',
+      'selector',
+      'unit',
+      'last_value',
+      'last_value_changed',
+      'last_downsampling',
+    ];
+    params.attributes_device_room = ['name', 'selector'];
+    params.attributes_device_service = ['name'];
 
     const devices = await gladys.device.getFeatureStates(params);
 

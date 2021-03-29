@@ -50,10 +50,14 @@ async function downsamplingStates() {
 
       // Delete possible featue state light in conflict
       const queryInterface = await db.sequelize.getQueryInterface();
-      queryInterface.bulkDelete('t_device_feature_state_light', {
-        device_feature_id: { [Op.eq]: feature.id },
-        created_at: { [Op.between]: [beginDate, endDate] },
-      });
+      queryInterface.bulkDelete(
+        't_device_feature_state_light',
+        {
+          device_feature_id: { [Op.eq]: feature.id },
+          created_at: { [Op.between]: [beginDate, endDate] },
+        },
+        { transaction: t },
+      );
 
       // Get feature state and downsample it to save in feature state light
       await db.DeviceFeatureState.findAll(statesQueryParams, { transaction: t }).then((data) => {
@@ -93,10 +97,10 @@ async function downsamplingStates() {
                 });
               });
 
-              await db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave);
+              await db.DeviceFeatureStateLight.bulkCreate(featureStatesToSave, { transaction: t });
             } else {
               // In this case all feature state was seed in feature state light
-              await db.DeviceFeatureStateLight.bulkCreate(value);
+              await db.DeviceFeatureStateLight.bulkCreate(value, { transaction: t });
             }
 
             // Change date of downsampling
