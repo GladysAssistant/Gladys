@@ -9,8 +9,13 @@ function createActions(store) {
       store.setState({
         DashboardRemoteControlStatus: RequestStatus.Getting
       });
+
+      const deviceOptions = {
+        device_feature_category: remoteType
+      };
+
       try {
-        const remoteDevices = await state.httpClient.get(`/api/v1/remote-control/${remoteType}`);
+        const remoteDevices = await state.httpClient.get('/api/v1/device', deviceOptions);
         store.setState({
           remoteDevices,
           DashboardRemoteControlStatus: RequestStatus.Success

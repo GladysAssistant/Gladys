@@ -13,14 +13,14 @@ function createActions(store) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
 
       try {
-        const remote = await state.httpClient.get(`/api/v1/device/${box.remote}`);
+        const device = await state.httpClient.get(`/api/v1/device/${box.device}`);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          remote
+          device
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          remote: null
+          device: null
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }

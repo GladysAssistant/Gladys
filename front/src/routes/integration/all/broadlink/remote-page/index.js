@@ -7,7 +7,7 @@ import RemoteTab from './RemoteTab';
 @connect('session,user,broadlinkDevices,getBroadlinkDevicesStatus,houses', actions)
 class BroadlinkRemotePage extends Component {
   componentWillMount() {
-    this.props.getBroadlinkRemotes(20, 0);
+    this.props.getBroadlinkRemotes();
     this.props.getHouses();
     this.props.getIntegrationByName('broadlink');
   }

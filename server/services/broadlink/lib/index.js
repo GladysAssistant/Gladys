@@ -1,12 +1,11 @@
-const { init } = require('./broadlink.init');
-const { discover } = require('./broadlink.discover');
-const { stop } = require('./broadlink.stop');
-const { addPeripheral } = require('./broadlink.addPeripheral');
-const { getPeripherals } = require('./broadlink.getPeripherals');
-const { learn } = require('./broadlink.learn');
-const { cancelLearn } = require('./broadlink.cancelLearn');
-const { send } = require('./broadlink.send');
-const { setValue } = require('./broadlink.setValue');
+const { init } = require('./commands/broadlink.init');
+const { stop } = require('./commands/broadlink.stop');
+const { getPeripherals } = require('./commands/broadlink.getPeripherals');
+const { setValue } = require('./commands/broadlink.setValue');
+const { addPeripheral } = require('./events/broadlink.addPeripheral');
+const { learn } = require('./learn/broadlink.learn');
+const { cancelLearn } = require('./learn/broadlink.cancelLearn');
+const { send } = require('./learn/broadlink.send');
 
 /**
  * @description Add ability to connect to a Broadlink broker.
@@ -21,18 +20,21 @@ const BroadlinkHandler = function BroadlinkHandler(gladys, broadlink, serviceId)
   this.broadlink = broadlink;
   this.serviceId = serviceId;
 
+  this.handlers = [];
+
   this.broadlinkDevices = {};
   this.peripherals = {};
+
+  this.addPeripheral = this.addPeripheral.bind(this);
 };
 
 BroadlinkHandler.prototype.init = init;
-BroadlinkHandler.prototype.discover = discover;
 BroadlinkHandler.prototype.stop = stop;
-BroadlinkHandler.prototype.addPeripheral = addPeripheral;
 BroadlinkHandler.prototype.getPeripherals = getPeripherals;
+BroadlinkHandler.prototype.setValue = setValue;
+BroadlinkHandler.prototype.addPeripheral = addPeripheral;
 BroadlinkHandler.prototype.learn = learn;
 BroadlinkHandler.prototype.cancelLearn = cancelLearn;
 BroadlinkHandler.prototype.send = send;
-BroadlinkHandler.prototype.setValue = setValue;
 
 module.exports = BroadlinkHandler;

@@ -642,7 +642,7 @@
       "remoteTab": "Devices",
       "peripheralTab": "Discover devices",
       "peripheral": {
-        "title": "Compatible available devices",
+        "title": "Available Broadlink devices",
         "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
         "noPeripherals": "No peripheral discovered on network, please check the connectivity.",
         "noNameLabel": "Type not recognized",
@@ -656,9 +656,9 @@
         "createRemoteButton": "Create remote control"
       },
       "remote": {
-        "title": "Devices in Gladys",
+        "title": "Broadlink devices in Gladys",
         "searchPlaceholder": "Search for devices",
-        "noRemoteFound": "No device found.",
+        "noRemoteFound": "No Broadlink device or remote found.",
         "saveError": "There was an error saving the device.",
         "nameLabel": "Device name",
         "namePlaceholder": "Enter the name of your device",
@@ -674,20 +674,24 @@
         "notFound": "Requested device not found.",
         "saveButton": "Save",
         "peripheralLabel": "Linked peripheral",
-        "learnModeTitle": "Entering learn mode from your remote",
-        "learningModeInProgress": "Please push button on your remote to learn its IR code or click again to cancel learn mode",
+        "learnModeTitle": "Capture remote command",
+        "learningModeInProgress": "Press button on your remote",
         "peripheralNotFound": "Peripheral not available.",
         "peripheralNotLearn": "Peripheral is not able to learn code.",
         "cancelLearnFailed": "Failed to cancel learning mode.",
         "learnFailed": "Failed to enter in learn mode.",
-        "selectButtonLabel": "Select a button on the remote control or click button bellow.",
+        "selectButtonLabel": "Select a button on the remote control or click button bellow to entrer in learning mode. Learning mode allows you to save all commands, one by one, in an automatized way.",
         "selectedButtonLabel": "Selected remote button",
+        "testError": "An error occured while testing button, please check your device.",
         "peripheralSelectLabel": "{{name}} ({{address}})",
         "testLabel": "Test button",
+        "unselect": "Unselect",
         "deleteLabel": "Delete button",
         "learnAllLabel": "Learn all buttons",
         "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
-        "quitLearnModeLabel": "Stop learning all buttons"
+        "quitLearnModeLabel": "Stop learning all buttons",
+        "saveSuccess": "Broadlink device successfully created.",
+        "successLabel": "Done"
       }
     },
     "xiaomi": {
@@ -1549,18 +1553,14 @@
     },
     "television": {
       "shortCategoryName": "Television",
-      "power-button": "Power",
+      "binary": "Power",
+      "binary-value": {
+        "none": "Power off",
+        "one": "Power on"
+      },
       "source-button": "Source",
-      "channel-0-button": "Channel 0",
-      "channel-1-button": "Channel 1",
-      "channel-2-button": "Channel 2",
-      "channel-3-button": "Channel 3",
-      "channel-4-button": "Channel 4",
-      "channel-5-button": "Channel 5",
-      "channel-6-button": "Channel 6",
-      "channel-7-button": "Channel 7",
-      "channel-8-button": "Channel 8",
-      "channel-9-button": "Channel 9",
+      "channel-button": "Channel",
+      "channel-button-value": "Channel {{value}}",
       "guide-button": "Guide",
       "menu-button": "Menu",
       "volume-up-button": "Volume up",
@@ -1597,6 +1597,9 @@
   "remoteControl": {
     "creation": {
       "selectTypeLabel": "Type of device to control"
+    },
+    "television": {
+      "toggleMore": "More buttons"
     }
   },
   "errorPage": {

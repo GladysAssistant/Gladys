@@ -8,29 +8,19 @@ function createActions(store) {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getBroadlinkRemotes(state, take, skip) {
+    async getBroadlinkRemotes(state) {
       store.setState({
         getBroadlinkDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
           service: 'broadlink',
-          order_dir: state.getBroadlinkDeviceOrderDir || 'asc',
-          take,
-          skip
+          order_dir: state.getBroadlinkDeviceOrderDir || 'asc'
         };
         if (state.broadlinkDeviceSearch && state.broadlinkDeviceSearch.length) {
           options.search = state.broadlinkDeviceSearch;
         }
-        const broadlinkDevicesReceived = await state.httpClient.get('/api/v1/service/broadlink/device', options);
-        let broadlinkDevices;
-        if (skip === 0) {
-          broadlinkDevices = broadlinkDevicesReceived;
-        } else {
-          broadlinkDevices = update(state.broadlinkDevices, {
-            $push: broadlinkDevicesReceived
-          });
-        }
+        const broadlinkDevices = await state.httpClient.get('/api/v1/service/broadlink/device', options);
         store.setState({
           broadlinkDevices,
           getBroadlinkDevicesStatus: RequestStatus.Success
@@ -64,13 +54,13 @@ function createActions(store) {
       store.setState({
         broadlinkDeviceSearch: e.target.value
       });
-      await actions.getBroadlinkRemotes(store.getState(), 20, 0);
+      await actions.getBroadlinkRemotes(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
         getBroadlinkDeviceOrderDir: e.target.value
       });
-      await actions.getBroadlinkRemotes(store.getState(), 20, 0);
+      await actions.getBroadlinkRemotes(store.getState());
     },
     async getBroadlinkPeripherals(state) {
       try {

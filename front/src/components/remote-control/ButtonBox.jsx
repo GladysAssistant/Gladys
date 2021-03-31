@@ -1,21 +1,34 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import style from './style.css';
+import get from 'get-value';
 
+import style from './style.css';
 class ButtonBox extends Component {
   buttonClick = () => {
     if (this.props.onClick) {
-      this.props.onClick(this.props.featureName);
+      const { button = {}, value } = this.props;
+      const subButton = get(button, `values.${value}`, { default: {} });
+      const valuedButton = { ...button, ...subButton };
+
+      this.props.onClick(valuedButton.type, valuedButton.value);
     }
   };
 
-  render({ category, featureName, buttonProps, editionMode, edited }) {
-    const { icon, text, customIconStyle, buttonClass } = buttonProps || { text: ' ' };
+  getValue(key) {
+    const { button, value } = this.props;
+    return get(button, `values.${value}.${key}`, { default: button[key] });
+  }
 
-    if (!buttonProps || (!icon && (!text || text.length > 1))) {
+  render({ category, featureName, button, editionMode, edited, value }) {
+    if (!button) {
       return null;
     }
+
+    const subButton = get(button, `values.${value}`, { default: {} });
+    const valuedButton = { ...button, ...subButton };
+
+    const { icon, text, customIconStyle, buttonClass } = valuedButton;
 
     return (
       <Localizer>
@@ -34,7 +47,7 @@ class ButtonBox extends Component {
             })}
             style={customIconStyle}
           >
-            {!icon && text}
+            {!icon && (text || ' ')}
           </i>
         </button>
       </Localizer>

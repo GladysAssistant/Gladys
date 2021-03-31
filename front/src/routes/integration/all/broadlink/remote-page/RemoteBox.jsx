@@ -6,12 +6,12 @@ import { Link } from 'preact-router/match';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
 
 class RemoteBox extends Component {
-  saveRemote = async () => {
+  saveDevice = async () => {
     this.setState({
       loading: true
     });
     try {
-      await this.props.saveDevice(this.props.remote, this.props.remoteIndex);
+      await this.props.saveDevice(this.props.device, this.props.deviceIndex);
       this.setState({
         saveError: null
       });
@@ -25,12 +25,12 @@ class RemoteBox extends Component {
     });
   };
 
-  deleteRemote = async () => {
+  deleteDevice = async () => {
     this.setState({
       loading: true
     });
     try {
-      await this.props.deleteDevice(this.props.remote, this.props.remoteIndex);
+      await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
       this.setState({
         error: RequestStatus.Error
@@ -41,16 +41,17 @@ class RemoteBox extends Component {
     });
   };
 
-  updateRemoteName = e => {
-    this.props.updateDeviceProperty(this.props.remoteIndex, 'name', e.target.value);
+  updateDeviceName = e => {
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRemoteRoom = e => {
-    this.props.updateDeviceProperty(this.props.remoteIndex, 'room_id', e.target.value);
+  updateDeviceRoom = e => {
+    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render(props, { loading, saveError }) {
-    const isRemote = props.remote.model.startsWith('remote-control:');
+  render({ deviceIndex, device, houses = [] }, { loading, saveError }) {
+    const isRemote = device.model;
+
     return (
       <div class="col-md-6">
         <div class="card">
@@ -68,38 +69,36 @@ class RemoteBox extends Component {
                   </div>
                 )}
                 <div class="form-group">
-                  <label class="form-label" for={`name_${props.remoteIndex}`}>
+                  <label class="form-label" for={`name_${deviceIndex}`}>
                     <Text id="integration.broadlink.remote.nameLabel" />
                   </label>
                   <Localizer>
                     <input
                       type="text"
-                      id={`name_${props.remoteIndex}`}
-                      value={props.remote.name}
-                      onInput={this.updateRemoteName}
+                      value={device.name}
+                      onInput={this.updateDeviceName}
                       class="form-control"
                       placeholder={<Text id="integration.broadlink.remote.namePlaceholder" />}
                     />
                   </Localizer>
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for={`room_${props.remoteIndex}`}>
+                  <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.broadlink.remote.roomLabel" />
                   </label>
-                  <select onChange={this.updateRemoteRoom} class="form-control" id={`room_${props.remoteIndex}`}>
+                  <select onChange={this.updateDeviceRoom} class="form-control" id={`room_${deviceIndex}`}>
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.remote.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
+                    {houses.map(house => (
+                      <optgroup label={house.name}>
+                        {house.rooms.map(room => (
+                          <option selected={room.id === device.room_id} value={room.id}>
+                            {room.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
                   </select>
                 </div>
 
@@ -109,8 +108,8 @@ class RemoteBox extends Component {
                       <Text id="integration.broadlink.remote.featuresLabel" />
                     </label>
                     <div class="tags">
-                      {props.remote.features &&
-                        props.remote.features.map(feature => (
+                      {device.features &&
+                        device.features.map(feature => (
                           <span class="tag">
                             <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                             <div class="tag-addon">
@@ -128,15 +127,15 @@ class RemoteBox extends Component {
                 )}
 
                 <div class="form-group">
-                  <button onClick={this.saveRemote} class="btn btn-success mr-2">
+                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.broadlink.remote.saveButton" />
                   </button>
-                  <button onClick={this.deleteRemote} class="btn btn-danger">
+                  <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.broadlink.remote.deleteButton" />
                   </button>
 
                   {isRemote && (
-                    <Link href={`/dashboard/integration/device/broadlink/edit/${props.remote.selector}`}>
+                    <Link href={`/dashboard/integration/device/broadlink/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.mqtt.device.editButton" />
                       </button>

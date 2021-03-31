@@ -13,10 +13,8 @@ module.exports = function BroadlinkService(gladys, serviceId) {
    * gladys.services.broadlink.start();
    */
   async function start() {
-    logger.log('starting Broadlink service');
+    logger.info('starting Broadlink service');
     broadlinkHandler.init();
-
-    broadlinkHandler.discover();
   }
 
   /**
@@ -26,7 +24,7 @@ module.exports = function BroadlinkService(gladys, serviceId) {
    *  gladys.services.broadlink.stop();
    */
   async function stop() {
-    logger.log('stopping Broadlink service');
+    logger.info('stopping Broadlink service');
     broadlinkHandler.stop();
   }
 

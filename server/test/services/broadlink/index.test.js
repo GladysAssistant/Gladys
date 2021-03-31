@@ -11,7 +11,7 @@ const BroadlinkService = proxyquire('../../../services/broadlink', {
 const gladys = {};
 
 describe('BroadlinkService', () => {
-  beforeEach(() => {
+  afterEach(() => {
     sinon.reset();
   });
 

@@ -6,7 +6,6 @@ const CameraManager = require('./camera');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
 const HumiditySensorManager = require('./humidity-sensor');
-const RemoteControlManager = require('./remote-control');
 
 // Functions
 const { add } = require('./device.add');
@@ -48,7 +47,6 @@ const DeviceManager = function DeviceManager(
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
-  this.remoteControlManager = new RemoteControlManager();
 
   this.devicesByPollFrequency = {};
   // listen to events
