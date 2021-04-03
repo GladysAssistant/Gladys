@@ -59,6 +59,7 @@ models.push(require('./Sercomm').Sercomm);
 models.push(require('./ShenzhenHoma').ShenzhenHoma);
 models.push(require('./SmartHomePty').SmartHomePty);
 models.push(require('./SmartThings').SmartThings);
+models.push(require('./SONOFF').SONOFF);
 models.push(require('./Stelpro').Stelpro);
 models.push(require('./Sunricher').Sunricher);
 models.push(require('./Swann').Swann);
