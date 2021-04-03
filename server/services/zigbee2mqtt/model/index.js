@@ -44,6 +44,7 @@ models.push(require('./Netvox').Netvox);
 models.push(require('./NinjaBlocks').NinjaBlocks);
 models.push(require('./Nue_3A').Nue3A);
 models.push(require('./Nyce').Nyce);
+models.push(require('./ORVIBO').ORVIBO);
 models.push(require('./OSRAM').OSRAM);
 models.push(require('./Oujiabao').Oujiabao);
 models.push(require('./PaulNeuhaus').PaulNeuhaus);
