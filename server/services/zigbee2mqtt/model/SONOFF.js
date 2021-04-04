@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const SONOFF = {
   brand: 'SONOFF',
   models: {
-    'SNZB-01': [features.switch],
+    'SNZB-01': [features.button],
     'SNZB-02': [features.temperature, features.humidity],
     'SNZB-03': [features.motion],
     'SNZB-04': [features.door],
