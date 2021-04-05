@@ -942,6 +942,10 @@
         "responseData": "Response",
         "tryButton": "Try request",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
+      },
+      "scene": {
+        "label": "Select a scene",
+        "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
       }
     },
     "actions": {

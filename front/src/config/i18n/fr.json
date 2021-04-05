@@ -942,6 +942,10 @@
         "responseData": "Réponse",
         "tryButton": "Essayer",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
+      },
+      "scene": {
+        "label": "Choisir une scène",
+        "notice": "Les conditions de déclenchements de la scène appelée seront ignorées. Si une scène appelle une autre scène, et vice-versa, Gladys ne tombera pas dans une boucle infinie: chaque scène ne sera exécutée qu'une seule fois"
       }
     },
     "actions": {
