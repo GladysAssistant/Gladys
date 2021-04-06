@@ -198,7 +198,7 @@ const features = {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,
     type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
     name: 'Light Brightness',
-    read_only: true,
+    read_only: false,
     has_feedback: false,
     min: 0,
     max: 255,

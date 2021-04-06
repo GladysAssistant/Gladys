@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const ROBB = {
   brand: 'ROBB',
   models: {
-    'ROB_200-004-0': [features.switch, features.brightness],
+    'ROB_200-004-0': [features.light, features.brightness],
   },
 };
 
