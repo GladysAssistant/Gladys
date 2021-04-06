@@ -13,7 +13,7 @@ const stateManager = new StateManager(event);
 const service = {};
 const device = new Device(event, {}, stateManager, service);
 
-describe('Device.getFeatureStates', () => {
+describe.only('Device.getFeatureStates', () => {
   const featureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
 
   afterEach(() => {

@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const Promise = require('bluebird');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -31,7 +32,9 @@ async function getFeatureStates(options) {
         as: 'room',
       },
     ],
-    offset: optionsWithDefault.skip,
+    offset: optionsWithDefault.skip, 
+    raw: true, 
+    nest: true 
   };
 
   // Fix attributes
@@ -58,18 +61,31 @@ async function getFeatureStates(options) {
     }
   }
 
-  const devices = await db.Device.findAll(queryParams);
-  const devicesPlain = await devices.map((device) => device.get({ plain: true }));
+  const devices = await db.Device.findAll(queryParams);  
+console.log(devices);
+  const deviceResult =[];
 
-  if (devicesPlain && devicesPlain.length > 0) {
-    for (let i = 0; i < devicesPlain.length; i += 1) {
-      const device = devicesPlain[i];
+  // Build request with OR condition
+  if (devices && devices.length > 0) { 
+    await Promise.each(devices, async (device) => { 
+
       if (device.features && device.features.length > 0) {
-        for (let j = 0; j < device.features.length; j += 1) {
-          const feature = device.features[j];
+
+        const stateLightOrCondition = [];
+        const stateOrCondition = [];
+
+        const queryStateLightParams = {
+          order: [['created_at', 'ASC']],
+          raw: true,
+        };       
+        const queryStateParams = { 
+          order: [['created_at', 'ASC']],
+          raw: true,
+        };
+
+        await Promise.each(device.features, async (feature) => {
           // Search feature state of current feature
           let beginStateSearchDate = optionsWithDefault.begin_date;
-          let currentState = [];
 
           // If column last_downsampling is explicitly asked
           // => part of data is extract from device_feature_state_light
@@ -78,38 +94,55 @@ async function getFeatureStates(options) {
             optionsWithDefault.attributes_device_feature &&
             optionsWithDefault.attributes_device_feature.length > 0 &&
             optionsWithDefault.attributes_device_feature.includes('last_downsampling')
-          ) {
-            const queryStateLightParams = {
-              where: {
-                device_feature_id: { [Op.eq]: feature.id },
-                created_at: { [Op.between]: [optionsWithDefault.begin_date, feature.last_downsampling] },
-              },
-              order: [['created_at', 'ASC']],
-              raw: true,
-            };
-            // eslint-disable-next-line no-await-in-loop
-            currentState = currentState.concat(await db.DeviceFeatureStateLight.findAll(queryStateLightParams));
+          ) { 
+            stateLightOrCondition.push({
+              device_feature_id: { [Op.eq]: feature.id },
+              created_at: { [Op.between]: [optionsWithDefault.begin_date, feature.last_downsampling] },
+            });
             beginStateSearchDate = feature.last_downsampling;
           }
 
-          const queryStateParams = {
-            where: {
-              device_feature_id: { [Op.eq]: feature.id },
-              created_at: { [Op.between]: [beginStateSearchDate, optionsWithDefault.end_date] },
-            },
-            order: [['created_at', 'ASC']],
-            raw: true,
-          };
+          stateOrCondition.push({
+            device_feature_id: { [Op.eq]: feature.id },
+            created_at: { [Op.between]: [beginStateSearchDate, optionsWithDefault.end_date] },
+          });
 
-          // eslint-disable-next-line no-await-in-loop
-          currentState = currentState.concat(await db.DeviceFeatureState.findAll(queryStateParams));
-          feature.device_feature_states = currentState;
-        }
+
+        });  
+
+        // Put where condition in query params
+        if(stateLightOrCondition && stateLightOrCondition.length > 1){
+          queryStateLightParams.where = {
+            $or: stateLightOrCondition
+          };
+        }else{
+          const [first] = stateLightOrCondition;
+          queryStateLightParams.where = first;
+        } 
+        if(stateOrCondition && stateOrCondition.length > 1){
+          queryStateParams.where = {
+            $or: stateOrCondition
+          };
+        }else{
+          const [first] = stateOrCondition;
+          queryStateParams.where = first;
+        } 
+
+
+// TODO : recup toutes les state et les mettre dans le device result
+ 
+        const featureStateLight = await db.DeviceFeatureStateLight.findAll(queryStateLightParams);
+        console.log(featureStateLight);
+        const featureLight = await db.DeviceFeatureState.findAll(queryStateParams); 
+        console.log(featureLight);
+
       }
-    }
+
+    });
   }
 
-  return devicesPlain;
+  console.log(deviceResult);
+  return deviceResult;
 }
 
 module.exports = {
