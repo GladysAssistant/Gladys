@@ -51,5 +51,5 @@ module.exports = {
 
     await queryInterface.addIndex('t_session', ['user_id']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_session'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_session'),
 };

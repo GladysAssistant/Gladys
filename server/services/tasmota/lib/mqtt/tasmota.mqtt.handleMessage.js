@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { featureStatus } = require('../utils/tasmota.featureStatus');
 
 /**
@@ -10,10 +10,7 @@ const { featureStatus } = require('../utils/tasmota.featureStatus');
  * handleMessage('stat/tasmota/POWER', 'ON');
  */
 function handleMessage(topic, message) {
-  const splittedTopic = topic.split('/');
-  const eventType = splittedTopic[2];
-  const deviceExternalId = splittedTopic[1];
-  const events = [];
+  const [, deviceExternalId, eventType] = topic.split('/');
 
   switch (eventType) {
     // Sensor status
@@ -67,9 +64,6 @@ function handleMessage(topic, message) {
       logger.debug(`MQTT : Tasmota topic "${topic}" not handled.`);
     }
   }
-
-  events.forEach((event) => this.tasmotaHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event));
-  return null;
 }
 
 module.exports = {

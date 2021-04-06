@@ -12,19 +12,11 @@ As you can notice, the package.json of a service looks like this:
 {
   "name": "gladys-example",
   "main": "index.js",
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm",
-    "arm64"
-  ],
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm", "arm64"],
   "scripts": {},
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^^0.21.1"
   }
 }
 ```
@@ -35,7 +27,7 @@ As you can notice, the package.json of a service looks like this:
 ## Folder structure
 
 This service is an example service which is able to control a light.
- 
+
 ```
 -- lib
 ---- light
@@ -51,8 +43,7 @@ This service is an example service which is able to control a light.
 
 ## API
 
-This services exposes a function which returns a read-only object: 
-
+This services exposes a function which returns a read-only object:
 
 ```
 {
@@ -96,8 +87,8 @@ const proxyquire = require('proxyquire').noCallThru();
 const MockedClient = {
   create: function create() {
     return {
-      post: url => Promise.resolve(logger.info(`Turning On Light, calling ${url}`)),
-      get: url => Promise.resolve(5),
+      post: (url) => Promise.resolve(logger.info(`Turning On Light, calling ${url}`)),
+      get: (url) => Promise.resolve(5),
     };
   },
 };

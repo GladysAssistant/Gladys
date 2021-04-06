@@ -24,19 +24,24 @@ async function train() {
     // if there are slots in the question, we handle them
     if (question.slots) {
       question.slots.forEach((slot) => {
-        const trimEntity = this.nlpManager.addTrimEntity(slot.key);
         if (slot.betweenCondition) {
-          trimEntity.addBetweenCondition(
-            'en',
+          this.nlpManager.addBetweenCondition(
+            question.language,
+            slot.key,
             slot.betweenCondition.between[0],
             slot.betweenCondition.between[1],
             slot.betweenCondition.options,
           );
         }
         if (slot.afterLastCondition) {
-          trimEntity.addAfterLastCondition('en', slot.afterLastCondition.after, slot.afterLastCondition.options);
+          this.nlpManager.addAfterLastCondition(
+            question.language,
+            slot.key,
+            slot.afterLastCondition.after,
+            slot.afterLastCondition.options,
+          );
         }
-        this.nlpManager.slotManager.addSlot(question.label, slot.key, slot.mandatory, {
+        this.nlpManager.nlp.slotManager.addSlot(question.label, slot.key, slot.mandatory, {
           [question.language]: slot.ifMissing,
         });
       });

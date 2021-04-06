@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const { EVENTS } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -8,7 +9,10 @@ const event = new EventEmitter();
 
 describe('SceneManager.addScene', () => {
   it('should add a scene with a scheduled trigger, every-month', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -25,7 +29,10 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, every-week', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -42,7 +49,10 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, every-day', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -58,7 +68,10 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, custom-time', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const in30Minutes = new Date(new Date().getTime() + 30 * 60 * 1000);
     const date = in30Minutes.toISOString().slice(0, 10);
     const time = in30Minutes.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
@@ -78,7 +91,13 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, interval', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const house = {
+      get: fake.resolves({
+        latitude: 50,
+        longitude: 50,
+      }),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -95,8 +114,11 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('jsInterval');
   });
   it('should throw an error, interval is too big', async () => {
-    const sceneManager = new SceneManager({}, event);
-    expect(() =>
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    try {
       sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
@@ -109,12 +131,18 @@ describe('SceneManager.addScene', () => {
           },
         ],
         actions: [],
-      }),
-    ).to.throw(BadParameters, '10000 hour is too big for an interval');
+      });
+    } catch (error) {
+      expect(error).to.be.an.instanceof(BadParameters);
+      expect(error.message).to.equal('10000 hour is too big for an interval');
+    }
   });
   it('should return error, interval not supported', async () => {
-    const sceneManager = new SceneManager({}, event);
-    expect(() =>
+    const house = {
+      get: fake.resolves([]),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    try {
       sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
@@ -127,7 +155,41 @@ describe('SceneManager.addScene', () => {
           },
         ],
         actions: [],
-      }),
-    ).to.throw(BadParameters, 'not-supported not supported');
+      });
+    } catch (error) {
+      expect(error).to.be.an.instanceof(BadParameters);
+      expect(error.message).to.equal('not-supported not supported');
+    }
+  });
+  it('should add a scene with a scheduled trigger, sunrise', async () => {
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+  });
+  it('should add a scene with a scheduled trigger, sunset', async () => {
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNSET,
+          scheduler_type: 'sunset',
+          house: 'house',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
   });
 });

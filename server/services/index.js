@@ -13,3 +13,4 @@ module.exports.bluetooth = require('./bluetooth');
 module.exports.withings = require('./withings');
 module.exports.ewelink = require('./ewelink');
 module.exports['tp-link'] = require('./tp-link');
+module.exports.zigbee2mqtt = require('./zigbee2mqtt');

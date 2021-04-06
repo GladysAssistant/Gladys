@@ -17,6 +17,10 @@
     "img": "/assets/integrations/cover/mqtt.jpg"
   },
   {
+    "key": "zigbee2mqtt",
+    "img": "/assets/integrations/cover/zigbee2mqtt.jpg"
+  },
+  {
     "key": "philipsHue",
     "link": "philips-hue",
     "img": "/assets/integrations/cover/philips-hue.jpg"

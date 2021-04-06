@@ -13,7 +13,11 @@
     "percent": "%",
     "degreeValue": "{{value}}°",
     "workInProgress": "Travail en cours...",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "celsius": "C",
+    "fahrenheit": "F",
+    "metersPerSec": "m/s",
+    "milesPerHour": "m/h"
   },
   "calendar": {
     "allDay": "Toute la journée",
@@ -174,6 +178,7 @@
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
+      "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
@@ -208,6 +213,10 @@
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
+      },
+      "humidityInRoom": {
+        "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
+        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
       },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
@@ -515,6 +524,83 @@
         "saveError": "Erreur lors de la sauvegarde, veuillez réessayer.",
         "deleteError": "Erreur lors de la suppression, veuillez réessayer."
       }
+    },
+    "zigbee2mqtt": {
+      "title": "Zigbee2mqtt",
+      "description": "Contrôlez vos appareils Zigbee.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Zigbee",
+      "settingsTab": "Paramètres",
+      "setupTab": "Configuration",
+      "status": {
+        "notConfigured": "Aucun dongle USB Zigbee2mqtt configuré, veuillez vous rendre sur ",
+        "notEnabled": "Le service Zigbee2mqtt n'est pas activé, veuillez vous rendre sur ",
+        "mqttNotInstalled": "Le broker MQTT n'a pas pu être installé.",
+        "mqttNotRunning": "Le broker MQTT n'a pas démarré.",
+        "zigbee2mqttNotInstalled": "Zigbee2mqtt n'a pas pu être installé.",
+        "zigbee2mqttNotRunning": "Zigbee2mqtt n'a pas démarré.",
+        "gladysNotConnected": "Gladys n'a pas réussi à se connecter au broker MQTT",
+        "zigbee2mqttNotConnected": "Zigbee2mqtt n'a pas réussi à se connecter au broker MQTT",
+        "settingsPageLink": "la page de paramétrage du dongle USB",
+        "setupPageLink": "la page de configuration de Zigbee2mqtt"
+      },
+      "settings": {
+        "title": "Paramétrage du dongle USB Zigbee2mqtt",
+        "description": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee2mqtt.",
+        "zigbee2mqttUsbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee2mqtt est inséré",
+        "saveButton": "Sauvegarde",
+        "refreshButton": "Rafraîchir la liste des appareils USB",
+        "notAttached": "Aucun dongle USB Zigbee2mqtt n'est attaché à Gladys.",
+        "attached": "Le dongle USB Zigbee2mqtt est configuré.",
+        "saving": "Sauvegarde de la configuration du Dongle USB Zigbee2mqtt..."
+      },
+      "setup": {
+        "title": "Configuration du service Zigbee2mqtt",
+        "description": "Ce service utilise deux containers Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
+        "enableLabel": "Activation du service Zigbee2mqtt",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "enableZigbee2mqtt": "Activer Zigbee2mqtt",
+        "containersStatus": "Conteneurs liés à Zigbee2mqtt",
+        "serviceStatus": "Etat du service Zigbee2mqtt",
+        "link": "Lien",
+        "connected": "Zigbee2mqtt démarré avec succès.",
+        "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt.",
+        "mqttZigbeeLink": "MQTT - Zigbee",
+        "gladysMqttLink": "Gladys - MQTT",
+        "zigbee2Mqtt": "Zigbee2mqtt",
+        "gladys": "Gladys",
+        "mqtt": "MQTT",
+        "status": "Status"
+      },
+      "device": {
+        "title": "Appareils Zigbee",
+        "search": "Chercher un appareil",
+        "editButton": "Editer"
+      },
+      "discover": {
+        "title": "Découverte du réseau Zigbee",
+        "device": "({{nbDevices}}) Appareils",
+        "permitJoin": "Autoriser l'association",
+        "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
+        "scanButton": "Scanner",
+        "serverNoResponse": "Gladys n'est pas accessible.",
+        "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
+        "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
+        "createGithubIssue": "Proposer ce périphérique"
+      },
+      "noDeviceFound": "Auncun appareil zigbee2mqtt n'a encore été ajouté.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Donner un nom à l'appareil",
+      "roomLabel": "Pièce",
+      "topicLabel": "Sujet MQTT",
+      "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
+      "featuresLabel": "Fonctionnalités",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "alreadyExistsButton": "Déjà créé",
+      "saveError": "Une erreur s'est produite lors de la sauvegarde.",
+      "documentation": "Documentation Zigbee2mqtt"
     },
     "zwave": {
       "title": "Z-Wave",
@@ -945,7 +1031,9 @@
         "new-state": "Changement d'état de l'appareil"
       },
       "time": {
-        "changed": "Déclenchement programmé"
+        "changed": "Déclenchement programmé",
+        "sunrise": "A chaque lever de soleil",
+        "sunset": "A chaque coucher de soleil"
       }
     },
     "triggersCard": {
@@ -990,7 +1078,11 @@
           "friday": "Vendredi",
           "saturday": "Samedi",
           "sunday": "Dimanche"
-        }
+        },
+        "house": "Maison"
+      },
+      "warning": {
+        "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       }
     }
   },
@@ -1307,10 +1399,11 @@
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
+    "hectoPascal": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
-    "kilowatt-hour": "Kilowatt heure (kW/h)",
+    "kilowatt-hour": "Kilowatt heure (kWh)",
     "ampere": "Ampère (A)",
     "volt": "Volt (V)",
     "ppm": "Partie par million (ppm)",
@@ -1322,10 +1415,11 @@
     "fahrenheit": "°F",
     "percent": "%",
     "pascal": "Pa",
+    "hectoPascal": "hPa",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "KW",
-    "kilowatt-hour": "kW/h",
+    "kilowatt-hour": "kWh",
     "ampere": "A",
     "volt": "V",
     "ppm": "ppm",

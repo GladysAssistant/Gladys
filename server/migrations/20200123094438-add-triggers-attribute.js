@@ -8,5 +8,5 @@ module.exports = {
     // delete useless trigger_scene table
     await queryInterface.dropTable('t_trigger_scene');
   },
-  down: (queryInterface, Sequelize) => {},
+  down: async (queryInterface, Sequelize) => {},
 };

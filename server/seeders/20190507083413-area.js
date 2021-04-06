@@ -18,5 +18,5 @@ module.exports = {
       {},
     ),
 
-  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('t_area', null, {}),
+  down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('t_area', null, {}),
 };

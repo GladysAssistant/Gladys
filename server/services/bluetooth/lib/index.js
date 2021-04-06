@@ -35,7 +35,7 @@ const BluetoothManager = function BluetoothManager(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
 
-  this.scanTimer = undefined;
+  this.scanPromise = undefined;
   this.scanCounter = 0;
 
   this.ready = false;
