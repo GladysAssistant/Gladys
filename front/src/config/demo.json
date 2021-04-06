@@ -853,6 +853,47 @@
     "networkModeValid": true,
     "brokerContainerAvailable": false
   },
+  "get /api/v1/service/zigbee2mqtt": {},
+  "get /api/v1/service/zigbee2mqtt/permit_join": true,
+  "get /api/v1/service/zigbee2mqtt/device": [
+    {
+      "name": "Aqara Sensor",
+      "external_id": "zigbee2mqtt:0x00158d0005828ece",
+      "selector": "zigbee2mqtt-0x00158d0005828ece",
+      "room_id": "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
+      "model": "WSDCGQ11LM",
+      "params": [
+        {
+          "name": "model",
+          "value": "WSDCGQ11LM"
+        }
+      ],
+      "supported": true,
+      "features": [
+        {
+          "category": "pressure-sensor",
+          "external_id": "zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure",
+          "name": "Pressure Sensor",
+          "read_only": true,
+          "selector": "zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure",
+          "type": "decimal"
+        }
+      ]
+    }
+  ],
+  "get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH": {},
+  "get /api/v1/service/zigbee2mqtt/status": {
+    "usbConfigured": true,
+    "mqttExist": true,
+    "mqttRunning": true,
+    "zigbee2mqttExist": true,
+    "zigbee2mqttRunning": true,
+    "gladysConnected": true,
+    "zigbee2mqttConnected": true,
+    "z2mEnabled": true,
+    "dockerBased": true,
+    "networkModeValid": true
+  },
   "get /api/v1/service/tasmota": {},
   "get /api/v1/service/tasmota/device": [
     {
