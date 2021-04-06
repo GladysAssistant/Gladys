@@ -64,7 +64,7 @@
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
-    "oauth2-mock-server": "^1.5.1",
+    "oauth2-mock-server": "^3.1.0",
     "prettier": "^1.17.1",
     "proxyquire": "^2.1.0",
     "shx": "^0.3.2",
