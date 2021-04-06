@@ -20,6 +20,12 @@ const containers = [
     HostConfig: {
       NetworkMode: 'host',
     },
+    Mounts: [
+      {
+        Source: '/home/myname/gladys',
+        Destination: '/var/lib/gladysassistant',
+      },
+    ],
     NetworkSettings: {
       Networks: {
         host: {
