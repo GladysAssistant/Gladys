@@ -191,12 +191,16 @@
       "pihole": {
         "description": "Edit box description",
         "headerToday": "Today Statistics",
-        "headerGravitySettings": "Gravity",
+        "headerGravitySettings": "Gravity List",
+        "headerStatus": "Status",
         "domainsBlocked": "Domains blocked",
         "adsBlocked": "Ads blocked",
         "adsBlockedPercentValue": "({{value}}%)",
         "dnsQuery": "DNS Queries",
-        "gravityLastUpdate": "Last update"
+        "gravityLastUpdate": "Last update",
+        "piholeStatus": "Pihole status",
+        "clients": "Clients",
+        "queriesCached": "Queries cached"
       },
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
