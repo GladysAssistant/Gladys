@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Immax = {
   brand: 'Immax',
   models: {
-    'IM-Z3.0-DIM': [features.switch, features.brightness],
+    'IM-Z3.0-DIM': [features.light, features.brightness],
   },
 };
 

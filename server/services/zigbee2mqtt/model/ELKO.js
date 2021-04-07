@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const ELKO = {
   brand: 'ELKO',
   models: {
-    '316GLEDRF': [features.switch, features.brightness],
+    '316GLEDRF': [features.light, features.brightness],
   },
 };
 

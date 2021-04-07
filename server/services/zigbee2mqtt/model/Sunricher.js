@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Sunricher = {
   brand: 'Sunricher',
   models: {
-    'ZG9101SAC-HP': [features.switch, features.brightness],
+    'ZG9101SAC-HP': [features.light, features.brightness],
   },
 };
 

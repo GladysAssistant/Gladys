@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Iluminize = {
   brand: 'Iluminize',
   models: {
-    '511.10': [features.switch, features.brightness],
+    '511.10': [features.light, features.brightness],
   },
 };
 
