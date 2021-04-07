@@ -2,19 +2,21 @@ const { expect } = require('chai');
 
 const PiholeService = require('../../../services/pihole/index');
 
-describe('PiholeService', () => {
+describe('🍓 Pihole Service', () => {
+  const piholeService = PiholeService();
+  it('should have start function', () => {
+    expect(piholeService)
+      .to.have.property('start')
+      .and.be.instanceOf(Function);
+  });
+  it('should have stop function', () => {
+    expect(piholeService)
+      .to.have.property('stop')
+      .and.be.instanceOf(Function);
+  });
   it('should have controllers', () => {
-    const piholeService = PiholeService();
     expect(piholeService)
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
-  });
-  it('should start service', async () => {
-    const piholeService = PiholeService();
-    await piholeService.start();
-  });
-  it('should stop service', async () => {
-    const piholeService = PiholeService();
-    await piholeService.stop();
   });
 });
