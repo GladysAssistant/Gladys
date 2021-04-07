@@ -18,7 +18,7 @@ const gladys = {
   },
 };
 
-describe('Pihole Service', () => {
+describe('Pihole Service LIB', () => {
   it('should get pihole summary data', async () => {
     const piholeHandler = new PiholeHandler(gladys, serviceId);
     await piholeHandler.getPiholeSummary();
