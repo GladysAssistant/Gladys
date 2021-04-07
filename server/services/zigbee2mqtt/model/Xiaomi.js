@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Xiaomi = {
   brand: 'Xiaomi',
   models: {
-    ZNLDP12LM: [features.switch, features.brightness, features.color_temperature],
+    ZNLDP12LM: [features.light, features.brightness, features.color_temperature],
     WXKG01LM: [features.button],
     WXKG11LM: [features.button],
     WXKG12LM: [features.button],
