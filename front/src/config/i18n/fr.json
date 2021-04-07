@@ -200,6 +200,7 @@
         "gravityLastUpdate": "Dernière mise à jour",
         "piholeStatus": "Status Pihole",
         "clients": "Clients",
+        "clientsValues": "{{number}}/{{total}}",
         "queriesCached": "Requêtes en cache"
       },
       "weather": {

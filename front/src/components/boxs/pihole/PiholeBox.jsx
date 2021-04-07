@@ -160,7 +160,10 @@ const PiholeBox = ({ children, ...props }) => (
                   <Text id="dashboard.boxes.pihole.clients" />
                 </td>
                 <td class="text-right">
-                  {props.uniqueClient}/{props.totalClient}
+                  <Text
+                    id="dashboard.boxes.pihole.clientsValues"
+                    fields={{ number: props.uniqueClient, total: props.totalClient }}
+                  />
                 </td>
               </tr>
             )}
