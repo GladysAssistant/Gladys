@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const PiholeService = require('../../../services/pihole/index');
 
-describe('🍓 Pihole Service', () => {
+describe('Pihole Service', () => {
   const piholeService = PiholeService();
   it('should have start function', () => {
     expect(piholeService)
