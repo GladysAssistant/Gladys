@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { fake } = sinon;
 const PiholeService = require('../../../services/pihole/index');
 
 const FakePiholeSummary = require('./piholeSummary.json');
