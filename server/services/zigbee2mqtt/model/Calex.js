@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Calex = {
   brand: 'Calex',
   models: {
-    '421786': [features.switch, features.brightness],
-    '421792': [features.switch, features.brightness, features.color_temperature], // color xy
+    '421786': [features.light, features.brightness],
+    '421792': [features.light, features.brightness, features.color_temperature], // color xy
   },
 };
 

@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const iCasa = {
   brand: 'iCasa',
   models: {
-    'ICZB-IW11D': [features.switch, features.brightness],
+    'ICZB-IW11D': [features.light, features.brightness],
   },
 };
 
