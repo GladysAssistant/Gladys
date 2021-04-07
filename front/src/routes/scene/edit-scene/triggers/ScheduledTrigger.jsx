@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { format } from 'date-fns';
-import Select from 'react-select';
+import { LocalizedSelect } from '../../../../components/select';
 
 import fr from 'date-fns/locale/fr';
 
@@ -210,7 +210,7 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeekLabel" />
                 </div>
-                <Select
+                <LocalizedSelect
                   defaultValue={[]}
                   isMulti
                   value={selectedWeekDaysOptions}
@@ -218,31 +218,31 @@ class TurnOnLight extends Component {
                   options={[
                     {
                       value: 'monday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday'
                     },
                     {
                       value: 'tuesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday'
                     },
                     {
                       value: 'wednesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday'
                     },
                     {
                       value: 'thursday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday'
                     },
                     {
                       value: 'friday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday'
                     },
                     {
                       value: 'saturday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday'
                     },
                     {
                       value: 'sunday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
+                      label: 'editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday'
                     }
                   ]}
                 />

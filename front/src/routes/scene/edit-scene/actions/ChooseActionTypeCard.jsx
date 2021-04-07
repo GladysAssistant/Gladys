@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
-import { Text, withText } from 'preact-i18n';
+import LocalizedSelect from '../../../../components/select';
+import { Text } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
@@ -20,11 +20,6 @@ const ACTION_LIST = [
   ACTIONS.HTTP.REQUEST
 ];
 
-const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
-  acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
-  return acc;
-}, {});
-@withText(TRANSLATIONS)
 @connect('httpClient', {})
 class ChooseActionType extends Component {
   state = {
@@ -43,7 +38,7 @@ class ChooseActionType extends Component {
   render(props, { currentAction }) {
     const options = ACTION_LIST.map(action => ({
       value: action,
-      label: props[`editScene.actions.${action}`]
+      label: `editScene.actions.${action}`
     }));
 
     return (
@@ -52,7 +47,7 @@ class ChooseActionType extends Component {
           <label class="form-label">
             <Text id="editScene.selectActionType" />
           </label>
-          <Select onChange={this.handleChange} value={currentAction} options={options} />
+          <LocalizedSelect onChange={this.handleChange} value={currentAction} options={options} />
         </div>
         <div class="form-group">
           <button onClick={this.changeBoxType} class="btn btn-success">
