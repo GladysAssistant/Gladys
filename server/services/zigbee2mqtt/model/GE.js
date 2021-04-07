@@ -6,11 +6,11 @@ const { features } = require('../utils/features');
 const GE = {
   brand: 'GE',
   models: {
-    '22670': [features.switch, features.brightness],
-    '45852GE': [features.switch, features.brightness],
+    '22670': [features.light, features.brightness],
+    '45852GE': [features.light, features.brightness],
     '45853GE': [features.switch, features.power],
     '45856GE': [features.switch],
-    '45857GE': [features.switch, features.brightness],
+    '45857GE': [features.light, features.brightness],
   },
 };
 

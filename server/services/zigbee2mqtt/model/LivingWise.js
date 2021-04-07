@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const LivingWise = {
   brand: 'LivingWise',
   models: {
-    'LVS-ZB500D': [features.switch, features.brightness],
+    'LVS-ZB500D': [features.light, features.brightness],
     'LVS-SM10ZW': [features.door],
   },
 };
