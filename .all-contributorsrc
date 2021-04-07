@@ -173,6 +173,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "rob-mccann",
+      "name": "Rob McCann",
+      "avatar_url": "https://avatars.githubusercontent.com/u/412744?v=4",
+      "profile": "http://robmccann.co.uk",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
