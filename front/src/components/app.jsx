@@ -72,6 +72,9 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import LGTVDevicesPage from '../routes/integration/all/lgtv/devices';
+import LGTVAddPage from '../routes/integration/all/lgtv/add';
+import LGTVDiscoverPage from '../routes/integration/all/lgtv/discover';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -213,6 +216,9 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <LGTVDevicesPage path="/dashboard/integration/device/lgtv" />
+        <LGTVDiscoverPage path="/dashboard/integration/device/lgtv/discover" />
+        <LGTVAddPage path="/dashboard/integration/device/lgtv/add" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

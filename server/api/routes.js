@@ -432,10 +432,13 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: mediaPlayerController.turnOn,
     },
-    // media-player
     'post /api/v1/media-player/:device_selector/off': {
       authenticated: true,
       controller: mediaPlayerController.turnOff,
+    },
+    'get /api/v1/media-player': {
+      authenticated: true,
+      controller: mediaPlayerController.get,
     },
     // scene
     'post /api/v1/scene': {

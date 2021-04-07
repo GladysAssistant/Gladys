@@ -122,7 +122,10 @@ function init() {
           }
           break;
         default:
-          logger.debug(`Message type not handled`);
+          this.gladys.event.emit(EVENTS.WEBSOCKET.RECEIVE, {
+            userId: user.id,
+            ...parsedMessage,
+          });
       }
     });
     setTimeout(() => {

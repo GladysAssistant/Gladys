@@ -3,6 +3,7 @@ const { buildMediaPlayerObject } = require('./media-player.buildMediaPlayerObjec
 const { command } = require('./media-player.command');
 const { init } = require('./media-player.init');
 const { getDevice } = require('./media-player.getDevice');
+const { get } = require('./media-player.get');
 const { turnOn } = require('./media-player.turnOn');
 const { turnOff } = require('./media-player.turnOff');
 
@@ -17,6 +18,7 @@ const MediaPlayerManager = function MediaPlayerManager(eventManager, messageMana
 MediaPlayerManager.prototype.buildMediaPlayerObject = buildMediaPlayerObject;
 MediaPlayerManager.prototype.command = command;
 MediaPlayerManager.prototype.init = init;
+MediaPlayerManager.prototype.get = get;
 MediaPlayerManager.prototype.getDevice = getDevice;
 MediaPlayerManager.prototype.turnOn = turnOn;
 MediaPlayerManager.prototype.turnOff = turnOff;

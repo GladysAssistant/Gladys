@@ -102,15 +102,15 @@ function Gladys(params = {}) {
       if (!params.disableBrainLoading) {
         await brain.load();
       }
+      if (!params.disableDeviceLoading) {
+        await device.init();
+      }
       if (!params.disableService) {
         await service.load(gladys);
         await service.startAll();
       }
       if (!params.disableSceneLoading) {
         await scene.init();
-      }
-      if (!params.disableDeviceLoading) {
-        await device.init();
       }
       if (!params.disableUserLoading) {
         await user.init();
