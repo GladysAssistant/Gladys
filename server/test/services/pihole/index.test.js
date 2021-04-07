@@ -14,33 +14,33 @@ const piholeHandler = {
 };
 
 describe('Pihole Service Basics', () => {
-                                          let piholeService;
-                                          beforeEach(() => {
-                                            piholeService = PiholeService();
-                                          });
-                                          it('should have start function', () => {
-                                            expect(piholeService)
-                                              .to.have.property('start')
-                                              .and.be.instanceOf(Function);
-                                          });
-                                          it('should have stop function', () => {
-                                            expect(piholeService)
-                                              .to.have.property('stop')
-                                              .and.be.instanceOf(Function);
-                                          });
+  let piholeService;
+  beforeEach(() => {
+    piholeService = PiholeService();
+  });
+  it('should have start function', () => {
+    expect(piholeService)
+      .to.have.property('start')
+      .and.be.instanceOf(Function);
+  });
+  it('should have stop function', () => {
+    expect(piholeService)
+      .to.have.property('stop')
+      .and.be.instanceOf(Function);
+  });
 
-                                          it('should have controllers', () => {
-                                            expect(piholeService)
-                                              .to.have.property('controllers')
-                                              .and.be.instanceOf(Object);
-                                          });
-                                        });
+  it('should have controllers', () => {
+    expect(piholeService)
+      .to.have.property('controllers')
+      .and.be.instanceOf(Object);
+  });
+});
 
 describe('Pihole Service Start', () => {
   it('should start', async () => {
     const gladys = {
       variable: {
-        getValue: fake.returns('192.168.1.100'),
+        getValue: fake.returns('127.0.0.1'),
       },
     };
     const piholeService = PiholeService(gladys, '5614b98c-6149-4db4-8ef5-a4c4281a9b7d');
