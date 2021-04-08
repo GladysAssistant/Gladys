@@ -1,4 +1,3 @@
-const { LTTB } = require('downsample');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
 
@@ -156,6 +155,7 @@ module.exports = function DeviceController(gladys) {
     // Choose attributes
     params.attributes_device = ['name', 'selector'];
     params.attributes_device_feature = [
+      'id',
       'name',
       'selector',
       'unit',
@@ -167,42 +167,6 @@ module.exports = function DeviceController(gladys) {
     params.attributes_device_service = ['name'];
 
     const devices = await gladys.device.getFeatureStates(params);
-
-    // Downsample result to reduce nb of value in response
-    if (params.downsample && params.downsample === 'true') {
-      if (devices && devices.length > 0) {
-        let chartWidth = 100;
-        if (params.maxValue) {
-          chartWidth = params.maxValue;
-        }
-        const featureArray = [];
-        const featureValuesArray = [];
-        devices.forEach((device) => {
-          device.features.forEach((feature) => {
-            if (feature.device_feature_states && feature.device_feature_states.length > 0) {
-              const newFeatureStateArray = [];
-              feature.device_feature_states.forEach(function changeState(state, index) {
-                newFeatureStateArray.push({
-                  x: new Date(state.created_at).getTime(),
-                  y: state.value,
-                });
-                featureValuesArray.push(state.value);
-              });
-
-              let smoothFeatureStates = newFeatureStateArray;
-              if (newFeatureStateArray.length > chartWidth) {
-                smoothFeatureStates = LTTB(newFeatureStateArray, chartWidth);
-              }
-              feature.device_feature_states = smoothFeatureStates;
-              feature.trend = newFeatureStateArray[newFeatureStateArray.length - 1] - newFeatureStateArray[0];
-
-              featureArray.push(feature);
-            }
-          });
-          device.features = featureArray;
-        });
-      }
-    }
 
     res.json(devices);
   }

@@ -13,7 +13,7 @@ const stateManager = new StateManager(event);
 const service = {};
 const device = new Device(event, {}, stateManager, service);
 
-describe.only('Device.getFeatureStates', () => {
+describe('Device.getFeatureStates', () => {
   const featureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
 
   afterEach(() => {
@@ -96,20 +96,18 @@ describe.only('Device.getFeatureStates', () => {
       end_date: endDate,
     };
     // Choose attributes
-    params.attributes_device = [];
-    params.attributes_device.push('name');
-    params.attributes_device.push('selector');
-    params.attributes_device_feature = [];
-    params.attributes_device_feature.push('id');
-    params.attributes_device_feature.push('name');
-    params.attributes_device_feature.push('selector');
-    params.attributes_device_feature.push('unit');
-    params.attributes_device_feature.push('last_value');
-    params.attributes_device_feature.push('last_value_changed');
-    params.attributes_device_feature.push('last_downsampling');
-    params.attributes_device_room = [];
-    params.attributes_device_room.push('name');
-    params.attributes_device_room.push('selector');
+    params.attributes_device = ['name', 'selector'];
+    params.attributes_device_feature = [
+      'id',
+      'name',
+      'selector',
+      'unit',
+      'last_value',
+      'last_value_changed',
+      'last_downsampling',
+    ];
+    params.attributes_device_room = ['name', 'selector'];
+    params.attributes_device_service = ['name'];
 
     const devices = await device.getFeatureStates(params);
 
@@ -141,20 +139,18 @@ describe.only('Device.getFeatureStates', () => {
       end_date: endDate,
     };
     // Choose attributes
-    params.attributes_device = [];
-    params.attributes_device.push('name');
-    params.attributes_device.push('selector');
-    params.attributes_device_feature = [];
-    params.attributes_device_feature.push('id');
-    params.attributes_device_feature.push('name');
-    params.attributes_device_feature.push('selector');
-    params.attributes_device_feature.push('unit');
-    params.attributes_device_feature.push('last_value');
-    params.attributes_device_feature.push('last_value_changed');
-    params.attributes_device_feature.push('last_downsampling');
-    params.attributes_device_room = [];
-    params.attributes_device_room.push('name');
-    params.attributes_device_room.push('selector');
+    params.attributes_device = ['name', 'selector'];
+    params.attributes_device_feature = [
+      'id',
+      'name',
+      'selector',
+      'unit',
+      'last_value',
+      'last_value_changed',
+      'last_downsampling',
+    ];
+    params.attributes_device_room = ['name', 'selector'];
+    params.attributes_device_service = ['name'];
 
     const devices = await device.getFeatureStates(params);
 
