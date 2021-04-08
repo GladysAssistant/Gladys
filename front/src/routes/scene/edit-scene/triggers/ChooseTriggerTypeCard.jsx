@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import { LocalizedSelect } from '../../../../components/select';
+import Select from 'react-select';
 
 import { EVENTS } from '../../../../../../server/utils/constants';
 
@@ -35,11 +35,11 @@ class ChooseTriggerType extends Component {
           <label class="form-label">
             <Text id="editScene.selectTriggerLabel" />
           </label>
-          <LocalizedSelect
+          <Select
             value={currentTrigger}
             options={TRIGGER_LIST.map(trigger => ({
               value: trigger,
-              label: `editScene.triggers.${trigger}`
+              label: <Text id={`editScene.triggers.${trigger}`} />
             }))}
             onChange={this.handleChange}
           />
