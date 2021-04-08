@@ -10,6 +10,7 @@ const HouseController = require('./controllers/house.controller');
 const HttpController = require('./controllers/http.controller');
 const LightController = require('./controllers/light.controller');
 const LocationController = require('./controllers/location.controller');
+const MediaPlayerController = require('./controllers/media-player.controller');
 const MessageController = require('./controllers/message.controller');
 const RoomController = require('./controllers/room.controller');
 const SessionController = require('./controllers/session.controller');
@@ -33,6 +34,7 @@ function getRoutes(gladys) {
   const dashboardController = DashboardController(gladys);
   const deviceController = DeviceController(gladys);
   const lightController = LightController(gladys);
+  const mediaPlayerController = MediaPlayerController(gladys);
   const locationController = LocationController(gladys);
   const userController = UserController(gladys);
   const houseController = HouseController(gladys);
@@ -424,6 +426,16 @@ function getRoutes(gladys) {
     'post /api/v1/light/:device_selector/on': {
       authenticated: true,
       controller: lightController.turnOn,
+    },
+    // media-player
+    'post /api/v1/media-player/:device_selector/on': {
+      authenticated: true,
+      controller: mediaPlayerController.turnOn,
+    },
+    // media-player
+    'post /api/v1/media-player/:device_selector/off': {
+      authenticated: true,
+      controller: mediaPlayerController.turnOff,
     },
     // scene
     'post /api/v1/scene': {

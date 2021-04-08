@@ -151,6 +151,12 @@ const EVENTS = {
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
+  MEDIA_PLAYER: {
+    TURNED_ON: 'media-player.turned-on',
+    TURNED_OFF: 'media-player.turned-off',
+    SOURCE_CHANGED: 'media-player.source-changed',
+    CURRENT_MEDIA_CHANGED: 'media-player.current-media-changed',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -245,6 +251,15 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  MEDIA_PLAYER: {
+    PLAY_MEDIA: 'intent.media-player.play-media',
+    PLAY: 'intent.media-player.play',
+    STOP: 'intent.media-player.stop',
+    PAUSE: 'intent.media-player.pause',
+    SELECT_SOURCE: 'intent.media-player.select-source',
+    TURN_ON: 'intent.media-player.turn-on',
+    TURN_OFF: 'intent.media-player.turn-off',
+  },
 };
 
 const INTENTS = {
@@ -266,6 +281,15 @@ const INTENTS = {
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+  },
+  MEDIA_PLAYER: {
+    PLAY_MEDIA: 'intent.media-player.play-media',
+    PLAY: 'intent.media-player.play',
+    STOP: 'intent.media-player.stop',
+    PAUSE: 'intent.media-player.pause',
+    SELECT_SOURCE: 'intent.media-player.select-source',
+    TURN_ON: 'intent.media-player.turn-on',
+    TURN_OFF: 'intent.media-player.turn-off',
   },
 };
 
@@ -292,6 +316,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  MEDIA_PLAYER: 'media-player',
   UNKNOWN: 'unknown',
 };
 
@@ -350,6 +375,11 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+  },
+  MEDIA_PLAYER: {
+    BINARY: 'binary',
+    SOURCE: 'source',
+    CURRENTLY_PLAYING: 'currently-playing',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
