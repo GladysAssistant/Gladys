@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const { LTTB } = require('downsample');
+const Promise = require('bluebird');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 
@@ -23,7 +24,7 @@ async function downsamplingStates() {
     const deviceFeatures = await db.DeviceFeature.findAll(featuresQueryParams, { transaction: t });
     logger.trace('List of features to treat: ', deviceFeatures);
 
-    deviceFeatures.forEach(async (feature) => {
+    await Promise.each(deviceFeatures, async (feature) => {
       // date interval
       let beginDate;
       if (feature.last_downsampling) {
