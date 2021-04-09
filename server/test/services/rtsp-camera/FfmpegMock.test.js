@@ -11,7 +11,7 @@ const FfmpegMock = (path) => {
       return func;
     },
     run: () => {
-      if (path === 'broken') {
+      if (path === 'rstp://broken') {
         func.emit('error', 'broken');
       } else {
         func.emit('end');
