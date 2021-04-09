@@ -7,7 +7,7 @@ const Trust = {
   brand: 'Trust',
   models: {
     'ZYCT-202': [features.switch_sensor],
-    'ZLED-2709': [features.switch, features.brightness],
+    'ZLED-2709': [features.light, features.brightness],
     'ZPIR-8000': [features.motion],
     'ZCTS-808': [features.door],
   },
