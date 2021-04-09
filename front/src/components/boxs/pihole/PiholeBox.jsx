@@ -5,7 +5,7 @@ import actions from '../../../actions/dashboard/boxes/pihole';
 import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import get from 'get-value';
 
-const BOX_REFRESH_INTERVAL_MS = 120000;
+const BOX_REFRESH_INTERVAL_MS = 30000;
 
 const cardStyle = {
   maxHeight: '28rem'
