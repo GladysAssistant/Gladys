@@ -198,7 +198,7 @@
         "adsBlockedPercentValue": "({{value}}%)",
         "dnsQuery": "Requêtes DNS",
         "gravityLastUpdate": "Dernière mise à jour",
-        "piholeStatus": "Status Pihole",
+        "piholeStatus": "Status",
         "clients": "Clients",
         "clientsValues": "{{number}}/{{total}}",
         "queriesCached": "Requêtes en cache"
@@ -858,12 +858,9 @@
     },
     "pihole": {
       "title": "Pi-hole",
-      "description": "Parlez à Gladys grâce à Telegram.",
-      "introduction": "INTROoooooooo",
-      "link": "<b>ACTION REQUISE :</b> Pour parler à Gladys dans Telegram, cliquez sur <a href=\"{{link}}\"> ce lien </a>. Ne parlez pas à votre bot dans Telegram directement avant d'avoir cliqué sur ce lien, sinon votre bot ne pourra pas savoir que c'est vous qui envoyez un message.",
-      "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
-      "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que ce token (jeton) est valide?",
-      "piholeIp": "Clé API du Bot Telegram",
+      "description": "Récupérez les statistiques de votre instance Pihole.",
+      "introduction": "L'integration Pihole vous permez de récupérer les statistiques de votre instance Pihole.",
+      "piholeIp": "Adresse ip de votre Pihole",
       "saveButton": "Sauvegarder"
     }
   },
