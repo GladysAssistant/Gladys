@@ -20,6 +20,7 @@ function createActions(store) {
       });
     },
     updateBoxChartLimitClass(state, x, y, chartLimitClass) {
+      console.log(chartLimitClass);
       boxActions.updateBoxConfig(state, x, y, {
         chart_limit_class: chartLimitClass
       });

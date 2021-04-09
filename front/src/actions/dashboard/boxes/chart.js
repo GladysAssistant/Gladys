@@ -109,8 +109,10 @@ function createActions(store) {
             unit = feature.unit;
 
             feature.device_feature_states.forEach(featureState => {
-              xData.push(featureState.x);
-              yData.push(featureState.y);
+              if (featureState.x && featureState.y) {
+                xData.push(featureState.x);
+                yData.push(featureState.y);
+              }
             });
             series.push({
               name: `${device.name} - ${feature.name}`,
