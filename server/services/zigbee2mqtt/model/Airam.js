@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Airam = {
   brand: 'Airam',
   models: {
-    '4713407': [features.switch, features.brightness],
+    '4713407': [features.light, features.brightness],
     'AIRAM-CTR.U': [features.switch_sensor],
   },
 };

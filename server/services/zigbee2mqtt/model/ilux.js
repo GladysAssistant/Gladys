@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const ilux = {
   brand: 'ilux',
   models: {
-    '900008-WW': [features.switch, features.brightness],
+    '900008-WW': [features.light, features.brightness],
   },
 };
 
