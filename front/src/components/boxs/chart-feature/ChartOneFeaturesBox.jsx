@@ -75,7 +75,7 @@ class ChartOneFeaturesBox extends Component {
                 <Text id="dashboard.boxes.devicesChart.lastValue" />
                 <div class="h6 " style="padding-left: 0.5em;">
                   {lastValue && `${lastValue} `}
-                  {unit && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+                  {lastValue && unit && <Text id={`deviceFeatureUnitShort.${unit}`} />}
                   {!lastValue && `?`}
                   <span class="d-inline-flex align-items-baseline lh-1">
                     <svg
