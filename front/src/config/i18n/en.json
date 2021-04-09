@@ -201,7 +201,9 @@
         "piholeStatus": "Status",
         "clients": "Clients",
         "clientsValues": "{{number}}/{{total}}",
-        "queriesCached": "Queries cached"
+        "queriesCached": "Queries cached",
+        "enabled": "Enabled",
+        "disabled": "Disabled"
       },
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
@@ -861,7 +863,8 @@
       "description": "Gather Pi-hole statistic to Gladys.",
       "introduction": "The Pi-hole integration allows you to retrieve statistics and interact with a Pi-hole system.",
       "piholeIp": "Pihole IP Adress",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "configurationError": "We were not able to configure this integration."
     }
   },
   "editScene": {

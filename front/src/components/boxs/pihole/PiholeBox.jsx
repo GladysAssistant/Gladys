@@ -68,23 +68,24 @@ const PiholeBox = ({ children, ...props }) => (
             </tr>
           </thead>
           <tbody>
-            {props.adsBlockedToday && (
-              <tr>
-                <td>
-                  <i class="mr-2 fe fe-shield-off" />
-                </td>
-                <td>
-                  <Text id="dashboard.boxes.pihole.adsBlocked" />
-                </td>
-                <td class="text-right">
-                  {props.adsBlockedToday}{' '}
-                  <Text
-                    id="dashboard.boxes.pihole.adsBlockedPercentValue"
-                    fields={{ value: Math.round(props.percentAdsBlockedToday) }}
-                  />
-                </td>
-              </tr>
-            )}
+            {props.adsBlockedToday &&
+              props.percentAdsBlockedToday(
+                <tr>
+                  <td>
+                    <i class="mr-2 fe fe-shield-off" />
+                  </td>
+                  <td>
+                    <Text id="dashboard.boxes.pihole.adsBlocked" />
+                  </td>
+                  <td class="text-right">
+                    {props.adsBlockedToday}{' '}
+                    <Text
+                      id="dashboard.boxes.pihole.adsBlockedPercentValue"
+                      fields={{ value: Math.round(props.percentAdsBlockedToday) }}
+                    />
+                  </td>
+                </tr>
+              )}
             {props.dnsQueryToday && (
               <tr>
                 <td>
@@ -140,7 +141,7 @@ const PiholeBox = ({ children, ...props }) => (
             </tr>
           </thead>
           <tbody>
-            {props.domainsBlocked && (
+            {props.status === 'enabled' && (
               <tr>
                 <td>
                   <i class="mr-2 fe fe-power" />
@@ -148,25 +149,41 @@ const PiholeBox = ({ children, ...props }) => (
                 <td>
                   <Text id="dashboard.boxes.pihole.piholeStatus" />
                 </td>
-                <td class="text-right">{props.status}</td>
+                <td class="text-right">
+                  <Text id="dashboard.boxes.pihole.enabled" />
+                </td>
               </tr>
             )}
-            {props.gravityRelativeDate && (
+            {props.status === 'disabled' && (
               <tr>
                 <td>
-                  <i class="mr-2 fe fe-monitor" />
+                  <i class="mr-2 fe fe-power" />
                 </td>
                 <td>
-                  <Text id="dashboard.boxes.pihole.clients" />
+                  <Text id="dashboard.boxes.pihole.piholeStatus" />
                 </td>
                 <td class="text-right">
-                  <Text
-                    id="dashboard.boxes.pihole.clientsValues"
-                    fields={{ number: props.uniqueClient, total: props.totalClient }}
-                  />
+                  <Text id="dashboard.boxes.pihole.disabled" />
                 </td>
               </tr>
             )}
+            {props.uniqueClient &&
+              props.totalClient(
+                <tr>
+                  <td>
+                    <i class="mr-2 fe fe-monitor" />
+                  </td>
+                  <td>
+                    <Text id="dashboard.boxes.pihole.clients" />
+                  </td>
+                  <td class="text-right">
+                    <Text
+                      id="dashboard.boxes.pihole.clientsValues"
+                      fields={{ number: props.uniqueClient, total: props.totalClient }}
+                    />
+                  </td>
+                </tr>
+              )}
             {props.queriesCached && (
               <tr>
                 <td>

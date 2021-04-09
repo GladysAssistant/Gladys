@@ -201,7 +201,9 @@
         "piholeStatus": "Status",
         "clients": "Clients",
         "clientsValues": "{{number}}/{{total}}",
-        "queriesCached": "Requêtes en cache"
+        "queriesCached": "Requêtes en cache",
+        "enabled": "Activé",
+        "disabled": "Désactivé"
       },
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
@@ -861,7 +863,8 @@
       "description": "Récupérez les statistiques de votre instance Pihole.",
       "introduction": "L'integration Pihole vous permez de récupérer les statistiques de votre instance Pihole.",
       "piholeIp": "Adresse ip de votre Pihole",
-      "saveButton": "Sauvegarder"
+      "saveButton": "Sauvegarder",
+      "configurationError": "Impossible de configurer l'intégration."
     }
   },
   "editScene": {
