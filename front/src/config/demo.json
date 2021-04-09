@@ -125,6 +125,9 @@
             "tv-lamp-binary",
             "tv-lamp-color",
             "tv-lamp-brightness",
+            "main-tv-binary",
+            "main-tv-volume",
+            "main-tv-channel",
             "mqtt-living-room-switch",
             "mqtt-living-room-dimmer",
             "mqtt-living-room-temp"
@@ -297,6 +300,46 @@
             "max": 1,
             "read_only": false,
             "last_value": 1,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          }
+        ]
+      },
+      {
+        "id": "20deebe6-57df-4940-afd1-11c189a407c2",
+        "name": "TV",
+        "selector": "main-tv",
+        "features": [
+          {
+            "name": "TV power",
+            "selector": "main-tv-binary",
+            "category": "television",
+            "type": "binary",
+            "min": 0,
+            "max": 1,
+            "read_only": false,
+            "last_value": 1,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "TV Volume",
+            "selector": "main-tv-volume",
+            "category": "television",
+            "type": "volume",
+            "min": 0,
+            "max": 20,
+            "read_only": false,
+            "last_value": 7,
+            "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
+          },
+          {
+            "name": "TV Channel",
+            "selector": "main-tv-channel",
+            "category": "television",
+            "type": "channel",
+            "min": 0,
+            "max": 99,
+            "read_only": false,
+            "last_value": 27,
             "last_value_changed": "2019-02-12 07:49:07.556 +00:00"
           }
         ]
