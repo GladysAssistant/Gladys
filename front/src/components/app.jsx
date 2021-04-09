@@ -79,6 +79,11 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 
+// Broadlink integration
+import BroadlinkRemotePage from '../routes/integration/all/broadlink/remote-page';
+import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page/setup';
+import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
+
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -230,6 +235,11 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
+        <BroadlinkRemotePage path="/dashboard/integration/device/broadlink" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
+        <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
 
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
 
