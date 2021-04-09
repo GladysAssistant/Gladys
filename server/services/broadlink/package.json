@@ -1,0 +1,18 @@
+{
+  "name": "gladys-broadlink",
+  "version": "1.0.0",
+  "author": "Alexandre Trovato",
+  "dependencies": {
+    "broadlink-js": "git+https://github.com/songfei/broadlink-js.git#817102ea4b904883b5dc858b475f39dbbcf96548"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ]
+}
