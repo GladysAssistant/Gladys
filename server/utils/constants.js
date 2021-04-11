@@ -143,6 +143,7 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+    RECEIVE: 'websocket.receive',
   },
   HOUSE: {
     CREATED: 'house.created',
