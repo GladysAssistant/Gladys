@@ -27,12 +27,12 @@
     "today": "今天",
     "month": "月",
     "week": "星期",
-    "day": "Day",
-    "agenda": "Agenda",
-    "date": "Date",
-    "time": "Time",
-    "event": "Event",
-    "noEventsInRange": "There are no events in this range."
+    "day": "天",
+    "agenda": "议程",
+    "date": "日期",
+    "time": "时间",
+    "event": "事件",
+    "noEventsInRange": "此范围内没有事件."
   },
   "login": {
     "title": "Gladys Assistant",
