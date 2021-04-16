@@ -100,18 +100,18 @@
       "passwordError": "密码至少应为8个字符.",
       "passwordRepeatError": "密码不匹配.",
       "birthdateError": "出生日期是必填的.",
-      "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
+      "networkError": "网络错误：我们没有成功连接到你的Gladys实例。你连接到网络了吗？你的Gladys实例正在运行吗？",
       "emailAlreadyExistError": "同名电子邮箱已存在.",
       "selectorAlreadyExistError": "同名用户已存在.",
       "createAccountButton": "创建账号"
     },
     "restoreBackupSetBackupKey": {
-      "title": "Enter your backup key",
-      "description": "As Gladys Plus backups are end-to-end encrypted, we need you to enter your backup key. Your local instance can only decrypt the backup with this backup key.",
-      "backupKeyLabel": "Backup key",
-      "backupKeyPlaceholder": "Enter your backup key",
-      "cancelButton": "Cancel",
-      "saveButton": "Save backup key"
+      "title": "输入备份密钥",
+      "description": "由于Gladys Plus备份是端到端加密的，因此我们需要您输入备份密钥。您的本地实例只能使用此备份密钥解密备份.",
+      "backupKeyLabel": "备份密钥",
+      "backupKeyPlaceholder": "输入备份密钥",
+      "cancelButton": "取消",
+      "saveButton": "保存备份密钥"
     },
     "restoreBackupInProgress": {
       "title": "Restore in progress...",
