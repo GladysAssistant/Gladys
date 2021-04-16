@@ -227,10 +227,10 @@
         "emptyText": "此处没有用户可显示。您可以在Gladys设置中添加用户."
       },
       "camera": {
-        "editCameraLabel": "选择要在此处显示的摄影机.",
-        "noImageToShow": "没有要显示的图像",
-        "editBoxNameLabel": "输入要为框指定的名称:",
-        "editBoxNamePlaceholder": "Name of the box"
+        "editCameraLabel": "选择摄影机.",
+        "noImageToShow": "没有图像",
+        "editBoxNameLabel": "名称:",
+        "editBoxNamePlaceholder": "输入名称"
       }
     }
   },
