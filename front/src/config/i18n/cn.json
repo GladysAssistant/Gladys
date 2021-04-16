@@ -205,31 +205,31 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "选择要在此处显示的房间.",
-        "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
-        "noValue": "No value recorded",
+        "editDeviceFeaturesLabel": "选择要显示的设备。此处仅显示灯光/传感器.",
+        "noValue": "未记录值",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
+        "noDevices": "看来你家里没有任何设备！<br/>在“集成”页中定义设备."
       },
       "temperatureInRoom": {
-        "editRoomLabel": "Select the room you want to display here.",
-        "noTemperatureRecorded": "No temperature recorded recently."
+        "editRoomLabel": "选择要在此处显示的房间.",
+        "noTemperatureRecorded": "最近没有温度记录."
       },
       "humidityInRoom": {
-        "editRoomLabel": "Select the room you want to display here.",
-        "noHumidityRecorded": "No humidity recorded recently."
+        "editRoomLabel": "选择要在此处显示的房间.",
+        "noHumidityRecorded": "最近没有湿度记录."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
-        "left": "Left ({{since}})",
-        "atHome": "At Home",
-        "neverSeenAtHome": "Never Seen At Home",
-        "error": "There was a network error fetching the list of user. Please refresh.",
-        "emptyText": "There are no users to display here. You can add users in Gladys settings."
+        "description": "显示谁是否在家。您可以更改场景中的用户状态.",
+        "left": "离开 ({{since}})",
+        "atHome": "在家",
+        "neverSeenAtHome": "从没见过",
+        "error": "获取用户列表时出现网络错误。请刷新.",
+        "emptyText": "此处没有用户可显示。您可以在Gladys设置中添加用户."
       },
       "camera": {
-        "editCameraLabel": "Select the camera you want to display here.",
-        "noImageToShow": "No image to show",
-        "editBoxNameLabel": "Enter the name you want to give to the box:",
+        "editCameraLabel": "选择要在此处显示的摄影机.",
+        "noImageToShow": "没有要显示的图像",
+        "editBoxNameLabel": "输入要为框指定的名称:",
         "editBoxNamePlaceholder": "Name of the box"
       }
     }
