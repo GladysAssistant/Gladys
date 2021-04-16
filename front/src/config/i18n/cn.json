@@ -593,7 +593,7 @@
         "nameLabel": "名称",
         "namePlaceholder": "输入特征名称",
         "externalIdLabel": "Feature external ID",
-        "externalIdMessage": "The external ID is an unique ID which helps you identify this device outside of Gladys when sending a MQTT message. It musts start with \"mqtt:\". Read the MQTT API documentation <a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">here</a>.",
+        "externalIdMessage": "External ID是一个唯一的ID，它可以帮助您在发送MQTT消息时在Gladys之外标识这个设备. 它必须以 \"mqtt:\"开头. 阅读MQTT<a href=\"https://gladysassistant.com/en/docs/api/mqtt-api\">API文档</a>.",
         "externalIdPlaceholder": "Feature MQTT 消息密钥",
         "minLabel": "最小值",
         "minPlaceholder": "输入特征最小值",
