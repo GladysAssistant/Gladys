@@ -7,6 +7,7 @@ const caldavService = {
   config: stub(),
   cleanUp: stub(),
   enableCalendar: stub(),
+  disableCalendar: stub(),
   syncUserCalendars: stub(),
 };
 
@@ -58,15 +59,27 @@ describe('get /api/v1/service/caldav/sync', () => {
 });
 
 describe('patch /api/v1/service/caldav/enable', () => {
+  it('should enable caldav calendar synchronization', async () => {
+    const caldavController = CaldavController(caldavService);
+    const req = {
+      body: {
+        selector: 'personnal',
+      },
+    };
+    await caldavController['patch /api/v1/service/caldav/enable'].controller(req, res);
+    assert.calledWith(caldavService.enableCalendar, 'personnal');
+  });
+});
+
+describe('patch /api/v1/service/caldav/disable', () => {
   it('should disable caldav calendar synchronization', async () => {
     const caldavController = CaldavController(caldavService);
     const req = {
       body: {
         selector: 'personnal',
-        sync: false,
       },
     };
-    await caldavController['patch /api/v1/service/caldav/enable'].controller(req, res);
-    assert.calledWith(caldavService.enableCalendar, 'personnal', false);
+    await caldavController['patch /api/v1/service/caldav/disable'].controller(req, res);
+    assert.calledWith(caldavService.disableCalendar, 'personnal');
   });
 });
