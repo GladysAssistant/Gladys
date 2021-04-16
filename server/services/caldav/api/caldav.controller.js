@@ -39,12 +39,22 @@ module.exports = function CalDAVController(caldavHandler) {
   }
 
   /**
-   * @api {patch} /api/v1/service/caldav/enable Enable or disable calendar synchronization
+   * @api {patch} /api/v1/service/caldav/enable Enable calendar synchronization
    * @apiName Enable
    * @apiGroup CalDAV
    */
   async function enable(req, res) {
     const calendar = await caldavHandler.enableCalendar(req.body.selector, req.body.sync);
+    res.status(200).json(calendar);
+  }
+
+  /**
+   * @api {patch} /api/v1/service/caldav/disable Disable calendar synchronization
+   * @apiName Disable
+   * @apiGroup CalDAV
+   */
+  async function disable(req, res) {
+    const calendar = await caldavHandler.disableCalendar(req.body.selector, req.body.sync);
     res.status(200).json(calendar);
   }
 
@@ -64,6 +74,10 @@ module.exports = function CalDAVController(caldavHandler) {
     'patch /api/v1/service/caldav/enable': {
       authenticated: true,
       controller: asyncMiddleware(enable),
+    },
+    'patch /api/v1/service/caldav/disable': {
+      authenticated: true,
+      controller: asyncMiddleware(disable),
     },
   };
 };

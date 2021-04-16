@@ -47,10 +47,12 @@ const actions = store => ({
       // save calendars sync changes
       const updatedCalendars = await Promise.all(
         Object.keys(state.calendarsToSync).map(selector => {
-          return state.httpClient.patch('/api/v1/service/caldav/enable', {
-            selector,
-            sync: state.calendarsToSync[selector]
-          });
+          return state.httpClient.patch(
+            `/api/v1/service/caldav/${state.calendarsToSync[selector] ? 'enable' : 'disable'}`,
+            {
+              selector
+            }
+          );
         })
       );
       store.setState({
