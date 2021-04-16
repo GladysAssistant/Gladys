@@ -793,51 +793,51 @@
       "discoverTab": "eWeLink 发现",
       "setupTab": "配置",
       "discoverDeviceDescr": "自动扫描链接设备eWeLink设备",
-      "nameLabel": "Device Name",
+      "nameLabel": "设备名称",
       "namePlaceholder": "Enter the name of your device",
       "modelLabel": "Model",
-      "roomLabel": "Room",
-      "saveButton": "Save",
-      "updateButton": "Update",
-      "alreadyCreatedButton": "Already created",
-      "deleteButton": "Delete",
+      "roomLabel": "房间",
+      "saveButton": "保存",
+      "updateButton": "更新",
+      "alreadyCreatedButton": "已创建",
+      "deleteButton": "删除",
       "unmanagedModelButton": "Model not managed",
       "status": {
-        "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
-        "setupPageLink": "eWeLink configuration page."
+        "notConnected": "Gladys无法连接到eWebLink云帐户，请转到 ",
+        "setupPageLink": "eWeLink配置页."
       },
       "device": {
-        "title": "Devices in Gladys",
-        "search": "Search devices",
-        "updates": "Check updates",
-        "editButton": "Edit",
-        "noDeviceFound": "No eWeLink device found.",
-        "featuresLabel": "Features"
+        "title": "在Gladys的设备",
+        "search": "搜索设备",
+        "updates": "检查更新",
+        "editButton": "编辑",
+        "noDeviceFound": "位发现eWeLink设备.",
+        "featuresLabel": "特征"
       },
       "discover": {
-        "title": "Devices detected on your eWeLink cloud account",
-        "description": "eWeLink devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
-        "error": "Error discovering eWeLink devices. Please verify your credentials on Setup.",
-        "noDeviceFound": "No eWeLink device discovered.",
-        "scan": "Scan"
+        "title": "在您的eWebLink云帐户上检测到设备",
+        "description": "自动发现eWebLink设备。您的eWebLink设备需要添加到您的eWebLink云帐户",
+        "error": "发现eWebLink设备时出错。请在安装时验证您的凭据.",
+        "noDeviceFound": "未发现eWebLink设备.",
+        "scan": "扫描"
       },
       "setup": {
-        "title": "eWeLink configuration",
-        "eweLinkDescription": "You can connect Gladys to your eWeLink cloud account to command the associated devices.",
-        "userLabel": "Username",
-        "userPlaceholder": "Enter eWeLink username",
-        "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter eWeLink password",
-        "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
-        "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
-        "connected": "Connected to the eWeLink cloud account with success !",
-        "connectionError": "Error while connecting, please check your configuration."
+        "title": "eWeLink 配置",
+        "eweLinkDescription": "您可以将Gladys连接到您的eWeLink云帐户以命令关联的设备.",
+        "userLabel": "用户名",
+        "userPlaceholder": "输入eWebLink用户名",
+        "passwordLabel": "密码",
+        "passwordPlaceholder": "输入eWebLink密码",
+        "saveLabel": "保存配置",
+        "error": "保存配置时出错.",
+        "connecting": "配置已保存。现在正在连接到您的eWebLink云帐户...",
+        "connected": "已成功连接到eWLink云帐户 !",
+        "connectionError": "连接时出错，请检查您的配置."
       },
       "error": {
-        "defaultError": "There was an error saving the device.",
-        "defaultDeletionError": "There was an error deleting the device.",
-        "conflictError": "Current device is already in Gladys."
+        "defaultError": "保存设备时出错.",
+        "defaultDeletionError": "删除设备时出错.",
+        "conflictError": "当前设备已在Gladys中."
       }
     }
   },
