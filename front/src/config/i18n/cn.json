@@ -255,8 +255,8 @@
     "telegram": {
       "title": "Telegram",
       "description": "通过 Telegram 与 Gladys 交谈.",
-      "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
-      "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
+      "introduction": "要将Gladys连接到Telegram，首先需要使用Botfather创建一个telegrambot. 在Telegram发送 <b>/newbot</b> 消息到 <a href=\"https://telegram.me/BotFather\">@BotFather</a> . 然后，在下面输入他给你的API密钥.",
+      "link": "<b>需要采取的行动:</b> 要在Telegram中与Gladys通话，请单击 <a href=\"{{link}}\">这个连接</a>. 在点击这个链接之前，不要直接给你的机器人发Telegram，否则你的机器人将无法知道是你在发送信息.",
       "note": "此链接对您的帐户是唯一的，请勿将其发送给其他用户.",
       "configurationError": "我们无法配置您的帐户。您确定此令牌有效吗?",
       "apiKey": "Telegram Bot API 密钥",
