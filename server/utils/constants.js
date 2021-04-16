@@ -20,6 +20,7 @@ const USER_ROLE = {
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
   FR: 'fr',
+  CN: 'cn',
 };
 
 const SESSION_TOKEN_TYPES = {
