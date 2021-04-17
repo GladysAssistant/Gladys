@@ -110,6 +110,25 @@ class HttpRequestAction extends Component {
     });
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
   };
+  loadVariables = keys => {
+    const { columnIndex, index } = this.props;
+    const keysVariables = keys.map(key => {
+      const keyWithData = `data.${key}`;
+      return {
+        name: keyWithData,
+        type: 'http_request',
+        ready: true,
+        label: keyWithData
+      };
+    });
+    keysVariables.push({
+      name: 'status',
+      type: 'http_request',
+      ready: true,
+      label: 'status'
+    });
+    this.props.setVariables(columnIndex, index, keysVariables);
+  };
   tryRequest = async e => {
     e.preventDefault();
     try {
@@ -125,23 +144,8 @@ class HttpRequestAction extends Component {
       });
       if (isJsonResponse) {
         const keys = getAllPropertiesObject(data);
-        const { columnIndex, index } = this.props;
-        const keysVariables = keys.map(key => {
-          const keyWithData = `data.${key}`;
-          return {
-            name: keyWithData,
-            type: 'http_request',
-            ready: true,
-            label: keyWithData
-          };
-        });
-        keysVariables.push({
-          name: 'status',
-          type: 'http_request',
-          ready: true,
-          label: 'status'
-        });
-        this.props.setVariables(columnIndex, index, keysVariables);
+        this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'request_response_keys', keys);
+        this.loadVariables(keys);
       }
       await this.setState({ error: false, pending: false });
     } catch (e) {
@@ -155,6 +159,9 @@ class HttpRequestAction extends Component {
     }
     if (!this.props.action.headers) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', []);
+    }
+    if (this.props.action.request_response_keys) {
+      this.loadVariables(this.props.action.request_response_keys);
     }
   }
   render(props) {
