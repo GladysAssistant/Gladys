@@ -16,21 +16,30 @@ describe('http.request', () => {
   it('should make a GET request', async () => {
     const response = await http.request('get', 'http://test.test');
     expect(response).to.deep.equal({
-      success: true,
+      data: {
+        success: true,
+      },
+      headers: { 'content-type': 'application/json' },
+      status: 200,
     });
     assert.calledWith(AxiosMock.request, {
       method: 'get',
       url: 'http://test.test',
-      timeout: 60000,
+      timeout: 20000,
       headers: {
         'user-agent': `GladysAssistant/v${packageJson.version}`,
       },
+      validateStatus: null,
     });
   });
   it('should make a POST request', async () => {
     const response = await http.request('post', 'http://test.test', { toto: 'toto' }, { authorization: 'TOKEN' });
     expect(response).to.deep.equal({
-      success: true,
+      data: {
+        success: true,
+      },
+      headers: { 'content-type': 'application/json' },
+      status: 200,
     });
     assert.calledWith(AxiosMock.request, {
       method: 'post',
@@ -42,7 +51,8 @@ describe('http.request', () => {
         authorization: 'TOKEN',
         'user-agent': `GladysAssistant/v${packageJson.version}`,
       },
-      timeout: 60000,
+      timeout: 20000,
+      validateStatus: null,
     });
   });
 });

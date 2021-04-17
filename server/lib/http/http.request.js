@@ -18,7 +18,7 @@ async function request(method, url, body, headers) {
     url,
     timeout: DEFAULT_TIMEOUT,
     headers: { 'user-agent': `GladysAssistant/${this.system.gladysVersion}` },
-    validateStatus: (status) => true,
+    validateStatus: null, // we don't want axios to throw an error
   };
   if (body) {
     options.data = body;
