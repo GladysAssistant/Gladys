@@ -932,7 +932,10 @@
         "bodyPlaceholder": "Body",
         "headersLabel": "Headers",
         "headersKeyPlaceholder": "Name",
-        "headersValuePlaceholder": "Value"
+        "headersValuePlaceholder": "Value",
+        "responseData": "Response",
+        "tryButton": "Try request",
+        "requestError": "An error happened while making the request. Are you sure parameters are right?"
       }
     },
     "actions": {
