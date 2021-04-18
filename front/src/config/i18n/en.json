@@ -181,12 +181,30 @@
       "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "pihole": "Pi-hole"
     },
     "boxes": {
       "column": "Column {{index}}",
       "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
+      "pihole": {
+        "description": "Edit box description",
+        "headerToday": "Today Statistics",
+        "headerGravitySettings": "Gravity List",
+        "headerStatus": "Status",
+        "domainsBlocked": "Domains blocked",
+        "adsBlocked": "Ads blocked",
+        "adsBlockedPercentValue": "({{value}}%)",
+        "dnsQuery": "DNS Queries",
+        "gravityLastUpdate": "Last update",
+        "piholeStatus": "Status",
+        "clients": "Clients",
+        "clientsValues": "{{number}}/{{total}}",
+        "queriesCached": "Queries cached",
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
         "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
@@ -248,7 +266,8 @@
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "Navigation",
+        "network": "Network"
       }
     },
     "telegram": {
@@ -838,6 +857,14 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "pihole": {
+      "title": "Pi-hole",
+      "description": "Gather Pi-hole statistic to Gladys.",
+      "introduction": "The Pi-hole integration allows you to retrieve statistics and interact with a Pi-hole system.",
+      "piholeIp": "Pihole IP Adress",
+      "saveButton": "Save",
+      "configurationError": "We were not able to configure this integration."
     }
   },
   "editScene": {

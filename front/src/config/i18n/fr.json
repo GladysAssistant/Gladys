@@ -181,12 +181,30 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "pihole": "Pi-hole"
     },
     "boxes": {
       "column": "Colonne {{index}}",
       "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
+      "pihole": {
+        "description": "Edit box description",
+        "headerToday": "Statistiques du jour",
+        "headerGravitySettings": "Liste Gravity",
+        "headerStatus": "Status",
+        "domainsBlocked": "Domaines bloqués",
+        "adsBlocked": "Publicités bloquées",
+        "adsBlockedPercentValue": "({{value}}%)",
+        "dnsQuery": "Requêtes DNS",
+        "gravityLastUpdate": "Dernière mise à jour",
+        "piholeStatus": "Status",
+        "clients": "Clients",
+        "clientsValues": "{{number}}/{{total}}",
+        "queriesCached": "Requêtes en cache",
+        "enabled": "Activé",
+        "disabled": "Désactivé"
+      },
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
@@ -248,7 +266,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "network": "Réseau"
       }
     },
     "caldav": {
@@ -838,6 +857,14 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "pihole": {
+      "title": "Pi-hole",
+      "description": "Récupérez les statistiques de votre instance Pihole.",
+      "introduction": "L'integration Pihole vous permez de récupérer les statistiques de votre instance Pihole.",
+      "piholeIp": "Adresse ip de votre Pihole",
+      "saveButton": "Sauvegarder",
+      "configurationError": "Impossible de configurer l'intégration."
     }
   },
   "editScene": {
