@@ -46,7 +46,11 @@ async function userSeen(houseSelector, userSelector) {
       last_house_changed: new Date(),
     });
     // so we emit back at home event
-    this.event.emit(EVENTS.USER_PRESENCE.BACK_HOME, userFinal.get({ plain: true }));
+    this.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.USER_PRESENCE.BACK_HOME,
+      user: userSelector,
+      house: houseSelector,
+    });
     // and we emit websocket event so that the change is sent to UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME,
