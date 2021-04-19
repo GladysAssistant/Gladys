@@ -992,6 +992,10 @@
       "user": {
         "back-home": "User left home",
         "left-home": "User back at home"
+      },
+      "house": {
+        "empty": "House is empty",
+        "no-longer-empty": "House is no longer empty"
       }
     },
     "triggersCard": {
@@ -1046,6 +1050,11 @@
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
         "leftHomeDescription": "This will trigger when the selected user is leaving the selected home.",
         "userLabel": "User",
+        "houseLabel": "House"
+      },
+      "houseEmptyOrNot": {
+        "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
+        "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
         "houseLabel": "House"
       }
     }

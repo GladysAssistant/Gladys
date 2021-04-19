@@ -992,6 +992,10 @@
       "user": {
         "back-home": "Retour à la maison",
         "left-home": "Départ de la maison"
+      },
+      "house": {
+        "empty": "La maison est vide",
+        "no-longer-empty": "La maison n'est plus vide"
       }
     },
     "triggersCard": {
@@ -1046,6 +1050,11 @@
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",
         "leftHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné partira de la maison sélectionnée.",
         "userLabel": "Utilisateur",
+        "houseLabel": "Maison"
+      },
+      "houseEmptyOrNot": {
+        "houseEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur quitte la maison et est le dernier à la quitter.",
+        "houseNoLongerEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur rentre à la maison et qu'elle était vide avant son retour.",
         "houseLabel": "Maison"
       }
     }
