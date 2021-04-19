@@ -74,6 +74,7 @@ function Gladys(params = {}) {
     dashboard,
     event,
     house,
+    http,
     gateway,
     location,
     message,
