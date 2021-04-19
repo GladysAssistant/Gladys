@@ -22,6 +22,7 @@ const actionSchema = Joi.array().items(
       url: Joi.string().uri(),
       body: Joi.string(),
       method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
+      request_response_keys: Joi.array().items(Joi.string()),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),

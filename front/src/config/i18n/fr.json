@@ -932,7 +932,10 @@
         "bodyPlaceholder": "Body",
         "headersLabel": "Headers",
         "headersKeyPlaceholder": "Nom",
-        "headersValuePlaceholder": "Valeur"
+        "headersValuePlaceholder": "Valeur",
+        "responseData": "Réponse",
+        "tryButton": "Essayer",
+        "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       }
     },
     "actions": {
