@@ -988,6 +988,10 @@
         "changed": "Déclenchement programmé",
         "sunrise": "A chaque lever de soleil",
         "sunset": "A chaque coucher de soleil"
+      },
+      "user": {
+        "back-home": "Retour à la maison",
+        "left-home": "Départ de la maison"
       }
     },
     "triggersCard": {
@@ -1037,6 +1041,12 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
+      },
+      "userPresence": {
+        "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",
+        "leftHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné partira de la maison sélectionnée.",
+        "userLabel": "Utilisateur",
+        "houseLabel": "Maison"
       }
     }
   },
