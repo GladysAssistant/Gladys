@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const Handlebars = require('handlebars');
 const set = require('set-value');
 const get = require('get-value');
+const dayjs = require('dayjs');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
@@ -126,6 +127,43 @@ const actionsFunc = {
     });
     if (oneConditionVerified === false) {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
+    }
+  },
+  [ACTIONS.CONDITION.CHECK_TIME]: async (self, action, scope) => {
+    const now = dayjs().tz(self.timezone);
+    if (action.before) {
+      const beforeDate = dayjs()
+        .hour(action.before.substr(0, 2))
+        .minute(action.before.substr(3, 2))
+        .tz(self.timezone);
+      const isBeforeCondition = now.isBefore(beforeDate);
+      if (!isBeforeCondition) {
+        logger.debug(`Condition isBeforeHour not verified. Now = ${now} > beforeDate = ${beforeDate}`);
+        throw new AbortScene('CONDITION_IS_BEFORE_HOUR_NOT_VERIFIED');
+      }
+    }
+    if (action.after) {
+      const afterDate = dayjs()
+        .hour(action.after.substr(0, 2))
+        .minute(action.after.substr(3, 2))
+        .tz(self.timezone);
+      const isAfterCondition = now.isAfter(afterDate);
+      if (!isAfterCondition) {
+        logger.debug(`Condition isAfterHour not verified. Now = ${now} < afterDate = ${afterDate}`);
+        throw new AbortScene('CONDITION_IS_AFTER_HOUR_NOT_VERIFIED');
+      }
+    }
+    if (action.days_of_the_week) {
+      const currentDayOfTheWeek = now.format('dddd').toLowerCase();
+      const isCurrentDayInCondition = action.days_of_the_week.indexOf(currentDayOfTheWeek) !== -1;
+      if (!isCurrentDayInCondition) {
+        logger.debug(
+          `Condition isInDayOfWeek not verified. Current day of the week = ${currentDayOfTheWeek}. Allowed days = ${action.days_of_the_week.join(
+            ',',
+          )}`,
+        );
+        throw new AbortScene('CONDITION_IS_IN_DAYS_OF_WEEK_NOT_VERIFIED');
+      }
     }
   },
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
