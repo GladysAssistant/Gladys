@@ -148,6 +148,8 @@ const EVENTS = {
     CREATED: 'house.created',
     UPDATED: 'house.updated',
     DELETED: 'house.deleted',
+    EMPTY: 'house.empty',
+    NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
 };
 

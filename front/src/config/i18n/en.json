@@ -988,6 +988,10 @@
         "changed": "Scheduled trigger",
         "sunrise": "Every sunrise",
         "sunset": "Every sunset"
+      },
+      "house": {
+        "empty": "House is empty",
+        "no-longer-empty": "House is no longer empty"
       }
     },
     "triggersCard": {
@@ -1037,6 +1041,11 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
+      },
+      "houseEmptyOrNot": {
+        "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
+        "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
+        "houseLabel": "House"
       }
     }
   },
