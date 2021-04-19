@@ -9,11 +9,10 @@ const METHOD_WITH_BODY = ['post', 'patch', 'put'];
 const getAllPropertiesObject = (obj, path = '', results = []) => {
   Object.keys(obj).forEach(key => {
     const value = obj[key];
-    const keyFormatted = Number.isInteger(parseInt(key, 10)) ? `[${key}]` : key;
     if (typeof value === 'object') {
-      getAllPropertiesObject(value, `${path}${keyFormatted}.`, results);
+      getAllPropertiesObject(value, `${path}${key}.`, results);
     } else {
-      results.push(path + keyFormatted);
+      results.push(path + key);
     }
   });
   return results;
