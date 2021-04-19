@@ -1043,8 +1043,8 @@
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       },
       "houseEmptyOrNot": {
-        "houseEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur quitte la maison et est le dernier à quitter la maison.",
-        "houseNoLongerEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur rentre à la maison et que la maison était vide avant son retour.",
+        "houseEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur quitte la maison et est le dernier à la quitter.",
+        "houseNoLongerEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur rentre à la maison et qu'elle était vide avant son retour.",
         "houseLabel": "Maison"
       }
     }
