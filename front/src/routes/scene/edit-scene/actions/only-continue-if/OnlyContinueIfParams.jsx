@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import get from 'get-value';
 
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+
 import Condition from './Condition';
 
 @connect('httpClient', {})
@@ -47,7 +49,7 @@ class OnlyContinueIf extends Component {
       actionGroup.forEach((action, index) => {
         if (this.props.variables[groupIndex][index]) {
           variableOptions.push({
-            label: `${groupIndex + 1}. ${get(this, `context.intl.dictionary.editScene.actions.${action.type}`)}`,
+            label: `${groupIndex + 1}. ${get(this, `props.intl.dictionary.editScene.actions.${action.type}`)}`,
             options: this.props.variables[groupIndex][index].map(option => ({
               label: option.label,
               value: `${groupIndex}.${index}.${option.name}`,
@@ -78,4 +80,4 @@ class OnlyContinueIf extends Component {
   }
 }
 
-export default OnlyContinueIf;
+export default withIntlAsProp(OnlyContinueIf);
