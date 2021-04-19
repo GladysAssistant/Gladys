@@ -4,8 +4,9 @@ const sinon = require('sinon');
 
 const { fake, assert } = sinon;
 
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
+const StateManager = require('../../../lib/state');
 const House = require('../../../lib/house');
 
 const event = {
@@ -128,7 +129,8 @@ describe('House', () => {
   });
 
   describe('house.userSeen', () => {
-    const house = new House(event);
+    const state = new StateManager();
+    const house = new House(event, state);
     it('should mark user as present in this house', async () => {
       const user = await house.userSeen('test-house', 'john');
       expect(user).to.deep.equal({
@@ -142,6 +144,14 @@ describe('House', () => {
         updated_at: user.updated_at,
       });
       assert.calledWith(event.emit, EVENTS.USER_PRESENCE.BACK_HOME, user);
+      assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME,
+        payload: user,
+      });
+      assert.calledWith(event.emit, EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.HOUSE.NO_LONGER_EMPTY,
+        house: 'test-house',
+      });
     });
     it('should emit user seen event', async () => {
       const user = await house.userSeen('pepper-house', 'pepper');
@@ -171,7 +181,8 @@ describe('House', () => {
       const userLeftEvent = {
         emit: fake.returns(null),
       };
-      const house = new House(userLeftEvent);
+      const state = new StateManager();
+      const house = new House(userLeftEvent, state);
       await house.userSeen('test-house', 'john');
       const user = await house.userLeft('test-house', 'john');
       expect(user).to.deep.equal({
@@ -185,12 +196,21 @@ describe('House', () => {
         updated_at: user.updated_at,
       });
       assert.calledWith(userLeftEvent.emit, EVENTS.USER_PRESENCE.LEFT_HOME, user);
+      assert.calledWith(userLeftEvent.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,
+        payload: user,
+      });
+      assert.calledWith(userLeftEvent.emit, EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.HOUSE.EMPTY,
+        house: 'test-house',
+      });
     });
     it('should not change anything', async () => {
       const userLeftEvent = {
         emit: fake.returns(null),
       };
-      const house = new House(userLeftEvent);
+      const state = new StateManager();
+      const house = new House(userLeftEvent, state);
       const user = await house.userLeft('test-house', 'john');
       expect(user).to.deep.equal({
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
@@ -207,7 +227,8 @@ describe('House', () => {
       const userLeftEvent = {
         emit: fake.returns(null),
       };
-      const house = new House(userLeftEvent);
+      const state = new StateManager();
+      const house = new House(userLeftEvent, state);
       const promise = house.userLeft('house-not-found', 'john');
       return assertChai.isRejected(promise, 'House not found');
     });
@@ -215,7 +236,8 @@ describe('House', () => {
       const userLeftEvent = {
         emit: fake.returns(null),
       };
-      const house = new House(userLeftEvent);
+      const state = new StateManager();
+      const house = new House(userLeftEvent, state);
       const promise = house.userLeft('test-house', 'user-not-found');
       return assertChai.isRejected(promise, 'User not found');
     });
