@@ -3,6 +3,14 @@ const STATE = {
   OFF: 0,
 };
 
+const BUTTON_STATUS = {
+  CLICK: 1,
+  DOUBLE_CLICK: 2,
+  LONG_CLICK_PRESS: 3,
+  LONG_CLICK_RELEASE: 4,
+  LONG_CLICK: 5,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -107,12 +115,17 @@ const EVENTS = {
   },
   TIME: {
     CHANGED: 'time.changed',
+    SUNRISE: 'time.sunrise',
+    SUNSET: 'time.sunset',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
+  },
+  HUMIDITY_SENSOR: {
+    HUMIDITY_CHANGED: 'humidity.changed',
   },
   SCHEDULED_SCENE: {
     ENABLED: 'scheduled-scene.enabled',
@@ -130,6 +143,13 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+  },
+  HOUSE: {
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
+    EMPTY: 'house.empty',
+    NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
 };
 
@@ -234,8 +254,14 @@ const INTENTS = {
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
   },
+  HUMIDITY_SENSOR: {
+    GET_IN_ROOM: 'intent.humidity-sensor.get-in-room',
+  },
   WEATHER: {
     GET: 'intent.weather.get',
+    TOMORROW: 'intent.weather.tomorrow',
+    AFTER_TOMORROW: 'intent.weather.after-tomorrow',
+    DAY: 'intent.weather.day',
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
@@ -333,6 +359,7 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+  HECTO_PASCAL: 'hPa',
   PASCAL: 'pascal',
   LUX: 'lux',
   WATT: 'watt',
@@ -345,13 +372,17 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
 };
 
+const WEATHER_UNITS = {
+  METRIC: 'metric',
+};
+
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [DEVICE_FEATURE_UNITS.MM, DEVICE_FEATURE_UNITS.CM],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
-  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL],
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL, DEVICE_FEATURE_UNITS.HECTO_PASCAL],
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
 };
 
@@ -415,6 +446,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
   },
+  ZIGBEE2MQTT: {
+    DISCOVER: 'zigbee2mqtt.discover',
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
+    MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
+    PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+  },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
@@ -440,6 +477,7 @@ const DASHBOARD_TYPE = {
 const DASHBOARD_BOX_TYPE = {
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
+  HUMIDITY_IN_ROOM: 'humidity-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
@@ -482,6 +520,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 
 module.exports.STATE = STATE;
+module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
@@ -526,3 +565,5 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.WEATHER_UNITS = WEATHER_UNITS;

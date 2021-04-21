@@ -89,6 +89,10 @@ module.exports = function RoomController(gladys) {
         unit: req.user.temperature_unit_preference,
       });
     }
+    // if the user wants the humidity in the room
+    if (expandFields.humidity) {
+      room.humidity = await gladys.device.humiditySensorManager.getHumidityInRoom(room.id);
+    }
     res.json(room);
   }
 

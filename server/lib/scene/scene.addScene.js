@@ -1,4 +1,3 @@
-const schedule = require('node-schedule');
 const cloneDeep = require('lodash.clonedeep');
 const uuid = require('uuid');
 
@@ -37,7 +36,7 @@ function addScene(sceneRaw) {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
-        const rule = new schedule.RecurrenceRule();
+        const rule = new this.schedule.RecurrenceRule();
         rule.tz = this.timezone;
         switch (trigger.scheduler_type) {
           case 'every-month':
@@ -68,7 +67,9 @@ function addScene(sceneRaw) {
           default:
             throw new BadParameters(`${trigger.scheduler_type} not supported`);
         }
-        trigger.nodeScheduleJob = schedule.scheduleJob(rule, () => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger));
+        trigger.nodeScheduleJob = this.schedule.scheduleJob(rule, () =>
+          this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
+        );
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
         let intervalMilliseconds;
         switch (trigger.unit) {

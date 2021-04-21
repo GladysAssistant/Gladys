@@ -1,9 +1,17 @@
 [
   {
     "label": "taxi.order",
-    "questions": ["Order me a taxi in %datetime% to %city%"],
-    "answers": ["Ok, got it. I'll order a taxi in {{datetime}} to {{city}}"],
+    "questions": ["Order me a taxi from %from% to %city% %datetime% "],
+    "answers": ["Ok, got it. I'll order a taxi in {{datetime}} from {{from}} to {{city}}"],
     "slots": [
+      {
+        "key": "from",
+        "mandatory": true,
+        "ifMissing": "Where should I pick you?",
+        "betweenCondition": {
+          "between": ["from", "to"]
+        }
+      },
       {
         "key": "city",
         "mandatory": true,

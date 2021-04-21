@@ -1,0 +1,6 @@
+[
+  {
+    "label": "humidity-sensor.get-in-room",
+    "questions": ["Quel est le taux d'humidité dans le %room% ?", "Donne moi l'humidité du %room%"]
+  }
+]

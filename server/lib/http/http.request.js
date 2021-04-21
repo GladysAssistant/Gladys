@@ -1,6 +1,7 @@
 const axios = require('axios');
 
-const DEFAULT_TIMEOUT = 60 * 1000;
+const DEFAULT_TIMEOUT = 20 * 1000;
+
 /**
  * @public
  * @description Make an HTTP request
@@ -17,6 +18,7 @@ async function request(method, url, body, headers) {
     url,
     timeout: DEFAULT_TIMEOUT,
     headers: { 'user-agent': `GladysAssistant/${this.system.gladysVersion}` },
+    validateStatus: null, // we don't want axios to throw an error
   };
   if (body) {
     options.data = body;
@@ -25,8 +27,12 @@ async function request(method, url, body, headers) {
     options.headers = Object.assign(options.headers, headers);
   }
   // @ts-ignore
-  const { data } = await axios.request(options);
-  return data;
+  const response = await axios.request(options);
+  return {
+    data: response.data,
+    status: response.status,
+    headers: response.headers,
+  };
 }
 
 module.exports = {
