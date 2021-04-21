@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @public
@@ -15,7 +16,9 @@ const db = require('../../models');
  * });
  */
 async function create(house) {
-  return db.House.create(house);
+  const newHouse = await db.House.create(house);
+  this.event.emit(EVENTS.HOUSE.CREATED, newHouse.get({ plain: true }));
+  return newHouse;
 }
 
 module.exports = {

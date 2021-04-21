@@ -48,5 +48,5 @@ module.exports = {
       unique: true,
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_variable'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_variable'),
 };

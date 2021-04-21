@@ -53,7 +53,7 @@ function Gladys(params = {}) {
   const stateManager = new StateManager(event);
   const system = new System(db.sequelize, event, config);
   const http = new Http(system);
-  const house = new House(event);
+  const house = new House(event, stateManager);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager);
@@ -74,6 +74,7 @@ function Gladys(params = {}) {
     dashboard,
     event,
     house,
+    http,
     gateway,
     location,
     message,

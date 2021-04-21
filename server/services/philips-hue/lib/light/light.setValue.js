@@ -28,6 +28,9 @@ async function setValue(device, deviceFeature, value) {
     case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
       state = new this.LightState().rgb(intToRgb(value));
       break;
+    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
+      state = new this.LightState().brightness(value);
+      break;
     default:
       logger.debug(`Philips Hue : Feature type = "${deviceFeature.type}" not handled`);
       break;

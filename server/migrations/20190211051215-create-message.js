@@ -57,5 +57,5 @@ module.exports = {
     await queryInterface.addIndex('t_message', ['sender_id']);
     await queryInterface.addIndex('t_message', ['receiver_id']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_message'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_message'),
 };

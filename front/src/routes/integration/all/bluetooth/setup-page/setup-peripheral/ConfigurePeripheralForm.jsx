@@ -6,6 +6,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import update from 'immutability-helper';
 
+import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 
@@ -88,7 +89,7 @@ class ConfigurePeripheralForm extends Component {
           $push: [
             {
               name: get(
-                this.context.intl.dictionary,
+                this.props.intl.dictionary,
                 `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}.${DEVICE_FEATURE_TYPES.SENSOR.PUSH}`
               ),
               external_id: `${device.external_id}:${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}`,
@@ -254,4 +255,4 @@ class ConfigurePeripheralForm extends Component {
   }
 }
 
-export default ConfigurePeripheralForm;
+export default withIntlAsProp(ConfigurePeripheralForm);

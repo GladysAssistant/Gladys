@@ -3,10 +3,11 @@ module.exports = {
     dialect: 'sqlite',
     storage: process.env.SQLITE_FILE_PATH || './gladys-development.db',
     logging: false,
-    operatorsAliases: false,
     define: {
       underscored: true,
       freezeTableName: true,
+      createdAt: 'created_at', // Hack https://github.com/sequelize/sequelize/issues/11225
+      updatedAt: 'updated_at',
     },
     retry: {
       match: [/SQLITE_BUSY/],
@@ -21,11 +22,12 @@ module.exports = {
   test: {
     dialect: 'sqlite',
     storage: process.env.SQLITE_FILE_PATH || ':memory:',
-    operatorsAliases: false,
     logging: false,
     define: {
       underscored: true,
       freezeTableName: true,
+      createdAt: 'created_at', // Hack https://github.com/sequelize/sequelize/issues/11225
+      updatedAt: 'updated_at',
     },
     retry: {
       match: [/SQLITE_BUSY/],
@@ -40,11 +42,12 @@ module.exports = {
   production: {
     dialect: 'sqlite',
     storage: process.env.SQLITE_FILE_PATH || './gladys-production.db',
-    operatorsAliases: false,
     logging: false,
     define: {
       underscored: true,
       freezeTableName: true,
+      createdAt: 'created_at', // Hack https://github.com/sequelize/sequelize/issues/11225
+      updatedAt: 'updated_at',
     },
     retry: {
       match: [/SQLITE_BUSY/],

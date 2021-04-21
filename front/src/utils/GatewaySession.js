@@ -58,6 +58,7 @@ class GatewaySession {
         }
       });
       this.ready = true;
+      this.websocketConnected = true;
       this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
     }
   }

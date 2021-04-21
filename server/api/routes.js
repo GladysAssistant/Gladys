@@ -7,6 +7,7 @@ const UserController = require('./controllers/user.controller');
 const PingController = require('./controllers/ping.controller');
 const GatewayController = require('./controllers/gateway.controller');
 const HouseController = require('./controllers/house.controller');
+const HttpController = require('./controllers/http.controller');
 const LightController = require('./controllers/light.controller');
 const LocationController = require('./controllers/location.controller');
 const MessageController = require('./controllers/message.controller');
@@ -35,6 +36,7 @@ function getRoutes(gladys) {
   const locationController = LocationController(gladys);
   const userController = UserController(gladys);
   const houseController = HouseController(gladys);
+  const httpController = HttpController(gladys);
   const messageController = MessageController(gladys);
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
@@ -234,6 +236,12 @@ function getRoutes(gladys) {
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
       controller: houseController.userSeen,
+    },
+    // http
+    'post /api/v1/http/request': {
+      authenticated: true,
+      admin: true,
+      controller: httpController.request,
     },
     // gateway
     'get /api/v1/gateway/status': {

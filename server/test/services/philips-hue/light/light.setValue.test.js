@@ -144,6 +144,30 @@ describe('PhilipsHueService', () => {
     assert.notCalled(fakes.off);
     assert.notCalled(fakes.on);
   });
+  it('should set brightness value', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+    await philipsHueService.device.setValue(
+      {
+        external_id: 'light:1234:1',
+        features: [
+          {
+            category: 'light',
+            type: 'brightness',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'brightness',
+      },
+      80,
+    );
+
+    assert.calledOnce(fakes.brightness);
+    assert.notCalled(fakes.off);
+    assert.notCalled(fakes.on);
+  });
   it('should return hue api not found', async () => {
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await philipsHueService.device.init();

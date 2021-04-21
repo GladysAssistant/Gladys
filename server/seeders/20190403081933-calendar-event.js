@@ -31,5 +31,5 @@ module.exports = {
       {},
     ),
 
-  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('t_calendar_event', null, {}),
+  down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('t_calendar_event', null, {}),
 };

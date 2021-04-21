@@ -4,10 +4,11 @@ import { Text, Localizer } from 'preact-i18n';
 import IntegrationMenu from './IntegrationMenu';
 import IntegrationCategory from './IntegrationCategory';
 import actions from '../../actions/integration';
+import withIntlAsProp from '../../utils/withIntlAsProp';
 
 @connect('integrations,currentUrl,totalSize,searchKeyword,user', actions)
 class IntegrationPage extends Component {
-  searchWithI18n = e => this.props.search(e, this.context.intl);
+  searchWithI18n = e => this.props.search(e, this.props.intl);
 
   render({ category, integrations, totalSize, currentUrl, searchKeyword, user }) {
     return (
@@ -70,4 +71,4 @@ class IntegrationPage extends Component {
   }
 }
 
-export default IntegrationPage;
+export default withIntlAsProp(IntegrationPage);

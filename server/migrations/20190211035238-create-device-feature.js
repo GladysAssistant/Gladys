@@ -85,5 +85,5 @@ module.exports = {
     await queryInterface.addIndex('t_device_feature', ['device_id']);
     await queryInterface.addIndex('t_device_feature', ['category']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_device_feature'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_device_feature'),
 };

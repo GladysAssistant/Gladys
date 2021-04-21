@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import CaldavPage from './CalDAV';
 import { RequestStatus } from '../../../../utils/consts';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 @connect(
   'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
@@ -19,8 +20,8 @@ class CaldavIntegration extends Component {
       props.caldavGetSettingsStatus === RequestStatus.Getting ||
       props.caldavCleanUpStatus === RequestStatus.Getting ||
       props.caldavSyncStatus === RequestStatus.Getting;
-    return <CaldavPage {...props} loading={loading} dictionary={this.context.intl.dictionary.integration.caldav} />;
+    return <CaldavPage {...props} loading={loading} dictionary={this.props.intl.dictionary.integration.caldav} />;
   }
 }
 
-export default CaldavIntegration;
+export default withIntlAsProp(CaldavIntegration);

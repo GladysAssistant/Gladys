@@ -5,6 +5,7 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const CameraManager = require('./camera');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
+const HumiditySensorManager = require('./humidity-sensor');
 
 // Functions
 const { add } = require('./device.add');
@@ -45,6 +46,7 @@ const DeviceManager = function DeviceManager(
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
+  this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
 
   this.devicesByPollFrequency = {};
   // listen to events

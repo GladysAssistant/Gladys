@@ -3,6 +3,9 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import dayjs from 'dayjs';
+
+import { WEATHER_UNITS } from '../../../../../server/utils/constants';
 
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
@@ -123,7 +126,7 @@ const WeatherBox = ({ children, ...props }) => (
                   fontSize: '30px'
                 }}
               >
-                {props.units === 'metric' ? 'C' : 'F'}
+                {props.units === WEATHER_UNITS.METRIC ? <Text id="global.celsius" /> : <Text id="global.fahrenheit" />}
               </span>
             </div>
           </div>
@@ -176,7 +179,11 @@ const WeatherBox = ({ children, ...props }) => (
                   color: 'grey'
                 }}
               >
-                {props.units === 'si' ? 'km/h' : 'm/h'}
+                {props.units === WEATHER_UNITS.METRIC ? (
+                  <Text id="global.metersPerSec" />
+                ) : (
+                  <Text id="global.milesPerHour" />
+                )}
               </span>
             </span>
           </div>
@@ -205,7 +212,7 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather', actions)
+@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather,user', actions)
 class WeatherBoxComponent extends Component {
   componentDidMount() {
     // get the weather
@@ -267,7 +274,11 @@ class WeatherBoxComponent extends Component {
         daysDisplay = days.map(day => {
           return (
             <div className="row" style={{ marginTop: '0.5em' }}>
-              <div className="col-5">{day.datetime_beautiful}</div>
+              <div className="col-5" style={{ textTransform: 'capitalize' }}>
+                {dayjs(day.datetime)
+                  .locale(props.user.language)
+                  .format('dddd')}
+              </div>
               <div className="col-3">
                 <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
               </div>

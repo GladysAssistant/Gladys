@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import { getDeviceFeatureName } from '../../../../utils/device';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 @connect('httpClient', {})
 class DeviceGetValue extends Component {
@@ -22,7 +23,7 @@ class DeviceGetValue extends Component {
 
   setVariables = (device, deviceFeature) => {
     const { columnIndex, index } = this.props;
-    const DEFAULT_VARIABLE_NAME = get(this.context.intl.dictionary, 'editScene.variables.device.get-value.last_value');
+    const DEFAULT_VARIABLE_NAME = get(this.props.intl.dictionary, 'editScene.variables.device.get-value.last_value');
     this.props.setVariables(columnIndex, index, [
       {
         name: 'last_value',
@@ -30,7 +31,7 @@ class DeviceGetValue extends Component {
         ready: device && deviceFeature,
         label:
           device && deviceFeature
-            ? getDeviceFeatureName(this.context.intl.dictionary, device, deviceFeature)
+            ? getDeviceFeatureName(this.props.intl.dictionary, device, deviceFeature)
             : DEFAULT_VARIABLE_NAME,
         data: {
           device,
@@ -68,4 +69,4 @@ class DeviceGetValue extends Component {
   }
 }
 
-export default DeviceGetValue;
+export default withIntlAsProp(DeviceGetValue);
