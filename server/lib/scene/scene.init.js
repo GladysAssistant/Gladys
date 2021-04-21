@@ -1,6 +1,7 @@
 const db = require('../../models');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
+
 /**
  * @description Load all scenes from the database to the trigger store.
  * @returns {Promise} Resolve when success.
@@ -21,6 +22,17 @@ async function init() {
     this.addScene(plainScene);
     return plainScene;
   });
+
+  // Recurrence rule (00:00 every day) to update sunrise/sunset time.
+  const rule = new this.schedule.RecurrenceRule();
+  rule.tz = this.timezone;
+  rule.hour = 0;
+  rule.minute = 0;
+  rule.second = 0;
+
+  this.schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
+  await this.dailyUpdate();
+
   return plainScenes;
 }
 

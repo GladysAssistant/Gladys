@@ -34,5 +34,5 @@ module.exports = {
       },
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_house'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_house'),
 };

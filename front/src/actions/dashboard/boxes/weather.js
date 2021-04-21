@@ -36,9 +36,10 @@ function createActions(store) {
           hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
           hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
         });
+        weather.days.shift();
         weather.days.map(day => {
-          day.weatherIcon = translateWeatherToFeIcon(day.weather);
-          day.datetime_beautiful = dayjs(day.datetime).format('D MMM');
+          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.datetime_beautiful = dayjs(day.datetime).format('dddd');
         });
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {

@@ -82,6 +82,26 @@ describe('GET /api/v1/room/:room_selector', () => {
         });
       });
   });
+  it('should get a room by selector with expanded humidity', async () => {
+    await authenticatedRequest
+      .get('/api/v1/room/test-room?expand=humidity')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          house_id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
+          name: 'Test room',
+          selector: 'test-room',
+          humidity: {
+            humidity: 56.2,
+            unit: 'percent',
+          },
+          created_at: '2019-02-12T07:49:07.556Z',
+          updated_at: '2019-02-12T07:49:07.556Z',
+        });
+      });
+  });
   it('should get a room by selector with expanded devices', async () => {
     await authenticatedRequest
       .get('/api/v1/room/test-room?expand=devices')

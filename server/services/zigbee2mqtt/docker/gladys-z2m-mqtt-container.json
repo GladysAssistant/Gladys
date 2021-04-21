@@ -1,0 +1,31 @@
+{
+  "name": "gladys-z2m-mqtt",
+  "Image": "eclipse-mosquitto:2",
+  "ExposedPorts": {
+    "1884/tcp": {}
+  },
+  "HostConfig": {
+    "Binds": [],
+    "PortBindings": {
+      "1884/tcp": [
+        {
+          "HostPort": "1884"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @public
@@ -23,6 +24,8 @@ async function update(selector, newHouse) {
   }
 
   await house.update(newHouse);
+
+  this.event.emit(EVENTS.HOUSE.UPDATED, house.get({ plain: true }));
 
   return house.get({ plain: true });
 }
