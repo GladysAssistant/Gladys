@@ -139,7 +139,7 @@ describe('scene.checkTrigger', () => {
       setValue: fake.resolves(null),
     };
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
-    const addedScene = sceneManager.addScene({
+    sceneManager.addScene({
       selector: 'my-scene',
       actions: [
         [
@@ -159,8 +159,167 @@ describe('scene.checkTrigger', () => {
     sceneManager.checkTrigger({
       type: EVENTS.TIME.SUNSET,
       house: {
-        selector: addedScene.triggers[0].house,
+        selector: 'house-1',
       },
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with empty house trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.HOUSE.EMPTY,
+          house: 'house-1',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.HOUSE.EMPTY,
+      house: 'house-1',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene with no longer empty house trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const addedScene = sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.HOUSE.NO_LONGER_EMPTY,
+          house: 'house-1',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.HOUSE.NO_LONGER_EMPTY,
+      house: addedScene.triggers[0].house,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene with user back home trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.USER_PRESENCE.BACK_HOME,
+          house: 'house-1',
+          user: 'tony',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.USER_PRESENCE.BACK_HOME,
+      house: 'house-1',
+      user: 'tony',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene with user left home trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.USER_PRESENCE.LEFT_HOME,
+          house: 'house-1',
+          user: 'tony',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.USER_PRESENCE.LEFT_HOME,
+      house: 'house-1',
+      user: 'tony',
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {

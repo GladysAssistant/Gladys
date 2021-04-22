@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
 import { getDeviceFeatureName } from '../../utils/device';
+import withIntlAsProp from '../../utils/withIntlAsProp';
 
 @connect('httpClient', {})
 class SelectDeviceFeature extends Component {
@@ -26,7 +27,7 @@ class SelectDeviceFeature extends Component {
 
             roomDeviceFeatures.push({
               value: feature.selector,
-              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
             });
           });
         });
@@ -109,4 +110,4 @@ class SelectDeviceFeature extends Component {
   }
 }
 
-export default SelectDeviceFeature;
+export default withIntlAsProp(SelectDeviceFeature);

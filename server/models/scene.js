@@ -22,6 +22,12 @@ const actionSchema = Joi.array().items(
       url: Joi.string().uri(),
       body: Joi.string(),
       method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
+      days_of_the_week: Joi.array().items(
+        Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+      ),
+      before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      request_response_keys: Joi.array().items(Joi.string()),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),

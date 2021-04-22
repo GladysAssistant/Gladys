@@ -15,6 +15,7 @@ import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
+import CheckTime from './actions/CheckTime';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -32,7 +33,8 @@ const ACTION_ICON = {
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
   [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
-  [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home'
+  [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
+  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -183,6 +185,16 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            setVariables={props.setVariables}
+          />
+        )}
+        {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (
+          <CheckTime
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+            setVariables={props.setVariables}
           />
         )}
       </div>
