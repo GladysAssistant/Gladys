@@ -903,6 +903,12 @@
         "orText": "OR",
         "orButton": "+ OR"
       },
+      "checkTime": {
+        "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
+        "beforeLabel": "Before",
+        "afterLabel": "After",
+        "daysOfTheWeekLabel": "Weekdays"
+      },
       "userPresence": {
         "userLabel": "User",
         "houseLabel": "House",
@@ -962,7 +968,8 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if"
+        "only-continue-if": "Only continue if",
+        "check-time": "Time condition"
       },
       "user": {
         "set-seen-at-home": "User seen at home",

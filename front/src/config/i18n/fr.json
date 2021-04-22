@@ -903,6 +903,12 @@
         "orText": "OU",
         "orButton": "+ OU"
       },
+      "checkTime": {
+        "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
+        "beforeLabel": "Avant",
+        "afterLabel": "Après",
+        "daysOfTheWeekLabel": "Jour de la semaine"
+      },
       "userPresence": {
         "userLabel": "Utilisateur",
         "houseLabel": "Maison",
@@ -962,7 +968,8 @@
         "stop": "Arrêter le service"
       },
       "condition": {
-        "only-continue-if": "Continuer seulement si"
+        "only-continue-if": "Continuer seulement si",
+        "check-time": "Condition temporelle"
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
