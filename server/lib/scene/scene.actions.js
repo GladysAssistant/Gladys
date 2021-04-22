@@ -3,12 +3,17 @@ const Handlebars = require('handlebars');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
@@ -130,27 +135,29 @@ const actionsFunc = {
     }
   },
   [ACTIONS.CONDITION.CHECK_TIME]: async (self, action, scope) => {
-    const now = dayjs().tz(self.timezone);
+    const now = dayjs.tz(dayjs(), self.timezone);
     if (action.before) {
-      const beforeDate = dayjs()
-        .hour(action.before.substr(0, 2))
-        .minute(action.before.substr(3, 2))
-        .tz(self.timezone);
+      const beforeDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.before}`, self.timezone);
       const isBeforeCondition = now.isBefore(beforeDate);
       if (!isBeforeCondition) {
-        logger.debug(`Condition isBeforeHour not verified. Now = ${now} > beforeDate = ${beforeDate}`);
+        logger.debug(
+          `Check time before: ${now.format('HH:mm')} > ${beforeDate.format('HH:mm')} condition is not verified.`,
+        );
         throw new AbortScene('CONDITION_IS_BEFORE_HOUR_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is valid.`);
       }
     }
     if (action.after) {
-      const afterDate = dayjs()
-        .hour(action.after.substr(0, 2))
-        .minute(action.after.substr(3, 2))
-        .tz(self.timezone);
+      const afterDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.after}`, self.timezone);
       const isAfterCondition = now.isAfter(afterDate);
       if (!isAfterCondition) {
-        logger.debug(`Condition isAfterHour not verified. Now = ${now} < afterDate = ${afterDate}`);
+        logger.debug(
+          `Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is not verified.`,
+        );
         throw new AbortScene('CONDITION_IS_AFTER_HOUR_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is valid.`);
       }
     }
     if (action.days_of_the_week) {

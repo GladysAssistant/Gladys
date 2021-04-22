@@ -1,5 +1,6 @@
 const { executeActions } = require('./scene.executeActions');
 const logger = require('../../utils/logger');
+const { AbortScene } = require('../../utils/coreErrors');
 
 /**
  * @description Execute a scene by its selector.
@@ -17,7 +18,11 @@ function execute(sceneSelector, scope) {
       try {
         await executeActions(this, this.scenes[sceneSelector].actions, scope);
       } catch (e) {
-        logger.error(e);
+        if (e instanceof AbortScene) {
+          logger.debug(e);
+        } else {
+          logger.error(e);
+        }
       }
     });
   } catch (e) {
