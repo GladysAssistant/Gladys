@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import BaseEditBox from '../baseEditBox';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartPeriodSelector from './ChartPeriodSelector';
@@ -12,7 +13,7 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import actions from '../../../actions/dashboard/edit-boxes/editChartFeatures';
 
 @connect('httpClient', actions)
-class EditChartMultiFeatures extends Component {
+class EditChartOneFeatures extends Component {
   updateBoxChartType = chartType => {
     this.props.updateBoxChartType(this.props.x, this.props.y, chartType.value);
   };
@@ -53,7 +54,7 @@ class EditChartMultiFeatures extends Component {
           if (!excludeFeatureType.includes(feature.type)) {
             const featureOption = {
               value: feature.selector,
-              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
             };
             if (feature.read_only) {
               roomDeviceFeatures.push(featureOption);
@@ -141,4 +142,4 @@ class EditChartMultiFeatures extends Component {
   }
 }
 
-export default EditChartMultiFeatures;
+export default withIntlAsProp(EditChartOneFeatures);

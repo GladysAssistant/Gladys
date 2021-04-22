@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -88,7 +89,7 @@ class EditChartMultiFeatures extends Component {
           if (!excludeFeatureType.includes(feature.type)) {
             const featureOption = {
               value: feature.selector,
-              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
             };
             if (feature.read_only) {
               roomDeviceFeatures.push(featureOption);
@@ -233,4 +234,4 @@ class EditChartMultiFeatures extends Component {
   }
 }
 
-export default EditChartMultiFeatures;
+export default withIntlAsProp(EditChartMultiFeatures);
