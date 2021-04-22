@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
+import withIntlAsProp from '../../utils/withIntlAsProp';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import localeData from 'dayjs/plugin/localeData';
@@ -76,7 +77,7 @@ class Map extends Component {
                         onRangeChange={this.onRangeChange}
                         defaultView="week"
                         culture={props.user.language}
-                        messages={this.context.intl.dictionary.calendar}
+                        messages={this.props.intl.dictionary.calendar}
                         scrollToTime={dayjs().subtract(2, 'hour')}
                         eventPropGetter={this.eventPropGetter}
                       />
@@ -92,4 +93,4 @@ class Map extends Component {
   }
 }
 
-export default Map;
+export default withIntlAsProp(Map);

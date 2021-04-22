@@ -4,6 +4,7 @@ import actions from './actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 @connect(
   'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,zigbee2mqttFrontend,usbConfigured,z2mEnabled',
@@ -41,10 +42,10 @@ class Zigbee2mqttIntegration extends Component {
   render(props, {}) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <DiscoverTab {...props} dictionary={this.context.intl.dictionary} />
+        <DiscoverTab {...props} dictionary={this.props.intl.dictionary} />
       </Zigbee2mqttPage>
     );
   }
 }
 
-export default Zigbee2mqttIntegration;
+export default withIntlAsProp(Zigbee2mqttIntegration);

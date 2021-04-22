@@ -6,6 +6,7 @@ import Select from 'react-select';
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 import actions from '../../../actions/dashboard/edit-boxes/editDevicesInRoom';
@@ -43,7 +44,7 @@ class EditDeviceInRoom extends Component {
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,
-            label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
           // for now, we only supports binary on/off and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
@@ -118,4 +119,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default EditDeviceInRoom;
+export default withIntlAsProp(EditDeviceInRoom);

@@ -936,6 +936,12 @@
         "orText": "OR",
         "orButton": "+ OR"
       },
+      "checkTime": {
+        "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
+        "beforeLabel": "Before",
+        "afterLabel": "After",
+        "daysOfTheWeekLabel": "Weekdays"
+      },
       "userPresence": {
         "userLabel": "User",
         "houseLabel": "House",
@@ -965,7 +971,10 @@
         "bodyPlaceholder": "Body",
         "headersLabel": "Headers",
         "headersKeyPlaceholder": "Name",
-        "headersValuePlaceholder": "Value"
+        "headersValuePlaceholder": "Value",
+        "responseData": "Response",
+        "tryButton": "Try request",
+        "requestError": "An error happened while making the request. Are you sure parameters are right?"
       }
     },
     "actions": {
@@ -992,7 +1001,8 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if"
+        "only-continue-if": "Only continue if",
+        "check-time": "Time condition"
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -1018,6 +1028,14 @@
         "changed": "Scheduled trigger",
         "sunrise": "Every sunrise",
         "sunset": "Every sunset"
+      },
+      "user": {
+        "back-home": "User left home",
+        "left-home": "User back at home"
+      },
+      "house": {
+        "empty": "House is empty",
+        "no-longer-empty": "House is no longer empty"
       }
     },
     "triggersCard": {
@@ -1067,6 +1085,17 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
+      },
+      "userPresence": {
+        "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
+        "leftHomeDescription": "This will trigger when the selected user is leaving the selected home.",
+        "userLabel": "User",
+        "houseLabel": "House"
+      },
+      "houseEmptyOrNot": {
+        "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
+        "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
+        "houseLabel": "House"
       }
     }
   },

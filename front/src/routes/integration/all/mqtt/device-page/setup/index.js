@@ -7,6 +7,7 @@ import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
+import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 
 @connect('session,user,httpClient,houses,currentIntegration', actions)
@@ -160,25 +161,25 @@ class MqttDeviceSetupPage extends Component {
     const deviceFeaturesOptions = [];
     Object.keys(DEVICE_FEATURE_CATEGORIES).forEach(category => {
       const categoryValue = DEVICE_FEATURE_CATEGORIES[category];
-      if (get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}`)) {
+      if (get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`)) {
         const categoryFeatureTypeOptions = [];
 
-        const types = Object.keys(get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}`));
+        const types = Object.keys(get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`));
 
         types.forEach(type => {
           const typeValue = type;
           if (
-            get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
+            get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
             typeValue !== 'shortCategoryName'
           ) {
             categoryFeatureTypeOptions.push({
               value: `${categoryValue}|${typeValue}`,
-              label: get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
+              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
             });
           }
         });
         deviceFeaturesOptions.push({
-          label: get(this.context.intl.dictionary, `deviceFeatureCategory.${categoryValue}.shortCategoryName`),
+          label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.shortCategoryName`),
           options: categoryFeatureTypeOptions
         });
       }
@@ -255,4 +256,4 @@ class MqttDeviceSetupPage extends Component {
   }
 }
 
-export default MqttDeviceSetupPage;
+export default withIntlAsProp(MqttDeviceSetupPage);

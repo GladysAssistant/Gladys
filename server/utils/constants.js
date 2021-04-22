@@ -149,6 +149,8 @@ const EVENTS = {
     CREATED: 'house.created',
     UPDATED: 'house.updated',
     DELETED: 'house.deleted',
+    EMPTY: 'house.empty',
+    NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
 };
 
@@ -234,6 +236,7 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+    CHECK_TIME: 'condition.check-time',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
