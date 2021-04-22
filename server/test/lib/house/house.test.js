@@ -143,7 +143,11 @@ describe('House', () => {
         last_house_changed: user.last_house_changed,
         updated_at: user.updated_at,
       });
-      assert.calledWith(event.emit, EVENTS.USER_PRESENCE.BACK_HOME, user);
+      assert.calledWith(event.emit, EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.USER_PRESENCE.BACK_HOME,
+        house: 'test-house',
+        user: 'john',
+      });
       assert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME,
         payload: user,
@@ -195,7 +199,11 @@ describe('House', () => {
         last_house_changed: user.last_house_changed,
         updated_at: user.updated_at,
       });
-      assert.calledWith(userLeftEvent.emit, EVENTS.USER_PRESENCE.LEFT_HOME, user);
+      assert.calledWith(userLeftEvent.emit, EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.USER_PRESENCE.LEFT_HOME,
+        house: 'test-house',
+        user: 'john',
+      });
       assert.calledWith(userLeftEvent.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,
         payload: user,
