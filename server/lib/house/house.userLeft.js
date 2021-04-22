@@ -33,21 +33,46 @@ async function userLeft(houseSelector, userSelector) {
   }
 
   let userFinal = user;
+  let userPlainFinal = userFinal.get({ plain: true });
 
   // user was in the house before
-  if (userFinal.get({ plain: true }).current_house_id === house.id) {
+  if (userPlainFinal.current_house_id === house.id) {
     logger.debug(`User ${userSelector} left home ${houseSelector}`);
-    userFinal = await user.update({ current_house_id: null, last_house_changed: new Date() });
+    userFinal = await user.update({
+      current_house_id: null,
+      last_house_changed: new Date(),
+    });
+    userPlainFinal = userFinal.get({ plain: true });
+    // we update the user in RAM
+    this.stateManager.setState('user', userPlainFinal.selector, userPlainFinal);
+    this.stateManager.setState('userById', userPlainFinal.id, userPlainFinal);
     // so we emit left home event
-    this.event.emit(EVENTS.USER_PRESENCE.LEFT_HOME, userFinal.get({ plain: true }));
+    this.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.USER_PRESENCE.LEFT_HOME,
+      user: userSelector,
+      house: houseSelector,
+    });
     // and we emit websocket event so that the change is sent to UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,
-      payload: userFinal.get({ plain: true }),
+      payload: userPlainFinal,
     });
+    // we check if the house is now empty
+    const usersStillInThisHouse = await db.User.count({
+      where: {
+        current_house_id: house.id,
+      },
+    });
+    // the house is empty
+    if (usersStillInThisHouse === 0) {
+      this.event.emit(EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.HOUSE.EMPTY,
+        house: houseSelector,
+      });
+    }
   }
 
-  return userFinal.get({ plain: true });
+  return userPlainFinal;
 }
 
 module.exports = {
