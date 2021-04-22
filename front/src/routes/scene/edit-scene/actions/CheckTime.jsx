@@ -6,6 +6,9 @@ import { format } from 'date-fns';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
+import 'react-datepicker/dist/react-datepicker.css';
+import style from './CheckTime.css';
+
 import fr from 'date-fns/locale/fr';
 
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -58,6 +61,7 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={after}
                   className="form-control"
+                  clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeAfterChange}
                   placeholderText={<Text id="editScene.actionsCard.checkTime.afterLabel" />}
@@ -80,6 +84,7 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={before}
                   className="form-control"
+                  clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeTimeChange}
                   placeholderText={<Text id="editScene.actionsCard.checkTime.beforeLabel" />}
