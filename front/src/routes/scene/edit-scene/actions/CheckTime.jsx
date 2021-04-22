@@ -4,8 +4,13 @@ import DatePicker from 'react-datepicker';
 import { connect } from 'unistore/preact';
 import { format } from 'date-fns';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 
-@connect('', {})
+import fr from 'date-fns/locale/fr';
+
+const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+@connect('user', {})
 class CheckTime extends Component {
   handleBeforeTimeChange = time => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
@@ -21,43 +26,18 @@ class CheckTime extends Component {
   };
 
   render(props, state) {
-    const { localeSet } = state;
+    const language = get(this.props, 'user.language');
+    const localeSet = language === 'fr' ? fr : 'en';
     const before = this.props.action.before
       ? new Date().setHours(this.props.action.before.substr(0, 2), this.props.action.before.substr(3, 2))
       : null;
     const after = this.props.action.after
       ? new Date().setHours(this.props.action.after.substr(0, 2), this.props.action.after.substr(3, 2))
       : null;
-    const daysOfTheWeekOptions = [
-      {
-        value: 'monday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
-      },
-      {
-        value: 'tuesday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
-      },
-      {
-        value: 'wednesday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
-      },
-      {
-        value: 'thursday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
-      },
-      {
-        value: 'friday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
-      },
-      {
-        value: 'saturday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
-      },
-      {
-        value: 'sunday',
-        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
-      }
-    ];
+    const daysOfTheWeekOptions = weekDays.map(weekDay => ({
+      value: weekDay,
+      label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${weekDay}`} />
+    }));
     const selectedWeekDaysOptions = this.props.action.days_of_the_week
       ? this.props.action.days_of_the_week.map(day => daysOfTheWeekOptions.find(option => option.value === day))
       : [];
