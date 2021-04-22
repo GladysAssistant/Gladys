@@ -10,7 +10,7 @@ const BrightnessDeviceType = ({ children, ...props }) => {
       props.deviceIndex,
       props.deviceFeatureIndex,
       e.target.value,
-      props.deviceFeature.lastValue
+      props.deviceFeature.last_value
     );
   }
 
@@ -27,7 +27,7 @@ const BrightnessDeviceType = ({ children, ...props }) => {
               minHeight: '30px'
             }}
             type="range"
-            value={props.deviceFeature.lastValue}
+            value={props.deviceFeature.last_value}
             onChange={updateValue}
             class="form-control custom-range"
             step="1"
