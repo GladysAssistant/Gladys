@@ -989,6 +989,10 @@
         "sunrise": "Every sunrise",
         "sunset": "Every sunset"
       },
+      "user": {
+        "back-home": "User left home",
+        "left-home": "User back at home"
+      },
       "house": {
         "empty": "House is empty",
         "no-longer-empty": "House is no longer empty"
@@ -1041,6 +1045,12 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
+      },
+      "userPresence": {
+        "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
+        "leftHomeDescription": "This will trigger when the selected user is leaving the selected home.",
+        "userLabel": "User",
+        "houseLabel": "House"
       },
       "houseEmptyOrNot": {
         "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
