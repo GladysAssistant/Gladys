@@ -1032,7 +1032,7 @@
         "intervalLabel": "Intervalle",
         "daysOfTheWeekLabel": "Jour de la semaine",
         "dayOfTheMonthLabel": "Jour du mois",
-        "dateFormat": "MM-dd-yyyy",
+        "dateFormat": "dd/MM/yyyy",
         "timeCaption": "Heure",
         "units": {
           "second": "seconde(s)",
