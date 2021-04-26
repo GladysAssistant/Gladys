@@ -5,7 +5,8 @@
     "authorizeHost": "http://localhost:9292",
     "authorizePath": "/oauth2_user/authorize2",
     "integrationScope": "user.info,user.metrics,user.activity,user.sleepevents",
-    "grantType": "authorization_code"
+    "grantType": "authorization_code",
+    "redirectUriSuffix": "dashboard/integration/health/test/settings"
   },
   "withings": {
     "tokenHost": "https://account.withings.com",
@@ -13,6 +14,7 @@
     "authorizeHost": "https://account.withings.com",
     "authorizePath": "/oauth2_user/authorize2",
     "integrationScope": "user.info,user.metrics,user.activity,user.sleepevents",
-    "grantType": "authorization_code"
+    "grantType": "authorization_code",
+    "redirectUriSuffix": "dashboard/integration/health/withings/settings"
   }
 }

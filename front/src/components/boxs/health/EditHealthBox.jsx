@@ -6,6 +6,7 @@ import cx from 'classnames';
 
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import actions from '../../../actions/dashboard/edit-boxes/editHealth';
 
@@ -32,7 +33,7 @@ class EditHealthBox extends Component {
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,
-            label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
           healthDeviceFeatures.push(featureOption);
 
@@ -95,4 +96,4 @@ class EditHealthBox extends Component {
   }
 }
 
-export default EditHealthBox;
+export default withIntlAsProp(EditHealthBox);

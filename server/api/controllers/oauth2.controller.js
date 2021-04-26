@@ -17,6 +17,7 @@ module.exports = function OAuth2Controller(gladys) {
     const { authorizeHost } = currentProvider;
     const { authorizePath } = currentProvider;
     const { integrationScope } = currentProvider;
+    const { redirectUriSuffix } = currentProvider;
 
     // Get variale client_id and secret_id
     const clientId = await gladys.variable.getValue(
@@ -45,7 +46,7 @@ module.exports = function OAuth2Controller(gladys) {
 
     const client = new AuthorizationCode(credentials);
     const authorizationUriResult = await client.authorizeURL({
-      redirect_uri: req.headers.referer,
+      redirect_uri: `${req.headers.referer}${redirectUriSuffix}`,
       scope: integrationScope,
       state: `gladys_state_${req.body.integrationName}`,
     });
@@ -70,6 +71,7 @@ module.exports = function OAuth2Controller(gladys) {
     const { authorizeHost } = currentProvider;
     const { authorizePath } = currentProvider;
     const { grantType } = currentProvider;
+    const { redirectUriSuffix } = currentProvider;
 
     const { authorizationCode } = req.body;
 
@@ -103,7 +105,7 @@ module.exports = function OAuth2Controller(gladys) {
       client_id: clientId,
       client_secret: secretId,
       grant_type: grantType,
-      redirect_uri: req.headers.referer.substring(0, req.headers.referer.indexOf('?')),
+      redirect_uri: `${req.headers.referer}${redirectUriSuffix}`,
     };
 
     try {
