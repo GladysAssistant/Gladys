@@ -667,28 +667,28 @@
     },
     "caldav": {
       "title": "CalDAV",
-      "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "hostLabel": "CalDAV host",
-      "hostInfo": "Choose your calendar host to be helped during configuration.",
+      "description": "同步CalDAV日历",
+      "introduction": "要使用CalDAV同步Gladys日历，首先需要一个外部兼容的日历。然后输入下面的配置",
+      "hostLabel": "CalDAV 主机",
+      "hostInfo": "选择配置期间需要设置的日历主机。Choose your calendar host to be helped during configuration.",
       "services": {
         "apple": {
-          "name": "iCloud Calendar",
-          "url": "iCloud URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
+          "name": "iCloud 日历",
+          "url": "iCloud 地址",
+          "urlInfo": "默认的网址，它会自动设置",
           "username": "Apple ID",
-          "usernameInfo": "Enter your Apple ID.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "usernameInfo": "输入您的 Apple ID.",
+          "password": "密码",
+          "passwordInfo": "<a href=\"https://support.apple.com/en-us/HT204397\" target=\"_blank\" rel=\"noopener noreferrer\">生成特定于应用程序的密码</a> 使用此应用程序特定密码而不是帐户密码。"
         },
         "google": {
-          "name": "Google Calendar (deprecated)",
-          "url": "Google Calendar URL",
-          "urlInfo": "Let default URL, it will be set automatically.",
-          "username": "Email",
-          "usernameInfo": "Enter your Google email adress.",
-          "password": "Password",
-          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
+          "name": "谷歌日历（已弃用）",
+          "url": "Google 日历地址",
+          "urlInfo": "默认的网址，它会自动设置",
+          "username": "邮箱",
+          "usernameInfo": "输入您的谷歌电子邮件地址。",
+          "password": "密码",
+          "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">生成特定于应用程序的密码</a> 使用此应用程序特定密码而不是帐户密码。"
         },
         "synology": {
           "name": "Synology Calendar",
