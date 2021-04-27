@@ -4,12 +4,12 @@ const { syncUserCalendars } = require('./calendar/calendar.syncUserCalendars');
 const { cleanUp } = require('./calendar/calendar.cleanUp');
 const { config } = require('./config/index');
 
-const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom) {
+const CalDAVHandler = function CalDAVHandler(gladys, serviceId, ical, dav, dayjs, xmlDom) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.ical = ical;
   this.dav = dav;
-  this.moment = moment;
+  this.dayjs = dayjs;
   this.xmlDom = xmlDom;
 };
 

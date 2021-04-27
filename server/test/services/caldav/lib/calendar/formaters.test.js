@@ -1,11 +1,18 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const moment = require('moment');
+const dayjs = require('dayjs');
+const duration = require('dayjs/plugin/duration');
+const advancedFormat = require('dayjs/plugin/advancedFormat');
+const isBetween = require('dayjs/plugin/isBetween');
 const {
   formatEvents,
   formatRecurringEvents,
   formatCalendars,
 } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
+
+dayjs.extend(duration);
+dayjs.extend(advancedFormat);
+dayjs.extend(isBetween);
 
 describe('CalDAV formaters', () => {
   let caldavCalendars;
@@ -252,7 +259,7 @@ describe('CalDAV formaters', () => {
       formatCalendars,
       formatEvents,
       formatRecurringEvents,
-      moment: moment.utc,
+      dayjs: dayjs.utc,
     };
     const start = new Date('2019-02-25T10:00:00Z');
     Object.defineProperty(start, 'tz', { value: 'Europe/London' });
