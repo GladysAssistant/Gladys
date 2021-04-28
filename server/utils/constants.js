@@ -55,6 +55,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
+    NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -270,32 +271,58 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  LIGHT: 'light',
+  ACCESS_CONTROL: 'access-control',
+  ANGLE_SENSOR: 'angle-sensor',
   BATTERY: 'battery',
-  TEMPERATURE_SENSOR: 'temperature-sensor',
-  MOTION_SENSOR: 'motion-sensor',
-  LIGHT_SENSOR: 'light-sensor',
-  SMOKE_SENSOR: 'smoke-sensor',
-  SISMIC_SENSOR: 'sismic-sensor',
-  PRESSURE_SENSOR: 'pressure-sensor',
-  OPENING_SENSOR: 'opening-sensor',
-  HUMIDITY_SENSOR: 'humidity-sensor',
-  VIBRATION_SENSOR: 'vibration-sensor',
+  BUTTON: 'button',
+  CAMERA: 'camera',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
-  LEAK_SENSOR: 'leak-sensor',
-  PRESENCE_SENSOR: 'presence-sensor',
-  DISTANCE_SENSOR: 'distance-sensor',
-  CAMERA: 'camera',
-  SWITCH: 'switch',
-  SIREN: 'siren',
-  ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
-  BUTTON: 'button',
+  DISTANCE_SENSOR: 'distance-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
+  INDEX: 'index',
+  LEAK_SENSOR: 'leak-sensor',
+  LIGHT: 'light',
+  LIGHT_SENSOR: 'light-sensor',
+  MOTION_SENSOR: 'motion-sensor',
+  NOISE_SENSOR: 'noise-sensor',
+  OPENING_SENSOR: 'opening-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
+  PRESSURE_SENSOR: 'pressure-sensor',
+  RAINFALL_SENSOR: 'rainfall-sensor',
+  SETPOINT: 'setpoint',
+  SIREN: 'siren',
+  SISMIC_SENSOR: 'sismic-sensor',
+  SMOKE_SENSOR: 'smoke-sensor',
+  SWITCH: 'switch',
+  TEMPERATURE_SENSOR: 'temperature-sensor',
+  VIBRATION_SENSOR: 'vibration-sensor',
+  WINDSPEED_SENSOR: 'windspeed-sensor',
   UNKNOWN: 'unknown',
 };
 
 const DEVICE_FEATURE_TYPES = {
+  ACCESS_CONTROL: {
+    MODE: 'mode',
+  },
+  BATTERY: {
+    INTEGER: 'integer',
+  },
+  BUTTON: {
+    CLICK: 'click',
+  },
+  CAMERA: {
+    IMAGE: 'image',
+  },
+  CUBE: {
+    MODE: 'mode',
+    ROTATION: 'rotation',
+  },
+  INDEX: {
+    INTEGER: 'integer',
+    DIMMER: 'dimmer',
+  },
   LIGHT: {
     BINARY: 'binary',
     BRIGHTNESS: 'brightness',
@@ -306,13 +333,23 @@ const DEVICE_FEATURE_TYPES = {
     POWER: 'power',
     EFFECT_MODE: 'effect-mode',
     EFFECT_SPEED: 'effect-speed',
+    STRING: 'string',
   },
   SENSOR: {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
     BINARY: 'binary',
     PUSH: 'push',
+    STRING: 'string',
     UNKNOWN: 'unknown',
+  },
+  SETPOINT: {
+    DECIMAL: 'decimal',
+    INTEGER: 'integer',
+    STRING: 'string',
+  },
+  SIREN: {
+    BINARY: 'binary',
   },
   SWITCH: {
     BINARY: 'binary',
@@ -323,21 +360,6 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
-  },
-  CAMERA: {
-    IMAGE: 'image',
-  },
-  SIREN: {
-    BINARY: 'binary',
-  },
-  ACCESS_CONTROL: {
-    MODE: 'mode',
-  },
-  CUBE: {
-    MODE: 'mode',
-    ROTATION: 'rotation',
-  },
-  BATTERY: {
     INTEGER: 'integer',
   },
   VIBRATION_SENSOR: {
@@ -348,9 +370,6 @@ const DEVICE_FEATURE_TYPES = {
     ACCELERATION_Z: 'acceleration-z',
     BED_ACTIVITY: 'bed-activity',
   },
-  BUTTON: {
-    CLICK: 'click',
-  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -360,8 +379,11 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+  MILLIBAR: 'millibar',
   HECTO_PASCAL: 'hPa',
   PASCAL: 'pascal',
+  INCH_MERCURY: 'inch-mercury',
+  MILLIMETER_MERCURY: 'millimeter-mercury',
   LUX: 'lux',
   WATT: 'watt',
   KILOWATT: 'kilowatt',
@@ -369,8 +391,18 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
+  DEGREE: 'degree',
+  DECIBEL: 'decibel',
+  INCH: 'inch',
   MM: 'mm',
   CM: 'cm',
+  MILES_HOUR: 'miles-hour',
+  INCH_HOUR: 'inch-hour',
+  MILLIMETER_HOUR: 'millimeter-hour',
+  METER_SECOND: 'meter-second',
+  KILOMETER_HOUR: 'kilometer-hour',
+  BEAUFORT: 'beaufort',
+  KNOTS: 'knots',
 };
 
 const WEATHER_UNITS = {
@@ -379,12 +411,38 @@ const WEATHER_UNITS = {
 
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
-  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
-  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [DEVICE_FEATURE_UNITS.MM, DEVICE_FEATURE_UNITS.CM],
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM, DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [
+    DEVICE_FEATURE_UNITS.INCH,
+    DEVICE_FEATURE_UNITS.MM,
+    DEVICE_FEATURE_UNITS.CM,
+  ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
-  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL, DEVICE_FEATURE_UNITS.HECTO_PASCAL],
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
+    DEVICE_FEATURE_UNITS.PASCAL,
+    DEVICE_FEATURE_UNITS.MILLIBAR,
+    DEVICE_FEATURE_UNITS.INCH_MERCURY,
+    DEVICE_FEATURE_UNITS.MILLIMETER_MERCURY,
+    DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+  ],
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: [DEVICE_FEATURE_UNITS.DEGREE],
+  [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: [DEVICE_FEATURE_UNITS.DECIBEL],
+  [DEVICE_FEATURE_CATEGORIES.SETPOINT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.WINDSPEED_SENSOR]: [
+    DEVICE_FEATURE_UNITS.KILOMETER_HOUR,
+    DEVICE_FEATURE_UNITS.MILES_HOUR,
+    DEVICE_FEATURE_UNITS.METER_SECOND,
+    DEVICE_FEATURE_UNITS.BEAUFORT,
+    DEVICE_FEATURE_UNITS.KNOTS,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.RAINFALL_SENSOR]: [
+    DEVICE_FEATURE_UNITS.INCH,
+    DEVICE_FEATURE_UNITS.INCH_HOUR,
+    DEVICE_FEATURE_UNITS.MILLIMETER,
+    DEVICE_FEATURE_UNITS.MILLIMETER_HOUR,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -408,6 +466,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
+    NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
   },
   MESSAGE: {
     NEW: 'message.new',

@@ -25,23 +25,6 @@ async function getHomeStatusData(mode = '') {
       const responseHomeStatus = await axios.post(`${this.baseUrl}/api/homestatus`, options);
       if (home.modules !== undefined) {
         home.modules.forEach((module) => {
-          // we get the 1st part of the smoke detectors - no interesting data for the moment - pending update API Netatmo because data available on https://dev.netatmo.com/apidocumentation/energy
-          // if (module.type === 'NSD') {
-          //   smokedetectors = module;
-          //   const indexSmokedetectorsHomeStatus = responseHomeStatus.data.body.home.modules.findIndex((element) =>
-          //     element.id === smokedetectors.id
-          //   );
-          //   const indexRoomHomeStatus = homeStatus.rooms.findIndex((element) =>
-          //     element.id === smokedetectors.room_id
-          //   );
-          //
-          //   // then we get the 2nd part of the smoke detectors - no interesting data for the moment -
-          //   // pending update Netatmo API because data available on https://dev.netatmo.com/apidocumentation/energy
-          //   smokedetectors['homeStatus'] = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
-          //   // then we get the 3rd part of the smoke detectors : rooms
-          //   smokedetectors['room'] = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
-          //   this.newValueSmokeDetector(smokedetectors);
-          // }
           if (module.type === 'NAPlug') {
             const indexBridge = responseThermostats.data.body.devices.findIndex((element) => element._id === module.id);
             if (

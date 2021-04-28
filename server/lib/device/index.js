@@ -24,8 +24,9 @@ const { saveStringState } = require('./device.saveStringState');
 const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
 const { setupPoll } = require('./device.setupPoll');
-const { newStateEvent } = require('./device.newStateEvent');
+const { newStateEvent, newStateNoChangedEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
+const { saveLastStateChanged } = require('./device.saveLastStateChanged');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -55,6 +56,7 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(EVENTS.DEVICE.ADD_FEATURE, eventFunctionWrapper(this.addFeature.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.PURGE_STATES, eventFunctionWrapper(this.purgeStates.bind(this)));
+  this.eventManager.on(EVENTS.DEVICE.NEW_STATE_NO_CHANGED, this.newStateNoChangedEvent.bind(this));
 };
 
 DeviceManager.prototype.add = add;
@@ -75,5 +77,7 @@ DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
 DeviceManager.prototype.notify = notify;
+DeviceManager.prototype.newStateNoChangedEvent = newStateNoChangedEvent;
+DeviceManager.prototype.saveLastStateChanged = saveLastStateChanged;
 
 module.exports = DeviceManager;
