@@ -35,7 +35,7 @@ function formatRecurringEvents(event, gladysCalendar) {
   // to add *all* recurrence override entries into the set of dates that we check, and then later
   // filter out any recurrences that don't actually belong within our range.
   if (event.recurrences !== undefined) {
-    event.recurrences.forEach((r) => {
+    Object.keys(event.recurrences).forEach((r) => {
       // Only add dates that weren't already in the range we added from the rrule so that
       // we don't double-add those events.
       if (this.dayjs(new Date(r)).isBetween(rangeStart, rangeEnd) !== true) {

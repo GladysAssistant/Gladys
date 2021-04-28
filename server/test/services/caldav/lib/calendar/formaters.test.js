@@ -169,6 +169,8 @@ describe('CalDAV formaters', () => {
     Object.defineProperty(start1, 'tz', { value: 'Europe/London' });
     const start2 = new Date('2019-06-08T09:00:00Z');
     Object.defineProperty(start2, 'tz', { value: 'Europe/London' });
+    const start3 = new Date('2019-06-10T09:00:00Z');
+    Object.defineProperty(start3, 'tz', { value: 'Europe/London' });
     recurrEvents = [
       {
         uid: 'fdc2bf57-0adb-4300-8287-4a9b34dc3786',
@@ -179,14 +181,9 @@ describe('CalDAV formaters', () => {
         rrule: {
           between: sinon.stub().returns([new Date('2019-06-01T09:00:00Z'), new Date('2019-06-15T09:00:00Z')]),
         },
-        recurrences: [
-          '2017-06-02T12:00:00Z',
-          // '2019-06-08': {
-          //   start: start2,
-          //   end: new Date('2019-06-08T12:00:00Z'),
-          //   summary: 'Cours de tennis différent',
-          // },
-        ],
+        recurrences: {
+          '2017-06-02T12:00:00Z': {},
+        },
         exdate: {
           '2019-06-15': {
             message: 'Cours de tennis annulé',
@@ -209,6 +206,41 @@ describe('CalDAV formaters', () => {
             ]),
         },
         href: 'https://caldav.host.com/home/recur-event2',
+      },
+      {
+        uid: '7de4104e-f46d-43e4-a62f-4d7c53c1ff71',
+        start: start3,
+        end: new Date('2019-06-10T10:00:00Z'),
+        summary: 'Réunion Avengers',
+        location: 'Tour Stark',
+        rrule: {
+          between: sinon
+            .stub()
+            .returns([
+              new Date('2019-06-10T09:00:00Z'),
+              new Date('2019-06-17T09:00:00Z'),
+              new Date('2019-06-24T09:00:00Z'),
+            ]),
+        },
+        recurrences: {
+          '2019-06-10': {
+            start: start3,
+            end: new Date('2019-06-10T10:00:00Z'),
+            summary: 'Réunion Avengers',
+          },
+          '2019-06-17': {
+            start: new Date('2019-06-17T09:00:00Z'),
+            end: new Date('2019-06-17T10:00:00Z'),
+            summary: 'Réunion Avengers',
+            status: 'CANCELLED',
+          },
+          '2019-06-24': {
+            start: new Date('2019-06-24T09:00:00Z'),
+            end: new Date('2019-06-24T10:00:00Z'),
+            summary: 'Réunion Avengers, nouvel arrivant',
+          },
+        },
+        href: 'https://caldav.host.com/home/recur-event3',
       },
     ];
 
@@ -251,6 +283,29 @@ describe('CalDAV formaters', () => {
           url: 'https://caldav.host.com/home/recur-event2',
         },
         null,
+      ],
+      [
+        {
+          external_id: '7de4104e-f46d-43e4-a62f-4d7c53c1ff712019-06-10-09-00',
+          selector: '7de4104e-f46d-43e4-a62f-4d7c53c1ff712019-06-10-09-00',
+          name: 'Réunion Avengers',
+          location: 'Tour Stark',
+          calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+          start: '2019-06-10T09:00:00.000Z',
+          end: '2019-06-10T10:00:00.000Z',
+          url: 'https://caldav.host.com/home/recur-event3',
+        },
+        null,
+        {
+          external_id: '7de4104e-f46d-43e4-a62f-4d7c53c1ff712019-06-24-09-00',
+          selector: '7de4104e-f46d-43e4-a62f-4d7c53c1ff712019-06-24-09-00',
+          name: 'Réunion Avengers, nouvel arrivant',
+          location: 'Tour Stark',
+          calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+          start: '2019-06-24T09:00:00.000Z',
+          end: '2019-06-24T10:00:00.000Z',
+          url: 'https://caldav.host.com/home/recur-event3',
+        },
       ],
     ];
 
@@ -295,5 +350,14 @@ describe('CalDAV formaters', () => {
     });
     clock.restore();
     expect(formattedEvents).to.eql(expectedRecurrEvents[1]);
+  });
+
+  it('should format recurr events with specific recurrences', () => {
+    const clock = sinon.useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
+    const formattedEvents = formatter.formatRecurringEvents(recurrEvents[2], {
+      id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    });
+    clock.restore();
+    expect(formattedEvents).to.eql(expectedRecurrEvents[2]);
   });
 });
