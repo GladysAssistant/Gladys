@@ -1,0 +1,183 @@
+{
+  "body": {
+    "homes": [
+      {
+        "id": "3iuhef7oihih89kojoihoui3",
+        "name": "Maison Stark",
+        "persons": [
+          {
+            "id": "98349902-ea01-2948-3094-c3298932b902",
+            "last_seen": 1608759346,
+            "out_of_sight": false,
+            "face": {
+              "id": "7bc8ffa879086786e90876aa",
+              "version": 1,
+              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie",
+              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aaeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie"
+            },
+            "pseudo": "Tony"
+          },
+          {
+            "id": "98349902-ea01-2948-3094-c3298932b903",
+            "last_seen": 0,
+            "out_of_sight": true,
+            "face": {
+              "id": "7bc8ffa879086786e90876ab",
+              "version": 1,
+              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif",
+              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876abeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif"
+            },
+            "pseudo": "Pepper"
+          },
+          {
+            "id": "98349902-ea01-2948-3094-c3298932b904",
+            "last_seen": 1608758099,
+            "out_of_sight": false,
+            "face": {
+              "id": "7bc8ffa879086786e90876ac",
+              "version": 1,
+              "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osi0",
+              "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aceqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osi0"
+            },
+            "pseudo": "Morgan"
+          }
+        ],
+        "place": {
+          "city": "Paris",
+          "country": "FR",
+          "timezone": "Europe/Paris"
+        },
+        "cameras": [
+          {
+            "id": "17:cc:50:67:aa:00",
+            "type": "NACamera",
+            "status": "on",
+            "vpn_url": "https://test.com",
+            "is_local": true,
+            "sd_status": "on",
+            "alim_status": "on",
+            "name": "Caméra Salle Maison",
+            "modules": [
+              {
+                "id": "17:cc:50:67:aa:01",
+                "type": "NACamDoorTag",
+                "name": "Porte Entrée Maison",
+                "battery_percent": 98,
+                "room": "2812958323",
+                "rf": 85,
+                "status": "closed",
+                "category": "door",
+                "last_activity": 1608752718
+              },
+              {
+                "id": "17:cc:50:67:aa:03",
+                "type": "NIS",
+                "battery_percent": 93,
+                "room": "2812958323",
+                "rf": 72,
+                "status": "no_sound",
+                "monitoring": "on",
+                "alim_source": "battery",
+                "name": "Caméra Salle Maison's Siren"
+              }
+            ],
+            "use_pin_code": true,
+            "last_setup": 1605543861
+          },
+          {
+            "id": "17:cc:50:67:aa:04",
+            "type": "NOC",
+            "status": "on",
+            "vpn_url": "https://test.com",
+            "is_local": true,
+            "sd_status": "on",
+            "alim_status": "on",
+            "name": "Camera Barrière",
+            "use_pin_code": false,
+            "last_setup": 1605566157,
+            "light_mode_status": "auto",
+            "siren_status": "no_sound"
+          },
+          {
+            "id": "17:cc:50:67:aa:05",
+            "type": "NOC",
+            "status": "on",
+            "vpn_url": "https://test.com",
+            "is_local": true,
+            "sd_status": "on",
+            "alim_status": "on",
+            "name": "Caméra Extérieure Parking",
+            "last_setup": 1608493953,
+            "light_mode_status": "auto",
+            "siren_status": "warning"
+          }
+        ],
+        "smokedetectors": [
+          {
+            "id": "17:cc:50:67:aa:07",
+            "type": "NSD",
+            "last_setup": 1608141580,
+            "name": "Détecteur de Fumée Etage"
+          }
+        ],
+        "events": [
+          {
+            "id": "7bc8ffa879086786e90876ac",
+            "type": "outdoor",
+            "time": 1608761557,
+            "camera_id": "17:cc:50:67:aa:05",
+            "device_id": "17:cc:50:67:aa:05",
+            "video_id": "5d011d3d-49c4-4148-9216-ab7e02d25ccc",
+            "video_status": "recording",
+            "event_list": [
+              {
+                "type": "human",
+                "time": 1608761557,
+                "id": "a0e6a83e-7bae-4599-9129-eb43cfc2039a",
+                "offset": 0,
+                "message": "Personne détectée",
+                "snapshot": {
+                  "id": "7bc8ffa879086786e90876aa",
+                  "version": 1,
+                  "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie",
+                  "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876aaeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osie"
+                },
+                "vignette": {
+                  "id": "7bc8ffa879086786e90876ab",
+                  "version": 1,
+                  "key": "eqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif",
+                  "url": "https://netatmocameraimage.blob.core.windows.net/production/7bc8ffa879086786e90876abeqfiuheiuv8oihqfvpiherviu98qosidjfoezf897qjefhpeurf9qidvh097osif"
+                }
+              }
+            ]
+          },
+          {
+            "time": 1608758472,
+            "offset": 24,
+            "id": "ab86066f-60b3-402d-b32e-cb50a8ac08a6",
+            "type": "animal",
+            "message": "Animal détecté",
+            "snapshot": {
+              "filename": "vod/6c6ccf57-fc33-4410-822c-1a53f92ab68e/events/ab86066f-60b3-402d-b32e-cb50a8ac08a6/snapshot_ab86066f-60b3-402d-b32e-cb50a8ac08a6.jpg"
+            },
+            "vignette": {
+              "filename": "vod/6c6ccf57-fc33-4410-822c-1a53f92ab68e/events/ab86066f-60b3-402d-b32e-cb50a8ac08a6/vignette_ab86066f-60b3-402d-b32e-cb50a8ac08a6.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    "user": {
+      "reg_locale": "fr-FR",
+      "lang": "fr",
+      "country": "FR_FR",
+      "mail": "tony.stark@gmail.com"
+    },
+    "global_info": {
+      "show_tags": true
+    }
+  },
+  "status": "ok",
+  "time_exec": 0.09904599189758301,
+  "time_server": 1608761677
+}

@@ -469,6 +469,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  NETATMO: {
+    NEW_DEVICE: 'netatmo.new-device',
+    CONNECTED: 'netatmo.connected',
+    DISCONNECTED: 'netatmo.disconnected',
+    ERROR: 'netatmo.error',
+    ERRORDATA: 'netatmo.errordata',
+  },
 };
 
 const DASHBOARD_TYPE = {
