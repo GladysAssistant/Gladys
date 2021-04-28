@@ -1,4 +1,4 @@
-const { CONFIGURATION } = require('../constants');
+const { CONFIGURATION } = require('../utils/constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
