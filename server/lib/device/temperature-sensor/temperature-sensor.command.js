@@ -16,10 +16,10 @@ async function command(message, classification, context) {
   try {
     switch (classification.intent) {
       case 'temperature-sensor.get-in-room':
-        if (!context.room) {
+        if (!roomEntity) {
           throw new NotFoundError('Room not found');
         }
-        temperatureResult = await this.getTemperatureInRoom(context.room, {
+        temperatureResult = await this.getTemperatureInRoom(roomEntity.option, {
           unit: context.user.temperature_unit_preference,
         });
         if (temperatureResult.temperature === null) {
