@@ -68,8 +68,30 @@ function getDeviceFeature(device, category, type) {
   return null;
 }
 
+/**
+ * @description Get Device Feature by selector.
+ * @param {Object} device - Device Object to parse.
+ * @param {string} selector - The selector of the feature to get.
+ * @returns {Object} Return feature.
+ * @example
+ * const value = getDeviceFeatureBySelector({
+ *  features: [{ selector: 'test'}]
+ * }, 'test');
+ */
+function getDeviceFeatureBySelector(device, selector) {
+  if (!get(device, 'features')) {
+    return null;
+  }
+  const feature = device.features.find((oneFeature) => oneFeature.selector === selector);
+  if (feature) {
+    return feature;
+  }
+  return null;
+}
+
 module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
+  getDeviceFeatureBySelector,
 };
