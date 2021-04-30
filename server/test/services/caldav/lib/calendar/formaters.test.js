@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const dayjs = require('dayjs');
-const duration = require('dayjs/plugin/duration');
+const originalDuration = require('dayjs/plugin/duration');
 const advancedFormat = require('dayjs/plugin/advancedFormat');
 const isBetween = require('dayjs/plugin/isBetween');
 const {
@@ -10,9 +10,24 @@ const {
   formatCalendars,
 } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
 
-dayjs.extend(duration);
+dayjs.extend(originalDuration);
 dayjs.extend(advancedFormat);
 dayjs.extend(isBetween);
+
+/**
+ * @description Dayjs with UTC for test (can't use dayjs.utc.duration).
+ * @param {*} date - Initial date.
+ * @returns {Object} Dayjs instance.
+ * @example
+ * dayjsUTCOverride(1619816485)
+ */
+function dayjsUTCOverride(date) {
+  return dayjs.utc(date);
+};
+
+dayjsUTCOverride.duration = function duration(number) {
+  return dayjs.duration(number);
+};
 
 describe('CalDAV formaters', () => {
   let caldavCalendars;
@@ -171,6 +186,8 @@ describe('CalDAV formaters', () => {
     Object.defineProperty(start2, 'tz', { value: 'Europe/London' });
     const start3 = new Date('2019-06-10T09:00:00Z');
     Object.defineProperty(start3, 'tz', { value: 'Europe/London' });
+    const start4 = new Date('2019-06-20T16:00:00Z');
+    Object.defineProperty(start4, 'tz', { value: 'Europe/London' });
     recurrEvents = [
       {
         uid: 'fdc2bf57-0adb-4300-8287-4a9b34dc3786',
@@ -242,6 +259,17 @@ describe('CalDAV formaters', () => {
         },
         href: 'https://caldav.host.com/home/recur-event3',
       },
+      {
+        uid: '30514e5d-8e2d-4e7b-9960-62ebf9e6f342',
+        start: start4,
+        duration: 5400000,
+        summary: 'Gouter',
+        location: 'Jardin',
+        rrule: {
+          between: sinon.stub().returns([new Date('2019-06-20T16:00:00Z'), new Date('2019-06-21T16:00:00Z')]),
+        },
+        href: 'https://caldav.host.com/home/recur-event4',
+      },
     ];
 
     expectedRecurrEvents = [
@@ -307,6 +335,28 @@ describe('CalDAV formaters', () => {
           url: 'https://caldav.host.com/home/recur-event3',
         },
       ],
+      [
+        {
+          external_id: '30514e5d-8e2d-4e7b-9960-62ebf9e6f3422019-06-20-16-00',
+          selector: '30514e5d-8e2d-4e7b-9960-62ebf9e6f3422019-06-20-16-00',
+          name: 'Gouter',
+          location: 'Jardin',
+          calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+          start: '2019-06-20T16:00:00.000Z',
+          end: '2019-06-20T17:30:00.000Z',
+          url: 'https://caldav.host.com/home/recur-event4',
+        },
+        {
+          external_id: '30514e5d-8e2d-4e7b-9960-62ebf9e6f3422019-06-21-16-00',
+          selector: '30514e5d-8e2d-4e7b-9960-62ebf9e6f3422019-06-21-16-00',
+          name: 'Gouter',
+          location: 'Jardin',
+          calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+          start: '2019-06-21T16:00:00.000Z',
+          end: '2019-06-21T17:30:00.000Z',
+          url: 'https://caldav.host.com/home/recur-event4',
+        },
+      ],
     ];
 
     formatter = {
@@ -314,7 +364,7 @@ describe('CalDAV formaters', () => {
       formatCalendars,
       formatEvents,
       formatRecurringEvents,
-      dayjs: dayjs.utc,
+      dayjs: dayjsUTCOverride,
     };
     const start = new Date('2019-02-25T10:00:00Z');
     Object.defineProperty(start, 'tz', { value: 'Europe/London' });
@@ -359,5 +409,14 @@ describe('CalDAV formaters', () => {
     });
     clock.restore();
     expect(formattedEvents).to.eql(expectedRecurrEvents[2]);
+  });
+
+  it('should format recurr events with duration', () => {
+    const clock = sinon.useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
+    const formattedEvents = formatter.formatRecurringEvents(recurrEvents[3], {
+      id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+    });
+    clock.restore();
+    expect(formattedEvents).to.eql(expectedRecurrEvents[3]);
   });
 });
