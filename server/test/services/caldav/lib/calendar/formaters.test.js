@@ -23,7 +23,7 @@ dayjs.extend(isBetween);
  */
 function dayjsUTCOverride(date) {
   return dayjs.utc(date);
-};
+}
 
 dayjsUTCOverride.duration = function duration(number) {
   return dayjs.duration(number);
