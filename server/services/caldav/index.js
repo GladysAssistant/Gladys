@@ -7,11 +7,13 @@ module.exports = function CalDAVService(gladys, serviceId) {
   const ical = require('ical');
   const dav = require('dav-request');
   const dayjs = require('dayjs');
+  const objectSupport = require('dayjs/plugin/objectSupport');
   const duration = require('dayjs/plugin/duration');
   const advancedFormat = require('dayjs/plugin/advancedFormat');
   const isBetween = require('dayjs/plugin/isBetween');
   const xmlDom = require('xmldom');
 
+  dayjs.extend(objectSupport);
   dayjs.extend(duration);
   dayjs.extend(advancedFormat);
   dayjs.extend(isBetween);
