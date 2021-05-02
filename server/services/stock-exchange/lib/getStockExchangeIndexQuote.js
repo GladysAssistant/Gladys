@@ -13,13 +13,9 @@ async function getStockExchangeIndexQuote(userId) {
   const tickers = await this.gladys.variable.getValue('STOCKEXCHANGE_TICKERS', this.serviceId, userId);
   const fmp = require('financialmodelingprep')(apiKey);
   let quotes = [];
-
-  try {
-    quotes = await fmp.stock(parseJsonIfJson(tickers) || ['^FCHI', 'GIB']).quote();
-  } catch (e) {
-    logger.warn('Unable to get FMP datas');
-    logger.debug(e);
-  }
+  quotes = await fmp.stock(parseJsonIfJson(tickers) || ['^FCHI', 'GIB']).quote();
+  // logger.warn('Unable to get FMP datas');
+  logger.debug(quotes);
   return quotes;
 }
 
