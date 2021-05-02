@@ -1382,58 +1382,58 @@
   },
   "deviceFeatureCategory": {
     "light": {
-      "shortCategoryName": "Light",
-      "binary": "Light On/Off",
-      "brightness": "Light Brightness",
-      "hue": "Light Hue",
-      "color": "Light Color",
-      "saturation": "Light Saturation",
-      "temperature": "Light Temperature",
-      "power": "Light Power consumption",
-      "effect-mode": "Effect mode",
-      "effect-speed": "Effect speed"
+      "shortCategoryName": "灯",
+      "binary": "灯开/关",
+      "brightness": "灯光亮度",
+      "hue": "灯光色调",
+      "color": "灯光颜色",
+      "saturation": "光照饱和度",
+      "temperature": "光照温度",
+      "power": "灯功耗",
+      "effect-mode": "效果模式",
+      "effect-speed": "效果速度"
     },
     "battery": {
-      "shortCategoryName": "Battery",
-      "integer": "Battery"
+      "shortCategoryName": "电量",
+      "integer": "电量"
     },
     "temperature-sensor": {
-      "shortCategoryName": "Temperature sensor",
-      "decimal": "Temperature"
+      "shortCategoryName": "温度传感器",
+      "decimal": "温度"
     },
     "motion-sensor": {
-      "shortCategoryName": "Motion sensor",
-      "push": "Motion (push)",
-      "binary": "Motion (binary)"
+      "shortCategoryName": "运动传感器",
+      "push": "运动 (push)",
+      "binary": "运动 (binary)"
     },
     "presence-sensor": {
-      "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "shortCategoryName": "存在传感器",
+      "push": "存在"
     },
     "light-sensor": {
-      "shortCategoryName": "Luminosity sensor",
-      "integer": "Luminosity (integer)",
-      "decimal": "Luminosity (decimal)"
+      "shortCategoryName": "亮度传感器",
+      "integer": "亮度 (integer)",
+      "decimal": "亮度 (decimal)"
     },
     "sismic-sensor": {
-      "shortCategoryName": "Sismic sensor",
-      "decimal": "Sismic (decimal)"
+      "shortCategoryName": "地震传感器",
+      "decimal": "地震 (decimal)"
     },
     "distance-sensor": {
-      "shortCategoryName": "Distance",
-      "decimal": "Distance"
+      "shortCategoryName": "距离传感器",
+      "decimal": "距离"
     },
     "camera": {
-      "shortCategoryName": "Camera",
-      "image": "Camera"
+      "shortCategoryName": "摄像头",
+      "image": "摄像头"
     },
     "counter-sensor": {
-      "shortCategoryName": "Counter",
-      "integer": "Counter (integer)"
+      "shortCategoryName": "计数器",
+      "integer": "计数器 (integer)"
     },
     "access-control": {
-      "shortCategoryName": "Access Control",
-      "mode": "Access Control Mode"
+      "shortCategoryName": "访问控制",
+      "mode": "访问控制模式"
     },
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
@@ -1441,103 +1441,103 @@
       "decimal": "Density (decimal)"
     },
     "co2-sensor": {
-      "shortCategoryName": "Co2 Sensor",
-      "decimal": "Co2 (decimal)"
+      "shortCategoryName": "二氧化碳传感器",
+      "decimal": "二氧化碳 (decimal)"
     },
     "switch": {
-      "shortCategoryName": "Switch",
-      "voltage": "Switch Voltage",
-      "current": "Switch Current",
-      "binary": "Switch (On/Off)",
-      "dimmer": "Switch Dimmer",
-      "burglar": "Switch Burglar",
-      "power": "Power consumption",
-      "energy": "Energy consumption"
+      "shortCategoryName": "开关",
+      "voltage": "开关电压",
+      "current": "开关电流",
+      "binary": "开关（开/关）",
+      "dimmer": "开关调光器",
+      "burglar": "开关防盗",
+      "power": "耗电量",
+      "energy": "能源消耗"
     },
     "siren": {
-      "shortCategoryName": "Siren",
-      "binary": "Siren"
+      "shortCategoryName": "警报器",
+      "binary": "警报器"
     },
     "cube": {
-      "shortCategoryName": "Cube",
-      "mode": "Mode",
-      "rotation": "Rotation"
+      "shortCategoryName": "魔方",
+      "mode": "模式",
+      "rotation": "旋转"
     },
     "button": {
-      "shortCategoryName": "Button",
-      "click": "Button (click)"
+      "shortCategoryName": "按钮",
+      "click": "按钮 (点击)"
     },
     "pressure-sensor": {
-      "shortCategoryName": "Pressure sensor",
-      "decimal": "Pressure (decimal)"
+      "shortCategoryName": "压力传感器",
+      "decimal": "压力 (decimal)"
     },
     "leak-sensor": {
-      "shortCategoryName": "Leak sensor",
-      "binary": "Leak (yes/no)"
+      "shortCategoryName": "泄漏传感器",
+      "binary": "泄漏 (yes/no)"
     },
     "opening-sensor": {
-      "shortCategoryName": "Opening sensor",
-      "binary": "Opening (open/closed)"
+      "shortCategoryName": "开路传感器",
+      "binary": "开路 (开/关)"
     },
     "humidity-sensor": {
-      "shortCategoryName": "Humidity sensor",
-      "decimal": "Humidity (decimal)"
+      "shortCategoryName": "湿度传感器",
+      "decimal": "湿度 (decimal)"
     },
     "vibration-sensor": {
-      "shortCategoryName": "Vibration sensor",
-      "status": "Status",
-      "tilt-angle": "Tilt Angle",
-      "acceleration-x": "Acceleration X",
-      "acceleration-y": "Acceleration Y",
-      "acceleration-z": "Acceleration Z",
-      "bed-activity": "Bed Activity"
+      "shortCategoryName": "振动传感器",
+      "status": "状态",
+      "tilt-angle": "倾斜角",
+      "acceleration-x": "加速度 X",
+      "acceleration-y": "加速度 Y",
+      "acceleration-z": "加速度 Z",
+      "bed-activity": "床上活动"
     },
     "unknown": {
-      "shortCategoryName": "Unknown",
-      "unknown": "Unknown"
+      "shortCategoryName": "未知",
+      "unknown": "未知"
     }
   },
   "errorPage": {
-    "title": "Oops... This page does not exist.",
-    "description": "If you think it's a Gladys Assistant bug, please report it to our team!",
-    "goBack": "Go Back"
+    "title": "额... 此页不存在.",
+    "description": "如果你认为这是一个Gladys Assistant错误，请报告给我们的团队!",
+    "goBack": "返回"
   },
   "chat": {
-    "whatCanYouAsk": "What can I ask?",
-    "emptyStateMessage": "Send me a message!",
-    "messagePlaceholder": "Type your message...",
-    "sendingInProgress": "Sending...",
-    "typingInProgress": "Typing...",
+    "whatCanYouAsk": "我可以问什么?",
+    "emptyStateMessage": "向我发送一条信息!",
+    "messagePlaceholder": "输入您的消息...",
+    "sendingInProgress": "发送中...",
+    "typingInProgress": "输入中...",
     "gladysAlt": "Gladys",
     "examples": {
-      "whatsTheWeatherLike": "\"What's the weather like?\"",
-      "whatsTheTemperatureKitchen": "\"What's the temperature in the kitchen?\"",
-      "showCameraImage": "\"Show me camera image in the kitchen\""
+      "whatsTheWeatherLike": "\"天气怎么样?\"",
+      "whatsTheTemperatureKitchen": "\"厨房的温度是多少?\"",
+      "showCameraImage": "\"给我看看厨房里的相机图像\""
     }
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
-    "home": "Home",
-    "chat": "Chat",
-    "devices": "Devices",
-    "integrations": "Integrations",
-    "calendar": "Calendar",
-    "maps": "Maps",
-    "scenes": "Scenes",
-    "profile": "Profile",
-    "settings": "Settings",
-    "needHelp": "Need help",
-    "signOut": "Sign Out"
+    "home": "家",
+    "chat": "聊天",
+    "devices": "设备",
+    "integrations": "集成",
+    "calendar": "日历",
+    "maps": "地图",
+    "scenes": "场景",
+    "profile": "简介",
+    "settings": "设置",
+    "needHelp": "需要帮助",
+    "signOut": "退出"
   },
   "gatewayLinkUser": {
-    "title": "Configure Gladys Plus",
-    "label": "Select you Gladys user",
-    "description": "Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
-    "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
-    "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
-    "saveButton": "Save",
-    "manageBilling": "To manage your billing, click ",
-    "here": "here"
+    "title": "配置 Gladys Plus",
+    "label": "选择Gladys用户",
+    "description": "在这里选择您的用户之前，请确保您的Gladys实例（在“设置”=>“Gladys Plus”=>“用户”）中本地接受此用户。",
+    "noInstanceFound": "您的Gladys实例未连接到Gladys网关。你在Gladys安装中连接到Gladys Plus帐户了吗？",
+    "error": "发生错误。Gladys实例中的用户是否在本地被接受？",
+    "saveButton": "保存",
+    "manageBilling": "要管理您的帐单，请单击 ",
+    "here": "这里"
   },
   "editDeviceForm": {
     "noName": "没有名称",
@@ -1571,15 +1571,15 @@
   },
   "gatewaySignup": {
     "title": "Gladys Assistant",
-    "alreadyHaveAccount": "Already have an account?",
-    "signin": "Sign in",
-    "supportText": "Support at hello@gladysassistant.com",
-    "createAccount": "Create your Gladys Plus account",
-    "emailAlreadyExistError": "An account with that email already exist",
-    "browserNotCompatibleError": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API.",
-    "tokenError": "You have to subscribe to the Gladys Community Package on Gladys website first!",
-    "unknownError": "An unknown error occured. Please retry later or contact me at hello@gladysassistant.com to understand what happened.",
-    "invalidInvitationError": "We cannot retrieve your invitation. Maybe it was already used or it has expired! Please contact us at hello@gladysassistant.com."
+    "alreadyHaveAccount": "已经有账户了?",
+    "signin": "登录",
+    "supportText": "支持hello@gladysassistant.com",
+    "createAccount": "创建您的Gladys Plus帐户",
+    "emailAlreadyExistError": "带有该电子邮件的帐户已存在",
+    "browserNotCompatibleError": "抱歉，您的浏览器与Gladys网关不兼容。您的浏览器应该支持webcryptoapi。",
+    "tokenError": "你必须先在Gladys网站上订阅Gladys社区包！",
+    "unknownError": "发生未知错误。请稍后再试或与我联系hello@gladysassistant.com 去了解发生了什么。",
+    "invalidInvitationError": "我们无法检索您的邀请。可能已经用过了或者已经过期了！请联系我们hello@gladysassistant.com."
   },
   "gatewaySubscribe": {
     "registerGladysPlus": "向Gladys Plus注册",
