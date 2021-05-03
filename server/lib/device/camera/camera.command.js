@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-
+const { NotFoundError } = require('../../../utils/coreErrors');
 /**
  * @description Command a light.
  * @param {Object} message - The message sent by the user.
@@ -9,11 +9,15 @@ const logger = require('../../../utils/logger');
  * light.command(message, classification, context);
  */
 async function command(message, classification, context) {
+  let cameraImage;
+  const roomEntity = classification.entities.find((entity) => entity.entity === 'room');
   try {
-    let cameraImage;
     switch (classification.intent) {
       case 'camera.get-image-room':
-        cameraImage = await this.getImageInRoom(context.room);
+        if (!roomEntity) {
+          throw new NotFoundError('Room not found');
+        }
+        cameraImage = await this.getImageInRoom(roomEntity.option);
         if (cameraImage) {
           this.messageManager.replyByIntent(message, 'camera.get-image-room.success', context, cameraImage);
         } else {
@@ -27,6 +31,7 @@ async function command(message, classification, context) {
     logger.debug(e);
     this.messageManager.replyByIntent(message, 'camera.get-image-room.fail', context);
   }
+  return null;
 }
 
 module.exports = {
