@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 
 const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
+const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 /**
@@ -14,8 +15,12 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
  */
 async function command(message, classification, context) {
   let nbAffectedLights = 0;
+  const roomEntity = classification.entities.find((entity) => entity.entity === 'room');
   try {
-    const devices = await this.getLightsInRoom(context.room);
+    if (!roomEntity) {
+      throw new NotFoundError('Room not found');
+    }
+    const devices = await this.getLightsInRoom(roomEntity.option);
     switch (classification.intent) {
       case 'light.turn-on':
         // foreach devices in room
@@ -65,6 +70,7 @@ async function command(message, classification, context) {
     logger.debug(e);
     this.messageManager.replyByIntent(message, 'light.turn-on.fail', context);
   }
+  return null;
 }
 
 module.exports = {
