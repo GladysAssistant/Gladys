@@ -105,6 +105,7 @@ describe('CalDAV sync', () => {
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/professional' })
       .resolves([
         {
+          sync: '1',
           ctag: 'ctag21',
           sync_token: 'syncToken21',
           external_id: 'https://caldav.host.com/home/professional',

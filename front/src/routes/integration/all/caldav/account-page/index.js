@@ -1,15 +1,16 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
-import CaldavPage from './CalDAV';
-import { RequestStatus } from '../../../../utils/consts';
-import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import CalDAVPage from '../CalDAV';
+import AccountTab from './AccountTab';
+import { RequestStatus } from '../../../../../utils/consts';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 @connect(
   'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
   actions
 )
-class CaldavIntegration extends Component {
+class AccountPage extends Component {
   componentWillMount() {
     this.props.getCaldavSetting();
   }
@@ -20,8 +21,12 @@ class CaldavIntegration extends Component {
       props.caldavGetSettingsStatus === RequestStatus.Getting ||
       props.caldavCleanUpStatus === RequestStatus.Getting ||
       props.caldavSyncStatus === RequestStatus.Getting;
-    return <CaldavPage {...props} loading={loading} dictionary={this.props.intl.dictionary.integration.caldav} />;
+    return (
+      <CalDAVPage>
+        <AccountTab {...props} loading={loading} dictionary={this.props.intl.dictionary.integration.caldav} />
+      </CalDAVPage>
+    );
   }
 }
 
-export default withIntlAsProp(CaldavIntegration);
+export default withIntlAsProp(AccountPage);

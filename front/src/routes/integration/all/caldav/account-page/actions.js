@@ -1,4 +1,4 @@
-import { CalDAVStatus } from '../../../../utils/consts';
+import { CalDAVStatus } from '../../../../../utils/consts';
 import get from 'get-value';
 
 const actions = store => ({
