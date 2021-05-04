@@ -292,6 +292,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  HEALTH: 'health',
   UNKNOWN: 'unknown',
 };
 
@@ -351,6 +352,26 @@ const DEVICE_FEATURE_TYPES = {
   BUTTON: {
     CLICK: 'click',
   },
+  HEALTH: {
+    BATTERY: 'battery',
+    WEIGHT: 'weight',
+    HEIGHT: 'height',
+    FAT_FREE_MASS: 'fat-free-mass',
+    FAT_RATIO: 'fat-ratio',
+    FAT_MASS_WEIGHT: 'fat-mass-weight',
+    DIASTOLIC_BLOOD_PRESSURE: 'diastolic-blood-pressure',
+    SYSTOLIC_BLOOD_PRESSURE: 'systolic-blood-pressure',
+    HEARTH_PULSE: 'heart-pulse',
+    TEMPERATURE: 'temperature',
+    SPO2: 'sp-o2',
+    BODY_TEMPERATURE: 'body-temperature',
+    SKIN_TEMPERATURE: 'skin-temperature',
+    MUSCLE_MASS: 'muscle-mass',
+    HYDRATION: 'hydration',
+    BONE_MASS: 'bone-mass',
+    PULSE_WAVE_VELOCITY: 'pulse-wave-velocity',
+    UNKNOWN: 'unknown',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -369,6 +390,11 @@ const DEVICE_FEATURE_UNITS = {
   AMPERE: 'ampere',
   VOLT: 'volt',
   PPM: 'ppm',
+  KILOGRAM: 'kg',
+  CENTIMETER: 'cm',
+  MERCURE_MILIMETER: 'mmHg',
+  BEATS_PER_MINUTE: 'bpm',
+  METER_PER_SECOND: 'm/s',
   MM: 'mm',
   CM: 'cm',
 };
@@ -394,6 +420,8 @@ const ACTIONS_STATUS = {
 };
 
 const DEVICE_POLL_FREQUENCIES = {
+  EVERY_DAY: 24 * 60 * 60 * 1000,
+  EVERY_HOUR: 60 * 60 * 1000,
   EVERY_MINUTES: 60 * 1000,
   EVERY_30_SECONDS: 30 * 1000,
   EVERY_10_SECONDS: 10 * 1000,

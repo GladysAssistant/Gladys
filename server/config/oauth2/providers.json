@@ -7,5 +7,14 @@
     "integrationScope": "user.info,user.metrics,user.activity,user.sleepevents",
     "grantType": "authorization_code",
     "redirectUriSuffix": "dashboard/integration/health/test/settings"
+  },
+  "withings": {
+    "tokenHost": "https://account.withings.com",
+    "tokenPath": "/oauth2/token",
+    "authorizeHost": "https://account.withings.com",
+    "authorizePath": "/oauth2_user/authorize2",
+    "integrationScope": "user.info,user.metrics,user.activity,user.sleepevents",
+    "grantType": "authorization_code",
+    "redirectUriSuffix": "dashboard/integration/health/withings/settings"
   }
 }
