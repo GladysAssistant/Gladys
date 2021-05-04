@@ -791,6 +791,18 @@
         "magnet": "Capteur magnétique"
       }
     },
+    "oauth2": {
+      "buttonConnect": "Connecter maintenant",
+      "apiKeyLabel": "Saisissez ensuite votre clé client_id et secret_id ici:",
+      "errorEmptyConfig": "Client Id et Secret Id ne doivent pas être vide !",
+      "errorServiceId": "Service Id de l'intégration courante n'a pas été trouvé !",
+      "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
+      "clientId": "Client id du compte",
+      "secretId": "Secret id du compte",
+      "instructions": "À cette étape, veuillez remplir les champs client_id et secret_id ci-dessous et cliquez sur le bouton de connexion.",
+      "delete": "Pour supprimer vos configuration de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
+      "buttonUnConnect": "Déconnecter"
+    },
     "eWeLink": {
       "title": "eWeLink",
       "description": "Contrôlez vos appareils eWeLink.",
