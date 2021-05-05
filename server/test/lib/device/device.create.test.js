@@ -129,6 +129,7 @@ describe('Device', () => {
         min: 0,
         max: 100,
         keep_history: true,
+        last_downsampling: null,
         last_value: 0,
         last_value_changed: null,
         last_value_string: null,

@@ -181,7 +181,9 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "chart-one-feature": "Graphique mono capteur",
+      "chart-multi-feature": "Graphique multi capteur"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -209,6 +211,19 @@
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
       },
+      "devicesChart": {
+        "editChartNamePlaceHolder": "Titre du graphique",
+        "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editChartType": "Sélectionnez le type de graphique.",
+        "editChartPeriod": "Sélectionnez la période par défaut affichée.",
+        "editChartDeviceClass": "Choisisser un sous ensemble d'appareils:",
+        "lastValue": "Dernière valeur:",
+        "editChartClass": {
+          "no": "Sans restriction",
+          "room": "Lié à une pièce"
+        }
+      },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
@@ -230,6 +245,24 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      }
+    },
+    "chart": {
+      "type": {
+        "name": {
+          "line": "Courbe",
+          "area": "Surface",
+          "bar": "Colonne"
+        }
+      }
+    },
+    "period": {
+      "label": {
+        "last1day": "Dernières 24 heures",
+        "last2day": "Dernières 48 heures",
+        "last1week": "Dernière semaine",
+        "last1month": "Dernier mois",
+        "last1year": "Dernière année"
       }
     }
   },

@@ -55,6 +55,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
+    DOWNSAMPLING_STATES: 'device.downsampling-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -482,6 +483,8 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  CHART_ONE_FEATURE: 'chart-one-feature',
+  CHART_MULTI_FEATURE: 'chart-multi-feature',
 };
 
 const ERROR_MESSAGES = {

@@ -91,6 +91,86 @@ module.exports = function DeviceController(gladys) {
     res.json(action);
   }
 
+  /**
+   * @api {get} /api/v1/device/device_feature/:device_feature_selector getDeviceFeature
+   * @apiName getDeviceFeature
+   * @apiGroup Device
+   */
+  async function getDeviceFeature(req, res) {
+    const params = Object.assign({}, req.query, {
+      device_feature_selector: req.params.device_feature_selector.split(','),
+    });
+
+    // Choose attributes
+    params.attributes_device = ['name', 'selector'];
+    params.attributes_device_feature = [
+      'name',
+      'selector',
+      'unit',
+      'last_value',
+      'last_value_changed',
+      'last_downsampling',
+    ];
+    params.attributes_device_room = ['name', 'selector'];
+    params.attributes_device_service = ['name'];
+    params.attributes_device_param = ['name'];
+
+    const devices = await gladys.device.get(params);
+
+    res.json(devices);
+  }
+  /**
+   * @api {get} /api/v1/device_feature_sate/:device_feature_selector getDeviceFeatureStates
+   * @apiName getDeviceFeatureStates
+   * @apiGroup Device
+   */
+  async function getDeviceFeatureStates(req, res) {
+    const params = Object.assign({}, req.query, {
+      device_feature_selector: req.params.device_feature_selector.split(','),
+    });
+
+    // fix period
+    const beginDate = new Date();
+    switch (params.chartPeriod) {
+      case 'last2day-selector':
+        beginDate.setDate(beginDate.getDate() - 2);
+        break;
+      case 'last1week-selector':
+        beginDate.setDate(beginDate.getDate() - 7);
+        break;
+      case 'last1month-selector':
+        beginDate.setDate(beginDate.getDate() - 31);
+        break;
+      case 'last1year-selector':
+        beginDate.setDate(beginDate.getDate() - 365);
+        break;
+      case 'last1day-selector':
+      default:
+        beginDate.setDate(beginDate.getDate() - 1);
+    }
+
+    params.begin_date = beginDate;
+    params.end_date = new Date();
+
+    // Choose attributes
+    params.attributes_device = ['name', 'selector'];
+    params.attributes_device_feature = [
+      'id',
+      'name',
+      'selector',
+      'unit',
+      'last_value',
+      'last_value_changed',
+      'last_downsampling',
+    ];
+    params.attributes_device_room = ['name', 'selector'];
+    params.attributes_device_service = ['name'];
+
+    const devices = await gladys.device.getFeatureStates(params);
+
+    res.json(devices);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
@@ -99,5 +179,7 @@ module.exports = function DeviceController(gladys) {
     destroy: asyncMiddleware(destroy),
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
+    getDeviceFeature: asyncMiddleware(getDeviceFeature),
+    getDeviceFeatureStates: asyncMiddleware(getDeviceFeatureStates),
   });
 };

@@ -79,3 +79,18 @@ describe('GET /api/v1/service/:service_name/device', () => {
       .expect(404);
   });
 });
+
+describe('GET /api/v1/device/device_feature/:device_feature_selector', () => {
+  it('should return device features with feature selector test-device-feature', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/device_feature/test-device-feature')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        expect(res.body[0]).to.have.property('selector', 'test-device');
+        expect(res.body[0]).to.have.property('features');
+        expect(res.body[0]).to.have.property('params');
+      });
+  });
+});
