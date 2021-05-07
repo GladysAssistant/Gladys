@@ -62,6 +62,7 @@ describe('bluetooth.scanDevice', () => {
     bluetooth = new BluetoothMock();
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
+    bluetoothManager.ready = true;
     bluetoothManager.discoveredDevices[peripheral.uuid] = device;
 
     bluetooth.startScanning = () => {
@@ -87,6 +88,7 @@ describe('bluetooth.scanDevice', () => {
     };
     services.push(service);
 
+    bluetoothManager.ready = false;
     await bluetoothManager.scanDevice(peripheral.uuid);
 
     expect(device).deep.eq({
