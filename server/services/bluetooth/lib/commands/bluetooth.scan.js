@@ -63,7 +63,7 @@ async function scan(state, peripheralUuid = undefined) {
       this.bluetooth.on('discover', onDiscover);
       this.bluetooth.once('scanStop', scanStop);
 
-      if (!this.scanning) {
+      if (!this.scanning && this.ready) {
         this.bluetooth.startScanning([], true);
       }
 
