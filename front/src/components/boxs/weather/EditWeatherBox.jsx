@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import actions from '../../../actions/dashboard/edit-boxes/editWeather';
 import BaseEditBox from '../baseEditBox';
 import { GetWeatherModes } from '../../../utils/consts';
 
@@ -53,7 +52,7 @@ const EditWeatherBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('houses', actions)
+@connect('httpClient', {})
 class EditWeatherBoxComponent extends Component {
   updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -69,12 +68,39 @@ class EditWeatherBoxComponent extends Component {
     });
   };
 
+  getHouses = async () => {
+    try {
+      await this.setState({
+        error: false,
+        pending: true
+      });
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      this.setState({
+        houses,
+        pending: false
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        error: true,
+        pending: false
+      });
+    }
+  };
+
   componentDidMount() {
-    this.props.getHouses();
+    this.getHouses();
   }
 
-  render(props, {}) {
-    return <EditWeatherBox {...props} updateBoxHouse={this.updateBoxHouse} updateBoxModes={this.updateBoxModes} />;
+  render(props, { houses }) {
+    return (
+      <EditWeatherBox
+        {...props}
+        houses={houses}
+        updateBoxHouse={this.updateBoxHouse}
+        updateBoxModes={this.updateBoxModes}
+      />
+    );
   }
 }
 
