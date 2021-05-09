@@ -1,0 +1,147 @@
+const logger = require('../../../../utils/logger');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
+
+/**
+ * @description New value homecoachs received.
+ * @param {Object} data - Data received.
+ * @example
+ * newValueHomeCoach(122324, {
+ * });
+ */
+function newValueHomeCoach(data) {
+  /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+  const sid = data._id;
+  const unitTemperature = DEVICE_FEATURE_UNITS.CELSIUS;
+  const minTemperature = 0;
+  const maxTemperature = 50;
+  const unitPressure = DEVICE_FEATURE_UNITS.MILLIBAR;
+  const minPressure = 260;
+  const maxPressure = 1260;
+
+  if (data.type === 'NHC') {
+    logger.debug(`Netatmo : New homecoach, sid = ${sid} - ${data.type}`);
+    const newSensor = {
+      service_id: this.serviceId,
+      name: data.station_name,
+      selector: `netatmo:${sid}`,
+      external_id: `netatmo:${sid}`,
+      model: 'netatmo-home-coachs',
+      should_poll: false,
+      features: [
+        {
+          name: `Temperature - ${data.station_name}`,
+          selector: `netatmo:${sid}:temperature`,
+          external_id: `netatmo:${sid}:temperature`,
+          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: unitTemperature,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: minTemperature,
+          max: maxTemperature,
+        },
+        {
+          name: `Humidity - ${data.station_name}`,
+          selector: `netatmo:${sid}:humidity`,
+          external_id: `netatmo:${sid}:humidity`,
+          category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 100,
+        },
+        {
+          name: `CO2 - ${data.station_name}`,
+          selector: `netatmo:${sid}:co2`,
+          external_id: `netatmo:${sid}:co2`,
+          category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: DEVICE_FEATURE_UNITS.PPM,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 5000,
+        },
+        {
+          name: `Pressure - ${data.station_name}`,
+          selector: `netatmo:${sid}:pressure`,
+          external_id: `netatmo:${sid}:pressure`,
+          category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: unitPressure,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: minPressure,
+          max: maxPressure,
+        },
+        {
+          name: `Pressure absolue - ${data.station_name}`,
+          selector: `netatmo:${sid}:absolutePressure`,
+          external_id: `netatmo:${sid}:absolutePressure`,
+          category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          unit: unitPressure,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: minPressure,
+          max: maxPressure,
+        },
+        {
+          name: `Noise - ${data.station_name}`,
+          selector: `netatmo:${sid}:noise`,
+          external_id: `netatmo:${sid}:noise`,
+          category: DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          unit: DEVICE_FEATURE_UNITS.DECIBEL,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 35,
+          max: 120,
+        },
+        {
+          name: `Health index - ${data.station_name}`,
+          selector: `netatmo:${sid}:health_idx`,
+          external_id: `netatmo:${sid}:health_idx`,
+          category: DEVICE_FEATURE_CATEGORIES.INDEX,
+          type: DEVICE_FEATURE_TYPES.INDEX.DIMMER,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 4,
+        },
+        {
+          name: `Reachable (WiFi or Power) - ${data.station_name}`,
+          selector: `netatmo:${sid}:reachable`,
+          external_id: `netatmo:${sid}:reachable`,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          read_only: true,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 1,
+        },
+      ],
+    };
+    this.addSensor(sid, newSensor);
+  } else {
+    logger.info(`Files newValueHomeCoach - Device type unknown : ${data.type}`);
+  }
+}
+
+module.exports = {
+  newValueHomeCoach,
+};

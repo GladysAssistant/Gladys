@@ -1,0 +1,351 @@
+{
+  "status": "ok",
+  "time_server": 1608769750,
+  "body": {
+    "home": {
+      "id": "3iuhef7oihih89kojoihoui3",
+      "modules": [
+        {
+          "type": "NAMain",
+          "firmware_revision": 178,
+          "wifi_strength": 49,
+          "last_status_store": 1608769612,
+          "co2_calibrating": false,
+          "id": "17:cc:50:67:aa:09",
+          "Temperature": 20.7,
+          "CO2": 524,
+          "Humidity": 61,
+          "Noise": 32,
+          "Pressure": 1005.6,
+          "AbsolutePressure": 991.1,
+          "time_utc": 1608769610,
+          "min_temp": 20.7,
+          "max_temp": 21,
+          "date_max_temp": 1608764772,
+          "date_min_temp": 1608768402,
+          "temp_trend": "stable",
+          "pressure_trend": "stable",
+          "homekit_status": "enabled",
+          "wifi_state": "full"
+        },
+        {
+          "id": "17:cc:50:67:aa:0a",
+          "type": "NAModule1",
+          "battery_level": 5964,
+          "last_message": 1608769605,
+          "last_seen": 1608769592,
+          "rf_strength": 75,
+          "firmware_revision": 50,
+          "Temperature": 7.3,
+          "Humidity": 100,
+          "time_utc": 1608769592,
+          "min_temp": 7.1,
+          "max_temp": 7.3,
+          "date_max_temp": 1608769592,
+          "date_min_temp": 1608764465,
+          "temp_trend": "stable",
+          "bridge": "17:cc:50:67:aa:09",
+          "battery_state": "full",
+          "rf_state": "medium"
+        },
+        {
+          "id": "17:cc:50:67:aa:0b",
+          "type": "NAModule3",
+          "battery_level": 6058,
+          "last_message": 1608769605,
+          "last_seen": 1608769605,
+          "rf_strength": 67,
+          "firmware_revision": 12,
+          "Rain": 0,
+          "time_utc": 1608769605,
+          "sum_rain_1": 0.101,
+          "sum_rain_24": 0.4,
+          "bridge": "17:cc:50:67:aa:09",
+          "battery_state": "full",
+          "rf_state": "high"
+        },
+        {
+          "id": "17:cc:50:67:aa:0c",
+          "type": "NAModule2",
+          "battery_level": 5944,
+          "last_message": 1608769593,
+          "last_seen": 1608769593,
+          "rf_strength": 89,
+          "firmware_revision": 25,
+          "WindStrength": 0,
+          "WindAngle": -1,
+          "GustStrength": 1,
+          "GustAngle": 90,
+          "time_utc": 1608769593,
+          "max_wind_str": 6,
+          "max_wind_angle": 113,
+          "date_max_wind_str": 1608764466,
+          "WindHistoric": [
+            {
+              "time_utc": 1608769593,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608769304,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608768997,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608768702,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608768401,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608768093,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608767792,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608767490,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608767189,
+              "WindStrength": 0,
+              "WindAngle": -1
+            },
+            {
+              "time_utc": 1608766888,
+              "WindStrength": 1,
+              "WindAngle": 126
+            },
+            {
+              "time_utc": 1608766587,
+              "WindStrength": 1,
+              "WindAngle": 135
+            },
+            {
+              "time_utc": 1608766279,
+              "WindStrength": 1,
+              "WindAngle": 236
+            }
+          ],
+          "bridge": "17:cc:50:67:aa:09",
+          "battery_state": "full",
+          "rf_state": "very_low"
+        },
+        {
+          "id": "17:cc:50:67:aa:0d",
+          "type": "NAModule4",
+          "battery_level": 6144,
+          "last_message": 1608769605,
+          "last_seen": 1608769586,
+          "rf_strength": 76,
+          "firmware_revision": 50,
+          "Temperature": 19.1,
+          "CO2": 617,
+          "Humidity": 64,
+          "time_utc": 1608769586,
+          "min_temp": 19.1,
+          "max_temp": 19.7,
+          "date_max_temp": 1608764459,
+          "date_min_temp": 1608769586,
+          "temp_trend": "down",
+          "bridge": "17:cc:50:67:aa:09",
+          "battery_state": "full",
+          "rf_state": "medium"
+        },
+        {
+          "id": "17:cc:50:67:aa:0e",
+          "type": "NAPlug",
+          "firmware_revision": 216,
+          "plug_connected_boiler": 1,
+          "rf_strength": 108,
+          "wifi_strength": 78
+        },
+        {
+          "id": "17:cc:50:67:aa:0f",
+          "anticipating": false,
+          "battery_level": 4128,
+          "firmware_revision": 73,
+          "rf_strength": 67,
+          "boiler_status": false,
+          "type": "NATherm1",
+          "boiler_valve_comfort_boost": false,
+          "reachable": true,
+          "bridge": "17:cc:50:67:aa:0e",
+          "battery_state": "full"
+        },
+        {
+          "id": "17:cc:50:67:aa:10",
+          "battery_level": 3011,
+          "firmware_revision": 83,
+          "rf_strength": 58,
+          "type": "NRV",
+          "reachable": true,
+          "bridge": "17:cc:50:67:aa:0e",
+          "battery_state": "full",
+          "room": {
+            "therm_setpoint_temperature": 20
+          }
+        },
+        {
+          "id": "17:cc:50:67:aa:11",
+          "type": "NAPlug",
+          "firmware_revision": 216,
+          "plug_connected_boiler": 0,
+          "rf_strength": 106,
+          "wifi_strength": 52
+        },
+        {
+          "id": "17:cc:50:67:aa:12",
+          "battery_level": 3053,
+          "firmware_revision": 83,
+          "rf_strength": 55,
+          "type": "NRV",
+          "reachable": true,
+          "bridge": "17:cc:50:67:aa:11",
+          "battery_state": "full",
+          "room": {
+            "therm_measured_temperature": 20
+          }
+        },
+        {
+          "id": "17:cc:50:67:aa:00",
+          "type": "NACamera",
+          "monitoring": "on",
+          "sd_status": 4,
+          "alim_status": 2,
+          "locked": false,
+          "vpn_url": "https://test.com",
+          "is_local": true,
+          "firmware_revision": 460,
+          "homekit_status": "enabled",
+          "wifi_strength": 37,
+          "wifi_state": "full",
+          "connection": "wifi"
+        },
+        {
+          "id": "17:cc:50:67:aa:01",
+          "type": "NACamDoorTag",
+          "status": "closed",
+          "battery_level": 5960,
+          "room": "1111111113",
+          "rf_strength": 85,
+          "firmware_revision": 58,
+          "last_seen": 1608769737,
+          "last_activity": 1608752718,
+          "bridge": "17:cc:50:67:aa:00",
+          "updating": false,
+          "battery_state": "full",
+          "rf_state": "very_low"
+        },
+        {
+          "id": "17:cc:50:67:aa:02",
+          "type": "NIS",
+          "status": "no_sound",
+          "room": "1111111111",
+          "last_seen": 1608769748,
+          "rf_strength": 65,
+          "monitoring": "on",
+          "alim_source": "battery",
+          "battery_level": 6428,
+          "firmware_revision": 209,
+          "bridge": "17:cc:50:67:aa:00",
+          "battery_state": "full",
+          "rf_state": "low"
+        },
+        {
+          "id": "17:cc:50:67:aa:04",
+          "type": "NOC",
+          "monitoring": "on",
+          "sd_status": 4,
+          "alim_status": 2,
+          "locked": false,
+          "siren_status": "no_sound",
+          "vpn_url": "https://prodvpn-eu-6.netatmo.net/restricted/10.255.255.255/89743cabef8784784710846178657800/SMFKioh3998KLhuhHKJH987AZADoiu0983E87bJH91,,",
+          "is_local": true,
+          "floodlight": "auto",
+          "firmware_revision": 198,
+          "homekit_status": "enabled",
+          "wifi_strength": 61,
+          "wifi_state": "high",
+          "connection": "wifi",
+          "timelapse_available": true
+        },
+        {
+          "id": "17:cc:50:67:aa:07",
+          "type": "NSD",
+          "firmware_revision": 108,
+          "status_active": true,
+          "status_tampered": false,
+          "test_mode": false,
+          "hush_mode": false,
+          "smoke_detected": false,
+          "detection_chamber_status": "ok",
+          "battery_alarm_state": "ok",
+          "battery_percent": 100,
+          "wifi_status": 3,
+          "wifi_strength": 64,
+          "last_seen": 1608744028,
+          "last_wifi_connection": 1608141604
+        }
+      ],
+      "rooms": [
+        {
+          "id": "1111111111",
+          "anticipating": false,
+          "heating_power_request": 0,
+          "open_window": false,
+          "reachable": true,
+          "therm_measured_temperature": 20.5,
+          "therm_setpoint_temperature": 18,
+          "therm_setpoint_mode": "schedule",
+          "therm_setpoint_start_time": 1608765579,
+          "therm_setpoint_end_time": 0
+        },
+        {
+          "id": "1111111112",
+          "anticipating": false,
+          "open_window": false,
+          "reachable": true,
+          "therm_measured_temperature": 20.1,
+          "therm_setpoint_temperature": 17.5,
+          "therm_setpoint_mode": "schedule",
+          "therm_setpoint_start_time": 1608765579,
+          "therm_setpoint_end_time": 0
+        }
+      ],
+      "persons": [
+        {
+          "id": "98349902-ea01-2948-3094-c3298932b902",
+          "last_seen": 1608759346,
+          "out_of_sight": false
+        },
+        {
+          "id": "98349902-ea01-2948-3094-c3298932b903",
+          "last_seen": 0,
+          "out_of_sight": true
+        }
+      ]
+    },
+    "errors": [
+      {
+        "code": 6,
+        "id": "17:cc:50:67:aa:06"
+      }
+    ]
+  }
+}

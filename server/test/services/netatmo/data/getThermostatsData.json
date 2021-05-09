@@ -1,0 +1,166 @@
+{
+  "body": {
+    "devices": [
+      {
+        "_id": "17:cc:50:67:aa:0e",
+        "type": "NAPlug",
+        "last_setup": 1578400589,
+        "firmware": 216,
+        "last_status_store": 1610014596,
+        "plug_connected_boiler": 1,
+        "wifi_status": 75,
+        "last_bilan": { "y": 2020, "m": 12 },
+        "modules": [
+          {
+            "_id": "17:cc:50:67:aa:0f",
+            "type": "NATherm1",
+            "firmware": 73,
+            "last_message": 1610014590,
+            "rf_status": 67,
+            "battery_vp": 4104,
+            "therm_orientation": 0,
+            "therm_relay_cmd": 200,
+            "anticipating": false,
+            "module_name": "Thermostat Maison",
+            "battery_percent": 74,
+            "event_history": {
+              "boiler_not_responding_events": [{ "K": 1579450545 }, { "K": 1580453625 }, { "K": 1581777974 }],
+              "boiler_responding_events": [{ "K": 1579505495 }, { "K": 1580761561 }, { "K": 1581846397 }]
+            },
+            "setpoint_history": [
+              { "setpoint": { "setpoint_mode": "program" }, "timestamp": 1609992663 },
+              {
+                "setpoint": {
+                  "setpoint_mode": "manual",
+                  "setpoint_temp": 19,
+                  "setpoint_endtime": 1610004365
+                },
+                "timestamp": 1609993565
+              },
+              { "setpoint": { "setpoint_mode": "program" }, "timestamp": 1609994766 },
+              {
+                "setpoint": {
+                  "setpoint_mode": "manual",
+                  "setpoint_temp": 20,
+                  "setpoint_endtime": 1610012775
+                },
+                "timestamp": 1610001975
+              },
+              { "setpoint": { "setpoint_mode": "program" }, "timestamp": 1610012806 },
+              {
+                "setpoint": {
+                  "setpoint_mode": "manual",
+                  "setpoint_temp": 20,
+                  "setpoint_endtime": 1610025393
+                },
+                "timestamp": 1610014593
+              }
+            ],
+            "last_therm_seen": 1610014590,
+            "setpoint": {
+              "setpoint_mode": "manual",
+              "setpoint_temp": 20,
+              "setpoint_endtime": 1610025393
+            },
+            "therm_program_list": [
+              {
+                "timetable": [
+                  { "m_offset": 0, "id": 1 },
+                  { "m_offset": 345, "id": 6 },
+                  { "m_offset": 510, "id": 9 },
+                  { "m_offset": 720, "id": 5 },
+                  { "m_offset": 840, "id": 4 },
+                  { "m_offset": 1020, "id": 5 },
+                  { "m_offset": 1260, "id": 8 },
+                  { "m_offset": 1380, "id": 1 },
+                  { "m_offset": 1800, "id": 6 },
+                  { "m_offset": 1950, "id": 9 },
+                  { "m_offset": 2160, "id": 5 },
+                  { "m_offset": 2280, "id": 4 },
+                  { "m_offset": 2460, "id": 5 },
+                  { "m_offset": 2700, "id": 8 },
+                  { "m_offset": 2820, "id": 1 },
+                  { "m_offset": 3240, "id": 6 },
+                  { "m_offset": 3390, "id": 9 },
+                  { "m_offset": 3600, "id": 5 },
+                  { "m_offset": 3720, "id": 4 },
+                  { "m_offset": 3900, "id": 5 },
+                  { "m_offset": 4140, "id": 8 },
+                  { "m_offset": 4260, "id": 1 },
+                  { "m_offset": 4680, "id": 6 },
+                  { "m_offset": 4830, "id": 9 },
+                  { "m_offset": 5040, "id": 5 },
+                  { "m_offset": 5160, "id": 4 },
+                  { "m_offset": 5340, "id": 5 },
+                  { "m_offset": 5580, "id": 8 },
+                  { "m_offset": 5700, "id": 1 },
+                  { "m_offset": 6120, "id": 6 },
+                  { "m_offset": 6270, "id": 9 },
+                  { "m_offset": 6480, "id": 5 },
+                  { "m_offset": 6600, "id": 4 },
+                  { "m_offset": 6780, "id": 5 },
+                  { "m_offset": 7020, "id": 8 },
+                  { "m_offset": 7140, "id": 1 },
+                  { "m_offset": 7620, "id": 6 },
+                  { "m_offset": 7740, "id": 0 },
+                  { "m_offset": 8460, "id": 3 },
+                  { "m_offset": 8670, "id": 1 },
+                  { "m_offset": 9060, "id": 6 },
+                  { "m_offset": 9240, "id": 0 },
+                  { "m_offset": 9900, "id": 3 },
+                  { "m_offset": 10020, "id": 7 }
+                ],
+                "zones": [
+                  { "name": "Confort", "id": 0, "type": 0, "temp": 20.5 },
+                  { "name": "Nuit", "id": 1, "type": 1, "temp": 17 },
+                  { "name": "Confort+", "id": 3, "type": 8, "temp": 21 },
+                  { "name": "Éco", "id": 4, "type": 5, "temp": 18 },
+                  { "name": "Confort couché", "id": 7, "type": 4, "temp": 18 },
+                  { "name": "Confort journée", "id": 5, "type": 4, "temp": 20 },
+                  { "name": "Confort levé", "id": 6, "type": 4, "temp": 19 },
+                  { "name": "Milieu de matinée", "id": 9, "type": 4, "temp": 18 },
+                  { "name": "Soirée", "id": 8, "type": 4, "temp": 20 },
+                  { "type": 2, "id": 2, "temp": 17 },
+                  { "type": 3, "id": 10, "temp": 8 }
+                ],
+                "name": "Standard",
+                "default": false,
+                "program_id": "3iuhef7oihi392kojoihoui5"
+              }
+            ],
+            "measured": { "time": 1610012439, "temperature": 17.7, "setpoint_temp": 20 }
+          }
+        ],
+        "station_name": "Relais Garage",
+        "place": {
+          "altitude": 123,
+          "city": "Paris",
+          "continent": "Europe",
+          "country": "FR",
+          "country_name": "France",
+          "location": [0.2348836678374973, 48.853492494796304],
+          "street": "Avenue des champs elysée",
+          "timezone": "Europe/Paris",
+          "trust_location": true
+        },
+        "udp_conn": true,
+        "last_plug_seen": 1610014596
+      }
+    ],
+    "user": {
+      "mail": "tony.stark@gmail.com",
+      "administrative": {
+        "lang": "fr",
+        "reg_locale": "fr-FR",
+        "country": "FR_FR",
+        "unit": 0,
+        "windunit": 0,
+        "pressureunit": 0,
+        "feel_like_algo": 0
+      }
+    }
+  },
+  "status": "ok",
+  "time_exec": 0.0377659797668457,
+  "time_server": 1610014417
+}
