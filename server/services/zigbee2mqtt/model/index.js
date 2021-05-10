@@ -76,6 +76,7 @@ models.push(require('./ilux').ilux);
 models.push(require('./TuYa').TuYa);
 models.push(require('./Lonsonho').Lonsonho);
 models.push(require('./Lidl').Lidl);
+models.push(require('./Adeo').Adeo);
 
 /**
  * @description Get features by model name.

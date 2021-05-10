@@ -448,5 +448,119 @@ describe('gateway', () => {
         );
       });
     });
+    it('should handle a new gateway open api message: create-device-state', async () => {
+      const variable = {
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'create-device-state',
+            data: {
+              device_feature_external_id: 'external-id',
+              state: 1,
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            try {
+              expect(res).to.deep.equal({
+                status: 200,
+              });
+              assert.calledWith(eventGateway.emit, EVENTS.DEVICE.NEW_STATE, {
+                device_feature_external_id: 'external-id',
+                state: 1,
+              });
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+        );
+      });
+    });
+    it('should handle a new gateway open api message: create-owntracks-location', async () => {
+      const variable = {
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'create-owntracks-location',
+            data: {
+              lat: 42,
+              lon: 42,
+              alt: 0,
+              acc: 100,
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            try {
+              expect(res).to.deep.equal({
+                status: 200,
+              });
+              assert.calledWith(eventGateway.emit, EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, {
+                lat: 42,
+                lon: 42,
+                alt: 0,
+                acc: 100,
+              });
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+        );
+      });
+    });
   });
 });
