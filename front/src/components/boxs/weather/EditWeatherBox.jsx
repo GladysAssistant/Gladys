@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
+import actions from '../../../actions/dashboard/boxActions';
 import { GetWeatherModes } from '../../../utils/consts';
 
 const EditWeatherBox = ({ children, ...props }) => (
@@ -52,7 +53,7 @@ const EditWeatherBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('httpClient', {})
+@connect('httpClient', actions)
 class EditWeatherBoxComponent extends Component {
   updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
