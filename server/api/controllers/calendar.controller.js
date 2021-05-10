@@ -159,7 +159,7 @@ module.exports = function CalendarController(gladys) {
    * }]
    */
   async function get(req, res) {
-    const calendars = await gladys.calendar.get(req.user.id);
+    const calendars = await gladys.calendar.get(req.user.id, req.query);
     res.json(calendars);
   }
 

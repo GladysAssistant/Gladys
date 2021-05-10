@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-const moment = require('moment');
+const dayjs = require('dayjs');
 const {
   requestCalendars,
   requestChanges,
@@ -27,7 +27,7 @@ describe('CalDAV requests', () => {
       requestCalendars,
       requestChanges,
       requestEventsData,
-      moment: moment.utc,
+      dayjs: dayjs.utc,
       dav: {
         ns: namespace,
         request: {

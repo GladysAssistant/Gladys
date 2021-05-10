@@ -16,6 +16,15 @@ async function get(userId, options = {}) {
     where.service_id = options.serviceId;
   }
 
+  if (options.serviceName) {
+    const service = await this.service.getLocalServiceByName(options.serviceName);
+    where.service_id = service.id;
+  }
+
+  if (options.selector) {
+    where.selector = options.selector;
+  }
+
   if (options.externalId) {
     where.external_id = options.externalId;
   }
