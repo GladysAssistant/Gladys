@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-const moment = require('moment');
+const dayjs = require('dayjs');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
 const { formatCalendars, formatEvents } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
 
@@ -39,7 +39,7 @@ describe('CalDAV sync', () => {
           getValue: sinon.stub(),
         },
       },
-      moment,
+      dayjs,
       dav: {
         transport: {
           Basic: sinon.stub(),
@@ -105,6 +105,7 @@ describe('CalDAV sync', () => {
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/professional' })
       .resolves([
         {
+          sync: '1',
           ctag: 'ctag21',
           sync_token: 'syncToken21',
           external_id: 'https://caldav.host.com/home/professional',

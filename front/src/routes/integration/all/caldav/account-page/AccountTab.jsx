@@ -1,8 +1,8 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
-import { CalDAVStatus } from '../../../../utils/consts';
 import cx from 'classnames';
+import { CalDAVStatus } from '../../../../../utils/consts';
 
-const CaldavPage = ({ children, ...props }) => (
+const AccountTab = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -19,10 +19,10 @@ const CaldavPage = ({ children, ...props }) => (
                     <div class="loader" />
                     <div class="dimmer-content">
                       <h2>
-                        <Text id="integration.caldav.title" />
+                        <Text id="integration.caldav.accountTab" />
                       </h2>
                       <p>
-                        <Text id="integration.caldav.introduction" />
+                        <Text id="integration.caldav.accountIntroduction" />
                       </p>
                       <div class="form-group">
                         <div class="form-label">
@@ -158,4 +158,4 @@ const CaldavPage = ({ children, ...props }) => (
   </div>
 );
 
-export default CaldavPage;
+export default AccountTab;

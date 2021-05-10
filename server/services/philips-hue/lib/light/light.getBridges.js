@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 
-const TIMEOUT = 5000;
+const TIMEOUT = 10000;
 
 /**
  * @description Return Philips hue bridges
