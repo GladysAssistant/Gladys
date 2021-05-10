@@ -66,11 +66,17 @@ class LightFadeInParams extends Component {
     this.state = {
       deviceOptions: null,
       selectedOptions: [],
-      parameters: props.parameters
     };
   }
   async componentDidMount() {
     this.getOptions();
+    if (!this.props.parameters){
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
+        durationValue: 30,
+        durationUnit: 'seconds',
+        targetBrightness: 50
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
