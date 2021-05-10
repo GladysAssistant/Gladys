@@ -28,7 +28,10 @@
     "apidoc": "apidoc -i controllers/ -o apidoc/",
     "checkjs": "tsc --allowJs --resolveJsonModule --checkJs --noEmit --lib ES5,ES2018 lib/**/*.js api/**/*.js services/**/*.js",
     "generate-apidoc": "apidoc -i api/ -o apidoc",
-    "generate-jsdoc": "jsdoc lib/**/*.js services/**/*.js -d jsdoc"
+    "generate-jsdoc": "jsdoc lib/**/*.js services/**/*.js -d jsdoc",
+    "cypress": "npm run cypress:clean && npm run cypress:start",
+    "cypress:start": "cross-env SQLITE_FILE_PATH=./gladys-cypress.db node index.js",
+    "cypress:clean": "npx rimraf ./gladys-cypress.db*"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "Apache-2.0",

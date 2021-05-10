@@ -88,6 +88,30 @@ jobs:
         run: npm audit --production --audit-level=high
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
+  cypress-run:
+    name: Cypress run
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 📦 Install NPM packages
+        run: |
+          npm ci
+      - name: ✅ Cypress run
+        uses: cypress-io/github-action@v2.8.2
+        with:
+          install: false
+          start: npm run start:cypress
+          wait-on: 'http://localhost:1444'
+          config-file: ./front/cypress/cypress.json
+          project: ./front
+          command: npm run cypress:run
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
