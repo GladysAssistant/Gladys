@@ -1,6 +1,5 @@
 const { assert, fake, useFakeTimers } = require('sinon');
 const chaiAssert = require('chai').assert;
-const { expect } = require('chai');
 const dayjs = require('dayjs');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');

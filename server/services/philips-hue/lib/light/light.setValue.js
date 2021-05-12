@@ -30,9 +30,6 @@ async function setValue(device, deviceFeature, value, { duration = 0 } = {}) {
     case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
       state = value === STATE.ON ? new this.LightState().on() : new this.LightState().off();
       break;
-    case DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS:
-      state = new this.LightState().brightness(value);
-      break;
     case DEVICE_FEATURE_TYPES.LIGHT.COLOR:
       state = new this.LightState().rgb(intToRgb(value));
       break;
