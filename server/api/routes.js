@@ -50,7 +50,6 @@ function getRoutes(gladys) {
   const weatherController = WeatherController(gladys);
   const oauth2Controller = OAuth2Controller(gladys);
 
-
   const routes = {};
 
   // add services routes
