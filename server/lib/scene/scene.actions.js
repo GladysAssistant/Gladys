@@ -26,7 +26,7 @@ const actionsFunc = {
       device = self.stateManager.get('device', action.device);
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
-    return self.device.setValue(device, deviceFeature, action.value);
+    return self.device.setValue(device, deviceFeature, action.parameters.value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
@@ -53,6 +53,50 @@ const actionsFunc = {
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
         await self.device.setValue(device, deviceFeature, 0);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
+  [ACTIONS.LIGHT.SET_BRIGHTNESS]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        );
+        await self.device.setValue(device, deviceFeature, action.parameters.value);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
+  [ACTIONS.LIGHT.FADE_IN]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.FADE_IN,
+        );
+        let durationMilliseconds;
+        switch (action.parameters.durationUnit) {
+          case 'seconds':
+            durationMilliseconds = action.parameters.durationValue * 1000;
+            break;
+          case 'minutes':
+            durationMilliseconds = action.parameters.durationValue * 1000 * 60;
+            break;
+          case 'hours':
+            durationMilliseconds = action.parameters.durationValue * 1000 * 60 * 60;
+            break;
+          default:
+            throw new Error(`Unit ${action.parameters.durationUnit} not recognized`);
+        }
+        await self.device.scenario(device, deviceFeature, { ...action.parameters, duration: durationMilliseconds });
       } catch (e) {
         logger.warn(e);
       }
@@ -91,21 +135,21 @@ const actionsFunc = {
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
       let timeToWaitMilliseconds;
-      switch (action.unit) {
+      switch (action.parameters.unit) {
         case 'milliseconds':
-          timeToWaitMilliseconds = action.value;
+          timeToWaitMilliseconds = action.parameters.value;
           break;
         case 'seconds':
-          timeToWaitMilliseconds = action.value * 1000;
+          timeToWaitMilliseconds = action.parameters.value * 1000;
           break;
         case 'minutes':
-          timeToWaitMilliseconds = action.value * 1000 * 60;
+          timeToWaitMilliseconds = action.parameters.value * 1000 * 60;
           break;
         case 'hours':
-          timeToWaitMilliseconds = action.value * 1000 * 60 * 60;
+          timeToWaitMilliseconds = action.parameters.value * 1000 * 60 * 60;
           break;
         default:
-          throw new Error(`Unit ${action.unit} not recognized`);
+          throw new Error(`Unit ${action.parameters.unit} not recognized`);
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
@@ -120,7 +164,7 @@ const actionsFunc = {
     self.execute(action.scene, scope);
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    const textWithVariables = Handlebars.compile(action.text)(scope);
+    const textWithVariables = Handlebars.compile(action.parameters.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {

@@ -5,6 +5,7 @@ const { init } = require('./light.init');
 const { getLightsInRoom } = require('./light.getLightsInRoom');
 const { turnOn } = require('./light.turnOn');
 const { turnOff } = require('./light.turnOff');
+const { setBrightness } = require('./light.setBrightness');
 
 const LightManager = function Light(eventManager, messageManager, deviceManager) {
   this.eventManager = eventManager;
@@ -20,5 +21,6 @@ LightManager.prototype.init = init;
 LightManager.prototype.getLightsInRoom = getLightsInRoom;
 LightManager.prototype.turnOn = turnOn;
 LightManager.prototype.turnOff = turnOff;
+LightManager.prototype.setBrightness = setBrightness;
 
 module.exports = LightManager;

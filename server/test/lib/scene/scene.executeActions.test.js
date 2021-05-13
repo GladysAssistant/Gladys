@@ -1,13 +1,17 @@
 const { assert, fake, useFakeTimers } = require('sinon');
 const chaiAssert = require('chai').assert;
-const { expect } = require('chai');
 const dayjs = require('dayjs');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const { AbortScene } = require('../../../utils/coreErrors');
 const { executeActions } = require('../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../lib/state');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const event = new EventEmitter();
 
@@ -57,8 +61,10 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            unit: 'milliseconds',
-            value: 5,
+            parameters: {
+              unit: 'milliseconds',
+              value: 5,
+            },
           },
         ],
       ],
@@ -70,8 +76,10 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            unit: 'seconds',
-            value: 5 / 1000,
+            parameters: {
+              unit: 'seconds',
+              value: 5 / 1000,
+            },
           },
         ],
       ],
@@ -83,8 +91,10 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            unit: 'minutes',
-            value: 5 / 1000 / 60,
+            parameters: {
+              unit: 'minutes',
+              value: 5 / 1000 / 60,
+            },
           },
         ],
       ],
@@ -96,8 +106,10 @@ describe('scene.executeActions', () => {
         [
           {
             type: ACTIONS.TIME.DELAY,
-            unit: 'hours',
-            value: 5 / 1000 / 60 / 60,
+            parameters: {
+              unit: 'hours',
+              value: 5 / 1000 / 60 / 60,
+            },
           },
         ],
       ],
@@ -184,7 +196,9 @@ describe('scene.executeActions', () => {
           {
             type: ACTIONS.DEVICE.SET_VALUE,
             device_feature: 'my-device-feature',
-            value: 11,
+            parameters: {
+              value: 11,
+            },
           },
         ],
       ],
@@ -227,7 +241,9 @@ describe('scene.executeActions', () => {
             device: 'my-device',
             feature_category: 'light',
             feature_type: 'binary',
-            value: 1,
+            parameters: {
+              value: 1,
+            },
           },
         ],
       ],
@@ -283,6 +299,88 @@ describe('scene.executeActions', () => {
         },
       },
     });
+  });
+  it('should execute action device.setBrightness', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'brightness',
+      last_value: 40,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions({ stateManager, event, device }, [
+      [
+        {
+          type: ACTIONS.LIGHT.SET_BRIGHTNESS,
+          device_feature: 'my-device-feature',
+          devices: ['light-1'],
+          parameters: {
+            value: 40,
+          },
+        },
+      ],
+    ]);
+    assert.calledOnce(device.setValue);
+  });
+  it('should execute action device.fadeIn', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'fade-in',
+      last_value: 15,
+    });
+    const device = {
+      scenario: fake.resolves(null),
+    };
+    await executeActions({ stateManager, event, device }, [
+      [
+        {
+          type: ACTIONS.LIGHT.FADE_IN,
+          device_feature: 'my-device-feature',
+          devices: ['light-1'],
+          parameters: {
+            durationUnit: 'seconds',
+            durationValue: 10,
+          },
+        },
+      ],
+      [
+        {
+          type: ACTIONS.LIGHT.FADE_IN,
+          device_feature: 'my-device-feature',
+          devices: ['light-1'],
+          parameters: {
+            durationUnit: 'minutes',
+            durationValue: 10,
+          },
+        },
+      ],
+      [
+        {
+          type: ACTIONS.LIGHT.FADE_IN,
+          device_feature: 'my-device-feature',
+          devices: ['light-1'],
+          parameters: {
+            durationUnit: 'hours',
+            durationValue: 10,
+          },
+        },
+      ],
+      [
+        {
+          type: ACTIONS.LIGHT.FADE_IN,
+          device_feature: 'my-device-feature',
+          devices: ['light-1'],
+          parameters: {
+            durationUnit: 'fake',
+            durationValue: 10,
+          },
+        },
+      ],
+    ]);
+    assert.calledThrice(device.scenario);
   });
   it('should execute action user.setSeenAtHome', async () => {
     const stateManager = new StateManager(event);
@@ -532,7 +630,9 @@ describe('scene.executeActions', () => {
           {
             type: ACTIONS.MESSAGE.SEND,
             user: 'pepper',
-            text: 'Temperature in the living room is {{0.0.last_value}} °C.',
+            parameters: {
+              text: 'Temperature in the living room is {{0.0.last_value}} °C.',
+            },
           },
         ],
       ],
@@ -563,9 +663,11 @@ describe('scene.executeActions', () => {
         ],
         [
           {
+            parameters: {
+              text: 'hello',
+            },
             type: ACTIONS.MESSAGE.SEND,
             user: 'pepper',
-            text: 'hello',
           },
         ],
       ],

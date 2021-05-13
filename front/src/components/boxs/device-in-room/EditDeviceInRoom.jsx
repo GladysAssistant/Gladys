@@ -47,7 +47,7 @@ class EditDeviceInRoom extends Component {
             value: feature.selector,
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
-          // for now, we only supports binary on/off and sensors
+          // for now, we only supports binary on/off, brightness, colors and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             roomDeviceFeatures.push(featureOption);
           }

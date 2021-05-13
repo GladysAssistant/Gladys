@@ -9,6 +9,11 @@ const LIGHT_MODEL = 'philips-hue-light';
 
 const LIGHT_EXTERNAL_ID_BASE = 'philips-hue-light';
 
+const LIGHT_BRIGHTNESS = {
+  MIN: 1,
+  MAX: 254,
+};
+
 module.exports = {
   BRIDGE_MODEL,
   BRIDGE_EXTERNAL_ID_BASE,
@@ -17,6 +22,7 @@ module.exports = {
   BRIDGE_IP_ADDRESS,
   BRIDGE_USERNAME,
   BRIDGE_SERIAL_NUMBER,
+  LIGHT_BRIGHTNESS,
   LIGHT_MODEL,
   LIGHT_EXTERNAL_ID_BASE,
 };

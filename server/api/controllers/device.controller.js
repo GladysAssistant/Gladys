@@ -68,7 +68,7 @@ module.exports = function DeviceController(gladys) {
       device: req.params.device_selector,
       feature_category: req.params.feature_category,
       feature_type: req.params.feature_type,
-      value: req.body.value,
+      parameters: req.body.parameters,
       status: ACTIONS_STATUS.PENDING,
     };
     gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
@@ -84,7 +84,7 @@ module.exports = function DeviceController(gladys) {
     const action = {
       type: ACTIONS.DEVICE.SET_VALUE,
       device_feature: req.params.device_feature_selector,
-      value: req.body.value,
+      parameters: req.body.parameters,
       status: ACTIONS_STATUS.PENDING,
     };
     gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);

@@ -7,6 +7,7 @@ const { init } = require('./light.init');
 const { poll } = require('./light.poll');
 const { getLights } = require('./light.getLights');
 const { getScenes } = require('./light.getScenes');
+const { scenario } = require('./light.scenario');
 const { setValue } = require('./light.setValue');
 
 // we rate-limit the number of request per seconds to poll lights
@@ -47,6 +48,7 @@ PhilipsHueLightHandler.prototype.init = init;
 PhilipsHueLightHandler.prototype.poll = pollLimiter.wrap(poll);
 PhilipsHueLightHandler.prototype.getLights = getLights;
 PhilipsHueLightHandler.prototype.getScenes = getScenes;
+PhilipsHueLightHandler.prototype.scenario = scenario;
 PhilipsHueLightHandler.prototype.setValue = setValueLimiter.wrap(setValue);
 
 module.exports = PhilipsHueLightHandler;

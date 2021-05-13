@@ -885,11 +885,20 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "fadeInLights": {
+        "duration": "Durée",
+        "label": "Sélectionnez les lumières que vous souhaitez allumer progressivement",
+        "targetBrightness": "Intensité cible",
+        "inputPlaceholder": "Durée",
+        "seconds": "secondes",
+        "minutes": "minutes",
+        "hours": "heures"
+      },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -963,6 +972,7 @@
       },
       "delay": "Attendre",
       "light": {
+        "fade-in": "Allumer la lumière progressivement",
         "turn-on": "Allumer la lumière",
         "turn-off": "Eteindre les lumières"
       },
@@ -1427,7 +1437,8 @@
       "temperature": "Température éclairage",
       "power": "Puissance consommée éclairage",
       "effect-mode": "Effet",
-      "effect-speed": "Vitesse de l'effet"
+      "effect-speed": "Vitesse de l'effet",
+      "fade-in": "Allumage progressif"
     },
     "battery": {
       "shortCategoryName": "Batterie",

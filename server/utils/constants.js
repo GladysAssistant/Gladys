@@ -217,6 +217,8 @@ const ACTIONS = {
     GET_VALUE: 'device.get-value',
   },
   LIGHT: {
+    FADE_IN: 'light.fade-in',
+    SET_BRIGHTNESS: 'light.set-brightness',
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
   },
@@ -299,6 +301,7 @@ const DEVICE_FEATURE_TYPES = {
   LIGHT: {
     BINARY: 'binary',
     BRIGHTNESS: 'brightness',
+    FADE_IN: 'fade-in',
     HUE: 'hue',
     SATURATION: 'saturation',
     COLOR: 'color',
@@ -399,6 +402,11 @@ const DEVICE_POLL_FREQUENCIES = {
   EVERY_10_SECONDS: 10 * 1000,
   EVERY_2_SECONDS: 2 * 1000,
   EVERY_SECONDS: 1 * 1000,
+};
+
+const DIMMER_VALUES = {
+  MIN: 0,
+  MAX: 100,
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {
@@ -547,6 +555,7 @@ module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
+module.exports.DIMMER_VALUES = DIMMER_VALUES;
 
 module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 

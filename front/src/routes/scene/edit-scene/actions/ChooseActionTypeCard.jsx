@@ -6,6 +6,7 @@ import { Text, withText } from 'preact-i18n';
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
 const ACTION_LIST = [
+  ACTIONS.LIGHT.FADE_IN,
   ACTIONS.LIGHT.TURN_ON,
   ACTIONS.LIGHT.TURN_OFF,
   ACTIONS.SWITCH.TURN_ON,
