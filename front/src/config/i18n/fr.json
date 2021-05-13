@@ -1656,8 +1656,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
-    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks\">Plus d'informations.</a>",
+    "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau.",
+    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/plus/open-api\">Plus d'informations.</a>",
     "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
     "keyName": "Nom",
     "keyLastUsed": "Dernière utilisation",
