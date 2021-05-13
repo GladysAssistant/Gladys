@@ -91,6 +91,7 @@ const EditScenePage = ({ children, ...props }) => (
                   updateActionProperty={props.updateActionProperty}
                   highLightedActions={props.highLightedActions}
                   sceneParamsData={props.sceneParamsData}
+                  scene={props.scene}
                   index={index}
                   saving={props.saving}
                   actionsGroupsBefore={update(props.scene.actions, {

@@ -990,6 +990,10 @@
         "responseData": "Response",
         "tryButton": "Try request",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
+      },
+      "scene": {
+        "label": "Select a scene",
+        "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
       }
     },
     "actions": {
@@ -1716,8 +1720,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "The Open API allows you to send information to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "<a href=\"https://gladysassistant.com/en/docs/integrations/owntracks\">More information.</a>",
+    "description": "The Open API allows you to send information to Gladys outside of your network.",
+    "moreInformations": "<a href=\"https://gladysassistant.com/docs/plus/open-api\">More information.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",

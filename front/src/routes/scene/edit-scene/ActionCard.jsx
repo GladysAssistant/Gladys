@@ -12,6 +12,7 @@ import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
 import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
 import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
+import StartSceneParams from './actions/StartSceneParams';
 import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
@@ -34,7 +35,8 @@ const ACTION_ICON = {
   [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
   [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
-  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch'
+  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
+  [ACTIONS.SCENE.START]: 'fe fe-fast-forward'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -195,6 +197,17 @@ const ActionCard = ({ children, ...props }) => (
             index={props.index}
             updateActionProperty={props.updateActionProperty}
             setVariables={props.setVariables}
+          />
+        )}
+        {props.action.type === ACTIONS.SCENE.START && (
+          <StartSceneParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+            variables={props.variables}
+            setVariables={props.setVariables}
+            scene={props.scene}
           />
         )}
       </div>

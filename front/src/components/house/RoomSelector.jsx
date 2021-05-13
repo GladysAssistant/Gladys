@@ -1,23 +1,17 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import actions from '../../actions/house';
 
-@connect('houses', actions)
+@connect('httpClient', {})
 class RoomSelector extends Component {
   updateSelection = option => {
     this.props.updateRoomSelection(option.room);
   };
 
-  componentDidMount = () => {
-    this.props.getHouses();
-  };
-
-  componentWillReceiveProps = newProps => {
-    let selectedRoom;
-    let houseOptions = [];
-    if (newProps.houses) {
-      houseOptions = newProps.houses.map(house => {
+  refreshOptions = () => {
+    if (this.state.houses) {
+      let selectedRoom;
+      const houseOptions = this.state.houses.map(house => {
         return {
           label: house.name,
           options:
@@ -29,7 +23,7 @@ class RoomSelector extends Component {
                     room
                   };
 
-                  if (newProps.selectedRoom === room.selector) {
+                  if (this.props.selectedRoom === room.selector) {
                     selectedRoom = option;
                   }
 
@@ -38,10 +32,43 @@ class RoomSelector extends Component {
               : []
         };
       });
-    }
 
-    this.setState({ houseOptions, selectedRoom });
+      this.setState({ houseOptions, selectedRoom });
+    }
   };
+
+  getHouses = async () => {
+    try {
+      await this.setState({
+        pending: true
+      });
+      const params = {
+        expand: 'rooms',
+        order_dir: 'asc'
+      };
+      const houses = await this.props.httpClient.get(`/api/v1/house`, params);
+      houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+      await this.setState({
+        houses,
+        pending: false,
+        error: false
+      });
+      this.refreshOptions();
+    } catch (e) {
+      this.setState({
+        pending: false,
+        error: true
+      });
+    }
+  };
+
+  componentDidMount = () => {
+    this.getHouses();
+  };
+
+  componentWillReceiveProps() {
+    this.refreshOptions();
+  }
 
   render({}, { selectedRoom, houseOptions }) {
     return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} />;

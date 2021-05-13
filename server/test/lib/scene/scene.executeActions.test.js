@@ -637,4 +637,52 @@ describe('scene.executeActions', () => {
     await chaiAssert.isRejected(promise, AbortScene);
     clock.restore();
   });
+
+  it('should execute action scene.start', async () => {
+    const stateManager = new StateManager(event);
+
+    const execute = fake.resolves(undefined);
+
+    const scope = {
+      alreadyExecutedScenes: new Set(),
+    };
+
+    await executeActions(
+      { stateManager, event, execute },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.START,
+            scene: 'other_scene_selector',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(execute, 'other_scene_selector', scope);
+  });
+
+  it('should not execute action scene.start when the scene has already been called as part of this chain', async () => {
+    const stateManager = new StateManager(event);
+
+    const execute = fake.resolves(undefined);
+
+    const scope = {
+      alreadyExecutedScenes: new Set(['other_scene_selector']),
+    };
+
+    await executeActions(
+      { stateManager, event, execute },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.START,
+            scene: 'other_scene_selector',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(execute);
+  });
 });
