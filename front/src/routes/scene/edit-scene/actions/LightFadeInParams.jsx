@@ -38,7 +38,7 @@ class LightFadeInParams extends Component {
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   handleChange = selectedOptions => {
@@ -65,12 +65,12 @@ class LightFadeInParams extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOptions: [],
+      selectedOptions: []
     };
   }
   async componentDidMount() {
     this.getOptions();
-    if (!this.props.parameters){
+    if (!this.props.parameters) {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'parameters', {
         durationValue: 30,
         durationUnit: 'seconds',

@@ -663,9 +663,11 @@ describe('scene.executeActions', () => {
         ],
         [
           {
+            parameters: {
+              text: 'hello',
+            },
             type: ACTIONS.MESSAGE.SEND,
             user: 'pepper',
-            text: 'hello',
           },
         ],
       ],

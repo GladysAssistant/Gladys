@@ -1433,7 +1433,8 @@
       "temperature": "Température éclairage",
       "power": "Puissance consommée éclairage",
       "effect-mode": "Effet",
-      "effect-speed": "Vitesse de l'effet"
+      "effect-speed": "Vitesse de l'effet",
+      "fade-in": "Allumage progressif"
     },
     "battery": {
       "shortCategoryName": "Batterie",

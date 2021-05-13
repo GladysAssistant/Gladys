@@ -1433,7 +1433,8 @@
       "temperature": "Light Temperature",
       "power": "Light Power consumption",
       "effect-mode": "Effect mode",
-      "effect-speed": "Effect speed"
+      "effect-speed": "Effect speed",
+      "fade-in": "Fade in"
     },
     "battery": {
       "shortCategoryName": "Battery",
