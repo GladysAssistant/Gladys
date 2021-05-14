@@ -60,6 +60,29 @@
     "invalidEmail": "E-mail invalide",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
+  "authorize": {
+    "authorizeTitle": "{{client}} aimerait :",
+    "unknownClientTitle": "{{client}} n'est pas connu par Galdys et ne sera pas authorisé à récupérer vos données.",
+    "denyClientTitle": "Gladys a refusé la connexion avec {{client}}.",
+    "allowButtonText": "Autoriser",
+    "denyButtonText": "Refuser",
+    "grants": {
+      "user": "Accéder à profile de l'utilisateur"
+    },
+    "error": {
+      "invalid_request": "Erreur de protocole, tel qu’un paramètre obligatoire manquant.",
+      "unauthorized_client": "L’application cliente n’est pas autorisée à demander un code d’autorisation.",
+      "access_denied": "Le propriétaire de la ressource n’a pas accordé son consentement.",
+      "unsupported_response_type": "Le serveur d’autorisation ne prend pas en charge le type de réponse dans la demande.",
+      "invalid_scope": "Le périmètre demandé est invalide ou inconnu.",
+      "server_error": "Le serveur a rencontré une erreur inattendue.",
+      "temporarily_unavailable": "Le serveur est temporairement trop occupé pour traiter la demande.",
+      "invalid_client": "Échec d’authentification du client.",
+      "invalid_grant": "Le code d’autorisation ou le vérificateur du code PCKE n’est pas valide ou a expiré.",
+      "undefined": "Une erreur est survenue.",
+      "client_disabled": "Le client est désactivé."
+    }
+  },
   "signup": {
     "welcome": {
       "title": "Bienvenue dans Gladys 🙋",

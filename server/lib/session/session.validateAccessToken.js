@@ -18,7 +18,7 @@ function validateAccessToken(accessToken, scope) {
   });
 
   // we verify that the scope required to access this route is here
-  if (decoded.scope.includes(scope) === false) {
+  if (scope && decoded.scope.includes(scope) === false) {
     throw new Error401(`AuthMiddleware: Scope "${scope}" is not in list of authorized scope ${decoded.scope}`);
   }
 
